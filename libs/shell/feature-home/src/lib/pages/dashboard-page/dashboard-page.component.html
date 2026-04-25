@@ -1,0 +1,134 @@
+<div class="dashboard">
+
+  <!-- Encabezado -->
+  <div class="dashboard__header">
+    <h1 class="dashboard__title">Dashboard General</h1>
+    <p class="dashboard__subtitle">Monitoreo en tiempo real del sistema GastroSENA.</p>
+  </div>
+
+  <!-- KPIs -->
+  <div class="dashboard__kpis">
+    @for (kpi of dashboard.kpis(); track kpi.label) {
+      <div class="kpi-card kpi-card--{{ kpi.colorVariant }}">
+        <div class="kpi-card__header">
+          <div class="kpi-card__icon">
+            <lucide-icon [name]="kpi.icon" [size]="22" />
+          </div>
+          <span class="kpi-card__trend kpi-card__trend--{{ kpi.trendType }}">
+            {{ kpi.trend }}
+          </span>
+        </div>
+        <p class="kpi-card__label">{{ kpi.label }}</p>
+        <h3 class="kpi-card__value">{{ kpi.value }}</h3>
+      </div>
+    }
+  </div>
+
+  <!-- Sección media -->
+  <div class="dashboard__mid">
+
+    <!-- Alertas de stock -->
+    <section class="dashboard__card">
+      <div class="dashboard__card-header">
+        <h2 class="dashboard__card-title">Alertas de Stock Mínimo</h2>
+        <a class="dashboard__link" routerLink="/inventario/alertas">Ver todas</a>
+      </div>
+      <div class="alerts-list">
+        @for (alerta of dashboard.alertasStock(); track alerta.id) {
+          <div class="alert-item">
+            <div class="alert-item__info">
+              <span class="alert-item__name">{{ alerta.bien }}</span>
+              <span class="alert-item__qty alert-item__qty--{{ alerta.prioridad.toLowerCase() }}">
+                {{ alerta.cantidadActual }} / {{ alerta.cantidadMinima }} {{ alerta.unidad }}
+              </span>
+            </div>
+            <div class="progress">
+              <div
+                class="progress__fill progress__fill--alert"
+                [style.width.%]="dashboard.stockPorcentaje(alerta)"
+              ></div>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- Movimientos recientes -->
+    <section class="dashboard__card">
+      <div class="dashboard__card-header">
+        <h2 class="dashboard__card-title">Movimientos Recientes</h2>
+      </div>
+      <div class="movements-list">
+        @for (mov of dashboard.movimientos(); track mov.id) {
+          <div class="movement-item">
+            <div
+              class="movement-item__dot"
+              [ngClass]="{
+                'movement-item__dot--entry': mov.tipo === 'Entry',
+                'movement-item__dot--exit': mov.tipo === 'Exit'
+              }"
+            ></div>
+            <div class="movement-item__info">
+              <p class="movement-item__name">{{ mov.bien }}</p>
+              <p class="movement-item__meta">{{ mov.tipo === 'Entry' ? 'Entrada' : 'Salida' }} · {{ mov.responsable }}</p>
+            </div>
+            <div class="movement-item__right">
+              <p class="movement-item__date">{{ mov.fecha }}</p>
+              <p
+                class="movement-item__qty"
+                [ngClass]="{
+                  'movement-item__qty--entry': mov.tipo === 'Entry',
+                  'movement-item__qty--exit': mov.tipo === 'Exit'
+                }"
+              >
+                {{ mov.tipo === 'Entry' ? '+' : '-' }}{{ mov.cantidad }} {{ mov.unidad }}
+              </p>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Acceso rápido -->
+  <section class="dashboard__card">
+    <div class="dashboard__card-header">
+      <h2 class="dashboard__card-title">Acceso Rápido</h2>
+    </div>
+    <div class="quick-access">
+      @for (item of dashboard.accesoRapido; track item.label) {
+        <a class="quick-access__item" [routerLink]="item.ruta">
+          <lucide-icon [name]="item.icon" [size]="24" class="quick-access__icon" />
+          <span class="quick-access__label">{{ item.label }}</span>
+        </a>
+      }
+    </div>
+  </section>
+
+  <!-- Resumen presupuestal -->
+  <section class="dashboard__card">
+    <div class="dashboard__card-header">
+      <lucide-icon name="pie-chart" [size]="18" />
+      <h2 class="dashboard__card-title">Resumen Presupuestal</h2>
+    </div>
+    <div class="budget-list">
+      @for (item of dashboard.resumenPresupuestal; track item.label) {
+        <div class="budget-item">
+          <div class="budget-item__header">
+            <span class="budget-item__label">{{ item.label }}</span>
+            <span class="budget-item__value">{{ item.valor }}</span>
+          </div>
+          <div class="progress progress--thick">
+            <div
+              class="progress__fill progress__fill--{{ item.colorVariant }}"
+              [style.width.%]="item.porcentaje"
+            ></div>
+          </div>
+          <p class="budget-item__note">{{ item.nota }}</p>
+        </div>
+      }
+    </div>
+  </section>
+
+</div>
