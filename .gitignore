@@ -15,8 +15,14 @@ coverage/
 .env
 .env.*
 
-# Docs (guías de referencia, no van al repo)
+# Docs — solo se ignoran los md sueltos de referencia personal
+# Los md de proyecto sí se trackean (ver excepciones abajo)
 *.md
+!ARQUITECTURA.md
+!CONTRIBUTING.md
+!SETUP.md
+!libs/**/CLAUDE.md
+!.github/**/*.md
 
 # OS
 .DS_Store
