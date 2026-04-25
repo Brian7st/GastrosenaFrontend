@@ -1,57 +1,123 @@
 import { Injectable, signal, computed } from '@angular/core';
-import {
-  AlertaStock,
-  MovimientoReciente,
-  KpiCard,
-  AccesoRapido,
-  ItemPresupuestal,
-} from '../models/dashboard.models';
+import { KpiCard, ModuleCard, ActividadReciente } from '../models/dashboard.models';
 
 @Injectable({ providedIn: 'root' })
 export class DashboardService {
-  private readonly _alertasStock = signal<AlertaStock[]>([
-    { id: 1, bien: 'Aceite de Oliva', codigoInterno: 'SEN-001', cantidadActual: 2, cantidadMinima: 10, unidad: 'L', prioridad: 'Crítica' },
-    { id: 2, bien: 'Harina de Trigo', codigoInterno: 'SEN-002', cantidadActual: 5, cantidadMinima: 20, unidad: 'Kg', prioridad: 'Alta' },
-    { id: 3, bien: 'Leche Entera', codigoInterno: 'SEN-003', cantidadActual: 8, cantidadMinima: 15, unidad: 'L', prioridad: 'Alta' },
-    { id: 4, bien: 'Azúcar Refinada', codigoInterno: 'SEN-004', cantidadActual: 12, cantidadMinima: 25, unidad: 'Kg', prioridad: 'Media' },
-  ]);
-
-  private readonly _movimientos = signal<MovimientoReciente[]>([
-    { id: 1, bien: 'Pechuga de Pollo', tipo: 'Entry', responsable: 'Carlos M.', fecha: 'Hoy 09:15', cantidad: 50, unidad: 'Kg' },
-    { id: 2, bien: 'Aceite de Oliva', tipo: 'Exit', responsable: 'Ana R.', fecha: 'Hoy 08:40', cantidad: 3, unidad: 'L' },
-    { id: 3, bien: 'Queso Mozzarella', tipo: 'Entry', responsable: 'Luis P.', fecha: 'Ayer 16:30', cantidad: 10, unidad: 'Kg' },
-    { id: 4, bien: 'Harina de Trigo', tipo: 'Exit', responsable: 'María S.', fecha: 'Ayer 14:00', cantidad: 8, unidad: 'Kg' },
-    { id: 5, bien: 'Tomates', tipo: 'Entry', responsable: 'Carlos M.', fecha: 'Ayer 11:20', cantidad: 30, unidad: 'Kg' },
-  ]);
+  // TODO: reemplazar con facades de cada dominio
+  private readonly _pedidosActivos = signal(12);
+  private readonly _mesasOcupadas = signal(8);
+  private readonly _alertasStock = signal(4);
+  private readonly _facturasPendientes = signal(8);
 
   readonly kpis = computed<KpiCard[]>(() => [
-    { label: 'Total de Bienes', value: '1.284', trend: '+4.2%', trendType: 'positive', icon: 'package', colorVariant: 'primary' },
-    { label: 'Valor Total Inventario', value: '$87.450.000', trend: '+12%', trendType: 'positive', icon: 'circle-dollar-sign', colorVariant: 'secondary' },
-    { label: 'Productos Bajo Stock', value: String(this._alertasStock().length), trend: '+8 hoy', trendType: 'alert', icon: 'triangle-alert', colorVariant: 'alert' },
-    { label: 'Facturas Pendientes', value: '8', trend: '-2 sem', trendType: 'neutral', icon: 'receipt', colorVariant: 'muted' },
+    {
+      label: 'Pedidos Activos',
+      value: String(this._pedidosActivos()),
+      trend: '+3 última hora',
+      trendType: 'info' as never,
+      icon: 'utensils',
+    },
+    {
+      label: 'Mesas Ocupadas',
+      value: `${this._mesasOcupadas()} / 12`,
+      trend: '67% ocupación',
+      trendType: 'positive',
+      icon: 'layout-grid',
+    },
+    {
+      label: 'Alertas de Stock',
+      value: String(this._alertasStock()),
+      trend: 'Requieren atención',
+      trendType: 'alert',
+      icon: 'triangle-alert',
+    },
+    {
+      label: 'Facturas Pendientes',
+      value: String(this._facturasPendientes()),
+      trend: 'Por procesar',
+      trendType: 'neutral',
+      icon: 'receipt',
+    },
   ]);
 
-  readonly alertasStock = this._alertasStock.asReadonly();
-  readonly movimientos = this._movimientos.asReadonly();
-
-  readonly accesoRapido: AccesoRapido[] = [
-    { label: 'Gestión de Bienes', icon: 'package', ruta: '/inventario/bienes' },
-    { label: 'Facturas Electrónicas', icon: 'receipt', ruta: '/facturacion' },
-    { label: 'GIL-F-014', icon: 'file-text', ruta: '/abastecimiento/gil' },
-    { label: 'Consolidado Presupuestal', icon: 'file-stack', ruta: '/presupuesto/consolidado' },
-    { label: 'Requisiciones', icon: 'arrow-left-right', ruta: '/requisiciones' },
-    { label: 'Alertas de Stock', icon: 'bell', ruta: '/inventario/alertas' },
-    { label: 'Presupuesto', icon: 'wallet', ruta: '/presupuesto' },
-    { label: 'Conciliación', icon: 'scale', ruta: '/inventario/conciliacion' },
+  readonly modulos: ModuleCard[] = [
+    {
+      label: 'Cocina',
+      description: 'Pedidos, recetas y tiempos',
+      icon: 'chef-hat',
+      ruta: '/cocina',
+    },
+    {
+      label: 'Bar',
+      description: 'Bebidas y barismo',
+      icon: 'wine',
+      ruta: '/bar',
+    },
+    {
+      label: 'Restaurante',
+      description: 'Mesas, pedidos y comandas',
+      icon: 'utensils',
+      ruta: '/restaurante',
+    },
+    {
+      label: 'Inventario',
+      description: 'Bienes, stock y conciliación',
+      icon: 'package',
+      ruta: '/inventario',
+      badgeCount: 4,
+      badgeType: 'alert',
+    },
+    {
+      label: 'Abastecimiento',
+      description: 'GIL-F-014 y consolidados',
+      icon: 'truck',
+      ruta: '/abastecimiento',
+    },
+    {
+      label: 'Facturación',
+      description: 'FEL, CUFE y facturas',
+      icon: 'file-text',
+      ruta: '/facturacion',
+      badgeCount: 8,
+      badgeType: 'info',
+    },
+    {
+      label: 'Presupuesto',
+      description: 'Techos y ejecución ZESE',
+      icon: 'wallet',
+      ruta: '/presupuesto',
+    },
+    {
+      label: 'Requisiciones',
+      description: 'Solicitudes y actas',
+      icon: 'clipboard-list',
+      ruta: '/requisiciones',
+    },
+    {
+      label: 'Reportes',
+      description: 'Exportables PDF y Excel',
+      icon: 'bar-chart-2',
+      ruta: '/reportes',
+    },
+    {
+      label: 'Usuarios',
+      description: 'Roles y permisos',
+      icon: 'users',
+      ruta: '/usuarios',
+    },
+    {
+      label: 'Notificaciones',
+      description: 'Alertas en tiempo real',
+      icon: 'bell',
+      ruta: '/notificaciones',
+    },
   ];
 
-  readonly resumenPresupuestal: ItemPresupuestal[] = [
-    { label: 'Presupuesto Utilizado', valor: '$52.400.000 / $80M', porcentaje: 65.5, nota: 'Equivalente al 65.5% del total anual asignado.', colorVariant: 'primary' },
-    { label: 'Compras Programadas', valor: '$12.150.000', porcentaje: 45, nota: 'Adquisiciones aprobadas para el Q4.', colorVariant: 'secondary' },
-    { label: 'Reserva de Emergencia', valor: '$4.500.000 disponible', porcentaje: 15, nota: 'Fondos retenidos para contingencias críticas.', colorVariant: 'alert' },
+  readonly actividadReciente: ActividadReciente[] = [
+    { id: 1, modulo: 'Cocina', descripcion: 'Pedido #042 marcado como listo', usuario: 'Chef Ramírez', hace: 'hace 2 min', tipo: 'info' },
+    { id: 2, modulo: 'Inventario', descripcion: 'Stock crítico: Aceite de Oliva', usuario: 'Sistema', hace: 'hace 5 min', tipo: 'alert' },
+    { id: 3, modulo: 'Restaurante', descripcion: 'Mesa 7 asignada', usuario: 'Mesero López', hace: 'hace 8 min', tipo: 'entry' },
+    { id: 4, modulo: 'Facturación', descripcion: 'Factura #F-2024-089 registrada', usuario: 'Contadora', hace: 'hace 15 min', tipo: 'info' },
+    { id: 5, modulo: 'Bar', descripcion: 'Pedido #041 entregado', usuario: 'Bartender Ruiz', hace: 'hace 20 min', tipo: 'exit' },
   ];
-
-  stockPorcentaje(alerta: AlertaStock): number {
-    return Math.min((alerta.cantidadActual / alerta.cantidadMinima) * 100, 100);
-  }
 }

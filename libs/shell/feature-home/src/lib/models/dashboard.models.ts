@@ -4,39 +4,22 @@ export interface KpiCard {
   trend: string;
   trendType: 'positive' | 'negative' | 'neutral' | 'alert';
   icon: string;
-  colorVariant: 'primary' | 'secondary' | 'alert' | 'muted';
 }
 
-export interface AlertaStock {
-  id: number;
-  bien: string;
-  codigoInterno: string;
-  cantidadActual: number;
-  cantidadMinima: number;
-  unidad: string;
-  prioridad: 'Crítica' | 'Alta' | 'Media';
-}
-
-export interface MovimientoReciente {
-  id: number;
-  bien: string;
-  tipo: 'Entry' | 'Exit';
-  responsable: string;
-  fecha: string;
-  cantidad: number;
-  unidad: string;
-}
-
-export interface AccesoRapido {
+export interface ModuleCard {
   label: string;
+  description: string;
   icon: string;
   ruta: string;
+  badgeCount?: number;
+  badgeType?: 'alert' | 'info' | 'success';
 }
 
-export interface ItemPresupuestal {
-  label: string;
-  valor: string;
-  porcentaje: number;
-  nota: string;
-  colorVariant: 'primary' | 'secondary' | 'alert';
+export interface ActividadReciente {
+  id: number;
+  modulo: string;
+  descripcion: string;
+  usuario: string;
+  hace: string;
+  tipo: 'entry' | 'exit' | 'alert' | 'info';
 }

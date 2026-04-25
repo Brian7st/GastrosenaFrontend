@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { DecimalPipe, NgClass } from '@angular/common';
 import { LucideAngularModule } from '@lucide/angular';
 import { DashboardService } from '../../data-access/dashboard.service';
 
@@ -8,7 +7,7 @@ import { DashboardService } from '../../data-access/dashboard.service';
   selector: 'app-dashboard-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, DecimalPipe, NgClass, LucideAngularModule],
+  imports: [RouterLink, LucideAngularModule],
   templateUrl: './dashboard-page.component.html',
   styleUrl: './dashboard-page.component.scss',
 })
