@@ -1,0 +1,11 @@
+﻿{
+    "name":  "feature-inventario",
+    "$schema":  "../../../node_modules/nx/schemas/project-schema.json",
+    "projectType":  "library",
+    "sourceRoot":  "libs/inventario/feature-inventario/src",
+    "tags":  [
+                 "scope:inventario",
+                 "type:feature"
+             ]
+}
+
