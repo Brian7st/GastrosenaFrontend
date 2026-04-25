@@ -9,6 +9,10 @@ Monorepo Angular 20 + Nx para el sistema de gestión del restaurante SENA (23 de
 | [Setup y desarrollo](docs/setup.md) | Cómo instalar, correr y crear features |
 | [Arquitectura](docs/arquitectura.md) | Estructura, reglas de dependencia, Git workflow, design tokens |
 | [Requisitos funcionales](docs/requisitos.md) | RFs por módulo con roles y prioridades |
+| [Contributing](docs/contributing.md) | Reglas que firma cada dev antes del primer commit |
+| [Bases globales monorepo](docs/bases-globales-monorepo.md) | Fundamentos del monorepo |
+| [Migración inventario](docs/inventario-migracion-monorepo.md) | Notas de migración del módulo inventario |
+| [Clasificación componentes inventario](docs/clasificacion-componentes-inventario.md) | Taxonomía de componentes |
 
 ## Gobernanza de IA
 
