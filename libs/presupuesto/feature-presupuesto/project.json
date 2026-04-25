@@ -1,11 +1,7 @@
-﻿{
-    "name":  "feature-presupuesto",
-    "$schema":  "../../../node_modules/nx/schemas/project-schema.json",
-    "projectType":  "library",
-    "sourceRoot":  "libs/presupuesto/feature-presupuesto/src",
-    "tags":  [
-                 "scope:presupuesto",
-                 "type:feature"
-             ]
+{
+  "name": "feature-presupuesto",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/presupuesto/feature-presupuesto/src",
+  "tags": ["scope:presupuesto", "type:feature"]
 }
-

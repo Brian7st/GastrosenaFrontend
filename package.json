@@ -8,7 +8,8 @@
     "lint": "nx affected:lint --base=develop",
     "test": "nx affected:test --base=develop",
     "graph": "nx graph",
-    "format": "nx format:write"
+    "format": "nx format:write",
+    "prepare": "husky"
   },
   "dependencies": {
     "@angular/common": "^20.3.19",

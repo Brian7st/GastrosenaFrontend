@@ -1,0 +1,24 @@
+#!/bin/sh
+
+commit_msg=$(cat "$1")
+pattern="^(feat|fix|chore|refactor|test|docs)(\([a-z/]+\))?!?: .{3,}"
+
+if ! echo "$commit_msg" | grep -qE "$pattern"; then
+  echo ""
+  echo "❌ Formato de commit inválido."
+  echo ""
+  echo "   Formato requerido:"
+  echo "   {tipo}({scope}): {descripción}"
+  echo ""
+  echo "   Ejemplos válidos:"
+  echo "   feat(cocina): add recipe card component"
+  echo "   fix(shared/ui): correct table pagination"
+  echo "   chore(inventario): add stock model"
+  echo ""
+  echo "   Tipos válidos: feat | fix | chore | refactor | test | docs"
+  echo "   Tu commit: '$commit_msg'"
+  echo ""
+  exit 1
+fi
+
+echo "✅ Formato de commit correcto."

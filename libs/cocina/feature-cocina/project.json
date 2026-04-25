@@ -1,11 +1,7 @@
-﻿{
-    "name":  "feature-cocina",
-    "$schema":  "../../../node_modules/nx/schemas/project-schema.json",
-    "projectType":  "library",
-    "sourceRoot":  "libs/cocina/feature-cocina/src",
-    "tags":  [
-                 "scope:cocina",
-                 "type:feature"
-             ]
+{
+  "name": "feature-cocina",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/cocina/feature-cocina/src",
+  "tags": ["scope:cocina", "type:feature"]
 }
-

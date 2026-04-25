@@ -21,8 +21,11 @@ coverage/
 !ARQUITECTURA.md
 !CONTRIBUTING.md
 !SETUP.md
+!AGENTS.md
+!CLAUDE.md
 !libs/**/CLAUDE.md
 !.github/**/*.md
+!.ai/**/*.md
 
 # OS
 .DS_Store

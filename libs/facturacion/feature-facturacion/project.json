@@ -1,11 +1,7 @@
-﻿{
-    "name":  "feature-facturacion",
-    "$schema":  "../../../node_modules/nx/schemas/project-schema.json",
-    "projectType":  "library",
-    "sourceRoot":  "libs/facturacion/feature-facturacion/src",
-    "tags":  [
-                 "scope:facturacion",
-                 "type:feature"
-             ]
+{
+  "name": "feature-facturacion",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/facturacion/feature-facturacion/src",
+  "tags": ["scope:facturacion", "type:feature"]
 }
-

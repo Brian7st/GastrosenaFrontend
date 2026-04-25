@@ -1,0 +1,16 @@
+#!/bin/sh
+
+echo "🔍 Verificando module boundaries y calidad..."
+npx nx affected:lint --base=develop
+
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "❌ Lint falló. Revisá los errores antes de commitear."
+  echo "   Posibles causas:"
+  echo "   - Importás desde un dominio que no es el tuyo"
+  echo "   - Usás 'any' en TypeScript"
+  echo "   - Violación de module boundaries"
+  exit 1
+fi
+
+echo "✅ Lint pasado."
