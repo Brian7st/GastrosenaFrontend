@@ -1,0 +1,64 @@
+<!-- Modal Overlay -->
+<div class="modal-overlay">
+  <!-- Modal Container -->
+  <div class="modal-container modal-container--export">
+      
+      <!-- Modal Header -->
+      <div class="modal-header">
+          <div class="modal-title-row">
+              <div class="icon-circle icon-circle--success">
+                  <lucide-icon name="share" class="icon--primary"></lucide-icon>
+              </div>
+              <h2 class="modal-title">Exportar Reporte para Contabilidad</h2>
+          </div>
+          <p class="modal-subtitle">Seleccione el formato de salida deseado para este consolidado</p>
+      </div>
+
+      <!-- Content: Format Selection -->
+      <div class="modal-content">
+          <div class="format-grid">
+              <!-- Option 1: Excel -->
+              <button class="format-option format-option--excel">
+                  <div class="format-icon-bg">
+                      <lucide-icon name="table" class="icon--primary" [size]="40"></lucide-icon>
+                  </div>
+                  <h3 class="format-title">Detallado Excel</h3>
+                  <p class="format-desc">
+                      Ideal para análisis profundo, tablas dinámicas y conciliación de partidas presupuestales.
+                  </p>
+                  <div class="format-check">
+                      <lucide-icon name="check-circle" class="icon--primary"></lucide-icon>
+                  </div>
+              </button>
+
+              <!-- Option 2: PDF -->
+              <button class="format-option format-option--pdf">
+                  <div class="format-icon-bg">
+                      <lucide-icon name="file-text" class="icon--danger" [size]="40"></lucide-icon>
+                  </div>
+                  <h3 class="format-title">Resumen PDF Contable</h3>
+                  <p class="format-desc">
+                      Documento formal listo para firma digital y presentación de informes mensuales ante contabilidad.
+                  </p>
+                  <div class="format-check">
+                      <lucide-icon name="check-circle" class="icon--danger"></lucide-icon>
+                  </div>
+              </button>
+          </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+          <button (click)="closeModal()" class="btn btn--outline">
+              Cerrar
+          </button>
+          <button class="btn btn--primary">
+              <lucide-icon name="download" [size]="16"></lucide-icon>
+              Iniciar Descarga
+          </button>
+      </div>
+      
+      <!-- Branding Accent -->
+      <div class="modal-accent modal-accent--gradient"></div>
+  </div>
+</div>

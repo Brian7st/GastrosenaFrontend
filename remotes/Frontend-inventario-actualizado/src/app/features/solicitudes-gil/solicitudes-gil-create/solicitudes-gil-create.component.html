@@ -1,0 +1,187 @@
+<!-- Back button -->
+<div class="back-bar">
+  <a routerLink="/solicitudes-gil" class="back-link">
+    <lucide-icon name="arrow-left" [size]="16"></lucide-icon>
+    Volver a Solicitudes GIL
+  </a>
+</div>
+
+<!-- Page Header -->
+<div class="form-header">
+  <h1 class="form-title">Nueva Solicitud GIL-F-014</h1>
+  <p class="form-subtitle">Complete la información requerida para el registro y movimiento de bienes institucionales.</p>
+</div>
+
+<!-- Main Form Card -->
+<div class="form-card">
+  <div class="form-grid">
+    <!-- Column 1 -->
+    <div class="form-column">
+      <div class="field">
+        <label class="field__label">CÓDIGO DE SOLICITUD</label>
+        <div class="field__readonly">
+          <span>GIL-F-014-2024-XXX</span>
+          <lucide-icon name="shield-check" [size]="16" class="field__lock"></lucide-icon>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field__label">REGIONAL</label>
+        <select class="field__select">
+          <option>Seleccione Regional</option>
+          <option selected>Distrito Capital</option>
+          <option>Antioquia</option>
+          <option>Valle del Cauca</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field__label">CUENTADANTE</label>
+        <select class="field__select">
+          <option>Seleccione Cuentadante</option>
+          <option selected>Carlos Mario Estrada</option>
+          <option>Jorge Eduardo Londoño</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field__label">GRUPO/FICHA</label>
+        <select class="field__select">
+          <option>Seleccione Ficha</option>
+          <option selected>2471532 - ADSO</option>
+          <option>2500124 - Gastronomía</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field__label">FECHA DE SOLICITUD</label>
+        <input type="date" class="field__input" value="2024-05-20">
+      </div>
+    </div>
+
+    <!-- Column 2 -->
+    <div class="form-column">
+      <div class="field">
+        <label class="field__label">FECHA REQUERIDA</label>
+        <input type="date" class="field__input">
+      </div>
+      <div class="field">
+        <label class="field__label">ÁREA</label>
+        <select class="field__select">
+          <option>Seleccione Área</option>
+          <option selected>Tecnología y Logística</option>
+          <option>Centro de Comercio y Servicios</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field__label">CENTRO DE COSTOS</label>
+        <select class="field__select">
+          <option>Seleccione Centro de Costo</option>
+          <option selected>CC-9201-450 - Bogotá</option>
+          <option>CC-1102-120 - Medellín</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field__label">DESTINO DE BIENES</label>
+        <select class="field__select">
+          <option>Seleccione Destino</option>
+          <option selected>Laboratorio 402 - Computo Avanzado</option>
+          <option>Aula 101 - Gastronomía</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field__label">SOLICITANTE</label>
+        <select class="field__select">
+          <option>Nombre del instructor solicitante</option>
+          <option selected>Ing. Ricardo Sarmiento</option>
+          <option>Lic. Martha Lucía Peña</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Trazabilidad Académica -->
+<div class="form-card form-card--academic">
+  <h3 class="section-title">
+    <lucide-icon name="graduation-cap" [size]="20" class="section-title__icon"></lucide-icon>
+    Trazabilidad Académica <span class="required">*</span>
+  </h3>
+  <div class="form-grid">
+    <div class="form-column">
+      <div class="field">
+        <label class="field__label">VOCERO DE APRENDICES (NOMBRE COMPLETO)</label>
+        <input type="text" class="field__input" placeholder="Ingrese nombre completo">
+      </div>
+      <div class="field">
+        <label class="field__label">CÉDULA DEL VOCERO</label>
+        <input type="text" class="field__input" placeholder="Ingrese número de documento">
+      </div>
+    </div>
+    <div class="form-column">
+      <div class="field">
+        <label class="field__label">RESULTADO DE APRENDIZAJE (RA)</label>
+        <textarea class="field__textarea" rows="2" placeholder="Especifique el resultado de aprendizaje asociado"></textarea>
+      </div>
+      <div class="field">
+        <label class="field__label">FRANJA HORARIA</label>
+        <input type="time" class="field__input">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Facturas Electrónicas Disponibles -->
+<div class="fel-section">
+  <div class="fel-header">
+    <h3 class="section-title section-title--no-icon">Facturas Electrónicas (FEL) Validadas Disponibles</h3>
+    <button class="link-btn">
+      <lucide-icon name="plus" [size]="16"></lucide-icon>
+      Ver histórico completo
+    </button>
+  </div>
+  <div class="fel-grid">
+    @for (f of facturasDisponibles(); track f.codigo; let i = $index) {
+      <div class="fel-card" [class.fel-card--selected]="f.seleccionada" [class.fel-card--inactive]="!f.seleccionada" (click)="selectFactura(i)">
+        <div class="fel-card__header">
+          <div class="fel-card__info">
+            <div class="fel-card__check" [class.fel-card__check--active]="f.seleccionada">
+              @if (f.seleccionada) {
+                <lucide-icon name="check-circle" [size]="16"></lucide-icon>
+              }
+            </div>
+            <div>
+              <h4 class="fel-card__code">{{ f.codigo }}</h4>
+              <p class="fel-card__area">{{ f.area }} - {{ f.responsable }}</p>
+            </div>
+          </div>
+          <div class="fel-card__amounts">
+            <span class="fel-card__items">{{ f.cantidadItems }} items</span>
+            <span class="fel-card__price">{{ formatCurrency(f.monto) }}</span>
+          </div>
+        </div>
+        <div class="fel-card__body">
+          <ul>
+            @for (item of f.items; track item) {
+              <li>
+                <lucide-icon name="chevron-right" [size]="14"></lucide-icon>
+                {{ item }}
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Observaciones -->
+<div class="form-card">
+  <label class="field__label">OBSERVACIONES</label>
+  <textarea class="field__textarea field__textarea--lg" rows="4" placeholder="Ingrese detalles adicionales de la solicitud, justificación técnica o notas de despacho..."></textarea>
+</div>
+
+<!-- Action Buttons -->
+<div class="form-actions">
+  <a routerLink="/solicitudes-gil" class="btn btn--ghost">Cancelar</a>
+  <button class="btn btn--primary">
+    <lucide-icon name="save" [size]="18"></lucide-icon>
+    Crear Solicitud
+  </button>
+</div>

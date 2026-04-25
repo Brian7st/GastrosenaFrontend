@@ -1,0 +1,123 @@
+<!-- Breadcrumb -->
+<div class="breadcrumb">
+  <a routerLink="/facturas" class="breadcrumb__link">Anulaciones</a>
+  <span class="breadcrumb__separator">
+    <lucide-icon name="chevron-right" [size]="14"></lucide-icon>
+  </span>
+  <span class="breadcrumb__current">Confirmar Anulación</span>
+</div>
+
+<!-- Header -->
+<div class="anular-header">
+  <h1 class="anular-header__title">Confirmar Anulación de Factura</h1>
+  <p class="anular-header__subtitle">Esta acción es irreversible y notificará a la administración tributaria de inmediato.</p>
+</div>
+
+<div class="anular-grid">
+  <!-- Left Column -->
+  <div class="anular-form-col">
+    <!-- Main Card -->
+    <div class="form-card">
+      <div class="form-card__header">
+        <div class="alert-icon">
+          <lucide-icon name="alert-triangle" [size]="24"></lucide-icon>
+        </div>
+        <div>
+          <h2 class="form-card__title">Declaración de Anulación</h2>
+          <p class="form-card__desc">Por favor, proporcione una justificación detallada para anular este documento tributario electrónico.</p>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>MOTIVO DE LA ANULACIÓN <span class="required">*</span></label>
+        <textarea 
+          placeholder="Ej: Error en el precio unitario del producto SKU-902, se procederá a emitir una nota de crédito..."
+          [(ngModel)]="motivo"
+          rows="4"
+        ></textarea>
+        <div class="form-hint">
+          <lucide-icon name="info" [size]="14"></lucide-icon>
+          Mínimo 20 caracteres requeridos para validación de auditoría.
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button 
+          class="btn btn--danger" 
+          [class.btn--disabled]="!isMotivoValid()"
+          [disabled]="!isMotivoValid()"
+          (click)="confirmar()">
+          <lucide-icon name="check-circle" [size]="20"></lucide-icon>
+          Confirmar Anulación
+        </button>
+        <a routerLink="/facturas" class="btn btn--neutral">
+          <lucide-icon name="x" [size]="20"></lucide-icon>
+          Cancelar Trámite
+        </a>
+      </div>
+    </div>
+
+    <!-- Recommendation Card -->
+    <div class="recommendation-card">
+      <div class="recommendation-card__icon">
+        <lucide-icon name="lightbulb" [size]="20"></lucide-icon>
+      </div>
+      <div>
+        <h4>Recomendación FEL</h4>
+        <p>Si el error es parcial, considere emitir una <a href="#">Nota de Crédito</a> en lugar de anular el documento completo para mantener la integridad de su correlativo.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column -->
+  <div class="anular-summary-col">
+    <!-- Summary Card -->
+    <div class="summary-card">
+      <h3 class="summary-card__title">RESUMEN DEL DOCUMENTO</h3>
+      
+      <div class="summary-list">
+        <div class="summary-item">
+          <span class="summary-item__label">Número de Factura</span>
+          <span class="summary-item__value summary-item__value--bold">{{ factura.numero }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-item__label">Fecha de Emisión</span>
+          <span class="summary-item__value">{{ factura.fecha }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-item__label">Cliente</span>
+          <span class="summary-item__value summary-item__value--bold">{{ factura.cliente }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-item__label">NIT Cliente</span>
+          <span class="summary-item__value">{{ factura.nit }}</span>
+        </div>
+      </div>
+
+      <div class="summary-total">
+        <span class="summary-total__label">Monto Total</span>
+        <span class="summary-total__value">Q {{ formatCurrency(factura.monto).replace('$', '') }}</span>
+      </div>
+
+      <!-- History sub-card inside summary -->
+      <div class="history-box">
+        <div class="history-box__header">
+          <lucide-icon name="history" [size]="16"></lucide-icon>
+          HISTORIAL RECIENTE
+        </div>
+        <ul class="history-list">
+          <li>Emitida por <strong>M. Arreaga</strong> el 24/10 a las 09:12 AM</li>
+          <li>Correo de envío entregado con éxito al cliente.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Certificate Banner -->
+    <div class="cert-banner">
+      <div class="cert-banner__icon">
+        <lucide-icon name="shield-check" [size]="24"></lucide-icon>
+      </div>
+      <p>Toda anulación es firmada digitalmente con su certificado G-FEL vigente. IP: 190.148.1.42</p>
+    </div>
+  </div>
+</div>

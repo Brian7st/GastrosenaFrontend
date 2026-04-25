@@ -1,0 +1,46 @@
+.resumen-container {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.resumen-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow-card);
+}
+
+.icon {
+  font-size: var(--font-size-2xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Alineamos los colores de los iconos con las nuevas variables */
+.icon-blue { color: var(--color-primary); }
+.icon-green { color: var(--color-abierto); }
+.icon-orange { color: var(--color-preparacion); }
+.icon-purple { color: var(--color-text-secondary); }
+
+.data {
+  h3 {
+    margin: 0;
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  p {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+  }
+}

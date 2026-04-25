@@ -1,0 +1,137 @@
+<div class="registrar-pago-container">
+  <header class="header-section">
+    <button class="btn-volver" (click)="volver()"> ← Volver </button>
+    <h1>Registrar Pago</h1>
+  </header>
+
+  <section class="form-block">
+    <div class="block-header">
+      <div class="title-left">
+        <i class="icon">📋</i>
+        <div class="title-group">
+          <h5>Mesas Listas para Pago</h5>
+          <span class="subtitle">Selecciona una mesa para procesar el pago</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mesas-list">
+      <div class="mesa-card shadow-sm">
+        <div class="mesa-info" (click)="verDetalle()">
+          <div class="icon-container purple-bg">
+            <i class="pi pi-credit-card">💳</i>
+          </div>
+          <div class="details">
+            <span class="mesa-name">{{ mesaSeleccionada.nombre }}</span>
+            <span class="mesa-meta">Mesero: {{ mesaSeleccionada.mesero }} • {{ mesaSeleccionada.productos.length }} ítems</span>
+            <span class="mesa-time">{{ mesaSeleccionada.hora }}</span>
+          </div>
+        </div>
+
+        <div class="mesa-actions">
+          <span class="mesa-price">${{ mesaSeleccionada.total | number }}</span>
+          <button class="btn-procesar" (click)="abrirCobro()">Procesar Pago</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  @if (mostrarModalDetalle) {
+    <div class="modal-overlay">
+      <div class="modal-card detail-modal">
+        <header class="modal-header blue-bg">
+          <h5>Detalle de Factura</h5>
+          <button class="close-x" (click)="cerrarModales()">×</button>
+        </header>
+        <div class="modal-body">
+          <div class="invoice-id text-center">
+            <small>ID FACTURA</small>
+            <h3>{{ mesaSeleccionada.id }}</h3>
+          </div>
+          <div class="info-grid-simple">
+            <div><span>Cliente:</span> <strong>{{ mesaSeleccionada.cliente }}</strong></div>
+            <div><span>Mesa:</span> <strong>{{ mesaSeleccionada.nombre }}</strong></div>
+            <div><span>Mesero:</span> <strong>{{ mesaSeleccionada.mesero }}</strong></div>
+            <div><span>Fecha:</span> <strong>05/04/2026</strong></div>
+          </div>
+          <div class="products-list">
+            <h6>Productos / Consumo</h6>
+            @for (item of mesaSeleccionada.productos; track item) {
+              <div class="product-item">
+                <span>{{ item.nombre }} x{{ item.cantidad }}</span>
+                <span>${{ item.precio | number }}</span>
+              </div>
+            }
+          </div>
+          <div class="divider"></div>
+          <div class="billing-rows">
+            <div class="row"><span>Subtotal:</span> <span>${{ mesaSeleccionada.subtotal | number }}</span></div>
+            <div class="row"><span>IVA (19%):</span> <span>${{ mesaSeleccionada.iva | number }}</span></div>
+            <div class="row total"><span>TOTAL:</span> <strong>${{ mesaSeleccionada.total | number }}</strong></div>
+          </div>
+        </div>
+        <footer class="modal-footer">
+          <button class="btn-outline" (click)="cerrarModales()">Cerrar</button>
+          <button class="btn-success" (click)="abrirCobro()">💳 Registrar Pago</button>
+        </footer>
+      </div>
+    </div>
+  }
+
+  @if (mostrarModalCobro) {
+    <div class="modal-overlay">
+      <div class="modal-card payment-modal">
+        <header class="modal-header blue-bg">
+          <h5>Procesar Pago</h5>
+          <button class="close-x" (click)="cerrarModales()">×</button>
+        </header>
+        <div class="modal-body text-center">
+          <p class="total-label">TOTAL A COBRAR</p>
+          <h2 class="total-amount">${{ mesaSeleccionada.total | number }}</h2>
+          <p class="invoice-sub">Factura: {{ mesaSeleccionada.id }}</p>
+          <div class="payment-methods">
+            <p>Seleccionar Método de Pago</p>
+            <div class="methods-grid">
+              <div class="method-option"
+                [class.active]="metodoSeleccionado === 'Efectivo'"
+                (click)="seleccionarMetodo('Efectivo')">
+                <i>💵</i> <span>Efectivo</span>
+              </div>
+              <div class="method-option"
+                [class.active]="metodoSeleccionado === 'Tarjeta'"
+                (click)="seleccionarMetodo('Tarjeta')">
+                <i>💳</i> <span>Tarjeta</span>
+              </div>
+              <div class="method-option"
+                [class.active]="metodoSeleccionado === 'Transferencia'"
+                (click)="seleccionarMetodo('Transferencia')">
+                <i>📱</i> <span>Transferencia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <footer class="modal-footer">
+          <button class="btn-outline" (click)="cerrarModales()">Cancelar</button>
+          <button class="btn-success" (click)="confirmarPago()">✓ Confirmar ({{metodoSeleccionado}})</button>
+        </footer>
+      </div>
+    </div>
+  }
+
+  @if (mostrarModalExito) {
+    <div class="modal-overlay">
+      <div class="modal-card success-modal text-center">
+        <div class="modal-body">
+          <div class="success-icon">✔️</div>
+          <h2>¡Pago Exitoso!</h2>
+          <p>El pago de la <strong>{{ mesaSeleccionada.nombre }}</strong> se ha registrado correctamente mediante <strong>{{ metodoSeleccionado }}</strong>.</p>
+          <div class="success-details">
+            <span>Total Pagado:</span>
+            <span class="amount">${{ mesaSeleccionada.total | number }}</span>
+          </div>
+          <button class="btn-finalizar" (click)="finalizarTodo()">Entendido</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

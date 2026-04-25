@@ -1,0 +1,17 @@
+<section class="section" id="recetas">
+  <div class="container">
+    <restaurant-section-title
+      title="Recetas Tradicionales"
+      subtitle="La cocina colombiana en sus mejores expresiones, preparada por nuestros aprendices."
+    />
+    <div class="items-grid">
+      @for (item of items(); track item.id) {
+        <restaurant-card
+          [title]="item.title"
+          [subtitle]="item.description"
+          [imageUrl]="item.imageUrl ?? ''"
+        />
+      }
+    </div>
+  </div>
+</section>

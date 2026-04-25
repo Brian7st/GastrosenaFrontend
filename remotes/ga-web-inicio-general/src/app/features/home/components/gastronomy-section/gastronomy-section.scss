@@ -1,0 +1,8 @@
+.section { padding: 96px 0; background: var(--gray-900); }
+.section ::ng-deep .section-title__heading { color: var(--white); }
+.section ::ng-deep .section-title__subtitle { color: rgba(255,255,255,.6); }
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}

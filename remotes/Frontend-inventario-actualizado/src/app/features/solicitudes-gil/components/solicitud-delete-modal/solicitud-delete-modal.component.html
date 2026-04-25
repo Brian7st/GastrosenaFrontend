@@ -1,0 +1,52 @@
+<div class="modal-backdrop" (click)="close()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Top accent bar -->
+    <div class="modal-accent"></div>
+
+    <div class="modal-body">
+      <!-- Warning Icon -->
+      <div class="warning-icon">
+        <lucide-icon name="alert-triangle" [size]="28"></lucide-icon>
+      </div>
+
+      <!-- Content -->
+      <h3 class="modal-title">¿Estás seguro de que deseas eliminar esta solicitud?</h3>
+      <p class="modal-desc">
+        Esta acción no se puede deshacer. Se eliminarán permanentemente todos los registros asociados al formato
+        <strong>{{ codigoSolicitud }}</strong> del sistema.
+      </p>
+
+      <!-- Confirmation Input -->
+      <div class="confirm-group">
+        <label>POR SEGURIDAD, ESCRIBE LA PALABRA ELIMINAR PARA CONTINUAR</label>
+        <input
+          type="text"
+          placeholder="ELIMINAR"
+          [ngModel]="confirmText()"
+          (ngModelChange)="confirmText.set($event)"
+        >
+      </div>
+
+      <!-- Actions -->
+      <div class="modal-actions">
+        <button
+          class="btn btn--danger"
+          [class.btn--disabled]="!isValid"
+          [disabled]="!isValid"
+          (click)="confirmarEliminacion()">
+          <lucide-icon name="trash-2" [size]="16"></lucide-icon>
+          Eliminar Solicitud
+        </button>
+        <button class="btn btn--cancel" (click)="close()">
+          Cancelar
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <lucide-icon name="info" [size]="14"></lucide-icon>
+      <span>IDENTIFICADOR: GIL-F-014-SYS-92</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,26 @@
+<section class="section" id="bar">
+  <div class="container">
+    <app-section-title
+      title="Bar & Coctelería"
+      subtitle="Cócteles de autor y bebidas signature preparados por nuestros aprendices de barismo y coctelería."
+    />
+    <div class="bar-grid">
+      @for (item of items(); track item.id) {
+        <div class="bar-card">
+          @if (item.imageUrl) {
+            <div class="bar-card__img">
+              <img [src]="item.imageUrl" [alt]="item.title" loading="lazy" />
+            </div>
+          }
+          <div class="bar-card__body">
+            <h3 class="bar-card__title">{{ item.title }}</h3>
+            <p  class="bar-card__desc">{{ item.description }}</p>
+            @if (item.price) {
+              <span class="bar-card__price">{{ item.price | currency:'COP':'symbol':'1.0-0' }}</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>

@@ -1,0 +1,7 @@
+{
+  "name": "feature-abastecimiento",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/feature-abastecimiento/src",
+  "tags": ["scope:abastecimiento", "type:feature"]
+}

@@ -1,0 +1,18 @@
+<section class="section" id="barismo">
+  <div class="container">
+    <restaurant-section-title
+      title="Barismo & Café Especial"
+      subtitle="Café de origen colombiano preparado con técnicas de especialidad por nuestros aprendices de barismo."
+    />
+    <div class="items-grid">
+      @for (item of items(); track item.id) {
+        <restaurant-card
+          [title]="item.title"
+          [subtitle]="item.description"
+          [imageUrl]="item.imageUrl ?? ''"
+          [price]="item.price ?? null"
+        />
+      }
+    </div>
+  </div>
+</section>

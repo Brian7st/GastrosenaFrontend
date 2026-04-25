@@ -1,0 +1,202 @@
+<!-- Page Header Actions -->
+<div class="bienes-header">
+  <div class="bienes-header__info">
+    <h1 class="bienes-header__title">Gestión de Bienes</h1>
+    <p class="bienes-header__subtitle">Control exhaustivo y trazabilidad de activos de formación.</p>
+  </div>
+  <div class="bienes-header__actions">
+    <a routerLink="/bienes/importar" class="btn btn--outline">
+      <lucide-icon name="upload" [size]="20"></lucide-icon>
+      Importar
+    </a>
+    <a routerLink="/bienes/exportar" class="btn btn--outline">
+      <lucide-icon name="download" [size]="20"></lucide-icon>
+      Exportar
+    </a>
+    <button class="btn btn--primary" (click)="openNuevoModal()">
+      <lucide-icon name="plus" [size]="20"></lucide-icon>
+      Nuevo Bien
+    </button>
+  </div>
+</div>
+
+<!-- Dashboard Card Container (Table) -->
+<div class="bienes-card">
+  <!-- Table Controls -->
+  <div class="bienes-card__controls">
+    <div class="bienes-card__title-row">
+      <lucide-icon name="list" [size]="22" class="icon-primary"></lucide-icon>
+      <h3 class="bienes-card__title">Lista de Bienes</h3>
+    </div>
+    <div class="bienes-card__search-row">
+      <div class="search-box">
+        <lucide-icon name="search" [size]="18" class="search-box__icon"></lucide-icon>
+        <input
+          type="text"
+          class="search-box__input"
+          placeholder="Buscar por código o nombre..."
+          [(ngModel)]="searchTerm"
+        />
+      </div>
+      <button class="btn btn--filter">
+        <lucide-icon name="sliders-horizontal" [size]="18"></lucide-icon>
+        Filtros
+      </button>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>CÓD. SENA</th>
+          <th>CÓD. PROVEEDOR</th>
+          <th>Nombre</th>
+          <th>Categoría</th>
+          <th class="text-center">Stock</th>
+          <th class="text-center">Stock Mín.</th>
+          <th class="text-center">UM</th>
+          <th>Valor</th>
+          <th>Estado</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (bien of filteredBienes; track bien.id) {
+          <tr class="data-table__row">
+            <td>
+              <span class="code-mono">{{ bien.codigoSena }}</span>
+            </td>
+            <td>
+              <span class="code-mono">{{ bien.codigoProveedor }}</span>
+            </td>
+            <td>
+              <p class="cell-name">{{ bien.nombre }}</p>
+              <p class="cell-desc">{{ bien.descripcion }}</p>
+            </td>
+            <td>
+              <span class="badge-categoria" [ngClass]="'badge-categoria--' + bien.categoriaColor">
+                {{ bien.categoria }}
+              </span>
+            </td>
+            <td class="text-center">
+              <span class="cell-stock" [class.cell-stock--low]="bien.stock <= bien.stockMinimo">
+                {{ bien.stock }}
+              </span>
+            </td>
+            <td class="text-center">
+              <span class="cell-stock-min">{{ bien.stockMinimo }}</span>
+            </td>
+            <td class="text-center">
+              <span class="cell-um">{{ bien.unidadMedida }}</span>
+            </td>
+            <td>
+              <span class="cell-valor">{{ formatCurrency(bien.valor) }}</span>
+            </td>
+            <td>
+              <span class="badge-estado" [ngClass]="{
+                'badge-estado--activo': bien.estado === 'Activo',
+                'badge-estado--bajo': bien.estado === 'Bajo Stock',
+                'badge-estado--inactivo': bien.estado === 'Inactivo'
+              }">
+                <span class="badge-estado__dot"></span>
+                {{ bien.estado }}
+              </span>
+            </td>
+            <td class="text-center">
+              <div class="action-buttons">
+                <a [routerLink]="['/bienes', bien.id, 'editar']" class="action-btn" title="Editar">
+                  <lucide-icon name="pencil" [size]="18"></lucide-icon>
+                </a>
+                <a [routerLink]="['/bienes', bien.id]" class="action-btn" title="Ver detalles">
+                  <lucide-icon name="eye" [size]="18"></lucide-icon>
+                </a>
+                <button class="action-btn action-btn--delete" title="Eliminar" (click)="openDeleteModal(bien)">
+                  <lucide-icon name="trash-2" [size]="18"></lucide-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination Footer -->
+  <div class="pagination">
+    <p class="pagination__info">
+      MOSTRANDO {{ filteredBienes.length }} DE {{ totalBienes() | number }} BIENES
+    </p>
+    <div class="pagination__controls">
+      <button class="pagination__btn" (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 1">
+        <lucide-icon name="chevron-left" [size]="18"></lucide-icon>
+      </button>
+      @for (page of [1, 2, 3]; track page) {
+        <button
+          class="pagination__btn"
+          [class.pagination__btn--active]="currentPage() === page"
+          (click)="goToPage(page)"
+        >{{ page }}</button>
+      }
+      <span class="pagination__dots">...</span>
+      <button class="pagination__btn" (click)="goToPage(totalPages)">{{ totalPages }}</button>
+      <button class="pagination__btn" (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() === totalPages">
+        <lucide-icon name="chevron-right" [size]="18"></lucide-icon>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Summary Stats (Bento Grid) -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-card__header">
+      <div class="stat-card__icon stat-card__icon--green">
+        <lucide-icon name="landmark" [size]="24"></lucide-icon>
+      </div>
+      <span class="stat-card__badge stat-card__badge--green">+12% vs mes anterior</span>
+    </div>
+    <p class="stat-card__label">VALOR TOTAL INVENTARIO</p>
+    <h4 class="stat-card__value">{{ valorTotal() }}</h4>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card__header">
+      <div class="stat-card__icon stat-card__icon--red">
+        <lucide-icon name="package-check" [size]="24"></lucide-icon>
+      </div>
+      <span class="stat-card__badge stat-card__badge--red">Crítico</span>
+    </div>
+    <p class="stat-card__label">BIENES EN ALERTA</p>
+    <h4 class="stat-card__value">{{ bienesAlerta() }} Items</h4>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card__header">
+      <div class="stat-card__icon stat-card__icon--blue">
+        <lucide-icon name="refresh-cw" [size]="24"></lucide-icon>
+      </div>
+      <span class="stat-card__badge stat-card__badge--muted">Hoy</span>
+    </div>
+    <p class="stat-card__label">MOVIMIENTOS RECIENTES</p>
+    <h4 class="stat-card__value">{{ movimientosHoy() }} Altas</h4>
+  </div>
+</div>
+
+<!-- FAB -->
+<button class="fab" (click)="openNuevoModal()">
+  <lucide-icon name="plus" [size]="28"></lucide-icon>
+</button>
+
+<!-- Modales -->
+@if (showNuevoModal()) {
+  <app-bien-form-modal (cerrar)="closeNuevoModal()"></app-bien-form-modal>
+}
+
+@if (showDeleteModal()) {
+  <app-delete-confirm-modal
+    (cerrar)="closeDeleteModal()"
+    (confirmar)="onDeleteConfirmed()"
+  ></app-delete-confirm-modal>
+}

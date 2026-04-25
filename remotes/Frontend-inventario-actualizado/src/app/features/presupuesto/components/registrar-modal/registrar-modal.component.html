@@ -1,0 +1,64 @@
+<div class="modal-overlay" (click)="cerrarModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    
+    <!-- Header -->
+    <header class="modal-header">
+      <div class="header-content">
+        <h2 class="title">Registrar Presupuesto Inicial</h2>
+        <p class="subtitle">Complete los detalles para asignar la bolsa presupuestal al nuevo periodo.</p>
+      </div>
+      <button class="close-btn" (click)="cerrarModal()">
+        <lucide-icon name="x" [size]="20"></lucide-icon>
+      </button>
+    </header>
+
+    <!-- Formulario -->
+    <form class="modal-form" (ngSubmit)="guardar()">
+      
+      <!-- Programa -->
+      <div class="form-group">
+        <label class="form-label">Nombre del Programa</label>
+        <div class="select-wrapper">
+          <select class="form-control" [(ngModel)]="programaSeleccionado" name="programa" required>
+            <option value="" disabled selected>Seleccione un programa administrativo</option>
+            <option value="Formación Titulada">Formación Titulada</option>
+            <option value="Agropecuaria">Agropecuaria</option>
+            <option value="Gestión Administrativa">Gestión Administrativa</option>
+            <option value="Bienestar">Bienestar al Aprendiz</option>
+            <option value="SENNOVA">Investigación y Desarrollo (SENNOVA)</option>
+          </select>
+          <lucide-icon name="chevron-down" [size]="18" class="select-icon"></lucide-icon>
+        </div>
+      </div>
+
+      <!-- Nombre del Rubro -->
+      <div class="form-group">
+        <label class="form-label">Nombre del Rubro</label>
+        <div class="input-icon-wrapper">
+          <lucide-icon name="info" [size]="20" class="input-icon"></lucide-icon>
+          <input type="text" class="form-control input-with-icon" placeholder="Ej: Adquisición de Materiales de Formación" [(ngModel)]="nombreRubro" name="rubro" required>
+        </div>
+      </div>
+
+      <!-- Bolsa Dinero Inicial -->
+      <div class="form-group mb-large">
+        <label class="form-label">Bolsa de Dinero Inicial</label>
+        <div class="money-wrapper">
+          <span class="money-symbol">$</span>
+          <input type="number" class="form-control money-input" placeholder="0.00" [(ngModel)]="presupuestoInicial" name="monto" required>
+          <span class="money-currency">COP</span>
+        </div>
+      </div>
+
+      <!-- Footer Actions -->
+      <footer class="modal-footer">
+        <button type="button" class="btn btn--secondary" (click)="cerrarModal()">Cancelar</button>
+        <button type="submit" class="btn btn--primary" [disabled]="!programaSeleccionado || !nombreRubro || !presupuestoInicial">
+          <lucide-icon name="save" [size]="20"></lucide-icon>
+          Guardar Presupuesto
+        </button>
+      </footer>
+    </form>
+
+  </div>
+</div>

@@ -1,0 +1,75 @@
+<div class="modal-backdrop" (click)="close()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Left Panel: Branding -->
+    <div class="modal-branding">
+      <div class="brand-icon">
+        <lucide-icon name="file-text" [size]="24"></lucide-icon>
+      </div>
+      <div class="brand-content">
+        <h2 class="brand-title">Registro de<br>Comprobante FEL</h2>
+        <p class="brand-desc">Cargue sus archivos XML y PDF para la validación automática ante la DIAN.</p>
+      </div>
+      
+      <div class="brand-footer">
+        <div class="security-badge">
+          <span class="dot"></span> SISTEMA SEGURO
+        </div>
+        <p class="security-desc">Este módulo cumple con el estándar UBL 2.1 para facturación electrónica en Colombia.</p>
+      </div>
+    </div>
+
+    <!-- Right Panel: Form -->
+    <div class="modal-form">
+      <div class="form-header">
+        <div>
+          <h3 class="form-title">Detalles de la Factura</h3>
+          <p class="form-desc">Complete los campos obligatorios para procesar el registro.</p>
+        </div>
+        <button class="close-btn" (click)="close()">
+          <lucide-icon name="x" [size]="20"></lucide-icon>
+        </button>
+      </div>
+
+      <div class="form-body">
+        <!-- Dropzone -->
+        <div class="dropzone">
+          <div class="dropzone-icon">
+            <lucide-icon name="upload-cloud" [size]="24"></lucide-icon>
+          </div>
+          <p class="dropzone-title"><strong>Arrastra y suelta tus archivos aquí</strong></p>
+          <p class="dropzone-desc">Soporta formatos XML y PDF (Máx. 10MB)</p>
+        </div>
+
+        <div class="form-group">
+          <label>CÓDIGO CUFE (64 CARACTERES)</label>
+          <div class="input-with-badge">
+            <input type="text" placeholder="7084931a27e3...b7a8d0f1" readonly class="input--readonly">
+            <span class="badge badge--gray">AUTO-DETECT</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>RETENCIÓN ZESE (%)</label>
+            <div class="input-with-icon">
+              <input type="text" value="0.625%" readonly class="input--readonly">
+              <lucide-icon name="check-circle" [size]="16" class="icon-success"></lucide-icon>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>ORDEN DE COMPRA</label>
+            <div class="input-with-icon">
+              <input type="text" placeholder="Seleccione una orden..." readonly class="input--readonly">
+              <lucide-icon name="chevron-down" [size]="16" class="icon-gray"></lucide-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-footer">
+        <button class="btn btn--text" (click)="close()">Cancelar</button>
+        <button class="btn btn--primary">Registrar Factura</button>
+      </div>
+    </div>
+  </div>
+</div>

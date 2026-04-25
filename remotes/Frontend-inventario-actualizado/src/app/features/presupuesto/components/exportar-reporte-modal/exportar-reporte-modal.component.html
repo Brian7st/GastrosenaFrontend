@@ -1,0 +1,135 @@
+<div class="modal-overlay" (click)="cerrarModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    
+    <!-- Header -->
+    <header class="modal-header">
+      <div class="header-title-container">
+        <div class="icon-box">
+          <lucide-icon name="bar-chart-2" [size]="20" class="text-primary"></lucide-icon>
+        </div>
+        <div class="header-texts">
+          <h2 class="title">Exportar Reportes de Ejecución</h2>
+          <p class="subtitle">Configure los filtros para generar su informe detallado</p>
+        </div>
+      </div>
+      <button class="close-btn" (click)="cerrarModal()">
+        <lucide-icon name="x" [size]="20"></lucide-icon>
+      </button>
+    </header>
+
+    <!-- Contenido -->
+    <div class="modal-content">
+      
+      <!-- Grid de Filtros -->
+      <div class="filters-grid">
+        
+        <!-- Programa -->
+        <div class="form-group">
+          <label class="form-label">Programa</label>
+          <div class="select-wrapper">
+            <select class="form-control" [(ngModel)]="programaSeleccionado">
+              <option>Todos los Programas</option>
+              <option>Tecnólogo en Análisis y Desarrollo</option>
+              <option>Técnico en Sistemas</option>
+              <option>Gestión Administrativa</option>
+            </select>
+            <lucide-icon name="chevron-down" [size]="18" class="select-icon"></lucide-icon>
+          </div>
+        </div>
+
+        <!-- Rubro -->
+        <div class="form-group">
+          <label class="form-label">Rubro</label>
+          <div class="select-wrapper">
+            <select class="form-control" [(ngModel)]="rubroSeleccionado">
+              <option>Todos los Rubros</option>
+              <option>Materiales de Formación</option>
+              <option>Mantenimiento de Ambientes</option>
+              <option>Servicios Públicos</option>
+            </select>
+            <lucide-icon name="chevron-down" [size]="18" class="select-icon"></lucide-icon>
+          </div>
+        </div>
+
+        <!-- Instructor -->
+        <div class="form-group col-span-2">
+          <label class="form-label">Instructor Cuentadante</label>
+          <div class="select-wrapper">
+            <select class="form-control" [(ngModel)]="instructorSeleccionado">
+              <option>Todos los Instructores</option>
+              <option>Juan Carlos Pérez - 1012345678</option>
+              <option>Martha Lucía Gómez - 1056789012</option>
+            </select>
+            <lucide-icon name="search" [size]="18" class="select-icon"></lucide-icon>
+          </div>
+        </div>
+
+        <!-- Fechas -->
+        <div class="form-group col-span-2">
+          <label class="form-label">Rango de Fechas</label>
+          <div class="date-range">
+            <div class="date-input-wrapper">
+              <span class="date-label">Desde</span>
+              <input type="date" class="form-control" [(ngModel)]="fechaDesde">
+            </div>
+            <div class="date-input-wrapper">
+              <span class="date-label">Hasta</span>
+              <input type="date" class="form-control" [(ngModel)]="fechaHasta">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Selección de Formato -->
+      <div class="format-selection">
+        <p class="format-title">Seleccione el formato de descarga</p>
+        
+        <div class="format-cards">
+          <!-- Excel -->
+          <button 
+            type="button" 
+            class="format-card" 
+            [class.format-card--active]="formatoSeleccionado === 'excel'"
+            (click)="seleccionarFormato('excel')">
+            
+            <div class="format-icon format-icon--excel">
+              <lucide-icon name="table-icon" [size]="20"></lucide-icon>
+            </div>
+            <div class="format-info">
+              <span class="format-name">Generar Excel</span>
+              <span class="format-ext">Archivo .xlsx</span>
+            </div>
+          </button>
+
+          <!-- PDF -->
+          <button 
+            type="button" 
+            class="format-card" 
+            [class.format-card--active]="formatoSeleccionado === 'pdf'"
+            (click)="seleccionarFormato('pdf')">
+            
+            <div class="format-icon format-icon--pdf">
+              <lucide-icon name="file-down" [size]="20"></lucide-icon>
+            </div>
+            <div class="format-info">
+              <span class="format-name">Generar PDF</span>
+              <span class="format-ext">Archivo .pdf</span>
+            </div>
+          </button>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- Footer -->
+    <footer class="modal-footer">
+      <button class="btn btn--text" (click)="restablecer()">Restablecer Filtros</button>
+      <button class="btn btn--primary" [disabled]="!formatoSeleccionado" (click)="descargar()">
+        Descargar Informe
+        <lucide-icon name="download" [size]="18"></lucide-icon>
+      </button>
+    </footer>
+
+  </div>
+</div>

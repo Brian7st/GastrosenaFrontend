@@ -1,0 +1,36 @@
+.comments-section {
+  padding: 5rem 0;
+  background: #f8fafc;
+  &__header { text-align: center; max-width: 42rem; margin: 0 auto 2.5rem; }
+  &__title  { font-size: 2rem; font-weight: 700; margin: 0.75rem 0; }
+  &__desc   { color: #64748b; }
+}
+
+.comments-form {
+  max-width: 42rem;
+  margin: 0 auto;
+  &__row    { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem; }
+  &__submit { margin-top: 1.5rem; width: 100%; justify-content: center; }
+}
+
+.field {
+  margin-bottom: 1.25rem;
+  &__label    { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.4rem; }
+  &__input    { width: 100%; padding: 0.625rem 0.875rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; font-size: 0.9375rem; outline: none; transition: border-color 0.2s;
+    &:focus { border-color: #22c55e; }
+    &--error { border-color: #ef4444; }
+  }
+  &__textarea  { resize: vertical; min-height: 120px; }
+  &__error     { display: block; font-size: 0.75rem; color: #ef4444; margin-top: 0.25rem; }
+}
+
+.btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.75rem 1.5rem; border-radius: 0.5rem;
+  font-weight: 600; font-size: 0.9375rem; cursor: pointer; border: none; transition: all 0.2s;
+  &-primary { background: #22c55e; color: #fff; &:hover { background: #16a34a; } &:disabled { opacity: 0.6; cursor: not-allowed; } }
+}
+
+.tag { display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.75rem; border-radius: 9999px;
+  &-green { background: #f0fdf4; color: #16a34a; }
+}

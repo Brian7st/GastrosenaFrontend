@@ -1,0 +1,6 @@
+<div class="loader" [class]="'loader--' + size()">
+  <div class="loader__spinner"></div>
+  @if (message()) {
+    <p class="loader__message">{{ message() }}</p>
+  }
+</div>

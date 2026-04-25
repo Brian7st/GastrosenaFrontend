@@ -1,0 +1,7 @@
+{
+  "name": "feature-usuarios",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/feature-usuarios/src",
+  "tags": ["scope:usuarios", "type:feature"]
+}

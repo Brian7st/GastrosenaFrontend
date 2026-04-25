@@ -1,0 +1,316 @@
+<div class="dashboard">
+
+  <!-- Banner -->
+  <div class="dashboard__banner">
+    <h2 class="dashboard__banner-title">Bienvenido al Panel Principal</h2>
+    <p class="dashboard__banner-sub">Sistema Integral de Gestión de Restaurante SENA</p>
+    <div class="dashboard__banner-badges">
+      <span class="badge badge--white">Instructor - Instructor</span>
+      <span class="badge badge--outline">{{ fechaHoy }}</span>
+    </div>
+  </div>
+
+  <!-- Métricas -->
+  <div class="dashboard__metrics">
+
+    <div class="metric-card metric-card--clickable" (click)="irA('/restaurante')">
+      <div class="metric-card__header">
+        <span class="metric-card__label">Mesas Totales</span>
+        <span class="metric-card__icon">👥</span>
+      </div>
+      <p class="metric-card__value">{{ totalMesas }}</p>
+      <p class="metric-card__sub">mesas configuradas</p>
+      <p class="metric-card__hint">Ver en Restaurante →</p>
+    </div>
+
+    <div class="metric-card metric-card--clickable" (click)="irA('/restaurante')">
+      <div class="metric-card__header">
+        <span class="metric-card__label">Ocupación de Mesas</span>
+        <span class="metric-card__icon">✂</span>
+      </div>
+      <p class="metric-card__value">{{ mesasOcupadas }}/{{ totalMesas }}</p>
+      <div class="metric-card__bar">
+        <div class="metric-card__bar-fill" [style.width.%]="porcentajeOcupacion"></div>
+      </div>
+      <p class="metric-card__sub">{{ porcentajeOcupacion }}%</p>
+      <p class="metric-card__hint">Ver en Restaurante →</p>
+    </div>
+
+    <div class="metric-card metric-card--clickable" (click)="irA('/estadisticas')">
+      <div class="metric-card__header">
+        <span class="metric-card__label">Ingresos del Día</span>
+        <span class="metric-card__icon">$</span>
+      </div>
+      <p class="metric-card__value">${{ ingresosDia | number:'1.0-0' }}</p>
+      <p class="metric-card__sub">+0 órdenes completadas</p>
+      <p class="metric-card__hint">Ver en Estadísticas →</p>
+    </div>
+
+    <div class="metric-card metric-card--clickable" (click)="irA('/comandas')">
+      <div class="metric-card__header">
+        <span class="metric-card__label">Pedidos Pendientes</span>
+        <span class="metric-card__icon">⏰</span>
+      </div>
+      <p class="metric-card__value">{{ pedidosPendientes }}</p>
+      <p class="metric-card__sub">requieren atención</p>
+      <p class="metric-card__hint">Ver en Comandas →</p>
+    </div>
+
+  </div>
+
+  <!-- Fila 1: Mesas + Alertas -->
+  <div class="dashboard__grid">
+
+    <div class="card">
+      <p class="card__title">Estado de las Mesas</p>
+      <p class="card__sub">Vista rápida — clic para ver detalle</p>
+      <div class="mesas-grid">
+        @for (mesa of mesas; track mesa.id) {
+          <div
+            class="mesa-item"
+            [class]="'mesa-item--' + mesa.estado.toLowerCase()"
+            (click)="abrirModalMesa(mesa)"
+          >
+            <p class="mesa-item__nombre">{{ mesa.nombre }}</p>
+            <p class="mesa-item__estado">{{ mesa.estado }}</p>
+            <p class="mesa-item__asientos">{{ mesa.asientos }} asientos</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="card__title">⚠ Alertas de Inventario</p>
+      <p class="card__sub">Productos que requieren atención</p>
+      <div class="alertas-list">
+        @for (producto of productos; track producto.nombre) {
+          <div
+            class="alerta-item"
+            [class]="getAlertaClase(producto.unidades, producto.minimo)"
+            (click)="abrirModalProducto(producto)"
+            style="cursor:pointer"
+          >
+            <div class="alerta-item__icon">☕</div>
+            <div class="alerta-item__info">
+              <p class="alerta-item__nombre">{{ producto.nombre }}</p>
+              <p class="alerta-item__categoria">{{ producto.categoria }}</p>
+            </div>
+            <div class="alerta-item__badge">
+              <span>{{ producto.unidades }} unidades</span>
+              <span class="alerta-item__min">Mín: {{ producto.minimo }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Fila 2: Actividad + Órdenes -->
+  <div class="dashboard__grid">
+
+    <div class="card">
+      <p class="card__title">Actividad Reciente</p>
+      <p class="card__sub">Últimas acciones en el sistema</p>
+      <div class="filtros">
+        @for (f of filtros; track f.valor) {
+          <button
+            class="filtro-btn"
+            [class.filtro-btn--activo]="filtroActivo === f.valor"
+            (click)="aplicarFiltro(f.valor)"
+          >
+            {{ f.label }}
+          </button>
+        }
+      </div>
+      <div class="actividad-list">
+        @if (actividadFiltrada.length === 0) {
+          <p class="actividad-empty">Sin actividad de este tipo</p>
+        }
+        @for (item of actividadFiltrada; track item.hora) {
+          <div class="actividad-item">
+            <span
+              class="actividad-item__dot"
+              [style.background-color]="getActividadColor(item.tipo)"
+            ></span>
+            <div>
+              <p class="actividad-item__desc">{{ item.descripcion }}</p>
+              <p class="actividad-item__hora">{{ item.hora }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="card__title">Órdenes Activas</p>
+      <p class="card__sub">Pedidos en proceso — clic para ver detalle</p>
+      <div class="ordenes-list">
+        @for (orden of ordenes; track orden.id) {
+          <div class="orden-item orden-item--clickable" (click)="abrirModalOrden(orden)">
+            <div class="orden-item__info">
+              <p class="orden-item__id">{{ orden.id }}</p>
+              <p class="orden-item__detalle">{{ orden.mesa }} • {{ orden.cliente }}</p>
+            </div>
+            <div class="orden-item__right">
+              <span class="badge" [class]="'badge--' + orden.estado.replace(' ', '-')">
+                {{ orden.estado }}
+              </span>
+              <p class="orden-item__total">${{ orden.total | number:'1.0-0' }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ===== MODAL MESA ===== -->
+@if (modalMesa) {
+  <div class="modal-overlay" (click)="cerrarModales()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h3 class="modal__title">{{ modalMesa.nombre }}</h3>
+        <button class="modal__close" (click)="cerrarModales()">✕</button>
+      </div>
+      <div class="modal__body">
+        <div class="modal-info-row">
+          <span class="modal-info-row__label">Estado</span>
+          <span class="estado-badge" [class]="getEstadoMesaClase(modalMesa.estado)">
+            {{ modalMesa.estado }}
+          </span>
+        </div>
+        <div class="modal-info-row">
+          <span class="modal-info-row__label">Capacidad</span>
+          <span class="modal-info-row__value">{{ modalMesa.asientos }} asientos</span>
+        </div>
+        @if (modalMesa.cliente) {
+          <div class="modal-info-row">
+            <span class="modal-info-row__label">Cliente</span>
+            <span class="modal-info-row__value">{{ modalMesa.cliente }}</span>
+          </div>
+        }
+        @if (modalMesa.tiempoOcupada) {
+          <div class="modal-info-row">
+            <span class="modal-info-row__label">Tiempo ocupada</span>
+            <span class="modal-info-row__value">{{ modalMesa.tiempoOcupada }}</span>
+          </div>
+        }
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--secondary" (click)="cerrarModales()">Cerrar</button>
+        <button class="btn btn--primary" (click)="irDesdeModal('/restaurante')">
+          Ir a gestionar →
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ===== MODAL ORDEN ===== -->
+@if (modalOrden) {
+  <div class="modal-overlay" (click)="cerrarModales()">
+    <div class="modal modal--lg" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h3 class="modal__title">{{ modalOrden.id }}</h3>
+        <button class="modal__close" (click)="cerrarModales()">✕</button>
+      </div>
+      <div class="modal__body">
+        <div class="modal-info-row">
+          <span class="modal-info-row__label">Mesa</span>
+          <span class="modal-info-row__value">{{ modalOrden.mesa }}</span>
+        </div>
+        <div class="modal-info-row">
+          <span class="modal-info-row__label">Cliente</span>
+          <span class="modal-info-row__value">{{ modalOrden.cliente }}</span>
+        </div>
+        <div class="modal-info-row">
+          <span class="modal-info-row__label">Estado</span>
+          <span class="badge" [class]="'badge--' + modalOrden.estado.replace(' ', '-')">
+            {{ modalOrden.estado }}
+          </span>
+        </div>
+        <div class="modal-info-row">
+          <span class="modal-info-row__label">Hora</span>
+          <span class="modal-info-row__value">{{ modalOrden.hora }}</span>
+        </div>
+
+        <div class="modal-divider"></div>
+        <p class="modal-section-title">Items del pedido</p>
+
+        <div class="modal-items">
+          @for (item of modalOrden.items; track item.nombre) {
+            <div class="modal-item">
+              <span class="modal-item__cant">{{ item.cantidad }}x</span>
+              <span class="modal-item__nombre">{{ item.nombre }}</span>
+              <span class="modal-item__precio">${{ item.precio | number:'1.0-0' }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="modal-divider"></div>
+        <div class="modal-total">
+          <span>Total</span>
+          <span class="modal-total__valor">${{ modalOrden.total | number:'1.0-0' }}</span>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--secondary" (click)="cerrarModales()">Cerrar</button>
+        <button class="btn btn--primary" (click)="irDesdeModal('/comandas')">
+          Ver en Comandas →
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ===== MODAL PRODUCTO ===== -->
+@if (modalProducto) {
+  <div class="modal-overlay" (click)="cerrarModales()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h3 class="modal__title">{{ modalProducto.nombre }}</h3>
+        <button class="modal__close" (click)="cerrarModales()">✕</button>
+      </div>
+      <div class="modal__body">
+        <div class="modal-info-row">
+          <span class="modal-info-row__label">Categoría</span>
+          <span class="modal-info-row__value">{{ modalProducto.categoria }}</span>
+        </div>
+        <div class="modal-info-row">
+          <span class="modal-info-row__label">Stock actual</span>
+          <span
+            class="modal-info-row__value"
+            [style.color]="modalProducto.unidades <= modalProducto.minimo ? 'var(--color-ocupado)' : 'var(--color-espera)'"
+            style="font-weight: 700"
+          >
+            {{ modalProducto.unidades }} unidades
+          </span>
+        </div>
+        <div class="modal-info-row">
+          <span class="modal-info-row__label">Stock mínimo</span>
+          <span class="modal-info-row__value">{{ modalProducto.minimo }} unidades</span>
+        </div>
+        <div class="modal-info-row">
+          <span class="modal-info-row__label">Último ingreso</span>
+          <span class="modal-info-row__value">{{ modalProducto.ultimoIngreso }}</span>
+        </div>
+        <div class="modal-info-row">
+          <span class="modal-info-row__label">Descripción</span>
+          <span class="modal-info-row__value">{{ modalProducto.descripcion }}</span>
+        </div>
+
+        @if (modalProducto.unidades <= modalProducto.minimo) {
+          <div class="modal-alerta-critica">
+            ⚠ Stock crítico — requiere reposición inmediata
+          </div>
+        }
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--primary" (click)="cerrarModales()">Entendido</button>
+      </div>
+    </div>
+  </div>
+}

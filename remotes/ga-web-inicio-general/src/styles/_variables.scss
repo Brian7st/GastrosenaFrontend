@@ -1,0 +1,67 @@
+// Colores primarios
+$color-primary: #39A900;
+$color-primary-light: #4CAF50;
+$color-primary-dark: #2d8200;
+$color-secondary: #FF8F00;
+$color-secondary-light: #FFB300;
+$color-secondary-dark: #E65100;
+
+// Colores neutros
+$color-white: #FFFFFF;
+$color-black: #000000;
+$color-gray-100: #F5F5F5;
+$color-gray-200: #EEEEEE;
+$color-gray-300: #E0E0E0;
+$color-gray-400: #BDBDBD;
+$color-gray-500: #9E9E9E;
+$color-gray-600: #757575;
+$color-gray-700: #616161;
+$color-gray-800: #424242;
+$color-gray-900: #212121;
+
+// Colores semánticos
+$color-success: #388E3C;
+$color-error: #D32F2F;
+$color-warning: #F57C00;
+$color-info: #1976D2;
+
+// Tipografía
+$font-family-base: 'Inter', sans-serif;
+$font-family-titles: 'Manrope', sans-serif;
+$font-size-xs: 0.75rem;
+$font-size-sm: 0.875rem;
+$font-size-base: 1rem;
+$font-size-lg: 1.125rem;
+$font-size-xl: 1.25rem;
+$font-size-2xl: 1.5rem;
+$font-size-3xl: 1.875rem;
+$font-size-4xl: 2.25rem;
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-bold: 700;
+
+// Espaciados
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-2xl: 48px;
+$spacing-3xl: 64px;
+
+// Bordes
+$border-radius-sm: 4px;
+$border-radius-md: 8px;
+$border-radius-lg: 16px;
+$border-radius-full: 9999px;
+
+// Sombras
+$shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+$shadow-md: 0 4px 6px rgba(0,0,0,0.15);
+$shadow-lg: 0 10px 25px rgba(0,0,0,0.2);
+
+// Breakpoints
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;

@@ -1,0 +1,31 @@
+.dashboard-container {
+  padding: 24px;
+  background-color: var(--color-bg);
+  min-height: 100vh;
+}
+
+.dashboard-header {
+  background-color: var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  color: #fff;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-card);
+
+  h2 {
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    margin-bottom: 6px;
+    margin-top: 0;
+  }
+
+  p {
+    font-size: var(--font-size-md);
+    opacity: 0.88;
+    margin: 0;
+  }
+}
+
+.middle-section, .bottom-section, .export-section {
+  margin-bottom: 24px;
+}

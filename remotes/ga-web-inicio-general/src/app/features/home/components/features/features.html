@@ -1,0 +1,25 @@
+<section class="features" id="nosotros">
+  <div class="container">
+
+    <div class="features__header">
+      <span class="tag tag-green">¿Por qué elegirnos?</span>
+      <h2 class="features__title">
+        Más que un restaurante,<br>
+        <em>un centro de formación</em>
+      </h2>
+      <p class="features__desc">
+        Cada experiencia en GastroSENA está respaldada por la calidad académica
+        del SENA y la dedicación de nuestros aprendices.
+      </p>
+    </div>
+
+    <div class="features__grid">
+      <div class="feature-card" *ngFor="let f of features">
+        <div class="feature-card__icon" [innerHTML]="f.icon"></div>
+        <h3 class="feature-card__title">{{ f.title }}</h3>
+        <p  class="feature-card__desc">{{ f.desc }}</p>
+      </div>
+    </div>
+
+  </div>
+</section>

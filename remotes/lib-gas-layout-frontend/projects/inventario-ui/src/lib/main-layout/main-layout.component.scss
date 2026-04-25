@@ -1,0 +1,34 @@
+@use '../../styles/variables' as *;
+
+:host {
+  display: block;
+}
+
+.layout-principal {
+  display: flex;
+  min-height: 100vh;
+  background-color: $color-superficie;
+}
+
+.contenido-principal {
+  margin-left: 16rem;
+  flex: 1;
+  min-height: 100vh;
+  padding-top: 6rem;
+  padding-bottom: 3rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  background-color: $color-superficie;
+}
+
+.contenido-principal__contenedor {
+  min-height: calc(100vh - 6rem);
+}
+
+@media (max-width: 768px) {
+  .contenido-principal {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-bottom: 2rem;
+  }
+}

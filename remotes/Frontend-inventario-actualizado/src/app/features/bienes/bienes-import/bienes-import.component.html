@@ -1,0 +1,107 @@
+<!-- Back Button -->
+<a routerLink="/bienes" class="back-link">
+  <lucide-icon name="arrow-left" [size]="18"></lucide-icon>
+  Volver a Gestión de Bienes
+</a>
+
+<h1 class="import-title">Importar Bienes</h1>
+<p class="import-subtitle">Cargue archivos masivos para actualizar el inventario nacional.</p>
+
+<div class="import-grid">
+  <!-- Left: Upload + Preview -->
+  <div class="import-left">
+    <!-- Dropzone -->
+    <div class="dropzone" (dragover)="onDragOver($event)" (drop)="onDrop($event)">
+      <div class="dropzone__icon">
+        <lucide-icon name="upload-cloud" [size]="40"></lucide-icon>
+      </div>
+      <h3 class="dropzone__title">Arrastre su archivo aquí</h3>
+      <p class="dropzone__desc">Soporta formatos <strong>.xlsx</strong> y <strong>.csv</strong>. Máximo 25MB por archivo.</p>
+      <label class="dropzone__btn">
+        Seleccionar Archivo
+        <input type="file" accept=".xlsx,.csv" (change)="onFileSelect($event)" hidden />
+      </label>
+    </div>
+
+    <!-- Preview Table -->
+    <!-- Vista Previa de Datos -->
+      <div class="preview-section">
+        <div class="preview-header">
+          <div class="preview-header__title">
+            <lucide-icon name="eye" [size]="20"></lucide-icon>
+            <h3>Vista Previa de Datos</h3>
+          </div>
+          <span class="preview-header__count">{{ previewRows().length }} FILAS ENCONTRADAS</span>
+        </div>
+        <div class="preview-table-wrap">
+          <table class="preview-table">
+            <thead>
+              <tr>
+                <th>CÓDIGO PLACA</th>
+                <th>DESCRIPCIÓN DEL BIEN</th>
+                <th>SERIAL</th>
+                <th>UBICACIÓN</th>
+                <th>ESTADO</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of previewRows(); track row.codigoPlaca) {
+                <tr>
+                  <td><span class="code-mono">{{ row.codigoPlaca }}</span></td>
+                  <td class="cell-bold">{{ row.descripcion }}</td>
+                  <td><span class="code-mono">{{ row.serial }}</span></td>
+                  <td>{{ row.ubicacion }}</td>
+                  <td>
+                    <span class="status-pill" [ngClass]="{
+                      'status-pill--activo': row.estado === 'Activo',
+                      'status-pill--bajo': row.estado === 'Bajo Stock'
+                    }">{{ row.estado }}</span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+  </div>
+
+  <!-- Right: Instructions -->
+  <div class="import-right">
+    <div class="instructions-card">
+      <div class="instructions-card__header">
+        <lucide-icon name="info" [size]="18"></lucide-icon>
+        <h3>Instrucciones</h3>
+      </div>
+      <ol class="instructions-list">
+        <li>
+          <span class="instructions-list__num">1</span>
+          Asegúrese de usar los encabezados definidos en la plantilla institucional.
+        </li>
+        <li>
+          <span class="instructions-list__num">2</span>
+          Los campos marcados con asterisco (*) son obligatorios para el registro oficial.
+        </li>
+        <li>
+          <span class="instructions-list__num">3</span>
+          Revise la vista previa antes de procesar para evitar duplicidades de seriales.
+        </li>
+      </ol>
+      <div class="server-status">
+        <span class="server-status__label">ESTADO DEL SERVIDOR</span>
+        <div class="server-status__value">
+          <span class="server-dot"></span> Listo para procesamiento
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="import-footer">
+  <a routerLink="/bienes" class="import-cancel">Cancelar</a>
+  <button class="import-process" (click)="procesar()">
+    <lucide-icon name="check-circle" [size]="18"></lucide-icon>
+    Procesar Importación
+  </button>
+</div>

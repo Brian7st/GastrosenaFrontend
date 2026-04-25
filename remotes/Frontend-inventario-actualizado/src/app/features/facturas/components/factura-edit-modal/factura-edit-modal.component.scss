@@ -1,0 +1,326 @@
+@use "sass:color";
+$primary: #006e25;
+$primary-container: #28a745;
+$tertiary: #ba1830;
+$slate-400: #94a3b8;
+$slate-500: #64748b;
+$slate-900: #0f172a;
+$surface-container-lowest: #ffffff;
+$surface-container-low: #f3f4f5;
+$green-600: #16a34a;
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 2rem;
+}
+
+.modal-container {
+  background: $surface-container-lowest;
+  border-radius: 1.5rem;
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  animation: scaleUp 0.2s ease-out;
+}
+
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.header-info {
+  display: flex;
+  gap: 1rem;
+}
+
+.header-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  background: #f0fdf4;
+  color: #16a34a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: $slate-900;
+  margin-bottom: 0.25rem;
+}
+
+.modal-subtitle {
+  color: $slate-500;
+  font-size: 0.875rem;
+}
+
+.text-green-600 { color: $green-600; }
+.font-bold { font-weight: 700; }
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: $slate-400;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  &:hover { background: #f1f5f9; color: $slate-900; }
+}
+
+.modal-body {
+  padding: 2rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+// Forms
+.form-row {
+  display: grid;
+  gap: 1rem;
+  
+  &--2cols { grid-template-columns: 1fr 1fr; }
+  &--3cols { grid-template-columns: 1fr 1fr 1fr; }
+  &.align-start { align-items: start; }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: $slate-500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+.input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: $surface-container-low;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  color: $slate-900;
+  transition: all 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: rgba($primary, 0.3);
+    background: white;
+  }
+
+  &--select {
+    cursor: pointer;
+    appearance: none;
+    padding-right: 2.5rem;
+    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="%2364748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1rem;
+  }
+}
+
+.icon-valid { position: absolute; right: 1rem; color: #16a34a; pointer-events: none; }
+.icon-right { position: absolute; right: 1rem; color: $slate-500; pointer-events: none; }
+
+.textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: $surface-container-low;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  color: $slate-900;
+  resize: vertical;
+  
+  &:focus {
+    outline: none;
+    border-color: rgba($primary, 0.3);
+    background: white;
+  }
+}
+
+// Items Table
+.items-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.items-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+
+  label {
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: $slate-500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+.btn-add-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: $primary;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  
+  &:hover { background: rgba($primary, 0.05); }
+}
+
+.items-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: $surface-container-low;
+  border-radius: 0.5rem;
+  overflow: hidden;
+
+  th {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: $slate-400;
+    text-transform: uppercase;
+    background: #e2e8f0;
+  }
+
+  td {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    color: $slate-900;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  tr:last-child td { border-bottom: none; }
+}
+
+.text-right { text-align: right; }
+
+.btn-icon-danger {
+  background: transparent;
+  border: none;
+  color: $tertiary;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  opacity: 0.5;
+  
+  &:hover {
+    opacity: 1;
+    background: #fef2f2;
+  }
+}
+
+// Totals
+.totals-card {
+  background: $surface-container-low;
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.totals-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: $slate-500;
+
+  &--grand {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #cbd5e1;
+    font-weight: 700;
+    font-size: 1rem;
+    color: $slate-900;
+    
+    .text-green-600 { font-size: 1.25rem; }
+  }
+}
+
+// Footer
+.modal-footer {
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  border: none;
+
+  &--primary {
+    background: $primary;
+    color: white;
+    &:hover { background: color.adjust($primary, $lightness: -5%); }
+  }
+  &--text {
+    background: transparent;
+    color: $slate-500;
+    &:hover { color: $slate-900; background: #f8fafc; }
+  }
+  &--danger-text {
+    background: transparent;
+    color: $tertiary;
+    padding: 0.5rem 1rem;
+    &:hover { background: #fef2f2; }
+  }
+}

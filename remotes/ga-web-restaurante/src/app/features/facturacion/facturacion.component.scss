@@ -1,0 +1,134 @@
+$green-sena: #28a745;
+$dark-text: #333;
+$text-muted: #6c757d;
+$bg-main: #f4f6f9;
+
+$stat-green: #28a745;
+$stat-blue: #007bff;
+$stat-purple: #6f42c1;
+$stat-orange: #fd7e14;
+
+.facturacion-container {
+  padding: 25px;
+  background-color: $bg-main;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  .header-banner {
+    background-color: $green-sena;
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+
+    h1 { font-size: 2rem; margin-bottom: 5px; font-weight: 600; }
+    p { font-size: 1rem; opacity: 0.9; margin-bottom: 15px; }
+
+    .badge-container {
+      .badge {
+        background-color: rgba(255,255,255,0.2);
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+      }
+    }
+  }
+
+  .stats-section {
+    margin-bottom: 40px;
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+
+      .stat-card {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: transform 0.2s;
+        &:hover { transform: translateY(-3px); }
+
+        .stat-content {
+          .stat-label { color: $text-muted; font-size: 0.95rem; margin-bottom: 5px; }
+          .stat-number { font-size: 2.2rem; font-weight: 700; margin: 0; }
+        }
+
+        .stat-icon {
+          font-size: 1.8rem;
+          padding: 10px;
+          border-radius: 10px;
+          background-color: #f8f9fa;
+          width: 50px; height: 50px;
+          display: flex; align-items: center; justify-content: center;
+        }
+      }
+    }
+  }
+
+  .actions-section {
+    .actions-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 25px;
+
+      .action-card {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+
+        .action-header {
+          display: flex; align-items: center; gap: 10px; margin-bottom: 15px;
+          .icon { font-size: 1.4rem; }
+          h3 { font-size: 1.3rem; font-weight: 600; margin: 0; }
+        }
+
+        .action-desc { color: $text-muted; font-size: 0.95rem; margin-bottom: 20px; }
+
+        .action-info {
+          display: flex; justify-content: space-between; width: 100%;
+          color: $text-muted; font-size: 0.9rem; margin-bottom: 25px;
+          .badge-count {
+            background-color: #e9ecef; color: $dark-text;
+            padding: 2px 8px; border-radius: 10px; font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+
+  .green-text { color: $stat-green; }
+  .blue-text { color: $stat-blue; }
+  .purple-text { color: $stat-purple; }
+  .orange-text { color: $stat-orange; }
+
+  .btn-sena-confirm {
+    background-color: $green-sena; color: white; border: none;
+    padding: 12px 20px; border-radius: 8px; width: 100%;
+    font-weight: 600; cursor: pointer; font-size: 1rem;
+    &:hover { background-color: darken($green-sena, 8%); }
+  }
+
+  .btn-sena-outline {
+    background-color: white; color: $stat-purple; border: 2px solid $stat-purple;
+    padding: 10px 20px; border-radius: 8px; width: 100%;
+    font-weight: 600; cursor: pointer; font-size: 1rem;
+    &:hover { background-color: rgba($stat-purple, 0.05); }
+  }
+
+  // Estilo para el nuevo botón de búsqueda
+  .btn-sena-outline-blue {
+    background-color: white; color: $stat-blue; border: 2px solid $stat-blue;
+    padding: 10px 20px; border-radius: 8px; width: 100%;
+    font-weight: 600; cursor: pointer; font-size: 1rem;
+    &:hover { background-color: rgba($stat-blue, 0.05); }
+  }
+}

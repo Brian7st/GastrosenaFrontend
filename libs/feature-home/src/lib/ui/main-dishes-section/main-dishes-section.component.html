@@ -1,0 +1,18 @@
+<section class="section" id="platos-principales">
+  <div class="container">
+    <restaurant-section-title
+      title="Platos Principales"
+      subtitle="Cortes premium, proteínas selectas y combinaciones irresistibles de nuestra cocina de autor."
+    />
+    <div class="items-grid">
+      @for (item of items(); track item.id) {
+        <restaurant-card
+          [title]="item.title"
+          [subtitle]="item.description"
+          [imageUrl]="item.imageUrl ?? ''"
+          [price]="item.price ?? null"
+        />
+      }
+    </div>
+  </div>
+</section>

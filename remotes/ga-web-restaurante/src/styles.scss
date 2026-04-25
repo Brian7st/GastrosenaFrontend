@@ -1,0 +1,66 @@
+:root {
+  --color-primary:        #28A745;
+  --color-primary-dark:   #1E8449;
+  --color-primary-light:  #D4EDDA;
+
+  --color-libre:          #2ECC71;
+  --color-libre-bg:       #EAFAF1;
+  --color-espera:         #F39C12;
+  --color-espera-bg:      #FEF9E7;
+  --color-ocupado:        #E74C3C;
+  --color-ocupado-bg:     #FDEDEC;
+
+  --color-abierto:        #27AE60;
+  --color-abierto-bg:     #EAFAF1;
+  --color-preparacion:    #E67E22;
+  --color-preparacion-bg: #FEF5E7;
+  --color-pagado:         #E74C3C;
+  --color-pagado-bg:      #FDEDEC;
+
+  --color-bg:             #F4F6F8;
+  --color-surface:        #FFFFFF;
+  --color-border:         #E8ECF0;
+  --color-text-primary:   #1A2332;
+  --color-text-secondary: #6B7A8D;
+  --color-text-muted:     #A0ADB8;
+
+  --font-family:          'Inter', 'Segoe UI', sans-serif;
+  --font-size-xs:         11px;
+  --font-size-sm:         12px;
+  --font-size-md:         13px;
+  --font-size-lg:         15px;
+  --font-size-xl:         22px;
+  --font-size-2xl:        28px;
+
+  --radius-sm:            6px;
+  --radius-md:            10px;
+  --radius-lg:            14px;
+  --shadow-card:          0 1px 4px rgba(0,0,0,0.06);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  line-height: 1.5;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font-family: var(--font-family);
+  cursor: pointer;
+}

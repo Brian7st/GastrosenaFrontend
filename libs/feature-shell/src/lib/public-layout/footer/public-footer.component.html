@@ -1,0 +1,57 @@
+<footer class="footer">
+  <div class="container">
+    <div class="footer__top">
+
+      <div class="footer__brand">
+        <div class="footer__logo">
+          <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+            <path d="M14 2C7.373 2 2 7.373 2 14s5.373 12 12 12 12-5.373 12-12S20.627 2 14 2z" fill="#22c55e" opacity=".2"/>
+            <path d="M10 8v4a4 4 0 008 0V8M14 16v6M10 22h8" stroke="#22c55e" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span>GastroSENA</span>
+        </div>
+        <p class="footer__tagline">Sistema de gestión gastronómica del programa SENA — formando los chefs y gestores del mañana.</p>
+        <div class="footer__sena-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
+          </svg>
+          Proyecto ADSO · SENA Quindío
+        </div>
+      </div>
+
+      <div class="footer__col">
+        <h5>Navegación</h5>
+        <ul>
+          <li><a href="#inicio">Inicio</a></li>
+          <li><a href="#nosotros">Nosotros</a></li>
+          <li><a href="#menu">Menú</a></li>
+          <li><a href="#contacto">Contacto</a></li>
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <h5>Sistema</h5>
+        <ul>
+          <li><a routerLink="/auth/login">Iniciar Sesión</a></li>
+          <li><a routerLink="/auth/forgot-password">Recuperar Contraseña</a></li>
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <h5>Módulos</h5>
+        <ul>
+          <li><span>Gestión de Usuarios</span></li>
+          <li><span>Cocina &amp; Bar</span></li>
+          <li><span>Inventario</span></li>
+          <li><span>Reportes</span></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="footer__bottom">
+      <p>© {{ year }} · GastroSENA. Proyecto formativo ADSO.</p>
+      <p>Desarrollado por aprendices del programa de Tecnología en Análisis y Desarrollo de Software.</p>
+    </div>
+  </div>
+</footer>

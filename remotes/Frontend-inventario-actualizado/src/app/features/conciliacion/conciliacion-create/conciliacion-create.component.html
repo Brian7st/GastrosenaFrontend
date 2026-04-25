@@ -1,0 +1,132 @@
+<div class="conciliacion-create-wrapper">
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb">
+      <a routerLink="/factura-global" class="breadcrumb__link">Ejecución</a>
+      <lucide-icon name="chevron-right" [size]="14"></lucide-icon>
+      <span class="breadcrumb__current">Generar Nuevo Consolidado</span>
+  </nav>
+
+  <!-- Header Section -->
+  <header class="page-header">
+      <h2 class="page-title">Generar Nuevo Consolidado</h2>
+      <p class="page-subtitle">Seleccione el rango de fechas para agrupar comprobantes GIL-F014.</p>
+  </header>
+
+  <!-- Main Grid Container -->
+  <div class="create-grid">
+      
+      <!-- Left Column: Form Controls -->
+      <section class="form-section">
+          <div class="card card--main">
+              <form class="create-form">
+                  <!-- Date Pickers Grid -->
+                  <div class="form-row">
+                      <div class="form-group">
+                          <label class="form-label" for="desde">Desde</label>
+                          <div class="input-wrapper">
+                              <div class="input-icon">
+                                  <lucide-icon name="calendar" class="text-primary" [size]="20"></lucide-icon>
+                              </div>
+                              <input class="form-input" id="desde" type="date">
+                          </div>
+                      </div>
+                      
+                      <div class="form-group">
+                          <label class="form-label" for="hasta">Hasta</label>
+                          <div class="input-wrapper">
+                              <div class="input-icon">
+                                  <lucide-icon name="calendar" class="text-primary" [size]="20"></lucide-icon>
+                              </div>
+                              <input class="form-input" id="hasta" type="date">
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Contextual Information -->
+                  <div class="info-alert">
+                      <lucide-icon name="info" class="text-primary" [size]="24"></lucide-icon>
+                      <p class="info-alert__text">
+                          El sistema buscará automáticamente todos los formatos <span class="font-bold">GIL-F014</span> aprobados en este periodo para generar la tabla de ejecución consolidada.
+                      </p>
+                  </div>
+
+                  <!-- Actions -->
+                  <div class="form-actions">
+                      <button type="button" routerLink="/factura-global/1" class="btn btn--primary">
+                          <lucide-icon name="bar-chart" [size]="20"></lucide-icon>
+                          Pre-visualizar y Calcular Consolidado
+                      </button>
+                      <button type="button" routerLink="/factura-global" class="btn btn--secondary">
+                          Cancelar
+                      </button>
+                  </div>
+              </form>
+          </div>
+      </section>
+
+      <!-- Right Column: Visual Summary/Meta Info -->
+      <aside class="sidebar-section">
+          <div class="card card--light">
+              <div class="icon-box icon-box--white">
+                  <lucide-icon name="file-text" class="text-primary" [size]="32"></lucide-icon>
+              </div>
+              <h3 class="card__title">GIL-F014</h3>
+              <p class="card__desc">
+                  Formato estándar de reporte para la ejecución presupuestal de bienes y servicios. Asegúrese que los reportes estén en estado <span class="text-primary font-bold">Aprobado</span> para ser incluidos.
+              </p>
+          </div>
+
+          <div class="card card--dark">
+              <div class="card__content">
+                  <h3 class="card__title-highlight">Dato Clave</h3>
+                  <p class="card__meta">Vigencia 2024</p>
+                  
+                  <div class="stat-progress">
+                      <div class="stat-progress__header">
+                          <span class="stat-progress__label">Reportes Pendientes</span>
+                          <span class="stat-progress__value">14</span>
+                      </div>
+                      <div class="progress-bar">
+                          <div class="progress-bar__fill"></div>
+                      </div>
+                  </div>
+              </div>
+              <div class="card__glow"></div>
+          </div>
+
+      </aside>
+  </div>
+
+  <!-- Footer-style helper section -->
+  <footer class="features-footer">
+      <div class="feature">
+          <div class="feature__icon">
+              <lucide-icon name="shield-check" class="text-slate-500"></lucide-icon>
+          </div>
+          <div class="feature__text">
+              <h4 class="feature__title">Seguridad</h4>
+              <p class="feature__desc">Los datos son validados contra el SIIF Nación.</p>
+          </div>
+      </div>
+      
+      <div class="feature">
+          <div class="feature__icon">
+              <lucide-icon name="clipboard-check" class="text-slate-500"></lucide-icon>
+          </div>
+          <div class="feature__text">
+              <h4 class="feature__title">Trazabilidad</h4>
+              <p class="feature__desc">Cada consolidado genera un registro de auditoría.</p>
+          </div>
+      </div>
+      
+      <div class="feature">
+          <div class="feature__icon">
+              <lucide-icon name="refresh-cw" class="text-slate-500"></lucide-icon>
+          </div>
+          <div class="feature__text">
+              <h4 class="feature__title">Actualización</h4>
+              <p class="feature__desc">Sincronización en tiempo real con tesorería.</p>
+          </div>
+      </div>
+  </footer>
+</div>

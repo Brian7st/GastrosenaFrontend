@@ -1,0 +1,42 @@
+@use 'variables' as *;
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin responsive-sm {
+  @media (max-width: #{$breakpoint-sm}) { @content; }
+}
+
+@mixin responsive-md {
+  @media (max-width: #{$breakpoint-md}) { @content; }
+}
+
+@mixin responsive-lg {
+  @media (max-width: #{$breakpoint-lg}) { @content; }
+}
+
+@mixin responsive-xl {
+  @media (max-width: #{$breakpoint-xl}) { @content; }
+}
+
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin card-base {
+  background: $color-white;
+  border-radius: $border-radius-md;
+  box-shadow: $shadow-sm;
+  padding: $spacing-md;
+}

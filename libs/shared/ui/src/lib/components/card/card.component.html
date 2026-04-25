@@ -1,0 +1,15 @@
+<div class="card">
+  @if (imageUrl()) {
+    <div class="card__image">
+      <img [src]="imageUrl()" [alt]="title()" loading="lazy" />
+    </div>
+  }
+  <div class="card__body">
+    @if (title())    { <h3 class="card__title">{{ title() }}</h3> }
+    @if (subtitle()) { <p  class="card__subtitle">{{ subtitle() }}</p> }
+    @if (price() !== null) {
+      <span class="card__price">{{ price() | currency:'COP':'symbol':'1.0-0' }}</span>
+    }
+    <ng-content />
+  </div>
+</div>

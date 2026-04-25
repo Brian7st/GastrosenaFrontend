@@ -1,0 +1,18 @@
+import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { LucideBell, LucideSearch, LucideUser } from '@lucide/angular';
+import { PerfilConfig, TopNavLink } from '../../nav/nav.models';
+
+@Component({
+  selector: 'restaurant-barra-superior',
+  standalone: true,
+  imports: [CommonModule, RouterModule, LucideSearch, LucideBell, LucideUser],
+  templateUrl: './barra-superior.component.html',
+  styleUrls: ['./barra-superior.component.scss'],
+})
+export class BarraSuperiorComponent {
+  @Input() perfil: PerfilConfig = {};
+  @Input() buscarPlaceholder = 'Buscar...';
+  @Input() enlaces: TopNavLink[] = [];
+}

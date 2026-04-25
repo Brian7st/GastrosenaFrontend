@@ -1,0 +1,73 @@
+<section class="menu-section" id="menu">
+  <div class="container">
+
+    <div class="menu-section__header">
+      <span class="tag tag-green">Nuestro Menú</span>
+      <h2 class="menu-section__title">
+        Platos elaborados con<br><em>pasión y técnica</em>
+      </h2>
+      <p class="menu-section__desc">
+        Descubre los exquisitos platos creados por nuestros estudiantes de gastronomía,
+        supervisados por chefs profesionales.
+      </p>
+    </div>
+
+    <div class="menu-section__tabs">
+      @for (cat of categories; track cat.key) {
+        <button class="tab-btn"
+                [class.active]="activeTab() === cat.key"
+                (click)="setTab(cat.key)">
+          {{ cat.label }}
+        </button>
+      }
+    </div>
+
+    @if (activeTab() === 'platos') {
+      <div class="menu-grid">
+        @for (p of platos; track p.name) {
+          <div class="menu-card">
+            <div class="menu-card__img">
+              <img [src]="p.img" [alt]="p.name" loading="lazy">
+              <span class="menu-card__tag">{{ p.category }}</span>
+            </div>
+            <div class="menu-card__body">
+              <h3 class="menu-card__name">{{ p.name }}</h3>
+              <p  class="menu-card__desc">{{ p.desc }}</p>
+              <span class="menu-card__price">{{ p.price | currency:'COP':'symbol':'1.0-0' }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    @if (activeTab() === 'bar') {
+      <div class="bar-grid">
+        <div class="bar-col">
+          <h4 class="bar-col__title">Cafés Especiales</h4>
+          @for (b of cafes; track b.name) {
+            <div class="bar-item">
+              <div>
+                <p class="bar-item__name">{{ b.name }}</p>
+                <p class="bar-item__desc">{{ b.desc }}</p>
+              </div>
+              <span class="bar-item__price">{{ b.price | currency:'COP':'symbol':'1.0-0' }}</span>
+            </div>
+          }
+        </div>
+        <div class="bar-col">
+          <h4 class="bar-col__title">Bebidas Signature</h4>
+          @for (b of bebidas; track b.name) {
+            <div class="bar-item">
+              <div>
+                <p class="bar-item__name">{{ b.name }}</p>
+                <p class="bar-item__desc">{{ b.desc }}</p>
+              </div>
+              <span class="bar-item__price">{{ b.price | currency:'COP':'symbol':'1.0-0' }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+  </div>
+</section>

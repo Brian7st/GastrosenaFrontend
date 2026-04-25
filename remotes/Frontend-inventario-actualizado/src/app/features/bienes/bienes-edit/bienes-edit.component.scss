@@ -1,0 +1,299 @@
+@use "sass:color";
+$primary: #006e25;
+$primary-container: #28a745;
+$on-surface: #191c1d;
+$surface: #f8f9fa;
+$surface-container-low: #f3f4f5;
+$surface-container-high: #e7e8e9;
+$slate-400: #94a3b8;
+$slate-500: #64748b;
+$slate-50: #f8fafc;
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: $primary;
+  text-decoration: none;
+  margin-bottom: 1rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba($primary, 0.06);
+    color: color.adjust($primary, $lightness: -5%);
+  }
+}
+
+.edit-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  margin-bottom: 1.5rem;
+
+  &__link { color: $slate-400; text-decoration: none; &:hover { text-decoration: underline; } }
+  &__sep { color: $slate-400; }
+  &__current { color: $primary; font-weight: 600; }
+}
+
+.edit-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  color: $primary;
+  margin-bottom: 0.25rem;
+}
+
+.edit-subtitle {
+  color: $slate-500;
+  font-size: 0.875rem;
+  font-style: italic;
+  margin-bottom: 2rem;
+}
+
+.edit-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1.3fr;
+  }
+}
+
+.edit-left {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.edit-image {
+  img {
+    width: 100%;
+    border-radius: 1rem;
+    object-fit: cover;
+    aspect-ratio: 4 / 3;
+    background: #f1f5f9;
+  }
+}
+
+.estado-box {
+  background: #fff;
+  border: 1px solid $slate-50;
+  border-radius: 1rem;
+  padding: 1.25rem;
+
+  &__label {
+    display: block;
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: $slate-400;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+
+  &__value {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba($primary, 0.06);
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    color: $primary;
+    font-weight: 700;
+    font-size: 0.875rem;
+  }
+
+  &__toggle { margin-left: auto; color: $slate-400; }
+}
+
+.dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  &--green { background: $primary; }
+}
+
+.edit-form-card {
+  background: #fff;
+  border: 1px solid $slate-50;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.edit-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.edit-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: $on-surface;
+  margin-bottom: 0.375rem;
+}
+
+.edit-input {
+  width: 100%;
+  background: $surface-container-low;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem;
+  color: $on-surface;
+  outline: none;
+  transition: all 0.2s;
+
+  &:focus { border-color: rgba($primary, 0.3); }
+  &--disabled { background: #f1f5f9; color: $slate-400; cursor: not-allowed; }
+}
+
+.edit-input-wrapper {
+  position: relative;
+
+  &--valid {
+    .edit-input-check {
+      display: flex;
+      color: $primary;
+    }
+  }
+}
+
+.edit-input-check {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: none;
+}
+
+.edit-select {
+  @extend .edit-input;
+  appearance: none;
+  cursor: pointer;
+  padding-right: 2.5rem;
+}
+
+.select-wrap {
+  position: relative;
+  &__icon { position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); color: $slate-400; pointer-events: none; }
+}
+
+.stock-control {
+  display: flex;
+  align-items: center;
+  background: $surface-container-low;
+  border-radius: 0.5rem;
+  overflow: hidden;
+
+  &__btn {
+    width: 3rem;
+    height: 3rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $slate-500;
+    transition: background 0.15s;
+
+    &:hover { background: $surface-container-high; }
+  }
+
+  &__value {
+    flex: 1;
+    text-align: center;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: $on-surface;
+  }
+}
+
+.edit-hint {
+  font-size: 0.75rem;
+  color: $primary;
+  font-style: italic;
+  margin-top: 0.25rem;
+}
+
+.input-prefix-edit {
+  position: relative;
+
+  &__symbol {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $slate-400;
+    font-size: 0.875rem;
+  }
+
+  .edit-input { padding-left: 1.75rem; }
+}
+
+.edit-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1rem;
+}
+
+.btn-cancel-edit {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: $on-surface;
+  text-decoration: none;
+  border-radius: 0.75rem;
+
+  &:hover { background: $surface-container-low; }
+}
+
+.btn-save-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 2rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(to bottom, #00AF00, #009000);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover { opacity: 0.9; }
+  &:active { transform: scale(0.98); }
+}
+
+.edit-modified {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  padding: 1rem 1.5rem;
+  background: #fff;
+  border-radius: 0.75rem;
+  border: 1px solid $slate-50;
+  font-size: 0.8125rem;
+  color: $slate-500;
+
+  a { color: $on-surface; text-decoration: underline; }
+}

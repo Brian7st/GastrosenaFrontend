@@ -1,0 +1,157 @@
+<!-- Page Header Actions -->
+<div class="facturas-header">
+  <div class="facturas-header__info">
+    <h1 class="facturas-header__title">Panel de Facturación</h1>
+    <p class="facturas-header__subtitle">Supervisión y control de documentos electrónicos en tiempo real.</p>
+  </div>
+  <div class="facturas-header__actions">
+    <button class="btn btn--outline" (click)="openExportModal()">
+      <lucide-icon name="download" [size]="20"></lucide-icon>
+      Exportar
+    </button>
+    <button class="btn btn--primary" (click)="openNuevoModal()">
+      <lucide-icon name="plus" [size]="20"></lucide-icon>
+      Nueva Factura
+    </button>
+  </div>
+</div>
+
+<!-- KPIs -->
+<div class="stats-grid">
+  <!-- Total Facturas -->
+  <div class="stat-card">
+    <div class="stat-card__header">
+      <div>
+        <p class="stat-card__label">TOTAL FACTURAS</p>
+        <h3 class="stat-card__value">1,284</h3>
+        <div class="stat-card__trend stat-card__trend--up">
+          <lucide-icon name="trending-up" [size]="14"></lucide-icon>
+          <span>+12.5% este mes</span>
+        </div>
+      </div>
+      <div class="stat-card__icon stat-card__icon--green">
+        <lucide-icon name="file-text" [size]="24"></lucide-icon>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monto Mensual -->
+  <div class="stat-card">
+    <div class="stat-card__header">
+      <div>
+        <p class="stat-card__label">MONTO MENSUAL</p>
+        <h3 class="stat-card__value">$42,500.00</h3>
+        <div class="stat-card__trend stat-card__trend--up">
+          <lucide-icon name="trending-up" [size]="14"></lucide-icon>
+          <span>+8.2% vs periodo anterior</span>
+        </div>
+      </div>
+      <div class="stat-card__icon stat-card__icon--blue">
+        <lucide-icon name="banknote" [size]="24"></lucide-icon>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pendientes -->
+  <div class="stat-card">
+    <div class="stat-card__header">
+      <div>
+        <p class="stat-card__label">PENDIENTES</p>
+        <h3 class="stat-card__value">28</h3>
+        <div class="stat-card__trend stat-card__trend--alert">
+          <lucide-icon name="alert-circle" [size]="14"></lucide-icon>
+          <span>Requieren acción inmediata</span>
+        </div>
+      </div>
+      <div class="stat-card__icon stat-card__icon--red">
+        <lucide-icon name="clock" [size]="24"></lucide-icon>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Facturas Table -->
+<div class="facturas-card">
+  <div class="facturas-card__header">
+    <h2 class="facturas-card__title">Últimas Facturas</h2>
+    <div class="facturas-card__actions">
+      <button class="btn-sm">
+        <lucide-icon name="filter" [size]="14"></lucide-icon> Filtrar
+      </button>
+      <button class="btn-sm" (click)="openExportModal()">
+        <lucide-icon name="download" [size]="14"></lucide-icon> Exportar
+      </button>
+    </div>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>PROVEEDOR</th>
+          <th>ORDEN DE COMPRA</th>
+          <th>TOTAL</th>
+          <th>FECHA</th>
+          <th>ESTADO</th>
+          <th class="text-right"></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (factura of facturas(); track factura.id) {
+          <tr class="data-table__row">
+            <td>
+              <div class="provider-cell">
+                <div class="provider-avatar">{{ factura.proveedorIniciales }}</div>
+                <div>
+                  <p class="provider-name">{{ factura.proveedor }}</p>
+                  <p class="provider-id">{{ factura.proveedorId }}</p>
+                </div>
+              </div>
+            </td>
+            <td><span class="cell-bold">{{ factura.ordenCompra }}</span></td>
+            <td><span class="cell-total">{{ formatCurrency(factura.total) }}</span></td>
+            <td><span class="cell-date">{{ factura.fecha }}</span></td>
+            <td>
+              <span class="status-badge" [ngClass]="{
+                'status-badge--activo': factura.estado === 'Activo',
+                'status-badge--bajo': factura.estado === 'Bajo Stock',
+                'status-badge--pendiente': factura.estado === 'Pendiente',
+                'status-badge--anulada': factura.estado === 'Anulada'
+              }">{{ factura.estado }}</span>
+            </td>
+            <td class="text-right">
+              <!-- Using MoreVertical as placeholder, but linking works -->
+              <a [routerLink]="['/facturas', factura.id]" class="action-btn">
+                <lucide-icon name="more-vertical" [size]="20"></lucide-icon>
+              </a>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination">
+    <p class="pagination__info">Mostrando 5 de 1,284 facturas</p>
+    <div class="pagination__controls">
+      <button class="pagination__btn" (click)="goToPage(currentPage() - 1)">
+        <lucide-icon name="chevron-left" [size]="14"></lucide-icon>
+      </button>
+      <button class="pagination__btn pagination__btn--active">1</button>
+      <button class="pagination__btn" (click)="goToPage(2)">2</button>
+      <button class="pagination__btn" (click)="goToPage(3)">3</button>
+      <button class="pagination__btn" (click)="goToPage(currentPage() + 1)">
+        <lucide-icon name="chevron-right" [size]="14"></lucide-icon>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modals -->
+@if (showNuevoModal()) {
+  <app-factura-form-modal (cerrar)="closeNuevoModal()"></app-factura-form-modal>
+}
+@if (showExportModal()) {
+  <app-factura-export-modal (cerrar)="closeExportModal()"></app-factura-export-modal>
+}

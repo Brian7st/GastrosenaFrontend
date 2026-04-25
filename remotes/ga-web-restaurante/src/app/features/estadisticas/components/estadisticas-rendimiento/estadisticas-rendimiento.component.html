@@ -1,0 +1,48 @@
+<div class="rendimiento-card">
+  <div class="card-header">
+    <i class="icon-users-group"></i> <h3>Rendimiento por Mesero</h3>
+  </div>
+
+  <div class="table-container">
+    <table class="rendimiento-table">
+      <thead>
+        <tr>
+          <th>Mesero</th>
+          <th>Órdenes Atendidas</th>
+          <th>Mesas Asignadas</th>
+          <th>Ingresos Generados</th>
+          <th>Promedio por Orden</th>
+          <th>Rendimiento</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (mesero of rendimiento; track mesero) {
+          <tr>
+            <td class="fw-bold">{{ mesero.nombre }}</td>
+            <td>{{ mesero.ordenesAtendidas }}</td>
+            <td>{{ mesero.mesasAsignadas }}</td>
+            <td class="text-success fw-bold">{{ mesero.ingresosGenerados | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+            <td>{{ mesero.promedioPorOrden | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+            <td>
+              <div class="status-cell">
+                <div class="status-bar-bg">
+                  <div class="status-bar-fill"
+                    [style.width]="mesero.rendimiento === 'Excelente' ? '100%' : '75%'"
+                    [ngClass]="mesero.rendimiento === 'Excelente' ? 'bg-success' : 'bg-info'">
+                  </div>
+                </div>
+                <span class="status-text">{{ mesero.rendimiento }}</span>
+              </div>
+            </td>
+          </tr>
+        }
+
+        @if (rendimiento.length === 0) {
+          <tr>
+            <td colspan="6" class="empty-state">No hay datos de rendimiento registrados en este turno.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

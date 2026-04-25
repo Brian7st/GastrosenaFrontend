@@ -1,0 +1,212 @@
+<div class="panel-restaurante">
+
+  <header class="tarjeta-seccion header-principal">
+    <div class="info-titulo">
+      <h1>Control de Restaurante</h1>
+      <p>Gestión completa de mesas y pedidos en tiempo real</p>
+      <div class="leyenda">
+        <div class="leyenda-item"><span class="punto verde"></span> Libre</div>
+        <div class="leyenda-item"><span class="punto naranja"></span> Espera</div>
+        <div class="leyenda-item"><span class="punto rojo"></span> Ocupado</div>
+      </div>
+    </div>
+
+    <div class="estadisticas">
+      <div class="stat"><span class="valor verde">Activas</span><span class="label">Mesas</span></div>
+      <div class="stat"><span class="valor azul">{{ ordenesHistorial.length }}</span><span class="label">Total Órdenes</span></div>
+      <button class="btn-primario" (click)="abrirModal('agregar')">+ Agregar Mesa</button>
+    </div>
+  </header>
+
+  <section class="tarjeta-seccion">
+    <div class="cabecera-seccion limpia">
+      <h2>Distribución de Mesas ({{ mesas.length }})</h2>
+      <p>Layout del restaurante - Gestión completa de mesas</p>
+    </div>
+
+    <div class="grid-mesas">
+      @for (mesa of mesas; track mesa) {
+        <div
+          class="mesa"
+          [ngClass]="{ 'card-libre': mesa.estado === 'libre', 'card-ocupado': mesa.estado === 'ocupado', 'card-espera': mesa.estado === 'espera' }"
+          (click)="abrirModal(mesa.estado === 'libre' ? 'asignar' : 'pedido', mesa)">
+          <div class="acciones-flotantes">
+            <button class="btn-flotante btn-eliminar-flor" (click)="$event.stopPropagation(); abrirModal('eliminar', mesa)" title="Eliminar Mesa">🗑️</button>
+            @if (mesa.estado !== 'libre') {
+              <button class="btn-flotante btn-liberar-flor" (click)="$event.stopPropagation(); abrirModal('liberar', mesa)" title="Liberar Mesa">✔️</button>
+            }
+          </div>
+          <div class="icono-herramienta">🛠️</div>
+          <h3>Mesa {{ mesa.numero }}</h3>
+          <p>{{ mesa.asientos }} asientos</p>
+          <span class="estado" [ngClass]="mesa.estado">{{ mesa.estado }}</span>
+          @if (mesa.comensal) {
+            <p class="cliente">{{ mesa.comensal }}</p>
+          }
+        </div>
+      }
+    </div>
+
+    @if (mesas.length === 0) {
+      <div class="empty-state">No hay mesas. Presiona "+ Agregar Mesa" para empezar a crearlas.</div>
+    }
+  </section>
+
+  @if (ordenesHistorial.length > 0) {
+    <section class="tarjeta-seccion">
+      <div class="cabecera-seccion flex-between">
+        <div>
+          <h2>Órdenes ({{ ordenesHistorial.length }})</h2>
+          <p>Registro de facturas y consumos</p>
+        </div>
+        <button class="btn-secundario" (click)="imprimirElemento()">🖨️ Imprimir Todas</button>
+      </div>
+      <div class="lista-ordenes">
+        @for (orden of ordenesHistorial; track orden) {
+          <div class="tarjeta-orden">
+            <div class="orden-info">
+              <h4>ORD00{{ orden.id }}</h4>
+              <p>Mesa {{ orden.mesaNumero }} • {{ orden.comensal }} • {{ orden.horaCreacion | date:'HH:mm:ss' }}</p>
+              <div class="precio">${{ calcularTotalDe(orden).toLocaleString() }}</div>
+            </div>
+            <div class="orden-acciones">
+              <button class="btn-secundario" (click)="imprimirElemento()">🖨️ Imprimir</button>
+              <button class="btn-ver" (click)="verReporteOrden(orden)">👁️ Ver Reporte</button>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  @if (modalActivo) {
+    <div class="modal-overlay" (click)="cerrarModales()">
+      <div class="modal-contenedor" (click)="$event.stopPropagation()">
+        @if (modalActivo === 'agregar') {
+          <div>
+            <h3>+ Agregar Nueva Mesa</h3>
+            <label>Número de Asientos</label>
+            <input type="number" [(ngModel)]="nuevoAsientos" placeholder="Ej: 4">
+            <label>Nombre del Comensal</label>
+            <input type="text" [(ngModel)]="nuevoComensal" placeholder="Nombre para la orden">
+            <div class="modal-footer">
+              <button class="btn-cancelar" (click)="cerrarModales()">Cancelar</button>
+              <button class="btn-crear" (click)="crearNuevaMesa()">Crear Mesa</button>
+            </div>
+          </div>
+        }
+        @if (modalActivo === 'asignar') {
+          <div>
+            <h3>Asignar Mesa {{ mesaSeleccionada?.numero }}</h3>
+            <label>Ajustar Asientos (Opcional)</label>
+            <input type="number" [(ngModel)]="nuevoAsientos" placeholder="Ej: 4">
+            <label>Nombre del Comensal (Obligatorio)</label>
+            <input type="text" [(ngModel)]="nuevoComensal" placeholder="Nombre para registrar la orden">
+            <div class="modal-footer">
+              <button class="btn-cancelar" (click)="cerrarModales()">Cancelar</button>
+              <button class="btn-crear" (click)="asignarMesaLibre()">Asignar Mesa</button>
+            </div>
+          </div>
+        }
+        @if (modalActivo === 'pedido') {
+          <div class="modal-pedido-grande">
+            <div class="modal-header-pedido">
+              <h3>🛒 Pedido - Mesa {{ mesaSeleccionada?.numero }}</h3>
+              <span class="info-comensal">{{ mesaSeleccionada?.comensal }}</span>
+            </div>
+            <div class="modal-body-pedido-unificado">
+              <p class="seccion-titulo">Añadir Productos</p>
+              <div class="grid-productos-menu">
+                @for (prod of menuProductos; track prod) {
+                  <div class="item-menu" (click)="agregarProductoAMesa(prod.id)">
+                    <span class="icono">{{ prod.icono }}</span>
+                    <span class="nombre">{{ prod.nombre }}</span>
+                    <span class="precio">${{ prod.precio.toLocaleString() }}</span>
+                  </div>
+                }
+              </div>
+              <p class="seccion-titulo mt-3">Resumen de Cuenta</p>
+              <div class="lista-carrito-unificada">
+                @for (p of mesaSeleccionada?.ordenActual?.productos; track p) {
+                  <div class="item-carrito">
+                    <span>{{ p.nombre }}</span>
+                    <span class="subtotal">x{{ p.cant }} = ${{ (p.cant * p.precio).toLocaleString() }}</span>
+                  </div>
+                }
+                @if (mesaSeleccionada?.ordenActual?.productos?.length === 0) {
+                  <div class="texto-vacio">No hay productos agregados.</div>
+                }
+              </div>
+              <div class="total-grande">Total: ${{ calcularTotalDe(mesaSeleccionada?.ordenActual).toLocaleString() }}</div>
+            </div>
+            <div class="botones-separados-container">
+              <button class="btn-cancelar" (click)="cerrarModales()">Cerrar</button>
+              <button class="btn-primario" (click)="abrirModal('pago', mesaSeleccionada)">💳 Procesar Pago</button>
+            </div>
+          </div>
+        }
+        @if (modalActivo === 'reporte-orden') {
+          <div>
+            <h3>📄 Reporte de Orden: ORD00{{ ordenSeleccionada?.id }}</h3>
+            <p><strong>Mesa:</strong> {{ ordenSeleccionada?.mesaNumero }} | <strong>Cliente:</strong> {{ ordenSeleccionada?.comensal }}</p>
+            <p><strong>Fecha:</strong> {{ ordenSeleccionada?.horaCreacion | date:'dd/MM/yyyy HH:mm' }}</p>
+            <hr>
+              <div class="resumen-cobro">
+                @for (p of ordenSeleccionada?.productos; track p) {
+                  <div class="linea-resumen">
+                    <span>{{ p.cant }}x {{ p.nombre }}</span>
+                    <span>${{ (p.cant * p.precio).toLocaleString() }}</span>
+                  </div>
+                }
+                <div class="total-cobro">TOTAL FACTURADO: ${{ calcularTotalDe(ordenSeleccionada).toLocaleString() }}</div>
+              </div>
+              <div class="modal-footer">
+                <button class="btn-cancelar" (click)="cerrarModales()">Cerrar</button>
+                <button class="btn-primario" (click)="imprimirElemento()">🖨️ Imprimir Factura</button>
+              </div>
+            </div>
+          }
+          @if (modalActivo === 'pago') {
+            <div>
+              <h3>💳 Cobrar Mesa {{ mesaSeleccionada?.numero }}</h3>
+              <p>Cliente: <strong>{{ mesaSeleccionada?.comensal }}</strong></p>
+              <div class="resumen-cobro">
+                @for (p of mesaSeleccionada?.ordenActual?.productos; track p) {
+                  <div class="linea-resumen">
+                    <span>{{ p.cant }}x {{ p.nombre }}</span>
+                    <span>${{ (p.cant * p.precio).toLocaleString() }}</span>
+                  </div>
+                }
+                <hr style="margin-top: 10px; border: 0; border-top: 1px dashed #ddd;">
+                <div class="total-cobro">TOTAL A COBRAR: ${{ calcularTotalDe(mesaSeleccionada?.ordenActual).toLocaleString() }}</div>
+              </div>
+              <div class="modal-footer">
+                <button class="btn-cancelar" (click)="abrirModal('pedido', mesaSeleccionada)">Atrás</button>
+                <button class="btn-crear" (click)="procesarPagoCompleto()">Confirmar Pago</button>
+              </div>
+            </div>
+          }
+          @if (modalActivo === 'liberar') {
+            <div>
+              <h3 class="red-text">¿Liberar Mesa {{ mesaSeleccionada?.numero }}?</h3>
+              <p>El pedido actual se marcará como cancelado en el historial.</p>
+              <div class="modal-footer">
+                <button class="btn-cancelar" (click)="cerrarModales()">Cancelar</button>
+                <button class="btn-rojo" (click)="liberarMesaDefinitivamente()">Sí, Liberar</button>
+              </div>
+            </div>
+          }
+          @if (modalActivo === 'eliminar') {
+            <div>
+              <h3 class="red-text">⚠️ ¿Eliminar Mesa {{ mesaSeleccionada?.numero }}?</h3>
+              <p>Desaparecerá de la pantalla, pero su historial de órdenes seguirá guardado.</p>
+              <div class="modal-footer">
+                <button class="btn-cancelar" (click)="cerrarModales()">Cancelar</button>
+                <button class="btn-rojo" (click)="eliminarMesaDelSistema()">Sí, Eliminar</button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>

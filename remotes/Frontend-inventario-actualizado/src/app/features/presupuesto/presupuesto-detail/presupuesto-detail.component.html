@@ -1,0 +1,120 @@
+@if (rubro()) {
+<div class="detail-wrapper">
+  
+  <!-- Encabezado y Breadcrumb -->
+  <header class="detail-header">
+    <div class="header-content">
+      <nav class="breadcrumb">
+        <a class="breadcrumb__link" (click)="volver()">Ejecución</a>
+        <lucide-icon name="chevron-right" [size]="12"></lucide-icon>
+        <span class="breadcrumb__current">Rubro</span>
+      </nav>
+      <div class="title-row">
+        <h2 class="title">Detalle del Rubro: <span class="text-primary">{{ rubro()?.codigo }}</span></h2>
+        <span class="badge badge--dark uppercase tracking-widest text-small">{{ rubro()?.nivelEjecucion }}</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn--secondary">
+        <lucide-icon name="printer" [size]="18"></lucide-icon>
+        Imprimir
+      </button>
+      <button class="btn btn--primary" (click)="abrirCargar()">
+        <lucide-icon name="plus-circle" [size]="18"></lucide-icon>
+        Cargar GIL
+      </button>
+    </div>
+  </header>
+
+  <!-- Métricas KPI -->
+  <section class="kpi-grid">
+    <article class="kpi-card">
+      <p class="kpi-card__subtitle">Apropiación Inicial</p>
+      <div class="kpi-card__content">
+        <span class="kpi-card__value">{{ formatCurrency(rubro()?.apropiacionInicial || 0) }}</span>
+      </div>
+    </article>
+
+    <article class="kpi-card">
+      <p class="kpi-card__subtitle">Comprometido</p>
+      <div class="kpi-card__content">
+        <span class="kpi-card__value">{{ formatCurrency(rubro()?.comprometido || 0) }}</span>
+        <p class="kpi-card__subtext">{{ rubro()?.porcentajeEjecucion }}% Ejecutado</p>
+      </div>
+    </article>
+
+    <article class="kpi-card">
+      <p class="kpi-card__subtitle">Pagado Real</p>
+      <div class="kpi-card__content">
+        <span class="kpi-card__value">{{ formatCurrency(rubro()?.pagado || 0) }}</span>
+      </div>
+    </article>
+
+    <article class="kpi-card">
+      <p class="kpi-card__subtitle">Disponible (Saldo)</p>
+      <div class="kpi-card__content">
+        <span class="kpi-card__value text-primary font-bold">{{ formatCurrency(rubro()?.disponible || 0) }}</span>
+      </div>
+    </article>
+  </section>
+
+  <!-- Listado de Documentos GIL -->
+  <section class="section-container">
+    <header class="section-header">
+      <div class="section-title">
+        <div class="icon-wrapper">
+          <lucide-icon name="file-text" [size]="20"></lucide-icon>
+        </div>
+        <h3>Documentos GIL-F014 Asociados</h3>
+      </div>
+      <div class="section-badge">
+        <span class="dot"></span>
+        Vouchers Auditados
+      </div>
+    </header>
+    
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Código GIL</th>
+            <th>Item / Concepto</th>
+            <th>Fecha</th>
+            <th class="text-right">Valor</th>
+            <th class="text-center">Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (doc of documentos(); track doc.id) {
+            <tr class="data-row">
+              <td>
+                <span class="code-badge">{{ doc.codigo }}</span>
+              </td>
+              <td>
+                <span class="font-medium text-dark">{{ doc.item }}</span>
+              </td>
+              <td>
+                <span class="text-regular text-muted">{{ doc.fechaValidacion }}</span>
+              </td>
+              <td class="text-right">
+                <span class="font-bold text-dark">{{ formatCurrency(doc.monto) }}</span>
+              </td>
+              <td class="text-center">
+                <span class="status-badge" [ngClass]="doc.estado === 'error' ? 'status-badge--error' : 'status-badge--success'">
+                  {{ doc.estado }}
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+}
+
+<!-- Modales -->
+@if (showCargarModal()) {
+  <app-cargar-gil-modal (close)="cerrarCargar()"></app-cargar-gil-modal>
+}

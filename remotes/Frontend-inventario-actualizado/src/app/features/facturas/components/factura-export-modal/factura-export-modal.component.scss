@@ -1,0 +1,248 @@
+@use "sass:color";
+$primary: #006e25;
+$primary-container: #28a745;
+$slate-400: #94a3b8;
+$slate-500: #64748b;
+$slate-900: #0f172a;
+$surface-container-lowest: #ffffff;
+$surface-container-low: #f3f4f5;
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 2rem;
+}
+
+.modal-container {
+  background: $surface-container-lowest;
+  border-radius: 1.5rem;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  animation: scaleUp 0.2s ease-out;
+}
+
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 2rem 2rem 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.header-content {
+  display: flex;
+  gap: 1rem;
+}
+
+.header-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  background: #f0fdf4;
+  color: #16a34a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: $slate-900;
+  margin-bottom: 0.25rem;
+}
+
+.modal-subtitle {
+  color: $slate-500;
+  font-size: 0.875rem;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: $slate-400;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  &:hover { background: #f1f5f9; color: $slate-900; }
+}
+
+.modal-body {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.section-label {
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: $slate-500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+}
+
+// Date Inputs
+.date-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.date-input {
+  position: relative;
+  flex: 1;
+
+  .date-icon {
+    position: absolute;
+    left: 1rem;
+    top: 0.875rem;
+    color: $slate-400;
+  }
+
+  input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    background: $surface-container-low;
+    border: 1px solid transparent;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    color: $slate-900;
+    transition: all 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: rgba($primary, 0.3);
+      background: white;
+    }
+  }
+
+  .input-hint {
+    font-size: 0.6875rem;
+    color: $slate-400;
+    margin-top: 0.5rem;
+  }
+}
+
+// Radio Grid
+.grid-2x2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.radio-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: $surface-container-low;
+  border-radius: 0.5rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+
+  input[type="radio"] {
+    appearance: none;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid $slate-400;
+    border-radius: 50%;
+    margin: 0;
+
+    &:checked {
+      border-color: $primary;
+      border-width: 0.3rem;
+    }
+  }
+
+  .radio-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: $slate-900;
+  }
+
+  &--active {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+  }
+}
+
+// Format Options
+.format-options {
+  display: flex;
+  gap: 1rem;
+}
+
+.format-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  cursor: pointer;
+
+  input[type="radio"] { display: none; }
+
+  span {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $slate-900;
+  }
+
+  &--active {
+    background: #f0fdf4;
+    border-color: #16a34a;
+  }
+}
+
+.text-green-600 { color: #16a34a; }
+.text-slate-500 { color: $slate-500; }
+
+.modal-footer {
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  border: none;
+
+  &--primary {
+    background: $primary;
+    color: white;
+    &:hover { background: color.adjust($primary, $lightness: -5%); }
+  }
+  &--text {
+    background: transparent;
+    color: $slate-500;
+    &:hover { color: $slate-900; background: #f8fafc; }
+  }
+}

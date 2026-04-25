@@ -1,0 +1,54 @@
+<nav class="navbar" [class.scrolled]="isScrolled">
+  <div class="container navbar__inner">
+
+    <a routerLink="/" class="navbar__brand">
+      <div class="navbar__logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <path d="M14 2C7.373 2 2 7.373 2 14s5.373 12 12 12 12-5.373 12-12S20.627 2 14 2z"
+                fill="#22c55e" opacity=".2"/>
+          <path d="M10 8v4a4 4 0 008 0V8M14 16v6M10 22h8" stroke="#22c55e"
+                stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="navbar__brand-text">
+        <span class="brand-name">GastroSENA</span>
+        <span class="brand-sub">Sistema de Gestión</span>
+      </div>
+    </a>
+
+    <ul class="navbar__links">
+      <li><a href="#inicio"   class="navbar__link">Inicio</a></li>
+      <li><a href="#nosotros" class="navbar__link">Nosotros</a></li>
+      <li><a href="#menu"     class="navbar__link">Menú</a></li>
+      <li><a href="#contacto" class="navbar__link">Contacto</a></li>
+    </ul>
+
+    <div class="navbar__actions">
+      <a routerLink="/auth/login" class="btn btn-primary navbar__cta">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round">
+          <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/>
+        </svg>
+        Iniciar Sesión
+      </a>
+    </div>
+
+    <button class="navbar__toggle" (click)="toggleMobile()"
+            [class.active]="mobileOpen" aria-label="Menú">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <div class="navbar__mobile" [class.open]="mobileOpen">
+    <ul>
+      <li><a href="#inicio"   (click)="closeMobile()">Inicio</a></li>
+      <li><a href="#nosotros" (click)="closeMobile()">Nosotros</a></li>
+      <li><a href="#menu"     (click)="closeMobile()">Menú</a></li>
+      <li><a href="#contacto" (click)="closeMobile()">Contacto</a></li>
+    </ul>
+    <a routerLink="/auth/login" class="btn btn-primary"
+       style="width:100%;justify-content:center;">
+      Iniciar Sesión
+    </a>
+  </div>
+</nav>

@@ -1,0 +1,193 @@
+<!-- Encabezado de bienvenida -->
+<div class="dashboard__encabezado">
+  <h1 class="titular dashboard__titulo">Dashboard - Módulo de Inventario</h1>
+  <p class="dashboard__descripcion">Gestión integral y monitoreo en tiempo real de los activos institucionales.</p>
+</div>
+<!-- KPI Cards Grid -->
+<div class="dashboard__kpi-cuadricula">
+  <!-- Card 1: Total de Bienes -->
+  <div class="tarjeta-kpi">
+    <div class="tarjeta-kpi__cabecera">
+      <div class="tarjeta-kpi__icono-contenedor tarjeta-kpi__icono-contenedor--primario">
+        <lucide-icon name="package" [size]="24"></lucide-icon>
+      </div>
+      <span class="etiqueta-cambio etiqueta-cambio--positiva">+4.2%</span>
+    </div>
+    <div class="tarjeta-kpi__cuerpo">
+      <p class="tarjeta-kpi__etiqueta">Total de Bienes</p>
+      <h3 class="tarjeta-kpi__valor titular">{{ getters.totalBienes() | number }}</h3>
+    </div>
+  </div>
+  <!-- Card 2: Valor Total -->
+  <div class="tarjeta-kpi">
+    <div class="tarjeta-kpi__cabecera">
+      <div class="tarjeta-kpi__icono-contenedor tarjeta-kpi__icono-contenedor--secundario">
+        <lucide-icon name="circle-dollar-sign" [size]="24"></lucide-icon>
+      </div>
+      <span class="etiqueta-cambio etiqueta-cambio--positiva">+12%</span>
+    </div>
+    <div class="tarjeta-kpi__cuerpo">
+      <p class="tarjeta-kpi__etiqueta">Valor Total Inventario</p>
+      <h3 class="tarjeta-kpi__valor titular">$87,450,000</h3>
+    </div>
+  </div>
+  <!-- Card 3: Bajo Stock -->
+  <div class="tarjeta-kpi">
+    <div class="tarjeta-kpi__cabecera">
+      <div class="tarjeta-kpi__icono-contenedor tarjeta-kpi__icono-contenedor--alerta">
+        <lucide-icon name="triangle-alert" [size]="24"></lucide-icon>
+      </div>
+      <span class="etiqueta-cambio etiqueta-cambio--alerta">+8 hoy</span>
+    </div>
+    <div class="tarjeta-kpi__cuerpo">
+      <p class="tarjeta-kpi__etiqueta">Productos Bajo Stock</p>
+      <h3 class="tarjeta-kpi__valor titular">23</h3>
+    </div>
+  </div>
+  <!-- Card 4: Facturas Pendientes -->
+  <div class="tarjeta-kpi">
+    <div class="tarjeta-kpi__cabecera">
+      <div class="tarjeta-kpi__icono-contenedor tarjeta-kpi__icono-contenedor--mudo">
+        <lucide-icon name="receipt" [size]="24"></lucide-icon>
+      </div>
+      <span class="etiqueta-cambio etiqueta-cambio--neutra">-2 sem</span>
+    </div>
+    <div class="tarjeta-kpi__cuerpo">
+      <p class="tarjeta-kpi__etiqueta">Facturas Pendientes</p>
+      <h3 class="tarjeta-kpi__valor titular">8</h3> 
+    </div>
+  </div>
+</div>
+<!-- Sección Media: Alertas de Stock + Movimientos Recientes -->
+<div class="dashboard__seccion-media">
+<!-- Alertas de Stock Mínimo -->
+  <section class="tarjeta-modulo">
+    <div class="tarjeta-modulo__cabecera">
+      <h2 class="titular tarjeta-modulo__titulo">Alertas de Stock Mínimo</h2>
+      <a class="boton-enlace" routerLink="/alertas">Ver reporte completo</a>
+    </div>
+    <div class="lista-alertas">
+      @for (alerta of getters.alertasStock().slice(0, 4); track alerta.id) {
+        <div class="item-alerta">
+          <div class="item-alerta__info">
+            <span class="item-alerta__nombre">{{ alerta.bien }}</span>
+            <span class="item-alerta__cantidades item-alerta__cantidades--alerta">{{ alerta.cantidadActual }} / {{ alerta.cantidadMinima }} {{ alerta.unidad }}</span>
+          </div>
+          <div class="barra-progreso">
+            <div class="barra-progreso__llenado barra-progreso__llenado--alerta"
+                 [style.width.%]="(alerta.cantidadActual / alerta.cantidadMinima) * 100">
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+  <!-- Movimientos Recientes -->
+  <section class="tarjeta-modulo">
+    <div class="tarjeta-modulo__cabecera">
+      <h2 class="titular tarjeta-modulo__titulo">Movimientos Recientes</h2>
+    </div>
+    <div class="lista-movimientos">
+      @for (mov of getters.movimientos(); track mov.id) {
+        <div class="item-movimiento">
+          <div class="item-movimiento__indicador"
+               [ngClass]="{'item-movimiento__indicador--entrada': mov.tipo === 'Entry', 'item-movimiento__indicador--salida': mov.tipo === 'Exit'}">
+          </div>
+          <div class="item-movimiento__detalles">
+            <p class="item-movimiento__nombre">{{ mov.bien }}</p>
+            <p class="item-movimiento__meta">{{ mov.tipo }} • {{ mov.responsable }}</p>
+          </div>
+          <div class="item-movimiento__extra">
+            <p class="item-movimiento__fecha">{{ mov.fecha }}</p>
+            <p class="item-movimiento__cantidad"
+               [ngClass]="{'item-movimiento__cantidad--positiva': mov.tipo === 'Entry', 'item-movimiento__cantidad--negativa': mov.tipo === 'Exit'}">
+              {{ mov.tipo === 'Entry' ? '+' : '-' }}{{ mov.cantidad }} {{ mov.unidad }}
+            </p>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+</div>
+<!-- Acceso Rápido a Módulos (Actualizado con RF de Brian) -->
+<section class="dashboard__acceso-rapido">
+  <h2 class="titular dashboard__acceso-titulo">Acceso Rápido a Módulos</h2>
+  <div class="cuadricula-modulos">
+    <div class="modulo-rapido">
+      <lucide-icon name="package" class="modulo-rapido__icono"></lucide-icon>
+      <span class="modulo-rapido__texto">Gestión de Bienes</span>
+    </div>
+    <div class="modulo-rapido">
+      <lucide-icon name="receipt" class="modulo-rapido__icono"></lucide-icon>
+      <span class="modulo-rapido__texto">Facturas Electrónicas</span>
+    </div>
+    <a routerLink="/gil-f014" class="modulo-rapido">
+      <lucide-icon name="file-text" class="modulo-rapido__icono"></lucide-icon>
+      <span class="modulo-rapido__texto">Generar GIL-F-014</span>
+    </a>
+    <div class="modulo-rapido">
+      <lucide-icon name="file-stack" class="modulo-rapido__icono"></lucide-icon>
+      <span class="modulo-rapido__texto">Consolidado Presupuestal</span>
+    </div>
+    <div class="modulo-rapido">
+      <lucide-icon name="arrow-left-right" class="modulo-rapido__icono"></lucide-icon>
+      <span class="modulo-rapido__texto">Requisición y Entradas</span>
+    </div>
+    <a routerLink="/alertas" class="modulo-rapido">
+      <lucide-icon name="bell" class="modulo-rapido__icono"></lucide-icon>
+      <span class="modulo-rapido__texto">Alertas de Stock</span>
+    </a>
+    <div class="modulo-rapido">
+      <lucide-icon name="wallet" class="modulo-rapido__icono"></lucide-icon>
+      <span class="modulo-rapido__texto">Presupuesto</span>
+    </div>
+    <div class="modulo-rapido">
+      <lucide-icon name="scale" class="modulo-rapido__icono"></lucide-icon>
+      <span class="modulo-rapido__texto">Conciliación (Auditoría)</span>
+    </div>
+  </div>
+</section>
+<!-- Presupuesto General de Inventario (Adaptado a Términos del Backend) -->
+<section class="tarjeta-modulo dashboard__presupuesto">
+  <div class="tarjeta-modulo__cabecera">
+    <div class="dashboard__presupuesto-titulo-contenedor">
+      <lucide-icon name="pie-chart" class="dashboard__presupuesto-icono"></lucide-icon>
+      <h2 class="titular tarjeta-modulo__titulo">Resumen Presupuestal</h2>
+    </div>
+  </div>
+  <div class="dashboard__presupuesto-cuadricula">
+    <!-- Barra 1: Disponible (Saldo verde positivo) -->
+    <div class="item-presupuesto">
+      <div class="item-presupuesto__cabecera">
+        <span class="item-presupuesto__etiqueta">Presupuesto Utilizado</span>
+        <span class="item-presupuesto__valor">$52,400,000 / $80M</span>
+      </div>
+      <div class="barra-progreso barra-progreso--gruesa">
+        <div class="barra-progreso__llenado barra-progreso__llenado--primario" [style.width.%]="65.5"></div>
+      </div>
+      <p class="item-presupuesto__nota">Equivalente al 65.5% del total anual asignado.</p>
+    </div>
+    <!-- Barra 2: Comprometido -->
+    <div class="item-presupuesto">
+      <div class="item-presupuesto__cabecera">
+        <span class="item-presupuesto__etiqueta">Compras Programadas</span>
+        <span class="item-presupuesto__valor">$12,150,000</span>
+      </div>
+      <div class="barra-progreso barra-progreso--gruesa">
+        <div class="barra-progreso__llenado barra-progreso__llenado--secundario" [style.width.%]="45"></div>
+      </div>
+      <p class="item-presupuesto__nota">Adquisiciones aprobadas para el Q4.</p>
+    </div>
+    <!-- Barra 3: Pagado (Dinero real entregado) -->
+    <div class="item-presupuesto">
+      <div class="item-presupuesto__cabecera">
+        <span class="item-presupuesto__etiqueta">Reserva de Emergencia</span>
+        <span class="item-presupuesto__valor">$4,500,000 Disponible</span>
+      </div>
+      <div class="barra-progreso barra-progreso--gruesa">
+        <div class="barra-progreso__llenado barra-progreso__llenado--alerta" [style.width.%]="15"></div>
+      </div>
+      <p class="item-presupuesto__nota">Fondos retenidos para contingencias críticas.</p>
+    </div>
+  </div>
+</section>

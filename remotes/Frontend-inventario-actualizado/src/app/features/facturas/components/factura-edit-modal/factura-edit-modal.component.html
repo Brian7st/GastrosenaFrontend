@@ -1,0 +1,140 @@
+<div class="modal-backdrop" (click)="close()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-info">
+        <div class="header-icon">
+          <lucide-icon name="pencil" [size]="20"></lucide-icon>
+        </div>
+        <div>
+          <h2 class="modal-title">Editar Factura FEL</h2>
+          <p class="modal-subtitle">Modificando Documento: <span class="text-green-600 font-bold">FAC-2023-0892</span></p>
+        </div>
+      </div>
+      <button class="close-btn" (click)="close()">
+        <lucide-icon name="x" [size]="20"></lucide-icon>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <!-- Fila 1: Entidades -->
+      <div class="form-row form-row--2cols">
+        <div class="form-group">
+          <label>IDENTIFICACIÓN DEL CLIENTE (NIT/DPI)</label>
+          <div class="input-wrap">
+            <input type="text" value="893241-2" class="input">
+            <lucide-icon name="check-circle" [size]="16" class="icon-valid"></lucide-icon>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>RAZÓN SOCIAL</label>
+          <input type="text" value="Distribuidora Global S.A." class="input">
+        </div>
+      </div>
+
+      <!-- Fila 2: Docs y Fechas -->
+      <div class="form-row form-row--3cols">
+        <div class="form-group">
+          <label>TIPO DE DOCUMENTO</label>
+          <div class="input-wrap">
+            <select class="input input--select">
+              <option>Factura Electrónica</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>FECHA DE EMISIÓN</label>
+          <div class="input-wrap">
+            <input type="text" value="10/25/2023" class="input">
+            <lucide-icon name="calendar" [size]="16" class="icon-right"></lucide-icon>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>MONEDA</label>
+          <div class="input-wrap">
+            <select class="input input--select">
+              <option>GTQ - Quetzales</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detalle Artículos (Tabla Editable) -->
+      <div class="items-section">
+        <div class="items-header">
+          <label>DETALLE DE PRODUCTOS/SERVICIOS</label>
+          <button class="btn-add-text">
+            <lucide-icon name="plus-circle" [size]="14"></lucide-icon> Agregar Item
+          </button>
+        </div>
+        
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th>CANT.</th>
+              <th>DESCRIPCIÓN</th>
+              <th>PRECIO U.</th>
+              <th>TOTAL</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of articulos; track item.desc) {
+              <tr>
+                <td>{{ item.cant }}</td>
+                <td>{{ item.desc }}</td>
+                <td>Q {{ item.precio | number:'1.2-2' }}</td>
+                <td class="font-bold">Q {{ item.total | number:'1.2-2' }}</td>
+                <td class="text-right">
+                  <button class="btn-icon-danger">
+                    <lucide-icon name="trash-2" [size]="16"></lucide-icon>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Fila 3: Notas y Totales -->
+      <div class="form-row form-row--2cols align-start">
+        <div class="form-group">
+          <label>NOTAS INTERNAS</label>
+          <textarea class="textarea" rows="4">Actualización de precios acordada con el cliente para el Q4.</textarea>
+        </div>
+
+        <div class="totals-card">
+          <div class="totals-row">
+            <span>Subtotal:</span>
+            <span>Q 1,107.14</span>
+          </div>
+          <div class="totals-row">
+            <span>IVA (12%):</span>
+            <span>Q 132.86</span>
+          </div>
+          <div class="totals-row totals-row--grand">
+            <span>TOTAL FEL:</span>
+            <span class="text-green-600">Q 1,240.00</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="btn btn--danger-text" (click)="goToAnular()">
+        <lucide-icon name="x-circle" [size]="18"></lucide-icon>
+        Anular Documento
+      </button>
+      <div class="footer-actions">
+        <button class="btn btn--text" (click)="close()">Cancelar</button>
+        <button class="btn btn--primary">
+          <lucide-icon name="save" [size]="18"></lucide-icon>
+          Guardar Cambios
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,103 @@
+<!-- Back Button -->
+<a routerLink="/bienes" class="back-link">
+  <lucide-icon name="arrow-left" [size]="18"></lucide-icon>
+  Volver a Gestión de Bienes
+</a>
+
+<!-- Breadcrumb -->
+<div class="edit-breadcrumb">
+  <a routerLink="/bienes" class="edit-breadcrumb__link">Inventario</a>
+  <span class="edit-breadcrumb__sep">›</span>
+  <span class="edit-breadcrumb__current">Editar Bien</span>
+</div>
+
+<h1 class="edit-title">Editar Bien</h1>
+<p class="edit-subtitle">Actualice la información técnica y administrativa del activo en el sistema.</p>
+
+<div class="edit-grid">
+  <!-- Left: Image + State -->
+  <div class="edit-left">
+    <div class="edit-image">
+      <img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&h=350&fit=crop" alt="Bien" />
+    </div>
+    <div class="estado-box">
+      <span class="estado-box__label">ESTADO DEL ACTIVO</span>
+      <div class="estado-box__value">
+        <span class="dot dot--green"></span>
+        <span>{{ bien().estado | uppercase }}</span>
+        <lucide-icon name="chevrons-up-down" [size]="16" class="estado-box__toggle"></lucide-icon>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Form -->
+  <div class="edit-form-card">
+    <div class="edit-field">
+      <label class="edit-label">Nombre del Bien</label>
+      <div class="edit-input-wrapper edit-input-wrapper--valid">
+        <input class="edit-input" type="text" [ngModel]="bien().nombre" />
+        <lucide-icon name="check-circle" [size]="18" class="edit-input-check"></lucide-icon>
+      </div>
+    </div>
+
+    <div class="edit-field-row">
+      <div class="edit-field">
+        <label class="edit-label">Código Interno (EQU)</label>
+        <input class="edit-input edit-input--disabled" type="text" [value]="bien().codigoSena" disabled />
+      </div>
+      <div class="edit-field">
+        <label class="edit-label">Categoría</label>
+        <div class="select-wrap">
+          <select class="edit-select" [ngModel]="bien().categoria">
+            @for (cat of categorias; track cat) {
+              <option [value]="cat">{{ cat }}</option>
+            }
+          </select>
+          <lucide-icon name="chevron-down" [size]="16" class="select-wrap__icon"></lucide-icon>
+        </div>
+      </div>
+    </div>
+
+    <div class="edit-field-row">
+      <div class="edit-field">
+        <label class="edit-label">Stock Actual</label>
+        <div class="stock-control">
+          <button class="stock-control__btn" (click)="decrementStock()">
+            <lucide-icon name="minus" [size]="16"></lucide-icon>
+          </button>
+          <span class="stock-control__value">{{ bien().stock }}</span>
+          <button class="stock-control__btn" (click)="incrementStock()">
+            <lucide-icon name="plus" [size]="16"></lucide-icon>
+          </button>
+        </div>
+      </div>
+      <div class="edit-field">
+        <label class="edit-label">Stock Mínimo Alerta</label>
+        <input class="edit-input" type="number" [ngModel]="bien().stockMinimo" />
+        <p class="edit-hint">Se notificará al llegar a este límite.</p>
+      </div>
+    </div>
+
+    <div class="edit-field">
+      <label class="edit-label">Valor Unitario (COP)</label>
+      <div class="input-prefix-edit">
+        <span class="input-prefix-edit__symbol">$</span>
+        <input class="edit-input" type="text" [value]="formatCurrency(bien().valor)" />
+      </div>
+    </div>
+
+    <div class="edit-footer">
+      <a routerLink="/bienes" class="btn-cancel-edit">Cancelar</a>
+      <button class="btn-save-edit" (click)="guardar()">
+        <lucide-icon name="save" [size]="16"></lucide-icon>
+        Guardar Cambios
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Last Modified -->
+<div class="edit-modified">
+  <lucide-icon name="clock" [size]="16"></lucide-icon>
+  <span>Última modificación: <strong>12 Oct 2024, 08:34 AM</strong> por <a href="#">Admin_Sena_Bogota</a></span>
+</div>

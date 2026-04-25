@@ -1,0 +1,50 @@
+@if (open) {
+  <div class="keyword-confirm-modal__backdrop" (click)="onCancel()">
+    <div class="keyword-confirm-modal" (click)="$event.stopPropagation()">
+      <div class="keyword-confirm-modal__accent" [class.keyword-confirm-modal__accent--warning]="accent === 'warning'"></div>
+
+      <div class="keyword-confirm-modal__body">
+        <div class="keyword-confirm-modal__icon" [class.keyword-confirm-modal__icon--warning]="accent === 'warning'">
+          <lucide-icon [name]="accent === 'warning' ? 'alert-circle' : 'alert-triangle'" [size]="28"></lucide-icon>
+        </div>
+
+        <h3 class="keyword-confirm-modal__title">{{ title }}</h3>
+        <p class="keyword-confirm-modal__description">{{ description }}</p>
+
+        <div class="keyword-confirm-modal__confirm-group">
+          <label class="keyword-confirm-modal__label">
+            {{ keywordLabel }} <strong>{{ keyword }}</strong>
+          </label>
+          <input
+            class="keyword-confirm-modal__input"
+            type="text"
+            [placeholder]="keyword"
+            [ngModel]="confirmText()"
+            (ngModelChange)="confirmText.set($event)"
+          />
+        </div>
+
+        <div class="keyword-confirm-modal__actions">
+          <button
+            class="keyword-confirm-modal__button keyword-confirm-modal__button--primary"
+            [class.keyword-confirm-modal__button--warning]="accent === 'warning'"
+            [disabled]="!isValid()"
+            (click)="onConfirm()"
+          >
+            {{ confirmLabel }}
+          </button>
+          <button class="keyword-confirm-modal__button keyword-confirm-modal__button--secondary" (click)="onCancel()">
+            {{ cancelLabel }}
+          </button>
+        </div>
+      </div>
+
+      @if (identifierLabel && identifierValue) {
+        <div class="keyword-confirm-modal__footer">
+          <lucide-icon name="info" [size]="14"></lucide-icon>
+          <span>{{ identifierLabel }}: {{ identifierValue }}</span>
+        </div>
+      }
+    </div>
+  </div>
+}

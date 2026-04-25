@@ -1,0 +1,47 @@
+.footer {
+  background: #0f172a;
+  color: rgba(255,255,255,0.7);
+  padding: 4rem 0 2rem;
+
+  &__top {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 3rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    @media (max-width: 768px) { grid-template-columns: 1fr; gap: 2rem; }
+  }
+
+  &__brand { }
+
+  &__logo {
+    display: flex; align-items: center; gap: 0.625rem;
+    margin-bottom: 1rem;
+    span { font-size: 1.125rem; font-weight: 700; color: #fff; }
+  }
+
+  &__tagline { font-size: 0.875rem; line-height: 1.7; margin-bottom: 1rem; }
+
+  &__sena-badge {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-size: 0.75rem; color: #64748b;
+  }
+
+  &__col {
+    h5 { font-size: 0.875rem; font-weight: 600; color: #fff; margin-bottom: 1rem; }
+    ul { list-style: none; margin: 0; padding: 0;
+      li { margin-bottom: 0.5rem; }
+      a, span { font-size: 0.875rem; color: rgba(255,255,255,0.5); text-decoration: none; transition: color 0.2s;
+        &:hover { color: #22c55e; }
+      }
+    }
+  }
+
+  &__bottom {
+    padding-top: 2rem;
+    text-align: center;
+    p { font-size: 0.8125rem; color: #475569; margin: 0.25rem 0; }
+  }
+}
+
+.container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }

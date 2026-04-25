@@ -1,0 +1,157 @@
+<!-- Back -->
+<div class="back-bar">
+  <a routerLink="/solicitudes-gil" class="back-link">
+    <lucide-icon name="arrow-left" [size]="16"></lucide-icon>
+    Volver a Solicitudes GIL
+  </a>
+</div>
+
+<!-- Header -->
+<div class="edit-header">
+  <div>
+    <h1 class="edit-title">Editar Solicitud GIL-F-014</h1>
+    <p class="edit-subtitle">Actualice la información de asignación de bienes de inventario.</p>
+  </div>
+  <div class="edit-meta">
+    <span class="status-tag">ACTIVO</span>
+    <span class="edit-id">ID: GIL-2023-0892</span>
+  </div>
+</div>
+
+<div class="edit-layout">
+  <!-- Form Column -->
+  <div class="edit-form">
+    <!-- Información del Solicitante -->
+    <div class="section-card">
+      <div class="section-card__header">
+        <lucide-icon name="user-circle" [size]="20" class="icon-green"></lucide-icon>
+        <h3 class="section-card__title">Información del Solicitante</h3>
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label class="field__label">NOMBRE COMPLETO</label>
+          <input type="text" class="field__input" [(ngModel)]="solicitud.nombre">
+        </div>
+        <div class="field">
+          <label class="field__label">IDENTIFICACIÓN</label>
+          <input type="text" class="field__input" [(ngModel)]="solicitud.identificacion">
+        </div>
+        <div class="field">
+          <label class="field__label">CENTRO DE FORMACIÓN</label>
+          <input type="text" class="field__input" [(ngModel)]="solicitud.centroFormacion">
+        </div>
+        <div class="field">
+          <label class="field__label">CARGO</label>
+          <input type="text" class="field__input" [(ngModel)]="solicitud.cargo">
+        </div>
+      </div>
+    </div>
+
+    <!-- Detalles del Bien -->
+    <div class="section-card">
+      <div class="section-card__header">
+        <lucide-icon name="package" [size]="20" class="icon-green"></lucide-icon>
+        <h3 class="section-card__title">Detalles del Bien</h3>
+      </div>
+      <div class="field-grid">
+        <div class="field field--full">
+          <label class="field__label">DESCRIPCIÓN DEL EQUIPO</label>
+          <input type="text" class="field__input" [(ngModel)]="solicitud.descripcionEquipo">
+        </div>
+        <div class="field">
+          <label class="field__label">PLACA INVENTARIO</label>
+          <input type="text" class="field__input" [(ngModel)]="solicitud.placaInventario">
+        </div>
+        <div class="field">
+          <label class="field__label">NÚMERO DE SERIE</label>
+          <input type="text" class="field__input" [(ngModel)]="solicitud.numeroSerie">
+        </div>
+        <div class="field">
+          <label class="field__label">ESTADO ENTREGA</label>
+          <select class="field__input" [(ngModel)]="solicitud.estadoEntrega">
+            <option>Excelente</option>
+            <option>Bueno</option>
+            <option>Regular</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field__label">FECHA DE ASIGNACIÓN</label>
+          <input type="date" class="field__input" [(ngModel)]="solicitud.fechaAsignacion">
+        </div>
+      </div>
+    </div>
+
+    <!-- Trazabilidad Académica -->
+    <div class="section-card">
+      <div class="section-card__header">
+        <lucide-icon name="graduation-cap" [size]="20" class="icon-green"></lucide-icon>
+        <h3 class="section-card__title">Trazabilidad Académica</h3>
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label class="field__label">VOCERO (NOMBRE COMPLETO) *</label>
+          <input type="text" class="field__input" placeholder="Nombre del vocero" [(ngModel)]="solicitud.vocero">
+        </div>
+        <div class="field">
+          <label class="field__label">VOCERO (CÉDULA) *</label>
+          <input type="text" class="field__input" placeholder="Ej. 1.000.000.000" [(ngModel)]="solicitud.cedulaVocero">
+        </div>
+        <div class="field field--full">
+          <label class="field__label">RESULTADO DE APRENDIZAJE (RA) *</label>
+          <textarea class="field__textarea" rows="3" placeholder="Ingrese el texto detallado del RA..." [(ngModel)]="solicitud.resultadoAprendizaje"></textarea>
+        </div>
+        <div class="field">
+          <label class="field__label">FRANJA HORARIA *</label>
+          <input type="text" class="field__input" placeholder="Ej. 06:00 AM - 12:00 PM" [(ngModel)]="solicitud.franjaHoraria">
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <a routerLink="/solicitudes-gil" class="btn btn--ghost">Cancelar</a>
+      <button class="btn btn--primary">Guardar Cambios</button>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="edit-sidebar">
+    <!-- Historial -->
+    <div class="sidebar-card">
+      <h4 class="sidebar-card__title">
+        <lucide-icon name="history" [size]="16"></lucide-icon>
+        Historial del Formato
+      </h4>
+      <div class="timeline-list">
+        <div class="timeline-item timeline-item--connected">
+          <div class="timeline-dot timeline-dot--green">
+            <lucide-icon name="check-circle" [size]="12"></lucide-icon>
+          </div>
+          <div>
+            <p class="timeline-text">Creado por Almacén</p>
+            <p class="timeline-date">14 Mayo, 2023 - 09:30 AM</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot timeline-dot--primary">
+            <lucide-icon name="pencil" [size]="12"></lucide-icon>
+          </div>
+          <div>
+            <p class="timeline-text">Edición Actual</p>
+            <p class="timeline-date">Hoy - En proceso</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen -->
+    <div class="sidebar-card sidebar-card--accent">
+      <h4 class="sidebar-card__title sidebar-card__title--green">Resumen de Bienes</h4>
+      <p class="sidebar-card__desc">Este formulario representa el soporte legal de la entrega física de bienes a funcionarios. Cualquier modificación será registrada en la auditoría del sistema.</p>
+      <div class="sidebar-card__footer">
+        <span>VALOR ASEGURADO</span>
+        <span>$3.250.000 COP</span>
+      </div>
+    </div>
+  </div>
+</div>

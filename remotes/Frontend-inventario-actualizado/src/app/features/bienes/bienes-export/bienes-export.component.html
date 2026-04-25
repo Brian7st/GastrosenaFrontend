@@ -1,0 +1,136 @@
+<!-- Back Button -->
+<a routerLink="/bienes" class="back-link">
+  <lucide-icon name="arrow-left" [size]="18"></lucide-icon>
+  Volver a Gestión de Bienes
+</a>
+
+<h1 class="export-title">Exportar Reporte de Bienes</h1>
+<p class="export-subtitle">Configure los parámetros del reporte para generar un archivo detallado del inventario actual. Los reportes generados se archivan automáticamente en el historial del sistema.</p>
+
+<div class="export-grid">
+  <!-- Left: Filters + Format -->
+  <div class="export-left">
+    <!-- Params -->
+    <div class="export-card">
+      <div class="export-section-title">
+        <lucide-icon name="sliders-horizontal" [size]="20"></lucide-icon>
+        <h3>Parámetros de Filtrado</h3>
+      </div>
+
+      <div class="filter-row">
+        <div class="filter-field">
+          <label class="filter-label">RANGO DE FECHAS</label>
+          <div class="date-range">
+            <input type="date" class="filter-input" />
+            <span class="date-range__sep">al</span>
+            <input type="date" class="filter-input" />
+          </div>
+        </div>
+        <div class="filter-field">
+          <label class="filter-label">CATEGORÍA</label>
+          <select class="filter-select">
+            <option>Todas las categorías</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <div class="filter-field">
+          <label class="filter-label">ESTADO DEL BIEN</label>
+          <div class="checkbox-row">
+            <label class="checkbox-item" [class.checkbox-item--active]="estadoActivo">
+              <input type="checkbox" [(ngModel)]="estadoActivo" /> Activo
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" [(ngModel)]="estadoBajoStock" /> Bajo Stock
+            </label>
+          </div>
+        </div>
+        <div class="filter-field">
+          <label class="filter-label">ALMACÉN / BODEGA</label>
+          <select class="filter-select">
+            <option>Todos los almacenes</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Format -->
+    <div class="export-card">
+      <div class="export-section-title">
+        <lucide-icon name="download" [size]="20"></lucide-icon>
+        <h3>Formato de Exportación</h3>
+      </div>
+      <div class="format-grid">
+        <button class="format-option" [class.format-option--active]="formato() === 'excel'" (click)="selectFormato('excel')">
+          <div class="format-option__radio"></div>
+          <lucide-icon name="file-spreadsheet" [size]="32" class="format-option__icon format-option__icon--excel"></lucide-icon>
+          <span class="format-option__name">Excel</span>
+          <span class="format-option__ext">.xlsx</span>
+        </button>
+        <button class="format-option" [class.format-option--active]="formato() === 'pdf'" (click)="selectFormato('pdf')">
+          <div class="format-option__radio"></div>
+          <lucide-icon name="file-text" [size]="32" class="format-option__icon format-option__icon--pdf"></lucide-icon>
+          <span class="format-option__name">PDF</span>
+          <span class="format-option__ext">Documento</span>
+        </button>
+        <button class="format-option" [class.format-option--active]="formato() === 'csv'" (click)="selectFormato('csv')">
+          <div class="format-option__radio"></div>
+          <lucide-icon name="file-code" [size]="32" class="format-option__icon format-option__icon--csv"></lucide-icon>
+          <span class="format-option__name">CSV</span>
+          <span class="format-option__ext">Texto plano</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Preview + History -->
+  <div class="export-right">
+    <div class="preview-card">
+      <p class="preview-card__header">Resumen del Reporte</p>
+      <h2 class="preview-card__title">Vista Previa</h2>
+      <div class="preview-stat">
+        <span>Registros totales</span>
+        <span class="preview-stat__value">1,248</span>
+      </div>
+      <div class="preview-stat">
+        <span>Valor estimado</span>
+        <span class="preview-stat__value">$142,500.00</span>
+      </div>
+      <div class="preview-stat">
+        <span>Columnas incluidas</span>
+        <span class="preview-stat__value">24</span>
+      </div>
+      <div class="preview-note">
+        <lucide-icon name="alert-circle" [size]="14"></lucide-icon>
+        Este reporte incluye datos de depreciación y activos en comodato según la normativa vigente del SENA.
+      </div>
+    </div>
+
+    <button class="btn-generate" (click)="generar()">
+      <lucide-icon name="cloud-download" [size]="22"></lucide-icon>
+      <div>
+        <span class="btn-generate__main">Generar y Descargar</span>
+        <span class="btn-generate__sub">PROCESAR REPORTE AHORA</span>
+      </div>
+    </button>
+
+    <div class="recent-card">
+      <p class="recent-card__title">EXPORTACIONES RECIENTES</p>
+      @for (exp of exportRecientes; track exp.nombre) {
+        <div class="recent-item">
+          <div class="recent-item__icon">
+            <lucide-icon name="file-text" [size]="18"></lucide-icon>
+          </div>
+          <div class="recent-item__info">
+            <span class="recent-item__name">{{ exp.nombre }}</span>
+            <span class="recent-item__meta">{{ exp.tiempo }} • {{ exp.size }}</span>
+          </div>
+          <button class="recent-item__download">
+            <lucide-icon name="download" [size]="16"></lucide-icon>
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</div>

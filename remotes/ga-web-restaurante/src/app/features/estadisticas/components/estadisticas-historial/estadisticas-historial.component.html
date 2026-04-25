@@ -1,0 +1,78 @@
+<div class="historial-card">
+  <div class="card-header">
+    <i class="icon-bar-chart"></i>
+    <h3>Historial de Pedidos por Mesa</h3>
+  </div>
+
+  <div class="filtro-grupo">
+    <label>Buscar Mesa</label>
+    <div class="input-wrapper">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Ej: Mesa 5"
+        [value]="terminoBusqueda"
+        (input)="filtrarMesas($event)"
+        (focus)="mostrarDropdown = true"
+        (blur)="cerrarDropdown()">
+
+      @if (terminoBusqueda) {
+        <button class="btn-clear" (click)="limpiarFiltro()" title="Limpiar filtro">
+          &times;
+        </button>
+      }
+
+      @if (mostrarDropdown) {
+        <ul class="custom-dropdown">
+          @for (mesa of mesasFiltradas; track mesa) {
+            <li (click)="seleccionarMesa(mesa)">
+              {{ mesa }}
+            </li>
+          }
+          @if (mesasFiltradas.length === 0) {
+            <li class="no-results">No se encontraron mesas</li>
+          }
+        </ul>
+      }
+    </div>
+  </div>
+
+  @if (comandasDeMesa.length > 0) {
+    <div class="ordenes-scroll-container">
+      <div class="resumen-mesa">
+        <span>Mostrando {{ comandasDeMesa.length }} orden(es) de <strong>{{ mesaSeleccionada }}</strong></span>
+      </div>
+      @for (orden of comandasDeMesa; track orden) {
+        <div class="comanda-details">
+          <div class="comanda-header">
+            <span class="estado-pill" [ngClass]="{'estado-pagado': orden.estado === 'Pagado', 'estado-preparacion': orden.estado === 'En Preparación', 'estado-abierto': orden.estado === 'Abierto'}">
+              {{ orden.estado }}
+            </span>
+            <strong>{{ orden.idComanda }}</strong>
+          </div>
+          <p class="mesero-text">Mesero: {{ orden.mesero }} <span class="date-text">| {{ orden.fechaHora | date:'shortTime' }}</span></p>
+          <ul class="items-list">
+            @for (item of orden.detalles; track item) {
+              <li>
+                <span>{{ item.cantidad }}x {{ item.nombre }}</span>
+                <span>{{ item.precio | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+              </li>
+            }
+          </ul>
+          <div class="comanda-total">
+            <span>Total:</span>
+            <strong>{{ orden.total | currency:'COP':'symbol-narrow':'1.0-0' }}</strong>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  @if (comandasDeMesa.length === 0) {
+    <div class="empty-state">
+      <div class="empty-content">
+        <p>Busca o selecciona una mesa para ver su historial.</p>
+      </div>
+    </div>
+  }
+</div>

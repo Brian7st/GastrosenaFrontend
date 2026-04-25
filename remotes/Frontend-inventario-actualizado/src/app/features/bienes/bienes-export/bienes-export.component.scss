@@ -1,0 +1,298 @@
+@use "sass:color";
+$primary: #006e25;
+$primary-container: #28a745;
+$on-surface: #191c1d;
+$surface-container-low: #f3f4f5;
+$surface-container-high: #e7e8e9;
+$slate-400: #94a3b8;
+$slate-500: #64748b;
+$slate-50: #f8fafc;
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: $primary;
+  text-decoration: none;
+  margin-bottom: 1rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba($primary, 0.06);
+    color: color.adjust($primary, $lightness: -5%);
+  }
+}
+
+.export-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  color: $on-surface;
+  margin-bottom: 0.5rem;
+}
+
+.export-subtitle {
+  font-size: 0.875rem;
+  color: $slate-500;
+  max-width: 48rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.export-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1.6fr 1fr;
+  }
+}
+
+.export-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.export-card {
+  background: #fff;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+}
+
+.export-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: $on-surface;
+  margin-bottom: 1.5rem;
+
+  h3 {
+    font-family: 'Manrope', sans-serif;
+    font-size: 1.125rem;
+    font-weight: 700;
+  }
+}
+
+.filter-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.filter-field { display: flex; flex-direction: column; }
+
+.filter-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: $slate-400;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.375rem;
+}
+
+.filter-input, .filter-select {
+  background: $surface-container-low;
+  border: 1px solid $surface-container-high;
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  color: $on-surface;
+  outline: none;
+  width: 100%;
+
+  &:focus { border-color: rgba($primary, 0.3); }
+}
+
+.filter-select { appearance: none; cursor: pointer; }
+
+.date-range {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &__sep { font-size: 0.8125rem; color: $slate-400; }
+}
+
+.checkbox-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid $surface-container-high;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+
+  input { cursor: pointer; }
+  &--active { background: rgba($primary, 0.05); border-color: rgba($primary, 0.2); }
+}
+
+// Format selection
+.format-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.format-option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem 1rem;
+  border: 2px solid transparent;
+  border-radius: 1rem;
+  background: $surface-container-low;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &--active {
+    border-color: $primary;
+    background: rgba($primary, 0.03);
+  }
+
+  &__radio {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 0.875rem;
+    height: 0.875rem;
+    border-radius: 50%;
+    border: 2px solid $slate-400;
+
+    .format-option--active & {
+      border-color: $primary;
+      background: $primary;
+      box-shadow: inset 0 0 0 2px #fff;
+    }
+  }
+
+  &__icon {
+    &--excel { color: $primary; }
+    &--pdf { color: #dc2626; }
+    &--csv { color: $slate-500; }
+  }
+
+  &__name { font-weight: 700; font-size: 0.9375rem; color: $on-surface; }
+  &__ext { font-size: 0.75rem; color: $primary; }
+}
+
+// Right column
+.export-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.preview-card {
+  background: $on-surface;
+  color: #fff;
+  border-radius: 1.5rem;
+  padding: 2rem;
+
+  &__header { font-size: 0.75rem; color: rgba(#fff, 0.6); margin-bottom: 0.25rem; }
+  &__title { font-family: 'Manrope', sans-serif; font-size: 1.75rem; font-weight: 800; margin-bottom: 1.5rem; }
+}
+
+.preview-stat {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  font-size: 0.875rem;
+
+  &__value { font-weight: 700; color: $primary-container; }
+}
+
+.preview-note {
+  margin-top: 1rem;
+  background: rgba(#fff, 0.08);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  display: flex;
+  gap: 0.5rem;
+  color: rgba(#fff, 0.7);
+}
+
+.btn-generate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, $primary, $primary-container);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &__main { display: block; font-size: 1.125rem; font-weight: 700; }
+  &__sub { display: block; font-size: 0.625rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.8; }
+
+  &:hover { transform: scale(1.01); }
+}
+
+.recent-card {
+  background: #fff;
+  border-radius: 1rem;
+  padding: 1.5rem;
+
+  &__title {
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: $slate-400;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+  }
+}
+
+.recent-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+
+  & + & { border-top: 1px solid $slate-50; }
+
+  &__icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.5rem;
+    background: rgba($primary, 0.08);
+    color: $primary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__info { flex: 1; }
+  &__name { display: block; font-weight: 700; font-size: 0.875rem; color: $on-surface; }
+  &__meta { display: block; font-size: 0.75rem; color: $slate-400; }
+
+  &__download {
+    background: transparent;
+    border: none;
+    color: $primary;
+    cursor: pointer;
+    padding: 0.5rem;
+
+    &:hover { color: color.adjust($primary, $lightness: -10%); }
+  }
+}

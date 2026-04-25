@@ -1,0 +1,75 @@
+// ==========================================
+// Variables Globales - SENA Gastronomía
+// ==========================================
+
+// 1. Colores Institucionales
+$color-esmeralda-50:  #e0f8e0;
+$color-esmeralda-100: #b3ecb3;
+$color-esmeralda-500: #33cc33;
+$color-esmeralda-600: #29a329;
+$color-esmeralda-700: #00AF00; // Verde principal SENA
+
+// 2. Colores Semánticos
+$color-secundario: #facc15;
+$color-secundario-contenedor: #fef08a;
+$color-en-secundario-contenedor: #713f12;
+
+$color-terciario: #ef4444;
+$color-terciario-contenedor: #fee2e2;
+
+$color-contorno: #94a3b8;
+$color-contorno-variante: #cbd5e1;
+
+// 3. Colores de Superficie y Texto
+$color-superficie: #f8fafc;
+$color-superficie-contenedor: #f1f5f9;
+$color-superficie-contenedor-bajo: #ffffff;
+$color-superficie-contenedor-mas-bajo: #ffffff;
+
+$color-en-superficie: #0f172a;
+$color-secundario-texto: #64748b;
+$color-pizarra-100: #f1f5f9;
+$color-pizarra-400: #94a3b8;
+
+// 4. Medidas y Bordes
+$radio-sm: 0.25rem;
+$radio-md: 0.5rem;
+$radio-lg: 0.75rem;
+$radio-xl: 1rem;
+$radio-full: 9999px;
+
+$sombra-baja: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+$sombra-media: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+// ==========================================
+// Alias para "Precision Ledger" (Módulo Presupuesto)
+// ==========================================
+$primary: $color-esmeralda-700;
+$primary-container: $color-esmeralda-600;
+$on-primary: #ffffff;
+$on-primary-container: #004d00;
+$secondary: $color-secundario-texto;
+$tertiary: $color-terciario;
+$tertiary-container: $color-terciario-contenedor;
+
+$surface: $color-superficie;
+$surface-container-lowest: #ffffff;
+$surface-container-low: $color-pizarra-100; // #f1f5f9
+$surface-container: #e2e8f0; // Slate 200 (reemplaza darken)
+$surface-container-high: $color-contorno-variante; // #cbd5e1
+
+$on-surface: $color-en-superficie;
+$outline-variant: $color-contorno-variante;
+
+// Radios
+$radius-DEFAULT: $radio-sm;
+$radius-lg: $radio-lg;
+$radius-xl: $radio-xl;
+$radius-full: $radio-full;
+
+// Otros
+$white: #ffffff;
+
+// Tipografía (Fallback)
+$font-headline: 'Manrope', system-ui, sans-serif;
+$font-body: 'Inter', system-ui, sans-serif;

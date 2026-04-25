@@ -1,0 +1,43 @@
+<aside class="sidebar">
+
+  <!-- Logo -->
+  <div class="sidebar__brand">
+    <div class="sidebar__logo">🍴</div>
+    <div class="sidebar__brand-text">
+      <span class="sidebar__brand-name">RestauranteSystem</span>
+      <span class="sidebar__brand-sub">Gestión Integral</span>
+    </div>
+  </div>
+
+  <!-- Usuario -->
+  <div class="sidebar__user">
+    <div class="sidebar__user-avatar">I</div>
+    <div>
+      <p class="sidebar__user-name">Instructor</p>
+      <p class="sidebar__user-role">Instructor</p>
+    </div>
+  </div>
+
+  <!-- Navegación -->
+  <nav class="sidebar__nav">
+    @for (item of navItems; track item.route) {
+      <a [routerLink]="item.route" routerLinkActive="sidebar__nav-item--active" class="sidebar__nav-item">
+        <span class="sidebar__nav-icon">{{ item.icon }}</span>
+        <span class="sidebar__nav-label">{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+
+  <!-- Footer -->
+  <div class="sidebar__footer">
+    <a routerLink="/configuracion" class="sidebar__nav-item">
+      <span class="sidebar__nav-icon">⚙</span>
+      <span class="sidebar__nav-label">Configuración</span>
+    </a>
+    <button class="sidebar__logout">
+      <span>↪</span>
+      <span>Cerrar Sesión</span>
+    </button>
+  </div>
+
+</aside>

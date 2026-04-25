@@ -1,0 +1,114 @@
+$verde: #10b981; $bg-verde: #ecfdf5;
+$rojo: #FB2C36; $bg-rojo: #fee2e2;
+$naranja: #ff6708; $bg-naranja: #fef3c7;
+$azul: #2563eb; 
+$gris: #4b5563; $borde: #e5e7eb;
+
+.panel-restaurante {
+  padding: 30px; font-family: 'Segoe UI', system-ui, sans-serif; background-color: #f9fafb; min-height: 100vh;
+
+  .tarjeta-seccion {
+    background: white; border: 1px solid $borde; border-radius: 12px; padding: 24px; margin-bottom: 30px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  }
+
+  .header-principal {
+    display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;
+    h1 { margin: 0; font-size: 26px; font-weight: 800; color: #111827; }
+    p { margin: 8px 0 0; color: $gris; font-size: 14px; }
+    .leyenda { margin-top: 18px; display: flex; gap: 20px;
+      .leyenda-item { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; color: $gris; }
+      .punto { width: 12px; height: 12px; border-radius: 50%; &.verde { background: $verde; } &.naranja { background: $naranja; } &.rojo { background: $rojo; } }
+    }
+    .estadisticas { display: flex; gap: 32px; align-items: center; text-align: right;
+      .stat { .valor { font-weight: 700; font-size: 20px; display: block; } .verde { color: $verde; } .azul { color: $azul; } .label { font-size: 11px; color: $gris; text-transform: uppercase;} }
+    }
+  }
+
+  .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+
+  .grid-mesas { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 24px;
+    .mesa { border: 2px solid $borde; border-radius: 10px; padding: 20px; text-align: center; position: relative; cursor: pointer; transition: 0.2s;
+      &:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+      .icono-herramienta { font-size: 26px; margin-bottom: 10px; }
+      h3 { margin: 0; font-size: 17px; font-weight: 700; color: #111827; }
+      p { margin: 4px 0; font-size: 12px; color: $gris; font-weight: 600; }
+      .estado { font-weight: 800; text-transform: uppercase; font-size: 13px; display: inline-block; margin-top: 12px; }
+      .cliente { color: $rojo; font-weight: 700; font-size: 12px; margin-top: 5px; }
+      
+      .acciones-flotantes {
+        position: absolute; top: -14px; right: -14px; display: flex; flex-direction: column; gap: 6px; z-index: 10;
+        .btn-flotante { 
+          border-radius: 50%; width: 34px; height: 34px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); border: 2px solid white; transition: 0.2s;
+          &:hover { transform: scale(1.1); }
+          &.btn-eliminar-flor { background: $rojo; color: white; }
+          &.btn-liberar-flor { background: $azul; color: white; }
+        }
+      }
+      
+      &.card-libre { background: $bg-verde; border-color: #a7f3d0; .estado { color: $verde; } }
+      &.card-ocupado { background: $bg-rojo; border-color: #fecaca; .estado { color: $rojo; } }
+      &.card-espera { background: $bg-naranja; border-color: #fbbf24; .estado { color: $naranja; } }
+    }
+  }
+
+  .empty-state { text-align: center; padding: 40px; color: $gris; font-weight: 600; font-size: 16px; border: 2px dashed $borde; border-radius: 10px; }
+
+  .lista-ordenes { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 20px;
+    .tarjeta-orden {
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; padding: 20px; border: 1px solid $borde; border-radius: 10px; background: white;
+      .orden-info {
+        h4 { margin: 0 0 6px 0; font-weight: 800; color: #111827; font-size: 16px; }
+        p { margin: 2px 0; font-size: 13px; color: $gris; font-weight: 500; }
+        .precio { font-weight: 800; font-size: 18px; color: $verde; margin-top: 8px; }
+      }
+      .orden-acciones { display: flex; gap: 10px; flex-wrap: wrap; }
+      .btn-ver { background: white; border: 2px solid $borde; color: #111827; padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; &:hover { background: #f3f4f6; border-color: $azul; color: $azul; } }
+    }
+  }
+
+  // MODALES
+  .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 9999; padding: 15px; box-sizing: border-box; }
+  .modal-contenedor { background: white; border-radius: 12px; padding: 25px; width: 100%; max-width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto;
+    h3 { margin: 0; font-size: 18px; font-weight: 800; color: #111827; }
+    p { color: $gris; font-size: 13px; margin-bottom: 20px; }
+    label { display: block; margin-top: 15px; font-weight: 600; font-size: 14px; color: #111827; }
+    input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; margin-top: 6px; box-sizing: border-box; font-family: inherit; font-size: 14px; outline: none; &:focus{ border-color: $verde; } }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; }
+    .red-text { color: $rojo; }
+    .total-cobro { font-weight: 800; font-size: 20px; color: $verde; margin-top: 15px; text-align: right; }
+    .linea-resumen { display: flex; justify-content: space-between; border-bottom: 1px dashed #eee; padding: 8px 0; font-size: 14px; }
+  }
+
+  .modal-pedido-grande { 
+    width: 100%; 
+    max-width: 600px; 
+    .modal-header-pedido { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid $borde; padding-bottom: 15px; h3{margin:0;} .info-comensal { font-weight: 700; color: $gris; font-size: 16px;} }
+    .modal-body-pedido-unificado { margin-top: 20px;
+      .seccion-titulo { font-weight: 800; font-size: 15px; margin-bottom: 10px; color: #111827; }
+      .mt-3 { margin-top: 25px; }
+      
+      .grid-productos-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; max-height: 250px; overflow-y: auto; padding-right: 5px;
+        .item-menu { border: 1px solid $borde; padding: 12px; border-radius: 8px; cursor: pointer; text-align: center; transition: 0.2s; background: #f9fafb;
+          &:hover { background: $bg-verde; border-color: $verde; transform: translateY(-2px); }
+          .icono { font-size: 24px; display: block; } .nombre { font-size: 12px; display: block; font-weight: 700; margin: 6px 0;} .precio { font-weight: 800; color: $verde;} }
+      }
+      
+      .lista-carrito-unificada {
+        border: 1px solid $borde; border-radius: 8px; padding: 15px; background: white; max-height: 200px; overflow-y: auto;
+        .item-carrito { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 5px; font-size: 14px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed #eee; .subtotal { font-weight: 800; color: $verde; } }
+        .texto-vacio { color: $gris; font-style: italic; font-size: 13px; text-align: center; }
+      }
+      .total-grande { font-weight: 800; text-align: right; font-size: 22px; margin-top: 15px; color: $verde; }
+    }
+    
+    .botones-separados-container { display: flex; justify-content: flex-end; gap: 15px; margin-top: 25px; padding-top: 20px; border-top: 1px solid $borde; }
+  }
+
+  button { cursor: pointer; transition: 0.2s; font-weight: 700; border-radius: 8px; border: none; font-family: inherit; font-size: 14px; }
+  .btn-primario { background: $verde; color: white; padding: 10px 18px; &:hover { background: #059669; } }
+  .btn-secundario { background: #f3f4f6; border: 1px solid #d1d5db; color: #111827; padding: 8px 16px; &:hover { background: #e5e7eb; } }
+  .btn-crear { background: $verde; color: white; padding: 10px 18px; }
+  .btn-cancelar { background: #f3f4f6; border: 1px solid #d1d5db; color: #111827; padding: 10px 18px; &:hover { background: #e5e7eb; } }
+  .btn-rojo { background: $rojo; color: white; padding: 10px 18px; }
+}

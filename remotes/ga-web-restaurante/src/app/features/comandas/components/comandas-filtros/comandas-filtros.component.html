@@ -1,0 +1,42 @@
+<div class="filtros-panel">
+
+  <div class="filtro-grupo fecha-grupo">
+    <label><span class="icon">📅</span> Rango de Fechas</label>
+    <div class="rango-fechas">
+      <input type="date" class="form-control" [(ngModel)]="fechaDesde" (ngModelChange)="emitirFiltrosAutomaticos()">
+      <span class="separador">hasta</span>
+      <input type="date" class="form-control" [(ngModel)]="fechaHasta" (ngModelChange)="emitirFiltrosAutomaticos()">
+    </div>
+  </div>
+
+  <div class="filtro-grupo">
+    <label><span class="icon verde">🔍</span> Buscar Mesa</label>
+    <input type="text" placeholder="Ej: Mesa 5" class="form-control" [(ngModel)]="mesaBuscada" (ngModelChange)="emitirFiltrosAutomaticos()">
+  </div>
+
+  <div class="filtro-grupo">
+    <label><span class="icon morado">👤</span> Mesero Atendiendo</label>
+    <div style="position: relative;">
+      <input type="text" class="form-control dropdown-input"
+        placeholder="Escribe para buscar..."
+        [(ngModel)]="meseroSeleccionado"
+        (ngModelChange)="filtrarMeseros()"
+        (focus)="abrirDropdown()"
+        (blur)="cerrarDropdown()">
+
+      @if (mostrarDropdownMesero) {
+        <ul class="custom-dropdown">
+          @for (mesero of meserosSugeridos; track mesero) {
+            <li (mousedown)="seleccionarMesero(mesero)">
+              {{ mesero }}
+            </li>
+          }
+          @if (meserosSugeridos.length === 0) {
+            <li class="no-results">No hay coincidencias</li>
+          }
+        </ul>
+      }
+    </div>
+  </div>
+
+</div>

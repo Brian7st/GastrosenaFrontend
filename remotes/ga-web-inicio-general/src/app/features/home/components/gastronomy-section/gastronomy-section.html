@@ -1,0 +1,17 @@
+<section class="section" id="gastronomia">
+  <div class="container">
+    <app-section-title
+      title="Alta Gastronomía"
+      subtitle="Técnicas modernas, ingredientes locales y creatividad para llevar la cocina colombiana al siguiente nivel."
+    />
+    <div class="items-grid">
+      @for (item of items(); track item.id) {
+        <app-card
+          [title]="item.title"
+          [subtitle]="item.description"
+          [imageUrl]="item.imageUrl ?? ''"
+        />
+      }
+    </div>
+  </div>
+</section>

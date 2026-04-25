@@ -1,0 +1,206 @@
+<!-- Header -->
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Formato GIL-F-014</h1>
+    <p class="page-subtitle">Gestión de bienes y servicios - Centro de Servicios y Gestión Empresarial</p>
+  </div>
+  <a routerLink="/solicitudes-gil/nueva" class="btn btn--primary">
+    <lucide-icon name="plus" [size]="20"></lucide-icon>
+    Nueva Solicitud
+  </a>
+</div>
+
+<!-- KPI Grid -->
+<div class="kpi-grid">
+  <div class="kpi-card kpi-card--green">
+    <div class="kpi-card__top">
+      <div class="kpi-icon kpi-icon--green">
+        <lucide-icon name="pie-chart" [size]="20"></lucide-icon>
+      </div>
+      <span class="kpi-label">TOTAL</span>
+    </div>
+    <p class="kpi-value">128</p>
+    <p class="kpi-desc">Total de solicitudes</p>
+  </div>
+
+  <div class="kpi-card kpi-card--gray">
+    <div class="kpi-card__top">
+      <div class="kpi-icon kpi-icon--gray">
+        <lucide-icon name="file-text" [size]="20"></lucide-icon>
+      </div>
+      <span class="kpi-label">BORRADORES</span>
+    </div>
+    <p class="kpi-value">14</p>
+    <p class="kpi-desc">Pendientes por enviar</p>
+  </div>
+
+  <div class="kpi-card kpi-card--orange">
+    <div class="kpi-card__top">
+      <div class="kpi-icon kpi-icon--orange">
+        <lucide-icon name="clock" [size]="20"></lucide-icon>
+      </div>
+      <span class="kpi-label">EN TRÁMITE</span>
+    </div>
+    <p class="kpi-value">42</p>
+    <p class="kpi-desc">Pendientes y validadas</p>
+  </div>
+
+  <div class="kpi-card kpi-card--check">
+    <div class="kpi-card__top">
+      <div class="kpi-icon kpi-icon--check">
+        <lucide-icon name="check-circle" [size]="20"></lucide-icon>
+      </div>
+      <span class="kpi-label">FINALIZADAS</span>
+    </div>
+    <p class="kpi-value">72</p>
+    <p class="kpi-desc">Aprobadas y procesadas</p>
+  </div>
+</div>
+
+<!-- Table Card -->
+<div class="table-card">
+  <!-- Filters -->
+  <div class="table-filters">
+    <div class="filter-group">
+      <div class="filter-select">
+        <select>
+          <option>Filtrar por Estado</option>
+          <option>Borrador</option>
+          <option>Pendiente</option>
+          <option>Validado</option>
+          <option>Aprobado</option>
+          <option>Procesado</option>
+        </select>
+        <lucide-icon name="chevron-down" [size]="14" class="select-icon"></lucide-icon>
+      </div>
+      <div class="filter-select">
+        <select>
+          <option>Filtrar por Fecha</option>
+          <option>Últimos 7 días</option>
+          <option>Este mes</option>
+          <option>Año 2024</option>
+        </select>
+        <lucide-icon name="chevron-down" [size]="14" class="select-icon"></lucide-icon>
+      </div>
+    </div>
+    <p class="results-count">MOSTRANDO 1-10 DE 128 RESULTADOS</p>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>CÓDIGO</th>
+          <th>FECHA SOLICITUD</th>
+          <th>SOLICITANTE</th>
+          <th>GRUPO/FICHA</th>
+          <th>ESTADO</th>
+          <th>TOTAL</th>
+          <th class="text-right">ACCIONES</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (s of solicitudes(); track s.id) {
+          <tr class="data-row">
+            <td>
+              <span class="cell-code">{{ s.codigo }}</span>
+            </td>
+            <td class="cell-date">{{ s.fecha }}</td>
+            <td>
+              <div class="cell-person">
+                <div class="person-avatar">{{ s.solicitanteIniciales }}</div>
+                <span class="person-name">{{ s.solicitante }}</span>
+              </div>
+            </td>
+            <td class="cell-ficha">{{ s.grupoFicha }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="{
+                'status-badge--borrador': s.estado === 'Borrador',
+                'status-badge--pendiente': s.estado === 'Pendiente',
+                'status-badge--validado': s.estado === 'Validado',
+                'status-badge--aprobado': s.estado === 'Aprobado',
+                'status-badge--procesado': s.estado === 'Procesado'
+              }">{{ s.estado }}</span>
+            </td>
+            <td class="cell-total">{{ formatCurrency(s.total) }}</td>
+            <td>
+              <div class="action-buttons">
+                <a [routerLink]="['/solicitudes-gil', s.id]" class="action-btn" title="Ver detalle">
+                  <lucide-icon name="eye" [size]="16"></lucide-icon>
+                </a>
+                <a [routerLink]="['/solicitudes-gil', s.id, 'editar']" class="action-btn" title="Editar"
+                  [class.action-btn--disabled]="s.estado === 'Validado' || s.estado === 'Aprobado' || s.estado === 'Procesado'">
+                  <lucide-icon name="pencil" [size]="16"></lucide-icon>
+                </a>
+                <a [routerLink]="['/solicitudes-gil', s.id, 'pdf']" class="action-btn" title="Ver PDF">
+                  <lucide-icon name="file-text" [size]="16"></lucide-icon>
+                </a>
+                <button class="action-btn action-btn--danger" title="Eliminar" (click)="openDeleteModal(s)">
+                  <lucide-icon name="trash-2" [size]="16"></lucide-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination">
+    <button class="pagination__nav" (click)="goToPage(currentPage() - 1)">
+      <lucide-icon name="chevron-left" [size]="14"></lucide-icon> Anterior
+    </button>
+    <div class="pagination__pages">
+      <button class="pagination__page pagination__page--active">1</button>
+      <button class="pagination__page" (click)="goToPage(2)">2</button>
+      <button class="pagination__page" (click)="goToPage(3)">3</button>
+    </div>
+    <button class="pagination__nav" (click)="goToPage(currentPage() + 1)">
+      Siguiente <lucide-icon name="chevron-right" [size]="14"></lucide-icon>
+    </button>
+  </div>
+</div>
+
+<!-- Bottom Info Cards -->
+<div class="info-grid">
+  <!-- Notas del Formato -->
+  <div class="info-card">
+    <div class="info-card__bg-icon">
+      <lucide-icon name="info" [size]="80"></lucide-icon>
+    </div>
+    <h3 class="info-card__title">Notas del Formato</h3>
+    <p class="info-card__text">El formato GIL-F-014 es indispensable para el trámite de solicitudes de bienes o servicios. Asegúrese de que el instructor y el coordinador técnico hayan revisado las cantidades antes de registrar formalmente.</p>
+    <button class="info-card__link">Ver Manual de Diligenciamiento</button>
+  </div>
+
+  <!-- Resumen de Inversión -->
+  <div class="invest-card">
+    <h3 class="invest-card__title">Resumen de Inversión</h3>
+    <div class="invest-card__rows">
+      <div class="invest-row">
+        <span>Presupuesto Ejecutado</span>
+        <span class="invest-row__value">$45.800.000</span>
+      </div>
+      <div class="invest-row">
+        <span>En Trámite</span>
+        <span class="invest-row__value">$12.350.000</span>
+      </div>
+      <div class="invest-progress">
+        <div class="invest-progress__bar">
+          <div class="invest-progress__fill" style="width: 75%"></div>
+        </div>
+        <p class="invest-progress__label">75% del presupuesto anual asignado</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+@if (showDeleteModal() && solicitudToDelete()) {
+  <app-solicitud-delete-modal
+    [codigoSolicitud]="solicitudToDelete()!.codigo"
+    (cerrar)="closeDeleteModal()">
+  </app-solicitud-delete-modal>
+}

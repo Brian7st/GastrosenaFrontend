@@ -1,0 +1,85 @@
+<div class="modal-backdrop" (click)="close()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="header-content">
+        <div class="header-icon">
+          <lucide-icon name="file-spreadsheet" [size]="24"></lucide-icon>
+        </div>
+        <div>
+          <h2 class="modal-title">Exportar Reporte FEL</h2>
+          <p class="modal-subtitle">Configure los parámetros de exportación</p>
+        </div>
+      </div>
+      <button class="close-btn" (click)="close()">
+        <lucide-icon name="x" [size]="20"></lucide-icon>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Rango de Fechas -->
+      <div class="form-section">
+        <label class="section-label">RANGO DE FECHAS</label>
+        <div class="date-row">
+          <div class="date-input">
+            <lucide-icon name="calendar" [size]="16" class="date-icon"></lucide-icon>
+            <input type="text" placeholder="mm/dd/yyyy">
+            <p class="input-hint">Fecha Inicial</p>
+          </div>
+          <div class="date-input">
+            <lucide-icon name="calendar" [size]="16" class="date-icon"></lucide-icon>
+            <input type="text" placeholder="mm/dd/yyyy">
+            <p class="input-hint">Fecha Final</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estado de Facturación -->
+      <div class="form-section">
+        <label class="section-label">ESTADO DE FACTURACIÓN</label>
+        <div class="grid-2x2">
+          <label class="radio-card radio-card--active">
+            <input type="radio" name="estado" value="todos" checked>
+            <span class="radio-label">Todos</span>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="estado" value="emitidas">
+            <span class="radio-label">Emitidas</span>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="estado" value="pendientes">
+            <span class="radio-label">Pendientes</span>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="estado" value="anuladas">
+            <span class="radio-label">Anuladas</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Formato de Archivo -->
+      <div class="form-section">
+        <label class="section-label">FORMATO DE ARCHIVO</label>
+        <div class="format-options">
+          <label class="format-card format-card--active">
+            <input type="radio" name="formato" value="excel" checked>
+            <lucide-icon name="file-spreadsheet" [size]="18" class="format-icon text-green-600"></lucide-icon>
+            <span>Excel (.xlsx)</span>
+          </label>
+          <label class="format-card">
+            <input type="radio" name="formato" value="pdf">
+            <lucide-icon name="file-text" [size]="18" class="format-icon text-slate-500"></lucide-icon>
+            <span>PDF (.pdf)</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn--text" (click)="close()">Cancelar</button>
+      <button class="btn btn--primary">
+        <lucide-icon name="download" [size]="18"></lucide-icon>
+        Descargar Excel/PDF
+      </button>
+    </div>
+  </div>
+</div>

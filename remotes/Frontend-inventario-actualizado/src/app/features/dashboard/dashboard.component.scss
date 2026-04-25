@@ -1,0 +1,339 @@
+@use '../../../styles/variables' as *;
+
+// ============================
+// Dashboard Principal
+// ============================
+.dashboard {
+  &__encabezado {
+    margin-bottom: 2rem;
+  }
+
+  &__titulo {
+    font-size: 1.875rem;
+    font-weight: 800;
+    color: $color-en-superficie;
+    letter-spacing: -0.025em;
+  }
+
+  &__descripcion {
+    color: $color-secundario-texto;
+    margin-top: 0.25rem;
+  }
+
+  // Grid de KPIs
+  &__kpi-cuadricula {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+
+    @media (min-width: 768px) { grid-template-columns: repeat(2, 1fr); }
+    @media (min-width: 1024px) { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  // Sección Media: 2 columnas
+  &__seccion-media {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+
+    @media (min-width: 1024px) { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  // Acceso Rápido a Módulos
+  &__acceso-rapido {
+    margin-bottom: 2.5rem;
+  }
+
+  &__acceso-titulo {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+  }
+
+  // Presupuesto
+  &__presupuesto {
+    margin-bottom: 2rem;
+  }
+
+  &__presupuesto-titulo-contenedor {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__presupuesto-icono {
+    color: $color-esmeralda-700;
+  }
+
+  &__presupuesto-cuadricula {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+
+    @media (min-width: 768px) { grid-template-columns: repeat(3, 1fr); }
+  }
+}
+
+// ============================
+// Tarjeta KPI
+// ============================
+.tarjeta-kpi {
+  background-color: $color-superficie-contenedor-mas-bajo;
+  padding: 1.5rem;
+  border-radius: $radio-xl;
+  box-shadow: $sombra-baja;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border: 1px solid transparent;
+  transition: border-color 0.3s ease;
+
+  &:hover {
+    border-color: rgba($color-esmeralda-500, 0.1);
+  }
+
+  &__cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  &__icono-contenedor {
+    width: 3rem;
+    height: 3rem;
+    border-radius: $radio-xl;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    span { font-size: 1.5rem; }
+
+    &--primario { background-color: rgba($color-esmeralda-500, 0.1); color: $color-esmeralda-600; }
+    &--secundario { background-color: rgba($color-secundario-contenedor, 0.5); color: $color-en-secundario-contenedor; }
+    &--alerta { background-color: rgba($color-terciario-contenedor, 0.1); color: $color-terciario; }
+    &--mudo { background-color: rgba($color-contorno-variante, 0.2); color: $color-contorno; }
+  }
+
+  &__etiqueta {
+    font-size: 0.875rem;
+    color: $color-secundario-texto;
+    font-weight: 500;
+  }
+
+  &__valor {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $color-en-superficie;
+    margin-top: 0.25rem;
+  }
+}
+
+// ============================
+// Etiquetas (Badges)
+// ============================
+.etiqueta-cambio {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  border-radius: $radio-full;
+
+  &--positiva { color: $color-esmeralda-600; background-color: $color-esmeralda-50; }
+  &--alerta { color: $color-terciario; background-color: rgba($color-terciario, 0.05); }
+  &--neutra { color: $color-secundario-texto; background-color: $color-pizarra-100; }
+}
+
+// ============================
+// Tarjeta Módulo Genérica
+// ============================
+.tarjeta-modulo {
+  background-color: $color-superficie-contenedor-mas-bajo;
+  padding: 2rem;
+  border-radius: $radio-xl;
+  box-shadow: $sombra-baja;
+
+  &__cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+
+  &__titulo {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+}
+
+.boton-enlace {
+  background: transparent;
+  border: none;
+  color: $color-esmeralda-700;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  &:hover { text-decoration: underline; }
+}
+
+// ============================
+// Lista de Alertas de Stock
+// ============================
+.lista-alertas {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.item-alerta {
+  &__info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+  }
+
+  &__nombre { font-weight: 600; color: $color-en-superficie; }
+  &__cantidades { font-weight: 700; }
+  &__cantidades--alerta { color: $color-terciario; }
+}
+
+.barra-progreso {
+  height: 0.5rem;
+  width: 100%;
+  background-color: $color-superficie-contenedor;
+  border-radius: $radio-full;
+  overflow: hidden;
+
+  &--gruesa { height: 0.75rem; }
+
+  &__llenado {
+    height: 100%;
+    border-radius: $radio-full;
+
+    &--primario { background-color: $color-esmeralda-500; }
+    &--secundario { background-color: rgba($color-secundario, 0.6); }
+    &--alerta { background-color: $color-terciario-contenedor; }
+  }
+}
+
+// ============================
+// Lista de Movimientos Recientes
+// ============================
+.lista-movimientos {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.item-movimiento {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid $color-superficie-contenedor;
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  &__indicador {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    &--entrada { background-color: $color-esmeralda-500; }
+    &--salida { background-color: $color-terciario-contenedor; }
+  }
+
+  &__detalles { flex: 1; }
+  &__nombre { font-size: 0.875rem; font-weight: 700; color: $color-en-superficie; }
+  &__meta { font-size: 0.75rem; color: $color-secundario-texto; }
+  &__extra { text-align: right; }
+  &__fecha { font-size: 0.875rem; font-weight: 500; color: $color-en-superficie; }
+
+  &__cantidad {
+    font-size: 0.75rem;
+    font-weight: 700;
+    &--positiva { color: $color-esmeralda-600; }
+    &--negativa { color: $color-terciario; }
+  }
+}
+
+// ============================
+// Cuadrícula de Acceso Rápido
+// ============================
+.cuadricula-modulos {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+
+  @media (min-width: 768px) { grid-template-columns: repeat(4, 1fr); }
+}
+
+.modulo-rapido {
+  background-color: $color-superficie-contenedor-bajo;
+  padding: 1.5rem;
+  border-radius: $radio-xl;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  &:hover {
+    background-color: rgba($color-esmeralda-500, 0.05);
+    transform: scale(1.04);
+
+    .modulo-rapido__icono {
+      transform: scale(1.1);
+      color: $color-esmeralda-700;
+    }
+  }
+
+  &__icono {
+    color: $color-esmeralda-700;
+    font-size: 1.75rem;
+    transition: all 0.2s ease;
+  }
+
+  &__texto {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: $color-en-superficie;
+  }
+}
+
+// ============================
+// Presupuesto General
+// ============================
+.item-presupuesto {
+  &__cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  &__etiqueta {
+    font-weight: 700;
+    color: $color-en-superficie;
+  }
+
+  &__valor {
+    color: $color-secundario-texto;
+    font-size: 0.8rem;
+  }
+
+  &__nota {
+    font-size: 0.625rem;
+    color: $color-pizarra-400;
+    margin-top: 0.5rem;
+  }
+}

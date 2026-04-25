@@ -1,0 +1,21 @@
+.section { padding: 96px 0; background: var(--gray-50); }
+.barismo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+}
+.barismo-card {
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+.barismo-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.barismo-card__img { height: 180px; overflow: hidden; }
+.barismo-card__img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+.barismo-card:hover .barismo-card__img img { transform: scale(1.05); }
+.barismo-card__body { padding: 20px; display: flex; flex-direction: column; gap: 8px; }
+.barismo-card__title { font-size: 1rem; font-weight: 600; color: var(--gray-900); }
+.barismo-card__desc  { font-size: 0.85rem; color: var(--gray-500); line-height: 1.55; }
+.barismo-card__price { font-size: 1.1rem; font-weight: 700; color: var(--green-dark); margin-top: 4px; }

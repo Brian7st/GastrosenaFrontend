@@ -1,0 +1,39 @@
+<div class="dashboard-container">
+
+  <header class="dashboard-header">
+    <h2>Consultar Estadísticas</h2>
+    <p>Análisis y métricas operativas del restaurante</p>
+  </header>
+
+  @if (kpisData) {
+    <section class="kpi-section">
+      <app-estadisticas-kpis [datos]="kpisData"></app-estadisticas-kpis>
+    </section>
+  }
+
+  <section class="middle-section" style="display: flex; gap: 20px; margin-top: 24px;">
+
+    <div style="flex: 2;">
+      <app-estadisticas-historial [comandas]="comandasData"></app-estadisticas-historial>
+    </div>
+
+    <div style="flex: 1;">
+      <app-estadisticas-top-mesas [mesas]="topMesasData"></app-estadisticas-top-mesas>
+    </div>
+
+  </section>
+
+  <section class="bottom-section">
+    <app-estadisticas-rendimiento [rendimiento]="rendimientoData"></app-estadisticas-rendimiento>
+  </section>
+
+  <section class="export-section">
+    @if (kpisData) {
+      <app-estadisticas-exportar
+        [kpis]="kpisData"
+        [comandas]="comandasData">
+      </app-estadisticas-exportar>
+    }
+  </section>
+
+</div>

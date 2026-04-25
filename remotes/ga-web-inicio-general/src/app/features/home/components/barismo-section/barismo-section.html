@@ -1,0 +1,26 @@
+<section class="section" id="barismo">
+  <div class="container">
+    <app-section-title
+      title="Barismo & Café Especial"
+      subtitle="Café de origen colombiano preparado con técnicas de especialidad por nuestros aprendices de barismo."
+    />
+    <div class="barismo-grid">
+      @for (item of items(); track item.id) {
+        <div class="barismo-card">
+          @if (item.imageUrl) {
+            <div class="barismo-card__img">
+              <img [src]="item.imageUrl" [alt]="item.title" loading="lazy" />
+            </div>
+          }
+          <div class="barismo-card__body">
+            <h3 class="barismo-card__title">{{ item.title }}</h3>
+            <p  class="barismo-card__desc">{{ item.description }}</p>
+            @if (item.price) {
+              <span class="barismo-card__price">{{ item.price | currency:'COP':'symbol':'1.0-0' }}</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>

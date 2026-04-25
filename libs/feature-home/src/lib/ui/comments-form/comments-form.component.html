@@ -1,0 +1,55 @@
+<section class="comments-section" id="comentarios">
+  <div class="container">
+    <div class="comments-section__header">
+      <span class="tag tag-green">¿Qué opinas?</span>
+      <h2 class="comments-section__title">Déjanos tu comentario</h2>
+      <p class="comments-section__desc">Tu opinión nos ayuda a mejorar. Comparte tu experiencia o escríbenos una consulta.</p>
+    </div>
+
+    <form class="comments-form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      @if (successMessage()) {
+        <restaurant-alert type="success" [message]="successMessage()" />
+      }
+      @if (errorMessage()) {
+        <restaurant-alert type="error" [message]="errorMessage()" />
+      }
+
+      <div class="comments-form__row">
+        <div class="field">
+          <label class="field__label" for="name">Nombre</label>
+          <input id="name" type="text" class="field__input" placeholder="Tu nombre"
+                 formControlName="name"
+                 [class.field__input--error]="name.invalid && name.touched" />
+          @if (name.invalid && name.touched) {
+            <span class="field__error">Nombre requerido (mínimo 2 caracteres).</span>
+          }
+        </div>
+        <div class="field">
+          <label class="field__label" for="email">Correo electrónico</label>
+          <input id="email" type="email" class="field__input" placeholder="tu@correo.com"
+                 formControlName="email"
+                 [class.field__input--error]="email.invalid && email.touched" />
+          @if (email.invalid && email.touched) {
+            <span class="field__error">Ingresa un correo válido.</span>
+          }
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="message">Mensaje</label>
+        <textarea id="message" class="field__input field__textarea" rows="5"
+                  placeholder="Escribe aquí tu comentario o consulta..."
+                  formControlName="message"
+                  [class.field__input--error]="message.invalid && message.touched">
+        </textarea>
+        @if (message.invalid && message.touched) {
+          <span class="field__error">El mensaje debe tener al menos 10 caracteres.</span>
+        }
+      </div>
+
+      <button type="submit" class="btn btn-primary comments-form__submit" [disabled]="isLoading()">
+        @if (isLoading()) { Enviando... } @else { Enviar Comentario }
+      </button>
+    </form>
+  </div>
+</section>

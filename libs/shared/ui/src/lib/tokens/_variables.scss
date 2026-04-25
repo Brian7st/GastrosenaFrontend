@@ -1,0 +1,99 @@
+:root {
+  --color-contorno: #6e7b6b;
+  --color-secundario-texto: #64748b;
+  --color-en-primario-contenedor: #00330d;
+  --color-superficie-tenue: #d9dadb;
+  --color-superficie-inversa: #2e3132;
+  --color-superficie-contenedor-mas-bajo: #ffffff;
+  --color-superficie-contenedor-alto: #e7e8e9;
+  --color-fondo: #f8f9fa;
+  --color-en-primario: #ffffff;
+  --color-contorno-variante: #bdcab9;
+  --color-primario: #39a900;
+  --color-superficie-contenedor: #edeeef;
+  --color-secundario-contenedor: #d8e1ea;
+  --color-en-fondo: #191c1d;
+  --color-secundario: #575f67;
+  --color-en-superficie: #191c1d;
+  --color-superficie: #f8f9fa;
+  --color-superficie-variante: #e1e3e4;
+  --color-superficie-contenedor-bajo: #f3f4f5;
+  --color-superficie-contenedor-mas-alto: #e1e3e4;
+  --color-primario-contenedor: #39a900;
+  --color-primario-hover: #38a800;
+  --color-en-secundario-contenedor: #5b646b;
+  --color-error: #ba1a1a;
+  --color-terciario: #ba1830;
+  --color-terciario-contenedor: #ff555f;
+
+  --color-brand-primary: #39a900;
+  --color-brand-primary-strong: #2f7f00;
+  --color-brand-primary-soft: #e9f8dd;
+  --color-success: #00b894;
+  --color-warning: #fdcb6e;
+  --color-danger: #d63031;
+  --color-info: #0984e3;
+
+  --color-esmeralda-50: #ecfdf5;
+  --color-esmeralda-100: #d1fae5;
+  --color-esmeralda-500: #10b981;
+  --color-esmeralda-600: #059669;
+  --color-esmeralda-700: #047857;
+  --color-esmeralda-800: #065f46;
+  --color-esmeralda-900: #064e3b;
+
+  --color-pizarra-50: #f8fafc;
+  --color-pizarra-100: #f1f5f9;
+  --color-pizarra-200: #e2e8f0;
+  --color-pizarra-300: #cbd5e1;
+  --color-pizarra-400: #94a3b8;
+  --color-pizarra-500: #64748b;
+  --color-pizarra-600: #475569;
+  --color-pizarra-700: #334155;
+  --color-pizarra-800: #1e293b;
+  --color-pizarra-900: #0f172a;
+  --color-pizarra-950: #020617;
+
+  --color-surface-primary: #ffffff;
+  --color-surface-secondary: #f8f9fa;
+  --color-surface-tertiary: #f1f3f5;
+  --color-border: #dee2e6;
+  --color-border-strong: #adb5bd;
+  --color-text-primary: #191c1d;
+  --color-text-secondary: #64748b;
+  --color-text-disabled: #b2bec3;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  --font-family-base: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-family-headline: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-size-xs: 11px;
+  --font-size-sm: 13px;
+  --font-size-md: 15px;
+  --font-size-lg: 18px;
+  --font-size-xl: 22px;
+  --font-size-2xl: 28px;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 999px;
+
+  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+}

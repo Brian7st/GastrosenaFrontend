@@ -1,0 +1,325 @@
+@use '../../../../../styles/variables.scss' as *;
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: rgba($on-surface, 0.2);
+  backdrop-filter: blur(4px);
+}
+
+.modal-container {
+  background-color: $surface-container-lowest;
+  width: 100%;
+  max-width: 42rem;
+  border-radius: $radius-xl;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  padding: 1.5rem 2rem;
+  background-color: $surface-container-low;
+  border-bottom: 1px solid rgba($outline-variant, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .header-title-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .icon-box {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: $radius-lg;
+      background-color: rgba($primary, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .header-texts {
+      .title {
+        font-family: $font-headline;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: $on-surface;
+        line-height: 1.2;
+        margin: 0;
+      }
+
+      .subtitle {
+        font-size: 0.875rem;
+        color: $secondary;
+        margin: 0;
+      }
+    }
+  }
+
+  .close-btn {
+    border: none;
+    background: transparent;
+    color: $secondary;
+    padding: 0.5rem;
+    border-radius: $radius-full;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+
+    &:hover {
+      background-color: $surface-container-high;
+      color: $on-surface;
+    }
+  }
+}
+
+.modal-content {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+
+  @media (min-width: 640px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.col-span-2 {
+  grid-column: span 1;
+  @media (min-width: 640px) {
+    grid-column: span 2;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: $secondary;
+  margin-left: 0.25rem;
+}
+
+.select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .select-icon {
+    position: absolute;
+    right: 1rem;
+    color: $secondary;
+    pointer-events: none;
+  }
+}
+
+.form-control {
+  width: 100%;
+  height: 3rem;
+  background-color: $surface-container-low;
+  border: none;
+  border-radius: $radius-xl;
+  padding: 0 1rem;
+  font-family: $font-body;
+  font-weight: 500;
+  color: $on-surface;
+  transition: all 0.2s;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba($primary, 0.2);
+  }
+}
+
+select.form-control {
+  appearance: none;
+  cursor: pointer;
+  padding-right: 2.5rem;
+}
+
+.date-range {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.date-input-wrapper {
+  position: relative;
+
+  .date-label {
+    position: absolute;
+    top: -0.5rem;
+    left: 0.75rem;
+    padding: 0 0.25rem;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background-color: $surface-container-lowest;
+    color: $secondary;
+    pointer-events: none;
+  }
+}
+
+.format-selection {
+  border-top: 1px solid rgba($outline-variant, 0.1);
+  padding-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  .format-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: $secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-align: center;
+    margin: 0;
+  }
+}
+
+.format-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+  }
+
+  .format-card {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    height: 3.5rem;
+    background-color: $surface-container-high;
+    border: 1px solid rgba($outline-variant, 0.2);
+    border-radius: $radius-xl;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    padding: 0 1rem;
+
+    &:hover {
+      background-color: $surface-container;
+    }
+
+    &--active {
+      background-color: rgba($primary, 0.05);
+      border-color: rgba($primary, 0.5);
+
+      .format-name {
+        color: $primary !important;
+      }
+    }
+
+    .format-icon {
+      width: 2rem;
+      height: 2rem;
+      border-radius: $radius-DEFAULT;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &--excel {
+        background-color: #dcfce7;
+        color: #15803d;
+      }
+
+      &--pdf {
+        background-color: #fee2e2;
+        color: #b91c1c;
+      }
+    }
+
+    .format-info {
+      display: flex;
+      flex-direction: column;
+
+      .format-name {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: $on-surface;
+        line-height: 1;
+      }
+
+      .format-ext {
+        font-size: 0.625rem;
+        font-weight: 500;
+        color: $secondary;
+        text-transform: uppercase;
+        margin-top: 0.25rem;
+      }
+    }
+  }
+}
+
+.modal-footer {
+  padding: 1.5rem 2rem;
+  background-color: $surface-container-lowest;
+  border-top: 1px solid rgba($outline-variant, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: $radius-xl;
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+
+    &--text {
+      background: transparent;
+      color: $secondary;
+
+      &:hover {
+        background-color: $surface-container-low;
+      }
+    }
+
+    &--primary {
+      background: linear-gradient(90deg, $primary 0%, $primary-container 100%);
+      color: $white;
+      box-shadow: 0 4px 12px rgba($primary, 0.2);
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+
+      &:hover:not(:disabled) {
+        opacity: 0.9;
+        transform: translateY(-1px);
+      }
+    }
+  }
+}

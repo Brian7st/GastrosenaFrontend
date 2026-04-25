@@ -1,0 +1,59 @@
+<div class="exportar-card">
+  <div class="card-header">
+    <i class="icon-file-text"></i>
+    <h3>Exportar Reporte Operativo del Turno</h3>
+  </div>
+
+  <div class="exportar-content">
+
+    <div class="resumen-section">
+      <h4 class="section-title">Resumen del Turno Actual</h4>
+
+      <ul class="resumen-list">
+        <li>
+          <span>Total de órdenes:</span>
+          <strong>{{ totalOrdenes }}</strong>
+        </li>
+        <li>
+          <span>Órdenes activas:</span>
+          <strong>{{ kpis.pedidosActivos }}</strong>
+        </li>
+        <li>
+          <span>Órdenes completadas:</span>
+          <strong>{{ ordenesCompletadas }}</strong>
+        </li>
+        <li>
+          <span>Ingresos totales:</span>
+          <strong>{{ kpis.ingresosTotales | currency:'COP':'symbol-narrow':'1.0-0' }}</strong>
+        </li>
+        <li>
+          <span>Tiempo promedio:</span>
+          <strong>{{ kpis.tiempoPromedio }} min</strong>
+        </li>
+        <li>
+          <span>Mesas atendidas:</span>
+          <strong>{{ kpis.mesasAtendidas }}</strong>
+        </li>
+      </ul>
+    </div>
+
+    <div class="acciones-section">
+      <h4 class="section-title">Acciones de Exportación</h4>
+
+      <div class="botones-container">
+        <button class="btn btn-primary">
+          <i class="icon-download"></i> Generar Reporte Completo
+        </button>
+        <button class="btn btn-outline">
+          <i class="icon-calendar"></i> Programar Reporte Automático
+        </button>
+        <button class="btn btn-outline">
+          <i class="icon-chart"></i> Exportar Solo Estadísticas
+        </button>
+      </div>
+
+      <p class="nota-footer">Los reportes incluyen todas las métricas operativas, análisis de rendimiento y recomendaciones.</p>
+    </div>
+
+  </div>
+</div>

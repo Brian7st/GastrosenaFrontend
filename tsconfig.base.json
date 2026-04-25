@@ -1,0 +1,40 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": ".",
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "bundler",
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "ES2022",
+    "lib": ["ES2022", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "paths": {
+      "@restaurant/feature-shell": ["libs/feature-shell/src/index.ts"],
+      "@restaurant/feature-auth": ["libs/feature-auth/src/index.ts"],
+      "@restaurant/feature-cocina": ["libs/feature-cocina/src/index.ts"],
+      "@restaurant/feature-bar": ["libs/feature-bar/src/index.ts"],
+      "@restaurant/feature-restaurante": ["libs/feature-restaurante/src/index.ts"],
+      "@restaurant/feature-inventario": ["libs/feature-inventario/src/index.ts"],
+      "@restaurant/feature-usuarios": ["libs/feature-usuarios/src/index.ts"],
+      "@restaurant/feature-reportes": ["libs/feature-reportes/src/index.ts"],
+      "@restaurant/feature-facturacion": ["libs/feature-facturacion/src/index.ts"],
+      "@restaurant/feature-abastecimiento": ["libs/feature-abastecimiento/src/index.ts"],
+      "@restaurant/feature-presupuesto": ["libs/feature-presupuesto/src/index.ts"],
+      "@restaurant/feature-requisiciones": ["libs/feature-requisiciones/src/index.ts"],
+      "@restaurant/feature-notificaciones": ["libs/feature-notificaciones/src/index.ts"],
+      "@restaurant/feature-home": ["libs/feature-home/src/index.ts"],
+      "@restaurant/shared/auth": ["libs/shared/auth/src/index.ts"],
+      "@restaurant/shared/api": ["libs/shared/api/src/index.ts"],
+      "@restaurant/shared/state": ["libs/shared/state/src/index.ts"],
+      "@restaurant/shared/ui": ["libs/shared/ui/src/index.ts"],
+      "@restaurant/shared/models": ["libs/shared/models/src/index.ts"],
+      "@restaurant/shared/util": ["libs/shared/util/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}

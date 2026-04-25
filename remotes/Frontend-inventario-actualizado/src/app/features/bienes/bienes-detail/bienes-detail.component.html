@@ -1,0 +1,137 @@
+<!-- Back Button -->
+<div class="detail-nav">
+  <a routerLink="/bienes" class="detail-nav__back">
+    <lucide-icon name="arrow-left" [size]="18"></lucide-icon>
+    Volver a Gestión de Bienes
+  </a>
+</div>
+
+<!-- Breadcrumb path -->
+<div class="breadcrumb">
+  <span>Inventario</span>
+  <span class="breadcrumb__sep">/</span>
+  <span>{{ bien().categoria }}</span>
+  <span class="breadcrumb__sep">/</span>
+  <span class="breadcrumb__active">{{ bien().codigoSena }}</span>
+</div>
+
+<!-- Title + Actions -->
+<div class="detail-header">
+  <div>
+    <h1 class="detail-header__title">{{ bien().nombre }}</h1>
+    <p class="detail-header__subtitle">Referencia técnica para auditoría de activos SENA</p>
+  </div>
+  <div class="detail-header__actions">
+    <button class="btn-outline-detail">
+      <lucide-icon name="history" [size]="18"></lucide-icon>
+      Exportar Historial
+    </button>
+    <a [routerLink]="['/bienes', bien().id, 'editar']" class="btn-primary-detail">
+      <lucide-icon name="pencil" [size]="18"></lucide-icon>
+      Editar Activo
+    </a>
+  </div>
+</div>
+
+<!-- Content Grid -->
+<div class="detail-grid">
+  <!-- Image -->
+  <div class="detail-image">
+    <img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&h=400&fit=crop" alt="{{ bien().nombre }}" />
+    <div class="detail-image__badges">
+      <div class="detail-badge detail-badge--estado">
+        <span class="detail-badge__label">ESTADO</span>
+        <span class="detail-badge__value detail-badge__value--activo">
+          <span class="dot dot--green"></span> Activo
+        </span>
+      </div>
+      <div class="detail-badge">
+        <span class="detail-badge__label">CATEGORÍA</span>
+        <span class="detail-badge__value">{{ bien().categoria }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right side cards -->
+  <div class="detail-cards">
+    <div class="kpi-card">
+      <div class="kpi-card__icon kpi-card__icon--green">
+        <lucide-icon name="package-check" [size]="24"></lucide-icon>
+      </div>
+      <p class="kpi-card__label">STOCK ACTUAL</p>
+      <h3 class="kpi-card__value">{{ bien().stock }}</h3>
+      <p class="kpi-card__sub">
+        <span class="dot dot--green"></span> Stock Mínimo Requerido: {{ bien().stockMinimo }}
+      </p>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-card__icon kpi-card__icon--blue">
+        <lucide-icon name="credit-card" [size]="24"></lucide-icon>
+      </div>
+      <p class="kpi-card__label">VALOR UNITARIO</p>
+      <h3 class="kpi-card__value">{{ formatCurrency(bien().valor) }}</h3>
+      <p class="kpi-card__sub">Depreciación anual: 20%</p>
+    </div>
+
+    <!-- Specs -->
+    <div class="specs-card">
+      <div class="specs-card__header">
+        <lucide-icon name="settings" [size]="20"></lucide-icon>
+        <h3>Especificaciones Técnicas</h3>
+      </div>
+      <div class="specs-grid">
+        @for (spec of specs; track spec.etiqueta) {
+          <div class="spec-item">
+            <span class="spec-item__label">{{ spec.etiqueta }}</span>
+            <span class="spec-item__value">{{ spec.valor }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Historial de Movimientos -->
+<div class="history-section">
+  <div class="history-header">
+    <div class="history-header__title-row">
+      <lucide-icon name="history" [size]="22"></lucide-icon>
+      <h3>Historial de Movimientos</h3>
+    </div>
+    <a routerLink="/movimientos" class="history-header__link">Ver todo el historial</a>
+  </div>
+
+  <table class="history-table">
+    <thead>
+      <tr>
+        <th>FECHA</th>
+        <th>TIPO</th>
+        <th>RESPONSABLE</th>
+        <th>UBICACIÓN</th>
+        <th>CANTIDAD</th>
+        <th>OBSERVACIÓN</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (mov of movimientos(); track mov.id) {
+        <tr>
+          <td>{{ mov.fecha }}</td>
+          <td>
+            <span class="mov-badge" [ngClass]="{
+              'mov-badge--entrada': mov.tipo === 'ENTRADA',
+              'mov-badge--salida': mov.tipo === 'SALIDA',
+              'mov-badge--traslado': mov.tipo === 'TRASLADO'
+            }">{{ mov.tipo }}</span>
+          </td>
+          <td class="cell-bold">{{ mov.responsable }}</td>
+          <td>{{ mov.ubicacion }}</td>
+          <td [ngClass]="{ 'text-green': mov.cantidad > 0, 'text-red': mov.cantidad < 0 }">
+            {{ mov.cantidad > 0 ? '+' : '' }}{{ mov.cantidad }}
+          </td>
+          <td class="cell-italic">{{ mov.observacion }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

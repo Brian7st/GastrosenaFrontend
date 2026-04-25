@@ -1,0 +1,117 @@
+.barra-superior {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: calc(100% - 16rem);
+  height: 4rem;
+  background-color: var(--color-superficie-contenedor-mas-bajo);
+  border-bottom: 1px solid var(--color-pizarra-100);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1.5rem;
+  z-index: 50;
+
+  &__nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-right: 1.5rem;
+  }
+
+  &__nav-link {
+    color: var(--color-pizarra-500);
+    font-size: 0.875rem;
+    font-weight: 600;
+
+    &--activo {
+      color: var(--color-primario);
+    }
+  }
+
+  &__buscador-contenedor {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex: 1;
+  }
+
+  &__buscador {
+    position: relative;
+    width: 24rem;
+  }
+
+  &__buscador-icono {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-pizarra-400);
+    font-size: 1.125rem;
+  }
+
+  &__buscador-input {
+    width: 100%;
+    padding: 0.5rem 1rem 0.5rem 2.5rem;
+    background-color: var(--color-pizarra-50);
+    border: none;
+    border-radius: var(--radius-pill);
+    font-size: 0.875rem;
+    font-family: var(--font-family-base);
+    transition: all 0.3s ease;
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+    }
+  }
+
+  &__acciones {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  &__herramientas {
+    display: flex;
+    gap: 1rem;
+    border-left: 1px solid var(--color-pizarra-100);
+    padding-left: 1.5rem;
+    align-items: center;
+  }
+
+  &__boton-icono {
+    background: transparent;
+    border: none;
+    color: var(--color-pizarra-500);
+    padding: 0.5rem;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__perfil {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: var(--color-pizarra-200);
+    margin-left: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__img-perfil {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &__icono-perfil {
+    color: var(--color-pizarra-500);
+    font-size: 1.125rem;
+  }
+}

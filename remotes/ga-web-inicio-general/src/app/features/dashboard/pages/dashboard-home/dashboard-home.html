@@ -1,0 +1,101 @@
+<div class="dash-home">
+
+  <div class="dash-home__header">
+    <div>
+      <div class="dash-home__welcome">
+        <h1>¡Bienvenido, <span>{{ userName }}</span>!</h1>
+        <span class="role-badge">{{ userRole }}</span>
+      </div>
+      <p class="dash-home__date">{{ today | date:"EEEE, d 'de' MMMM 'de' yyyy" }}</p>
+    </div>
+    <a routerLink="/dashboard/restaurante" class="btn btn-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2.5" stroke-linecap="round">
+        <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2M7 2v20M21 15V2a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>
+      </svg>
+      Ver Restaurante
+    </a>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card" *ngFor="let k of kpis">
+      <div class="kpi-card__icon" [style.background]="k.iconBg" [innerHTML]="k.icon"></div>
+      <div class="kpi-card__body">
+        <p class="kpi-card__label">{{ k.label }}</p>
+        <p class="kpi-card__value">{{ k.value }}</p>
+        <p class="kpi-card__trend" [class.up]="k.trendUp" [class.down]="!k.trendUp">
+          {{ k.trend }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash-content-grid">
+
+    <div class="dash-card">
+      <div class="dash-card__header">
+        <h3>Pedidos Recientes</h3>
+        <a routerLink="/dashboard/restaurante" class="dash-card__link">Ver todos</a>
+      </div>
+      <div class="orders-list">
+        <div class="order-item" *ngFor="let o of recentOrders">
+          <div class="order-item__info">
+            <div class="order-item__top">
+              <span class="order-id">{{ o.id }}</span>
+              <span class="order-status" [ngClass]="'status-' + o.statusKey">{{ o.status }}</span>
+            </div>
+            <p class="order-item__detail">{{ o.table }} · {{ o.items }}</p>
+          </div>
+          <span class="order-item__time">{{ o.time }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-card__header">
+        <h3>⚠ Inventario Bajo</h3>
+        <a routerLink="/dashboard/inventario" class="dash-card__link">Ver Inventario</a>
+      </div>
+      <div class="stock-list">
+        <div class="stock-item" *ngFor="let s of lowStock">
+          <div class="stock-item__info">
+            <p class="stock-item__name">{{ s.name }}</p>
+            <div class="stock-bar">
+              <div class="stock-bar__fill" [style.width]="s.pct + '%'"
+                   [class.critical]="s.pct < 30"></div>
+            </div>
+          </div>
+          <span class="stock-item__qty">{{ s.qty }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-card__header">
+        <h3>Actividad Reciente</h3>
+      </div>
+      <div class="activity-list">
+        <div class="activity-item" *ngFor="let a of recentActivity">
+          <div class="activity-dot" [style.background]="a.color"></div>
+          <div>
+            <p class="activity-text">{{ a.text }}</p>
+            <span class="activity-time">{{ a.time }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-card__header">
+        <h3>Accesos Rápidos</h3>
+      </div>
+      <div class="quick-access">
+        <a *ngFor="let q of quickAccess" [routerLink]="q.route" class="quick-access-btn">
+          <span [innerHTML]="q.icon"></span>
+          <span>{{ q.label }}</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>

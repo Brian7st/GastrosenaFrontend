@@ -1,0 +1,10 @@
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--gray-100);
+}
+.dashboard-layout__main {
+  flex: 1;
+  overflow-x: hidden;
+  min-width: 0;
+}

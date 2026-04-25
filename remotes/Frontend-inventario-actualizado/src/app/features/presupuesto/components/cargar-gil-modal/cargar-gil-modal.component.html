@@ -1,0 +1,112 @@
+<div class="slide-overlay" (click)="cerrarModal()">
+  <div class="slide-panel" (click)="$event.stopPropagation()">
+    
+    <!-- Header -->
+    <header class="panel-header">
+      <div class="header-content">
+        <h2 class="title">Cargar GIL-F-014 a Presupuesto</h2>
+        <p class="subtitle">Solicitudes en estado <span class="font-bold text-primary">Validado</span></p>
+      </div>
+      <button class="close-btn" (click)="cerrarModal()">
+        <lucide-icon name="x" [size]="20"></lucide-icon>
+      </button>
+    </header>
+
+    <!-- Content (Scrollable List) -->
+    <div class="panel-content">
+      
+      <!-- Buscador -->
+      <div class="search-bar">
+        <div class="input-wrapper">
+          <lucide-icon name="search" [size]="18" class="text-muted"></lucide-icon>
+          <input type="text" class="search-input" placeholder="Buscar por número GIL..." [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)">
+        </div>
+        <button class="filter-btn">
+          <lucide-icon name="list-filter" [size]="20"></lucide-icon>
+        </button>
+      </div>
+
+      <!-- Lista de Documentos -->
+      <div class="doc-list">
+        @for (doc of docsFiltrados(); track doc.id) {
+          <div class="doc-item" [ngClass]="doc.estado === 'error' ? 'doc-item--error' : ''">
+            <div class="doc-item__main">
+              <div class="checkbox-wrapper">
+                <input 
+                  type="checkbox" 
+                  [checked]="isSeleccionado(doc.id)"
+                  (change)="toggleSeleccion(doc.id, $event)"
+                  [ngClass]="doc.estado === 'error' ? 'checkbox--error' : 'checkbox--primary'">
+              </div>
+              <div class="doc-info">
+                <div class="doc-title-row">
+                  <div>
+                    <h4 class="doc-code">{{ doc.codigo }}</h4>
+                    @if (doc.estado === 'error') {
+                      <span class="badge badge--error">Error de Saldo</span>
+                    } @else {
+                      <span class="badge badge--neutral">Validado el {{ doc.fechaValidacion }}</span>
+                    }
+                  </div>
+                  <span class="doc-amount">{{ formatCurrency(doc.monto) }}</span>
+                </div>
+                <div class="doc-details">
+                  <div class="detail-row">
+                    <span class="detail-label">Rubro:</span>
+                    <span class="detail-value">{{ doc.rubro }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">Ítem:</span>
+                    <span class="detail-value text-ellipsis">{{ doc.item }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Alerta Error de Déficit -->
+            @if (doc.estado === 'error') {
+              <div class="error-alert">
+                <lucide-icon name="alert-triangle" [size]="18"></lucide-icon>
+                <div class="error-text">
+                  <p class="error-title">Bloqueo por Déficit</p>
+                  <p class="error-desc">{{ doc.errorMessage }}</p>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        @if (docsFiltrados().length === 0) {
+          <div class="empty-state">
+            <div class="empty-line"></div>
+            <p>No se encontraron documentos.</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Footer Flotante -->
+    <footer class="panel-footer">
+      <div class="footer-summary">
+        <span class="summary-label">Seleccionados ({{ seleccionados().length }})</span>
+        <span class="summary-total">{{ formatCurrency(montoSeleccionado()) }}</span>
+      </div>
+      
+      <div class="footer-actions">
+        <button class="btn btn--primary btn--full" (click)="comprometer()" [disabled]="seleccionados().length === 0">
+          <lucide-icon name="check-square" [size]="20"></lucide-icon>
+          Comprometer al Presupuesto
+        </button>
+        <button class="btn btn--secondary btn--full">Descargar Vista Previa</button>
+      </div>
+
+      @if (erroresCount() > 0) {
+        <div class="footer-warning">
+          <lucide-icon name="alert-triangle" [size]="14"></lucide-icon>
+          <span>{{ erroresCount() }} documento(s) con errores de presupuesto</span>
+        </div>
+      }
+    </footer>
+
+  </div>
+</div>

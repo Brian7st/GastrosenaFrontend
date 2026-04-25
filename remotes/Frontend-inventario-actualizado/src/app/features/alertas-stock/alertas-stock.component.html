@@ -1,0 +1,134 @@
+<div class="page-header" style="margin-bottom: 2rem;">
+  <div>
+    <h1 class="page-title titular dashboard__titulo">Alertas de Stock Mínimo</h1>
+    <p class="page-subtitle dashboard__descripcion">Gestión proactiva de inventario crítico y riesgo.</p>
+  </div>
+</div>
+
+<section class="tarjeta-modulo tarjeta-modulo--extendida">
+  <!-- Mini KPIs Alertas -->
+  <div class="alertas-kpis">
+    <div class="alerta-mini-kpi">
+      <div class="alerta-mini-kpi__icono alerta-mini-kpi__icono--critico">
+        <lucide-icon name="triangle-alert" [size]="20"></lucide-icon>
+      </div>
+      <div>
+        <p class="alerta-mini-kpi__label">Críticas</p>
+        <p class="alerta-mini-kpi__valor alerta-mini-kpi__valor--critico">{{ alertasCriticas().length }}</p>
+      </div>
+    </div>
+    <div class="alerta-mini-kpi">
+      <div class="alerta-mini-kpi__icono alerta-mini-kpi__icono--activo">
+        <lucide-icon name="bell" [size]="20"></lucide-icon>
+      </div>
+      <div>
+        <p class="alerta-mini-kpi__label">Activas</p>
+        <p class="alerta-mini-kpi__valor alerta-mini-kpi__valor--activo">{{ alertasActivas().length }}</p>
+      </div>
+    </div>
+    <div class="alerta-mini-kpi">
+      <div class="alerta-mini-kpi__icono alerta-mini-kpi__icono--riesgo">
+        <lucide-icon name="circle-dollar-sign" [size]="20"></lucide-icon>
+      </div>
+      <div>
+        <p class="alerta-mini-kpi__label">En Riesgo</p>
+        <p class="alerta-mini-kpi__valor">{{ formatCurrency(valorTotalEnRiesgo()) }}</p>
+      </div>
+    </div>
+    <div class="alerta-mini-kpi">
+      <div class="alerta-mini-kpi__icono alerta-mini-kpi__icono--tiempo">
+        <lucide-icon name="clock" [size]="20"></lucide-icon>
+      </div>
+      <div>
+        <p class="alerta-mini-kpi__label">Sin Reposición</p>
+        <p class="alerta-mini-kpi__valor">{{ tiempoPromedio() }} <span style="font-size: 0.75rem; font-weight: normal;">días</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="alertas-filtros">
+    <div class="search-box">
+      <lucide-icon name="search" [size]="16" class="search-box__icon"></lucide-icon>
+      <input type="text" class="search-box__input" placeholder="Buscar por código o nombre..." [(ngModel)]="searchTerm">
+    </div>
+    <select class="alertas-filtros__select" [(ngModel)]="filtroPrioridad">
+      <option>Prioridad</option>
+      <option>Crítica</option>
+      <option>Alta</option>
+      <option>Media</option>
+    </select>
+    <select class="alertas-filtros__select" [(ngModel)]="filtroEstado">
+      <option>Estado</option>
+      <option>Activa</option>
+      <option>Resuelta</option>
+    </select>
+  </div>
+
+  <!-- Lista -->
+  <div class="lista-alertas-expandida">
+    @for (alerta of alertasFiltradas(); track alerta.id) {
+      <div class="alerta-item" [ngClass]="'alerta-item--' + alerta.prioridad.toLowerCase()">
+        <!-- Info -->
+        <div class="alerta-item__principal">
+          <div class="alerta-item__header">
+            <div>
+              <h3 class="alerta-item__nombre">{{ alerta.bien }}</h3>
+              <p class="alerta-item__codigo">{{ alerta.codigoInterno }}</p>
+            </div>
+            <span class="etiqueta-prioridad" [ngClass]="'etiqueta-prioridad--' + alerta.prioridad.toLowerCase()">{{ alerta.prioridad }}</span>
+          </div>
+          <div class="alerta-item__detalles">
+            <div>
+              <p class="alerta-item__label">Stock Actual</p>
+              <p class="alerta-item__data">{{ alerta.cantidadActual }} / {{ alerta.cantidadMinima }}{{ alerta.unidad }}</p>
+            </div>
+            <div>
+              <p class="alerta-item__label">Días Restantes</p>
+              <p class="alerta-item__data">{{ alerta.diasRestantes }} días</p>
+            </div>
+            <div>
+              <p class="alerta-item__label">Valor en Riesgo</p>
+              <p class="alerta-item__data" style="color: inherit;">{{ formatCurrency(alerta.valorEnRiesgo) }}</p>
+            </div>
+          </div>
+          @if(alerta.estado === 'Resuelta') {
+            <div class="alerta-item__resolucion">
+              <lucide-icon name="check-circle" [size]="14"></lucide-icon>
+              <span>Resuelta por {{ alerta.resueltaPor }}: {{ alerta.accionTomada }}</span>
+            </div>
+          }
+        </div>
+        <!-- Acciones -->
+        @if(alerta.estado === 'Activa') {
+          <div class="alerta-item__acciones">
+            <button class="btn-resolver" (click)="resolverAlerta(alerta.id)">Resolver</button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Historial Toggle -->
+  <div class="alertas-historial-toggle" (click)="toggleHistorial()">
+    <h3 class="font-headline" style="font-size: 0.875rem; font-weight: 700;">Historial de Resoluciones ({{ alertasResueltas().length }})</h3>
+    <lucide-icon [name]="mostrarHistorial() ? 'chevron-up' : 'chevron-down'" [size]="16"></lucide-icon>
+  </div>
+  
+  @if(mostrarHistorial()) {
+    <div class="alertas-historial">
+      @for (res of alertasResueltas(); track res.id) {
+        <div class="historial-item">
+          <div class="historial-item__icono">
+            <lucide-icon name="check-circle" [size]="16"></lucide-icon>
+          </div>
+          <div>
+            <p class="historial-item__nombre">{{ res.bien }}</p>
+            <p class="historial-item__texto">{{ res.accionTomada }}</p>
+            <p class="historial-item__meta">{{ res.fechaAlerta }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</section>

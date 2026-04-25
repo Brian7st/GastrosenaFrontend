@@ -1,0 +1,39 @@
+{
+  "name": "restaurant-app",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/restaurant-app/src",
+  "tags": ["scope:app", "type:feature"],
+  "targets": {
+    "build": {
+      "executor": "@angular/build:application",
+      "options": {
+        "outputPath": "dist/apps/restaurant-app",
+        "index": "apps/restaurant-app/src/index.html",
+        "browser": "apps/restaurant-app/src/main.ts",
+        "polyfills": ["zone.js"],
+        "tsConfig": "apps/restaurant-app/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": [],
+        "styles": ["apps/restaurant-app/src/styles.scss"]
+      },
+      "configurations": {
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true
+        },
+        "production": {
+          "outputHashing": "all"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular/build:dev-server",
+      "options": {
+        "buildTarget": "restaurant-app:build:development"
+      }
+    }
+  }
+}

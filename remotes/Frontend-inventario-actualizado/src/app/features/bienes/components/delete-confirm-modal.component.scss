@@ -1,0 +1,140 @@
+$tertiary: #ba1830;
+$on-surface: #191c1d;
+$surface-container-low: #f3f4f5;
+$surface-container-high: #e7e8e9;
+
+.delete-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba($on-surface, 0.15);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+}
+
+.delete-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border-radius: 1.5rem;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.12);
+  width: 100%;
+  max-width: 28rem;
+  padding: 2.5rem 2rem 2rem;
+  text-align: center;
+  z-index: 201;
+
+  &__icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: rgba($tertiary, 0.1);
+    color: $tertiary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+  }
+
+  &__title {
+    font-family: 'Manrope', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: $on-surface;
+    margin-bottom: 0.5rem;
+  }
+
+  &__desc {
+    font-size: 0.875rem;
+    color: #64748b;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+  }
+
+  &__confirm-box {
+    background: $surface-container-low;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    text-align: left;
+    margin-bottom: 1.5rem;
+  }
+
+  &__confirm-text {
+    font-size: 0.875rem;
+    color: $on-surface;
+    margin-bottom: 0.75rem;
+
+    strong {
+      font-weight: 700;
+    }
+  }
+
+  &__input {
+    width: 100%;
+    background: #fff;
+    border: 1px solid $surface-container-high;
+    border-radius: 0.5rem;
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
+    color: $on-surface;
+    outline: none;
+
+    &::placeholder {
+      color: #94a3b8;
+    }
+
+    &:focus {
+      border-color: $tertiary;
+      box-shadow: 0 0 0 2px rgba($tertiary, 0.1);
+    }
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding-top: 0.5rem;
+  }
+}
+
+.delete-btn-cancel {
+  padding: 0.625rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: $on-surface;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 0.5rem;
+
+  &:hover {
+    background: $surface-container-low;
+  }
+}
+
+.delete-btn-confirm {
+  padding: 0.625rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #fff;
+  background: $tertiary;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+
+  &:not(:disabled) {
+    opacity: 1;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}

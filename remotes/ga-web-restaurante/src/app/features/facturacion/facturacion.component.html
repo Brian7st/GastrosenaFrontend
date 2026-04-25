@@ -1,0 +1,106 @@
+<div class="facturacion-container">
+  
+  <header class="header-banner">
+    <h1>Módulo de Facturación - Instructor</h1>
+    <p>Panel de control para facturación y procesamiento de pagos</p>
+    <div class="badge-container">
+      <span class="badge">Instructor - Instructor</span>
+    </div>
+  </header>
+
+  <section class="stats-section">
+    <div class="stats-grid">
+      
+      <div class="stat-card">
+        <div class="stat-content">
+          <p class="stat-label">Pedidos Listos</p>
+          <p class="stat-number green-text">2</p>
+        </div>
+        <div class="stat-icon green-icon">
+          <i>$</i> 
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-content">
+          <p class="stat-label">Mesas por Pagar</p>
+          <p class="stat-number blue-text">1</p>
+        </div>
+        <div class="stat-icon blue-icon">
+          <i>💳</i>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-content">
+          <p class="stat-label">Facturas Hoy</p>
+          <p class="stat-number purple-text">4</p>
+        </div>
+        <div class="stat-icon purple-icon">
+          <i>📄</i>
+        </div>
+      </div>
+
+      <div class="stat-card total-card">
+        <div class="stat-content">
+          <p class="stat-label">Total Facturado</p>
+          <p class="stat-number orange-text">$150.535</p>
+        </div>
+        <div class="stat-icon orange-icon">
+          <i>💰</i>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="actions-section">
+    <div class="actions-grid">
+
+      <div class="action-card generate-card">
+        <div class="action-header">
+          <i class="icon green-text">💵</i>
+          <h3 class="green-text">Generar Factura</h3>
+        </div>
+        <p class="action-desc">Crear facturas para pedidos finalizados</p>
+        <div class="action-info">
+          <span>Pedidos disponibles:</span>
+          <span class="badge-count">2</span>
+        </div>
+        <button class="btn-sena-confirm" (click)="irANuevaFactura()">+ Crear Nueva Factura</button>
+      </div>
+
+      <div class="action-card search-card">
+        <div class="action-header">
+          <i class="icon blue-text">🔍</i>
+          <h3 class="blue-text">Buscar Factura</h3>
+        </div>
+        <p class="action-desc">Consultar facturas existentes</p>
+        <div class="action-info">
+          <span>Total facturas:</span>
+          <span class="badge-count">4</span>
+        </div>
+        <button class="btn-sena-outline-blue" (click)="irABuscar()">
+          🔍 Ir al Buscador
+        </button>
+      </div>
+
+      <div class="action-card pay-card">
+        <div class="action-header">
+          <i class="icon purple-text">💳</i>
+          <h3 class="purple-text">Registrar Pago</h3>
+        </div>
+        <p class="action-desc">Procesar pagos de mesas activas</p>
+        <div class="action-info">
+          <span>Mesas por pagar:</span>
+          <span class="badge-count">1</span>
+        </div>
+        <button class="btn-sena-outline" (click)="irARegistrarPago()">
+          💳 Procesar Pagos
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+</div>

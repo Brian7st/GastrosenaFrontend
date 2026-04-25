@@ -1,0 +1,26 @@
+<section class="section" id="postres">
+  <div class="container">
+    <app-section-title
+      title="Postres Artesanales"
+      subtitle="El dulce final perfecto, elaborado con recetas tradicionales y creatividad contemporánea."
+    />
+    <div class="desserts-grid">
+      @for (item of items(); track item.id) {
+        <div class="dessert-card">
+          @if (item.imageUrl) {
+            <div class="dessert-card__img">
+              <img [src]="item.imageUrl" [alt]="item.title" loading="lazy" />
+            </div>
+          }
+          <div class="dessert-card__body">
+            <h3 class="dessert-card__title">{{ item.title }}</h3>
+            <p  class="dessert-card__desc">{{ item.description }}</p>
+            @if (item.price) {
+              <span class="dessert-card__price">{{ item.price | currency:'COP':'symbol':'1.0-0' }}</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>

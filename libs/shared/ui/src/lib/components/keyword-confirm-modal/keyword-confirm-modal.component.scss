@@ -1,0 +1,113 @@
+.keyword-confirm-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: grid;
+  place-items: center;
+  background: rgba(15, 23, 42, 0.45);
+  padding: var(--space-6);
+}
+
+.keyword-confirm-modal {
+  width: min(100%, 520px);
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  background: var(--color-surface-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.keyword-confirm-modal__accent {
+  height: 6px;
+  background: var(--color-danger);
+}
+
+.keyword-confirm-modal__accent--warning {
+  background: #d97a00;
+}
+
+.keyword-confirm-modal__body {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-6);
+}
+
+.keyword-confirm-modal__icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(214, 48, 49, 0.12);
+  color: var(--color-danger);
+}
+
+.keyword-confirm-modal__icon--warning {
+  background: rgba(253, 203, 110, 0.28);
+  color: #a15c00;
+}
+
+.keyword-confirm-modal__title,
+.keyword-confirm-modal__description {
+  margin: 0;
+}
+
+.keyword-confirm-modal__description {
+  color: var(--color-text-secondary);
+}
+
+.keyword-confirm-modal__confirm-group {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.keyword-confirm-modal__label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.keyword-confirm-modal__input {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-primary);
+}
+
+.keyword-confirm-modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.keyword-confirm-modal__button {
+  border: 0;
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  font-weight: var(--font-weight-semibold);
+}
+
+.keyword-confirm-modal__button--primary {
+  background: var(--color-danger);
+  color: white;
+}
+
+.keyword-confirm-modal__button--warning {
+  background: #d97a00;
+}
+
+.keyword-confirm-modal__button--secondary {
+  background: var(--color-surface-tertiary);
+  color: var(--color-text-primary);
+}
+
+.keyword-confirm-modal__button:disabled {
+  opacity: 0.5;
+}
+
+.keyword-confirm-modal__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6) var(--space-5);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}

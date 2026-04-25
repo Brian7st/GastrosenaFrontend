@@ -1,0 +1,86 @@
+<div class="modal-overlay" (click)="cerrar.emit()">
+  <div class="modal" (click)="$event.stopPropagation()">
+
+    <div class="modal__header">
+      <h2 class="modal__title">{{ titulo }}</h2>
+      <button class="modal__close" (click)="cerrar.emit()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="auth-alert auth-alert--error" *ngIf="errorMsg">{{ errorMsg }}</div>
+
+    <form class="modal__form" (ngSubmit)="guardar()" novalidate>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nombre Completo</label>
+          <input type="text" class="form-input" placeholder="Nombre del usuario"
+                 [(ngModel)]="form.nombre" name="nombre" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Apellidos</label>
+          <input type="text" class="form-input" placeholder="Apellidos"
+                 [(ngModel)]="form.apellidos" name="apellidos" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Documento</label>
+          <input type="text" class="form-input" placeholder="Número de documento"
+                 [(ngModel)]="form.documento" name="documento" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Teléfono</label>
+          <input type="text" class="form-input" placeholder="+57 300 000 0000"
+                 [(ngModel)]="form.telefono" name="telefono">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" placeholder="usuario@sena.edu.co"
+               [(ngModel)]="form.email" name="email" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Contraseña {{ esEdicion ? '(dejar vacío para no cambiar)' : '' }}</label>
+          <div class="form-input-wrap">
+            <input [type]="showPass ? 'text' : 'password'" class="form-input"
+                   placeholder="••••••••"
+                   [(ngModel)]="form.contrasena" name="contrasena"
+                   [required]="!esEdicion">
+            <button type="button" class="form-input-toggle" (click)="showPass = !showPass">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" stroke-linecap="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Rol</label>
+          <select class="form-input" [(ngModel)]="form.idRol" name="idRol" required>
+            <option value="">Seleccionar rol</option>
+            <option *ngFor="let r of roles" [value]="r.idRol">{{ r.nombreRol }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal__footer">
+        <button type="button" class="btn-cancelar" (click)="cerrar.emit()">Cancelar</button>
+        <button type="submit" class="btn btn-primary" [disabled]="loading">
+          <span *ngIf="!loading">{{ esEdicion ? 'Guardar Cambios' : 'Crear Usuario' }}</span>
+          <span *ngIf="loading" class="auth-spinner"></span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

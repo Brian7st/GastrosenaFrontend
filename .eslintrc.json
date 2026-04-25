@@ -1,0 +1,39 @@
+{
+  "root": true,
+  "ignorePatterns": ["**/*"],
+  "plugins": ["@nx"],
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "rules": {
+        "@nx/enforce-module-boundaries": [
+          "error",
+          {
+            "enforceBuildableLibDependency": true,
+            "depConstraints": [
+              { "sourceTag": "scope:cocina", "onlyDependOnLibsWithTags": ["scope:shared", "scope:cocina"] },
+              { "sourceTag": "scope:bar", "onlyDependOnLibsWithTags": ["scope:shared", "scope:bar"] },
+              { "sourceTag": "scope:restaurante", "onlyDependOnLibsWithTags": ["scope:shared", "scope:restaurante"] },
+              { "sourceTag": "scope:inventario", "onlyDependOnLibsWithTags": ["scope:shared", "scope:inventario"] },
+              { "sourceTag": "scope:facturacion", "onlyDependOnLibsWithTags": ["scope:shared", "scope:facturacion"] },
+              { "sourceTag": "scope:abastecimiento", "onlyDependOnLibsWithTags": ["scope:shared", "scope:abastecimiento"] },
+              { "sourceTag": "scope:presupuesto", "onlyDependOnLibsWithTags": ["scope:shared", "scope:presupuesto"] },
+              { "sourceTag": "scope:requisiciones", "onlyDependOnLibsWithTags": ["scope:shared", "scope:requisiciones"] },
+              { "sourceTag": "scope:usuarios", "onlyDependOnLibsWithTags": ["scope:shared", "scope:usuarios"] },
+              { "sourceTag": "scope:reportes", "onlyDependOnLibsWithTags": ["scope:shared", "scope:reportes"] },
+              { "sourceTag": "scope:auth", "onlyDependOnLibsWithTags": ["scope:shared", "scope:auth"] },
+              { "sourceTag": "scope:notificaciones", "onlyDependOnLibsWithTags": ["scope:shared", "scope:notificaciones"] },
+              { "sourceTag": "scope:shell", "onlyDependOnLibsWithTags": ["scope:shared", "scope:*", "scope:shell"] },
+              { "sourceTag": "scope:shared", "onlyDependOnLibsWithTags": ["scope:shared"] },
+              { "sourceTag": "type:ui", "onlyDependOnLibsWithTags": ["type:ui", "type:util", "type:models"] },
+              { "sourceTag": "type:data-access", "onlyDependOnLibsWithTags": ["type:data-access", "type:util", "type:models"] },
+              { "sourceTag": "type:util", "onlyDependOnLibsWithTags": ["type:util", "type:models"] },
+              { "sourceTag": "type:models", "onlyDependOnLibsWithTags": ["type:models"] },
+              { "sourceTag": "type:feature", "onlyDependOnLibsWithTags": ["type:feature", "type:ui", "type:util", "type:models", "type:data-access"] }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+<section class="section" id="postres">
+  <div class="container">
+    <restaurant-section-title
+      title="Postres Artesanales"
+      subtitle="El dulce final perfecto, elaborado con recetas tradicionales y creatividad contemporánea."
+    />
+    <div class="items-grid">
+      @for (item of items(); track item.id) {
+        <restaurant-card
+          [title]="item.title"
+          [subtitle]="item.description"
+          [imageUrl]="item.imageUrl ?? ''"
+          [price]="item.price ?? null"
+        />
+      }
+    </div>
+  </div>
+</section>

@@ -1,0 +1,64 @@
+<div class="tabla-container">
+  <div class="tabla-header">
+    <div class="titulo">
+      <span>📄</span> Comandas Encontradas
+    </div>
+    <div class="acciones-header">
+      <button class="btn-limpiar" (click)="limpiar.emit()">Limpiar Filtros</button>
+      <span class="badge-count">{{ comandas.length }} comandas</span>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>ID Comanda</th>
+          <th>Mesa</th>
+          <th>Mesero</th>
+          <th>Estado</th>
+          <th>Total</th>
+          <th>Fecha/Hora</th>
+          <th>Items</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (comanda of comandas; track comanda) {
+          <tr>
+            <td class="fw-bold">{{ comanda.idComanda }}</td>
+            <td>{{ comanda.mesa }}</td>
+            <td>{{ comanda.mesero }}</td>
+            <td>
+            <span class="estado-pill" [ngClass]="{
+              'estado-preparacion': comanda.estado === 'En Preparación',
+              'estado-abierto': comanda.estado === 'Abierto',
+              'estado-pagado': comanda.estado === 'Pagado'
+            }">
+                {{ comanda.estado }}
+              </span>
+            </td>
+            <td class="fw-bold">{{ comanda.total | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+            <td class="text-muted">🕑 {{ comanda.fechaHora | date:'dd/M/yyyy HH:mm:ss' }}</td>
+            <td>{{ comanda.items }} items</td>
+            <td>
+              <button class="btn-accion" (click)="verDetalle.emit(comanda)">👁️</button>
+            </td>
+          </tr>
+        }
+
+        @if (comandas.length === 0) {
+          <tr>
+            <td colspan="8" class="empty-state">
+              <div class="empty-content">
+                <span class="icon">📭</span>
+                <h4>No se encontraron comandas</h4>
+                <p>Intenta ajustar o limpiar los filtros de búsqueda.</p>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

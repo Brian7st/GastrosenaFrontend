@@ -1,0 +1,58 @@
+<!-- DANGER MODAL OVERLAY -->
+<div class="modal-overlay">
+  <!-- Modal Container -->
+  <div class="modal-container">
+      <!-- Decorative Danger Header Line -->
+      <div class="modal-accent modal-accent--danger"></div>
+      
+      <div class="modal-content-danger">
+          <!-- Icon & Title Section -->
+          <div class="modal-header-center">
+              <div class="icon-circle icon-circle--danger">
+                  <lucide-icon name="alert-triangle" class="icon--danger" [size]="32"></lucide-icon>
+              </div>
+              <h2 class="modal-title-danger">
+                  ¿Está seguro de reversar este consolidado?
+              </h2>
+              <p class="modal-desc-danger">
+                  Esta acción es <span class="font-bold text-danger">irreversible</span> y deshará la agrupación contable de los comprobantes asociados. Todos los registros volverán a estado pendiente.
+              </p>
+          </div>
+
+          <!-- Security Input -->
+          <div class="security-panel">
+              <label class="security-label" for="security-confirm">
+                  Escriba la palabra "ANULAR" para confirmar
+              </label>
+              <input 
+                  [ngModel]="confirmText()" 
+                  (ngModelChange)="confirmText.set($event)"
+                  class="security-input" 
+                  id="security-confirm" 
+                  placeholder="ANULAR" 
+                  type="text"
+              />
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="modal-actions">
+              <button 
+                  [disabled]="!isConfirmed"
+                  (click)="confirmReverse()"
+                  [ngClass]="{'is-disabled': !isConfirmed}"
+                  class="btn btn--danger">
+                  <lucide-icon name="trash-2" [size]="20"></lucide-icon>
+                  Confirmar Reversión
+              </button>
+              <button (click)="closeModal()" class="btn btn--neutral">
+                  Cancelar
+              </button>
+          </div>
+
+          <!-- Extra Caution Hint -->
+          <p class="modal-hint">
+              Se registrará un log de auditoría con su usuario y marca de tiempo al realizar esta acción.
+          </p>
+      </div>
+  </div>
+</div>

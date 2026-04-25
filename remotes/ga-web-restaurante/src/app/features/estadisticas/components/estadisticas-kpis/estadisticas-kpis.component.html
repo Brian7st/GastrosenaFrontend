@@ -1,0 +1,68 @@
+<div class="kpis-grid">
+
+  <div class="kpi-card card-blue">
+    <div class="kpi-header">
+      <div class="title-wrap">
+        <i class="icon-pulse"></i> <h4>Pedidos Activos</h4>
+      </div>
+    </div>
+    <div class="kpi-body">
+      <h2 class="value text-blue">{{ datos.pedidosActivos }}</h2>
+      <p class="subtitle">Órdenes en proceso en sala</p>
+    </div>
+  </div>
+
+  <div class="kpi-card card-green">
+    <div class="kpi-header">
+      <div class="title-wrap">
+        <i class="icon-clock"></i>
+        <h4>Tiempo Promedio</h4>
+      </div>
+    </div>
+    <div class="kpi-body">
+      <h2 class="value text-green">{{ datos.tiempoPromedio }} min</h2>
+      <p class="subtitle">Tiempo de atención promedio</p>
+
+      <div class="progress-section">
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill fill-green" style="width: 75%;"></div>
+        </div>
+        <span class="progress-text">Objetivo: 20 min (75% eficiencia)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-card card-orange">
+    <div class="kpi-header">
+      <div class="title-wrap">
+        <i class="icon-dollar"></i>
+        <h4>Ingresos Totales</h4>
+      </div>
+    </div>
+    <div class="kpi-body">
+      <h2 class="value text-orange">{{ datos.ingresosTotales | currency:'COP':'symbol-narrow':'1.0-0' }}</h2>
+      <p class="subtitle">Revenue del turno actual</p>
+    </div>
+  </div>
+
+  <div class="kpi-card card-purple">
+    <div class="kpi-header">
+      <div class="title-wrap">
+        <i class="icon-users"></i>
+        <h4>Mesas Atendidas</h4>
+      </div>
+    </div>
+    <div class="kpi-body">
+      <h2 class="value text-purple">{{ datos.mesasAtendidas }}</h2>
+      <p class="subtitle">De 8 mesas disponibles</p>
+
+      <div class="progress-section">
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill fill-purple" style="width: 38%;"></div>
+        </div>
+        <span class="progress-text">38% ocupación</span>
+      </div>
+    </div>
+  </div>
+
+</div>

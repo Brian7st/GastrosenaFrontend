@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+remotes/**/node_modules/
+
+# Build outputs
+dist/
+.tmp/
+coverage/
+
+# Angular / Nx cache
+.angular/
+.nx/
+
+# Environment
+.env
+.env.*
+
+# Docs (guías de referencia, no van al repo)
+*.md
+
+# OS
+.DS_Store
+Thumbs.db

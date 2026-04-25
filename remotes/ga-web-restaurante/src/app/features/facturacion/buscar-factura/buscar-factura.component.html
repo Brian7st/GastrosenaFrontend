@@ -1,0 +1,109 @@
+<div class="buscar-factura-container">
+  <header class="header-section">
+    <button class="btn-volver" (click)="volver()"> ← Volver </button>
+    <h1>Buscar Facturas</h1>
+  </header>
+
+  <section class="form-block search-filters">
+    <div class="block-header">
+      <div class="title-left">
+        <i class="icon">🔍</i>
+        <div class="title-group">
+          <h5>Criterios de Búsqueda</h5>
+          <span class="subtitle">Busca facturas por mesa, mesero o rango de fechas</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-controls">
+      <div class="radio-group">
+        <label><input type="radio" name="criterio" checked> Buscar por Mesa</label>
+        <label><input type="radio" name="criterio"> Buscar por Mesero</label>
+      </div>
+
+      <div class="inputs-row">
+        <select class="form-input">
+          <option value="">Seleccionar Mesero / Mesa</option>
+        </select>
+        <div class="date-range">
+          <input type="date" class="form-input">
+          <input type="date" class="form-input">
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn-search">🔍 Buscar Facturas</button>
+        <button class="btn-clear-minimal">
+          <span class="trash-icon">🗑️</span> Limpiar Filtros
+        </button>
+        <button class="btn-export-green">📥 Exportar Todas</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="form-block results-section">
+    <div class="results-header">
+      <h6>Facturas Encontradas</h6>
+      <div class="results-badge">Se encontraron 1 facturas</div>
+    </div>
+
+    <div class="factura-item pending" (click)="verDetalle({id: 'INV-2024-002', total: '$59.500'})">
+      <div class="status-border"></div>
+      <div class="factura-content">
+        <div class="factura-info">
+          <span class="id">INV-2024-002</span>
+          <span class="details">Cliente Mesa 3 • Mesa 3 • 15 de enero de 2024</span>
+        </div>
+        <div class="factura-status">
+          <span class="price">$59.500</span>
+          <span class="badge pendiente">Pendiente</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  @if (mostrarModalDetalle) {
+    <div class="modal-overlay">
+      <div class="modal-card">
+        <header class="modal-header">
+          <h5>Detalle de Factura</h5>
+          <button class="close-x" (click)="cerrarModal()">×</button>
+        </header>
+        <div class="modal-body">
+          <div class="invoice-main-info">
+            <span class="label">ID FACTURA</span>
+            <h2>{{ facturaSeleccionada?.id }}</h2>
+          </div>
+          <div class="info-grid">
+            <div class="info-item"><span>Cliente:</span> <strong>Cliente Mesa 3</strong></div>
+            <div class="info-item"><span>Mesa:</span> <strong>Mesa 3</strong></div>
+            <div class="info-item"><span>Mesero:</span> <strong>Instructor</strong></div>
+            <div class="info-item"><span>Fecha:</span> <strong>15/01/2024</strong></div>
+          </div>
+          <div class="products-section">
+            <h6>Productos / Consumo</h6>
+            <div class="product-row">
+              <span>Hamburguesa Especial x1</span>
+              <span>$45.000</span>
+            </div>
+            <div class="product-row">
+              <span>Gaseosa 350ml x2</span>
+              <span>$5.000</span>
+            </div>
+          </div>
+          <div class="billing-summary">
+            <div class="summary-row"><span>Subtotal:</span> <span>$50.000</span></div>
+            <div class="summary-row"><span>IVA (19%):</span> <span>$9.500</span></div>
+            <div class="summary-row total"><span>TOTAL:</span> <strong>{{ facturaSeleccionada?.total }}</strong></div>
+          </div>
+        </div>
+        <footer class="modal-footer">
+          <button class="btn-secundario" (click)="cerrarModal()">Cerrar</button>
+          <button class="btn-primario-green" (click)="irAPagar()">
+            💳 Registrar Pago
+          </button>
+        </footer>
+      </div>
+    </div>
+  }
+</div>

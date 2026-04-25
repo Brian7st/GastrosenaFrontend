@@ -1,0 +1,159 @@
+<div class="conciliacion-list-container">
+  <!-- Header Section -->
+  <header class="page-header">
+    <div class="page-header__left">
+      <h1 class="page-title">Consolidado de Ejecución Presupuestal</h1>
+      <p class="page-subtitle">Análisis contable y consolidación de comprobantes GIL-F014 para la vigencia fiscal actual.</p>
+    </div>
+    <button routerLink="/factura-global/nuevo" class="btn btn--primary">
+      <lucide-icon name="plus" [size]="20"></lucide-icon>
+      <span>Generar Nuevo Consolidado</span>
+    </button>
+  </header>
+
+  <!-- Bento-Style KPI Grid -->
+  <section class="kpi-grid">
+    <!-- KPI Card 1 -->
+    <div class="kpi-card">
+      <div class="kpi-card__top">
+        <div class="kpi-icon kpi-icon--gray">
+          <lucide-icon name="library" [size]="24"></lucide-icon>
+        </div>
+        <span class="status-badge status-badge--green">+4.2%</span>
+      </div>
+      <div class="kpi-card__bottom">
+        <p class="kpi-label">Total Retención ZESE Acumulada</p>
+        <p class="kpi-value">$1,452,890.00</p>
+      </div>
+    </div>
+
+    <!-- KPI Card 2 -->
+    <div class="kpi-card">
+      <div class="kpi-card__top">
+        <div class="kpi-icon kpi-icon--green">
+          <lucide-icon name="banknote" [size]="24"></lucide-icon>
+        </div>
+        <span class="status-badge status-badge--gray text-muted">Estable</span>
+      </div>
+      <div class="kpi-card__bottom">
+        <p class="kpi-label">Total IVA Acumulado</p>
+        <p class="kpi-value">$3,842,120.45</p>
+      </div>
+    </div>
+
+    <!-- KPI Card 3 -->
+    <div class="kpi-card">
+      <div class="kpi-card__top">
+        <div class="kpi-icon kpi-icon--red">
+          <lucide-icon name="bar-chart-2" [size]="24"></lucide-icon>
+        </div>
+        <span class="status-badge status-badge--red">Alerta</span>
+      </div>
+      <div class="kpi-card__bottom">
+        <p class="kpi-label">Total Ejecutado Neto</p>
+        <p class="kpi-value">$12,980,500.00</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Table Section: Consolidados Históricos -->
+  <section class="table-card">
+    <div class="table-card__header">
+      <h2 class="table-card__title">Consolidados Históricos</h2>
+      <div class="table-card__actions">
+        <button class="action-btn action-btn--icon">
+          <lucide-icon name="list-filter" [size]="20"></lucide-icon>
+        </button>
+        <button class="action-btn action-btn--icon">
+          <lucide-icon name="download" [size]="20"></lucide-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID Consolidado</th>
+            <th>Periodo/Mes</th>
+            <th>Total Consolidado</th>
+            <th>Estado Contable</th>
+            <th class="text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (consolidado of consolidados(); track consolidado.codigo) {
+            <tr class="data-row">
+              <td class="cell-code">
+                <span class="text-primary">{{ consolidado.codigo }}</span>
+              </td>
+              <td>
+                <p class="cell-period">{{ consolidado.periodo }}</p>
+                <p class="cell-type">{{ consolidado.tipo }}</p>
+              </td>
+              <td class="cell-total">
+                <p>{{ formatCurrency(consolidado.totalConsolidado) }}</p>
+              </td>
+              <td>
+                <span class="status-badge"
+                      [ngClass]="{
+                        'status-badge--activo': consolidado.estado === 'Activo',
+                        'status-badge--archivado': consolidado.estado === 'Archivado',
+                        'status-badge--bajo-stock': consolidado.estado === 'Bajo Stock'
+                      }">
+                  {{ consolidado.estado }}
+                </span>
+              </td>
+              <td class="text-right">
+                <button [routerLink]="['/factura-global', consolidado.id]" class="action-text-btn">Ver Detalles</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación -->
+    <div class="pagination">
+      <p class="pagination__info">Mostrando 4 de 12 registros de consolidados</p>
+      <div class="pagination__controls">
+        <button class="btn-outline btn-outline--sm">Anterior</button>
+        <button class="btn btn--primary btn--sm">Siguiente</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contextual Insight / Floating Card -->
+  <section class="info-grid">
+    <div class="insight-card insight-card--gradient">
+      <div class="insight-card__content">
+        <h3 class="insight-card__title">Resumen de Cumplimiento</h3>
+        <p class="insight-card__text">La ejecución presupuestal del presente trimestre se encuentra en un 85% de avance respecto a la proyección anual GIL-F014.</p>
+        <button class="btn-blur">Ver Auditoría</button>
+      </div>
+      <div class="insight-card__graphic">
+        <div class="progress-ring">
+          <span class="progress-ring__value">85%</span>
+        </div>
+      </div>
+      <div class="insight-card__glow"></div>
+    </div>
+    
+    <div class="insight-card insight-card--plain">
+      <div class="insight-card__header">
+        <div class="icon-box icon-box--white">
+          <lucide-icon name="file-text" class="text-primary"></lucide-icon>
+        </div>
+        <div class="insight-card__header-text">
+          <h4 class="insight-card__subtitle">Instructivo GIL-F014</h4>
+          <p class="insight-card__meta">Actualizado hace 2 días</p>
+        </div>
+      </div>
+      <p class="insight-card__description">Revise los nuevos parámetros de consolidación para el IVA y retención en la fuente según la circular 012-2024.</p>
+      <a class="action-link">
+        Descargar Guía PDF
+        <lucide-icon name="external-link" [size]="16"></lucide-icon>
+      </a>
+    </div>
+  </section>
+</div>

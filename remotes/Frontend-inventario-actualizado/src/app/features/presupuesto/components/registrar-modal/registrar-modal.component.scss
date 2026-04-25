@@ -1,0 +1,234 @@
+@use '../../../../../styles/variables.scss' as *;
+@use "sass:color";
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: rgba($on-surface, 0.4);
+  backdrop-filter: blur(4px);
+}
+
+.modal-container {
+  background-color: $surface-container-lowest;
+  width: 100%;
+  max-width: 36rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  border: 1px solid rgba($white, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  padding: 2rem 2rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  .header-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    .title {
+      font-family: $font-headline;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: $primary-container;
+      letter-spacing: -0.025em;
+      margin: 0;
+    }
+
+    .subtitle {
+      font-size: 0.875rem;
+      color: $secondary;
+      margin: 0;
+    }
+  }
+
+  .close-btn {
+    background: transparent;
+    border: none;
+    color: $secondary;
+    padding: 0.5rem;
+    border-radius: $radius-full;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: $surface-container-low;
+      color: $on-surface;
+    }
+  }
+}
+
+.modal-form {
+  padding: 1rem 2rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  &.mb-large {
+    margin-bottom: 0.5rem;
+  }
+}
+
+.form-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: $secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.select-wrapper, .input-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.select-icon, .input-icon {
+  position: absolute;
+  color: $secondary;
+  pointer-events: none;
+}
+
+.select-icon {
+  right: 1rem;
+}
+
+.input-icon {
+  left: 1rem;
+}
+
+.form-control {
+  width: 100%;
+  background-color: $surface-container-low;
+  border: none;
+  border-radius: $radius-xl;
+  padding: 0.875rem 1rem;
+  font-family: $font-body;
+  font-size: 1rem;
+  font-weight: 500;
+  color: $on-surface;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba($primary, 0.2);
+  }
+
+  &::placeholder {
+    color: color.adjust($secondary, $lightness: 20%);
+  }
+}
+
+select.form-control {
+  appearance: none;
+  cursor: pointer;
+  padding-right: 2.5rem;
+}
+
+input.input-with-icon {
+  padding-left: 2.75rem;
+}
+
+.money-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .money-symbol {
+    position: absolute;
+    left: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $primary;
+  }
+
+  .money-input {
+    padding: 2rem 4rem 2rem 3rem;
+    font-size: 2.25rem;
+    font-weight: 800;
+    height: auto;
+
+    /* Hide standard number spinners */
+    -moz-appearance: textfield;
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+
+  .money-currency {
+    position: absolute;
+    right: 1.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: $primary;
+    background-color: rgba($primary-container, 0.2);
+    padding: 0.25rem 0.75rem;
+    border-radius: $radius-full;
+  }
+}
+
+.modal-footer {
+  padding-top: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+
+  .btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: $radius-xl;
+    font-weight: 700;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &--secondary {
+      background: transparent;
+      color: $secondary;
+      
+      &:hover:not(:disabled) {
+        background-color: $surface-container-low;
+      }
+    }
+
+    &--primary {
+      background: linear-gradient(90deg, $primary 0%, $primary-container 100%);
+      color: $on-primary;
+      box-shadow: 0 4px 12px rgba($primary, 0.2);
+
+      &:hover:not(:disabled) {
+        transform: scale(1.02);
+      }
+      
+      &:active:not(:disabled) {
+        transform: scale(0.98);
+      }
+    }
+  }
+}

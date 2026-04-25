@@ -1,0 +1,15 @@
+<div class="layout-principal">
+  <lib-barra-lateral [config]="sidebarConfig"></lib-barra-lateral>
+
+  <main class="contenido-principal">
+    <lib-barra-superior
+      [perfil]="perfil"
+      [buscarPlaceholder]="buscarPlaceholder"
+      [enlaces]="topMenu"
+    ></lib-barra-superior>
+
+    <div class="contenido-principal__contenedor">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

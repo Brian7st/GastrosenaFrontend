@@ -1,0 +1,176 @@
+<!-- Back Button -->
+<a routerLink="/facturas" class="back-link">
+  <lucide-icon name="arrow-left" [size]="18"></lucide-icon>
+  Volver a Facturas Electrónicas
+</a>
+
+<!-- Header -->
+<div class="detail-header">
+  <div class="detail-header__info">
+    <div class="detail-header__badge">
+      <span class="status-dot"></span> Aprobada
+    </div>
+    <h1 class="detail-header__title">FACTURA DE VENTA</h1>
+    <h2 class="detail-header__number">FE-00452-2024</h2>
+    <p class="detail-header__meta">Emitida el {{ factura().fecha }} • 10:45 AM</p>
+  </div>
+  <div class="detail-header__actions">
+    <button class="btn btn--danger-outline" (click)="goToAnular()">
+      <lucide-icon name="x-circle" [size]="18"></lucide-icon>
+      Anular
+    </button>
+    <button class="btn btn--outline" (click)="openEditModal()">
+      <lucide-icon name="pencil" [size]="18"></lucide-icon>
+      Editar
+    </button>
+    <button class="btn btn--outline">
+      <lucide-icon name="download" [size]="18"></lucide-icon>
+      Descargar PDF
+    </button>
+    <button class="btn btn--primary">
+      <lucide-icon name="printer" [size]="18"></lucide-icon>
+      Imprimir
+    </button>
+  </div>
+</div>
+
+<div class="detail-grid">
+  <!-- Left Column -->
+  <div class="detail-content">
+    
+    <!-- Entities Card -->
+    <div class="entities-card">
+      <div class="entity">
+        <p class="entity__label">EMISOR</p>
+        <div class="entity__body">
+          <div class="entity__icon entity__icon--green">
+            <lucide-icon name="building-2" [size]="20"></lucide-icon>
+          </div>
+          <div>
+            <p class="entity__name">{{ factura().clienteReceptor }}</p> <!-- Actually SENA Centro de Gestión in mockup -->
+            <p class="entity__nit">NIT: {{ factura().nitEmisor }}</p>
+            <p class="entity__address">{{ factura().direccionEmisor }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="entity">
+        <p class="entity__label">RECEPTOR</p>
+        <div class="entity__body">
+          <div class="entity__icon entity__icon--gray">
+            <lucide-icon name="user" [size]="20"></lucide-icon>
+          </div>
+          <div>
+            <p class="entity__name">{{ factura().proveedor }}</p>
+            <p class="entity__nit">NIT: {{ factura().nitReceptor }}</p>
+            <p class="entity__address">{{ factura().direccionReceptor }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Items Table -->
+    <div class="items-card">
+      <div class="items-card__header">
+        <div class="items-card__title-wrap">
+          <lucide-icon name="list" [size]="18"></lucide-icon>
+          <h3>Detalle de Artículos</h3>
+        </div>
+        <span class="items-card__count">{{ factura().articulos.length }} ITEMS</span>
+      </div>
+      
+      <table class="items-table">
+        <thead>
+          <tr>
+            <th>DESCRIPCIÓN</th>
+            <th class="text-center">CANT.</th>
+            <th class="text-right">PRECIO UNIT.</th>
+            <th class="text-right">TOTAL</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of factura().articulos; track item.codigo) {
+            <tr>
+              <td>
+                <p class="item-name">{{ item.descripcion }}</p>
+                <p class="item-code">Código: {{ item.codigo }}</p>
+              </td>
+              <td class="text-center">{{ item.cantidad }}</td>
+              <td class="text-right">{{ formatCurrency(item.precioUnitario) }}</td>
+              <td class="text-right item-total">{{ formatCurrency(item.total) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- Right Column -->
+  <div class="detail-sidebar">
+    
+    <!-- Resumen -->
+    <div class="sidebar-card">
+      <h3 class="sidebar-card__title">Resumen de Pago</h3>
+      
+      <div class="summary-rows">
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span class="summary-row__value">{{ formatCurrency(factura().resumen.subtotal) }}</span>
+        </div>
+        <div class="summary-row">
+          <span>IVA (19%)</span>
+          <span class="summary-row__value">{{ formatCurrency(factura().resumen.iva) }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="flex items-center gap-1">Retención ZESE <lucide-icon name="info" [size]="12"></lucide-icon></span>
+          <span class="summary-row__value summary-row__value--negative">{{ formatCurrency(factura().resumen.retencionZese) }}</span>
+        </div>
+      </div>
+
+      <div class="summary-total">
+        <p class="summary-total__label">TOTAL NETO</p>
+        <div class="summary-total__wrap">
+          <h2 class="summary-total__value">{{ formatCurrency(factura().resumen.totalNeto) }}</h2>
+          <span class="currency-badge">COP</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Adicional -->
+    <div class="sidebar-card sidebar-card--gray">
+      <h3 class="sidebar-info-title">INFORMACIÓN ADICIONAL</h3>
+      
+      <div class="info-block">
+        <p class="info-label">ESTADO DIAN</p>
+        <div class="info-status">
+          <lucide-icon name="check-circle" [size]="16"></lucide-icon>
+          Validado Exitosamente
+        </div>
+      </div>
+
+      <div class="info-block">
+        <p class="info-label">CUFE</p>
+        <div class="info-cufe">{{ factura().cufe }}</div>
+      </div>
+
+      <div class="info-block">
+        <p class="info-label">MÉTODO DE PAGO</p>
+        <p class="info-value">{{ factura().metodoPago }}</p>
+      </div>
+    </div>
+
+    <!-- Historial -->
+    <div class="history-banner">
+      <button class="btn-history">
+        <lucide-icon name="history" [size]="18"></lucide-icon>
+        Ver Historial de Cambios
+      </button>
+    </div>
+
+  </div>
+</div>
+
+@if (showEditModal()) {
+  <app-factura-edit-modal (cerrar)="closeEditModal()"></app-factura-edit-modal>
+}

@@ -1,0 +1,22 @@
+<section class="features" id="nosotros">
+  <div class="container">
+    <div class="features__header">
+      <span class="tag tag-green">¿Por qué elegirnos?</span>
+      <h2 class="features__title">Más que un restaurante,<br><em>un centro de formación</em></h2>
+      <p class="features__desc">Cada experiencia en GastroSENA está respaldada por la calidad académica del SENA y la dedicación de nuestros aprendices.</p>
+    </div>
+    <div class="features__grid">
+      @for (card of cards(); track card.title) {
+        <div class="feature-card">
+          <div class="feature-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path [attr.d]="card.svgPath" />
+            </svg>
+          </div>
+          <h3 class="feature-card__title">{{ card.title }}</h3>
+          <p  class="feature-card__desc">{{ card.desc }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>

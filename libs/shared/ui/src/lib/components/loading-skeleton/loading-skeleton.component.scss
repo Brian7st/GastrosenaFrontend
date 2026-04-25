@@ -1,0 +1,15 @@
+.loading-skeleton {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.loading-skeleton__line {
+  height: 14px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-tertiary) 25%,
+    #f8fbf6 50%,
+    var(--color-surface-tertiary) 75%
+  );
+}

@@ -1,0 +1,178 @@
+<div class="conciliacion-detail-container">
+  <!-- Breadcrumb & Header -->
+  <header class="detail-header">
+    <div class="detail-header__left">
+      <nav class="breadcrumb">
+        <a routerLink="/factura-global" class="breadcrumb__link">Ejecución</a>
+        <lucide-icon name="chevron-right" [size]="12"></lucide-icon>
+        <a routerLink="/factura-global" class="breadcrumb__link">Consolidados</a>
+        <lucide-icon name="chevron-right" [size]="12"></lucide-icon>
+        <span class="breadcrumb__current">Detalle</span>
+      </nav>
+      <div class="detail-title-row">
+        <h2 class="detail-title">Detalle del Consolidado: <span class="text-primary">{{ detalle().codigo }}</span></h2>
+        <span class="badge badge--success">{{ detalle().estado }}</span>
+      </div>
+    </div>
+    <div class="detail-header__actions">
+      <button class="btn-secondary">
+        <lucide-icon name="printer" [size]="18"></lucide-icon>
+        Imprimir
+      </button>
+      <button (click)="openExportModal()" class="btn-primary">
+        <lucide-icon name="download" [size]="18"></lucide-icon>
+        Exportar Reporte Contable
+      </button>
+    </div>
+  </header>
+
+  <div class="detail-reverse-action">
+    <button (click)="openReverseModal()" class="btn-danger">
+      <lucide-icon name="x-circle" [size]="18"></lucide-icon>
+      Reversar Consolidado
+    </button>
+  </div>
+
+  <!-- Dashboard Stats Summary (Bento Grid) -->
+  <section class="stats-grid">
+    <div class="stat-card">
+      <p class="stat-card__label">Total Consolidado</p>
+      <div class="stat-card__data">
+        <span class="stat-card__value">{{ formatCurrency(detalle().totalConsolidado) }}</span>
+        <p class="stat-card__trend stat-card__trend--up">
+          <lucide-icon name="trending-up" [size]="14"></lucide-icon>
+          +12.5% vs Mes Anterior
+        </p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <p class="stat-card__label">Vouchers Incluidos</p>
+      <div class="stat-card__data">
+        <span class="stat-card__value">{{ detalle().vouchersIncluidos }} Formatos</span>
+        <p class="stat-card__subtext">GIL-F014 v.2023</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <p class="stat-card__label">Fecha de Cierre</p>
+      <div class="stat-card__data">
+        <span class="stat-card__value">{{ detalle().fechaCierre }}</span>
+        <p class="stat-card__subtext">{{ detalle().horaCierre }}</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <p class="stat-card__label">Centro de Operación</p>
+      <div class="stat-card__data">
+        <span class="stat-card__value">{{ detalle().centroOperacion }}</span>
+        <p class="stat-card__subtext">{{ detalle().sedeOpcion }}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 1: Subtotales Discriminados -->
+  <section class="content-section">
+    <header class="section-header">
+      <div class="section-title-wrapper">
+        <div class="icon-circle text-primary">
+          <lucide-icon name="pie-chart"></lucide-icon>
+        </div>
+        <h3 class="section-title">Subtotales Discriminados</h3>
+      </div>
+      <span class="section-subtitle">Agrupado por categoría contable</span>
+    </header>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Centro de Costo</th>
+            <th>Categoría de Inventario</th>
+            <th class="text-right">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (subtotal of detalle().subtotales; track subtotal.centroCosto) {
+          <tr class="data-row">
+            <td>
+              <div class="flex-column">
+                <span class="font-bold text-dark">{{ subtotal.centroCosto }}</span>
+                <span class="text-small text-muted">{{ subtotal.descripcion }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="text-medium">{{ subtotal.categoria }}</span>
+            </td>
+            <td class="text-right">
+              <span class="text-large text-primary font-bold">{{ formatCurrency(subtotal.subtotal) }}</span>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Section 2: Listado de Formatos GIL-F014 -->
+  <section class="content-section">
+    <header class="section-header">
+      <div class="section-title-wrapper">
+        <div class="icon-circle text-primary">
+          <lucide-icon name="file-text"></lucide-icon>
+        </div>
+        <h3 class="section-title">Listado de Formatos GIL-F014</h3>
+      </div>
+      <div class="badge-outline">
+        <span class="dot tag-dot"></span>
+        Vouchers Auditados
+      </div>
+    </header>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Código GIL</th>
+            <th>Solicitante</th>
+            <th>Fecha</th>
+            <th class="text-right">Valor</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (formato of detalle().formatos; track formato.codigo) {
+          <tr class="data-row">
+            <td>
+              <span class="code-badge">{{ formato.codigo }}</span>
+            </td>
+            <td>
+              <div class="avatar-row">
+                <div class="avatar">{{ formato.iniciales }}</div>
+                <span class="font-medium text-dark">{{ formato.solicitante }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="text-regular text-muted">{{ formato.fecha }}</span>
+            </td>
+            <td class="text-right">
+              <span class="font-bold text-dark">{{ formatCurrency(formato.valor) }}</span>
+            </td>
+            <td class="text-center">
+              <button class="action-btn">
+                <lucide-icon name="eye" [size]="20"></lucide-icon>
+              </button>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <footer class="section-footer">
+      <span class="pagination-info">Mostrando {{ detalle().formatos.length }} de {{ detalle().vouchersIncluidos }}
+        registros</span>
+      <div class="pagination-controls">
+        <button class="page-btn disabled" disabled><lucide-icon name="chevron-left" [size]="18"></lucide-icon></button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn"><lucide-icon name="chevron-right" [size]="18"></lucide-icon></button>
+      </div>
+    </footer>
+  </section>
+</div>

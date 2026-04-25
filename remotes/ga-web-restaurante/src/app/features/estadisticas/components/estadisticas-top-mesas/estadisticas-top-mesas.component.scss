@@ -1,0 +1,34 @@
+.top-mesas-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 24px; box-shadow: var(--shadow-card); height: 100%; }
+
+.card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid var(--color-border); padding-bottom: 12px; h3 { margin: 0; font-size: var(--font-size-lg); font-weight: 600; color: var(--color-text-primary); } }
+
+.mesas-list { display: flex; flex-direction: column; gap: 12px; }
+
+.mesa-item {
+  display: flex; justify-content: space-between; align-items: center; padding: 14px 16px;
+  background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+
+  &:hover { background-color: var(--color-bg); border-color: var(--color-primary-light); }
+
+  .mesa-info-left { display: flex; align-items: center; gap: 16px; }
+
+  .rank-badge {
+    display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; font-weight: 700; font-size: var(--font-size-sm);
+    &.rank-1 { background-color: var(--color-primary-light); color: var(--color-primary-dark); }
+    &.rank-2 { background-color: var(--color-libre-bg); color: var(--color-libre); }
+    &.rank-3 { background-color: var(--color-abierto-bg); color: var(--color-abierto); }
+    background-color: var(--color-bg); color: var(--color-text-muted);
+  }
+
+  .mesa-details {
+    h4 { margin: 0; font-size: var(--font-size-md); font-weight: 600; color: var(--color-text-primary); }
+    p { margin: 4px 0 0 0; font-size: var(--font-size-xs); color: var(--color-text-secondary); }
+  }
+
+  .mesa-info-right {
+    text-align: right;
+    .total-amount { margin: 0; font-size: var(--font-size-lg); font-weight: 700; color: var(--color-primary); }
+    .avg-amount { margin: 4px 0 0 0; font-size: var(--font-size-xs); color: var(--color-text-muted); }
+  }
+}

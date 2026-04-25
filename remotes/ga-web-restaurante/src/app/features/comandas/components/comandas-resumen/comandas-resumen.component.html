@@ -1,0 +1,35 @@
+<div class="resumen-container">
+
+  <div class="resumen-card">
+    <div class="icon icon-blue">📄</div>
+    <div class="data">
+      <h3>{{ totalComandas }}</h3>
+      <p>Total Comandas</p>
+    </div>
+  </div>
+
+  <div class="resumen-card">
+    <div class="icon icon-green">🕒</div>
+    <div class="data">
+      <h3>{{ activas }}</h3>
+      <p>Activas</p>
+    </div>
+  </div>
+
+  <div class="resumen-card">
+    <div class="icon icon-orange">💲</div>
+    <div class="data">
+      <h3>{{ valorTotal | currency:'COP':'symbol-narrow':'1.0-0' }}</h3>
+      <p>Valor Total</p>
+    </div>
+  </div>
+
+  <div class="resumen-card">
+    <div class="icon icon-purple">👤</div>
+    <div class="data">
+      <h3>{{ meserosActivos }}</h3>
+      <p>Meseros Activos</p>
+    </div>
+  </div>
+
+</div>

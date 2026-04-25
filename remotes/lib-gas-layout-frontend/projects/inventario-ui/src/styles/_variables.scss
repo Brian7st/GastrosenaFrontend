@@ -1,0 +1,108 @@
+// _variables.scss - Design Tokens SENA Inventario
+// Copiado exacto desde Frontend-inventario para sincronización entre micro-frontends
+
+// =======================
+// COLORES (Design Tokens)
+// =======================
+
+$color-contorno: #6e7b6b;
+$color-secundario-texto: #64748b;
+$color-en-primario-contenedor: #00330d;
+$color-superficie-tenue: #d9dadb;
+$color-superficie-inversa: #2e3132;
+$color-superficie-contenedor-mas-bajo: #ffffff;
+$color-superficie-contenedor-alto: #e7e8e9;
+$color-fondo: #f8f9fa;
+$color-en-terciario-fijo-variante: #92001f;
+$color-en-primario: #ffffff;
+$color-superficie-brillante: #f8f9fa;
+$color-en-secundario: #ffffff;
+$color-en-error: #ffffff;
+$color-contorno-variante: #bdcab9;
+$color-primario: #39A900;
+$color-superficie-contenedor: #edeeef;
+$color-secundario-contenedor: #d8e1ea;
+$color-en-fondo: #191c1d;
+$color-inverso-en-superficie: #f0f1f2;
+$color-secundario: #575f67;
+$color-error-contenedor: #ffdad6;
+$color-en-primario-fijo-variante: #00531a;
+$color-en-primario-fijo: #002106;
+$color-terciario-contenedor: #ff555f;
+$color-en-superficie: #191c1d;
+$color-en-secundario-fijo: #141d23;
+$color-superficie-tinte: #39A900;
+$color-en-terciario-contenedor: #5d0010;
+$color-en-error-contenedor: #93000a;
+$color-en-terciario-fijo: #410008;
+$color-en-secundario-fijo-variante: #3f484f;
+$color-terciario-fijo-tenue: #ffb3b2;
+$color-secundario-fijo-tenue: #bfc8d0;
+$color-primario-fijo: #83fc8e;
+$color-terciario-fijo: #ffdad9;
+$color-superficie: #f8f9fa;
+$color-en-superficie-variante: #3e4a3c;
+$color-superficie-contenedor-mas-alto: #e1e3e4;
+$color-secundario-fijo: #dbe4ed;
+$color-primario-fijo-tenue: #66df75;
+$color-inverso-primario: #66df75;
+$color-en-terciario: #ffffff;
+$color-superficie-contenedor-bajo: #f3f4f5;
+$color-terciario: #ba1830;
+$color-superficie-variante: #e1e3e4;
+$color-primario-contenedor: #39A900;
+$color-primario-hover: #38A800;
+$color-en-secundario-contenedor: #5b646b;
+$color-error: #ba1a1a;
+
+// Paleta Esmeralda
+$color-esmeralda-50: #ecfdf5;
+$color-esmeralda-100: #d1fae5;
+$color-esmeralda-500: #10b981;
+$color-esmeralda-600: #059669;
+$color-esmeralda-700: #047857;
+$color-esmeralda-800: #065f46;
+$color-esmeralda-900: #064e3b;
+
+// Paleta Pizarra
+$color-pizarra-50: #f8fafc;
+$color-pizarra-100: #f1f5f9;
+$color-pizarra-200: #e2e8f0;
+$color-pizarra-300: #cbd5e1;
+$color-pizarra-400: #94a3b8;
+$color-pizarra-500: #64748b;
+$color-pizarra-600: #475569;
+$color-pizarra-700: #334155;
+$color-pizarra-800: #1e293b;
+$color-pizarra-900: #0f172a;
+$color-pizarra-950: #020617;
+
+// Paleta Naranja
+$color-naranja-400: #fb923c;
+$color-naranja-500: #f97316;
+
+// Gradientes
+$gradiente-primario: linear-gradient(135deg, #39A900 0%, #38A800 100%);
+
+// =======================
+// TIPOGRAFÍA
+// =======================
+$fuente-titular: 'Manrope', sans-serif;
+$fuente-cuerpo: 'Inter', sans-serif;
+$fuente-etiqueta: 'Inter', sans-serif;
+
+// =======================
+// BORDES Y RADIOS
+// =======================
+$radio-defecto: 0.125rem;
+$radio-lg: 0.25rem;
+$radio-xl: 0.5rem;
+$radio-full: 0.75rem;
+$radio-2xl: 1rem;
+$radio-completo: 9999px;
+
+// =======================
+// SOMBRAS
+// =======================
+$sombra-baja: 0 4px 20px rgba(0,0,0,0.02);
+$sombra-media: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);

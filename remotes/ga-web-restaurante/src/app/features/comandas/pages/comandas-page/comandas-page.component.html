@@ -1,0 +1,74 @@
+<div class="comandas-layout">
+
+  <header class="header-banner">
+    <div class="icon-wrapper">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="icono-documento">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+    </div>
+    <div class="header-titles">
+      <h1>Gestión de Comandas</h1>
+      <p>Consulta y administra todas las comandas del restaurante</p>
+    </div>
+  </header>
+
+  <section class="filtros-section" style="padding: 0; border: none; background: transparent;">
+    <app-comandas-filtros (filtrar)="aplicarFiltro($event)"></app-comandas-filtros>
+  </section>
+
+  <section class="tabla-section" style="padding: 0; border: none; background: transparent;">
+    <app-comandas-tabla
+      [comandas]="comandasFiltradas"
+      (limpiar)="limpiarFiltros()"
+    (verDetalle)="abrirModalDetalle($event)"> </app-comandas-tabla>
+  </section>
+
+  <section class="resumen-section" style="padding: 0; border: none; background: transparent;">
+    <app-comandas-resumen [comandas]="comandasFiltradas"></app-comandas-resumen>
+  </section>
+
+  @if (modalAbierto) {
+    <div class="modal-overlay" (click)="cerrarModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Detalle de Comanda</h2>
+          <button class="btn-cerrar" (click)="cerrarModal()">✖</button>
+        </div>
+        <div class="modal-body">
+          <div class="info-grid">
+            <div>
+              <label>ID Comanda</label>
+              <p class="fw-bold">{{ comandaSeleccionada?.idComanda }}</p>
+            </div>
+            <div>
+              <label>Mesa</label>
+              <p>{{ comandaSeleccionada?.mesa }}</p>
+            </div>
+            <div>
+              <label>Mesero</label>
+              <p>{{ comandaSeleccionada?.mesero }}</p>
+            </div>
+            <div>
+              <label>Estado</label>
+              <p>{{ comandaSeleccionada?.estado }}</p>
+            </div>
+          </div>
+          <hr class="divisor">
+          <h4>Resumen del Pedido ({{ comandaSeleccionada?.items }} items)</h4>
+          <ul class="lista-items">
+            @for (item of comandaSeleccionada?.detalles; track item) {
+              <li>
+                <span>{{ item.cantidad }}x {{ item.nombre }}</span>
+                <span>{{ item.precio | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+              </li>
+            }
+          </ul>
+          <div class="total-section">
+            <h3>Total a Pagar:</h3>
+            <h3 class="precio-total">{{ comandaSeleccionada?.total | currency:'COP':'symbol-narrow':'1.0-0' }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

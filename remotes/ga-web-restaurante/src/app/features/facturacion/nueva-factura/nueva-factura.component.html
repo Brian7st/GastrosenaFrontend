@@ -1,0 +1,45 @@
+<div class="nueva-factura-container">
+  
+  <header class="header-section">
+    <button class="btn-volver" (click)="volver()"> ← Volver </button>
+    <h1>Crear Nueva Factura</h1>
+  </header>
+
+  <div class="forms-grid">
+    
+    <section class="form-block client-data">
+      <div class="block-header">
+        <i class="icon">👤</i>
+        <div class="title-group">
+          <h5>Datos del Cliente</h5>
+          <span class="subtitle">Información del cliente (opcional)</span>
+        </div>
+      </div>
+      
+      <div class="input-group">
+        <input type="text" class="form-input" placeholder="Nombre del Cliente">
+        <input type="text" class="form-input" placeholder="Documento de Identidad">
+        <input type="tel" class="form-input" placeholder="Teléfono de contacto">
+      </div>
+    </section>
+    
+    <section class="form-block add-products">
+      <div class="block-header">
+        <i class="icon green-text">➕</i>
+        <div class="title-group">
+          <h5 class="green-text">Agregar Productos</h5>
+          <span class="subtitle">Añade productos al pedido</span>
+        </div>
+      </div>
+      
+      <div class="input-grid">
+        <input type="text" class="form-input product-name" placeholder="Nombre del Producto">
+        <input type="number" class="form-input product-cant" placeholder="Cant.">
+        <input type="number" class="form-input product-price" placeholder="Precio Unitario">
+      </div>
+
+      <button class="btn-add-product">+ Agregar Producto</button>
+    </section>
+
+  </div>
+</div>

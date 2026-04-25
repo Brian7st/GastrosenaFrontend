@@ -1,0 +1,253 @@
+$primary: #006e25;
+$primary-container: #28a745;
+$on-surface: #191c1d;
+$surface-container-low: #f3f4f5;
+$surface-container-lowest: #ffffff;
+$slate-400: #94a3b8;
+$slate-500: #64748b;
+$slate-600: #475569;
+$slate-900: #0f172a;
+
+// ---- PDF Toolbar ----
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin: -2rem;
+}
+
+.pdf-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: $on-surface;
+  color: white;
+  flex-shrink: 0;
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+}
+
+.pdf-icon { color: #ef4444; }
+.pdf-filename { font-weight: 700; font-size: 0.9375rem; }
+.pdf-doc-type {
+  font-size: 0.6875rem;
+  color: $slate-400;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+
+  &--close {
+    background: transparent;
+    color: rgba(white, 0.7);
+    &:hover { color: white; background: rgba(white, 0.1); }
+  }
+  &--download {
+    background: $primary;
+    color: white;
+    &:hover { background: $primary-container; }
+  }
+}
+
+// ---- PDF Viewer ----
+.pdf-viewer {
+  flex: 1;
+  background: $slate-500;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  position: relative;
+}
+
+.pdf-page {
+  background: white;
+  width: 100%;
+  max-width: 900px;
+  min-height: 1100px;
+  padding: 3rem;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  border-radius: 0.25rem;
+}
+
+// ---- Document Header ----
+.doc-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  border: 1px solid $on-surface;
+  margin-bottom: 2rem;
+}
+
+.doc-header__logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  border-right: 1px solid $on-surface;
+}
+.logo-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: $on-surface;
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 0.25rem;
+}
+.logo-text { font-weight: 800; font-size: 1.25rem; letter-spacing: 0.1em; }
+.logo-subtext { font-size: 0.5rem; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(white, 0.7); }
+
+.doc-header__title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  text-align: center;
+  border-right: 1px solid $on-surface;
+}
+.doc-process { font-size: 0.75rem; font-weight: 600; color: $slate-600; margin-bottom: 0.5rem; }
+.doc-format { font-size: 0.875rem; font-weight: 800; color: $on-surface; }
+
+.doc-header__meta { padding: 1rem; }
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.75rem;
+  padding: 0.25rem 0;
+
+  span:first-child { color: $slate-500; }
+  span:last-child { font-weight: 700; }
+}
+
+// ---- Document Info ----
+.doc-info {
+  margin-bottom: 2rem;
+
+  &__row {
+    display: grid;
+    grid-template-columns: auto 1fr auto 1fr;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e5e7eb;
+
+    &:last-child { border-bottom: none; }
+  }
+  &__label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: $slate-500;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  &__value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $on-surface;
+  }
+}
+
+// ---- Document Table ----
+.doc-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 3rem;
+  border: 1px solid $on-surface;
+
+  th, td {
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    font-size: 0.8125rem;
+  }
+  th {
+    background: #f8fafc;
+    font-weight: 700;
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $slate-600;
+  }
+  .col-item { width: 5%; }
+  .col-desc { width: 50%; }
+  .col-unit { width: 8%; }
+  .col-qty { width: 7%; }
+  .col-obs { width: 30%; }
+}
+.text-center { text-align: center; }
+.text-italic { font-style: italic; color: $slate-500; }
+
+// ---- Signatures ----
+.signatures {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 2rem;
+  margin-top: 4rem;
+}
+.signature-block { text-align: center; }
+.signature-line {
+  height: 1px;
+  background: $on-surface;
+  margin-bottom: 0.75rem;
+}
+.signature-role {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+.signature-sub {
+  font-size: 0.6875rem;
+  color: $slate-500;
+}
+
+// ---- PDF Controls ----
+.pdf-controls {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: $on-surface;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+}
+.controls-sep {
+  width: 1px;
+  height: 1rem;
+  background: rgba(white, 0.2);
+}

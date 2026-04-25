@@ -1,0 +1,26 @@
+<div class="delete-backdrop" (click)="close()"></div>
+<div class="delete-modal">
+  <div class="delete-modal__icon">
+    <lucide-icon name="alert-triangle" [size]="32"></lucide-icon>
+  </div>
+  <h2 class="delete-modal__title">¿Estás seguro de eliminar este bien?</h2>
+  <p class="delete-modal__desc">Esta acción es irreversible. Todos los datos asociados a este inventario se perderán permanentemente.</p>
+
+  <div class="delete-modal__confirm-box">
+    <p class="delete-modal__confirm-text">
+      Por seguridad, escribe la palabra <strong>ELIMINAR</strong> para continuar
+    </p>
+    <input
+      type="text"
+      class="delete-modal__input"
+      placeholder="Escribe ELIMINAR aquí"
+      [(ngModel)]="confirmText"
+      (input)="onInput()"
+    />
+  </div>
+
+  <div class="delete-modal__footer">
+    <button class="delete-btn-cancel" (click)="close()">Cancelar</button>
+    <button class="delete-btn-confirm" [disabled]="!isValid()" (click)="onConfirm()">Eliminar</button>
+  </div>
+</div>

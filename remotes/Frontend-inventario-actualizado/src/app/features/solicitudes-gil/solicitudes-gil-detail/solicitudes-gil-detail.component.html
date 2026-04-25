@@ -1,0 +1,198 @@
+<!-- Action Header -->
+<div class="detail-header">
+  <div>
+    <div class="breadcrumb">
+      <a routerLink="/solicitudes-gil" class="breadcrumb__back">
+        <lucide-icon name="arrow-left" [size]="14"></lucide-icon>
+        Volver
+      </a>
+      <span class="breadcrumb__sep">/</span>
+      <span class="breadcrumb__current">Solicitudes GIL</span>
+    </div>
+    <h1 class="detail-title">{{ solicitud().codigo }}</h1>
+  </div>
+  <div class="detail-actions">
+    <a [routerLink]="['/solicitudes-gil', solicitud().id, 'editar']" class="btn btn--outline">
+      <lucide-icon name="pencil" [size]="18"></lucide-icon>
+      Editar
+    </a>
+    <a [routerLink]="['/solicitudes-gil', solicitud().id, 'pdf']" class="btn btn--outline">
+      <lucide-icon name="file-text" [size]="18"></lucide-icon>
+      Descargar PDF
+    </a>
+    <button class="btn btn--primary">Enviar a Aprobación</button>
+  </div>
+</div>
+
+<!-- Timeline -->
+<div class="timeline">
+  <div class="timeline__line"></div>
+  <div class="timeline__progress"></div>
+  @for (step of timelineSteps; track step.label) {
+    <div class="timeline__step" [class.timeline__step--active]="step.active">
+      <div class="timeline__circle" [class.timeline__circle--active]="step.active">
+        <lucide-icon [name]="step.icon" [size]="14"></lucide-icon>
+      </div>
+      <span class="timeline__label">{{ step.label }}</span>
+    </div>
+  }
+</div>
+
+<!-- Session Info -->
+<div class="info-card session-card">
+  <div class="session-card__header">
+    <lucide-icon name="file-text" [size]="20" class="icon-primary"></lucide-icon>
+    <h3 class="card-title">Información de la Sesión</h3>
+  </div>
+  <div class="session-grid">
+    <div>
+      <label class="detail-label">NOMBRE DEL VOCERO</label>
+      <p class="detail-value">{{ solicitud().vocero }}</p>
+    </div>
+    <div>
+      <label class="detail-label">HORARIOS</label>
+      <p class="detail-value">{{ solicitud().franjaHoraria }}</p>
+    </div>
+    <div>
+      <label class="detail-label">RESULTADO DE APRENDIZAJE (RA)</label>
+      <p class="detail-value">{{ solicitud().resultadoAprendizaje }}</p>
+    </div>
+  </div>
+</div>
+
+<!-- Bento Grid -->
+<div class="bento-grid">
+  <!-- Left Column -->
+  <div class="bento-left">
+    <!-- Estado Card -->
+    <div class="info-card">
+      <h3 class="card-label">ESTADO DE SOLICITUD</h3>
+      <div class="status-row">
+        <div class="status-badge">
+          <span class="status-dot"></span>
+          {{ solicitud().estado }}
+        </div>
+        <span class="status-date">Creado el {{ solicitud().fecha }}</span>
+      </div>
+      <div class="summary-block">
+        <p class="summary-label">Total Estimado</p>
+        <p class="summary-value">{{ formatCurrency(solicitud().total) }}</p>
+      </div>
+      <div class="responsible-block">
+        <p class="summary-label">Responsable (Instructor)</p>
+        <div class="responsible-info">
+          <div class="responsible-avatar">{{ solicitud().solicitanteIniciales }}</div>
+          <span class="responsible-name">{{ solicitud().solicitante }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info General Card -->
+    <div class="info-card">
+      <h3 class="card-label">INFORMACIÓN GENERAL</h3>
+      <div class="info-list">
+        <div class="info-item">
+          <label class="detail-label">REGIONAL</label>
+          <p class="detail-value">{{ solicitud().regional }}</p>
+        </div>
+        <div class="info-item">
+          <label class="detail-label">CENTRO DE FORMACIÓN</label>
+          <p class="detail-value">{{ solicitud().centroFormacion }}</p>
+        </div>
+        <div class="info-item">
+          <label class="detail-label">ÁREA / PROGRAMA</label>
+          <p class="detail-value">{{ solicitud().area }}</p>
+        </div>
+        <div class="info-item">
+          <label class="detail-label">CUENTADANTE RESPONSABLE</label>
+          <p class="detail-value">{{ solicitud().cuentadante }}</p>
+        </div>
+        <div class="info-item">
+          <label class="detail-label">DESTINO DEL BIEN</label>
+          <p class="detail-value">{{ solicitud().destinoBien }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column -->
+  <div class="bento-right">
+    <!-- Pre-Facturas -->
+    <div class="info-card prefact-card">
+      <div class="prefact-header">
+        <h3 class="card-title">Pre-Facturas Asociadas</h3>
+        <span class="badge badge--green">{{ solicitud().preFacturas.length }} DOCUMENTOS</span>
+      </div>
+      @for (pf of solicitud().preFacturas; track pf.codigo) {
+        <div class="prefact-item">
+          <div class="prefact-item__header">
+            <div class="prefact-item__info">
+              <lucide-icon name="receipt" [size]="18" class="icon-muted"></lucide-icon>
+              <div>
+                <p class="prefact-code">{{ pf.codigo }}</p>
+                <p class="prefact-prov">Proveedor: {{ pf.proveedor }}</p>
+              </div>
+            </div>
+            <p class="prefact-total">{{ formatCurrency(pf.monto) }}</p>
+          </div>
+          <div class="prefact-table-wrap">
+            <table class="prefact-table">
+              <thead>
+                <tr>
+                  <th>ÍTEM / DESCRIPCIÓN</th>
+                  <th class="text-center">CANT.</th>
+                  <th class="text-right">UNITARIO</th>
+                  <th class="text-right">SUBTOTAL</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of pf.items; track item.descripcion) {
+                  <tr>
+                    <td>{{ item.descripcion }}</td>
+                    <td class="text-center">{{ item.cantidad }}</td>
+                    <td class="text-right">{{ formatCurrency(item.precioUnitario) }}</td>
+                    <td class="text-right cell-bold">{{ formatCurrency(item.subtotal) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Observaciones -->
+    <div class="info-card">
+      <div class="obs-header">
+        <lucide-icon name="file-text" [size]="20" class="icon-primary"></lucide-icon>
+        <h3 class="card-title">Observaciones y Justificación</h3>
+      </div>
+      <div class="obs-quote">
+        <p>"{{ solicitud().observaciones }}"</p>
+      </div>
+      <div class="obs-footer">
+        <div class="obs-avatars">
+          <div class="obs-avatar">ML</div>
+          <div class="obs-avatar">JD</div>
+          <div class="obs-avatar obs-avatar--count">+1</div>
+        </div>
+        <button class="link-btn">
+          Añadir comentario
+          <lucide-icon name="plus" [size]="14"></lucide-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Audit Footer -->
+<div class="audit-footer">
+  <div class="audit-left">
+    <span>ID TRANSACCIÓN: #TRX-998210-GIL</span>
+    <span>HASH: 8F9A2B...3C1E</span>
+  </div>
+  <div class="audit-right">
+    <lucide-icon name="shield-check" [size]="14"></lucide-icon>
+    <span>VALIDADO BAJO ESTÁNDAR SENA-GIL-2024</span>
+  </div>
+</div>

@@ -1,0 +1,201 @@
+<div class="dashboard-wrapper">
+  
+  <!-- Encabezado Principal -->
+  <header class="dashboard-header">
+    <div class="header-titles">
+      <h1 class="title">Presupuesto General de Gastos</h1>
+      <p class="subtitle">Vigencia Fiscal 2024 &bull; Corte al 30 de Octubre</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn--secondary" (click)="abrirExportar()">
+        <lucide-icon name="file-down" [size]="18"></lucide-icon>
+        Exportar PDF
+      </button>
+      <button class="btn btn--primary" (click)="abrirRegistrar()">
+        <lucide-icon name="plus-circle" [size]="18"></lucide-icon>
+        Nuevo Rubro
+      </button>
+    </div>
+  </header>
+
+  <!-- Métricas KPI -->
+  <section class="kpi-grid">
+    <article class="kpi-card">
+      <header class="kpi-card__header">
+        <h3 class="kpi-card__title">Total Apropiación</h3>
+      </header>
+      <div class="kpi-card__body">
+        <span class="kpi-card__value">{{ formatCurrency(totales().apropiacion) }}</span>
+        <div class="kpi-card__indicator kpi-card__indicator--positive">
+          <lucide-icon name="trending-up" [size]="16"></lucide-icon>
+          <span>Asignación Inicial Constante</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="kpi-card">
+      <header class="kpi-card__header">
+        <h3 class="kpi-card__title">Comprometido</h3>
+      </header>
+      <div class="kpi-card__body">
+        <span class="kpi-card__value">{{ formatCurrency(totales().comprometido) }}</span>
+        <div class="progress-bar-container">
+          <div class="progress-bar" [style.width.%]="(totales().comprometido / totales().apropiacion) * 100"></div>
+        </div>
+        <p class="kpi-card__text">Ejecución Constante</p>
+      </div>
+    </article>
+
+    <article class="kpi-card">
+      <header class="kpi-card__header">
+        <h3 class="kpi-card__title">Pagado Real</h3>
+      </header>
+      <div class="kpi-card__body">
+        <span class="kpi-card__value">{{ formatCurrency(totales().pagado) }}</span>
+        <div class="kpi-card__indicator">
+          <lucide-icon name="landmark" [size]="16"></lucide-icon>
+          <span>Consolidado a la fecha</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="kpi-card">
+      <header class="kpi-card__header">
+        <h3 class="kpi-card__title text-tertiary">Disponible (Saldo)</h3>
+      </header>
+      <div class="kpi-card__body">
+        <span class="kpi-card__value">{{ formatCurrency(totales().disponible) }}</span>
+        <div class="kpi-card__indicator kpi-card__indicator--alert">
+          <lucide-icon name="info" [size]="16"></lucide-icon>
+          <span>Libre para asignar</span>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- Tabla de Estructura Presupuestal -->
+  <section class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Estructura Presupuestal</th>
+          <th class="text-right">Apropiación Inicial</th>
+          <th class="text-right">Disponible (Saldo)</th>
+          <th class="text-right">Comprometido</th>
+          <th class="text-right">Pagado</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (grupo of rubrosPorPrograma(); track grupo.programa) {
+          <!-- Fila de Grupo (Programa) -->
+          <tr class="group-header">
+            <td colspan="5">
+              <div class="group-header__content">
+                <lucide-icon name="chevron-down" [size]="18" class="text-primary"></lucide-icon>
+                <span class="group-header__title">Programa: {{ grupo.programa }}</span>
+              </div>
+            </td>
+          </tr>
+          
+          <!-- Filas de Rubros -->
+          @for (item of grupo.items; track item.id) {
+            <tr class="data-row" (click)="verDetalle(item.id)">
+              <td class="pl-lg">
+                <div class="flex-column">
+                  <span class="font-bold text-dark">{{ item.nombre }}</span>
+                  <span class="text-small text-muted">Código: {{ item.codigo }}</span>
+                </div>
+              </td>
+              <td class="text-right font-medium">{{ formatCurrency(item.apropiacionInicial) }}</td>
+              <td class="text-right font-bold" [ngClass]="item.nivelEjecucion === 'critico' ? 'text-tertiary' : (item.nivelEjecucion === 'alto' ? 'text-orange' : '')">
+                {{ formatCurrency(item.disponible) }}
+              </td>
+              <td class="text-right">
+                <div class="flex-column flex-end">
+                  <span>{{ formatCurrency(item.comprometido) }}</span>
+                  <span class="badge badge--small" [ngClass]="item.porcentajeEjecucion >= 90 ? 'badge--alert' : 'badge--warning'">
+                    {{ item.porcentajeEjecucion }}% EJECUTADO
+                  </span>
+                </div>
+              </td>
+              <td class="text-right">{{ formatCurrency(item.pagado) }}</td>
+            </tr>
+          }
+        }
+      </tbody>
+      <tfoot>
+        <tr>
+          <td class="font-bold text-dark">TOTAL CONSOLIDADO</td>
+          <td class="text-right font-bold text-dark">{{ formatCurrency(totales().apropiacion) }}</td>
+          <td class="text-right font-bold text-dark">{{ formatCurrency(totales().disponible) }}</td>
+          <td class="text-right font-bold text-dark">{{ formatCurrency(totales().comprometido) }}</td>
+          <td class="text-right font-bold text-dark">{{ formatCurrency(totales().pagado) }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </section>
+
+  <!-- Insights Bento Grid -->
+  <section class="insights-grid">
+    <div class="insight-card insight-card--large">
+      <header class="insight-card__header">
+        <h3 class="insight-card__title">Curva de Ejecución Mensual</h3>
+        <select class="form-select form-select--small">
+          <option>Gastos de Funcionamiento</option>
+          <option>Inversión</option>
+        </select>
+      </header>
+      <!-- Chart placeholder -->
+      <div class="chart-container">
+        <div class="chart-bars">
+          <div class="bar" style="height: 40%;"></div>
+          <div class="bar" style="height: 55%;"></div>
+          <div class="bar" style="height: 45%;"></div>
+          <div class="bar" style="height: 70%;"></div>
+          <div class="bar" style="height: 85%;"></div>
+          <div class="bar" style="height: 65%;"></div>
+          <div class="bar bar--active" style="height: 92%;">
+            <span class="bar-label">Actual</span>
+          </div>
+          <div class="bar bar--future" style="height: 30%;"></div>
+        </div>
+        <div class="chart-labels">
+          <span>Ene</span><span>Feb</span><span>Mar</span><span>Abr</span><span>May</span><span>Jun</span><span class="text-primary">Jul</span><span>Ago</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-card">
+      <header class="insight-card__header">
+        <h3 class="insight-card__title">Próximos Vencimientos</h3>
+      </header>
+      <div class="vencimientos-list">
+        @for (venc of vencimientos(); track venc.titulo) {
+          <div class="vencimiento-item" [ngClass]="{'opacity-muted': venc.tipo !== 'critico'}">
+            <div class="vencimiento-item__icon">
+              <lucide-icon 
+                [name]="venc.tipo === 'critico' ? 'calendar-off' : (venc.tipo === 'pendiente' ? 'calendar-clock' : 'history')" 
+                [size]="20"
+                [ngClass]="venc.tipo === 'critico' ? 'text-tertiary' : 'text-muted'">
+              </lucide-icon>
+            </div>
+            <div class="vencimiento-item__content">
+              <p class="vencimiento-item__title">{{ venc.titulo }}</p>
+              <p class="vencimiento-item__desc" [ngClass]="venc.tipo === 'critico' ? 'text-tertiary' : 'text-muted'">En {{ venc.diasRestantes }} días ({{ venc.fecha }})</p>
+            </div>
+          </div>
+        }
+      </div>
+      <button class="btn btn--text btn--full-width mt-lg">Ver Calendario Completo</button>
+    </div>
+  </section>
+
+</div>
+
+<!-- Componentes de Modales -->
+@if (showRegistrarModal()) {
+  <app-registrar-modal (close)="cerrarRegistrar()"></app-registrar-modal>
+}
+@if (showExportarModal()) {
+  <app-exportar-reporte-modal (close)="cerrarExportar()"></app-exportar-reporte-modal>
+}

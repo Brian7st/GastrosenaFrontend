@@ -1,0 +1,137 @@
+<!-- Backdrop -->
+<div class="modal-backdrop" (click)="close()"></div>
+
+<!-- Modal Container -->
+<div class="modal-container">
+  <!-- Header -->
+  <div class="modal-header">
+    <div>
+      <h2 class="modal-header__title">Registrar Nuevo Bien</h2>
+      <p class="modal-header__subtitle">Ingrese los detalles del nuevo activo para el inventario.</p>
+    </div>
+    <button class="modal-close" (click)="close()">
+      <lucide-icon name="x" [size]="20"></lucide-icon>
+    </button>
+  </div>
+
+  <!-- Body -->
+  <div class="modal-body">
+    <form (ngSubmit)="onSubmit()" class="modal-form">
+      <div class="modal-form__grid">
+        <!-- Left Column -->
+        <div class="modal-form__col">
+          <!-- Section: Identificación -->
+          <div class="form-section">
+            <div class="form-section__header">
+              <div class="form-section__icon">
+                <lucide-icon name="badge" [size]="16"></lucide-icon>
+              </div>
+              <h3 class="form-section__title">Identificación</h3>
+            </div>
+            <div class="form-fields">
+              <div class="form-field">
+                <label class="form-label" for="codSena">CÓD. INTERNO SENA</label>
+                <input class="form-input" id="codSena" type="text" placeholder="Ej. SENA-001" [(ngModel)]="form.codigoSena" name="codigoSena" />
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="codProv">CÓD. PROVEEDOR</label>
+                <input class="form-input" id="codProv" type="text" placeholder="Ej. PRV-992" [(ngModel)]="form.codigoProveedor" name="codigoProveedor" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Bodega -->
+          <div class="form-section">
+            <div class="form-section__header">
+              <div class="form-section__icon">
+                <lucide-icon name="warehouse" [size]="16"></lucide-icon>
+              </div>
+              <h3 class="form-section__title">Bodega</h3>
+            </div>
+            <div class="form-fields">
+              <div class="form-field">
+                <label class="form-label" for="nombreBien">NOMBRE DEL BIEN</label>
+                <input class="form-input" id="nombreBien" type="text" placeholder="Descripción clara del activo" [(ngModel)]="form.nombre" name="nombre" />
+              </div>
+              <div class="form-field-row">
+                <div class="form-field">
+                  <label class="form-label" for="kilosUm">KILOS / UM</label>
+                  <div class="input-suffix">
+                    <input class="form-input" id="kilosUm" type="number" placeholder="0.00" [(ngModel)]="form.kilosUm" name="kilosUm" />
+                    <span class="input-suffix__text">kg</span>
+                  </div>
+                </div>
+                <div class="form-field">
+                  <label class="form-label" for="factorConv">FACTOR DE CONVERSIÓN</label>
+                  <input class="form-input" id="factorConv" type="number" placeholder="1.00" [(ngModel)]="form.factorConversion" name="factorConversion" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="modal-form__col">
+          <!-- Section: Financiera -->
+          <div class="form-section">
+            <div class="form-section__header">
+              <div class="form-section__icon">
+                <lucide-icon name="credit-card" [size]="16"></lucide-icon>
+              </div>
+              <h3 class="form-section__title">Información Financiera</h3>
+            </div>
+            <div class="form-fields">
+              <div class="form-field">
+                <label class="form-label" for="proveedor">PROVEEDOR ASOCIADO</label>
+                <div class="select-wrapper">
+                  <select class="form-select" id="proveedor" [(ngModel)]="form.proveedor" name="proveedor">
+                    <option value="" disabled>Seleccione un proveedor</option>
+                    <option value="1">Proveedor A</option>
+                    <option value="2">Proveedor B</option>
+                  </select>
+                  <lucide-icon name="chevron-down" [size]="18" class="select-wrapper__icon"></lucide-icon>
+                </div>
+              </div>
+
+              <div class="financial-box">
+                <div class="form-field">
+                  <label class="form-label" for="valorNeto">VALOR UNITARIO NETO</label>
+                  <div class="input-prefix">
+                    <span class="input-prefix__text">$</span>
+                    <input class="form-input" id="valorNeto" type="number" placeholder="0.00" [(ngModel)]="form.valorNeto" name="valorNeto" />
+                  </div>
+                </div>
+
+                <div class="form-field">
+                  <label class="form-label" for="iva">IVA (%)</label>
+                  <div class="select-wrapper">
+                    <select class="form-select" id="iva" [(ngModel)]="form.iva" name="iva">
+                      <option [ngValue]="19">19%</option>
+                      <option [ngValue]="5">5%</option>
+                      <option [ngValue]="0">0%</option>
+                    </select>
+                    <lucide-icon name="chevron-down" [size]="18" class="select-wrapper__icon"></lucide-icon>
+                  </div>
+                </div>
+
+                <div class="financial-total">
+                  <span class="financial-total__label">Valor Total con IVA</span>
+                  <span class="financial-total__value">{{ formatCurrency(valorConIva) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Footer -->
+  <div class="modal-footer">
+    <button class="btn-cancel" type="button" (click)="close()">Cancelar</button>
+    <button class="btn-save" type="submit" (click)="onSubmit()">
+      <lucide-icon name="save" [size]="16"></lucide-icon>
+      Guardar Bien
+    </button>
+  </div>
+</div>

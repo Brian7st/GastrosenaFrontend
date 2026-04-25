@@ -1,0 +1,353 @@
+@use "sass:color";
+// variables
+$primary: #006e25;
+$tertiary: #ba1830;
+$on-surface: #191c1d;
+$surface: #f8f9fa;
+$surface-container-low: #f3f4f5;
+$surface-container-lowest: #ffffff;
+$slate-400: #94a3b8;
+$slate-500: #64748b;
+$slate-600: #475569;
+$slate-900: #0f172a;
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  font-size: 0.875rem;
+
+  &__link {
+    color: $slate-500;
+    text-decoration: none;
+    &:hover { color: $primary; }
+  }
+  &__separator {
+    color: $slate-400;
+    display: flex;
+  }
+  &__current {
+    font-weight: 600;
+    color: $slate-900;
+  }
+}
+
+.anular-header {
+  margin-bottom: 2.5rem;
+
+  &__title {
+    font-family: 'Manrope', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: $slate-900;
+    margin-bottom: 0.5rem;
+  }
+  &__subtitle {
+    font-size: 1rem;
+    color: $slate-500;
+  }
+}
+
+.anular-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+// Left Column (Form)
+.form-card {
+  background: $surface-container-lowest;
+  border-radius: 1rem;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+
+  // Background pattern from mockup
+  &::after {
+    content: '';
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    width: 200px;
+    height: 200px;
+    background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 10 L90 90 L10 90 Z" fill="rgba(241, 245, 249, 0.5)"/></svg>') no-repeat;
+    background-size: contain;
+    pointer-events: none;
+  }
+
+  &__header {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  &__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: $slate-900;
+    margin-bottom: 0.25rem;
+  }
+
+  &__desc {
+    color: $slate-500;
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+}
+
+.alert-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.75rem;
+  background: #fef2f2;
+  color: $tertiary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.form-group {
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+
+  label {
+    display: block;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: $slate-500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+
+    .required { color: $tertiary; }
+  }
+
+  textarea {
+    width: 100%;
+    background: $surface-container-low;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    font-size: 0.875rem;
+    color: $slate-900;
+    resize: vertical;
+    transition: all 0.2s;
+
+    &::placeholder { color: $slate-400; }
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba($tertiary, 0.2);
+    }
+  }
+}
+
+.form-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: $slate-400;
+  margin-top: 0.75rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  flex: 1;
+  text-decoration: none;
+
+  &--danger {
+    background: #c1121f;
+    color: white;
+    &:hover:not(.btn--disabled) { background: color.adjust(#c1121f, $lightness: -5%); }
+  }
+
+  &--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &--neutral {
+    background: #e2e8f0;
+    color: $slate-900;
+    &:hover { background: color.adjust(#e2e8f0, $lightness: -5%); }
+  }
+}
+
+.recommendation-card {
+  display: flex;
+  gap: 1rem;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+
+  &__icon {
+    color: #16a34a;
+    flex-shrink: 0;
+  }
+
+  h4 {
+    color: #166534;
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  p {
+    font-size: 0.875rem;
+    color: #14532d;
+    line-height: 1.5;
+
+    a {
+      color: #16a34a;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+  }
+}
+
+// Right Column (Summary)
+.summary-card {
+  background: #f8fafc;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+
+  &__title {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: $slate-500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1.5rem;
+  }
+}
+
+.summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+
+  &__label { color: $slate-500; }
+  &__value {
+    color: $slate-900;
+    &--bold { font-weight: 700; }
+  }
+}
+
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+
+  &__label {
+    font-weight: 700;
+    color: $slate-900;
+  }
+  &__value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #006e25; // using the green from screenshot for Q 12,450.00
+  }
+}
+
+.history-box {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: $slate-500;
+    margin-bottom: 1rem;
+  }
+}
+
+.history-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    position: relative;
+    padding-left: 1rem;
+    font-size: 0.75rem;
+    color: $slate-600;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.375rem;
+      width: 0.375rem;
+      height: 0.375rem;
+      border-radius: 50%;
+      background: #16a34a;
+    }
+
+    &:last-child { margin-bottom: 0; }
+  }
+}
+
+.cert-banner {
+  background: #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+
+  &__icon { color: $slate-400; }
+
+  p {
+    font-size: 0.75rem;
+    color: $slate-500;
+    font-style: italic;
+    line-height: 1.5;
+  }
+}
