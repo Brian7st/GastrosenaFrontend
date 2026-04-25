@@ -11,7 +11,7 @@
     @for (kpi of dashboard.kpis(); track kpi.label) {
       <div class="kpi-card kpi-card--{{ kpi.trendType }}">
         <div class="kpi-card__icon">
-          <lucide-icon [name]="kpi.icon" [size]="20" />
+          <svg [lucideIcon]="kpi.icon" [size]="20"></svg>
         </div>
         <div class="kpi-card__body">
           <p class="kpi-card__label">{{ kpi.label }}</p>
@@ -29,7 +29,7 @@
       @for (mod of dashboard.modulos; track mod.label) {
         <a class="module-card" [routerLink]="mod.ruta">
           <div class="module-card__icon-wrap">
-            <lucide-icon [name]="mod.icon" [size]="22" />
+            <svg [lucideIcon]="mod.icon" [size]="22"></svg>
           </div>
           <div class="module-card__info">
             <span class="module-card__label">{{ mod.label }}</span>
@@ -40,7 +40,7 @@
               {{ mod.badgeCount }}
             </span>
           }
-          <lucide-icon name="chevron-right" [size]="16" class="module-card__arrow" />
+          <svg lucideIcon="chevron-right" [size]="16" class="module-card__arrow"></svg>
         </a>
       }
     </div>
