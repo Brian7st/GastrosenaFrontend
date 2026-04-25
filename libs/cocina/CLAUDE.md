@@ -1,4 +1,4 @@
-﻿# Dominio: cocina
+# Dominio: cocina
 
 Estás trabajando en el dominio **cocina** de GastroSENA.
 
@@ -13,7 +13,7 @@ Lee .ai/rules/architecture.md para las reglas de dependencias.
 Lee .ai/rules/code-quality.md para los estándares de código.
 
 ## Scope de tus commits
-eat(cocina): ... | ix(cocina): ... | chore(cocina): ...
+feat(cocina): ... | fix(cocina): ... | chore(cocina): ...
 
 ## Si necesitás algo de shared
 No lo modificás vos — coordiná con el equipo de Arquitectura.

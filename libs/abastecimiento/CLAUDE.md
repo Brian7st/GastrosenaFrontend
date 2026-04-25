@@ -1,4 +1,4 @@
-﻿# Dominio: abastecimiento
+# Dominio: abastecimiento
 
 Estás trabajando en el dominio **abastecimiento** de GastroSENA.
 
@@ -13,7 +13,7 @@ Lee .ai/rules/architecture.md para las reglas de dependencias.
 Lee .ai/rules/code-quality.md para los estándares de código.
 
 ## Scope de tus commits
-eat(abastecimiento): ... | ix(abastecimiento): ... | chore(abastecimiento): ...
+feat(abastecimiento): ... | fix(abastecimiento): ... | chore(abastecimiento): ...
 
 ## Si necesitás algo de shared
 No lo modificás vos — coordiná con el equipo de Arquitectura.

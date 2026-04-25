@@ -64,7 +64,7 @@ libs/
 ```
 
 Cada dev trabaja únicamente dentro de su carpeta de dominio.
-Ver `ARQUITECTURA.md` para la descripción completa.
+Ver [`docs/arquitectura.md`](arquitectura.md) para la descripción completa.
 
 ---
 
@@ -208,7 +208,7 @@ npm start
 
 **El lint falla con "module boundary" error**
 Estás importando desde un dominio que no te corresponde.
-Revisá `ARQUITECTURA.md` sección 4 — Regla de Oro de Dependencias.
+Revisá [`docs/arquitectura.md`](arquitectura.md) sección 4 — Regla de Oro de Dependencias.
 
 **Error de TypeScript con un path alias**
 Verificá que el alias esté declarado en `tsconfig.base.json` apuntando a la nueva ubicación.

@@ -1,4 +1,4 @@
-﻿# Dominio: presupuesto
+# Dominio: presupuesto
 
 Estás trabajando en el dominio **presupuesto** de GastroSENA.
 
@@ -13,7 +13,7 @@ Lee .ai/rules/architecture.md para las reglas de dependencias.
 Lee .ai/rules/code-quality.md para los estándares de código.
 
 ## Scope de tus commits
-eat(presupuesto): ... | ix(presupuesto): ... | chore(presupuesto): ...
+feat(presupuesto): ... | fix(presupuesto): ... | chore(presupuesto): ...
 
 ## Si necesitás algo de shared
 No lo modificás vos — coordiná con el equipo de Arquitectura.

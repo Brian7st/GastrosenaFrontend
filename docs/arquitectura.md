@@ -112,8 +112,8 @@ GastrosenaFrontend/
 ├── .eslintrc.json                ← Reglas de módulos (enforce-module-boundaries)
 ├── nx.json                       ← Configuración Nx y caché
 ├── tsconfig.base.json            ← Path aliases para todas las librerías
-├── SETUP.md                      ← Cómo instalar, correr y contribuir al proyecto
-└── CONTRIBUTING.md               ← Reglas de trabajo (ver sección 14)
+├── docs/setup.md                 ← Cómo instalar, correr y contribuir al proyecto
+└── docs/arquitectura.md          ← Este archivo (arquitectura y reglas)
 ```
 
 > **Convención de crecimiento:** cuando un dominio necesite una segunda feature (ej. `feature-cocina-recetas`), se crea dentro de `libs/cocina/feature-cocina-recetas/` — nunca en la raíz de `libs/`.

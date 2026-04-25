@@ -1,4 +1,4 @@
-﻿# Dominio: bar
+# Dominio: bar
 
 Estás trabajando en el dominio **bar** de GastroSENA.
 
@@ -13,7 +13,7 @@ Lee .ai/rules/architecture.md para las reglas de dependencias.
 Lee .ai/rules/code-quality.md para los estándares de código.
 
 ## Scope de tus commits
-eat(bar): ... | ix(bar): ... | chore(bar): ...
+feat(bar): ... | fix(bar): ... | chore(bar): ...
 
 ## Si necesitás algo de shared
 No lo modificás vos — coordiná con el equipo de Arquitectura.

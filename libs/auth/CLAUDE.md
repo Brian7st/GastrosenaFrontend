@@ -1,4 +1,4 @@
-﻿# Dominio: auth
+# Dominio: auth
 
 Estás trabajando en el dominio **auth** de GastroSENA.
 
@@ -13,7 +13,7 @@ Lee .ai/rules/architecture.md para las reglas de dependencias.
 Lee .ai/rules/code-quality.md para los estándares de código.
 
 ## Scope de tus commits
-eat(auth): ... | ix(auth): ... | chore(auth): ...
+feat(auth): ... | fix(auth): ... | chore(auth): ...
 
 ## Si necesitás algo de shared
 No lo modificás vos — coordiná con el equipo de Arquitectura.

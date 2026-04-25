@@ -1,4 +1,4 @@
-﻿# Dominio: inventario
+# Dominio: inventario
 
 Estás trabajando en el dominio **inventario** de GastroSENA.
 
@@ -13,7 +13,7 @@ Lee .ai/rules/architecture.md para las reglas de dependencias.
 Lee .ai/rules/code-quality.md para los estándares de código.
 
 ## Scope de tus commits
-eat(inventario): ... | ix(inventario): ... | chore(inventario): ...
+feat(inventario): ... | fix(inventario): ... | chore(inventario): ...
 
 ## Si necesitás algo de shared
 No lo modificás vos — coordiná con el equipo de Arquitectura.

@@ -1,4 +1,4 @@
-﻿# Dominio: facturacion
+# Dominio: facturacion
 
 Estás trabajando en el dominio **facturacion** de GastroSENA.
 
@@ -13,7 +13,7 @@ Lee .ai/rules/architecture.md para las reglas de dependencias.
 Lee .ai/rules/code-quality.md para los estándares de código.
 
 ## Scope de tus commits
-eat(facturacion): ... | ix(facturacion): ... | chore(facturacion): ...
+feat(facturacion): ... | fix(facturacion): ... | chore(facturacion): ...
 
 ## Si necesitás algo de shared
 No lo modificás vos — coordiná con el equipo de Arquitectura.

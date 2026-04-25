@@ -1,4 +1,4 @@
-﻿# Dominio: requisiciones
+# Dominio: requisiciones
 
 Estás trabajando en el dominio **requisiciones** de GastroSENA.
 
@@ -13,7 +13,7 @@ Lee .ai/rules/architecture.md para las reglas de dependencias.
 Lee .ai/rules/code-quality.md para los estándares de código.
 
 ## Scope de tus commits
-eat(requisiciones): ... | ix(requisiciones): ... | chore(requisiciones): ...
+feat(requisiciones): ... | fix(requisiciones): ... | chore(requisiciones): ...
 
 ## Si necesitás algo de shared
 No lo modificás vos — coordiná con el equipo de Arquitectura.
