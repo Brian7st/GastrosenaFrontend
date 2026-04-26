@@ -1,0 +1,66 @@
+<div class="dashboard">
+
+  <!-- Encabezado -->
+  <div class="dashboard__header">
+    <h1 class="dashboard__title">Panel General</h1>
+    <p class="dashboard__subtitle">Vista general del sistema GastroSENA en tiempo real.</p>
+  </div>
+
+  <!-- KPIs -->
+  <div class="dashboard__kpis">
+    @for (kpi of dashboard.kpis(); track kpi.label) {
+      <div class="kpi-card kpi-card--{{ kpi.trendType }}">
+        <div class="kpi-card__icon">
+          <svg [lucideIcon]="kpi.icon" [size]="20"></svg>
+        </div>
+        <div class="kpi-card__body">
+          <p class="kpi-card__label">{{ kpi.label }}</p>
+          <h3 class="kpi-card__value">{{ kpi.value }}</h3>
+          <span class="kpi-card__trend">{{ kpi.trend }}</span>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Módulos del sistema -->
+  <section class="dashboard__section">
+    <h2 class="dashboard__section-title">Módulos del sistema</h2>
+    <div class="modules-grid">
+      @for (mod of dashboard.modulos; track mod.label) {
+        <a class="module-card" [routerLink]="mod.ruta">
+          <div class="module-card__icon-wrap">
+            <svg [lucideIcon]="mod.icon" [size]="22"></svg>
+          </div>
+          <div class="module-card__info">
+            <span class="module-card__label">{{ mod.label }}</span>
+            <span class="module-card__desc">{{ mod.description }}</span>
+          </div>
+          @if (mod.badgeCount) {
+            <span class="module-card__badge module-card__badge--{{ mod.badgeType }}">
+              {{ mod.badgeCount }}
+            </span>
+          }
+          <svg lucideIcon="chevron-right" [size]="16" class="module-card__arrow"></svg>
+        </a>
+      }
+    </div>
+  </section>
+
+  <!-- Actividad reciente -->
+  <section class="dashboard__section">
+    <h2 class="dashboard__section-title">Actividad reciente</h2>
+    <div class="activity-list">
+      @for (item of dashboard.actividadReciente; track item.id) {
+        <div class="activity-item">
+          <div class="activity-item__dot activity-item__dot--{{ item.tipo }}"></div>
+          <div class="activity-item__body">
+            <p class="activity-item__desc">{{ item.descripcion }}</p>
+            <p class="activity-item__meta">{{ item.modulo }} · {{ item.usuario }}</p>
+          </div>
+          <span class="activity-item__time">{{ item.hace }}</span>
+        </div>
+      }
+    </div>
+  </section>
+
+</div>
