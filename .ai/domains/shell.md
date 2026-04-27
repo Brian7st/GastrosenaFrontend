@@ -12,7 +12,7 @@
 ## Nunca tocás
 - Cualquier otro dominio (`libs/cocina/`, `libs/auth/`, etc.)
 - `apps/`, `tsconfig.base.json`, `.eslintrc.json`, `nx.json`
-- `libs/shell/feature-shell/src/lib/shell.routes.ts` — coordiná con Arquitectura
+- `libs/shell/shell/src/lib/shell.routes.ts` — coordiná con Arquitectura
 
 ## Scope de tus ramas y commits
 `feat/shell/...` | `fix/shell/...` | `chore/shell/...`
