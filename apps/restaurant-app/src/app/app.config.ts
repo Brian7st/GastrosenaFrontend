@@ -3,7 +3,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { provideStore } from '@ngrx/store';
 import { errorInterceptor, jwtInterceptor, loadingInterceptor } from '@restaurant/shared/api';
-import { shellRoutes } from '@restaurant/feature-shell';
+import { shellRoutes } from '@restaurant/shell';
 import { provideRestaurantUi } from '@restaurant/shared/ui';
 
 export const appConfig: ApplicationConfig = {
