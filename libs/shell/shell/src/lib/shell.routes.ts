@@ -66,24 +66,9 @@ export const shellRoutes: Routes = [
         loadChildren: () => import('@restaurant/reportes').then(m => m.REPORTES_ROUTES),
       },
       {
-        path: 'facturacion',
-        loadChildren: () =>
-          import('@restaurant/facturacion').then(m => m.FACTURACION_ROUTES),
-      },
-      {
         path: 'abastecimiento',
         loadChildren: () =>
           import('@restaurant/abastecimiento').then(m => m.ABASTECIMIENTO_ROUTES),
-      },
-      {
-        path: 'presupuesto',
-        loadChildren: () =>
-          import('@restaurant/presupuesto').then(m => m.PRESUPUESTO_ROUTES),
-      },
-      {
-        path: 'requisiciones',
-        loadChildren: () =>
-          import('@restaurant/requisiciones').then(m => m.REQUISICIONES_ROUTES),
       },
       {
         path: 'notificaciones',
