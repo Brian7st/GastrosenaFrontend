@@ -1,0 +1,64 @@
+<!-- Modo: BLOQUEADO POR STOCK -->
+<ng-container *ngIf="isBloqueado(); else confirmMode">
+  <div class="modal-overlay" (click)="cancel.emit()">
+    <div class="delete-dialog" (click)="$event.stopPropagation()">
+
+      <div class="blocked-banner">
+        <span class="material-symbols-outlined">block</span>
+        Bien con stock activo — no se puede eliminar
+      </div>
+
+      <div class="dialog-body">
+        <div class="warning-icon">
+          <span class="material-symbols-outlined">warning</span>
+        </div>
+        <h3>No se puede eliminar — este bien tiene {{ bien.stockActual }} unidades en stock</h3>
+        <p>Esta acción es irreversible. Todos los datos asociados a este inventario se perderán permanentemente.</p>
+      </div>
+
+      <div class="dialog-footer">
+        <button class="btn-cancel-green" (click)="cancel.emit()">Cancelar</button>
+        <button class="btn-delete" disabled>Eliminar</button>
+      </div>
+
+    </div>
+  </div>
+</ng-container>
+
+<!-- Modo: CONFIRMACIÓN CON PALABRA CLAVE -->
+<ng-template #confirmMode>
+  <div class="modal-overlay" (click)="cancel.emit()">
+    <div class="delete-dialog" (click)="$event.stopPropagation()">
+
+      <div class="dialog-body">
+        <div class="warning-icon">
+          <span class="material-symbols-outlined">warning</span>
+        </div>
+        <h3>¿Estás seguro de eliminar este bien?</h3>
+        <p>Esta acción es irreversible. Todos los datos asociados a este inventario se perderán permanentemente.</p>
+
+        <div class="keyword-box">
+          <p>Por seguridad, escribe la palabra <strong>ELIMINAR</strong> para continuar</p>
+          <input
+            class="keyword-input"
+            type="text"
+            placeholder="Escribe ELIMINAR aquí"
+            [ngModel]="keyword()"
+            (ngModelChange)="onKeywordChange($event)"
+          />
+        </div>
+      </div>
+
+      <div class="dialog-footer">
+        <button class="btn-cancel-neutral" (click)="cancel.emit()">Cancelar</button>
+        <button class="btn-delete btn-delete--active"
+                [disabled]="!canDelete()"
+                [class.btn-delete--disabled]="!canDelete()"
+                (click)="onConfirm()">
+          Eliminar
+        </button>
+      </div>
+
+    </div>
+  </div>
+</ng-template>

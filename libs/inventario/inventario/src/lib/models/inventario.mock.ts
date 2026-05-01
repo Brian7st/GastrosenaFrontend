@@ -12,10 +12,29 @@ export const BIENES_MOCK: Bien[] = [
     stockActual: 15,
     stockMinimo: 5,
     unidadMedida: 'UND',
+    valorNeto: 3781512,
+    iva: 19,
     valor: 4500000,
     estado: 'Activo',
     estadoStock: 'DISPONIBLE',
-    tieneHistorial: true
+    tieneHistorial: true,
+    proveedor: 'Dell Colombia S.A.S.',
+    fechaCompra: '2024-01-10',
+    factorConversion: 1,
+    depreciacionAnual: 20,
+    imagenUrl: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=400',
+    especificaciones: {
+      'Procesador': 'Intel Core i7 11th Gen',
+      'Memoria RAM': '16GB DDR4',
+      'Almacenamiento': '512GB SSD NVMe',
+      'Sistema Operativo': 'Windows 11 Pro',
+      'Código Activo': 'EQU-2024-001',
+      'Fecha Compra': '12 Ene 2024',
+    },
+    facturas: [
+      { id: 1, fel: 'FEL-99281', cufe: 'e3b0c442...855', proveedor: 'Dell Colombia S.A.S.', fecha: '2024-01-10', monto: 4500000, estado: 'PAGADA' },
+      { id: 2, fel: 'FEL-98745', cufe: '8d969eef...c92', proveedor: 'Distribuidora Tecnológica', fecha: '2023-11-05', monto: 120000, estado: 'CAUSADA' },
+    ],
   },
   {
     id: 2,
@@ -28,10 +47,16 @@ export const BIENES_MOCK: Bien[] = [
     stockActual: 4,
     stockMinimo: 10,
     unidadMedida: 'UND',
+    valorNeto: 100840,
+    iva: 19,
     valor: 120000,
     estado: 'Bajo Stock',
     estadoStock: 'BAJO_STOCK',
-    tieneHistorial: false
+    tieneHistorial: false,
+    proveedor: 'Papelería Nacional S.A.',
+    fechaCompra: '2024-03-15',
+    factorConversion: 1,
+    facturas: [],
   },
   {
     id: 3,
@@ -44,10 +69,16 @@ export const BIENES_MOCK: Bien[] = [
     stockActual: 32,
     stockMinimo: 10,
     unidadMedida: 'UND',
+    valorNeto: 714286,
+    iva: 19,
     valor: 850000,
     estado: 'Activo',
     estadoStock: 'DISPONIBLE',
-    tieneHistorial: true
+    tieneHistorial: true,
+    proveedor: 'Muebles y Más S.A.S.',
+    fechaCompra: '2024-02-20',
+    factorConversion: 1,
+    facturas: [],
   },
   {
     id: 4,
@@ -60,16 +91,22 @@ export const BIENES_MOCK: Bien[] = [
     stockActual: 6,
     stockMinimo: 8,
     unidadMedida: 'UND',
+    valorNeto: 1008403,
+    iva: 19,
     valor: 1200000,
     estado: 'Bajo Stock',
     estadoStock: 'BAJO_STOCK',
-    tieneHistorial: true
-  }
+    tieneHistorial: true,
+    proveedor: 'Equipo Chef Colombia',
+    fechaCompra: '2024-01-25',
+    factorConversion: 1,
+    facturas: [],
+  },
 ];
 
 export const BIENES_KPIS_MOCK: BienKpis = {
   valorTotal: 458240000,
   totalAlertas: 23,
   movimientosHoy: 156,
-  tendenciaValor: 12
+  tendenciaValor: 12,
 };

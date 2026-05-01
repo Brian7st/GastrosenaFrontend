@@ -1,92 +1,137 @@
-<div class="modal-overlay" (click)="cancel.emit()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <header class="modal-header">
-      <div class="header-title">
-        <div class="icon-box">
-          <lucide-icon name="upload-cloud" size="24"></lucide-icon>
-        </div>
-        <div>
-          <h3>Carga Masiva de Bienes</h3>
-          <p>Importe múltiples activos desde un archivo CSV o Excel.</p>
-        </div>
-      </div>
-      <button class="close-btn" (click)="cancel.emit()">
-        <lucide-icon name="x" size="20"></lucide-icon>
-      </button>
-    </header>
+<div class="import-page">
 
-    <div class="modal-body">
-      <!-- Drop Zone -->
-      <div 
-        class="drop-zone" 
-        [class.is-dragging]="isDragging()"
-        (dragover)="onDragOver($event)"
-        (dragleave)="onDragLeave()"
-        (drop)="onDrop($event)"
-        *ngIf="!file()">
-        <lucide-icon name="upload" size="40"></lucide-icon>
-        <p>Arrastre su archivo aquí o <span>busque en su equipo</span></p>
-        <small>Formatos admitidos: .csv, .xlsx (Máx 5MB)</small>
-        <input type="file" (change)="onFileSelected($event)" accept=".csv, .xlsx">
-      </div>
+  <!-- Header -->
+  <div class="import-header">
+    <div>
+      <h1 class="import-title">Importar Bienes</h1>
+      <p class="import-subtitle">Cargue archivos masivos para actualizar el inventario nacional.</p>
+    </div>
+    <button class="btn-plantilla" (click)="onDescargarPlantilla()">
+      <span class="material-symbols-outlined">download</span>
+      Descargar Plantilla
+    </button>
+  </div>
 
-      <!-- File Selected Info -->
-      <div class="file-info" *ngIf="file()">
-        <div class="file-card">
-          <lucide-icon name="file-text" size="24"></lucide-icon>
-          <div class="file-details">
-            <span class="file-name">{{ file()?.name }}</span>
-            <span class="file-size">{{ (file()?.size || 0) / 1024 | number:'1.0-2' }} KB</span>
+  <!-- Upload + Instrucciones -->
+  <div class="upload-row">
+
+    <!-- Drop zone -->
+    <div class="upload-card">
+      <ng-container *ngIf="!file(); else fileSelected">
+        <div class="drop-zone" [class.is-dragging]="isDragging()"
+             (dragover)="onDragOver($event)" (dragleave)="onDragLeave()" (drop)="onDrop($event)">
+          <div class="drop-icon">
+            <span class="material-symbols-outlined">upload_file</span>
           </div>
-          <button class="remove-btn" (click)="file.set(null); previewData.set([])">
-            <lucide-icon name="trash-2" size="18"></lucide-icon>
+          <h3>Arrastre su archivo aquí</h3>
+          <p>Soporta formatos <strong>.xlsx</strong> y <strong>.csv</strong>. Máximo 25MB por archivo.</p>
+          <label class="btn-select-file">
+            Seleccionar Archivo
+            <input type="file" accept=".csv,.xlsx,.xls" (change)="onFileSelected($event)" />
+          </label>
+        </div>
+      </ng-container>
+
+      <ng-template #fileSelected>
+        <div class="file-card">
+          <div class="file-icon">
+            <span class="material-symbols-outlined">description</span>
+          </div>
+          <div class="file-info">
+            <p class="file-name">{{ file()?.name }}</p>
+            <p class="file-size">{{ getFileSize() }}</p>
+          </div>
+          <button class="remove-btn" (click)="removeFile()">
+            <span class="material-symbols-outlined">close</span>
           </button>
         </div>
-      </div>
+      </ng-template>
+    </div>
 
-      <!-- Preview Table -->
-      <div class="preview-section" *ngIf="previewData().length > 0">
-        <h5>Previsualización de Datos ({{ previewData().length }} registros)</h5>
-        <div class="preview-container">
-          <table class="preview-table">
-            <thead>
-              <tr>
-                <th>Placa</th>
-                <th>Descripción</th>
-                <th>Serial</th>
-                <th>Ubicación</th>
-                <th>Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let row of previewData()" [class.row-error]="row.error">
-                <td>{{ row.codigoPlaca }}</td>
-                <td>{{ row.descripcion || '—' }}</td>
-                <td>{{ row.serial }}</td>
-                <td>{{ row.ubicacion }}</td>
-                <td>
-                  <span class="error-text" *ngIf="row.error">{{ row.error }}</span>
-                  <span *ngIf="!row.error">{{ row.estado }}</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+    <!-- Instrucciones -->
+    <div class="instrucciones-card">
+      <div class="instr-header">
+        <span class="material-symbols-outlined">info</span>
+        <h4>Instrucciones</h4>
+      </div>
+      <ol class="instr-list">
+        <li *ngFor="let item of INSTRUCCIONES; let i = index">
+          <span class="instr-num">{{ i + 1 }}</span>
+          <span>{{ item }}</span>
+        </li>
+      </ol>
+      <div class="server-status">
+        <p class="status-label">ESTADO DEL SERVIDOR</p>
+        <div class="status-value">
+          <span class="status-dot"></span>
+          Listo para procesamiento
         </div>
       </div>
     </div>
-
-    <footer class="modal-footer">
-      <div class="footer-info" *ngIf="previewData().length > 0">
-        <span [class.text-danger]="!isValid()">
-          {{ isValid() ? '✓ Archivo listo para importar' : '⚠ Corrija los errores para continuar' }}
-        </span>
-      </div>
-      <div class="footer-actions">
-        <button class="btn-secondary" (click)="cancel.emit()">Cancelar</button>
-        <button class="btn-primary" [disabled]="!isValid() || previewData().length === 0" (click)="onImport()">
-          Confirmar Importación
-        </button>
-      </div>
-    </footer>
   </div>
+
+  <!-- Vista Previa -->
+  <ng-container *ngIf="previewData().length > 0 || isProcessing()">
+    <div class="preview-card">
+      <div class="preview-header">
+        <div class="preview-title">
+          <span class="material-symbols-outlined">visibility</span>
+          <h3>Vista Previa de Datos</h3>
+        </div>
+        <span class="preview-count" *ngIf="!isProcessing()">{{ previewData().length }} FILAS ENCONTRADAS</span>
+        <span class="preview-count" *ngIf="isProcessing()">Procesando...</span>
+      </div>
+
+      <div *ngIf="isProcessing()" class="processing-indicator">
+        <span class="material-symbols-outlined spin">sync</span>
+        Analizando archivo...
+      </div>
+
+      <div class="preview-table-wrap" *ngIf="!isProcessing()">
+        <table class="preview-table">
+          <thead>
+            <tr>
+              <th>CÓDIGO PLACA</th>
+              <th>DESCRIPCIÓN DEL BIEN</th>
+              <th>UM</th>
+              <th>SERIAL</th>
+              <th>UBICACIÓN</th>
+              <th>ESTADO</th>
+              <th>VALIDACIÓN</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of previewData()">
+              <td class="code-mono">{{ row.codigoPlaca }}</td>
+              <td class="row-nombre">{{ row.descripcion }}</td>
+              <td>{{ row.um }}</td>
+              <td class="code-mono text-muted">{{ row.serial }}</td>
+              <td>{{ row.ubicacion }}</td>
+              <td>
+                <span class="estado-pill" [ngClass]="row.estado === 'Activo' ? 'estado-pill--activo' : 'estado-pill--bajo'">
+                  {{ row.estado }}
+                </span>
+              </td>
+              <td>
+                <span class="valid-badge" [ngClass]="getValidacionClass(row.validacion)">
+                  {{ row.validacion }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Footer -->
+  <div class="import-footer">
+    <button class="btn-cancel" (click)="cancel.emit()">Cancelar</button>
+    <button class="btn-procesar" [disabled]="!file() || isProcessing() || previewData().length === 0"
+            (click)="onProcesar()">
+      <span class="material-symbols-outlined">check_circle</span>
+      Procesar Importación
+    </button>
+  </div>
+
 </div>

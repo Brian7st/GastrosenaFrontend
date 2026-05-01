@@ -349,6 +349,13 @@
     color: var(--color-primario);
     background: rgba(0, 110, 37, 0.05);
   }
+
+  &--danger {
+    &:hover {
+      color: var(--color-terciario);
+      background: rgba(186, 24, 48, 0.05);
+    }
+  }
 }
 
 /* ── Pagination Footer ─────────────────────────────────────────────────────── */

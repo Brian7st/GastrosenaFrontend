@@ -99,6 +99,9 @@
                 <button class="action-icon" (click)="onVerDetalle(bien)" title="Ver detalle">
                   <span class="material-symbols-outlined">visibility</span>
                 </button>
+                <button class="action-icon action-icon--danger" (click)="onEliminar(bien)" title="Eliminar">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
               </div>
             </td>
           </tr>
@@ -176,15 +179,12 @@
   (cancel)="showFormModal.set(false)"
 ></restaurant-bien-form>
 
-<restaurant-keyword-confirm-modal
-  [open]="showDeleteModal()"
-  [title]="'Confirmar Eliminación'"
-  [description]="'¿Desea eliminar permanentemente el bien ' + selectedBien()?.nombre + '? Esta acción no se puede deshacer.'"
-  [identifierLabel]="'Código SENA'"
-  [identifierValue]="selectedBien()?.codigoSena"
+<restaurant-bien-delete-modal
+  *ngIf="showDeleteModal() && selectedBien()"
+  [bien]="selectedBien()!"
   (cancel)="showDeleteModal.set(false)"
   (confirm)="confirmarEliminacion()"
-></restaurant-keyword-confirm-modal>
+></restaurant-bien-delete-modal>
 
 <restaurant-bien-import
   *ngIf="showImportModal()"

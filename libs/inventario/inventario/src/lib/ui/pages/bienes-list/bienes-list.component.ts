@@ -1,14 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import {
-  LoadingSkeletonComponent,
-  KeywordConfirmModalComponent,
-} from '@restaurant/shared/ui';
+import { LoadingSkeletonComponent } from '@restaurant/shared/ui';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
-import { BienExportService } from '../../../data-access/services/bien-export.service';
 import { BienFormComponent } from '../../modals/bien-form/bien-form.component';
 import { BienImportModalComponent } from '../../modals/bien-import/bien-import.component';
+import { BienDeleteModalComponent } from '../../modals/bien-delete-modal/bien-delete-modal.component';
 import { Bien, BienFormDto } from '../../../models/inventario.model';
 
 @Component({
@@ -19,7 +16,7 @@ import { Bien, BienFormDto } from '../../../models/inventario.model';
     LoadingSkeletonComponent,
     BienFormComponent,
     BienImportModalComponent,
-    KeywordConfirmModalComponent,
+    BienDeleteModalComponent,
   ],
   templateUrl: './bienes-list.component.html',
   styleUrl: './bienes-list.component.scss',
@@ -28,7 +25,6 @@ import { Bien, BienFormDto } from '../../../models/inventario.model';
 export class BienesListPageComponent implements OnInit {
   private facade = inject(InventarioFacade);
   private router = inject(Router);
-  private exportService = inject(BienExportService);
 
   // State signals
   bienes = this.facade.bienes;
@@ -61,7 +57,7 @@ export class BienesListPageComponent implements OnInit {
   }
 
   onExportBienes(): void {
-    this.exportService.exportToCsv(this.bienes());
+    this.router.navigate(['/app/inventario/bienes/exportar']);
   }
 
   onNuevoBien(): void {
@@ -86,10 +82,6 @@ export class BienesListPageComponent implements OnInit {
   }
 
   onEliminar(bien: Bien): void {
-    if (bien.stockActual > 0) {
-      alert('No se puede eliminar un bien con stock activo. Realice una salida primero.');
-      return;
-    }
     this.selectedBien.set(bien);
     this.showDeleteModal.set(true);
   }

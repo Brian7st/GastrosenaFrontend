@@ -11,7 +11,27 @@ export type EstadoBien = 'Activo' | 'Bajo Stock' | 'Agotado' | 'Inactivo';
 export type CategoriaColor = 'blue' | 'amber' | 'green' | 'purple' | 'red' | 'slate';
 
 /**
- * Representa un Bien (producto/activo) con todos los detalles necesarios 
+ * Especificaciones técnicas de un bien (equipos de cómputo, etc.)
+ */
+export interface EspecificacionesTecnicas {
+  [clave: string]: string;
+}
+
+/**
+ * Factura de abastecimiento vinculada a un bien.
+ */
+export interface FacturaBien {
+  id: string | number;
+  fel: string;
+  cufe: string;
+  proveedor: string;
+  fecha: string;
+  monto: number;
+  estado: 'PAGADA' | 'CAUSADA' | 'PENDIENTE';
+}
+
+/**
+ * Representa un Bien (producto/activo) con todos los detalles necesarios
  * para el módulo de administración de inventario.
  * Extiende la base de shared/models.
  */
@@ -22,9 +42,18 @@ export interface Bien extends Omit<SharedBien, 'id' | 'codigo'> {
   descripcion: string;
   categoriaColor?: CategoriaColor;
   valor: number;
+  valorNeto?: number;      // Valor sin IVA
+  iva?: number;            // Porcentaje de IVA (19, 5, 0)
   estado: EstadoBien;
   imagenUrl?: string;
   tieneHistorial?: boolean;
+  proveedor?: string;
+  fechaCompra?: string;
+  kilos?: number;
+  factorConversion?: number;
+  depreciacionAnual?: number; // Porcentaje anual
+  especificaciones?: EspecificacionesTecnicas;
+  facturas?: FacturaBien[];
 }
 
 /**
@@ -65,7 +94,10 @@ export interface BienKpis {
 export interface BienExportConfig {
   formato: 'pdf' | 'excel' | 'csv';
   soloActivos?: boolean;
-  rangoFechas?: { inicio: Date; fin: Date };
+  soloBajoStock?: boolean;
+  categoria?: string;
+  almacen?: string;
+  rangoFechas?: { inicio: string; fin: string };
 }
 
 /**
@@ -77,16 +109,28 @@ export interface BienImportRow {
   serial: string;
   ubicacion: string;
   estado: EstadoBien;
-  error?: string; // Para validación en UI
+  um?: string;
+  validacion?: 'Correcto' | 'Código duplicado' | 'Falta campo' | string;
+  error?: string;
 }
 
 /**
  * DTO para el formulario de creación/edición de bienes.
  */
-export interface BienFormDto extends Partial<Bien> {
+export interface BienFormDto {
   nombre: string;
+  codigoSena?: string;
+  codigoProveedor?: string;
+  descripcion?: string;
   categoria: string;
   unidadMedida: string;
+  stockActual?: number;
   stockMinimo: number;
+  kilos?: number;
+  factorConversion?: number;
+  proveedor?: string;
+  valorNeto: number;
+  iva: number;
   valor: number;
+  estado?: EstadoBien;
 }
