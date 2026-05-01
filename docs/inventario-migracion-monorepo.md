@@ -58,9 +58,9 @@ Este proyecto **no aporta código migrable por ahora**. Solo aporta intención f
 
 #### Acción sugerida
 En el monorepo debe convertirse en:
-- `feature-auth` si cubre login/recuperación
-- `feature-home` o rutas públicas dentro de `feature-shell`
-- `feature-notificaciones` si luego se separan panel e historial
+- `libs/auth/auth` si cubre login/recuperación
+- `libs/shell/home` o rutas públicas dentro de `libs/shell/shell`
+- `libs/notificaciones/notificaciones` si luego se separan panel e historial
 
 ---
 
@@ -102,9 +102,9 @@ export const routes: Routes = [];
 Este proyecto hoy es **una base estructural, no una feature consolidada**. Sirve para rescatar naming y dominio, pero casi no aporta implementación real.
 
 #### Destino recomendado en monorepo
-- `libs/feature-cocina/models`
-- `libs/feature-cocina/data-access` (solo cuando exista lógica real)
-- `libs/feature-cocina/ui`
+- `libs/cocina/cocina/src/lib/models`
+- `libs/cocina/cocina/src/lib/data-access` (solo cuando exista lógica real)
+- `libs/cocina/cocina/src/lib/ui`
 
 **NO conviene migrarlo “tal cual”**. Primero hay que clasificar qué existe de verdad y qué es solo scaffolding.
 
@@ -177,11 +177,10 @@ Este proyecto hoy es **una base estructural, no una feature consolidada**. Sirve
 Este proyecto sí tiene material migrable y se debe **partir por dominios**, no copiar carpeta por carpeta.
 
 #### Destino recomendado en monorepo
-- `layout/*` → `libs/feature-shell`
-- `features/restaurante` → `libs/feature-restaurante`
-- `features/comandas` → `libs/feature-restaurante` o subdominio interno
-- `features/estadisticas` → `libs/feature-reportes` o `feature-restaurante` según ownership final
-- `features/facturacion` → `libs/feature-facturacion`
+- `layout/*` → `libs/shell/shell`
+- `features/restaurante` → `libs/restaurante/restaurante`
+- `features/comandas` → `libs/restaurante/restaurante` o subdominio interno
+- `features/estadisticas` → `libs/reportes/reportes` o `libs/restaurante/restaurante` según ownership final
 - modelos compartibles (`mesa`, `orden`, `comanda`, `user`) → evaluar promoción a `libs/shared/models`
 
 ---
@@ -277,10 +276,10 @@ Este proyecto es la **fuente principal de código migrable** para:
 - alertas
 
 #### Destino recomendado en monorepo
-- `bienes` + alertas → `libs/feature-inventario`
-- `facturas` → `libs/feature-facturacion`
-- `solicitudes-gil` + `conciliacion` → `libs/feature-abastecimiento`
-- `presupuesto` → `libs/feature-presupuesto`
+- `bienes` + alertas → `libs/inventario/inventario`
+- `facturas` → (dominio removido — evaluar con Arquitectura si se reactiva)
+- `solicitudes-gil` + `conciliacion` → `libs/abastecimiento/abastecimiento`
+- `presupuesto` → (dominio removido — evaluar con Arquitectura si se reactiva)
 - íconos/config común → `libs/shared/ui` o `libs/shared/util`
 
 #### Observación arquitectónica importante
@@ -289,7 +288,7 @@ La pantalla raíz ya usa un layout reusable:
 - `BarraLateralConfig`
 - `TopNavLink`
 
-Eso demuestra que **ya existe un embrión de `shared/ui + feature-shell`**, solo que hoy vive fuera del repo principal deseado.
+Eso demuestra que **ya existe un embrión de `shared/ui + shell`**, solo que hoy vive fuera del repo principal deseado.
 
 ---
 
@@ -316,10 +315,10 @@ Workspace Angular de librería con proyecto:
 - Integración de iconos con Lucide
 
 #### Conclusión
-Esta librería **no debe migrarse como `feature-inventario`**. Debe partirse así:
-- layout compartido → `libs/feature-shell` o `libs/shared/ui/layout`
+Esta librería **no debe migrarse como un bloque único**. Debe partirse así:
+- layout compartido → `libs/shell/shell` o `libs/shared/ui/layout`
 - tokens → `libs/shared/ui/tokens`
-- contratos de navegación → `libs/shared/models` o `libs/feature-shell/models`
+- contratos de navegación → `libs/shared/models` o `libs/shell/shell/src/lib/models`
 - provider de iconos → `libs/shared/ui/icons` o `libs/shared/util/icons`
 
 ---
@@ -437,7 +436,7 @@ Cocina debe **adoptar** el sistema compartido del monorepo; no hay nada serio pa
 
 ## 6. Componentes compartibles detectados
 
-## 6.1 Candidatos claros a `feature-shell` / `shared/ui`
+## 6.1 Candidatos claros a `libs/shell/shell` / `shared/ui`
 
 ### Desde `lib-gas-layout-frontend`
 - `MainLayoutComponent`
@@ -503,19 +502,19 @@ Lo específico se queda en cada feature.
 
 | Origen actual | Destino recomendado |
 |---|---|
-| `lib-gas-layout-frontend/projects/inventario-ui/src/lib/main-layout` | `libs/feature-shell` o `libs/shared/ui/layout` |
+| `lib-gas-layout-frontend/projects/inventario-ui/src/lib/main-layout` | `libs/shell/shell` o `libs/shared/ui/layout` |
 | `lib-gas-layout-frontend/projects/inventario-ui/src/styles/_variables.scss` | `libs/shared/ui/tokens/_variables.scss` |
-| `Frontend-inventario-actualizado/src/app/features/bienes` | `libs/feature-inventario` |
-| `Frontend-inventario-actualizado/src/app/features/alertas-stock` | `libs/feature-inventario` o `feature-notificaciones` |
-| `Frontend-inventario-actualizado/src/app/features/facturas` | `libs/feature-facturacion` |
-| `Frontend-inventario-actualizado/src/app/features/solicitudes-gil` | `libs/feature-abastecimiento` |
-| `Frontend-inventario-actualizado/src/app/features/conciliacion` | `libs/feature-abastecimiento` |
-| `Frontend-inventario-actualizado/src/app/features/presupuesto` | `libs/feature-presupuesto` |
-| `ga-web-restaurante/src/app/features/restaurante` | `libs/feature-restaurante` |
-| `ga-web-restaurante/src/app/features/comandas` | `libs/feature-restaurante` |
-| `ga-web-restaurante/src/app/features/facturacion` | `libs/feature-facturacion` |
-| `ga-web-restaurante/src/app/features/estadisticas` | `libs/feature-reportes` o `feature-restaurante` |
-| `cocina-frontend/src/app/features/*` | `libs/feature-cocina` (solo luego de validar qué no es stub) |
+| `Frontend-inventario-actualizado/src/app/features/bienes` | `libs/inventario/inventario` |
+| `Frontend-inventario-actualizado/src/app/features/alertas-stock` | `libs/inventario/inventario` o `libs/notificaciones/notificaciones` |
+| `Frontend-inventario-actualizado/src/app/features/facturas` | *(dominio removido — coordinar con Arquitectura)* |
+| `Frontend-inventario-actualizado/src/app/features/solicitudes-gil` | `libs/abastecimiento/abastecimiento` |
+| `Frontend-inventario-actualizado/src/app/features/conciliacion` | `libs/abastecimiento/abastecimiento` |
+| `Frontend-inventario-actualizado/src/app/features/presupuesto` | *(dominio removido — coordinar con Arquitectura)* |
+| `ga-web-restaurante/src/app/features/restaurante` | `libs/restaurante/restaurante` |
+| `ga-web-restaurante/src/app/features/comandas` | `libs/restaurante/restaurante` |
+| `ga-web-restaurante/src/app/features/facturacion` | *(dominio removido — coordinar con Arquitectura)* |
+| `ga-web-restaurante/src/app/features/estadisticas` | `libs/reportes/reportes` o `libs/restaurante/restaurante` |
+| `cocina-frontend/src/app/features/*` | `libs/cocina/cocina` (solo luego de validar qué no es stub) |
 | `ga-web-inicio-general` | No migrar código; redefinir desde requerimientos |
 
 ---
@@ -539,21 +538,22 @@ Lo específico se queda en cada feature.
 4. Reemplazar hardcodes de `ga-web-restaurante` por tokens comunes.
 
 ## Fase 3 — Migrar por dominio
-1. `feature-shell`
-2. `shared/ui`
-3. `shared/models`
-4. `feature-inventario`
-5. `feature-facturacion`
-6. `feature-abastecimiento`
-7. `feature-restaurante`
-8. `feature-cocina`
-9. `feature-reportes`
+1. `libs/shell/shell`
+2. `libs/shared/ui`
+3. `libs/shared/models`
+4. `libs/inventario/inventario`
+5. `libs/abastecimiento/abastecimiento`
+6. `libs/restaurante/restaurante`
+7. `libs/cocina/cocina`
+8. `libs/bar/bar`
+9. `libs/reportes/reportes`
+10. `libs/notificaciones/notificaciones`
 
 ## Fase 4 — Enforzar arquitectura
 1. Crear monorepo Nx real.
 2. Definir tags por scope/tipo.
 3. Activar `@nx/enforce-module-boundaries`.
-4. Prohibir import directo entre features.
+4. Prohibir import directo entre dominios.
 5. Promover contratos compartidos a `shared/models`.
 
 ---

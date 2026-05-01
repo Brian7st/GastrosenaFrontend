@@ -2,8 +2,8 @@
 
 ## Reglas de arquitectura
 
-1. No importar de otro `feature-*` directamente.
-2. No importar de `feature-*` dentro de `shared/`.
+1. No importar de otro dominio directamente — solo de `@restaurant/shared/*`.
+2. No importar de dominios dentro de `shared/`.
 3. No redefinir interfaces que existen en `shared/models/`.
 4. No definir colores, espaciados ni tipografía fuera de `libs/shared/ui/src/lib/tokens/_variables.scss`.
 

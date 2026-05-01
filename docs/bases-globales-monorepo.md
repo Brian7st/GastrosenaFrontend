@@ -58,7 +58,7 @@ Estas son las piezas que deben existir primero en el monorepo:
 
 ## Decisión
 Estos componentes deben convertirse en la base de:
-- `libs/feature-shell`
+- `libs/shell/shell`
 
 ## No mezclar con
 - lógica de negocio
@@ -164,7 +164,7 @@ Esto debe vivir en:
 
 ## Decisión
 Mover a:
-- `libs/feature-shell/models`
+- `libs/shell/shell/src/lib/models`
 
 ## Regla
 Los componentes de layout reciben configuración; **no conocen dominios concretos**.
@@ -232,10 +232,10 @@ Lo específico se queda dentro de su feature.
 
 ## 9. Base global #7 — Convención estructural por librería
 
-Cada feature migrada al monorepo debe respetar esta estructura:
+Cada librería migrada al monorepo debe respetar esta estructura:
 
 ```text
-libs/feature-xxx/
+libs/{dominio}/{dominio}/src/lib/
   ui/
   data-access/
   models/
@@ -367,7 +367,8 @@ apps/
   restaurant-app/
 
 libs/
-  feature-shell/
+  shell/
+    shell/
   shared/
     ui/
       tokens/
@@ -384,11 +385,13 @@ Y recién después empezar:
 
 ```text
 libs/
-  feature-inventario/
-  feature-facturacion/
-  feature-abastecimiento/
-  feature-restaurante/
-  feature-cocina/
+  inventario/inventario/
+  abastecimiento/abastecimiento/
+  restaurante/restaurante/
+  cocina/cocina/
+  bar/bar/
+  reportes/reportes/
+  notificaciones/notificaciones/
 ```
 
 ---

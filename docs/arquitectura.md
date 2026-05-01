@@ -62,42 +62,33 @@ GastrosenaFrontend/
 ├── libs/
 │   │
 │   ├── shell/                    ← Infraestructura de navegación (no es dominio de negocio)
-│   │   ├── feature-shell/        ← Routing principal, layouts, guards, nav
-│   │   └── feature-home/         ← Landing pública del restaurante
+│   │   ├── shell/                ← Routing principal, layouts, guards, nav
+│   │   └── home/                 ← Landing pública del restaurante
 │   │
 │   ├── auth/                     ← Dominio: identidad y acceso
-│   │   ├── feature-auth/         ← Login, recuperación de contraseña
-│   │   └── feature-usuarios/     ← CRUD usuarios, roles, permisos, historial
+│   │   ├── auth/                 ← Login, recuperación de contraseña
+│   │   └── usuarios/             ← CRUD usuarios, roles, permisos, historial
 │   │
 │   ├── cocina/                   ← Dominio: operaciones de cocina
-│   │   └── feature-cocina/       ← Pedidos, recetas, tiempos, menús
+│   │   └── cocina/               ← Pedidos, recetas, tiempos, menús
 │   │
 │   ├── bar/                      ← Dominio: operaciones de bar
-│   │   └── feature-bar/          ← Pedidos bar, recetas de bebidas, alertas
+│   │   └── bar/                  ← Pedidos bar, recetas de bebidas, alertas
 │   │
 │   ├── restaurante/              ← Dominio: salón y servicio
-│   │   └── feature-restaurante/  ← Mesas, pedidos de salón, comandas
+│   │   └── restaurante/          ← Mesas, pedidos de salón, comandas
 │   │
 │   ├── inventario/               ← Dominio: gestión de bienes
-│   │   └── feature-inventario/   ← Bienes, entradas/salidas, stock, conciliación
+│   │   └── inventario/           ← Bienes, entradas/salidas, stock, conciliación
 │   │
 │   ├── abastecimiento/           ← Dominio: abastecimiento y GIL
-│   │   └── feature-abastecimiento/ ← GIL-F-014, consolidados, paquete probatorio
-│   │
-│   ├── facturacion/              ← Dominio: facturación electrónica
-│   │   └── feature-facturacion/  ← FEL, CUFE, ciclo de vida de facturas
-│   │
-│   ├── presupuesto/              ← Dominio: presupuesto y ZESE
-│   │   └── feature-presupuesto/  ← Techos presupuestales, ejecución
-│   │
-│   ├── requisiciones/            ← Dominio: requisiciones y actas
-│   │   └── feature-requisiciones/ ← Requisiciones diarias, actas de legalización
+│   │   └── abastecimiento/       ← GIL-F-014, consolidados, paquete probatorio
 │   │
 │   ├── reportes/                 ← Dominio: reportería
-│   │   └── feature-reportes/     ← Reportes exportables (PDF/Excel)
+│   │   └── reportes/             ← Reportes exportables (PDF/Excel)
 │   │
 │   ├── notificaciones/           ← Dominio: alertas y notificaciones
-│   │   └── feature-notificaciones/ ← Panel, historial, alertas de stock en tiempo real
+│   │   └── notificaciones/       ← Panel, historial, alertas de stock en tiempo real
 │   │
 │   └── shared/                   ← Código reutilizable cross-dominio
 │       ├── auth/                 ← AuthService, guards de sesión, current-user signal
@@ -116,7 +107,7 @@ GastrosenaFrontend/
 └── docs/arquitectura.md          ← Este archivo (arquitectura y reglas)
 ```
 
-> **Convención de crecimiento:** cuando un dominio necesite una segunda feature (ej. `feature-cocina-recetas`), se crea dentro de `libs/cocina/feature-cocina-recetas/` — nunca en la raíz de `libs/`.
+> **Convención de crecimiento:** cuando un dominio necesite una segunda librería (ej. `cocina-recetas`), se crea dentro de `libs/cocina/cocina-recetas/` — nunca en la raíz de `libs/`.
 
 ---
 
@@ -140,7 +131,7 @@ La app shell **no contiene** routing, guards, layouts ni lógica de negocio. Su 
 ### 3.2 Feature Shell
 
 ```
-libs/feature-shell/
+libs/shell/shell/
   └── src/lib/
       ├── shell.routes.ts        ← Rutas principales con lazy loading
       ├── shell-layout/
@@ -173,27 +164,27 @@ export const shellRoutes: Routes = [
         path: 'cocina',
         canActivate: [roleGuard(['CHEF', 'ADMIN_COCINA', 'AUXILIAR_COCINA'])],
         loadChildren: () =>
-          import('@restaurant/feature-cocina').then(m => m.COCINA_ROUTES),
+          import('@restaurant/cocina').then(m => m.COCINA_ROUTES),
       },
       {
         path: 'bar',
         canActivate: [roleGuard(['LIDER_BAR', 'ADMIN_BAR', 'BARTENDER'])],
         loadChildren: () =>
-          import('@restaurant/feature-bar').then(m => m.BAR_ROUTES),
+          import('@restaurant/bar').then(m => m.BAR_ROUTES),
       },
       {
         path: 'inventario',
         canActivate: [roleGuard(['ADMINISTRADOR', 'CONTADORA'])],
         loadChildren: () =>
-          import('@restaurant/feature-inventario').then(m => m.INVENTARIO_ROUTES),
+          import('@restaurant/inventario').then(m => m.INVENTARIO_ROUTES),
       },
-      // ... demás features
+      // ... demás dominios
     ],
   },
   {
     path: 'auth',
     loadChildren: () =>
-      import('@restaurant/feature-auth').then(m => m.AUTH_ROUTES),
+      import('@restaurant/auth').then(m => m.AUTH_ROUTES),
   },
 ];
 ```
@@ -247,7 +238,7 @@ shared/state/src/lib/
       └── hydration.metareducer.ts  ← Persistencia en localStorage
 ```
 
-> El estado **específico de cada feature** (pedidos de cocina, bienes del inventario) vive en `feature-*/data-access/`, no aquí. En `shared/state` solo va el estado verdaderamente global.
+> El estado **específico de cada dominio** (pedidos de cocina, bienes del inventario) vive en `{dominio}/{dominio}/src/lib/data-access/`, no aquí. En `shared/state` solo va el estado verdaderamente global.
 
 #### `shared/ui`
 
@@ -308,17 +299,18 @@ shared/models/src/lib/
 
 ### 3.4 Feature Layer
 
-Cada librería de feature tiene la misma anatomía interna de cuatro sublibrerías. La consistencia entre features es lo que permite que cualquier dev pueda moverse entre dominios sin curva de aprendizaje.
+Cada librería de dominio tiene la misma anatomía interna de cuatro carpetas. La consistencia entre dominios es lo que permite que cualquier dev pueda moverse entre ellos sin curva de aprendizaje.
 
 ```
-feature-cocina/
+libs/cocina/cocina/src/lib/
   ├── ui/              ← Componentes visuales exclusivos de cocina
+  ├── pages/           ← Componentes con routing (una carpeta por ruta)
   ├── data-access/     ← Services, NgRx Store+Effects propios de cocina
   ├── util/            ← Helpers específicos de cocina (no van a shared)
   └── models/          ← Interfaces propias (RecetaCocina, TiempoPreparacion...)
 ```
 
-Regla: si una interfaz de `feature-cocina/models` empieza a ser necesaria en `feature-restaurante`, se **promueve** a `shared/models`. Nunca se importa entre features directamente.
+Regla: si una interfaz de `cocina/models` empieza a ser necesaria en `restaurante`, se **promueve** a `shared/models`. Nunca se importa entre dominios directamente.
 
 ---
 
@@ -327,9 +319,9 @@ Regla: si una interfaz de `feature-cocina/models` empieza a ser necesaria en `fe
 ```
 ┌─────────────────────────────────────────────────────┐
 │                                                     │
-│  feature-*   →  puede importar de  shared/*         │
-│  feature-*   →  NUNCA importa de otro  feature-*    │
-│  shared/*    →  NUNCA importa de  feature-*         │
+│  {dominio}  →  puede importar de  shared/*          │
+│  {dominio}  →  NUNCA importa de otro  {dominio}     │
+│  shared/*   →  NUNCA importa de  {dominio}          │
 │                                                     │
 └─────────────────────────────────────────────────────┘
 ```
@@ -349,51 +341,49 @@ Esta jerarquía se enforza automáticamente con ESLint (ver sección 11).
 
 ---
 
-## 5. Anatomía Interna de un Feature
+## 5. Anatomía Interna de un Dominio
 
-Tomando `feature-inventario` como ejemplo completo:
+Tomando `inventario` como ejemplo completo:
 
 ```
-libs/feature-inventario/
+libs/inventario/inventario/src/lib/
 │
-├── ui/
-│   └── src/lib/
-│       ├── catalog/
-│       │   ├── catalog-list.component.ts
-│       │   └── catalog-filter.component.ts
-│       ├── stock/
-│       │   ├── stock-alert-banner.component.ts    ← Solo existe en inventario
-│       │   └── stock-level-indicator.component.ts
-│       ├── movements/
-│       │   ├── entry-form.component.ts
-│       │   └── exit-form.component.ts
-│       └── index.ts   ← Barrel: exporta solo lo público
+├── ui/                         ← Componentes visuales (presentacionales)
+│   ├── catalog-list/
+│   │   ├── catalog-list.component.ts
+│   │   └── catalog-list.component.html
+│   ├── stock/
+│   │   ├── stock-alert-banner.component.ts    ← Solo existe en inventario
+│   │   └── stock-level-indicator.component.ts
+│   └── movements/
+│       ├── entry-form.component.ts
+│       └── exit-form.component.ts
 │
-├── data-access/
-│   └── src/lib/
-│       ├── +state/
-│       │   ├── inventario.actions.ts
-│       │   ├── inventario.reducer.ts
-│       │   ├── inventario.effects.ts
-│       │   ├── inventario.selectors.ts
-│       │   └── inventario.facade.ts    ← El único punto de entrada al store
-│       ├── services/
-│       │   ├── bienes.service.ts
-│       │   ├── movimientos.service.ts
-│       │   └── alertas-stock.service.ts
-│       └── index.ts
+├── pages/                      ← Componentes con routing (una por ruta)
+│   ├── bienes-page/
+│   │   └── bienes-page.component.ts
+│   └── movimientos-page/
+│       └── movimientos-page.component.ts
 │
-├── util/
-│   └── src/lib/
-│       ├── stock-level.calculator.ts   ← Lógica específica de umbrales
-│       └── bien-code.generator.ts      ← Generador de códigos SENA internos
+├── data-access/                ← Lógica de negocio y acceso al store
+│   ├── store/
+│   │   ├── inventario.actions.ts
+│   │   ├── inventario.reducer.ts
+│   │   ├── inventario.effects.ts
+│   │   └── inventario.selectors.ts
+│   ├── inventario.facade.ts    ← El único punto de entrada al store
+│   ├── bienes.service.ts
+│   ├── movimientos.service.ts
+│   └── alertas-stock.service.ts
 │
-└── models/
-    └── src/lib/
-        ├── bien.model.ts               ← Extiende shared/models Bien si hace falta
-        ├── movimiento.model.ts
-        ├── alerta-stock.model.ts
-        └── index.ts
+├── models/                     ← Interfaces propias del dominio
+│   ├── bien.model.ts
+│   ├── movimiento.model.ts
+│   └── alerta-stock.model.ts
+│
+└── util/                       ← Helpers específicos (no van a shared)
+    ├── stock-level.calculator.ts
+    └── bien-code.generator.ts
 ```
 
 **El Facade** (`inventario.facade.ts`) es el patrón clave: los componentes de `ui/` solo hablan con el facade, nunca con el store directamente. Esto hace que los componentes sean más testeables y desacoplados.
@@ -629,7 +619,7 @@ export interface ApiResponse<T> {
 }
 ```
 
-**Regla de promoción:** si una interfaz definida en `feature-*/models` es necesaria en más de un feature, se abre un PR para moverla a `shared/models`. Nunca se importa entre features directamente.
+**Regla de promoción:** si una interfaz definida en `{dominio}/models` es necesaria en más de un dominio, se abre un PR para moverla a `shared/models`. Nunca se importa entre dominios directamente.
 
 ---
 
@@ -637,34 +627,34 @@ export interface ApiResponse<T> {
 
 ### Regla de las 3 instancias
 
-Un componente sube a `shared/ui` únicamente cuando **3 o más features distintas lo necesitan**. Antes de eso, vive en el `feature-*/ui` que lo originó.
+Un componente sube a `shared/ui` únicamente cuando **3 o más dominios distintos lo necesitan**. Antes de eso, vive en el `{dominio}/ui` que lo originó.
 
 ```
-✅ shared/ui — usados por 3+ features
-  DataTableComponent          (Inventario, Reportes, Usuarios, Facturación...)
+✅ shared/ui — usados por 3+ dominios
+  DataTableComponent          (Inventario, Reportes, Usuarios)
   StatusBadgeComponent        (Cocina, Bar, Restaurante)
   ConfirmDialogComponent      (Todo el sistema)
   PageHeaderComponent         (Todas las vistas)
   SearchFilterComponent       (Inventario, Reportes, Usuarios)
   LoadingSkeletonComponent    (Todo el sistema)
   EmptyStateComponent         (Todo el sistema)
-  ExportButtonComponent       (Reportes, Inventario, Facturación)
+  ExportButtonComponent       (Reportes, Inventario)
 
-✅ feature-cocina/ui — únicos de cocina
+✅ cocina/ui — únicos de cocina
   KitchenBoardComponent       (Tablero de pedidos en tiempo real)
   OrderTimerComponent         (Contador de tiempo por pedido)
   RecipeStepsComponent        (Pasos de preparación)
 
-✅ feature-bar/ui — únicos de bar
+✅ bar/ui — únicos de bar
   DrinkQueueComponent         (Cola de bebidas)
   BarStatsComponent           (Estadísticas de tiempos del bar)
 
-✅ feature-inventario/ui — únicos de inventario
+✅ inventario/ui — únicos de inventario
   StockAlertBannerComponent   (Alerta visual de stock crítico)
   StockLevelIndicatorComponent
   BienDetailCardComponent
 
-✅ feature-abastecimiento/ui — únicos de GIL/abastecimiento
+✅ abastecimiento/ui — únicos de GIL/abastecimiento
   GilFormComponent
   ConsolidadoTableComponent
   PaqueteProbatorioStatusComponent
@@ -693,12 +683,12 @@ export const UiActions = createActionGroup({
 
 Cocina dispara `UiActions.showToast` cuando un pedido está listo. El shell lo escucha y muestra la notificación. Cocina no sabe nada del mecanismo de notificación.
 
-### Mecanismo 2: Facade en `feature-shell`
+### Mecanismo 2: Facade en `shell`
 
-Para coordinación de alto nivel entre features.
+Para coordinación de alto nivel entre dominios.
 
 ```typescript
-// feature-shell/src/lib/app.facade.ts
+// libs/shell/shell/src/lib/app.facade.ts
 @Injectable({ providedIn: 'root' })
 export class AppFacade {
   // Orquesta flujos que involucran múltiples features
@@ -715,10 +705,10 @@ export class AppFacade {
 Para navegación entre dominios.
 
 ```typescript
-// En feature-restaurante, al cerrar la mesa:
-this.router.navigate(['/facturacion', mesaId]);
-// feature-facturacion lee el parámetro y carga los datos.
-// Los features nunca se importan entre sí.
+// En restaurante, al cerrar la mesa, navegamos vía router:
+this.router.navigate(['/reportes', mesaId]);
+// El dominio destino lee el parámetro y carga los datos.
+// Los dominios nunca se importan entre sí.
 ```
 
 ---
@@ -747,8 +737,7 @@ main                          ← Producción. Solo recibe merges desde develop 
 
 tipo:  feat | fix | chore | refactor | test | docs
 scope: shell | auth | cocina | bar | restaurante | inventario |
-       usuarios | reportes | facturacion | abastecimiento |
-       presupuesto | requisiciones | shared
+       usuarios | reportes | abastecimiento | notificaciones | shared
 ```
 
 ### Reglas de PR
@@ -756,7 +745,7 @@ scope: shell | auth | cocina | bar | restaurante | inventario |
 | Regla | Detalle |
 |---|---|
 | **Máximo 400 líneas** por PR | Si es mayor, se divide. Sin excepciones. |
-| **Un scope por PR** | Un PR no puede tocar `feature-cocina` y `feature-bar` al mismo tiempo |
+| **Un scope por PR** | Un PR no puede tocar `cocina` y `bar` al mismo tiempo |
 | **Tests obligatorios** | Todo componente nuevo lleva su `.spec.ts` |
 | **`nx affected:lint` verde** | Requisito antes de abrir el PR |
 | **`nx affected:test` verde** | Requisito antes de abrir el PR |
@@ -786,11 +775,8 @@ Las reglas de dependencia se verifican **automáticamente en cada commit y CI**.
 ### Tags por proyecto (`project.json`)
 
 ```json
-// libs/feature-cocina/ui/project.json
-{ "tags": ["scope:cocina", "type:ui"] }
-
-// libs/feature-cocina/data-access/project.json
-{ "tags": ["scope:cocina", "type:data-access"] }
+// libs/cocina/cocina/project.json
+{ "tags": ["scope:cocina", "type:feature"] }
 
 // libs/shared/ui/project.json
 { "tags": ["scope:shared", "type:ui"] }
@@ -798,7 +784,7 @@ Las reglas de dependencia se verifican **automáticamente en cada commit y CI**.
 // libs/shared/models/project.json
 { "tags": ["scope:shared", "type:models"] }
 
-// libs/feature-shell/project.json
+// libs/shell/shell/project.json
 { "tags": ["scope:shell", "type:feature"] }
 ```
 
@@ -826,20 +812,12 @@ Las reglas de dependencia se verifican **automáticamente en cada commit y CI**.
         "onlyDependOn": ["scope:shared", "scope:inventario"]
       },
       {
-        "sourceTag": "scope:facturacion",
-        "onlyDependOn": ["scope:shared", "scope:facturacion"]
-      },
-      {
         "sourceTag": "scope:abastecimiento",
         "onlyDependOn": ["scope:shared", "scope:abastecimiento"]
       },
       {
-        "sourceTag": "scope:presupuesto",
-        "onlyDependOn": ["scope:shared", "scope:presupuesto"]
-      },
-      {
-        "sourceTag": "scope:requisiciones",
-        "onlyDependOn": ["scope:shared", "scope:requisiciones"]
+        "sourceTag": "scope:notificaciones",
+        "onlyDependOn": ["scope:shared", "scope:notificaciones"]
       },
       {
         "sourceTag": "scope:usuarios",
@@ -882,7 +860,7 @@ Las reglas de dependencia se verifican **automáticamente en cada commit y CI**.
 }
 ```
 
-Si alguien de `feature-cocina` intenta importar algo de `feature-inventario`, el linter falla con:
+Si alguien de `cocina` intenta importar algo de `inventario`, el linter falla con:
 
 ```
 A project tagged with "scope:cocina" can only depend on
@@ -897,15 +875,14 @@ Con 23 personas y la estructura de librerías definida:
 
 | Equipo | Librerías bajo su ownership | Personas | RF relacionados |
 |---|---|---|---|
-| **Arquitectura + Shell** | `apps/restaurant-app`, `feature-shell`, `shared/*` | 3 | RF1.x, RF2.x (base) |
-| **Auth + Usuarios** | `feature-auth`, `feature-usuarios` | 2 | RF1.2–1.4, RF2.x |
-| **Restaurante** | `feature-restaurante` | 3 | RF3.x completo |
-| **Cocina** | `feature-cocina` | 2 | RF-C 4.0–4.9 |
-| **Bar** | `feature-bar` | 2 | RF-C 4.10–4.19 |
-| **Inventario** | `feature-inventario` | 3 | RF-5.1, RF-5.5, RF-5.6, RF-5.8 |
-| **Abastecimiento** | `feature-abastecimiento` | 3 | RF-5.2–5.4, RF-5.9–5.11 |
-| **Presupuesto** | `feature-presupuesto` | 1 | RF-5.7 |
-| **Reportes** | `feature-reportes` | 2 | RF6.x completo |
+| **Arquitectura + Shell** | `apps/restaurant-app`, `libs/shell/*`, `libs/shared/*` | 3 | RF1.x, RF2.x (base) |
+| **Auth + Usuarios** | `libs/auth/auth`, `libs/auth/usuarios` | 2 | RF1.2–1.4, RF2.x |
+| **Restaurante** | `libs/restaurante/restaurante` | 3 | RF3.x completo |
+| **Cocina** | `libs/cocina/cocina` | 2 | RF-C 4.0–4.9 |
+| **Bar** | `libs/bar/bar` | 2 | RF-C 4.10–4.19 |
+| **Inventario** | `libs/inventario/inventario` | 3 | RF-5.1, RF-5.5, RF-5.6, RF-5.8 |
+| **Abastecimiento** | `libs/abastecimiento/abastecimiento` | 3 | RF-5.2–5.4, RF-5.9–5.11 |
+| **Reportes** | `libs/reportes/reportes` | 2 | RF6.x completo |
 | **QA + DevOps** | Transversal (CI, coverage, E2E) | 2 | Todos |
 
 > El equipo de **Arquitectura** tiene veto en cambios a `shared/*`. Cualquier PR que modifique librerías compartidas requiere su aprobación.
@@ -915,45 +892,56 @@ Con 23 personas y la estructura de librerías definida:
 ## 13. Comandos Nx del Día a Día
 
 ```bash
-# Crear una nueva feature dentro del dominio cocina
-nx g @nx/angular:library feature-cocina-recetas \
-  --directory=libs/cocina/feature-cocina-recetas \
+# Crear un componente dentro de un dominio
+nx g @nx/angular:component nombre-componente \
+  --project=cocina \
+  --path=libs/cocina/cocina/src/lib/ui \
+  --standalone --change-detection=OnPush
+
+# Crear un service
+nx g @nx/angular:service nombre-service \
+  --project=cocina \
+  --path=libs/cocina/cocina/src/lib/data-access
+
+# Crear una nueva librería dentro de un dominio
+nx g @nx/angular:library cocina-recetas \
+  --directory=libs/cocina/cocina-recetas \
   --tags="scope:cocina,type:feature" \
   --standalone \
-  --importPath="@restaurant/feature-cocina-recetas"
+  --importPath="@restaurant/cocina-recetas"
 
-# Crear una nueva librería de UI para el dominio cocina
-nx g @nx/angular:library ui \
-  --directory=libs/cocina/feature-cocina/ui \
-  --tags="scope:cocina,type:ui" \
-  --standalone \
-  --importPath="@restaurant/feature-cocina/ui"
+# Crear store NgRx completo (actions + reducer + effects + selectors)
+nx g @ngrx/schematics:feature nombre \
+  --project=cocina \
+  --path=libs/cocina/cocina/src/lib/data-access/store \
+  --module=false
 
-# Correr solo los tests afectados por mis cambios (no todo el monorepo)
+# Correr solo los tests afectados por mis cambios
 nx affected:test --base=develop
 
 # Lint solo de lo afectado
 nx affected:lint --base=develop
 
-# Build solo de lo que cambió
-nx affected:build --base=develop
-
 # Ver el grafo de dependencias (detecta acoplamientos no deseados)
 nx graph
 
-# Correr los tests de un proyecto específico
-nx test feature-cocina-ui
+# Correr los tests de un dominio específico
+nx test cocina
 
 # Correr en watch mode durante desarrollo
-nx test feature-cocina-data-access --watch
+nx test cocina --watch
 
 # Ver qué proyectos se ven afectados por mis cambios actuales
-nx affected:apps --base=develop
-nx affected:libs --base=develop
+nx affected:graph --base=develop
+
+# Listar todos los proyectos del workspace
+nx show projects
 
 # Formatear todo el código
 nx format:write
 ```
+
+Ver [`docs/setup.md`](setup.md) para la referencia completa de generators.
 
 ---
 
@@ -963,8 +951,8 @@ Antes de hacer el primer commit, cada desarrollador confirma haber leído y ente
 
 ### Reglas de arquitectura
 
-1. **No importar de otro `feature-*` directamente.** Si necesitas algo de otro dominio, sube al estado compartido o habla con el equipo de Arquitectura.
-2. **No importar de `feature-*` dentro de `shared/`.** El flujo de dependencias es unidireccional: features dependen de shared, nunca al revés.
+1. **No importar de otro dominio directamente.** Si necesitas algo de otro dominio, sube al estado compartido o habla con el equipo de Arquitectura.
+2. **No importar de dominios dentro de `shared/`.** El flujo de dependencias es unidireccional: dominios dependen de shared, nunca al revés.
 3. **No redefinir interfaces que existen en `shared/models/`.** Si necesitas extender, usa `extends`. Si necesitas un campo nuevo, abre un PR a `shared/models`.
 4. **No definir colores, espaciados ni tipografía** fuera de `libs/shared/ui/src/lib/tokens/_variables.scss`.
 

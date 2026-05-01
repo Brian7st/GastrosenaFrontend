@@ -1,22 +1,15 @@
-# Dominio: Facturación
+> **DOMINIO REMOVIDO** — Este dominio fue eliminado del monorepo en el commit `460fff6`.
+> Las librerías `libs/facturacion/**` ya no existen en el workspace.
+> Si este dominio se reactiva en el futuro, recrear las librerías con el generator correspondiente.
+
+# Dominio: Facturación ~~(removido)~~
 
 **Equipo propietario:** Equipo Facturación (2 personas)
 **RF relacionados:** RF-F — FEL y facturas electrónicas
+**Estado:** **REMOVIDO** — no existe en el workspace actual
 
-## Podés modificar
-- `libs/facturacion/**`
+## Componentes planeados (referencia histórica)
 
-## Solo lectura
-- `libs/shared/**` — podés importar, nunca modificar
-
-## Nunca tocás
-- Cualquier otro dominio
-- `apps/`, `tsconfig.base.json`, `.eslintrc.json`, `nx.json`
-
-## Scope de tus ramas y commits
-`feat/facturacion/...` | `fix/facturacion/...` | `chore/facturacion/...`
-
-## Componentes únicos de este dominio
 - `InvoiceListComponent` — listado de facturas emitidas
 - `FelFormComponent` — formulario de emisión FEL
 - `InvoiceDetailComponent` — detalle y descarga de factura

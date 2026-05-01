@@ -7,7 +7,7 @@ No asumas nada. No empieces a codificar hasta tener todas las respuestas.
 
 1. **¿En qué dominio vas a trabajar?**
    Opciones: `shell` | `auth` | `cocina` | `bar` | `restaurante` | `inventario` |
-   `abastecimiento` | `facturacion` | `presupuesto` | `requisiciones` | `reportes` | `notificaciones` | `shared`
+   `abastecimiento` | `reportes` | `notificaciones` | `shared`
 
 2. **¿Cuál es el RF o descripción del cambio?**
    Ejemplo: "RF-C4.2.1 — agregar componente de tarjeta de receta"
