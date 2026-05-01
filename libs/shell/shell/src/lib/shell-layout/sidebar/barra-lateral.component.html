@@ -23,23 +23,70 @@
         <p class="barra-lateral__etiqueta-grupo">{{ grupo.etiqueta }}</p>
         <div class="barra-lateral__grupo-items">
           @for (item of grupo.items; track item.ruta) {
-            <a
-              [routerLink]="item.ruta"
-              routerLinkActive="barra-lateral__enlace--activo"
-              class="barra-lateral__enlace"
-              [class.barra-lateral__enlace--con-insignia]="item.insignia !== undefined"
-            >
-              <svg [lucideIcon]="item.icono" class="barra-lateral__icono"></svg>
-              <span class="barra-lateral__texto">{{ item.label }}</span>
-              @if (item.insignia !== undefined) {
-                <span
-                  class="barra-lateral__insignia"
-                  [class.barra-lateral__insignia--alerta]="item.insigniaAlerta"
-                >
-                  {{ item.insignia }}
-                </span>
+
+            @if (item.children?.length) {
+              <button
+                class="barra-lateral__enlace barra-lateral__enlace--expandible"
+                [class.barra-lateral__enlace--expandido]="isExpanded(item.ruta)"
+                (click)="toggleItem(item.ruta)"
+                type="button"
+              >
+                @if (item.icono) {
+                  <svg [lucideIcon]="item.icono!" class="barra-lateral__icono"></svg>
+                }
+                <span class="barra-lateral__texto">{{ item.label }}</span>
+                @if (item.insignia !== undefined) {
+                  <span
+                    class="barra-lateral__insignia"
+                    [class.barra-lateral__insignia--alerta]="item.insigniaAlerta"
+                  >{{ item.insignia }}</span>
+                }
+                <svg
+                  [lucideIcon]="isExpanded(item.ruta) ? 'chevron-down' : 'chevron-right'"
+                  class="barra-lateral__chevron"
+                ></svg>
+              </button>
+
+              @if (isExpanded(item.ruta)) {
+                <div class="barra-lateral__subgrupo">
+                  @for (child of item.children; track child.ruta) {
+                    <a
+                      [routerLink]="child.ruta"
+                      routerLinkActive="barra-lateral__subenlace--activo"
+                      class="barra-lateral__subenlace"
+                    >
+                      @if (child.icono) {
+                        <svg [lucideIcon]="child.icono!" class="barra-lateral__subicono"></svg>
+                      } @else {
+                        <span class="barra-lateral__subpunto"></span>
+                      }
+                      <span class="barra-lateral__texto">{{ child.label }}</span>
+                    </a>
+                  }
+                </div>
               }
-            </a>
+
+            } @else {
+              <a
+                [routerLink]="item.ruta"
+                routerLinkActive="barra-lateral__enlace--activo"
+                [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+                class="barra-lateral__enlace"
+                [class.barra-lateral__enlace--con-insignia]="item.insignia !== undefined"
+              >
+                @if (item.icono) {
+                  <svg [lucideIcon]="item.icono!" class="barra-lateral__icono"></svg>
+                }
+                <span class="barra-lateral__texto">{{ item.label }}</span>
+                @if (item.insignia !== undefined) {
+                  <span
+                    class="barra-lateral__insignia"
+                    [class.barra-lateral__insignia--alerta]="item.insigniaAlerta"
+                  >{{ item.insignia }}</span>
+                }
+              </a>
+            }
+
           }
         </div>
       </div>
