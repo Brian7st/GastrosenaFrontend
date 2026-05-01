@@ -1,19 +1,14 @@
 import { Rol } from '@restaurant/shared/models';
 
-export interface SubNavItem {
-  label: string;
-  ruta: string;
-  icono?: string;
-}
-
 export interface NavItem {
   label: string;
   ruta: string;
-  icono: string;
+  icono?: string;
+  exact?: boolean;
   insignia?: number;
   insigniaAlerta?: boolean;
   roles?: Rol[];
-  subItems?: SubNavItem[];
+  children?: NavItem[];
 }
 
 export interface NavGrupo {

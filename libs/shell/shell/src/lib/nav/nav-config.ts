@@ -1,10 +1,8 @@
-import { Rol } from '@restaurant/shared/models';
 import { BarraLateralConfig, TopNavLink } from './nav.models';
 
 export const TOP_MENU_CONFIG: TopNavLink[] = [
-  { label: 'Inventario',     ruta: '/app/inventario'     },
-  { label: 'Abastecimiento', ruta: '/app/abastecimiento' },
-  { label: 'Reportes',       ruta: '/app/reportes'       },
+  { label: 'Inventario', ruta: '/app/inventario' },
+  { label: 'Reportes',   ruta: '/app/reportes'   },
 ];
 
 export const SIDEBAR_CONFIG: BarraLateralConfig = {
@@ -15,32 +13,26 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
     {
       etiqueta: 'Principal',
       items: [
-        { label: 'Dashboard', ruta: '/app/inventario', icono: 'layout-dashboard' },
+        { label: 'Dashboard', ruta: '/app', exact: true, icono: 'layout-dashboard' },
       ],
     },
     {
       etiqueta: 'Operación',
       items: [
         {
-          label: 'Cocina',
-          ruta: '/app/cocina',
-          icono: 'library',
-          roles: [Rol.CHEF, Rol.ADMIN_COCINA, Rol.AUXILIAR_COCINA],
-          subItems: [
-            { label: 'Órdenes',  ruta: '/app/cocina/ordenes',  icono: 'clipboard-check' },
-            { label: 'Recetas',  ruta: '/app/cocina/recetas',  icono: 'file-text'       },
-            { label: 'Menú',     ruta: '/app/cocina/menu',     icono: 'list'            },
+          label: 'Cocina', ruta: '/app/cocina', icono: 'chef-hat',
+          children: [
+            { label: 'Comandas', ruta: '/app/cocina/comandas', icono: 'clipboard-list' },
+            { label: 'Recetas', ruta: '/app/cocina/recetas', icono: 'book-open'      },
+            { label: 'Menú',    ruta: '/app/cocina/menu',    icono: 'utensils'       },
           ],
         },
         {
-          label: 'Bar',
-          ruta: '/app/bar',
-          icono: 'badge',
-          roles: [Rol.LIDER_BAR, Rol.ADMIN_BAR, Rol.BARTENDER],
-          subItems: [
-            { label: 'Pedidos',  ruta: '/app/bar/pedidos',  icono: 'receipt'  },
-            { label: 'Cócteles', ruta: '/app/bar/cocteles', icono: 'landmark' },
-            { label: 'Stock',    ruta: '/app/bar/stock',    icono: 'package'  },
+          label: 'Bar y barismo', ruta: '/app/bar', icono: 'coffee',
+          children: [
+            { label: 'Comandas', ruta: '/app/bar/comandas', icono: 'clipboard-list' },
+            { label: 'Recetas', ruta: '/app/bar/recetas', icono: 'book-open'      },
+            { label: 'Menú',    ruta: '/app/bar/menu',    icono: 'list'           },
           ],
         },
       ],
@@ -49,68 +41,43 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
       etiqueta: 'Administración',
       items: [
         {
-          label: 'Usuarios',
-          ruta: '/app/usuarios',
-          icono: 'user-circle',
-          subItems: [
-            { label: 'Lista',  ruta: '/app/usuarios',       icono: 'list'         },
-            { label: 'Roles',  ruta: '/app/usuarios/roles', icono: 'shield-check' },
+          label: 'Usuarios', ruta: '/app/usuarios', icono: 'users',
+          children: [
+            { label: 'Lista',              ruta: '/app/usuarios/lista',   icono: 'list'         },
+            { label: 'Roles',              ruta: '/app/usuarios/roles',   icono: 'shield-check' },
+            { label: 'Gestión de Cuentas', ruta: '/app/usuarios/cuentas', icono: 'user-cog'     },
           ],
         },
         {
-          label: 'Restaurante',
-          ruta: '/app/restaurante',
-          icono: 'list',
-          subItems: [
-            { label: 'Mesas',    ruta: '/app/restaurante/mesas',    icono: 'layout-dashboard' },
-            { label: 'Pedidos',  ruta: '/app/restaurante/pedidos',  icono: 'receipt'          },
-            { label: 'Reservas', ruta: '/app/restaurante/reservas', icono: 'calendar'         },
+          label: 'Restaurante', ruta: '/app/restaurante', icono: 'utensils',
+          children: [
+            { label: 'Mesas',   ruta: '/app/restaurante/mesas',   icono: 'layout-grid'  },
+            { label: 'Pedidos', ruta: '/app/restaurante/pedidos', icono: 'receipt'       },
+            { label: 'Caja',    ruta: '/app/restaurante/caja',    icono: 'banknote'      },
           ],
         },
         {
-          label: 'Inventario',
-          ruta: '/app/inventario',
-          icono: 'warehouse',
-          subItems: [
-            { label: 'Gestión de Bienes',         ruta: '/app/inventario/bienes',        icono: 'box'             },
-            { label: 'Facturas Electrónicas',      ruta: '/app/inventario/facturas',      icono: 'receipt'         },
-            { label: 'Solicitudes GIL-F-014',      ruta: '/app/inventario/gil',           icono: 'file-text'       },
-            { label: 'Ejecución Presupuestal',     ruta: '/app/inventario/presupuestal',  icono: 'bar-chart'       },
-            { label: 'Entradas y Salidas (Kardex)',ruta: '/app/inventario/kardex',        icono: 'history'         },
-            { label: 'Alertas de Stock',           ruta: '/app/inventario/alertas',       icono: 'alert-triangle'  },
-            { label: 'Presupuesto General',        ruta: '/app/inventario/presupuesto',   icono: 'wallet'          },
-            { label: 'Conciliación',               ruta: '/app/inventario/conciliacion',  icono: 'check-square'    },
-            { label: 'Requisiciones Diarias',      ruta: '/app/inventario/requisiciones', icono: 'clipboard-check' },
-            { label: 'Actas de Legalización',      ruta: '/app/inventario/actas',         icono: 'file-code'       },
-            { label: 'Paquete Probatorio',         ruta: '/app/inventario/probatorio',    icono: 'file-stack'      },
+          label: 'Inventario', ruta: '/app/inventario', icono: 'warehouse',
+          children: [
+            { label: 'Gestión de Bienes',           ruta: '/app/inventario/bienes',             icono: 'package-open'     },
+            { label: 'Facturas Electrónicas',       ruta: '/app/inventario/facturas',           icono: 'file-spreadsheet' },
+            { label: 'Solicitudes GIL-F-014',       ruta: '/app/inventario/solicitudes',        icono: 'clipboard-check'  },
+            { label: 'Consolidado de Ejecución',    ruta: '/app/inventario/consolidado',        icono: 'bar-chart-2'      },
+            { label: 'Entradas y Salidas (Kardex)', ruta: '/app/inventario/kardex',             icono: 'arrow-left-right' },
+            { label: 'Alertas de Stock',            ruta: '/app/inventario/alertas',            icono: 'alert-circle'     },
+            { label: 'Presupuesto General',         ruta: '/app/inventario/presupuesto',        icono: 'wallet'           },
+            { label: 'Conciliación',                ruta: '/app/inventario/conciliacion',       icono: 'scale'            },
+            { label: 'Requisiciones Diarias',       ruta: '/app/inventario/requisiciones',      icono: 'calendar'         },
+            { label: 'Actas de Legalización',       ruta: '/app/inventario/actas',              icono: 'file-check'       },
+            { label: 'Paquete Probatorio',          ruta: '/app/inventario/paquete-probatorio', icono: 'file-stack'       },
           ],
         },
         {
-          label: 'Abastecimiento',
-          ruta: '/app/abastecimiento',
-          icono: 'file-stack',
-          subItems: [
-            { label: 'Proveedores', ruta: '/app/abastecimiento/proveedores', icono: 'building-2'    },
-            { label: 'Órdenes',     ruta: '/app/abastecimiento/ordenes',     icono: 'file-text'     },
-            { label: 'Recepción',   ruta: '/app/abastecimiento/recepcion',   icono: 'package-check' },
+          label: 'Reportes y estadísticas', ruta: '/app/reportes', icono: 'pie-chart',
+          children: [
+            { label: 'Ventas',     ruta: '/app/reportes/ventas',     icono: 'trending-up' },
+            { label: 'Inventario', ruta: '/app/reportes/inventario', icono: 'warehouse'   },
           ],
-        },
-        {
-          label: 'Reportes',
-          ruta: '/app/reportes',
-          icono: 'bar-chart',
-          subItems: [
-            { label: 'Ventas',      ruta: '/app/reportes/ventas',      icono: 'trending-up' },
-            { label: 'Inventario',  ruta: '/app/reportes/inventario',  icono: 'package'     },
-            { label: 'Rendimiento', ruta: '/app/reportes/rendimiento', icono: 'bar-chart-2' },
-          ],
-        },
-        {
-          label: 'Notificaciones',
-          ruta: '/app/notificaciones',
-          icono: 'bell',
-          insignia: 3,
-          insigniaAlerta: true,
         },
       ],
     },

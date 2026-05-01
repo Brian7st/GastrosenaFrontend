@@ -30,7 +30,7 @@ export class BarraLateralComponent {
     grupos: [],
   };
 
-  protected readonly itemsAbiertos = signal<Set<string>>(new Set());
+  readonly expandedItems = signal(new Set<string>());
 
   protected readonly visibleGroups = computed(() => {
     const currentRole = this.authService.currentUser()?.rol;
@@ -43,19 +43,19 @@ export class BarraLateralComponent {
       .filter(grupo => grupo.items.length > 0);
   });
 
-  protected toggleItem(ruta: string): void {
-    this.itemsAbiertos.update(set => {
-      const nuevo = new Set(set);
-      if (nuevo.has(ruta)) {
-        nuevo.delete(ruta);
+  toggleItem(ruta: string): void {
+    this.expandedItems.update(current => {
+      const next = new Set(current);
+      if (next.has(ruta)) {
+        next.delete(ruta);
       } else {
-        nuevo.add(ruta);
+        next.add(ruta);
       }
-      return nuevo;
+      return next;
     });
   }
 
-  protected estaAbierto(ruta: string): boolean {
-    return this.itemsAbiertos().has(ruta);
+  isExpanded(ruta: string): boolean {
+    return this.expandedItems().has(ruta);
   }
 }
