@@ -184,6 +184,103 @@ $verde-sena-hover: rgba($verde-sena-nuevo, 0.05);
     }
   }
 
+  &__enlace--expandible {
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+
+    &:hover {
+      background-color: $verde-sena-hover;
+      color: color.adjust($verde-sena-nuevo, $lightness: -10%);
+
+      .barra-lateral__icono {
+        color: $verde-sena-nuevo;
+      }
+    }
+
+    &.barra-lateral__enlace--expandido {
+      color: color.adjust($verde-sena-nuevo, $lightness: -10%);
+
+      .barra-lateral__icono {
+        color: $verde-sena-nuevo;
+      }
+    }
+  }
+
+  &__chevron {
+    width: 0.875rem;
+    height: 0.875rem;
+    flex-shrink: 0;
+    margin-left: auto;
+    color: var(--color-pizarra-400);
+    transition: transform 0.2s ease;
+  }
+
+  &__subgrupo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    margin-left: 1rem;
+    padding-left: 0.75rem;
+    border-left: 1px solid var(--color-pizarra-200);
+    margin-bottom: 0.25rem;
+  }
+
+  &__subenlace {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.375rem;
+    text-decoration: none;
+    color: var(--color-pizarra-500);
+    font-size: 0.8125rem;
+    font-weight: 400;
+    transition: all 0.15s ease;
+
+    &:hover {
+      background-color: $verde-sena-hover;
+      color: color.adjust($verde-sena-nuevo, $lightness: -10%);
+
+      .barra-lateral__subpunto {
+        background-color: $verde-sena-nuevo;
+      }
+    }
+
+    &--activo {
+      color: color.adjust($verde-sena-nuevo, $lightness: -15%);
+      font-weight: 600;
+
+      .barra-lateral__subpunto {
+        background-color: $verde-sena-nuevo;
+      }
+    }
+  }
+
+  &__subicono {
+    width: 0.875rem;
+    height: 0.875rem;
+    flex-shrink: 0;
+    color: var(--color-pizarra-400);
+    transition: color 0.15s ease;
+
+    .barra-lateral__subenlace:hover &,
+    .barra-lateral__subenlace--activo & {
+      color: $verde-sena-nuevo;
+    }
+  }
+
+  &__subpunto {
+    width: 0.3125rem;
+    height: 0.3125rem;
+    border-radius: 50%;
+    background-color: var(--color-pizarra-300);
+    flex-shrink: 0;
+    transition: background-color 0.15s ease;
+  }
+
   &__pie {
     flex-shrink: 0;
     padding: 1rem;

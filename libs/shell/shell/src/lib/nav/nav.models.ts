@@ -3,10 +3,12 @@ import { Rol } from '@restaurant/shared/models';
 export interface NavItem {
   label: string;
   ruta: string;
-  icono: string;
+  icono?: string;
+  exact?: boolean;
   insignia?: number;
   insigniaAlerta?: boolean;
   roles?: Rol[];
+  children?: NavItem[];
 }
 
 export interface NavGrupo {
