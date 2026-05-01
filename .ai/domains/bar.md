@@ -18,3 +18,26 @@
 ## Componentes únicos de este dominio
 - `DrinkQueueComponent` — cola de bebidas
 - `BarStatsComponent` — estadísticas de tiempos del bar
+
+## Estructura de carpetas
+
+```
+libs/bar/bar/src/lib/
+├── pages/                    ← una carpeta por ruta del sidebar
+│   ├── comandas-page/
+│   ├── recetas-page/
+│   └── menu-page/
+├── ui/                       ← page raíz del módulo (landing/índice)
+├── components/               ← componentes presentacionales propios del dominio
+├── data-access/
+│   ├── store/
+│   │   ├── actions/
+│   │   ├── effects/
+│   │   ├── reducers/
+│   │   └── selectors/
+│   └── bar.facade.ts
+├── models/
+├── pipes/
+├── validators/
+└── util/
+```

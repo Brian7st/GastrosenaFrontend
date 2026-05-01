@@ -20,3 +20,25 @@
 - `ReportSelectorComponent` — selección de tipo de reporte
 - `PdfExportService` — generación de PDF
 - `ExcelExportService` — generación de Excel
+
+## Estructura de carpetas
+
+```
+libs/reportes/reportes/src/lib/
+├── pages/                    ← una carpeta por ruta del sidebar
+│   ├── ventas-page/
+│   └── inventario-reportes-page/
+├── ui/                       ← page raíz del módulo (landing/índice)
+├── components/               ← componentes presentacionales propios del dominio
+├── data-access/
+│   ├── store/
+│   │   ├── actions/
+│   │   ├── effects/
+│   │   ├── reducers/
+│   │   └── selectors/
+│   └── reportes.facade.ts
+├── models/
+├── pipes/
+├── validators/
+└── util/
+```

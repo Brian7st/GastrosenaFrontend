@@ -14,3 +14,26 @@
 
 ## Scope
 `feat/auth/...` | `fix/auth/...` | `feat/usuarios/...`
+
+## Estructura de carpetas
+
+```
+libs/auth/usuarios/src/lib/
+├── pages/                    ← una carpeta por ruta del sidebar
+│   ├── lista-page/
+│   ├── roles-page/
+│   └── cuentas-page/
+├── ui/                       ← page raíz del módulo (landing/índice)
+├── components/               ← componentes presentacionales propios del dominio
+├── data-access/
+│   ├── store/
+│   │   ├── actions/
+│   │   ├── effects/
+│   │   ├── reducers/
+│   │   └── selectors/
+│   └── usuarios.facade.ts
+├── models/
+├── pipes/
+├── validators/
+└── util/
+```

@@ -21,3 +21,26 @@
 - `KitchenBoardComponent` — tablero de pedidos en tiempo real
 - `OrderTimerComponent` — contador de tiempo por pedido
 - `RecipeStepsComponent` — pasos de preparación
+
+## Estructura de carpetas
+
+```
+libs/cocina/cocina/src/lib/
+├── pages/                    ← una carpeta por ruta del sidebar
+│   ├── comandas-page/
+│   ├── recetas-page/
+│   └── menu-page/
+├── ui/                       ← page raíz del módulo (landing/índice)
+├── components/               ← componentes presentacionales propios del dominio
+├── data-access/
+│   ├── store/
+│   │   ├── actions/
+│   │   ├── effects/
+│   │   ├── reducers/
+│   │   └── selectors/
+│   └── cocina.facade.ts
+├── models/
+├── pipes/
+├── validators/
+└── util/
+```
