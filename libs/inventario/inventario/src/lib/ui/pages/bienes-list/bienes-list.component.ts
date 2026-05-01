@@ -1,18 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { 
-  PageHeaderComponent, 
-  SearchFilterComponent, 
-  SelectFilterComponent,
+import {
   LoadingSkeletonComponent,
   KeywordConfirmModalComponent,
-  LucideIconComponent
 } from '@restaurant/shared/ui';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { BienExportService } from '../../../data-access/services/bien-export.service';
-import { BienKpiCardsComponent } from '../../components/bien-kpi-cards/bien-kpi-cards.component';
-import { BienTableComponent } from '../../components/bien-table/bien-table.component';
 import { BienFormComponent } from '../../modals/bien-form/bien-form.component';
 import { BienImportModalComponent } from '../../modals/bien-import/bien-import.component';
 import { Bien, BienFormDto } from '../../../models/inventario.model';
@@ -22,16 +16,10 @@ import { Bien, BienFormDto } from '../../../models/inventario.model';
   standalone: true,
   imports: [
     CommonModule,
-    PageHeaderComponent,
-    SearchFilterComponent,
-    SelectFilterComponent,
     LoadingSkeletonComponent,
-    BienKpiCardsComponent,
-    BienTableComponent,
     BienFormComponent,
     BienImportModalComponent,
     KeywordConfirmModalComponent,
-    LucideIconComponent
   ],
   templateUrl: './bienes-list.component.html',
   styleUrl: './bienes-list.component.scss',
@@ -42,13 +30,12 @@ export class BienesListPageComponent implements OnInit {
   private router = inject(Router);
   private exportService = inject(BienExportService);
 
-  // Seleccionamos los estados desde el facade (Signals)
+  // State signals
   bienes = this.facade.bienes;
   kpis = this.facade.kpis;
   loading = this.facade.loading;
-  filtros = this.facade.filtros;
 
-  // Control de Modales
+  // Modal controls
   showFormModal = signal(false);
   showDeleteModal = signal(false);
   showImportModal = signal(false);
@@ -70,7 +57,7 @@ export class BienesListPageComponent implements OnInit {
   onProcessImport(data: any[]): void {
     console.log('Procesando importación de', data.length, 'registros');
     this.showImportModal.set(false);
-    this.facade.loadAll(); // Refrescar
+    this.facade.loadAll();
   }
 
   onExportBienes(): void {
@@ -90,13 +77,12 @@ export class BienesListPageComponent implements OnInit {
   }
 
   onSaveBien(dto: BienFormDto): void {
-    // Aquí iría la lógica de persistencia vía Facade
     console.log('Guardando bien:', dto);
     this.showFormModal.set(false);
   }
 
   onVerDetalle(bien: Bien): void {
-    this.router.navigate(['/inventario/bienes', bien.id]);
+    this.router.navigate(['/app/inventario/bienes', bien.id]);
   }
 
   onEliminar(bien: Bien): void {

@@ -5,6 +5,11 @@ import { BienDetailPageComponent } from './ui/pages/bien-detail/bien-detail.comp
 export const INVENTARIO_ROUTES: Routes = [
   {
     path: '',
+    pathMatch: 'full',
+    redirectTo: 'bienes',
+  },
+  {
+    path: 'bienes',
     component: BienesListPageComponent,
   },
   {
