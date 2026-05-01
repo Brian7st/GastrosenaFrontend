@@ -1,4 +1,4 @@
-import { Component, Input, computed, inject } from '@angular/core';
+import { Component, Input, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { LucideBox, LucideDynamicIcon, LucideLogOut, LucideSettings, LucideUser } from '@lucide/angular';
@@ -30,6 +30,8 @@ export class BarraLateralComponent {
     grupos: [],
   };
 
+  protected readonly itemsAbiertos = signal<Set<string>>(new Set());
+
   protected readonly visibleGroups = computed(() => {
     const currentRole = this.authService.currentUser()?.rol;
 
@@ -40,4 +42,20 @@ export class BarraLateralComponent {
       }))
       .filter(grupo => grupo.items.length > 0);
   });
+
+  protected toggleItem(ruta: string): void {
+    this.itemsAbiertos.update(set => {
+      const nuevo = new Set(set);
+      if (nuevo.has(ruta)) {
+        nuevo.delete(ruta);
+      } else {
+        nuevo.add(ruta);
+      }
+      return nuevo;
+    });
+  }
+
+  protected estaAbierto(ruta: string): boolean {
+    return this.itemsAbiertos().has(ruta);
+  }
 }

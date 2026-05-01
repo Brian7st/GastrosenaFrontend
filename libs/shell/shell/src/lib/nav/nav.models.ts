@@ -1,5 +1,11 @@
 import { Rol } from '@restaurant/shared/models';
 
+export interface SubNavItem {
+  label: string;
+  ruta: string;
+  icono?: string;
+}
+
 export interface NavItem {
   label: string;
   ruta: string;
@@ -7,6 +13,7 @@ export interface NavItem {
   insignia?: number;
   insigniaAlerta?: boolean;
   roles?: Rol[];
+  subItems?: SubNavItem[];
 }
 
 export interface NavGrupo {
