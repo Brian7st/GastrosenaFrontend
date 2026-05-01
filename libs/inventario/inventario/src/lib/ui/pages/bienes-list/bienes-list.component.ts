@@ -9,9 +9,11 @@ import {
   KeywordConfirmModalComponent
 } from '@restaurant/shared/ui';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
+import { BienExportService } from '../../../data-access/services/bien-export.service';
 import { BienKpiCardsComponent } from '../../components/bien-kpi-cards/bien-kpi-cards.component';
 import { BienTableComponent } from '../../components/bien-table/bien-table.component';
 import { BienFormComponent } from '../../modals/bien-form/bien-form.component';
+import { BienImportModalComponent } from '../../modals/bien-import/bien-import.component';
 import { Bien, BienFormDto } from '../../../models/inventario.model';
 
 @Component({
@@ -26,6 +28,7 @@ import { Bien, BienFormDto } from '../../../models/inventario.model';
     BienKpiCardsComponent,
     BienTableComponent,
     BienFormComponent,
+    BienImportModalComponent,
     KeywordConfirmModalComponent
   ],
   templateUrl: './bienes-list.component.html',
@@ -35,6 +38,7 @@ import { Bien, BienFormDto } from '../../../models/inventario.model';
 export class BienesListPageComponent implements OnInit {
   private facade = inject(InventarioFacade);
   private router = inject(Router);
+  private exportService = inject(BienExportService);
 
   // Seleccionamos los estados desde el facade (Signals)
   bienes = this.facade.bienes;
@@ -45,6 +49,7 @@ export class BienesListPageComponent implements OnInit {
   // Control de Modales
   showFormModal = signal(false);
   showDeleteModal = signal(false);
+  showImportModal = signal(false);
   formMode = signal<'create' | 'edit'>('create');
   selectedBien = signal<Bien | undefined>(undefined);
 
@@ -54,6 +59,20 @@ export class BienesListPageComponent implements OnInit {
 
   onSearch(query: string): void {
     this.facade.setFiltros({ busqueda: query });
+  }
+
+  onImportBienes(): void {
+    this.showImportModal.set(true);
+  }
+
+  onProcessImport(data: any[]): void {
+    console.log('Procesando importación de', data.length, 'registros');
+    this.showImportModal.set(false);
+    this.facade.loadAll(); // Refrescar
+  }
+
+  onExportBienes(): void {
+    this.exportService.exportToCsv(this.bienes());
   }
 
   onNuevoBien(): void {

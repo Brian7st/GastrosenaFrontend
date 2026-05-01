@@ -1,0 +1,92 @@
+<div class="modal-overlay" (click)="cancel.emit()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <div class="header-title">
+        <div class="icon-box">
+          <restaurant-lucide-icon name="upload-cloud" size="24"></restaurant-lucide-icon>
+        </div>
+        <div>
+          <h3>Carga Masiva de Bienes</h3>
+          <p>Importe múltiples activos desde un archivo CSV o Excel.</p>
+        </div>
+      </div>
+      <button class="close-btn" (click)="cancel.emit()">
+        <restaurant-lucide-icon name="x" size="20"></restaurant-lucide-icon>
+      </button>
+    </header>
+
+    <div class="modal-body">
+      <!-- Drop Zone -->
+      <div 
+        class="drop-zone" 
+        [class.is-dragging]="isDragging()"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave()"
+        (drop)="onDrop($event)"
+        *ngIf="!file()">
+        <restaurant-lucide-icon name="upload" size="40"></restaurant-lucide-icon>
+        <p>Arrastre su archivo aquí o <span>busque en su equipo</span></p>
+        <small>Formatos admitidos: .csv, .xlsx (Máx 5MB)</small>
+        <input type="file" (change)="onFileSelected($event)" accept=".csv, .xlsx">
+      </div>
+
+      <!-- File Selected Info -->
+      <div class="file-info" *ngIf="file()">
+        <div class="file-card">
+          <restaurant-lucide-icon name="file-text" size="24"></restaurant-lucide-icon>
+          <div class="file-details">
+            <span class="file-name">{{ file()?.name }}</span>
+            <span class="file-size">{{ (file()?.size || 0) / 1024 | number:'1.0-2' }} KB</span>
+          </div>
+          <button class="remove-btn" (click)="file.set(null); previewData.set([])">
+            <restaurant-lucide-icon name="trash-2" size="18"></restaurant-lucide-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Preview Table -->
+      <div class="preview-section" *ngIf="previewData().length > 0">
+        <h5>Previsualización de Datos ({{ previewData().length }} registros)</h5>
+        <div class="preview-container">
+          <table class="preview-table">
+            <thead>
+              <tr>
+                <th>Placa</th>
+                <th>Descripción</th>
+                <th>Serial</th>
+                <th>Ubicación</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of previewData()" [class.row-error]="row.error">
+                <td>{{ row.codigoPlaca }}</td>
+                <td>{{ row.descripcion || '—' }}</td>
+                <td>{{ row.serial }}</td>
+                <td>{{ row.ubicacion }}</td>
+                <td>
+                  <span class="error-text" *ngIf="row.error">{{ row.error }}</span>
+                  <span *ngIf="!row.error">{{ row.estado }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <footer class="modal-footer">
+      <div class="footer-info" *ngIf="previewData().length > 0">
+        <span [class.text-danger]="!isValid()">
+          {{ isValid() ? '✓ Archivo listo para importar' : '⚠ Corrija los errores para continuar' }}
+        </span>
+      </div>
+      <div class="footer-actions">
+        <button class="btn-secondary" (click)="cancel.emit()">Cancelar</button>
+        <button class="btn-primary" [disabled]="!isValid() || previewData().length === 0" (click)="onImport()">
+          Confirmar Importación
+        </button>
+      </div>
+    </footer>
+  </div>
+</div>

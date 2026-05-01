@@ -3,11 +3,11 @@
   subtitle="Control exhaustivo y trazabilidad de activos de formación."
 >
   <div class="header-actions">
-    <button class="btn-outline">
+    <button class="btn-outline" (click)="onImportBienes()">
       <restaurant-lucide-icon name="upload" size="18"></restaurant-lucide-icon>
       Importar
     </button>
-    <button class="btn-outline">
+    <button class="btn-outline" (click)="onExportBienes()">
       <restaurant-lucide-icon name="download" size="18"></restaurant-lucide-icon>
       Exportar
     </button>
@@ -73,3 +73,9 @@
   (cancel)="showDeleteModal.set(false)"
   (confirm)="confirmarEliminacion()"
 ></restaurant-keyword-confirm-modal>
+
+<restaurant-bien-import
+  *ngIf="showImportModal()"
+  (cancel)="showImportModal.set(false)"
+  (import)="onProcessImport($event)"
+></restaurant-bien-import>
