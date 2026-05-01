@@ -1,0 +1,88 @@
+<div class="modal-overlay" (click)="onCancel()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <div class="header-title">
+        <div class="icon-box">
+          <restaurant-lucide-icon [name]="mode === 'create' ? 'plus' : 'pencil'" size="24"></restaurant-lucide-icon>
+        </div>
+        <div>
+          <h3>{{ mode === 'create' ? 'Registrar Nuevo Bien' : 'Editar Bien' }}</h3>
+          <p>{{ mode === 'create' ? 'Complete la información para ingresar un nuevo activo.' : 'Actualice los datos del bien seleccionado.' }}</p>
+        </div>
+      </div>
+      <button class="close-btn" (click)="onCancel()">
+        <restaurant-lucide-icon name="x" size="20"></restaurant-lucide-icon>
+      </button>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="modal-form">
+      <div class="form-grid">
+        <!-- Nombre -->
+        <div class="form-group full-width">
+          <label>Nombre del Bien *</label>
+          <input type="text" formControlName="nombre" placeholder="Ej: Portátil Dell Latitude 5420">
+          <span class="error-msg" *ngIf="form.get('nombre')?.invalid && form.get('nombre')?.touched">El nombre es requerido.</span>
+        </div>
+
+        <!-- Códigos -->
+        <div class="form-group">
+          <label>Código SENA (Placa)</label>
+          <input type="text" formControlName="codigoSena" placeholder="Autogenerado" readonly>
+        </div>
+        <div class="form-group">
+          <label>Código Proveedor</label>
+          <input type="text" formControlName="codigoProveedor" placeholder="Ej: PRV-992-B">
+        </div>
+
+        <!-- Descripción -->
+        <div class="form-group full-width">
+          <label>Descripción / Especificaciones</label>
+          <textarea formControlName="descripcion" rows="2" placeholder="Detalles técnicos..."></textarea>
+        </div>
+
+        <!-- Categoría y UM -->
+        <div class="form-group">
+          <label>Categoría *</label>
+          <select formControlName="categoria">
+            <option value="">Seleccione una categoría</option>
+            <option value="Equipos de Cómputo">Equipos de Cómputo</option>
+            <option value="Papelería">Papelería</option>
+            <option value="Mobiliario">Mobiliario</option>
+            <option value="Cocina">Cocina</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Unidad de Medida *</label>
+          <select formControlName="unidadMedida">
+            <option value="">Seleccione UM</option>
+            <option value="UND">Unidad (UND)</option>
+            <option value="MTS">Metros (MTS)</option>
+            <option value="KG">Kilogramos (KG)</option>
+          </select>
+          <span class="info-msg" *ngIf="bien?.tieneHistorial">Bloqueado por historial de movimientos.</span>
+        </div>
+
+        <!-- Stock y Valor -->
+        <div class="form-group">
+          <label>Stock Actual *</label>
+          <input type="number" formControlName="stockActual">
+        </div>
+        <div class="form-group">
+          <label>Stock Mínimo *</label>
+          <input type="number" formControlName="stockMinimo">
+        </div>
+        <div class="form-group">
+          <label>Valor Unitario ($) *</label>
+          <input type="number" formControlName="valor">
+        </div>
+      </div>
+
+      <footer class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="onCancel()">Cancelar</button>
+        <button type="submit" class="btn-primary" [disabled]="form.invalid">
+          {{ mode === 'create' ? 'Registrar Bien' : 'Guardar Cambios' }}
+        </button>
+      </footer>
+    </form>
+  </div>
+</div>

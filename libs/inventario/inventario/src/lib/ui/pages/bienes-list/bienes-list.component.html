@@ -54,3 +54,22 @@
     </ng-template>
   </div>
 </div>
+
+<!-- Modales -->
+<restaurant-bien-form
+  *ngIf="showFormModal()"
+  [mode]="formMode()"
+  [bien]="selectedBien()"
+  (save)="onSaveBien($event)"
+  (cancel)="showFormModal.set(false)"
+></restaurant-bien-form>
+
+<restaurant-keyword-confirm-modal
+  [open]="showDeleteModal()"
+  [title]="'Confirmar Eliminación'"
+  [description]="'¿Desea eliminar permanentemente el bien ' + selectedBien()?.nombre + '? Esta acción no se puede deshacer.'"
+  [identifierLabel]="'Código SENA'"
+  [identifierValue]="selectedBien()?.codigoSena"
+  (cancel)="showDeleteModal.set(false)"
+  (confirm)="confirmarEliminacion()"
+></restaurant-keyword-confirm-modal>

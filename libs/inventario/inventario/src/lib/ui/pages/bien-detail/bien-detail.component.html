@@ -1,0 +1,99 @@
+<restaurant-page-header
+  [title]="bien()?.nombre || 'Cargando...'"
+  [subtitle]="'Ficha técnica y trazabilidad de movimientos'"
+>
+  <div class="header-actions">
+    <button class="btn-outline" (click)="onVolver()">
+      <restaurant-lucide-icon name="arrow-left" size="18"></restaurant-lucide-icon>
+      Volver a la lista
+    </button>
+    <button class="btn-primary-gradient">
+      <restaurant-lucide-icon name="pencil" size="18"></restaurant-lucide-icon>
+      Editar Bien
+    </button>
+  </div>
+</restaurant-page-header>
+
+<div class="page-content" *ngIf="bien() as data">
+  <div class="detail-grid">
+    <!-- Ficha Técnica -->
+    <div class="info-card">
+      <div class="card-header">
+        <restaurant-lucide-icon name="file-text" size="20"></restaurant-lucide-icon>
+        <h4>Información General</h4>
+      </div>
+      
+      <div class="data-list">
+        <div class="data-item">
+          <label>Código SENA (Placa)</label>
+          <span>{{ data.codigoSena }}</span>
+        </div>
+        <div class="data-item">
+          <label>Código Proveedor</label>
+          <span>{{ data.codigoProveedor || 'N/A' }}</span>
+        </div>
+        <div class="data-item">
+          <label>Categoría</label>
+          <span class="category-text">{{ data.categoria }}</span>
+        </div>
+        <div class="data-item">
+          <label>Unidad de Medida</label>
+          <span>{{ data.unidadMedida }}</span>
+        </div>
+        <div class="data-item">
+          <label>Stock Actual / Mínimo</label>
+          <div class="stock-info">
+            <span [class.text-danger]="data.estado === 'Bajo Stock'">{{ data.stockActual }}</span>
+            <span class="separator">/</span>
+            <span>{{ data.stockMinimo }}</span>
+          </div>
+        </div>
+        <div class="data-item">
+          <label>Valor Unitario</label>
+          <span class="value-text">{{ data.valor | currency:'USD' }}</span>
+        </div>
+        <div class="data-item">
+          <label>Estado Actual</label>
+          <restaurant-bien-status-badge [estado]="data.estado"></restaurant-bien-status-badge>
+        </div>
+      </div>
+
+      <div class="description-box">
+        <label>Descripción / Especificaciones</label>
+        <p>{{ data.descripcion || 'Sin descripción detallada.' }}</p>
+      </div>
+    </div>
+
+    <!-- Historial -->
+    <div class="history-card">
+      <div class="card-header">
+        <restaurant-lucide-icon name="history" size="20"></restaurant-lucide-icon>
+        <h4>Historial de Movimientos</h4>
+      </div>
+
+      <div class="timeline" *ngIf="movimientos().length > 0; else noHistory">
+        <div class="timeline-item" *ngFor="let mov of movimientos()">
+          <div class="timeline-dot" [ngClass]="'timeline-dot--' + mov.tipo.toLowerCase()"></div>
+          <div class="timeline-content">
+            <div class="timeline-header">
+              <span class="timeline-type">{{ mov.tipo }}</span>
+              <span class="timeline-date">{{ mov.fecha | date:'mediumDate' }}</span>
+            </div>
+            <p class="timeline-desc">{{ mov.observacion }}</p>
+            <div class="timeline-footer">
+              <span><strong>Cant:</strong> {{ mov.cantidad > 0 ? '+' : '' }}{{ mov.cantidad }}</span>
+              <span><strong>Resp:</strong> {{ mov.responsable }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noHistory>
+        <div class="empty-history">
+          <restaurant-lucide-icon name="info" size="48"></restaurant-lucide-icon>
+          <p>No se registran movimientos para este bien aún.</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>
