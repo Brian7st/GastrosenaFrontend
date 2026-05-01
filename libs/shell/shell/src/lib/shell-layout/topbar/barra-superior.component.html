@@ -22,6 +22,27 @@
 
   <div class="barra-superior__acciones">
     <div class="barra-superior__herramientas">
+      <button
+        class="barra-superior__boton-icono barra-superior__boton-icono--ia"
+        title="Asistente IA"
+        type="button"
+      >
+        <svg lucideBrainCircuit></svg>
+      </button>
+
+      <button
+        class="barra-superior__boton-icono"
+        [title]="esOscuro() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+        (click)="alternarTema()"
+        type="button"
+      >
+        @if (esOscuro()) {
+          <svg lucideSun></svg>
+        } @else {
+          <svg lucideMoon></svg>
+        }
+      </button>
+
       <button class="barra-superior__boton-icono">
         <svg lucideBell></svg>
       </button>
