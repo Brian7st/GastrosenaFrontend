@@ -1,0 +1,56 @@
+<restaurant-page-header
+  title="Gestión de Bienes"
+  subtitle="Control exhaustivo y trazabilidad de activos de formación."
+>
+  <div class="header-actions">
+    <button class="btn-outline">
+      <restaurant-lucide-icon name="upload" size="18"></restaurant-lucide-icon>
+      Importar
+    </button>
+    <button class="btn-outline">
+      <restaurant-lucide-icon name="download" size="18"></restaurant-lucide-icon>
+      Exportar
+    </button>
+    <button class="btn-primary-gradient" (click)="onNuevoBien()">
+      <restaurant-lucide-icon name="plus" size="18"></restaurant-lucide-icon>
+      Nuevo Bien
+    </button>
+  </div>
+</restaurant-page-header>
+
+<div class="page-content">
+  <!-- KPIs Section -->
+  <restaurant-bien-kpi-cards *ngIf="kpis()" [kpis]="kpis()!"></restaurant-bien-kpi-cards>
+
+  <!-- Filters Panel -->
+  <div class="filters-panel">
+    <div class="filters-panel__search">
+      <restaurant-search-filter 
+        placeholder="Buscar por código o nombre..."
+        (search)="onSearch($event)">
+      </restaurant-search-filter>
+    </div>
+    <div class="filters-panel__actions">
+      <button class="btn-filter">
+        <restaurant-lucide-icon name="filter" size="18"></restaurant-lucide-icon>
+        Filtros Avanzados
+      </button>
+    </div>
+  </div>
+
+  <!-- Table Section -->
+  <div class="table-section">
+    <ng-container *ngIf="!loading(); else loadingTemplate">
+      <restaurant-bien-table 
+        [bienes]="bienes()"
+        (edit)="onEditar($event)"
+        (view)="onVerDetalle($event)"
+        (delete)="onEliminar($event)">
+      </restaurant-bien-table>
+    </ng-container>
+
+    <ng-template #loadingTemplate>
+      <restaurant-loading-skeleton [rows]="5" [columns]="8"></restaurant-loading-skeleton>
+    </ng-template>
+  </div>
+</div>

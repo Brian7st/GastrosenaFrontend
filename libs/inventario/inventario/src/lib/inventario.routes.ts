@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
-import { InventarioPageComponent } from './ui/inventario-page.component';
+import { BienesListPageComponent } from './ui/pages/bienes-list/bienes-list.component';
 
 export const INVENTARIO_ROUTES: Routes = [
   {
     path: '',
-    component: InventarioPageComponent,
+    component: BienesListPageComponent,
   },
 ];
