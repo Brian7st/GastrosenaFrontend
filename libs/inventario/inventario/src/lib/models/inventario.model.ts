@@ -79,3 +79,14 @@ export interface BienImportRow {
   estado: EstadoBien;
   error?: string; // Para validación en UI
 }
+
+/**
+ * DTO para el formulario de creación/edición de bienes.
+ */
+export interface BienFormDto extends Partial<Bien> {
+  nombre: string;
+  categoria: string;
+  unidadMedida: string;
+  stockMinimo: number;
+  valor: number;
+}
