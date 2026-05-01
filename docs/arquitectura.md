@@ -95,7 +95,10 @@ GastrosenaFrontend/
 │       ├── api/                  ← BaseHttpService, interceptores, error handling
 │       ├── state/                ← NgRx root store, metareducers globales
 │       ├── ui/                   ← Design system: botones, tablas, modales, tokens
-│       ├── util/                 ← Pipes, validators, formatters, constantes
+│       ├── pipes/                ← Pipes globales reutilizables en todos los dominios
+│       ├── directives/           ← Directivas globales (hasRole, autoFocus, etc.)
+│       ├── validators/           ← Validadores de formularios globales (NIT, CUFE, etc.)
+│       ├── util/                 ← Helpers, formatters y constantes puras
 │       └── models/               ← Interfaces globales (Usuario, Rol, Paginacion...)
 │
 ├── remotes/                      ← Proyectos standalone de referencia (no son parte del monorepo)
@@ -263,19 +266,43 @@ shared/ui/src/lib/
       └── auto-focus.directive.ts
 ```
 
+#### `shared/pipes`
+
+Responsabilidad única: pipes Angular reutilizables en 3 o más dominios.
+
+```
+shared/pipes/src/lib/
+  ├── currency-cop.pipe.ts   ← Formato moneda colombiana
+  ├── date-co.pipe.ts        ← Formato fecha Colombia
+  └── estado-pedido.pipe.ts  ← EstadoPedido → label legible
+```
+
+#### `shared/directives`
+
+Responsabilidad única: directivas Angular globales.
+
+```
+shared/directives/src/lib/
+  ├── has-role.directive.ts   ← *hasRole="['CHEF', 'ADMIN']"
+  └── auto-focus.directive.ts
+```
+
+#### `shared/validators`
+
+Responsabilidad única: validadores de formularios globales (usados en 3+ dominios).
+
+```
+shared/validators/src/lib/
+  ├── cufe.validator.ts      ← Valida 64 caracteres SHA-256
+  └── nit.validator.ts       ← Valida formato NIT colombiano
+```
+
 #### `shared/util`
 
-Responsabilidad única: funciones puras y sin estado.
+Responsabilidad única: helpers y formatters puros sin estado. Los pipes y validators se movieron a sus propias librerías.
 
 ```
 shared/util/src/lib/
-  ├── pipes/
-  │   ├── currency-cop.pipe.ts   ← Formato moneda colombiana
-  │   ├── date-co.pipe.ts        ← Formato fecha Colombia
-  │   └── estado-pedido.pipe.ts  ← EstadoPedido → label legible
-  ├── validators/
-  │   ├── cufe.validator.ts      ← Valida 64 caracteres SHA-256
-  │   └── nit.validator.ts       ← Valida formato NIT colombiano
   └── formatters/
       ├── iva.calculator.ts      ← Cálculos IVA 0%, 5%, 19%
       └── zese.calculator.ts     ← Retención ZESE 0.625%
@@ -329,12 +356,15 @@ Regla: si una interfaz de `cocina/models` empieza a ser necesaria en `restaurant
 Dentro de `shared/`, el orden jerárquico es:
 
 ```
-shared/ui       → puede importar: shared/models, shared/util
-shared/auth     → puede importar: shared/models, shared/api
-shared/api      → puede importar: shared/models
-shared/state    → puede importar: shared/models, shared/auth
-shared/util     → puede importar: shared/models
-shared/models   → NO importa nada (es la capa base)
+shared/ui         → puede importar: shared/models, shared/util, shared/pipes, shared/directives
+shared/auth       → puede importar: shared/models, shared/api
+shared/api        → puede importar: shared/models
+shared/state      → puede importar: shared/models, shared/auth
+shared/pipes      → puede importar: shared/models
+shared/directives → puede importar: shared/models
+shared/validators → puede importar: shared/models
+shared/util       → puede importar: shared/models
+shared/models     → NO importa nada (es la capa base)
 ```
 
 Esta jerarquía se enforza automáticamente con ESLint (ver sección 11).
@@ -347,46 +377,49 @@ Tomando `inventario` como ejemplo completo:
 
 ```
 libs/inventario/inventario/src/lib/
-│
-├── ui/                         ← Componentes visuales (presentacionales)
-│   ├── catalog-list/
-│   │   ├── catalog-list.component.ts
-│   │   └── catalog-list.component.html
-│   ├── stock/
-│   │   ├── stock-alert-banner.component.ts    ← Solo existe en inventario
-│   │   └── stock-level-indicator.component.ts
-│   └── movements/
-│       ├── entry-form.component.ts
-│       └── exit-form.component.ts
-│
-├── pages/                      ← Componentes con routing (una por ruta)
+├── pages/                    ← una carpeta por ruta del sidebar
 │   ├── bienes-page/
-│   │   └── bienes-page.component.ts
-│   └── movimientos-page/
-│       └── movimientos-page.component.ts
-│
-├── data-access/                ← Lógica de negocio y acceso al store
+│   ├── facturas-page/
+│   ├── solicitudes-page/
+│   ├── consolidado-page/
+│   ├── kardex-page/
+│   ├── alertas-page/
+│   ├── presupuesto-page/
+│   ├── conciliacion-page/
+│   ├── requisiciones-page/
+│   ├── actas-page/
+│   └── paquete-probatorio-page/
+├── ui/                       ← page raíz del módulo (landing/índice)
+│   └── inventario-page.component.ts
+├── components/               ← componentes presentacionales propios del dominio
+├── data-access/
 │   ├── store/
-│   │   ├── inventario.actions.ts
-│   │   ├── inventario.reducer.ts
-│   │   ├── inventario.effects.ts
-│   │   └── inventario.selectors.ts
-│   ├── inventario.facade.ts    ← El único punto de entrada al store
-│   ├── bienes.service.ts
-│   ├── movimientos.service.ts
-│   └── alertas-stock.service.ts
-│
-├── models/                     ← Interfaces propias del dominio
-│   ├── bien.model.ts
-│   ├── movimiento.model.ts
-│   └── alerta-stock.model.ts
-│
-└── util/                       ← Helpers específicos (no van a shared)
-    ├── stock-level.calculator.ts
-    └── bien-code.generator.ts
+│   │   ├── actions/
+│   │   ├── effects/
+│   │   ├── reducers/
+│   │   └── selectors/
+│   └── inventario.facade.ts
+├── models/
+├── pipes/
+├── validators/
+└── util/
 ```
 
-**El Facade** (`inventario.facade.ts`) es el patrón clave: los componentes de `ui/` solo hablan con el facade, nunca con el store directamente. Esto hace que los componentes sean más testeables y desacoplados.
+**El Facade** (`inventario.facade.ts`) es el patrón clave: los componentes de `pages/` y `components/` solo hablan con el facade, nunca con el store directamente. Esto hace que los componentes sean más testeables y desacoplados.
+
+### ¿Qué va dónde? — Referencia rápida
+
+| ¿Qué? | ¿Dónde? |
+|---|---|
+| Pantalla nueva del sidebar | `pages/` |
+| Componente reutilizable dentro del módulo | `components/` |
+| Componente reutilizable en 3+ módulos | `shared/ui/` |
+| Llamadas al backend / facade / NgRx | `data-access/` |
+| Pipe de este módulo | `pipes/` |
+| Pipe global | `shared/pipes/` |
+| Validación de formulario de este módulo | `validators/` |
+| Validación global (NIT, CUFE, etc.) | `shared/validators/` |
+| Función pura / helper | `util/` |
 
 ```typescript
 // inventario.facade.ts

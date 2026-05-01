@@ -19,3 +19,34 @@
 - `StockAlertBannerComponent` — alerta visual de stock crítico
 - `StockLevelIndicatorComponent`
 - `BienDetailCardComponent`
+
+## Estructura de carpetas
+
+```
+libs/inventario/inventario/src/lib/
+├── pages/                    ← una carpeta por ruta del sidebar
+│   ├── bienes-page/
+│   ├── facturas-page/
+│   ├── solicitudes-page/
+│   ├── consolidado-page/
+│   ├── kardex-page/
+│   ├── alertas-page/
+│   ├── presupuesto-page/
+│   ├── conciliacion-page/
+│   ├── requisiciones-page/
+│   ├── actas-page/
+│   └── paquete-probatorio-page/
+├── ui/                       ← page raíz del módulo (landing/índice)
+├── components/               ← componentes presentacionales propios del dominio
+├── data-access/
+│   ├── store/
+│   │   ├── actions/
+│   │   ├── effects/
+│   │   ├── reducers/
+│   │   └── selectors/
+│   └── inventario.facade.ts
+├── models/
+├── pipes/
+├── validators/
+└── util/
+```

@@ -17,3 +17,25 @@ feat(reportes): ... | fix(reportes): ... | chore(reportes): ...
 
 ## Si necesitás algo de shared
 No lo modificás vos — coordiná con el equipo de Arquitectura.
+
+## Estructura de carpetas
+
+```
+libs/reportes/reportes/src/lib/
+├── pages/                           ← una carpeta por ruta del sidebar
+│   ├── ventas-page/                 ← reportes de ventas
+│   └── inventario-reportes-page/   ← reportes de inventario
+├── ui/                             ← page raíz del módulo (landing/índice)
+├── components/                     ← componentes presentacionales propios del dominio
+├── data-access/
+│   ├── store/
+│   │   ├── actions/
+│   │   ├── effects/
+│   │   ├── reducers/
+│   │   └── selectors/
+│   └── reportes.facade.ts          ← único punto de entrada al store
+├── models/                         ← interfaces propias del dominio
+├── pipes/                          ← pipes específicos del dominio
+├── validators/                     ← validadores de formularios del dominio
+└── util/                           ← helpers específicos (no van a shared)
+```
