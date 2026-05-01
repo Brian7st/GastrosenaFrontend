@@ -42,8 +42,8 @@ export class BienExportPageComponent {
   readonly ALMACENES = ['Todos los almacenes', 'Almacén Central', 'Sede Norte', 'Sede Sur', 'Laboratorio 302'];
 
   readonly EXPORTACIONES_RECIENTES = [
-    { nombre: 'Inv_Bienes_Oct.xlsx', tiempo: 'Hace 2 horas', tamaño: '4.2 MB', icono: 'table_chart', color: '#217346' },
-    { nombre: 'Reporte_BajoStock.pdf', tiempo: 'Ayer', tamaño: '1.8 MB', icono: 'picture_as_pdf', color: '#d93025' },
+    { nombre: 'Inv_Bienes_Oct.xlsx', tiempo: 'Hace 2 horas', tamano: '4.2 MB', icono: 'table_chart', color: '#217346' },
+    { nombre: 'Reporte_BajoStock.pdf', tiempo: 'Ayer', tamano: '1.8 MB', icono: 'picture_as_pdf', color: '#d93025' },
   ];
 
   readonly resumenReporte = computed(() => ({
