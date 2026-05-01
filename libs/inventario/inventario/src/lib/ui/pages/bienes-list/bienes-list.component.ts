@@ -6,7 +6,8 @@ import {
   SearchFilterComponent, 
   SelectFilterComponent,
   LoadingSkeletonComponent,
-  KeywordConfirmModalComponent
+  KeywordConfirmModalComponent,
+  LucideIconComponent
 } from '@restaurant/shared/ui';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { BienExportService } from '../../../data-access/services/bien-export.service';
@@ -29,7 +30,8 @@ import { Bien, BienFormDto } from '../../../models/inventario.model';
     BienTableComponent,
     BienFormComponent,
     BienImportModalComponent,
-    KeywordConfirmModalComponent
+    KeywordConfirmModalComponent,
+    LucideIconComponent
   ],
   templateUrl: './bienes-list.component.html',
   styleUrl: './bienes-list.component.scss',

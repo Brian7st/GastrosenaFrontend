@@ -3,7 +3,7 @@
     <header class="modal-header">
       <div class="header-title">
         <div class="icon-box">
-          <restaurant-lucide-icon name="upload-cloud" size="24"></restaurant-lucide-icon>
+          <lucide-icon name="upload-cloud" size="24"></lucide-icon>
         </div>
         <div>
           <h3>Carga Masiva de Bienes</h3>
@@ -11,7 +11,7 @@
         </div>
       </div>
       <button class="close-btn" (click)="cancel.emit()">
-        <restaurant-lucide-icon name="x" size="20"></restaurant-lucide-icon>
+        <lucide-icon name="x" size="20"></lucide-icon>
       </button>
     </header>
 
@@ -24,7 +24,7 @@
         (dragleave)="onDragLeave()"
         (drop)="onDrop($event)"
         *ngIf="!file()">
-        <restaurant-lucide-icon name="upload" size="40"></restaurant-lucide-icon>
+        <lucide-icon name="upload" size="40"></lucide-icon>
         <p>Arrastre su archivo aquí o <span>busque en su equipo</span></p>
         <small>Formatos admitidos: .csv, .xlsx (Máx 5MB)</small>
         <input type="file" (change)="onFileSelected($event)" accept=".csv, .xlsx">
@@ -33,13 +33,13 @@
       <!-- File Selected Info -->
       <div class="file-info" *ngIf="file()">
         <div class="file-card">
-          <restaurant-lucide-icon name="file-text" size="24"></restaurant-lucide-icon>
+          <lucide-icon name="file-text" size="24"></lucide-icon>
           <div class="file-details">
             <span class="file-name">{{ file()?.name }}</span>
             <span class="file-size">{{ (file()?.size || 0) / 1024 | number:'1.0-2' }} KB</span>
           </div>
           <button class="remove-btn" (click)="file.set(null); previewData.set([])">
-            <restaurant-lucide-icon name="trash-2" size="18"></restaurant-lucide-icon>
+            <lucide-icon name="trash-2" size="18"></lucide-icon>
           </button>
         </div>
       </div>

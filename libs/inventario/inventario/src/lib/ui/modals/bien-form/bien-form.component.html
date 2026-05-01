@@ -3,7 +3,7 @@
     <header class="modal-header">
       <div class="header-title">
         <div class="icon-box">
-          <restaurant-lucide-icon [name]="mode === 'create' ? 'plus' : 'pencil'" size="24"></restaurant-lucide-icon>
+          <lucide-icon [name]="mode === 'create' ? 'plus' : 'pencil'" size="24"></lucide-icon>
         </div>
         <div>
           <h3>{{ mode === 'create' ? 'Registrar Nuevo Bien' : 'Editar Bien' }}</h3>
@@ -11,7 +11,7 @@
         </div>
       </div>
       <button class="close-btn" (click)="onCancel()">
-        <restaurant-lucide-icon name="x" size="20"></restaurant-lucide-icon>
+        <lucide-icon name="x" size="20"></lucide-icon>
       </button>
     </header>
 

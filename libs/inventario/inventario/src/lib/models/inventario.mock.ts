@@ -14,6 +14,7 @@ export const BIENES_MOCK: Bien[] = [
     unidadMedida: 'UND',
     valor: 4500000,
     estado: 'Activo',
+    estadoStock: 'DISPONIBLE',
     tieneHistorial: true
   },
   {
@@ -29,6 +30,7 @@ export const BIENES_MOCK: Bien[] = [
     unidadMedida: 'UND',
     valor: 120000,
     estado: 'Bajo Stock',
+    estadoStock: 'BAJO_STOCK',
     tieneHistorial: false
   },
   {
@@ -44,6 +46,7 @@ export const BIENES_MOCK: Bien[] = [
     unidadMedida: 'UND',
     valor: 850000,
     estado: 'Activo',
+    estadoStock: 'DISPONIBLE',
     tieneHistorial: true
   },
   {
@@ -59,6 +62,7 @@ export const BIENES_MOCK: Bien[] = [
     unidadMedida: 'UND',
     valor: 1200000,
     estado: 'Bajo Stock',
+    estadoStock: 'BAJO_STOCK',
     tieneHistorial: true
   }
 ];
