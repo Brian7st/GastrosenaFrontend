@@ -1,22 +1,15 @@
-# Dominio: Presupuesto
+> **DOMINIO REMOVIDO** — Este dominio fue eliminado del monorepo en el commit `460fff6`.
+> Las librerías `libs/presupuesto/**` ya no existen en el workspace.
+> Si este dominio se reactiva en el futuro, recrear las librerías con el generator correspondiente.
+
+# Dominio: Presupuesto ~~(removido)~~
 
 **Equipo propietario:** Equipo Presupuesto (2 personas)
 **RF relacionados:** RF-P — techos presupuestarios y ZESE
+**Estado:** **REMOVIDO** — no existe en el workspace actual
 
-## Podés modificar
-- `libs/presupuesto/**`
+## Componentes planeados (referencia histórica)
 
-## Solo lectura
-- `libs/shared/**` — podés importar, nunca modificar
-
-## Nunca tocás
-- Cualquier otro dominio
-- `apps/`, `tsconfig.base.json`, `.eslintrc.json`, `nx.json`
-
-## Scope de tus ramas y commits
-`feat/presupuesto/...` | `fix/presupuesto/...` | `chore/presupuesto/...`
-
-## Componentes únicos de este dominio
 - `BudgetOverviewComponent` — resumen de techos por área
 - `ZeseFormComponent` — formulario ZESE
 - `BudgetAlertComponent` — alerta de techo superado

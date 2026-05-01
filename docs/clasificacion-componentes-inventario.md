@@ -182,7 +182,7 @@ Estos deben quedarse en su feature:
 
 ## 3. Decisiones ya aplicadas al monorepo
 
-Ya quedaron extraídos o reforzados en `shared/ui` / `feature-shell`:
+Ya quedaron extraídos o reforzados en `shared/ui` / `libs/shell/shell`:
 
 - shell global
 - navegación global

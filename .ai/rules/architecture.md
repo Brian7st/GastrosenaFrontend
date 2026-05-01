@@ -34,9 +34,6 @@ import { AuthService } from '../../shared/auth/src/lib/auth.service';
 | `@restaurant/restaurante` | `libs/restaurante/restaurante` |
 | `@restaurant/inventario` | `libs/inventario/inventario` |
 | `@restaurant/abastecimiento` | `libs/abastecimiento/abastecimiento` |
-| `@restaurant/facturacion` | `libs/facturacion/facturacion` |
-| `@restaurant/presupuesto` | `libs/presupuesto/presupuesto` |
-| `@restaurant/requisiciones` | `libs/requisiciones/requisiciones` |
 | `@restaurant/reportes` | `libs/reportes/reportes` |
 | `@restaurant/notificaciones` | `libs/notificaciones/notificaciones` |
 | `@restaurant/shared/auth` | `libs/shared/auth` |

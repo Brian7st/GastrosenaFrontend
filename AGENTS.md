@@ -111,4 +111,4 @@ chore(shared/models): promote Pedido interface
 - `nx.json`
 - `apps/**`
 - `package.json`
-- `libs/shell/feature-shell/src/lib/shell.routes.ts`
+- `libs/shell/shell/src/lib/shell.routes.ts`
