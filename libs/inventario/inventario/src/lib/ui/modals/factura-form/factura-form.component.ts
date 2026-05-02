@@ -26,6 +26,12 @@ export class FacturaFormComponent {
   codigoCufe     = signal('');
   retencionZESE  = signal(0.625);
   ordenCompra    = signal('');
+  
+  // Datos Bancarios
+  banco = signal('');
+  tipoCuenta = signal('');
+  numeroCuenta = signal('');
+
   archivosNombres = signal<string[]>([]);
 
   isDragOver = signal(false);
@@ -56,6 +62,7 @@ export class FacturaFormComponent {
   }
 
   onSubmit(): void {
+    // Note: The model `Factura` or `FacturaFormDto` might need to be updated to accept bank details later
     this.save.emit({
       numeroFEL: this.numeroFEL(),
       fechaEmision: this.fechaEmision(),
@@ -67,6 +74,9 @@ export class FacturaFormComponent {
       codigoCufe: this.codigoCufe() || undefined,
       retencionZESE: this.retencionZESE(),
       ordenCompra: this.ordenCompra() || undefined,
+      // banco: this.banco(),
+      // tipoCuenta: this.tipoCuenta(),
+      // numeroCuenta: this.numeroCuenta(),
     });
   }
 
