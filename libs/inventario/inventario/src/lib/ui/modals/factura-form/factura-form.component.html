@@ -1,0 +1,224 @@
+<div class="modal-overlay" (click)="onOverlayClick($event)">
+  <div class="modal-dialog" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <div>
+        <h2 class="modal-title">Registro de Comprobante FEL</h2>
+        <p class="modal-subtitle">
+          Cargue sus archivos XML y PDF para la validación automática ante la DIAN. Cumple con el estándar UBL 2.1.
+        </p>
+      </div>
+      <button class="close-btn" id="btn-cerrar-modal-factura" (click)="close.emit()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <form class="modal-form" (ngSubmit)="onSubmit()" #formDir="ngForm">
+
+        <div class="form-columns">
+          <!-- ── Columna izquierda ── -->
+          <div class="form-col">
+            <!-- Sección: Identificación -->
+            <div class="form-section">
+              <div class="form-section__header">
+                <div class="section-icon section-icon--green">
+                  <span class="material-symbols-outlined filled">badge</span>
+                </div>
+                <span class="form-section__title">Identificación</span>
+              </div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label class="field-label" for="field-numero-fel">Número FEL</label>
+                  <input
+                    id="field-numero-fel"
+                    class="field-input"
+                    type="text"
+                    placeholder="Ej. FEL-12345"
+                    [(ngModel)]="numeroFEL"
+                    name="numeroFEL"
+                  />
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label class="field-label" for="field-fecha-emision">Fecha Emisión</label>
+                  <input
+                    id="field-fecha-emision"
+                    class="field-input"
+                    type="date"
+                    [(ngModel)]="fechaEmision"
+                    name="fechaEmision"
+                  />
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="field-fecha-vencimiento">Fecha Vencim.</label>
+                  <input
+                    id="field-fecha-vencimiento"
+                    class="field-input"
+                    type="date"
+                    [(ngModel)]="fechaVencimiento"
+                    name="fechaVencimiento"
+                  />
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label class="field-label" for="field-nit-emisor">NIT Emisor</label>
+                  <input
+                    id="field-nit-emisor"
+                    class="field-input"
+                    type="text"
+                    placeholder="Ej. 900.123.456-7"
+                    [(ngModel)]="nitEmisor"
+                    name="nitEmisor"
+                  />
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="field-nit-receptor">NIT Receptor</label>
+                  <input
+                    id="field-nit-receptor"
+                    class="field-input"
+                    type="text"
+                    placeholder="Ej. 899.999.034-1"
+                    [(ngModel)]="nitReceptor"
+                    name="nitReceptor"
+                  />
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="field-cufe">Código CUFE (64 caracteres)</label>
+                <div class="cufe-field">
+                  <input
+                    id="field-cufe"
+                    class="field-input"
+                    type="text"
+                    placeholder="7084931a27e3...b7a8d0f1"
+                    [ngModel]="codigoCufe()"
+                    (ngModelChange)="codigoCufe.set($event)"
+                    name="codigoCufe"
+                    maxlength="64"
+                  />
+                  <span class="cufe-field__tag">AUTO-DETECT</span>
+                </div>
+                <p class="field-hint">{{ codigoCufe().length }} / 64</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Columna derecha ── -->
+          <div class="form-col">
+            <!-- Sección: Vínculos y Responsables -->
+            <div class="form-section">
+              <div class="form-section__header">
+                <div class="section-icon section-icon--blue">
+                  <span class="material-symbols-outlined filled">link</span>
+                </div>
+                <span class="form-section__title">Vínculos y Responsables</span>
+              </div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label class="field-label" for="field-gil-vinculado">GIL-F-014 Vinculado</label>
+                  <select class="field-select" id="field-gil-vinculado" [(ngModel)]="gilVinculado" name="gilVinculado">
+                    <option value="">Seleccione un formulario...</option>
+                    <option value="GIL-F-014-2024-001">GIL-F-014-2024-001</option>
+                    <option value="GIL-F-014-2024-002">GIL-F-014-2024-002</option>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="field-orden">Orden de Compra</label>
+                  <select class="field-select" id="field-orden" [(ngModel)]="ordenCompra" name="ordenCompra">
+                    <option value="">Seleccione una orden...</option>
+                    <option value="OC-2023-050">OC-2023-050</option>
+                    <option value="OC-2023-051">OC-2023-051</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="field-instructor">Instructor Cuentadante</label>
+                <input
+                  class="field-input field-input--disabled"
+                  id="field-instructor"
+                  type="text"
+                  [value]="instructorCuentadante()"
+                  readonly
+                />
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="field-retencion">Retención ZESE (%)</label>
+                <div class="retencion-field">
+                  <input
+                    id="field-retencion"
+                    class="field-input"
+                    type="number"
+                    step="0.001"
+                    [ngModel]="retencionZESE()"
+                    (ngModelChange)="retencionZESE.set($event)"
+                    name="retencionZESE"
+                  />
+                  <span class="retencion-field__badge">
+                    <span class="material-symbols-outlined">verified</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Drop Zone -->
+            <div
+              class="drop-zone"
+              [class.drop-zone--active]="isDragOver()"
+              (dragover)="onDragOver($event)"
+              (dragleave)="onDragLeave()"
+              (drop)="onDrop($event)"
+              (click)="fileInput.click()"
+            >
+              <span class="material-symbols-outlined drop-zone__icon">upload_file</span>
+              <p class="drop-zone__primary">Arrastra y suelta tus archivos aquí</p>
+              <p class="drop-zone__secondary">Soporta formatos XML y PDF (Máx. 10MB)</p>
+              <input
+                #fileInput
+                type="file"
+                accept=".xml,.pdf"
+                multiple
+                hidden
+                (change)="onFileInput($event)"
+              />
+            </div>
+
+            <!-- Archivos adjuntos -->
+            <div class="file-chips" *ngIf="archivosNombres().length > 0">
+              <div class="file-chip" *ngFor="let name of archivosNombres()">
+                <span class="material-symbols-outlined">attach_file</span>
+                <span>{{ name }}</span>
+                <button type="button" (click)="removeFile(name)">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="btn-cancel" type="button" (click)="close.emit()">Cancelar</button>
+      <button class="btn-save" type="submit" (click)="onSubmit()" id="btn-guardar-factura">
+        <span class="material-symbols-outlined">save</span>
+        Registrar Factura
+      </button>
+    </div>
+
+  </div>
+</div>
