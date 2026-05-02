@@ -1,0 +1,252 @@
+<div class="factura-edit" *ngIf="factura() as f; else loadingTpl">
+
+  <!-- ── BLOCKED BANNER (Vista 4) ── -->
+  <div class="blocked-banner" *ngIf="isBlocked()">
+    <span class="material-symbols-outlined">lock</span>
+    <span>Factura bloqueada — estado: <strong>{{ f.estado }}</strong></span>
+  </div>
+
+  <!-- ── PAGE HEADER ── -->
+  <div class="page-header">
+    <div class="page-header__left">
+      <button class="back-btn" (click)="onVolver()">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </button>
+      <div>
+        <div class="page-header__breadcrumb">
+          <span>SENA FEL</span>
+          <span class="page-header__breadcrumb-sep">|</span>
+          <span class="page-header__cufe">CUFE: {{ (f.cufe | slice:0:12) }}...{{ (f.cufe | slice:-8) }}</span>
+        </div>
+        <div class="page-header__title-row">
+          <span class="material-symbols-outlined page-header__icon">edit_document</span>
+          <h1>Editar Factura FEL</h1>
+        </div>
+        <p class="page-header__sub">
+          Modificando Documento: <strong class="page-header__doc-id">{{ f.numeroFEL }}</strong>
+        </p>
+      </div>
+    </div>
+    <button class="btn btn--ghost" (click)="onExportar()">
+      <span class="material-symbols-outlined">download</span>
+      Exportar
+    </button>
+  </div>
+
+  <!-- ── FORM CARD ── -->
+  <div class="edit-card">
+
+    <!-- Cliente -->
+    <div class="form-grid form-grid--2">
+      <div class="form-field">
+        <label>Identificación del Cliente (NIT/DPI)</label>
+        <div class="input-with-badge">
+          <input
+            type="text"
+            id="field-nit-cliente"
+            [ngModel]="nitCliente()"
+            (ngModelChange)="nitCliente.set($event)"
+            [disabled]="isBlocked()"
+          />
+          <span class="material-symbols-outlined input-badge" [class.input-badge--ok]="nitCliente().length > 3">
+            {{ nitCliente().length > 3 ? 'check_circle' : 'radio_button_unchecked' }}
+          </span>
+        </div>
+      </div>
+      <div class="form-field">
+        <label>Razón Social</label>
+        <input
+          type="text"
+          id="field-razon-social"
+          [ngModel]="razonSocial()"
+          (ngModelChange)="razonSocial.set($event)"
+          [disabled]="isBlocked()"
+        />
+      </div>
+    </div>
+
+    <div class="form-grid form-grid--3">
+      <div class="form-field">
+        <label>Tipo de Documento</label>
+        <div class="select-wrapper">
+          <select id="field-tipo-doc" [(ngModel)]="tipoDoc" [disabled]="isBlocked()">
+            <option>Factura Electrónica</option>
+            <option>Nota Crédito</option>
+            <option>Nota Débito</option>
+          </select>
+          <span class="material-symbols-outlined">expand_more</span>
+        </div>
+      </div>
+      <div class="form-field">
+        <label>Fecha de Emisión</label>
+        <input
+          type="date"
+          id="field-fecha"
+          [ngModel]="fechaEmision()"
+          (ngModelChange)="fechaEmision.set($event)"
+          [disabled]="isBlocked()"
+        />
+      </div>
+      <div class="form-field">
+        <label>Moneda</label>
+        <div class="select-wrapper">
+          <select id="field-moneda" [(ngModel)]="moneda" [disabled]="isBlocked()">
+            <option value="COP">COP - Pesos Colombianos</option>
+            <option value="GTQ">GTQ - Quetzales</option>
+            <option value="USD">USD - Dólares</option>
+          </select>
+          <span class="material-symbols-outlined">expand_more</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ITEMS TABLE ── -->
+    <div class="section-header">
+      <div class="section-header__left">
+        <span class="material-symbols-outlined">table_rows</span>
+        <h3>Detalle de Productos/Servicios</h3>
+      </div>
+      <button class="btn btn--add-item" *ngIf="!isBlocked()">
+        <span class="material-symbols-outlined">add_circle</span>
+        Agregar Ítem
+      </button>
+    </div>
+
+    <div class="items-table-wrapper">
+      <table class="items-table">
+        <thead>
+          <tr>
+            <th>Cant.</th>
+            <th>Descripción</th>
+            <th>Precio U.</th>
+            <th>IVA (%)</th>
+            <th>Total</th>
+            <th *ngIf="!isBlocked()"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of f.items">
+            <td class="td--num">{{ item.cantidad }}</td>
+            <td>{{ item.descripcion }}</td>
+            <td class="td--currency">{{ formatMoney(item.precioUnitario, f.moneda) }}</td>
+            <td class="td--iva">
+              <div class="iva-select">
+                {{ item.iva }}%
+                <span class="material-symbols-outlined" *ngIf="!isBlocked()">expand_more</span>
+              </div>
+            </td>
+            <td class="td--currency td--bold">{{ formatMoney(item.total, f.moneda) }}</td>
+            <td *ngIf="!isBlocked()">
+              <button class="icon-btn icon-btn--danger">
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="f.items.length === 0">
+            <td [attr.colspan]="isBlocked() ? 5 : 6" class="empty-row">
+              Sin ítems registrados
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── CONCILIACIÓN GIL (Vista 4) ── -->
+    <div class="conciliacion-section" *ngIf="hasConciliacion() && f.conciliacion">
+      <div class="section-header">
+        <div class="section-header__left">
+          <span class="material-symbols-outlined">sync_alt</span>
+          <h3>Conciliación Técnica GIL vs Factura</h3>
+        </div>
+      </div>
+      <div class="conciliacion-table-wrapper">
+        <table class="conciliacion-table">
+          <thead>
+            <tr>
+              <th>Ítem</th>
+              <th>Cant. GIL</th>
+              <th>Cant. Factura</th>
+              <th>Diferencia Cant.</th>
+              <th>Precio GIL</th>
+              <th>Precio Factura</th>
+              <th>Diferencia Precio</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of f.conciliacion">
+              <td>{{ c.descripcion }}</td>
+              <td class="td--num">{{ c.cantidadGil }}</td>
+              <td class="td--num">{{ c.cantidadFactura }}</td>
+              <td class="td--num" [ngClass]="getDiffClass(c.diferenciaCantidad)">
+                {{ c.diferenciaCantidad === 0 ? '0' : c.diferenciaCantidad }}
+              </td>
+              <td class="td--currency">{{ formatMoney(c.precioGil, f.moneda) }}</td>
+              <td class="td--currency">{{ formatMoney(c.precioFactura, f.moneda) }}</td>
+              <td class="td--currency" [ngClass]="getDiffClass(c.diferenciaPrecio)">
+                {{ c.diferenciaPrecio > 0 ? '+' : '' }}{{ formatMoney(c.diferenciaPrecio, f.moneda) }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── NOTAS + TOTALES ── -->
+    <div class="bottom-section">
+      <div class="notas-section">
+        <label class="notas-section__label">Notas Internas</label>
+        <textarea
+          id="field-notas"
+          rows="4"
+          [ngModel]="notasInternas()"
+          (ngModelChange)="notasInternas.set($event)"
+          [disabled]="isBlocked()"
+          placeholder="Añade observaciones internas..."
+        ></textarea>
+      </div>
+
+      <div class="totals-card">
+        <div class="totals-row">
+          <span>Subtotal:</span>
+          <span>{{ formatMoney(f.subtotal, f.moneda) }}</span>
+        </div>
+        <div class="totals-row">
+          <span>IVA ({{ f.ivaTotal > 0 ? '12' : '0' }}%):</span>
+          <span>{{ formatMoney(f.ivaTotal, f.moneda) }}</span>
+        </div>
+        <div class="totals-row totals-row--total">
+          <span>TOTAL FEL:</span>
+          <span class="totals-total-value">{{ formatMoney(f.total, f.moneda) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FOOTER ACTIONS ── -->
+  <div class="page-footer">
+    <button class="btn btn--anular" *ngIf="!isBlocked()" (click)="onAnular()">
+      <span class="material-symbols-outlined">cancel</span>
+      Anular Documento
+    </button>
+    <div class="footer-right">
+      <button class="btn btn--ghost" (click)="onVolver()">Cancelar</button>
+      <button
+        class="btn btn--primary"
+        id="btn-guardar-factura"
+        [disabled]="isBlocked()"
+        (click)="onGuardar()"
+      >
+        <span class="material-symbols-outlined">save</span>
+        Guardar Cambios
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Loading -->
+<ng-template #loadingTpl>
+  <div class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>Cargando factura...</p>
+  </div>
+</ng-template>
