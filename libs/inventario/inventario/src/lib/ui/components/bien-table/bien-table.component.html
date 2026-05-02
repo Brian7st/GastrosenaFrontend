@@ -1,0 +1,74 @@
+<div class="table-container">
+  <table class="bien-table">
+    <thead>
+      <tr>
+        <th>CÓD. SENA</th>
+        <th>CÓD. PROVEEDOR</th>
+        <th>Nombre</th>
+        <th>Categoría</th>
+        <th class="text-center">Stock</th>
+        <th class="text-center">Stock Mín.</th>
+        <th class="text-center">UM</th>
+        <th>Valor</th>
+        <th>Estado</th>
+        <th class="text-center">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let bien of bienes" class="bien-row">
+        <td>
+          <span class="code-badge">{{ bien.codigoSena }}</span>
+        </td>
+        <td>
+          <span class="code-badge secondary">{{ bien.codigoProveedor }}</span>
+        </td>
+        <td>
+          <div class="name-cell">
+            <span class="name">{{ bien.nombre }}</span>
+            <span class="description">{{ bien.descripcion }}</span>
+          </div>
+        </td>
+        <td>
+          <span class="category-badge" [ngClass]="'category-badge--' + bien.categoriaColor">
+            {{ bien.categoria }}
+          </span>
+        </td>
+        <td class="text-center">
+          <span class="stock-value" [class.low-stock]="bien.estado === 'Bajo Stock'">
+            {{ bien.stockActual }}
+          </span>
+        </td>
+        <td class="text-center">
+          <span class="min-stock">{{ bien.stockMinimo }}</span>
+        </td>
+        <td class="text-center">
+          <span class="um-badge">{{ bien.unidadMedida }}</span>
+        </td>
+        <td>
+          <span class="value-cell">{{ bien.valor | currency:'USD':'symbol':'1.0-0' }}</span>
+        </td>
+        <td>
+          <restaurant-bien-status-badge [estado]="bien.estado"></restaurant-bien-status-badge>
+        </td>
+        <td>
+          <div class="actions-cell">
+            <button class="action-btn" (click)="onEdit(bien)" title="Editar">
+              <lucide-icon name="pencil" size="18"></lucide-icon>
+            </button>
+            <button class="action-btn" (click)="onView(bien)" title="Ver Detalle">
+              <lucide-icon name="eye" size="18"></lucide-icon>
+            </button>
+            <button class="action-btn danger" (click)="onDelete(bien)" title="Eliminar">
+              <lucide-icon name="trash-2" size="18"></lucide-icon>
+            </button>
+          </div>
+        </td>
+      </tr>
+
+      <!-- Empty State / Loading placeholder logic can go here -->
+      <tr *ngIf="bienes.length === 0 && !isLoading">
+        <td colspan="10" class="empty-row">No se encontraron bienes con los filtros aplicados.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

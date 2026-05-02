@@ -1,0 +1,193 @@
+<!-- Page Header Actions -->
+<div class="page-header-row">
+  <div>
+    <h1 class="page-title">Gestión de Bienes</h1>
+    <p class="page-subtitle">Control exhaustivo y trazabilidad de activos de formación.</p>
+  </div>
+  <div class="header-actions">
+    <button class="btn-surface" (click)="onImportBienes()">
+      <span class="material-symbols-outlined">file_upload</span>
+      Importar
+    </button>
+    <button class="btn-surface" (click)="onExportBienes()">
+      <span class="material-symbols-outlined">file_download</span>
+      Exportar
+    </button>
+    <button class="btn-gradient" (click)="onNuevoBien()">
+      <span class="material-symbols-outlined">add</span>
+      Nuevo Bien
+    </button>
+  </div>
+</div>
+
+<!-- Dashboard Card Container (Tabla) -->
+<div class="card-container">
+  <!-- Table Controls -->
+  <div class="table-controls">
+    <div class="table-controls__title">
+      <span class="material-symbols-outlined filled text-primary">list_alt</span>
+      <h3>Lista de Bienes</h3>
+    </div>
+    <div class="table-controls__actions">
+      <div class="search-box">
+        <span class="material-symbols-outlined search-icon">search</span>
+        <input type="text" placeholder="Buscar por código o nombre..." (input)="onSearch($any($event.target).value)" />
+      </div>
+      <button class="btn-filter">
+        <span class="material-symbols-outlined">filter_list</span>
+        Filtros
+      </button>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <ng-container *ngIf="!loading(); else loadingTemplate">
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>CÓD. SENA</th>
+            <th>CÓD. PROVEEDOR</th>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th class="text-center">Stock</th>
+            <th class="text-center">Stock Mín.</th>
+            <th class="text-center">UM</th>
+            <th>Valor</th>
+            <th>Estado</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let bien of bienes()" class="table-row">
+            <td>
+              <span class="code-mono">{{ bien.codigoSena }}</span>
+            </td>
+            <td>
+              <span class="code-mono">{{ bien.codigoProveedor }}</span>
+            </td>
+            <td>
+              <p class="bien-nombre">{{ bien.nombre }}</p>
+              <p class="bien-desc">{{ bien.descripcion }}</p>
+            </td>
+            <td>
+              <span class="category-pill" [ngClass]="'category-pill--' + bien.categoriaColor">{{ bien.categoria }}</span>
+            </td>
+            <td class="text-center">
+              <span class="stock-value" [class.stock-value--danger]="bien.stockActual < bien.stockMinimo">{{ bien.stockActual }}</span>
+            </td>
+            <td class="text-center">
+              <span class="stock-min">{{ bien.stockMinimo }}</span>
+            </td>
+            <td class="text-center">
+              <span class="um-value">{{ bien.unidadMedida }}</span>
+            </td>
+            <td>
+              <span class="valor-text">{{ bien.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+            </td>
+            <td>
+              <span class="estado-badge" [ngClass]="bien.estado === 'Activo' ? 'estado-badge--activo' : 'estado-badge--bajo'">
+                <span class="estado-dot"></span>
+                {{ bien.estado }}
+              </span>
+            </td>
+            <td class="text-center">
+              <div class="actions-row">
+                <button class="action-icon" (click)="onEditar(bien)" title="Editar">
+                  <span class="material-symbols-outlined">edit</span>
+                </button>
+                <button class="action-icon" (click)="onVerDetalle(bien)" title="Ver detalle">
+                  <span class="material-symbols-outlined">visibility</span>
+                </button>
+                <button class="action-icon action-icon--danger" (click)="onEliminar(bien)" title="Eliminar">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination Footer -->
+    <div class="pagination-footer">
+      <p class="pagination-info">MOSTRANDO {{ bienes().length }} DE {{ bienes().length }} BIENES</p>
+      <div class="pagination-controls">
+        <button class="page-btn" disabled>
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        <button class="page-btn page-btn--active">1</button>
+        <button class="page-btn" disabled>
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-template #loadingTemplate>
+    <restaurant-loading-skeleton [rows]="5" [columns]="10"></restaurant-loading-skeleton>
+  </ng-template>
+</div>
+
+<!-- Summary Dashboard Stats (KPIs al fondo como en prototipo) -->
+<div class="kpi-grid" *ngIf="kpis() as k">
+  <div class="kpi-card">
+    <div class="kpi-card__header">
+      <div class="kpi-icon kpi-icon--primary">
+        <span class="material-symbols-outlined filled">account_balance</span>
+      </div>
+      <span class="kpi-trend kpi-trend--success">+{{ k.tendenciaValor }}% vs mes anterior</span>
+    </div>
+    <p class="kpi-label">Valor Total Inventario</p>
+    <h4 class="kpi-value">{{ k.valorTotal | currency:'COP':'symbol-narrow':'1.0-0' }}</h4>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-card__header">
+      <div class="kpi-icon kpi-icon--danger">
+        <span class="material-symbols-outlined filled">inventory</span>
+      </div>
+      <span class="kpi-trend kpi-trend--danger">Crítico</span>
+    </div>
+    <p class="kpi-label">Bienes en Alerta</p>
+    <h4 class="kpi-value">{{ k.totalAlertas }} Items</h4>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-card__header">
+      <div class="kpi-icon kpi-icon--info">
+        <span class="material-symbols-outlined filled">sync</span>
+      </div>
+      <span class="kpi-trend kpi-trend--muted">Hoy</span>
+    </div>
+    <p class="kpi-label">Movimientos Recientes</p>
+    <h4 class="kpi-value">{{ k.movimientosHoy }} Altas</h4>
+  </div>
+</div>
+
+<!-- FAB -->
+<button class="fab" (click)="onNuevoBien()">
+  <span class="material-symbols-outlined">add</span>
+</button>
+
+<!-- Modales -->
+<restaurant-bien-form
+  *ngIf="showFormModal()"
+  [mode]="formMode()"
+  [bien]="selectedBien()"
+  (save)="onSaveBien($event)"
+  (cancel)="showFormModal.set(false)"
+></restaurant-bien-form>
+
+<restaurant-bien-delete-modal
+  *ngIf="showDeleteModal() && selectedBien()"
+  [bien]="selectedBien()!"
+  (cancel)="showDeleteModal.set(false)"
+  (confirm)="confirmarEliminacion()"
+></restaurant-bien-delete-modal>
+
+<restaurant-bien-import
+  *ngIf="showImportModal()"
+  (cancel)="showImportModal.set(false)"
+  (import)="onProcessImport($event)"
+></restaurant-bien-import>

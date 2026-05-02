@@ -1,0 +1,217 @@
+<!-- Breadcrumb + Back -->
+<div class="breadcrumb">
+  <button class="back-btn" (click)="onVolver()">
+    <span class="material-symbols-outlined">arrow_back</span>
+  </button>
+  <nav class="breadcrumb-nav">
+    <span class="breadcrumb-link" (click)="onVolver()">Inventario</span>
+    <span class="material-symbols-outlined breadcrumb-sep">chevron_right</span>
+    <span class="breadcrumb-link" (click)="onVolver()">Equipos de Cómputo</span>
+    <span class="material-symbols-outlined breadcrumb-sep">chevron_right</span>
+    <span class="breadcrumb-current">{{ bien()?.codigoSena }}</span>
+  </nav>
+</div>
+
+<ng-container *ngIf="bien() as b; else loadingTpl">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">{{ b.nombre }}</h1>
+      <p class="page-subtitle">Referencia técnica para auditoría de activos SENA</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-surface" (click)="onExportarHistorial()">
+        <span class="material-symbols-outlined">history</span>
+        Exportar Historial
+      </button>
+      <button class="btn-gradient" (click)="onEditarActivo()">
+        <span class="material-symbols-outlined">edit</span>
+        Editar Activo
+      </button>
+    </div>
+  </div>
+
+  <!-- Top Section: imagen + KPIs + especificaciones -->
+  <div class="detail-top">
+    <!-- Left: imagen + badges -->
+    <div class="asset-card">
+      <div class="asset-image-wrap">
+        <img *ngIf="b.imagenUrl; else imgPlaceholder"
+             [src]="b.imagenUrl" [alt]="b.nombre" class="asset-image" />
+        <ng-template #imgPlaceholder>
+          <div class="asset-image-placeholder">
+            <span class="material-symbols-outlined">inventory_2</span>
+          </div>
+        </ng-template>
+      </div>
+      <div class="asset-badges">
+        <div class="asset-badge-item">
+          <span class="badge-label">ESTADO</span>
+          <span class="estado-pill" [ngClass]="b.estado === 'Activo' ? 'estado-pill--activo' : 'estado-pill--bajo'">
+            <span class="estado-dot"></span>
+            {{ b.estado }}
+          </span>
+        </div>
+        <div class="asset-badge-item">
+          <span class="badge-label">CATEGORÍA</span>
+          <span class="categoria-text">{{ b.categoria }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center: KPI cards -->
+    <div class="kpi-cards-col">
+      <div class="kpi-mini-card">
+        <div class="kpi-mini-icon kpi-mini-icon--primary">
+          <span class="material-symbols-outlined filled">inventory</span>
+        </div>
+        <div>
+          <p class="kpi-mini-label">STOCK ACTUAL</p>
+          <h3 class="kpi-mini-value" [class.kpi-mini-value--danger]="b.stockActual < b.stockMinimo">{{ b.stockActual }}</h3>
+          <p class="kpi-mini-sub">
+            <span class="dot-green"></span>
+            Stock Mínimo Requerido: <strong>{{ b.stockMinimo }}</strong>
+          </p>
+        </div>
+      </div>
+      <div class="kpi-mini-card">
+        <div class="kpi-mini-icon kpi-mini-icon--blue">
+          <span class="material-symbols-outlined filled">payments</span>
+        </div>
+        <div>
+          <p class="kpi-mini-label">VALOR UNITARIO</p>
+          <h3 class="kpi-mini-value">{{ b.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</h3>
+          <p class="kpi-mini-sub" *ngIf="b.depreciacionAnual">Depreciación anual: {{ b.depreciacionAnual }}%</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: especificaciones técnicas -->
+    <div class="spec-card" *ngIf="espec().length > 0">
+      <div class="spec-card__header">
+        <span class="material-symbols-outlined">settings</span>
+        <h4>Especificaciones Técnicas</h4>
+      </div>
+      <div class="spec-grid">
+        <div class="spec-item" *ngFor="let s of espec()">
+          <span class="spec-key">{{ s[0] }}</span>
+          <span class="spec-val">{{ s[1] }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Historial de Movimientos -->
+  <section class="section-card mt-6">
+    <div class="section-header">
+      <div class="section-title">
+        <span class="material-symbols-outlined filled text-primary">sync</span>
+        <h3>Historial de Movimientos</h3>
+      </div>
+      <button class="link-btn">Ver todo el historial</button>
+    </div>
+
+    <div class="movements-table-wrap">
+      <table class="movements-table">
+        <thead>
+          <tr>
+            <th>FECHA</th>
+            <th>TIPO</th>
+            <th>RESPONSABLE</th>
+            <th>UBICACIÓN</th>
+            <th>CANTIDAD</th>
+            <th>OBSERVACIÓN</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let m of movimientos()">
+            <td class="mov-fecha">{{ m.fecha | date:'dd/MM/yyyy' }}</td>
+            <td>
+              <span class="tipo-badge" [ngClass]="'tipo-badge--' + getTipoClass(m.tipo)">
+                {{ getTipoLabel(m.tipo) }}
+              </span>
+            </td>
+            <td class="mov-responsable">{{ m.responsable }}</td>
+            <td class="mov-ubicacion">{{ m.ubicacion }}</td>
+            <td>
+              <span class="cantidad-text" [ngClass]="getCantidadClass(m.cantidad)">
+                {{ getCantidadPrefix(m.cantidad) }}
+              </span>
+            </td>
+            <td class="mov-obs">{{ m.observacion }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Facturas de Abastecimiento -->
+  <section class="section-card mt-6">
+    <div class="section-header">
+      <div class="section-title">
+        <span class="material-symbols-outlined filled text-primary">receipt_long</span>
+        <h3>Facturas de Abastecimiento</h3>
+      </div>
+      <button class="link-btn">Ver todas</button>
+    </div>
+
+    <ng-container *ngIf="b.facturas && b.facturas.length > 0; else noFacturas">
+      <div class="movements-table-wrap">
+        <table class="movements-table">
+          <thead>
+            <tr>
+              <th>FEL</th>
+              <th>CUFE</th>
+              <th>PROVEEDOR</th>
+              <th>FECHA</th>
+              <th>MONTO</th>
+              <th>ESTADO</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let f of b.facturas">
+              <td class="code-mono">{{ f.fel }}</td>
+              <td class="code-mono text-muted">{{ f.cufe }}</td>
+              <td>{{ f.proveedor }}</td>
+              <td>{{ f.fecha | date:'dd/MM/yyyy' }}</td>
+              <td class="mov-valor">{{ f.monto | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+              <td>
+                <span class="factura-estado" [ngClass]="getEstadoFacturaClass(f.estado)">{{ f.estado }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </ng-container>
+
+    <ng-template #noFacturas>
+      <div class="empty-state">
+        <span class="material-symbols-outlined">receipt_long</span>
+        <p>No hay facturas vinculadas</p>
+        <small>Este activo aún no tiene facturas de abastecimiento asociadas.</small>
+        <button class="btn-outline-sm">
+          <span class="material-symbols-outlined">add</span>
+          Vincular Factura Manualmente
+        </button>
+      </div>
+    </ng-template>
+  </section>
+
+</ng-container>
+
+<ng-template #loadingTpl>
+  <div class="loading-state">
+    <span class="material-symbols-outlined loading-icon">inventory_2</span>
+    <p>Cargando información del bien...</p>
+  </div>
+</ng-template>
+
+<!-- Modal de edición -->
+<restaurant-bien-form
+  *ngIf="showEditModal()"
+  mode="edit"
+  [bien]="bien()"
+  (save)="onSaveEdit($event)"
+  (cancel)="showEditModal.set(false)"
+></restaurant-bien-form>
