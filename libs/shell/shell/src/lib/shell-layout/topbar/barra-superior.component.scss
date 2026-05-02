@@ -90,6 +90,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
+    &--ia {
+      color: var(--color-primario);
+
+      &:hover {
+        background-color: rgba(57, 169, 0, 0.08);
+        color: var(--color-brand-primary-strong);
+      }
+    }
   }
 
   &__perfil {
