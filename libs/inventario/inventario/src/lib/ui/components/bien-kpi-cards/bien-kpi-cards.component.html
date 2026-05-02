@@ -3,21 +3,21 @@
   <div class="kpi-card">
     <div class="kpi-card__header">
       <div class="kpi-card__icon kpi-card__icon--primary">
-        <lucide-icon name="banknote" size="24"></lucide-icon>
+        <span class="material-symbols-outlined">payments</span>
       </div>
-      <span class="kpi-card__badge kpi-card__badge--success" *ngIf="kpis.tendenciaValor">
+      <span class="kpi-card__badge kpi-card__badge--success" *ngIf="kpis.tendenciaValor !== undefined">
         +{{ kpis.tendenciaValor }}% vs mes anterior
       </span>
     </div>
     <p class="kpi-card__label">Valor Total Inventario</p>
-    <h4 class="kpi-card__value">{{ kpis.valorTotal | currency:'USD':'symbol':'1.0-0' }}</h4>
+    <h4 class="kpi-card__value">{{ kpis.valorTotal | currency:'COP':'symbol':'1.0-0' }}</h4>
   </div>
 
   <!-- Bienes en Alerta -->
   <div class="kpi-card">
     <div class="kpi-card__header">
       <div class="kpi-card__icon kpi-card__icon--danger">
-        <lucide-icon name="triangle-alert" size="24"></lucide-icon>
+        <span class="material-symbols-outlined">warning</span>
       </div>
       <span class="kpi-card__badge kpi-card__badge--danger">Crítico</span>
     </div>
@@ -29,7 +29,7 @@
   <div class="kpi-card">
     <div class="kpi-card__header">
       <div class="kpi-card__icon kpi-card__icon--info">
-        <lucide-icon name="refresh-cw" size="24"></lucide-icon>
+        <span class="material-symbols-outlined">history</span>
       </div>
       <span class="kpi-card__badge kpi-card__badge--info">Hoy</span>
     </div>
