@@ -6,7 +6,8 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: var(--color-superficie-contenedor-bajo, #f3f4f5);
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -214,7 +215,7 @@
   height: 32px;
   border-radius: 50%;
   border: none;
-  background: var(--color-pizarra-100);
+  background: transparent;
   color: var(--color-pizarra-500);
   cursor: pointer;
   transition: all 0.2s;

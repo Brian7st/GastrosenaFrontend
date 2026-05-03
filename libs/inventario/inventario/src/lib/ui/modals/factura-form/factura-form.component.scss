@@ -1,0 +1,564 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Factura Form Modal SCSS (Slide-Over Pattern)
+// ─────────────────────────────────────────────────────────────────────────────
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: rgba(25, 28, 29, 0.3);
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-dialog {
+  position: relative;
+  width: 100%;
+  background: var(--color-superficie-contenedor-mas-bajo);
+  border-radius: 1.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 90vh;
+  
+  @media (min-width: 768px) {
+    flex-direction: row;
+  }
+
+  &--slide-over {
+    max-width: 64rem; // max-w-5xl approx
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Left Panel (Dark)
+// ─────────────────────────────────────────────────────────────────────────────
+.modal-left {
+  display: none;
+  width: 33.333333%;
+  background-color: #0f172a; // slate-900 equivalent
+  padding: 2rem;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+
+  @media (min-width: 768px) {
+    display: flex;
+  }
+
+  &__bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0.2;
+    pointer-events: none;
+  }
+
+  &__bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &__content, &__footer {
+    position: relative;
+    z-index: 10;
+  }
+
+  &__icon {
+    width: 3rem;
+    height: 3rem;
+    background-color: var(--color-primario);
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+
+    .material-symbols-outlined {
+      color: #fff;
+      font-size: 1.5rem;
+    }
+  }
+
+  &__title {
+    font-family: var(--font-family-headline);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.2;
+  }
+
+  &__subtitle {
+    font-family: var(--font-family-base);
+    color: #94a3b8; // slate-400
+    font-size: 0.875rem;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  &__legal {
+    font-size: 0.625rem; // text-[10px]
+    color: #64748b; // slate-500
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
+.system-secure-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #4ade80; // green-400
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 1rem;
+
+  &__dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background-color: #4ade80;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Right Panel (Form Canvas)
+// ─────────────────────────────────────────────────────────────────────────────
+.modal-right {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+  }
+
+  &__title {
+    font-family: var(--font-family-headline);
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--color-en-superficie);
+    margin: 0 0 0.25rem 0;
+  }
+
+  &__subtitle {
+    font-size: 0.875rem;
+    color: #64748b;
+    font-weight: 500;
+    margin: 0;
+  }
+}
+
+.close-btn {
+  padding: 0.5rem;
+  background: transparent;
+  border: none;
+  border-radius: 9999px;
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+
+  &:hover {
+    background-color: #f1f5f9; // slate-100
+    color: #475569;
+  }
+
+  .material-symbols-outlined {
+    font-size: 1.25rem;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Form Layout & Sections
+// ─────────────────────────────────────────────────────────────────────────────
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.form-section {
+  &__title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-en-superficie);
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #f1f5f9; // gray-100
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  &.grid-cols-2 {
+    @media (min-width: 640px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  &.grid-cols-3 {
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+}
+
+.col-span-2 {
+  @media (min-width: 640px) {
+    grid-column: span 2 / span 2;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Inputs & Fields
+// ─────────────────────────────────────────────────────────────────────────────
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.field-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b; // slate-500
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-left: 0.25rem;
+}
+
+.field-input,
+.field-select {
+  width: 100%;
+  background-color: var(--color-superficie-contenedor-bajo);
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-family: var(--font-family-base);
+  color: var(--color-en-superficie);
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(var(--color-primario-rgb, 0, 110, 37), 0.2);
+  }
+
+  &::placeholder {
+    color: #cbd5e1; // slate-300
+  }
+
+  &--readonly {
+    background-color: var(--color-superficie-contenedor-alto);
+    color: #475569;
+    font-weight: 600;
+    cursor: default;
+    &:focus { box-shadow: none; }
+  }
+
+  &--white {
+    background-color: #fff;
+    border: 1px solid #e2e8f0; // gray-200
+    &:focus {
+      border-color: var(--color-primario);
+    }
+  }
+}
+
+.select-wrapper,
+.input-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .field-select {
+    appearance: none;
+    padding-right: 2.5rem;
+  }
+
+  .select-icon,
+  .input-icon {
+    position: absolute;
+    right: 1rem;
+    pointer-events: none;
+    color: #94a3b8;
+    font-size: 1.25rem;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CUFE Field Special
+// ─────────────────────────────────────────────────────────────────────────────
+.cufe-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .cufe-input {
+    font-family: monospace;
+    padding-right: 7rem;
+  }
+
+  .cufe-tag {
+    position: absolute;
+    right: 4rem;
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+  }
+
+  .cufe-count {
+    position: absolute;
+    right: 1rem;
+    font-size: 0.625rem;
+    font-family: monospace;
+    color: #94a3b8;
+    background-color: #fff;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Drag & Drop Zone
+// ─────────────────────────────────────────────────────────────────────────────
+.drop-zone {
+  position: relative;
+  border: 2px dashed #bdcab9; // outline-variant from prototype
+  border-radius: 0.75rem;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover, &--active {
+    border-color: var(--color-primario);
+    background-color: rgba(var(--color-primario-rgb, 0, 110, 37), 0.05);
+
+    .drop-zone__icon-wrapper {
+      transform: scale(1.1);
+    }
+  }
+
+  &__icon-wrapper {
+    width: 3rem;
+    height: 3rem;
+    background-color: var(--color-superficie-contenedor);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    transition: transform 0.2s ease;
+  }
+
+  &__icon {
+    color: var(--color-primario);
+    font-size: 1.5rem;
+  }
+
+  &__primary {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-en-superficie);
+    margin: 0 0 0.25rem 0;
+  }
+
+  &__secondary {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin: 0;
+  }
+}
+
+.file-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.file-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  background-color: var(--color-superficie-contenedor);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  color: var(--color-en-superficie);
+
+  button {
+    background: transparent;
+    border: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    color: #64748b;
+    cursor: pointer;
+    &:hover { color: var(--color-terciario); }
+  }
+
+  .material-symbols-outlined { font-size: 1rem; }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Datos Bancarios Accordion
+// ─────────────────────────────────────────────────────────────────────────────
+.bank-details-accordion {
+  background-color: var(--color-superficie-contenedor-mas-bajo);
+  border: 1px solid #f1f5f9;
+  border-radius: 0.75rem;
+  overflow: hidden;
+
+  &[open] {
+    .bank-details-accordion__icon {
+      transform: rotate(180deg);
+    }
+  }
+
+  &__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    cursor: pointer;
+    list-style: none;
+    transition: background-color 0.2s;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &:hover {
+      background-color: #f8fafc;
+    }
+  }
+
+  &__title {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--color-en-superficie);
+    margin: 0;
+  }
+
+  &__icon {
+    color: #94a3b8;
+    transition: transform 0.2s ease;
+  }
+
+  &__content {
+    padding: 1rem;
+    border-top: 1px solid #f1f5f9;
+    background-color: rgba(248, 250, 252, 0.5); // slate-50/50
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Footer Actions
+// ─────────────────────────────────────────────────────────────────────────────
+.modal-form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 1.5rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem 1.5rem;
+  font-family: var(--font-family-base);
+  font-size: 0.875rem;
+  font-weight: 700;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+
+  &--ghost {
+    background-color: transparent;
+    color: #64748b;
+    &:hover {
+      background-color: #f8fafc; // slate-50
+    }
+  }
+
+  &--primary {
+    background: linear-gradient(to right, var(--color-primario), var(--color-primario-contenedor));
+    color: #fff;
+    box-shadow: 0 10px 15px -3px rgba(0, 110, 37, 0.1);
+    
+    &:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 110, 37, 0.2);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Animations
+// ─────────────────────────────────────────────────────────────────────────────
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(2rem) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .5; }
+}

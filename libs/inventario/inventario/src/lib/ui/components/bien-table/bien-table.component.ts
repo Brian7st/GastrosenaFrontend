@@ -1,13 +1,12 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideIconComponent } from '@restaurant/shared/ui';
 import { Bien } from '../../../models/inventario.model';
 import { BienStatusBadgeComponent } from '../bien-status-badge/bien-status-badge.component';
 
 @Component({
   selector: 'restaurant-bien-table',
   standalone: true,
-  imports: [CommonModule, LucideIconComponent, BienStatusBadgeComponent],
+  imports: [CommonModule, BienStatusBadgeComponent],
   templateUrl: './bien-table.component.html',
   styleUrl: './bien-table.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

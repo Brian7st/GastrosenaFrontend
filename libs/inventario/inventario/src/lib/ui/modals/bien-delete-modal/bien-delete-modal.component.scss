@@ -1,7 +1,8 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: var(--color-superficie-contenedor-bajo, #f3f4f5);
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -160,12 +161,16 @@
   color: var(--color-pizarra-500);
 
   &--active {
-    background: #e87070;
-    color: white;
+    background: transparent;
+    color: #e87070;
+    border: 1.5px solid #e87070;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s;
 
-    &:hover:not(:disabled) { background: #b91c1c; }
+    &:hover:not(:disabled) { 
+      background: rgba(232, 112, 112, 0.1);
+      transform: scale(1.02);
+    }
   }
 
   &--disabled {

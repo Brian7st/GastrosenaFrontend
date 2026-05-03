@@ -45,7 +45,7 @@
           <span class="um-badge">{{ bien.unidadMedida }}</span>
         </td>
         <td>
-          <span class="value-cell">{{ bien.valor | currency:'USD':'symbol':'1.0-0' }}</span>
+          <span class="value-cell">{{ bien.valor | currency:'COP':'symbol':'1.0-0' }}</span>
         </td>
         <td>
           <restaurant-bien-status-badge [estado]="bien.estado"></restaurant-bien-status-badge>
@@ -53,13 +53,13 @@
         <td>
           <div class="actions-cell">
             <button class="action-btn" (click)="onEdit(bien)" title="Editar">
-              <lucide-icon name="pencil" size="18"></lucide-icon>
+              <span class="material-symbols-outlined">edit</span>
             </button>
             <button class="action-btn" (click)="onView(bien)" title="Ver Detalle">
-              <lucide-icon name="eye" size="18"></lucide-icon>
+              <span class="material-symbols-outlined">visibility</span>
             </button>
             <button class="action-btn danger" (click)="onDelete(bien)" title="Eliminar">
-              <lucide-icon name="trash-2" size="18"></lucide-icon>
+              <span class="material-symbols-outlined">delete</span>
             </button>
           </div>
         </td>

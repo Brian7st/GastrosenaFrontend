@@ -1,0 +1,205 @@
+<div class="gil-detail" *ngIf="solicitud() as s; else loadingTpl">
+
+  <!-- ── TOPBAR ── -->
+  <div class="topbar">
+    <div class="topbar__left">
+      <button class="back-link" (click)="onVolver()">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Volver
+      </button>
+      <span class="breadcrumb-sep">/</span>
+      <span class="breadcrumb-label">Solicitudes GIL</span>
+    </div>
+    <div class="topbar__actions">
+      <button class="btn btn--ghost" (click)="onEditar()">
+        <span class="material-symbols-outlined">edit</span>
+        Editar
+      </button>
+      <button class="btn btn--outline" (click)="onDescargarPDF()">
+        <span class="material-symbols-outlined">picture_as_pdf</span>
+        Descargar PDF
+      </button>
+      <button class="btn btn--primary" id="btn-enviar-aprobacion" (click)="onEnviarAprobacion()">
+        Enviar a Aprobación
+      </button>
+    </div>
+  </div>
+
+  <!-- ── TITLE ── -->
+  <h1 class="gil-title">{{ s.id }}</h1>
+
+  <!-- ── TIMELINE ── -->
+  <div class="timeline-container">
+    <div
+      *ngFor="let step of STEPS; let last = last"
+      class="timeline-step"
+      [ngClass]="'timeline-step--' + getStepState(step, s.estadoSolicitud)"
+    >
+      <div class="timeline-step__icon">
+        <span class="material-symbols-outlined" *ngIf="getStepState(step, s.estadoSolicitud) === 'active'">play_arrow</span>
+        <span class="material-symbols-outlined" *ngIf="getStepState(step, s.estadoSolicitud) === 'done'">check</span>
+        <span class="material-symbols-outlined" *ngIf="getStepState(step, s.estadoSolicitud) === 'pending'">radio_button_unchecked</span>
+      </div>
+      <span class="timeline-step__label">{{ step | uppercase }}</span>
+      <div class="timeline-step__connector" *ngIf="!last"></div>
+    </div>
+  </div>
+
+  <!-- ── MAIN GRID ── -->
+  <div class="detail-grid">
+
+    <!-- LEFT COLUMN -->
+    <div class="detail-left">
+
+      <!-- Info Sesión -->
+      <div class="detail-card">
+        <div class="detail-card__header">
+          <span class="material-symbols-outlined">calendar_month</span>
+          <h2>Información de la Sesión</h2>
+        </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-item__label">Nombre del Vocero</span>
+            <span class="info-item__value">{{ s.nombreVocero }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-item__label">Horarios</span>
+            <span class="info-item__value">{{ s.horarios }}</span>
+          </div>
+          <div class="info-item info-item--full">
+            <span class="info-item__label">Resultado de Aprendizaje (RA)</span>
+            <span class="info-item__value">{{ s.resultadoAprendizaje }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estado + General -->
+      <div class="two-col-layout">
+        <!-- Estado Card -->
+        <div class="detail-card status-card">
+          <span class="info-item__label">Estado de Solicitud</span>
+          <div class="status-badge-wrap">
+            <span class="status-pill">{{ s.estadoSolicitud }}</span>
+            <span class="status-date">Creado el {{ s.fechaCreacion | date:'dd MMM yyyy' }}</span>
+          </div>
+          <div class="total-amount">{{ formatMoney(s.totalEstimado) }}</div>
+          <span class="total-label">Total Estimado</span>
+          <div class="responsable-chip">
+            <div class="responsable-avatar">{{ getResponsableIniciales(s.responsable) }}</div>
+            <span class="responsable-nombre">{{ s.responsable }}</span>
+          </div>
+          <span class="responsable-rol">Responsable (Instructor)</span>
+        </div>
+
+        <!-- Información General -->
+        <div class="detail-card">
+          <span class="info-section-label">Información General</span>
+          <div class="info-stack">
+            <div class="info-item">
+              <span class="info-item__label">Regional</span>
+              <span class="info-item__value">{{ s.regional }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-item__label">Centro de Formación</span>
+              <span class="info-item__value">{{ s.centroFormacion }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-item__label">Área / Programa</span>
+              <span class="info-item__value">{{ s.areaPrograma }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-item__label">Cuentadante Responsable</span>
+              <span class="info-item__value">{{ s.cuentadanteResponsable }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-item__label">Destino del Bien</span>
+              <span class="info-item__value">{{ s.destinoBien }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="detail-right">
+
+      <!-- Pre-Facturas -->
+      <div class="detail-card">
+        <div class="detail-card__header">
+          <span class="material-symbols-outlined">receipt</span>
+          <h2>Pre-Facturas Asociadas</h2>
+          <span class="count-badge">{{ s.preFacturas.length }} DOCUMENTOS</span>
+        </div>
+
+        <div class="prefacturas-list">
+          <div class="prefactura-item" *ngFor="let pf of s.preFacturas">
+            <div class="prefactura-header">
+              <div class="prefactura-header__left">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <div>
+                  <p class="prefactura-id">{{ pf.id }}</p>
+                  <p class="prefactura-proveedor">Proveedor: {{ pf.proveedor }}</p>
+                </div>
+              </div>
+              <span class="prefactura-total">{{ formatMoney(pf.subtotal) }}</span>
+            </div>
+
+            <table class="pf-items-table">
+              <thead>
+                <tr>
+                  <th>Ítem / Descripción</th>
+                  <th>Cant.</th>
+                  <th>Unitario</th>
+                  <th>Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of pf.items">
+                  <td>{{ item.descripcion }}</td>
+                  <td class="td--center">{{ item.cantidad }}</td>
+                  <td class="td--right">{{ formatMoney(item.precioUnitario) }}</td>
+                  <td class="td--right td--bold">{{ formatMoney(item.total) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Observaciones -->
+      <div class="detail-card">
+        <div class="detail-card__header">
+          <span class="material-symbols-outlined">chat_bubble</span>
+          <h2>Observaciones y Justificación</h2>
+        </div>
+        <blockquote class="observacion-quote">{{ s.observaciones }}</blockquote>
+
+        <div class="comentarios-row" *ngIf="s.comentarios?.length">
+          <div class="comentario-bubble" *ngFor="let c of s.comentarios">{{ c }}</div>
+          <button class="btn-comentario">Añadir comentario +</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── FOOTER (hash) ── -->
+  <div class="gil-footer">
+    <span class="hash-id">ID TRANSACCIÓN: {{ s.idTransaccion }}</span>
+    <span class="hash-sep">|</span>
+    <span class="hash-val">HASH: {{ s.hashTransaccion }}</span>
+    <div class="hash-seal">
+      <span class="material-symbols-outlined">verified</span>
+      VALIDADO BAJO ESTÁNDAR SENA-GIL-2024
+    </div>
+  </div>
+
+</div>
+
+<ng-template #loadingTpl>
+  <div class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>Cargando solicitud GIL...</p>
+  </div>
+</ng-template>
