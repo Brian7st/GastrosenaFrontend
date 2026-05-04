@@ -1,25 +1,40 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { NgFor } from '@angular/common';
+import { ChangeDetectionStrategy, Component, Input, ViewEncapsulation } from '@angular/core';
 
 @Component({
   selector: 'restaurant-data-table',
   standalone: true,
-  imports: [NgFor],
+  imports: [],
   template: `
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th *ngFor="let column of columns">{{ column }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let row of rows">
-          <td *ngFor="let column of columns">{{ row[column] ?? '—' }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="dt-card">
+      <ng-content select="[dtHeader]"></ng-content>
+      <div class="dt-wrapper">
+        <table class="dt-table">
+          @if (columns.length > 0) {
+            <thead>
+              <tr>
+                @for (col of columns; track col) {
+                  <th>{{ col }}</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of rows; track $index) {
+                <tr>
+                  @for (col of columns; track col) {
+                    <td>{{ row[col] ?? '—' }}</td>
+                  }
+                </tr>
+              }
+            </tbody>
+          }
+          <ng-content></ng-content>
+        </table>
+      </div>
+      <ng-content select="[dtFooter]"></ng-content>
+    </div>
   `,
   styleUrl: './data-table.component.scss',
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DataTableComponent {
