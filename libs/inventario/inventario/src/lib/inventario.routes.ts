@@ -32,6 +32,11 @@ export const INVENTARIO_ROUTES: Routes = [
     path: 'facturas',
     component: FacturasListPageComponent,
   },
+  // Vista de Importar Factura
+  {
+    path: 'facturas/importar',
+    loadComponent: () => import('./pages/facturas-page/factura-import/factura-import.component').then(m => m.FacturaImportPageComponent)
+  },
   // Vista 3 & 4: Editar Factura FEL (activa o bloqueada)
   {
     path: 'facturas/:id',
