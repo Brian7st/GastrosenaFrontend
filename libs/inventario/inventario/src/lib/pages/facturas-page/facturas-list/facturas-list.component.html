@@ -130,13 +130,17 @@
           </span>
         </td>
         <td class="cell--actions">
-          <button
-            class="icon-btn"
-            (click)="$event.stopPropagation(); onVerFactura(factura)"
-            title="Ver / Editar factura"
-          >
-            <span class="material-symbols-outlined">more_vert</span>
-          </button>
+          <div class="actions-row">
+            <button class="action-icon" (click)="$event.stopPropagation(); onEditarFactura(factura)" title="Editar">
+              <span class="material-symbols-outlined">edit</span>
+            </button>
+            <button class="action-icon" (click)="$event.stopPropagation(); onVerFactura(factura)" title="Ver detalle">
+              <span class="material-symbols-outlined">visibility</span>
+            </button>
+            <button class="action-icon action-icon--danger" (click)="$event.stopPropagation(); onAnularFactura(factura)" title="Anular">
+              <span class="material-symbols-outlined">block</span>
+            </button>
+          </div>
         </td>
       </tr>
 
