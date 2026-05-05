@@ -3,9 +3,9 @@
   <header class="page-header">
     <nav class="breadcrumb">
       <ol>
-        <li><a routerLink="/facturas">Facturación</a></li>
+        <li><a routerLink="/app/inventario/facturas">Facturación</a></li>
         <li class="separator"><span class="material-symbols-outlined">chevron_right</span></li>
-        <li><a routerLink="/facturas">Facturas</a></li>
+        <li><a routerLink="/app/inventario/facturas">Facturas</a></li>
         <li class="separator"><span class="material-symbols-outlined">chevron_right</span></li>
         <li class="current">Importar</li>
       </ol>
@@ -14,10 +14,29 @@
     <p class="page-header__subtitle">Cargue el archivo XML o PDF de la factura de su proveedor para registrarla automáticamente.</p>
   </header>
 
-  <!-- Success Banner (Visible only when file loaded) -->
-  <div class="alert alert--success" *ngIf="fileLoaded()">
-    <span class="material-symbols-outlined">check_circle</span>
-    <span class="alert__text">Datos extraídos correctamente de FEL1314.xml · 3 ítems detectados</span>
+  <!-- Alerts -->
+  <div class="alerts-container">
+    <div class="alert alert--error">
+      <span class="material-symbols-outlined">error</span>
+      <div class="alert__content">
+        <h4 class="alert__title">Error de Validación CUFE</h4>
+        <p class="alert__text">El CUFE ingresado no coincide con la firma criptográfica del archivo XML. Verifique el documento original.</p>
+      </div>
+    </div>
+    
+    <div class="alert alert--warning">
+      <span class="material-symbols-outlined">warning</span>
+      <div class="alert__content">
+        <h4 class="alert__title">Advertencia de Orden de Compra</h4>
+        <p class="alert__text">No se ha asociado una Guía de Ingreso (GIL) u Orden de Compra válida para este proveedor.</p>
+      </div>
+    </div>
+
+    <!-- Success Banner -->
+    <div class="alert alert--success">
+      <span class="material-symbols-outlined">check_circle</span>
+      <span class="alert__text font-medium">Datos extraídos correctamente de FEL1314.pdf · 8 ítems detectados</span>
+    </div>
   </div>
 
   <!-- 2. Main Layout (Asymmetric) -->
@@ -76,8 +95,8 @@
     </div>
   </div>
 
-  <!-- 3. Review Data Section (Only visible after loading file) -->
-  <div class="review-section" *ngIf="fileLoaded()">
+  <!-- 3. Review Data Section -->
+  <div class="review-section">
     <h2 class="review-section__title">Revisión de Datos</h2>
     
     <!-- Document Data Card -->
@@ -239,7 +258,7 @@
 </div>
 
 <!-- Sticky Footer -->
-<div class="sticky-footer" *ngIf="fileLoaded()">
+<div class="sticky-footer">
   <button class="btn btn--ghost" (click)="goBack()">Cancelar</button>
   <div class="footer-actions">
     <button class="btn btn--outline">Guardar como borrador</button>
