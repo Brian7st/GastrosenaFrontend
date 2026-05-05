@@ -31,8 +31,7 @@ export class FacturasListPageComponent implements OnInit {
     this.facade.loadAll();
   }
 
-  onSearch(event: Event): void {
-    const query = (event.target as HTMLInputElement).value;
+  onSearch(query: string): void {
     this.searchQuery.set(query);
     this.facade.setFiltros({ busqueda: query });
   }
@@ -60,12 +59,12 @@ export class FacturasListPageComponent implements OnInit {
 
   getEstadoBadgeClass(estado: EstadoFactura): string {
     const map: Record<EstadoFactura, string> = {
-      Registrada: 'badge--registrada',
-      Verificada: 'badge--verificada',
-      Pagada:     'badge--pagada',
-      Anulada:    'badge--anulada',
+      Registrada: 'status-badge--registrada',
+      Verificada: 'status-badge--verificada',
+      Pagada:     'status-badge--pagada',
+      Anulada:    'status-badge--anulada',
     };
-    return map[estado] ?? 'badge--default';
+    return map[estado] ?? 'status-badge--default';
   }
 
   getProveedorIniciales(nombre: string): string {
