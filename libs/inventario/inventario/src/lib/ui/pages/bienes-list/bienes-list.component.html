@@ -47,7 +47,6 @@
         <thead>
           <tr>
             <th>CÓD. SENA</th>
-            <th>CÓD. PROVEEDOR</th>
             <th>Nombre</th>
             <th>Categoría</th>
             <th class="text-center">Stock</th>
@@ -62,9 +61,6 @@
           <tr *ngFor="let bien of bienes()" class="table-row">
             <td>
               <span class="code-mono">{{ bien.codigoSena }}</span>
-            </td>
-            <td>
-              <span class="code-mono">{{ bien.codigoProveedor }}</span>
             </td>
             <td>
               <p class="bien-nombre">{{ bien.nombre }}</p>
