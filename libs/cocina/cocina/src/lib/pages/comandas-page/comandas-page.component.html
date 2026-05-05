@@ -1,0 +1,116 @@
+<div class="comanda-container">
+
+  <!-- Filtros -->
+  <div class="filters-container">
+    <div class="search-wrapper">
+      <i class="bi bi-search"></i>
+      <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)"
+             placeholder="Buscar por mesa, mesero o plato..." class="search-bar">
+    </div>
+
+    <select [ngModel]="filtroEstado()" (ngModelChange)="filtroEstado.set($event)" class="filter-select">
+      <option>Todos los estados</option>
+      <option>En Espera</option>
+      <option>Preparando</option>
+      <option>Listo</option>
+    </select>
+
+    <select [ngModel]="filtroPrioridad()" (ngModelChange)="filtroPrioridad.set($event)" class="filter-select">
+      <option>Todas las prioridades</option>
+      <option>Urgente</option>
+      <option>Alta</option>
+      <option>Normal</option>
+    </select>
+
+    <select [ngModel]="filtroOrden()" (ngModelChange)="filtroOrden.set($event)" class="filter-select">
+      <option>Prioridad</option>
+      <option>Hora de llegada</option>
+      <option>Tiempo estimado</option>
+    </select>
+  </div>
+
+  <div class="comandas-grid">
+    
+    <div class="column col-espera">
+      <div class="col-header">
+        <span><i class="bi bi-clock-history"></i> En Espera</span>
+        <span class="counter">{{ enEspera().length }}</span>
+      </div>
+      @for (c of enEspera(); track c.id) {
+        <div class="comanda-card shadow-sm">
+          <div class="card-header">
+            <span class="mesa">{{ c.mesa }}</span>
+            <span class="prioridad" [class]="c.prioridad.toLowerCase()">{{ c.prioridad }}</span>
+          </div>
+          <div class="card-body">
+            <p class="mesero"><b>Mesero:</b> {{ c.mesero }}</p>
+            <ul class="platos-list">
+              @for (plato of c.platos; track plato) {
+                <li>{{ plato }}</li>
+              }
+            </ul>
+          </div>
+          <div class="card-footer">
+            <span class="tiempo"><i class="bi bi-stopwatch"></i> {{ c.tiempo }} min</span>
+            <button class="btn-preparar" (click)="cambiarEstado(c, 'Preparando')">Preparar</button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="column col-preparando">
+      <div class="col-header">
+        <span><i class="bi bi-play-circle-fill"></i> Preparando</span>
+        <span class="counter">{{ preparando().length }}</span>
+      </div>
+      @for (c of preparando(); track c.id) {
+        <div class="comanda-card shadow-sm">
+          <div class="card-header">
+            <span class="mesa">{{ c.mesa }}</span>
+            <span class="prioridad" [class]="c.prioridad.toLowerCase()">{{ c.prioridad }}</span>
+          </div>
+          <div class="card-body">
+            <p class="mesero"><b>Mesero:</b> {{ c.mesero }}</p>
+            <ul class="platos-list">
+              @for (plato of c.platos; track plato) {
+                <li>{{ plato }}</li>
+              }
+            </ul>
+          </div>
+          <div class="card-footer">
+            <span class="tiempo"><i class="bi bi-stopwatch"></i> {{ c.tiempo }} min</span>
+            <button class="btn-listo" (click)="cambiarEstado(c, 'Listo')">Listo</button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="column col-listo">
+      <div class="col-header">
+        <span><i class="bi bi-check-circle-fill"></i> Listo</span>
+        <span class="counter">{{ listos().length }}</span>
+      </div>
+      @for (c of listos(); track c.id) {
+        <div class="comanda-card card-completed shadow-sm">
+          <div class="card-header">
+            <span class="mesa">{{ c.mesa }}</span>
+            <span class="prioridad done">Completado</span>
+          </div>
+          <div class="card-body">
+            <p class="mesero"><b>Mesero:</b> {{ c.mesero }}</p>
+            <ul class="platos-list">
+              @for (plato of c.platos; track plato) {
+                <li class="text-muted text-decoration-line-through">{{ plato }}</li>
+              }
+            </ul>
+          </div>
+          <div class="card-footer">
+            <span class="finalizado">Esperando entrega</span>
+            <i class="bi bi-check2-all text-success fs-4"></i>
+          </div>
+        </div>
+      }
+    </div>
+
+  </div>
+</div>

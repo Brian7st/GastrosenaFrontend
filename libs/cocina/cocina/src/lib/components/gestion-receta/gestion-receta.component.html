@@ -1,0 +1,150 @@
+<div class="modal-backdrop" (click)="cancelar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <header class="form-card-header">
+      <div class="header-titles">
+        <h2>{{ receta ? 'Editar Receta' : 'Nueva Receta' }}</h2>
+        <p>{{ receta ? 'Modifica los detalles del plato' : 'Crear una nueva receta para el módulo de cocina' }}</p>
+      </div>
+      <button type="button" class="btn-close" (click)="cancelar()">
+        <lucide-icon name="x" size="24"></lucide-icon>
+      </button>
+    </header>
+
+    <form [formGroup]="recipeForm" (ngSubmit)="guardar()" class="modern-form">
+      <!-- Section 1: General Info -->
+      <div class="form-grid">
+        <div class="field Full">
+          <label>Nombre de la Receta *</label>
+          <input type="text" formControlName="nombreReceta" placeholder="Ej: Pasta Carbonara"
+                 [class.error]="esCampoInvalido('nombreReceta')">
+          @if (esCampoInvalido('nombreReceta')) {
+            <span class="error-text">El nombre es obligatorio (min 5 letras).</span>
+          }
+        </div>
+
+        <div class="field">
+          <label>Categoría *</label>
+          <select formControlName="idCategoria" [class.error]="esCampoInvalido('idCategoria')">
+            <option value="">Seleccione</option>
+            @for (cat of catService.categorias(); track cat.idCategoria) {
+              <option [value]="cat.idCategoria">{{ cat.nombreCategoria }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Tiempo de Preparación (min) *</label>
+          <input type="number" formControlName="tiempoPreparacion" placeholder="15">
+        </div>
+
+        <div class="field">
+          <label>Precio Unitario ($) *</label>
+          <input type="number" formControlName="precioUnitario" placeholder="0.00">
+        </div>
+
+        <div class="field">
+          <label>Temperatura *</label>
+          <select formControlName="temperatura">
+            <option value="">Seleccione</option>
+            <option value="Caliente">Caliente</option>
+            <option value="Frío">Frío</option>
+            <option value="Ambiente">Ambiente</option>
+          </select>
+        </div>
+
+        <div class="field Full image-upload-container">
+          <label>Imagen de la Receta (Opcional)</label>
+          <div class="file-upload-wrapper">
+            <input type="file" id="fileInput" (change)="onFileSelected($event)" accept="image/*" class="file-input">
+            <label for="fileInput" class="file-label">
+              <lucide-icon name="upload-cloud" size="20"></lucide-icon>
+              <span>Subir imagen desde el explorador</span>
+            </label>
+          </div>
+          <input type="hidden" formControlName="urlImagen">
+          
+          @if (recipeForm.get('urlImagen')?.value) {
+            <div class="image-preview">
+              <img [src]="recipeForm.get('urlImagen')?.value" alt="Vista previa">
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Section 2: Ingredients -->
+      <section class="form-section">
+        <div class="section-header">
+          <h3>Ingredientes *</h3>
+          <button type="button" class="btn-add-item" (click)="agregarIngrediente()">
+            <lucide-icon name="plus" size="16"></lucide-icon> Agregar Ingrediente
+          </button>
+        </div>
+
+        <div formArrayName="ingredientes" class="items-list">
+          @if (ingredientesArr.hasError('duplicate')) {
+            <div class="error-banner" style="background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.85rem;">
+              ⚠️ Existen ingredientes con el mismo nombre. Por favor, modifícalos o elimínalos para continuar.
+            </div>
+          }
+          @for (ing of ingredientesArr.controls; track $index) {
+            <div [formGroupName]="$index" class="item-row ingredient-row">
+              <input type="text" formControlName="nombreIngrediente" placeholder="Nombre del ingrediente" class="flex-3">
+              <input type="number" formControlName="cantidadRequerida" placeholder="Cantidad" class="flex-1">
+              <select formControlName="unidadMedida" class="flex-1">
+                <option value="GR">Gramos (g)</option>
+                <option value="ML">Mililitros (ml)</option>
+                <option value="UN">Unidades</option>
+              </select>
+              <button type="button" class="btn-remove" (click)="removerIngrediente($index)">
+                <lucide-icon name="trash-2" size="16"></lucide-icon>
+              </button>
+            </div>
+          } @empty {
+            <p class="empty-list">No hay ingredientes. Haga clic en "+ Agregar Ingrediente".</p>
+          }
+        </div>
+      </section>
+
+      <!-- Section 3: Steps -->
+      <section class="form-section">
+        <div class="section-header">
+          <h3>Instrucciones *</h3>
+          <button type="button" class="btn-add-item" (click)="agregarPaso()">
+            <lucide-icon name="plus" size="16"></lucide-icon> Agregar Paso
+          </button>
+        </div>
+
+        <div formArrayName="pasos" class="items-list">
+          @if (pasosArr.hasError('duplicate')) {
+            <div class="error-banner" style="background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.85rem;">
+              ⚠️ Existen pasos con la misma descripción. Por favor, modifícalos o elimínalos para continuar.
+            </div>
+          }
+          @for (paso of pasosArr.controls; track $index) {
+            <div [formGroupName]="$index" class="item-row step-row">
+              <div class="step-badge">{{ $index + 1 }}</div>
+              <textarea formControlName="descripcionPaso" placeholder="Paso {{ $index + 1 }}..." rows="2" class="flex-5"></textarea>
+              <button type="button" class="btn-remove" (click)="removerPaso($index)">
+                <lucide-icon name="trash-2" size="16"></lucide-icon>
+              </button>
+            </div>
+          } @empty {
+            <p class="empty-list">No hay pasos definidos. Haga clic en "+ Agregar Paso".</p>
+          }
+        </div>
+      </section>
+
+      <!-- Actions -->
+      <footer class="form-footer">
+        <button type="button" class="btn-cancel" (click)="cancelar()">Cancelar</button>
+        <button type="submit" [disabled]="recipeForm.invalid || isSaving" class="btn-submit">
+          @if (isSaving) {
+            <span>Guardando...</span>
+          } @else {
+            {{ receta ? 'Actualizar Receta' : 'Crear Receta' }}
+          }
+        </button>
+      </footer>
+    </form>
+  </div>
+</div>

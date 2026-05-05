@@ -1,0 +1,45 @@
+.cocina-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.comanda-tabs {
+  display: flex;
+  background-color: var(--color-surface, #f1f5f9);
+  padding: var(--space-2, 5px);
+  border-radius: var(--radius-md, 10px);
+  gap: var(--space-2, 5px);
+  margin: var(--space-4, 1rem) var(--space-6, 2rem) var(--space-3, 0.5rem);
+  border: 1px solid var(--color-border, #e2e8f0);
+
+  .tab-btn {
+    flex: 1;
+    padding: var(--space-2, 7px);
+    border: none;
+    border-radius: var(--radius-sm, 7px);
+    background: transparent;
+    color: var(--color-text-secondary, #64748b);
+    font-size: var(--text-sm, 0.9rem);
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: center;
+    text-decoration: none;
+
+    &.active {
+      background: var(--color-background, white);
+      color: var(--color-text-primary, #1e293b);
+      box-shadow: var(--shadow-sm, 0 2px 4px rgba(0,0,0,0.05));
+    }
+    
+    &:hover:not(.active) {
+      background-color: var(--color-surface-hover, rgba(255, 255, 255, 0.5));
+    }
+  }
+}
+
+.cocina-content {
+  flex: 1;
+  overflow-y: auto;
+}

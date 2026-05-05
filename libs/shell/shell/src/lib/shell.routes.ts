@@ -29,7 +29,8 @@ export const shellRoutes: Routes = [
   {
     path: 'app',
     component: ShellLayoutComponent,
-    canActivate: [authGuard],
+    // TODO: Restaurar authGuard cuando se conecte la autenticación real
+    // canActivate: [authGuard],
     children: [
       {
         path: '',
@@ -38,7 +39,8 @@ export const shellRoutes: Routes = [
       },
       {
         path: 'cocina',
-        canActivate: [roleGuard([Rol.CHEF, Rol.ADMIN_COCINA, Rol.AUXILIAR_COCINA])],
+        // TODO: Restaurar el roleGuard cuando se conecte la autenticación real
+        // canActivate: [roleGuard([Rol.CHEF, Rol.ADMIN_COCINA, Rol.AUXILIAR_COCINA])],
         loadChildren: () => import('@restaurant/cocina').then(m => m.COCINA_ROUTES),
       },
       {
