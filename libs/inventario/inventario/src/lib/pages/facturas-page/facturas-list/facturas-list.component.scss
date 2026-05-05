@@ -199,14 +199,10 @@
 
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Row hover — el icon-btn aparece al hacer hover en la fila
+// Row clickable
 // ─────────────────────────────────────────────────────────────────────────────
 .row-clickable {
   cursor: pointer;
-
-  &:hover .icon-btn {
-    opacity: 1;
-  }
 }
 
 // Cell variants
@@ -306,80 +302,38 @@
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Icon Button
+// Action Buttons (igual que bienes)
 // ─────────────────────────────────────────────────────────────────────────────
-.icon-btn {
-  opacity: 0;
-  padding: 0.5rem;
-  border: none;
-  background: transparent;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  color: #9ca3af;
-  transition: all 0.15s ease;
-  display: inline-flex;
+.actions-row {
+  display: flex;
   align-items: center;
-
-  &:hover {
-    background: var(--color-superficie-contenedor-mas-bajo);
-    color: var(--color-primario);
-  }
+  justify-content: center;
+  gap: 0.5rem;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Buttons
-// ─────────────────────────────────────────────────────────────────────────────
-.btn {
-  display: inline-flex;
+.action-icon {
+  display: flex;
   align-items: center;
-  gap: 0.375rem;
+  justify-content: center;
+  padding: 0.5rem;
   border-radius: 0.5rem;
   border: none;
+  background: transparent;
+  color: var(--color-pizarra-400);
   cursor: pointer;
-  font-family: var(--font-family-base);
-  font-weight: 600;
-  transition: all 0.15s ease;
+  transition: all 0.2s;
 
-  .material-symbols-outlined {
-    font-size: 1rem;
+  .material-symbols-outlined { font-size: 20px; }
+
+  &:hover {
+    color: var(--color-primario);
+    background: rgba(0, 110, 37, 0.05);
   }
 
-  &--filter {
-    background: var(--color-superficie-contenedor-bajo);
-    color: #374151;
-    border: 1px solid var(--color-superficie-contenedor);
-
+  &--danger {
     &:hover {
-      background: var(--color-superficie-contenedor);
-    }
-  }
-
-  &--sm {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.75rem;
-  }
-
-  &--ghost {
-    background: transparent;
-    border: 1px solid var(--color-superficie-contenedor);
-    color: #374151;
-
-    &:hover {
-      background: var(--color-superficie-contenedor-bajo);
-    }
-  }
-
-  &--primary {
-    background: var(--color-primario);
-    color: #fff;
-    box-shadow: 0 1px 3px rgba(0, 110, 37, 0.3);
-
-    &:hover {
-      background: var(--color-primario-hover);
-    }
-
-    &:active {
-      transform: scale(0.97);
+      color: var(--color-terciario);
+      background: rgba(186, 24, 48, 0.05);
     }
   }
 }

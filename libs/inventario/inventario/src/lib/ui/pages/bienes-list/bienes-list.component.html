@@ -5,18 +5,18 @@
     <p class="page-subtitle">Control exhaustivo y trazabilidad de activos de formación.</p>
   </div>
   <div class="header-actions">
-    <button class="btn-surface" (click)="onImportBienes()">
+    <restaurant-button variant="surface" (click)="onImportBienes()">
       <span class="material-symbols-outlined">file_upload</span>
       Importar
-    </button>
-    <button class="btn-surface" (click)="onExportBienes()">
+    </restaurant-button>
+    <restaurant-button variant="surface" (click)="onExportBienes()">
       <span class="material-symbols-outlined">file_download</span>
       Exportar
-    </button>
-    <button class="btn-gradient" (click)="onNuevoBien()">
+    </restaurant-button>
+    <restaurant-button variant="primary" (click)="onNuevoBien()">
       <span class="material-symbols-outlined">add</span>
       Nuevo Bien
-    </button>
+    </restaurant-button>
   </div>
 </div>
 
@@ -33,10 +33,10 @@
         <span class="material-symbols-outlined search-icon">search</span>
         <input type="text" placeholder="Buscar por código o nombre..." (input)="onSearch($any($event.target).value)" />
       </div>
-      <button class="btn-filter">
+      <restaurant-button variant="filter">
         <span class="material-symbols-outlined">filter_list</span>
         Filtros
-      </button>
+      </restaurant-button>
     </div>
   </div>
 

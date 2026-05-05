@@ -7,14 +7,18 @@
       <p class="page-header__subtitle">Supervisión y control de documentos electrónicos en tiempo real.</p>
     </div>
     <div class="page-header__actions">
-      <button class="btn btn--ghost btn--sm" (click)="onExportar()">
+      <restaurant-button variant="surface" (click)="onImportar()">
+        <span class="material-symbols-outlined">upload</span>
+        Importar
+      </restaurant-button>
+      <restaurant-button variant="ghost" (click)="onExportar()">
         <span class="material-symbols-outlined">download</span>
         Exportar
-      </button>
-      <button class="btn btn--primary btn--sm" id="btn-nueva-factura" (click)="onNuevaFactura()">
+      </restaurant-button>
+      <restaurant-button variant="primary" id="btn-nueva-factura" (click)="onNuevaFactura()">
         <span class="material-symbols-outlined">add</span>
         Nueva Factura
-      </button>
+      </restaurant-button>
     </div>
   </div>
 
@@ -130,13 +134,17 @@
           </span>
         </td>
         <td class="cell--actions">
-          <button
-            class="icon-btn"
-            (click)="$event.stopPropagation(); onVerFactura(factura)"
-            title="Ver / Editar factura"
-          >
-            <span class="material-symbols-outlined">more_vert</span>
-          </button>
+          <div class="actions-row">
+            <button class="action-icon" (click)="$event.stopPropagation(); onEditarFactura(factura)" title="Editar">
+              <span class="material-symbols-outlined">edit</span>
+            </button>
+            <button class="action-icon" (click)="$event.stopPropagation(); onVerFactura(factura)" title="Ver detalle">
+              <span class="material-symbols-outlined">visibility</span>
+            </button>
+            <button class="action-icon action-icon--danger" (click)="$event.stopPropagation(); onAnularFactura(factura)" title="Anular">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </div>
         </td>
       </tr>
 
