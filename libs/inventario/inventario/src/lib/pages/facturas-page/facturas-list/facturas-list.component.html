@@ -24,35 +24,26 @@
 
   <!-- ── KPI CARDS ── -->
   <div class="kpi-grid" *ngIf="kpis() as k">
-    <div class="kpi-card">
-      <div class="kpi-card__body">
-        <span class="kpi-card__label">Total Facturas</span>
-        <span class="kpi-card__value">{{ k.totalFacturas | number }}</span>
-        <div class="kpi-card__trend kpi-card__trend--up">
-          <span class="material-symbols-outlined">trending_up</span>
-          <span>+{{ k.tendenciaTotalFacturas }}% este mes</span>
-        </div>
-      </div>
-      <div class="kpi-card__icon kpi-card__icon--green">
-        <span class="material-symbols-outlined">description</span>
-      </div>
-    </div>
 
-    <div class="kpi-card">
-      <div class="kpi-card__body">
-        <span class="kpi-card__label">Monto Mensual</span>
-        <span class="kpi-card__value">${{ k.montoMensual | number:'1.2-2' }}</span>
-        <div class="kpi-card__trend kpi-card__trend--up">
-          <span class="material-symbols-outlined">trending_up</span>
-          <span>+{{ k.tendenciaMonto }}% vs periodo anterior</span>
-        </div>
-      </div>
-      <div class="kpi-card__icon kpi-card__icon--blue">
-        <span class="material-symbols-outlined">payments</span>
-      </div>
-    </div>
+    <restaurant-kpi-card
+      label="Total Facturas"
+      [value]="k.totalFacturas | number"
+      icon="description"
+      iconColor="green"
+      [trend]="'+' + k.tendenciaTotalFacturas + '% este mes'"
+      [trendUp]="true"
+    />
 
-    <div class="kpi-card kpi-card--states">
+    <restaurant-kpi-card
+      label="Monto Mensual"
+      [value]="'$' + (k.montoMensual | number:'1.2-2')"
+      icon="payments"
+      iconColor="blue"
+      [trend]="'+' + k.tendenciaMonto + '% vs periodo anterior'"
+      [trendUp]="true"
+    />
+
+    <restaurant-kpi-card variant="states">
       <div class="kpi-states-grid">
         <div class="kpi-state">
           <span class="kpi-state__label">Registradas</span>
@@ -71,7 +62,8 @@
           <span class="kpi-state__value kpi-state__value--red">{{ k.anuladas }}</span>
         </div>
       </div>
-    </div>
+    </restaurant-kpi-card>
+
   </div>
 
   <!-- ── TABLE CARD ── -->

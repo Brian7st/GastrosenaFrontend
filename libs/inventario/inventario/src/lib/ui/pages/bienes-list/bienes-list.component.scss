@@ -345,7 +345,7 @@
   }
 }
 
-/* ── KPIs (Bottom Bento) ───────────────────────────────────────────────────── */
+/* ── KPI Grid layout (host styles for the grid wrapper) ───────────────────── */
 .kpi-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -355,62 +355,6 @@
   @media (min-width: 768px) {
     grid-template-columns: repeat(3, 1fr);
   }
-}
-
-.kpi-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 1.5rem;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.02);
-  border: 1px solid var(--color-pizarra-50, #f8fafc);
-
-  &__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-  }
-}
-
-.kpi-icon {
-  width: 3rem;
-  height: 3rem;
-  border-radius: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  .material-symbols-outlined { font-variation-settings: 'FILL' 1; }
-
-  &--primary { background: rgba(0, 110, 37, 0.1); color: var(--color-primario); }
-  &--danger { background: rgba(186, 24, 48, 0.1); color: var(--color-terciario); }
-  &--info { background: rgba(59, 130, 246, 0.1); color: #2563eb; }
-}
-
-.kpi-trend {
-  font-size: 0.75rem;
-  font-weight: 700;
-
-  &--success { color: var(--color-primario); }
-  &--danger { color: var(--color-terciario); }
-  &--muted { color: var(--color-pizarra-400); }
-}
-
-.kpi-label {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--color-pizarra-400);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin: 0;
-}
-
-.kpi-value {
-  font-family: 'Manrope', sans-serif;
-  font-size: 1.875rem;
-  font-weight: 800;
-  color: var(--color-en-fondo);
-  margin: 0.25rem 0 0;
 }
 
 /* ── FAB ───────────────────────────────────────────────────────────────────── */

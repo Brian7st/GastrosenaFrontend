@@ -47,7 +47,7 @@
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// KPI Cards Grid
+// KPI Grid layout (host styles for the grid wrapper)
 // ─────────────────────────────────────────────────────────────────────────────
 .kpi-grid {
   display: grid;
@@ -63,97 +63,7 @@
   }
 }
 
-.kpi-card {
-  background: var(--color-superficie-contenedor-mas-bajo);
-  border-radius: 0.75rem;
-  padding: 1.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(0, 0, 0, 0.03);
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  transition: box-shadow 0.2s ease;
-
-  &:hover {
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
-  }
-
-  &__body {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  &__label {
-    font-size: 0.6875rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #6b7280;
-  }
-
-  &__value {
-    font-family: var(--font-family-headline);
-    font-size: 1.875rem;
-    font-weight: 700;
-    color: #111827;
-    line-height: 1.2;
-    margin-top: 0.25rem;
-  }
-
-  &__trend {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    font-size: 0.8125rem;
-    font-weight: 600;
-    margin-top: 0.75rem;
-
-    .material-symbols-outlined {
-      font-size: 1rem;
-    }
-
-    &--up {
-      color: var(--color-primario);
-    }
-
-    &--down {
-      color: var(--color-terciario);
-    }
-  }
-
-  &__icon {
-    width: 2.75rem;
-    height: 2.75rem;
-    border-radius: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-
-    .material-symbols-outlined {
-      font-size: 1.5rem;
-    }
-
-    &--green {
-      background: #f0fdf4;
-      color: #16a34a;
-    }
-
-    &--blue {
-      background: #eff6ff;
-      color: #2563eb;
-    }
-  }
-
-  // States grid variant
-  &--states {
-    align-items: center;
-    padding: 1.5rem;
-  }
-}
-
-// KPI States (4-up grid)
+// KPI States (4-up grid — content projected into restaurant-kpi-card[variant=states])
 .kpi-states-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -179,24 +89,12 @@
     font-size: 1.25rem;
     font-weight: 700;
 
-    &--blue {
-      color: #2563eb;
-    }
-
-    &--orange {
-      color: #ea580c;
-    }
-
-    &--green {
-      color: var(--color-primario-contenedor);
-    }
-
-    &--red {
-      color: var(--color-terciario);
-    }
+    &--blue   { color: #2563eb; }
+    &--orange { color: #ea580c; }
+    &--green  { color: var(--color-primario-contenedor); }
+    &--red    { color: var(--color-terciario); }
   }
 }
-
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Row clickable
