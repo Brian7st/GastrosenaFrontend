@@ -61,6 +61,10 @@ export class FacturasListPageComponent implements OnInit {
     console.log('Anular factura:', factura.id);
   }
 
+  onImportar(): void {
+    console.log('Importando facturas...');
+  }
+
   onExportar(): void {
     console.log('Exportando facturas...');
   }
