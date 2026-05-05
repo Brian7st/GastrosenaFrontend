@@ -7,48 +7,43 @@
       <p class="page-header__subtitle">Supervisión y control de documentos electrónicos en tiempo real.</p>
     </div>
     <div class="page-header__actions">
-      <button class="btn btn--ghost btn--sm" (click)="onExportar()">
+      <restaurant-button variant="surface" (click)="onImportar()">
+        <span class="material-symbols-outlined">upload</span>
+        Importar
+      </restaurant-button>
+      <restaurant-button variant="ghost" (click)="onExportar()">
         <span class="material-symbols-outlined">download</span>
         Exportar
-      </button>
-      <button class="btn btn--primary btn--sm" id="btn-nueva-factura" (click)="onNuevaFactura()">
+      </restaurant-button>
+      <restaurant-button variant="primary" id="btn-nueva-factura" (click)="onNuevaFactura()">
         <span class="material-symbols-outlined">add</span>
         Nueva Factura
-      </button>
+      </restaurant-button>
     </div>
   </div>
 
   <!-- ── KPI CARDS ── -->
   <div class="kpi-grid" *ngIf="kpis() as k">
-    <div class="kpi-card">
-      <div class="kpi-card__body">
-        <span class="kpi-card__label">Total Facturas</span>
-        <span class="kpi-card__value">{{ k.totalFacturas | number }}</span>
-        <div class="kpi-card__trend kpi-card__trend--up">
-          <span class="material-symbols-outlined">trending_up</span>
-          <span>+{{ k.tendenciaTotalFacturas }}% este mes</span>
-        </div>
-      </div>
-      <div class="kpi-card__icon kpi-card__icon--green">
-        <span class="material-symbols-outlined">description</span>
-      </div>
-    </div>
 
-    <div class="kpi-card">
-      <div class="kpi-card__body">
-        <span class="kpi-card__label">Monto Mensual</span>
-        <span class="kpi-card__value">${{ k.montoMensual | number:'1.2-2' }}</span>
-        <div class="kpi-card__trend kpi-card__trend--up">
-          <span class="material-symbols-outlined">trending_up</span>
-          <span>+{{ k.tendenciaMonto }}% vs periodo anterior</span>
-        </div>
-      </div>
-      <div class="kpi-card__icon kpi-card__icon--blue">
-        <span class="material-symbols-outlined">payments</span>
-      </div>
-    </div>
+    <restaurant-kpi-card
+      label="Total Facturas"
+      [value]="k.totalFacturas | number"
+      icon="description"
+      iconColor="green"
+      [trend]="'+' + k.tendenciaTotalFacturas + '% este mes'"
+      [trendUp]="true"
+    />
 
-    <div class="kpi-card kpi-card--states">
+    <restaurant-kpi-card
+      label="Monto Mensual"
+      [value]="'$' + (k.montoMensual | number:'1.2-2')"
+      icon="payments"
+      iconColor="blue"
+      [trend]="'+' + k.tendenciaMonto + '% vs periodo anterior'"
+      [trendUp]="true"
+    />
+
+    <restaurant-kpi-card variant="states">
       <div class="kpi-states-grid">
         <div class="kpi-state">
           <span class="kpi-state__label">Registradas</span>
@@ -67,7 +62,8 @@
           <span class="kpi-state__value kpi-state__value--red">{{ k.anuladas }}</span>
         </div>
       </div>
-    </div>
+    </restaurant-kpi-card>
+
   </div>
 
   <!-- ── TABLE CARD ── -->
@@ -96,12 +92,12 @@
     <!-- Table content -->
     <thead *ngIf="!loading()">
       <tr>
-        <th>Proveedor</th>
-        <th>Orden de Compra</th>
-        <th>Total</th>
-        <th>Fecha</th>
-        <th>Estado</th>
-        <th></th>
+        <th class="col-proveedor">Proveedor</th>
+        <th class="col-orden">Orden de Compra</th>
+        <th class="col-total">Total</th>
+        <th class="col-fecha">Fecha</th>
+        <th class="col-estado">Estado</th>
+        <th class="col-acciones cell--actions">Acciones</th>
       </tr>
     </thead>
     <tbody *ngIf="!loading()">
@@ -130,13 +126,17 @@
           </span>
         </td>
         <td class="cell--actions">
-          <button
-            class="icon-btn"
-            (click)="$event.stopPropagation(); onVerFactura(factura)"
-            title="Ver / Editar factura"
-          >
-            <span class="material-symbols-outlined">more_vert</span>
-          </button>
+          <div class="actions-row">
+            <button class="action-icon" (click)="$event.stopPropagation(); onEditarFactura(factura)" title="Editar">
+              <span class="material-symbols-outlined">edit</span>
+            </button>
+            <button class="action-icon" (click)="$event.stopPropagation(); onVerFactura(factura)" title="Ver detalle">
+              <span class="material-symbols-outlined">visibility</span>
+            </button>
+            <button class="action-icon action-icon--danger" (click)="$event.stopPropagation(); onAnularFactura(factura)" title="Anular">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </div>
         </td>
       </tr>
 

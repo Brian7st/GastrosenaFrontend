@@ -12,6 +12,8 @@ export * from './lib/components/status-badge/status-badge.component';
 export * from './lib/components/section-title/section-title.component';
 export * from './lib/components/card/card.component';
 export * from './lib/components/alert/alert.component';
+export * from './lib/components/button/button.component';
+export * from './lib/components/kpi-card/kpi-card.component';
 export * from './lib/directives/has-role.directive';
 export * from './lib/directives/auto-focus.directive';
 export * from './lib/providers/restaurant-ui.providers';
