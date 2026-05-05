@@ -48,6 +48,6 @@ export class FacturaImportPageComponent {
   }
 
   goBack(): void {
-    this.router.navigate(['/facturas']);
+    this.router.navigate(['/app/inventario/facturas']);
   }
 }
