@@ -40,52 +40,6 @@
   gap: 0.75rem;
 }
 
-/* ── Buttons ───────────────────────────────────────────────────────────────── */
-.btn-surface {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
-  border-radius: 999px;
-  background: var(--color-superficie-contenedor);
-  color: var(--color-en-fondo);
-  font-weight: 700;
-  font-size: 0.8125rem;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  .material-symbols-outlined { font-size: 20px; }
-
-  &:hover {
-    background: var(--color-superficie-contenedor-alto);
-  }
-}
-
-.btn-gradient {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1.5rem;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #006e25 0%, #28a745 100%);
-  color: white;
-  font-weight: 700;
-  font-size: 0.8125rem;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 8px 20px rgba(0, 110, 37, 0.2);
-  transition: all 0.2s;
-
-  .material-symbols-outlined { font-size: 20px; }
-
-  &:hover {
-    transform: scale(1.02);
-    box-shadow: 0 12px 28px rgba(0, 110, 37, 0.3);
-  }
-  &:active { transform: scale(0.98); }
-}
-
 /* ── Card Container (tabla envuelta) ───────────────────────────────────────── */
 .card-container {
   background: white;
@@ -165,25 +119,6 @@
     &::placeholder { color: var(--color-pizarra-400); }
     &:focus { box-shadow: 0 0 0 2px rgba(0, 110, 37, 0.2); }
   }
-}
-
-.btn-filter {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 0.75rem;
-  background: var(--color-superficie-contenedor-bajo);
-  color: var(--color-en-fondo);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  .material-symbols-outlined { font-size: 18px; }
-
-  &:hover { background: var(--color-superficie-contenedor-alto); }
 }
 
 /* ── Data Table ────────────────────────────────────────────────────────────── */

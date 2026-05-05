@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { DataTableComponent } from '@restaurant/shared/ui';
+import { ButtonComponent, DataTableComponent } from '@restaurant/shared/ui';
 import { FacturasFacade } from '../../../data-access/facturas.facade';
 import { Factura, EstadoFactura } from '../../../models/facturas.model';
 import { FacturaFormComponent } from '../../../ui/modals/factura-form/factura-form.component';
@@ -9,7 +9,7 @@ import { FacturaFormComponent } from '../../../ui/modals/factura-form/factura-fo
 @Component({
   selector: 'restaurant-facturas-list',
   standalone: true,
-  imports: [CommonModule, DataTableComponent, FacturaFormComponent],
+  imports: [CommonModule, ButtonComponent, DataTableComponent, FacturaFormComponent],
   templateUrl: './facturas-list.component.html',
   styleUrl: './facturas-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

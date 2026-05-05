@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { LoadingSkeletonComponent } from '@restaurant/shared/ui';
+import { ButtonComponent, LoadingSkeletonComponent } from '@restaurant/shared/ui';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { BienFormComponent } from '../../modals/bien-form/bien-form.component';
 import { BienImportModalComponent } from '../../modals/bien-import/bien-import.component';
@@ -13,6 +13,7 @@ import { Bien, BienFormDto } from '../../../models/inventario.model';
   standalone: true,
   imports: [
     CommonModule,
+    ButtonComponent,
     LoadingSkeletonComponent,
     BienFormComponent,
     BienImportModalComponent,
