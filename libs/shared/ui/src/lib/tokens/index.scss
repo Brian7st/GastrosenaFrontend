@@ -58,6 +58,7 @@ h6,
 .contenido-principal {
   margin-left: 16rem;
   flex: 1;
+  max-width: calc(100vw - 16rem);
   min-height: 100vh;
   padding-top: 6rem;
   padding-bottom: 3rem;
