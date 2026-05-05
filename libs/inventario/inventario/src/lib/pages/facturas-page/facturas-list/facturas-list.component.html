@@ -6,11 +6,20 @@
       <h1>Panel de Facturación</h1>
       <p class="page-header__subtitle">Supervisión y control de documentos electrónicos en tiempo real.</p>
     </div>
+    <div class="page-header__actions">
+      <button class="btn btn--ghost btn--sm" (click)="onExportar()">
+        <span class="material-symbols-outlined">download</span>
+        Exportar
+      </button>
+      <button class="btn btn--primary btn--sm" id="btn-nueva-factura" (click)="onNuevaFactura()">
+        <span class="material-symbols-outlined">add</span>
+        Nueva Factura
+      </button>
+    </div>
   </div>
 
   <!-- ── KPI CARDS ── -->
   <div class="kpi-grid" *ngIf="kpis() as k">
-    <!-- Total Facturas -->
     <div class="kpi-card">
       <div class="kpi-card__body">
         <span class="kpi-card__label">Total Facturas</span>
@@ -25,7 +34,6 @@
       </div>
     </div>
 
-    <!-- Monto Mensual -->
     <div class="kpi-card">
       <div class="kpi-card__body">
         <span class="kpi-card__label">Monto Mensual</span>
@@ -40,7 +48,6 @@
       </div>
     </div>
 
-    <!-- Estados grid -->
     <div class="kpi-card kpi-card--states">
       <div class="kpi-states-grid">
         <div class="kpi-state">
@@ -64,107 +71,86 @@
   </div>
 
   <!-- ── TABLE CARD ── -->
-  <div class="table-card">
-    <div class="table-card__header">
-      <h2 class="table-card__title">Últimas Facturas</h2>
-      <div class="table-card__actions">
-        <button class="btn btn--ghost btn--sm" (click)="onExportar()">
-          <span class="material-symbols-outlined">download</span>
-          Exportar
-        </button>
-        <button class="btn btn--primary btn--sm" id="btn-nueva-factura" (click)="onNuevaFactura()">
-          <span class="material-symbols-outlined">add</span>
-          Nueva Factura
-        </button>
-      </div>
-    </div>
-
-    <!-- Search bar -->
-    <div class="table-search">
-      <span class="material-symbols-outlined table-search__icon">search</span>
-      <input
-        id="input-buscar-facturas"
-        type="text"
-        class="table-search__input"
-        placeholder="Buscar por proveedor o número de orden..."
-        (input)="onSearch($event)"
-      />
-    </div>
+  <restaurant-data-table
+    tableTitle="Lista de Facturas"
+    tableIcon="receipt_long"
+    searchPlaceholder="Buscar por proveedor o número de orden..."
+    (searchChange)="onSearch($event)"
+  >
 
     <!-- Loading skeleton -->
-    <div *ngIf="loading()" class="table-loading">
-      <div *ngFor="let i of [1,2,3,4,5]" class="skeleton-row">
-        <div class="skeleton skeleton--avatar"></div>
-        <div class="skeleton skeleton--text-lg"></div>
-        <div class="skeleton skeleton--text-sm"></div>
-        <div class="skeleton skeleton--text-sm"></div>
-        <div class="skeleton skeleton--badge"></div>
-      </div>
-    </div>
+    <tbody *ngIf="loading()">
+      <tr *ngFor="let i of [1,2,3,4,5]">
+        <td colspan="6">
+          <div class="skeleton-row">
+            <div class="skeleton skeleton--avatar"></div>
+            <div class="skeleton skeleton--text-lg"></div>
+            <div class="skeleton skeleton--text-sm"></div>
+            <div class="skeleton skeleton--text-sm"></div>
+            <div class="skeleton skeleton--badge"></div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
 
-    <!-- Table -->
-    <div class="table-wrapper" *ngIf="!loading()">
-      <table class="fel-table">
-        <thead>
-          <tr>
-            <th>Proveedor</th>
-            <th>Orden de Compra</th>
-            <th>Total</th>
-            <th>Fecha</th>
-            <th>Estado</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            *ngFor="let factura of facturas()"
-            class="fel-table__row"
-            (click)="onVerFactura(factura)"
+    <!-- Table content -->
+    <thead *ngIf="!loading()">
+      <tr>
+        <th>Proveedor</th>
+        <th>Orden de Compra</th>
+        <th>Total</th>
+        <th>Fecha</th>
+        <th>Estado</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody *ngIf="!loading()">
+      <tr
+        *ngFor="let factura of facturas()"
+        (click)="onVerFactura(factura)"
+        class="row-clickable"
+      >
+        <td>
+          <div class="proveedor-cell">
+            <div class="proveedor-avatar">
+              {{ getProveedorIniciales(factura.proveedor) }}
+            </div>
+            <div>
+              <p class="proveedor-cell__name">{{ factura.proveedor }}</p>
+              <p class="proveedor-cell__id">{{ factura.nitEmisor }}</p>
+            </div>
+          </div>
+        </td>
+        <td class="cell--medium">{{ factura.ordenCompra ?? '—' }}</td>
+        <td class="cell--bold">${{ factura.total | number:'1.2-2' }}</td>
+        <td class="cell--muted">{{ factura.fechaEmision | date:'MMM dd, yyyy' }}</td>
+        <td>
+          <span class="status-badge" [ngClass]="getEstadoBadgeClass(factura.estado)">
+            {{ factura.estado }}
+          </span>
+        </td>
+        <td class="cell--actions">
+          <button
+            class="icon-btn"
+            (click)="$event.stopPropagation(); onVerFactura(factura)"
+            title="Ver / Editar factura"
           >
-            <td>
-              <div class="proveedor-cell">
-                <div class="proveedor-avatar">
-                  {{ getProveedorIniciales(factura.proveedor) }}
-                </div>
-                <div>
-                  <p class="proveedor-cell__name">{{ factura.proveedor }}</p>
-                  <p class="proveedor-cell__id">{{ factura.nitEmisor }}</p>
-                </div>
-              </div>
-            </td>
-            <td class="cell--medium">{{ factura.ordenCompra ?? '—' }}</td>
-            <td class="cell--bold">${{ factura.total | number:'1.2-2' }}</td>
-            <td class="cell--muted">{{ factura.fechaEmision | date:'MMM dd, yyyy' }}</td>
-            <td>
-              <span class="status-badge" [ngClass]="getEstadoBadgeClass(factura.estado)">
-                {{ factura.estado }}
-              </span>
-            </td>
-            <td class="cell--actions">
-              <button
-                class="icon-btn"
-                (click)="$event.stopPropagation(); onVerFactura(factura)"
-                title="Ver / Editar factura"
-              >
-                <span class="material-symbols-outlined">more_vert</span>
-              </button>
-            </td>
-          </tr>
+            <span class="material-symbols-outlined">more_vert</span>
+          </button>
+        </td>
+      </tr>
 
-          <!-- Empty state -->
-          <tr *ngIf="facturas().length === 0">
-            <td colspan="6" class="empty-state">
-              <span class="material-symbols-outlined">receipt_long</span>
-              <p>No se encontraron facturas</p>
-              <span>Intenta ajustar los filtros de búsqueda</span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+      <tr *ngIf="facturas().length === 0">
+        <td colspan="6" class="empty-state">
+          <span class="material-symbols-outlined">receipt_long</span>
+          <p>No se encontraron facturas</p>
+          <span>Intenta ajustar los filtros de búsqueda</span>
+        </td>
+      </tr>
+    </tbody>
 
-    <!-- Pagination -->
-    <div class="table-pagination" *ngIf="!loading() && facturas().length > 0">
+    <!-- Pagination slot -->
+    <div dtFooter class="table-pagination" *ngIf="!loading() && facturas().length > 0">
       <span class="table-pagination__info">Mostrando {{ facturas().length }} de {{ kpis()?.totalFacturas | number }} facturas</span>
       <div class="pagination-btns">
         <button class="pagination-btn" disabled>
@@ -178,7 +164,9 @@
         </button>
       </div>
     </div>
-  </div>
+
+  </restaurant-data-table>
+
 </section>
 
 <!-- ── MODAL: Registrar Factura ── -->

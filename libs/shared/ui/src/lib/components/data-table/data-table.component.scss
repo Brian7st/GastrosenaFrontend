@@ -1,15 +1,141 @@
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
+.dt-card {
   background: var(--color-surface-primary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
   overflow: hidden;
 }
 
-.data-table th,
-.data-table td {
-  padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--color-border);
+// ── Controles bakeados (título + buscador + filtros) ──────────────────────────
+.dt-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--color-pizarra-50);
+  gap: var(--space-4);
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  &__icon {
+    color: var(--color-primario);
+    font-size: 1.375rem;
+  }
+
+  &__heading {
+    font-family: var(--font-family-headline);
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    color: var(--color-en-superficie);
+    margin: 0;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+}
+
+.dt-search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--color-superficie-contenedor-bajo);
+  border-radius: var(--radius-lg);
+  padding: 0.4rem var(--space-3);
+  min-width: 16rem;
+
+  &__icon {
+    color: var(--color-pizarra-400);
+    font-size: 1.125rem;
+    flex-shrink: 0;
+  }
+
+  &__input {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-sm);
+    color: var(--color-en-superficie);
+    width: 100%;
+
+    &::placeholder {
+      color: var(--color-pizarra-400);
+    }
+  }
+}
+
+.dt-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.4rem var(--space-3);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-superficie-contenedor);
+  background: var(--color-superficie-contenedor-bajo);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-en-superficie);
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  .material-symbols-outlined { font-size: 1rem; }
+
+  &:hover { background: var(--color-superficie-contenedor); }
+}
+
+// ── Tabla ─────────────────────────────────────────────────────────────────────
+.dt-wrapper {
+  overflow-x: auto;
+}
+
+.dt-table {
+  width: 100%;
   text-align: left;
+  border-collapse: collapse;
+
+  thead tr {
+    background-color: var(--color-pizarra-50);
+  }
+
+  th {
+    padding: var(--space-4) var(--space-6);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 1.25rem var(--space-6);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+  }
+
+  tbody > tr + tr {
+    border-top: 1px solid var(--color-pizarra-50);
+  }
+
+  tbody tr {
+    transition: background-color 0.15s ease;
+
+    &:hover { background-color: rgba(248, 250, 252, 0.8); }
+  }
+}
+
+.dt-footer {
+  padding: var(--space-4) var(--space-6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: rgba(248, 250, 252, 0.3);
+  border-top: 1px solid var(--color-pizarra-50);
 }

@@ -1,9 +1,6 @@
 import { BarraLateralConfig, TopNavLink } from './nav.models';
 
-export const TOP_MENU_CONFIG: TopNavLink[] = [
-  { label: 'Inventario', ruta: '/app/inventario' },
-  { label: 'Reportes',   ruta: '/app/reportes'   },
-];
+export const TOP_MENU_CONFIG: TopNavLink[] = [];
 
 export const SIDEBAR_CONFIG: BarraLateralConfig = {
   titulo:    'GastroSena',
