@@ -62,7 +62,7 @@ export class FacturasListPageComponent implements OnInit {
   }
 
   onImportar(): void {
-    console.log('Importando facturas...');
+    this.router.navigate(['/app/inventario/facturas/importar']);
   }
 
   onExportar(): void {
