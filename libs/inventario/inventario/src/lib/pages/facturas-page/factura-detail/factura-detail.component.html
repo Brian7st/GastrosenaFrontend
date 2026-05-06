@@ -4,19 +4,18 @@
     <div class="page-header__left">
       <nav class="breadcrumb">
         <ol>
-          <li><a routerLink="/app/inventario/facturas">Facturación</a></li>
-          <li class="separator"><span class="material-symbols-outlined">chevron_right</span></li>
+
           <li><a routerLink="/app/inventario/facturas">Facturas</a></li>
           <li class="separator"><span class="material-symbols-outlined">chevron_right</span></li>
-          <li class="current">FEL-1314</li>
+          <li class="current">FEL</li>
         </ol>
       </nav>
       <div class="page-header__title-row">
-        <h1 class="page-header__title">Factura Electrónica FEL-1314</h1>
+        <h1 class="page-header__title">Factura Electrónica</h1>
         <span class="badge badge--verificada">VERIFICADA</span>
       </div>
     </div>
-    
+
     <div class="page-header__actions">
       <restaurant-button variant="surface" icon="picture_as_pdf">Descargar PDF</restaurant-button>
       <restaurant-button variant="surface" icon="print">Imprimir</restaurant-button>
@@ -28,11 +27,11 @@
   <div class="bento-grid">
     <!-- Main Left Column -->
     <div class="bento-main">
-      
+
       <!-- SECCIÓN 1 & 2: Emisor, Receptor & Metadatos -->
       <section class="bento-card bento-card--accent">
         <div class="bento-card__accent-bg"></div>
-        
+
         <div class="parties-grid">
           <!-- Emisor -->
           <div class="party-info">
@@ -82,10 +81,7 @@
 
       <!-- SECCIÓN 3: Tabla Detalle (Reutilizando Data Table) -->
       <section class="bento-card p-0">
-        <restaurant-data-table
-          tableTitle="Detalle de Artículos"
-          tableIcon="list_alt"
-        >
+        <restaurant-data-table tableTitle="Detalle de Artículos" tableIcon="list_alt">
           <thead>
             <tr>
               <th class="w-12 text-center">#</th>
@@ -155,9 +151,9 @@
               </button>
             </div>
           </div>
-          
+
           <div class="divider"></div>
-          
+
           <div class="card-section">
             <h4 class="card-section__title">
               <span class="material-symbols-outlined text-outline">account_balance</span> Datos Bancarios
@@ -185,12 +181,12 @@
               </div>
               <span class="badge badge--primary-soft text-[10px]">APROBADO</span>
             </div>
-            
+
             <div class="linked-details">
               <p><span class="material-symbols-outlined">person</span> Sebastian Betancourt</p>
               <p class="font-bold"><span class="material-symbols-outlined">payments</span> $1,011,047.00</p>
             </div>
-            
+
             <button class="linked-btn group">
               Ver GIL completo
               <span class="material-symbols-outlined group-hover-translate">arrow_right_alt</span>
@@ -219,7 +215,7 @@
     <div class="bento-sidebar">
       <section class="bento-card bento-card--summary sticky-summary">
         <h3 class="summary__title">Resumen Fiscal</h3>
-        
+
         <div class="summary__body">
           <div class="summary-row">
             <span class="summary-row__label">Valor Bruto</span>
@@ -229,9 +225,9 @@
             <span class="summary-row__label">Descuento</span>
             <span class="summary-row__value font-medium">-$0.00</span>
           </div>
-          
+
           <div class="divider my-2"></div>
-          
+
           <div class="summary-row">
             <span class="summary-row__label font-semibold">Subtotal Base</span>
             <span class="summary-row__value font-bold">$850,000.00</span>
@@ -252,9 +248,9 @@
               <span class="summary-row__label">IVA 19%</span>
               <span class="summary-row__value">$158,197.00</span>
             </div>
-            
+
             <div class="divider my-2"></div>
-            
+
             <div class="summary-row">
               <span class="summary-row__label font-semibold">Total IVA</span>
               <span class="summary-row__value font-bold">$161,047.00</span>
@@ -268,11 +264,11 @@
               <span class="material-symbols-outlined text-[14px] text-outline">info</span>
             </div>
             <span class="summary-row__value font-medium">$0.00</span>
-            
+
             <div class="tooltip">Aplica tarifa 0% por régimen especial ZESE registrado.</div>
           </div>
         </div>
-        
+
         <!-- Gran Total -->
         <div class="summary__footer">
           <span class="summary__footer-label">Total a Pagar</span>
