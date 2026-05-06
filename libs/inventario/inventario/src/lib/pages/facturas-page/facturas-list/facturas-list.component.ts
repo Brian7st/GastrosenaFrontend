@@ -54,7 +54,7 @@ export class FacturasListPageComponent implements OnInit {
   }
 
   onEditarFactura(factura: Factura): void {
-    this.router.navigate(['/app/inventario/facturas', factura.id], { queryParams: { modo: 'editar' } });
+    this.router.navigate(['/app/inventario/facturas', factura.id, 'editar']);
   }
 
   onAnularFactura(factura: Factura): void {
@@ -62,7 +62,7 @@ export class FacturasListPageComponent implements OnInit {
   }
 
   onImportar(): void {
-    console.log('Importando facturas...');
+    this.router.navigate(['/app/inventario/facturas/importar']);
   }
 
   onExportar(): void {

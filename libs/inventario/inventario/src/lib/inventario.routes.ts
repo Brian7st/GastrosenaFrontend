@@ -32,9 +32,19 @@ export const INVENTARIO_ROUTES: Routes = [
     path: 'facturas',
     component: FacturasListPageComponent,
   },
-  // Vista 3 & 4: Editar Factura FEL (activa o bloqueada)
+  // Vista de Importar Factura
+  {
+    path: 'facturas/importar',
+    loadComponent: () => import('./pages/facturas-page/factura-import/factura-import.component').then(m => m.FacturaImportPageComponent)
+  },
+  // Vista 3: Detalle de Factura FEL (Bento Grid)
   {
     path: 'facturas/:id',
+    loadComponent: () => import('./pages/facturas-page/factura-detail/factura-detail.component').then(m => m.FacturaDetailPageComponent)
+  },
+  // Vista 4: Editar Factura FEL (Editable/Lectura antigua)
+  {
+    path: 'facturas/:id/editar',
     component: FacturaEditPageComponent,
   },
   // Vista 5: Detalle Solicitud GIL F-014

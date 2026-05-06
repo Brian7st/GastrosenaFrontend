@@ -1,0 +1,283 @@
+<div class="factura-detail-page">
+  <!-- Header Section -->
+  <header class="page-header">
+    <div class="page-header__left">
+      <nav class="breadcrumb">
+        <ol>
+
+          <li><a routerLink="/app/inventario/facturas">Facturas</a></li>
+          <li class="separator"><span class="material-symbols-outlined">chevron_right</span></li>
+          <li class="current">FEL</li>
+        </ol>
+      </nav>
+      <div class="page-header__title-row">
+        <h1 class="page-header__title">Factura Electrónica</h1>
+        <span class="badge badge--verificada">VERIFICADA</span>
+      </div>
+    </div>
+
+    <div class="page-header__actions">
+      <restaurant-button variant="surface" icon="picture_as_pdf">Descargar PDF</restaurant-button>
+      <restaurant-button variant="surface" icon="print">Imprimir</restaurant-button>
+      <restaurant-button variant="primary" icon="check_circle">Marcar como Pagada</restaurant-button>
+    </div>
+  </header>
+
+  <!-- Bento Grid Layout -->
+  <div class="bento-grid">
+    <!-- Main Left Column -->
+    <div class="bento-main">
+
+      <!-- SECCIÓN 1 & 2: Emisor, Receptor & Metadatos -->
+      <section class="bento-card bento-card--accent">
+        <div class="bento-card__accent-bg"></div>
+
+        <div class="parties-grid">
+          <!-- Emisor -->
+          <div class="party-info">
+            <span class="party-info__label">Emisor</span>
+            <h3 class="party-info__name">INVERSIONES QDE S.A.S</h3>
+            <p class="party-info__doc">NIT 900802002-1</p>
+            <p class="party-info__location">
+              <span class="material-symbols-outlined">location_on</span> Armenia
+            </p>
+          </div>
+          <!-- Receptor -->
+          <div class="party-info">
+            <span class="party-info__label">Receptor</span>
+            <h3 class="party-info__name">SERVICIO NACIONAL DE APRENDIZAJE</h3>
+            <p class="party-info__doc">NIT 899999034</p>
+            <p class="party-info__location">
+              <span class="material-symbols-outlined">location_on</span> Armenia
+            </p>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Metadatos -->
+        <div class="metadata-grid">
+          <div class="metadata-item">
+            <span class="metadata-item__label">Fecha Emisión</span>
+            <p class="metadata-item__value">29 May 2025</p>
+          </div>
+          <div class="metadata-item">
+            <span class="metadata-item__label">Vencimiento</span>
+            <p class="metadata-item__value">29 Jun 2025</p>
+          </div>
+          <div class="metadata-item">
+            <span class="metadata-item__label">Forma Pago</span>
+            <p class="metadata-item__value">Crédito 30 días</p>
+          </div>
+          <div class="metadata-item">
+            <span class="metadata-item__label">Orden Compra</span>
+            <a href="#" class="metadata-item__link group">
+              08 - Sebastian Betancourt
+              <span class="material-symbols-outlined icon-arrow">arrow_forward</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 3: Tabla Detalle (Reutilizando Data Table) -->
+      <section class="bento-card p-0">
+        <restaurant-data-table tableTitle="Detalle de Artículos" tableIcon="list_alt">
+          <thead>
+            <tr>
+              <th class="w-12 text-center">#</th>
+              <th>Descripción</th>
+              <th>UM</th>
+              <th class="text-right">Cantidad</th>
+              <th class="text-right">Precio Unitario</th>
+              <th class="text-right">IVA%</th>
+              <th class="text-right">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-center font-medium text-secondary">1</td>
+              <td class="font-medium">Salchichas Manguera Tipo Suiza</td>
+              <td class="text-secondary">UND</td>
+              <td class="text-right">11</td>
+              <td class="text-right">$28,546</td>
+              <td class="text-right text-secondary">19%</td>
+              <td class="text-right font-semibold">$314,006</td>
+            </tr>
+            <tr class="row-highlight-tertiary">
+              <td class="text-center font-medium text-secondary">2</td>
+              <td class="font-medium">Harina de Trigo Fortificada</td>
+              <td class="text-secondary">UND</td>
+              <td class="text-right">10</td>
+              <td class="text-right">$5,700</td>
+              <td class="text-right"><span class="badge badge--tertiary">5%</span></td>
+              <td class="text-right font-semibold">$57,000</td>
+            </tr>
+            <tr class="row-highlight-surface">
+              <td class="text-center font-medium text-secondary">3</td>
+              <td class="font-medium text-secondary">Papa Pastusa Lavada</td>
+              <td class="text-secondary">Gr</td>
+              <td class="text-right">10,000</td>
+              <td class="text-right">$6.00</td>
+              <td class="text-right text-secondary">0%</td>
+              <td class="text-right font-semibold">$60,000</td>
+            </tr>
+            <tr>
+              <td class="text-center font-medium text-secondary">...</td>
+              <td colspan="6" class="text-secondary italic">5 ítems adicionales omitidos en esta vista...</td>
+            </tr>
+          </tbody>
+        </restaurant-data-table>
+      </section>
+
+      <!-- SECCIÓN 5, 6, 7 Grid -->
+      <div class="bottom-cards-grid">
+        <!-- SECCIÓN 5: Estado DIAN & Bancos -->
+        <section class="bento-card">
+          <div class="card-section">
+            <h4 class="card-section__title">
+              <span class="material-symbols-outlined text-primary">verified_user</span> Validación DIAN
+            </h4>
+            <div class="status-tags">
+              <span class="badge badge--success-soft">Validado Exitosamente</span>
+              <span class="badge badge--surface">Régimen ZESE</span>
+            </div>
+            <div class="cufe-box">
+              <div class="cufe-box__text">
+                <span class="cufe-box__label">CUFE</span>
+                <span class="cufe-box__value">8a9f...c2d1e</span>
+              </div>
+              <button class="icon-btn" title="Copiar CUFE">
+                <span class="material-symbols-outlined">content_copy</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="card-section">
+            <h4 class="card-section__title">
+              <span class="material-symbols-outlined text-outline">account_balance</span> Datos Bancarios
+            </h4>
+            <div class="bank-info">
+              <div class="bank-info__icon">
+                <span class="material-symbols-outlined">account_balance</span>
+              </div>
+              <div class="bank-info__text">
+                <p class="bank-info__name">Bancolombia</p>
+                <p class="bank-info__type">Cta Cte/Ah • Convenio</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECCIÓN 6 & 7 Stack -->
+        <div class="cards-stack">
+          <!-- SECCIÓN 7: GIL Vinculado -->
+          <section class="bento-card bento-card--linked">
+            <div class="linked-header">
+              <div>
+                <span class="linked-header__label">Documento Vinculado</span>
+                <h4 class="linked-header__title">GIL-F-014-001</h4>
+              </div>
+              <span class="badge badge--primary-soft text-[10px]">APROBADO</span>
+            </div>
+
+            <div class="linked-details">
+              <p><span class="material-symbols-outlined">person</span> Sebastian Betancourt</p>
+              <p class="font-bold"><span class="material-symbols-outlined">payments</span> $1,011,047.00</p>
+            </div>
+
+            <button class="linked-btn group">
+              Ver GIL completo
+              <span class="material-symbols-outlined group-hover-translate">arrow_right_alt</span>
+            </button>
+          </section>
+
+          <!-- SECCIÓN 6: Documentos Soporte -->
+          <section class="bento-card p-5">
+            <h4 class="card-section__title mb-3">Documentos Soporte</h4>
+            <div class="docs-grid">
+              <button class="doc-btn group">
+                <span class="material-symbols-outlined text-tertiary group-hover-bounce">description</span>
+                <span class="doc-btn__name">Factura.pdf</span>
+              </button>
+              <button class="doc-btn group">
+                <span class="material-symbols-outlined text-primary group-hover-bounce">code</span>
+                <span class="doc-btn__name">Attached.xml</span>
+              </button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column (SECCIÓN 4: Resumen Fiscal) -->
+    <div class="bento-sidebar">
+      <section class="bento-card bento-card--summary sticky-summary">
+        <h3 class="summary__title">Resumen Fiscal</h3>
+
+        <div class="summary__body">
+          <div class="summary-row">
+            <span class="summary-row__label">Valor Bruto</span>
+            <span class="summary-row__value font-medium">$850,000.00</span>
+          </div>
+          <div class="summary-row text-tertiary">
+            <span class="summary-row__label">Descuento</span>
+            <span class="summary-row__value font-medium">-$0.00</span>
+          </div>
+
+          <div class="divider my-2"></div>
+
+          <div class="summary-row">
+            <span class="summary-row__label font-semibold">Subtotal Base</span>
+            <span class="summary-row__value font-bold">$850,000.00</span>
+          </div>
+
+          <!-- Desglose IVA -->
+          <div class="tax-box">
+            <span class="tax-box__title">Desglose Impuestos</span>
+            <div class="summary-row summary-row--sm">
+              <span class="summary-row__label">IVA 0% (Bienes Exentos)</span>
+              <span class="summary-row__value">$0.00</span>
+            </div>
+            <div class="summary-row summary-row--sm">
+              <span class="summary-row__label">IVA 5%</span>
+              <span class="summary-row__value">$2,850.00</span>
+            </div>
+            <div class="summary-row summary-row--sm">
+              <span class="summary-row__label">IVA 19%</span>
+              <span class="summary-row__value">$158,197.00</span>
+            </div>
+
+            <div class="divider my-2"></div>
+
+            <div class="summary-row">
+              <span class="summary-row__label font-semibold">Total IVA</span>
+              <span class="summary-row__value font-bold">$161,047.00</span>
+            </div>
+          </div>
+
+          <!-- Retenciones -->
+          <div class="summary-row mt-2 tooltip-container">
+            <div class="flex items-center gap-1">
+              <span class="summary-row__label">Retención ZESE</span>
+              <span class="material-symbols-outlined text-[14px] text-outline">info</span>
+            </div>
+            <span class="summary-row__value font-medium">$0.00</span>
+
+            <div class="tooltip">Aplica tarifa 0% por régimen especial ZESE registrado.</div>
+          </div>
+        </div>
+
+        <!-- Gran Total -->
+        <div class="summary__footer">
+          <span class="summary__footer-label">Total a Pagar</span>
+          <div class="text-right">
+            <span class="summary__footer-total">$1,011,047.00</span>
+            <p class="summary__footer-currency">COP • Pesos Colombianos</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
