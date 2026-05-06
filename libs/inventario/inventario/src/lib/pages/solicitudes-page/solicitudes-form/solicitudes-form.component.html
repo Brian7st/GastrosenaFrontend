@@ -1,0 +1,199 @@
+<!-- ══════════════════════════════════════════════════════════════════════════
+     Contenedor Principal de la Vista Formulario
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="form-page-container">
+  
+  <!-- Page Header -->
+  <div class="page-header">
+    <h2 class="page-title">Nueva Solicitud GIL-F-014</h2>
+    <p class="page-subtitle">Complete la información requerida para el registro y movimiento de bienes institucionales.</p>
+  </div>
+
+  <!-- Main Form Card -->
+  <div class="form-card">
+    <div class="form-grid">
+      <!-- Columna 1 -->
+      <div class="form-col">
+        <div class="form-group">
+          <label class="form-label">Código de Solicitud</label>
+          <div class="readonly-input">
+            <span class="readonly-text">GIL-F-014-2024-XXX</span>
+            <span class="material-symbols-outlined icon-locked">lock</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Regional</label>
+          <select class="form-control">
+            <option>Seleccione Regional</option>
+            <option selected>Distrito Capital</option>
+            <option>Antioquia</option>
+            <option>Valle del Cauca</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Cuentadante</label>
+          <select class="form-control">
+            <option>Seleccione Cuentadante</option>
+            <option selected>Carlos Mario Estrada</option>
+            <option>Jorge Eduardo Londoño</option>
+          </select>
+          <button class="btn-link btn-link--add mt-2" type="button" (click)="onAddCuentadante()">
+            <span class="material-symbols-outlined">add</span>
+            Agregar otro cuentadante
+          </button>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Ficha de Caracterización</label>
+          <input type="text" class="form-control" maxlength="7" pattern="\d{7}" placeholder="Ej. 2471532" />
+          <p class="form-hint">Debe contener exactamente 7 dígitos.</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Fecha de Solicitud</label>
+          <input type="date" class="form-control" [value]="fechaSolicitud()" />
+        </div>
+      </div>
+
+      <!-- Columna 2 -->
+      <div class="form-col">
+        <div class="form-group">
+          <label class="form-label">Fecha Requerida</label>
+          <input type="date" class="form-control" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Área</label>
+          <select class="form-control">
+            <option>Seleccione Área</option>
+            <option selected>Tecnología y Logística</option>
+            <option>Centro de Comercio y Servicios</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Centro de Costos</label>
+          <select class="form-control">
+            <option>Seleccione Centro de Costo</option>
+            <option selected>CC-9201-450 - Bogotá</option>
+            <option>CC-1102-120 - Medellin</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Destino de Bienes</label>
+          <select class="form-control">
+            <option>Seleccione Destino</option>
+            <option selected>Laboratorio 402 - Computo Avanzado</option>
+            <option>Aula 101 - Gastronomía</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Solicitante</label>
+          <select class="form-control">
+            <option>Nombre del instructor solicitante</option>
+            <option selected>Ing. Ricardo Sarmiento</option>
+            <option>Lic. Martha Lucía Peña</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trazabilidad Académica Section -->
+  <div class="form-card form-card--bordered">
+    <h3 class="section-title">
+      <span class="material-symbols-outlined section-icon">school</span>
+      Trazabilidad Académica <span class="required-asterisk">*</span>
+    </h3>
+    <div class="form-grid">
+      <div class="form-col">
+        <div class="form-group">
+          <label class="form-label">Vocero de Aprendices (Nombre Completo)</label>
+          <input type="text" class="form-control" placeholder="Ingrese nombre completo" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cédula del Vocero</label>
+          <input type="text" class="form-control" placeholder="Ingrese número de documento" />
+        </div>
+      </div>
+      <div class="form-col">
+        <div class="form-group">
+          <label class="form-label">Resultado de Aprendizaje (RA)</label>
+          <textarea class="form-control" rows="2" placeholder="Especifique el resultado de aprendizaje asociado"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Franja Horaria</label>
+          <input type="time" class="form-control" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bienes Solicitados Section -->
+  <div class="form-card">
+    <h3 class="section-title">
+      <span class="material-symbols-outlined section-icon">category</span>
+      Bienes Solicitados <span class="required-asterisk">*</span>
+    </h3>
+    
+    <div class="table-container">
+      <table class="bienes-table">
+        <thead>
+          <tr>
+            <th>Código SENA</th>
+            <th class="w-full">Descripción</th>
+            <th>UM</th>
+            <th class="text-right">Cantidad</th>
+            <th class="text-right">Valor Unitario</th>
+            <th class="text-right">Subtotal</th>
+            <th class="text-center">Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let bien of bienes(); let i = index">
+            <td class="font-medium">{{ bien.codigo }}</td>
+            <td class="text-secondary">{{ bien.descripcion }}</td>
+            <td class="text-secondary">{{ bien.um }}</td>
+            <td class="text-right font-medium">{{ bien.cantidad }}</td>
+            <td class="text-right text-secondary">{{ bien.valorUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+            <td class="text-right font-bold">{{ bien.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+            <td class="text-center">
+              <button class="btn-icon btn-icon--danger" type="button" (click)="onRemoveBien(i)" title="Eliminar bien">
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <button class="btn-link btn-link--add mt-4" type="button" (click)="onAddBien()">
+      <span class="material-symbols-outlined">add_circle</span>
+      Agregar bien
+    </button>
+  </div>
+
+  <!-- Observaciones -->
+  <div class="form-card mb-12">
+    <label class="form-label mb-4">Observaciones</label>
+    <textarea class="form-control" rows="4" placeholder="Ingrese detalles adicionales de la solicitud, justificación técnica o notas de despacho..."></textarea>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="actions-footer">
+    <button class="btn btn--secondary" type="button" (click)="onCancel()">Cancelar</button>
+    <button class="btn btn--primary" type="button" (click)="onSave()">
+      <span class="material-symbols-outlined">save</span>
+      Crear Solicitud
+    </button>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<footer class="page-footer">
+  © 2024 SENA - Sistema de Gestión de Bienes • Formulario GIL-F-014 Rev. 04
+</footer>

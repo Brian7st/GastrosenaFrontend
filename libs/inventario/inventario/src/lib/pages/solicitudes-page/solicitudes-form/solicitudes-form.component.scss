@@ -1,0 +1,297 @@
+/* ==========================================================================
+   Nueva Solicitud GIL-F-014 — Estilos basados en prototipo
+   ========================================================================== */
+
+/* ── Container y Page Header ─────────────────────────────────────────────── */
+.form-page-container {
+  padding: 2rem;
+  max-width: 72rem; /* max-w-6xl */
+  margin: 0 auto;
+  width: 100%;
+}
+
+.page-header {
+  margin-bottom: 2.5rem;
+}
+
+.page-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.875rem; /* 3xl */
+  font-weight: 800;
+  color: var(--color-text-primary, #191c1d);
+  letter-spacing: -0.025em;
+  margin: 0 0 0.5rem;
+}
+
+.page-subtitle {
+  color: var(--color-text-secondary, #3e4a3c);
+  font-weight: 500;
+  margin: 0;
+}
+
+/* ── Form Cards ──────────────────────────────────────────────────────────── */
+.form-card {
+  background: white;
+  border-radius: 0.75rem; /* rounded-xl */
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+
+  &--bordered {
+    border: 1px solid rgba(0, 110, 37, 0.2);
+  }
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+
+  .section-icon {
+    color: #006e25; /* primary */
+    margin-right: 0.5rem;
+  }
+}
+
+.required-asterisk {
+  color: #ba1a1a; /* error */
+  margin-left: 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* ── Form Grid Layout ────────────────────────────────────────────────────── */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 1.5rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 3rem;
+  }
+}
+
+.form-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ── Controles de Formulario ─────────────────────────────────────────────── */
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.75rem; /* text-xs */
+  font-weight: 700; /* font-bold */
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6e7b6b; /* outline */
+  margin-bottom: 0.5rem;
+}
+
+.form-control {
+  width: 100%;
+  background: #f3f4f5; /* surface-container-low */
+  border: none;
+  border-radius: 0.75rem; /* rounded-xl */
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem; /* text-sm */
+  font-weight: 500;
+  color: var(--color-text-primary);
+  outline: none;
+  transition: box-shadow 0.2s;
+
+  &::placeholder {
+    color: #94a3b8; /* slate-400 */
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 2px rgba(0, 110, 37, 0.2); /* primary/20 */
+  }
+
+  /* Si es textarea, quitamos el resize horizontal */
+  resize: vertical;
+}
+
+.form-hint {
+  font-size: 0.625rem; /* text-[10px] */
+  color: #64748b; /* slate-500 */
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+
+/* Input readonly simulado */
+.readonly-input {
+  display: flex;
+  align-items: center;
+  background: #f3f4f5;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+
+  &:focus-within {
+    border-color: rgba(0, 110, 37, 0.2);
+  }
+}
+
+.readonly-text {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+}
+
+.icon-locked {
+  margin-left: auto;
+  color: #94a3b8; /* slate-400 */
+  font-size: 18px;
+}
+
+/* ── Botones y Links ─────────────────────────────────────────────────────── */
+.btn-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #006e25;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &--add .material-symbols-outlined {
+    font-size: 16px;
+    margin-right: 0.25rem;
+  }
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  padding: 0.25rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &--danger {
+    color: #ba1a1a;
+    &:hover { background-color: rgba(186, 26, 26, 0.1); }
+  }
+
+  .material-symbols-outlined { font-size: 18px; }
+}
+
+/* ── Tabla Bienes Solicitados ────────────────────────────────────────────── */
+.table-container {
+  overflow-x: auto;
+  border: 1px solid #edeeef; /* surface-container */
+  border-radius: 0.75rem;
+}
+
+.bienes-table {
+  width: 100%;
+  text-align: left;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  border-collapse: collapse;
+
+  thead {
+    background: #f3f4f5;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #3e4a3c;
+    font-weight: 700;
+    border-bottom: 1px solid #edeeef;
+  }
+
+  th, td {
+    padding: 0.75rem 1rem;
+  }
+
+  tbody tr {
+    transition: background-color 0.2s;
+    border-bottom: 1px solid #edeeef;
+
+    &:last-child {
+      border-bottom: none;
+    }
+    &:hover {
+      background-color: rgba(243, 244, 245, 0.5);
+    }
+  }
+}
+
+/* Utilidades tabla */
+.w-full { width: 100%; }
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.text-secondary { color: #3e4a3c; } /* on-surface-variant */
+.font-medium { font-weight: 500; }
+.font-bold { font-weight: 700; }
+
+/* ── Footer Actions ──────────────────────────────────────────────────────── */
+.actions-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1.5rem;
+  margin-bottom: 5rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 2rem;
+  border-radius: 9999px; /* full */
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+
+  &:active { transform: scale(0.95); }
+
+  &--secondary {
+    background: transparent;
+    color: #475569; /* slate-600 */
+    &:hover { background: #edeeef; }
+  }
+
+  &--primary {
+    background: linear-gradient(to right, #006e25, #28a745);
+    color: white;
+    box-shadow: 0 4px 14px rgba(0, 110, 37, 0.2);
+    padding: 0.75rem 2.5rem;
+
+    .material-symbols-outlined {
+      font-size: 20px;
+      margin-right: 0.5rem;
+    }
+
+    &:hover { opacity: 0.9; }
+  }
+}
+
+/* ── Page Footer ─────────────────────────────────────────────────────────── */
+.page-footer {
+  margin-top: auto;
+  padding: 2rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  border-top: 1px solid #edeeef;
+}

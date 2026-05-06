@@ -29,10 +29,22 @@ export const INVENTARIO_ROUTES: Routes = [
   // ── GIL-F-014: Solicitudes de Abastecimiento ─────────────────────────────
   {
     path: 'solicitudes-gil',
-    loadComponent: () =>
-      import('./pages/solicitudes-page/solicitudes-list/solicitudes-list.component').then(
-        m => m.SolicitudesListComponent
-      ),
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./pages/solicitudes-page/solicitudes-list/solicitudes-list.component').then(
+            m => m.SolicitudesListComponent
+          ),
+      },
+      {
+        path: 'nueva',
+        loadComponent: () =>
+          import('./pages/solicitudes-page/solicitudes-form/solicitudes-form.component').then(
+            m => m.SolicitudesFormComponent
+          ),
+      }
+    ]
   },
 
   // ── FE: Facturas Electrónicas ────────────────────────────────────────────
