@@ -1,0 +1,555 @@
+/* ==========================================================================
+   Solicitudes GIL-F-014 — Lista principal
+   Basado fielmente en el prototipo Stitch
+   ========================================================================== */
+
+/* ── Page Header ────────────────────────────────────────────────────────────── */
+.page-header-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+}
+
+.page-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-text-primary, #191c1d);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.page-subtitle {
+  color: var(--color-text-secondary, #636E72);
+  font-weight: 500;
+  margin: 0.375rem 0 0;
+  font-size: 0.9375rem;
+}
+
+/* ── KPI Grid — 4 columnas ──────────────────────────────────────────────────── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.kpi-card {
+  background: white;
+  border-radius: 0.875rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  border-bottom: 4px solid transparent;
+  transition: transform 0.2s ease;
+
+  &:hover { transform: scale(1.02); }
+
+  &--green   { border-bottom-color: #10b981; }
+  &--slate   { border-bottom-color: #94a3b8; }
+  &--orange  { border-bottom-color: #f97316; }
+  &--emerald { border-bottom-color: #006e25; }
+}
+
+.kpi-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.kpi-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .material-symbols-outlined { font-size: 20px; }
+
+  &--green   { background: rgba(16,185,129,0.12);  color: #059669; }
+  &--slate   { background: rgba(148,163,184,0.15); color: #64748b; }
+  &--orange  { background: rgba(249,115,22,0.12);  color: #ea580c; }
+  &--emerald { background: rgba(0,110,37,0.10);    color: #006e25; }
+}
+
+.kpi-label-top {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--color-text-disabled, #B2BEC3);
+}
+
+.kpi-value {
+  font-family: 'Manrope', sans-serif;
+  font-size: 2.25rem;
+  font-weight: 900;
+  color: var(--color-text-primary);
+  margin: 0 0 0.25rem;
+  line-height: 1;
+}
+
+.kpi-desc {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* ── Card Container (tabla) ─────────────────────────────────────────────────── */
+.card-container {
+  background: white;
+  border-radius: 0.875rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  border: 1px solid #f0f0f0;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+/* ── Barra de filtros ───────────────────────────────────────────────────────── */
+.table-controls {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border-bottom: 1px solid #f3f4f5;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.filters-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.results-count {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-disabled);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* Select nativo estilizado */
+.select-box {
+  position: relative;
+
+  select {
+    appearance: none;
+    background: #f8f9fa;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.5rem 2.25rem 0.5rem 0.875rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    outline: none;
+    cursor: pointer;
+    transition: box-shadow 0.2s;
+
+    &:focus { box-shadow: 0 0 0 2px rgba(0,110,37,0.2); }
+  }
+
+  .dropdown-icon {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: var(--color-text-disabled);
+    pointer-events: none;
+  }
+}
+
+/* Search nativo */
+.search-box {
+  position: relative;
+
+  .search-icon {
+    position: absolute;
+    left: 0.625rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: var(--color-text-disabled);
+  }
+
+  input {
+    background: #f8f9fa;
+    border: 1px solid transparent;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.875rem 0.5rem 2rem;
+    font-size: 0.8125rem;
+    color: var(--color-text-primary);
+    outline: none;
+    width: 13rem;
+    transition: all 0.2s;
+
+    &::placeholder { color: var(--color-text-disabled); }
+    &:focus {
+      background: white;
+      border-color: #006e25;
+      box-shadow: 0 0 0 2px rgba(0,110,37,0.12);
+    }
+  }
+}
+
+/* ── Data Table ─────────────────────────────────────────────────────────────── */
+.table-scroll { overflow-x: auto; }
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+
+  th {
+    padding: 1rem 1.5rem;
+    background: #fafafa;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-text-disabled);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  td {
+    padding: 1.375rem 1.5rem;
+    font-size: 0.8125rem;
+    color: var(--color-text-primary);
+    vertical-align: middle;
+    border-bottom: 1px solid #f8f9fa;
+  }
+
+  tbody tr {
+    transition: background 0.15s;
+    &:last-child td { border-bottom: none; }
+    &:hover td { background: #fafafa; }
+  }
+}
+
+.text-right  { text-align: right; }
+.text-secondary { color: var(--color-text-secondary, #636E72); }
+
+/* Código GIL */
+.code-bold {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  color: var(--color-text-primary);
+}
+
+/* Celda Solicitante con avatar */
+.solicitante-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  flex-shrink: 0;
+
+  &--blue   { background: rgba(59,130,246,0.12); color: #2563eb; }
+  &--purple { background: rgba(139,92,246,0.12); color: #7c3aed; }
+  &--amber  { background: rgba(245,158,11,0.12); color: #d97706; }
+  &--green  { background: rgba(16,185,129,0.12); color: #059669; }
+  &--slate  { background: rgba(100,116,139,0.12);color: #475569; }
+}
+
+.solicitante-nombre {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* Monto COP */
+.monto-text {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+/* Estado badge */
+.estado-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  white-space: nowrap;
+
+  &--borrador  { background: #f1f5f9; color: #64748b; }
+  &--pendiente { background: #fff7ed; color: #c2410c; }
+  &--validado  { background: #eff6ff; color: #1d4ed8; }
+  &--aprobado  { background: #006e25; color: white;   }
+  &--procesado { background: #e2e8f0; color: #475569; }
+}
+
+/* Actions row */
+.actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+.action-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  border: none;
+  background: transparent;
+  color: var(--color-text-disabled, #B2BEC3);
+  cursor: pointer;
+  transition: all 0.2s;
+
+  .material-symbols-outlined { font-size: 18px; }
+
+  &:hover:not(:disabled) {
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    color: #006e25;
+  }
+
+  &--danger:hover:not(:disabled) {
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    color: #dc2626;
+  }
+
+  &:disabled { opacity: 0.35; cursor: not-allowed; }
+}
+
+.opacity-40 { opacity: 0.4; }
+
+/* ── Paginación ─────────────────────────────────────────────────────────────── */
+.pagination-footer {
+  padding: 1.25rem 1.5rem;
+  background: #fafafa;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.page-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: none;
+  border: none;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color 0.15s;
+
+  .material-symbols-outlined { font-size: 18px; }
+  &:hover { color: #006e25; }
+}
+
+.page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.page-btn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  border: none;
+  background: transparent;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover:not(.page-btn--active) { background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+  &--active { background: #006e25; color: white; }
+}
+
+/* ── Bottom Cards: Notas + Resumen de Inversión ─────────────────────────────── */
+.bottom-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.info-card {
+  border-radius: 1rem;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+
+  /* Fondo claro */
+  &--light {
+    background: white;
+    border: 1px solid #f0f0f0;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  }
+
+  /* Fondo oscuro SENA */
+  &--dark {
+    background: #0a3d1f;
+    color: white;
+  }
+
+  &__bg-icon {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    opacity: 0.07;
+    pointer-events: none;
+
+    .material-symbols-outlined {
+      font-size: 7rem;
+      color: #006e25;
+    }
+  }
+
+  &__title {
+    font-family: 'Manrope', sans-serif;
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin: 0 0 1rem;
+    color: inherit;
+  }
+
+  &__body {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    margin: 0 0 1.5rem;
+  }
+
+  &__link {
+    background: none;
+    border: none;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #006e25;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.15s;
+    &:hover { color: #28a745; }
+  }
+}
+
+/* Filas inversión */
+.investment-rows { margin-bottom: 1.25rem; }
+
+.investment-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.625rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+
+  &:last-child { border-bottom: none; }
+}
+
+.investment-label {
+  font-size: 0.875rem;
+  color: rgba(255,255,255,0.65);
+}
+
+.investment-value {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: white;
+}
+
+/* Barra de progreso */
+.progress-wrap { padding-top: 0.5rem; }
+
+.progress-track {
+  width: 100%;
+  height: 0.5rem;
+  background: rgba(255,255,255,0.1);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #28a745;
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+
+.progress-label {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.45);
+  margin: 0.5rem 0 0;
+}
+
+/* ── FAB ────────────────────────────────────────────────────────────────────── */
+.fab {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #004d1a 0%, #006e25 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 8px 24px rgba(0,110,37,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 50;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  .material-symbols-outlined {
+    font-size: 28px;
+    transition: transform 0.3s;
+  }
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 12px 32px rgba(0,110,37,0.45);
+    .material-symbols-outlined { transform: rotate(90deg); }
+  }
+  &:active { transform: scale(0.95); }
+}

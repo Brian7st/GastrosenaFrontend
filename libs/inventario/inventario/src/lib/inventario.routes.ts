@@ -26,6 +26,15 @@ export const INVENTARIO_ROUTES: Routes = [
     component: BienDetailPageComponent,
   },
 
+  // ── GIL-F-014: Solicitudes de Abastecimiento ─────────────────────────────
+  {
+    path: 'solicitudes-gil',
+    loadComponent: () =>
+      import('./pages/solicitudes-page/solicitudes-list/solicitudes-list.component').then(
+        m => m.SolicitudesListComponent
+      ),
+  },
+
   // ── FE: Facturas Electrónicas ────────────────────────────────────────────
   // Vista 1: Panel de Facturación (listado + KPIs)
   {
