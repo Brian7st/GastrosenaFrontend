@@ -1,0 +1,368 @@
+<!-- ══════════════════════════════════════════════════════════════════════════
+     Header y Acciones Principales
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="detail-page-container">
+  
+  <div class="action-header">
+    <div class="header-left">
+      <div class="breadcrumbs">
+        <button class="btn-volver" (click)="onVolver()">
+          <span class="material-symbols-outlined icon-back">arrow_back</span> Volver
+        </button>
+        <span class="separator">/</span>
+        <span class="breadcrumb-text">Solicitudes GIL</span>
+      </div>
+      <h2 class="title">{{ solicitudId() }}</h2>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn-action" (click)="onEditar()" [disabled]="estadoActual() !== 'Borrador'">
+        <span class="material-symbols-outlined">edit</span> Editar
+      </button>
+      <button class="btn-action" (click)="onDownloadPdf()">
+        <span class="material-symbols-outlined">picture_as_pdf</span> Descargar PDF
+      </button>
+      
+      <div class="action-group">
+        <button class="btn-primary" (click)="onEnviarAprobacion()" [disabled]="estadoActual() !== 'Borrador'">
+          Enviar a Aprobación
+        </button>
+        <div class="tooltip" *ngIf="estadoActual() !== 'Borrador'">
+          La solicitud ya fue enviada o no puede ser aprobada.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════
+       Timeline Visual
+  ══════════════════════════════════════════════════════════════════════════ -->
+  <div class="timeline-container">
+    <div class="timeline-line-bg"></div>
+    <div class="timeline-line-active" [style.width]="(estados.indexOf(estadoActual()) * 25) + '%'"></div>
+
+    <div class="timeline-nodes">
+      <div class="node" *ngFor="let est of estados">
+        <div class="node-icon" 
+             [ngClass]="{
+               'node-icon--active': isActive(est) || isPast(est),
+               'node-icon--pending': !isActive(est) && !isPast(est)
+             }">
+          <span class="material-symbols-outlined">{{ getIcon(est) }}</span>
+        </div>
+        <span class="node-label" 
+              [ngClass]="{'node-label--active': isActive(est) || isPast(est)}">
+          {{ est }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════
+       Información de la Sesión
+  ══════════════════════════════════════════════════════════════════════════ -->
+  <div class="card card--session">
+    <div class="card-header-icon">
+      <span class="material-symbols-outlined icon-primary">event_note</span>
+      <h3>Información de la Sesión</h3>
+    </div>
+    
+    <div class="grid-3-col">
+      <div class="info-block">
+        <label>Nombre del Vocero</label>
+        <p>Juan David Castro</p>
+      </div>
+      <div class="info-block">
+        <label>Horarios</label>
+        <p>06:00 AM - 12:00 PM</p>
+      </div>
+      <div class="info-block">
+        <label>Resultado de Aprendizaje (RA)</label>
+        <p>Realizar el mantenimiento correctivo de los sistemas mecánicos...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════
+       Bento Grid Layout (Left Col vs Right Col)
+  ══════════════════════════════════════════════════════════════════════════ -->
+  <div class="bento-grid">
+    
+    <!-- Left Column (Resumen y General) -->
+    <div class="bento-col-left">
+      
+      <!-- Card: Estado de Solicitud -->
+      <div class="card card--summary">
+        <h3 class="card-subtitle">Estado de Solicitud</h3>
+        <div class="status-row">
+          <div class="badge badge--state">
+            <span class="pulse-dot"></span> {{ estadoActual() }}
+          </div>
+          <span class="date-created">Creado el {{ fechaCreacion() }}</span>
+        </div>
+
+        <div class="summary-details">
+          <div class="total-block">
+            <p class="label">Total Estimado</p>
+            <p class="value-money">{{ totalEstimado() | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
+          </div>
+          <div class="owner-block">
+            <p class="label">Responsable (Instructor)</p>
+            <div class="owner-info">
+              <div class="owner-avatar">CR</div>
+              <p class="owner-name">Carlos Alberto Ruiz</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Información General -->
+      <div class="card card--general">
+        <h3 class="card-subtitle">Información General</h3>
+        <div class="info-stack">
+          <div class="info-item">
+            <label>Regional</label>
+            <p>Antioquia</p>
+          </div>
+          <div class="info-item">
+            <label>Centro de Formación</label>
+            <p>Centro de Diseño y Manufactura del Cuero</p>
+          </div>
+          <div class="info-item">
+            <label>Área / Programa</label>
+            <p>Mantenimiento Electromecánico Industrial</p>
+          </div>
+          <div class="info-item">
+            <label>Cuentadante Responsable</label>
+            <p>Marta Lucía Gómez</p>
+          </div>
+          <div class="info-item">
+            <label>Destino del Bien</label>
+            <p>Ambiente de Soldadura - Sede Itagüí</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Column (Tablas, Pre-facturas, Observaciones) -->
+    <div class="bento-col-right">
+      
+      <!-- Card: Bienes Solicitados -->
+      <div class="card card--table p-0">
+        <div class="card-header card-header--bg">
+          <span class="material-symbols-outlined icon-primary">list_alt</span>
+          <h3>Bienes Solicitados Originalmente</h3>
+        </div>
+        <div class="table-wrap">
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Código SENA</th>
+                <th>Descripción</th>
+                <th class="text-center">UM</th>
+                <th class="text-center">Cant.</th>
+                <th class="text-right">Valor Unitario</th>
+                <th class="text-right">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="text-muted">27112100</td>
+                <td class="font-semibold">Juego de Llaves Allen - Industrial Grade</td>
+                <td class="text-center">UN</td>
+                <td class="text-center">2</td>
+                <td class="text-right">$125.000</td>
+                <td class="text-right font-bold text-primary">$250.000</td>
+              </tr>
+              <tr>
+                <td class="text-muted">27112700</td>
+                <td class="font-semibold">Pulidora Angular 4.5" 1200W</td>
+                <td class="text-center">UN</td>
+                <td class="text-center">2</td>
+                <td class="text-right">$300.000</td>
+                <td class="text-right font-bold text-primary">$600.000</td>
+              </tr>
+              <tr>
+                <td class="text-muted">46181700</td>
+                <td class="font-semibold">Careta Electrónica para Soldar Pro-T</td>
+                <td class="text-center">UN</td>
+                <td class="text-center">3</td>
+                <td class="text-right">$130.000</td>
+                <td class="text-right font-bold text-primary">$390.000</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Card: Pre-Facturas Asociadas -->
+      <div class="card card--table p-0">
+        <div class="card-header card-header--bg space-between">
+          <h3>Pre-Facturas Asociadas</h3>
+          <span class="badge badge--green">2 Documentos</span>
+        </div>
+        
+        <div class="factura-list">
+          <!-- Item 1 -->
+          <div class="factura-item">
+            <div class="factura-header">
+              <div class="factura-title">
+                <span class="material-symbols-outlined text-muted">receipt_long</span>
+                <div>
+                  <p class="title-bold">PROV-9982-2024</p>
+                  <p class="subtitle-xs">Proveedor: Herramientas Industriales SAS</p>
+                </div>
+              </div>
+              <p class="factura-total">$850.000</p>
+            </div>
+            <div class="factura-table-wrap">
+              <table class="styled-table styled-table--sm">
+                <thead>
+                  <tr>
+                    <th>Ítem / Descripción</th>
+                    <th class="text-center">Cant.</th>
+                    <th class="text-right">Unitario</th>
+                    <th class="text-right">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Juego de Llaves Allen - Industrial Grade</td>
+                    <td class="text-center">2</td>
+                    <td class="text-right">$125.000</td>
+                    <td class="text-right font-bold">$250.000</td>
+                  </tr>
+                  <tr>
+                    <td>Pulidora Angular 4.5" 1200W</td>
+                    <td class="text-center">2</td>
+                    <td class="text-right">$300.000</td>
+                    <td class="text-right font-bold">$600.000</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <!-- Item 2 -->
+          <div class="factura-item">
+            <div class="factura-header">
+              <div class="factura-title">
+                <span class="material-symbols-outlined text-muted">receipt_long</span>
+                <div>
+                  <p class="title-bold">PROV-4412-2024</p>
+                  <p class="subtitle-xs">Proveedor: Dotaciones del Norte Ltda.</p>
+                </div>
+              </div>
+              <p class="factura-total">$390.000</p>
+            </div>
+            <div class="factura-table-wrap">
+              <table class="styled-table styled-table--sm">
+                <thead>
+                  <tr>
+                    <th>Ítem / Descripción</th>
+                    <th class="text-center">Cant.</th>
+                    <th class="text-right">Unitario</th>
+                    <th class="text-right">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Careta Electrónica para Soldar Pro-T</td>
+                    <td class="text-center">3</td>
+                    <td class="text-right">$130.000</td>
+                    <td class="text-right font-bold">$390.000</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Conciliación -->
+      <div class="card card--table p-0">
+        <div class="card-header card-header--bg space-between">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined icon-primary">handshake</span>
+            <h3>Conciliación de Recepción</h3>
+          </div>
+          <span class="badge badge--gray">Fase de Recepción</span>
+        </div>
+        <div class="table-wrap">
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Bien</th>
+                <th class="text-center">Cant. Solicitada</th>
+                <th class="text-center">Cant. Recibida</th>
+                <th class="text-center">Diferencia</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="font-semibold">Juego de Llaves Allen - Industrial Grade</td>
+                <td class="text-center">2</td>
+                <td class="text-center">2</td>
+                <td class="text-center font-bold text-muted">0</td>
+              </tr>
+              <tr>
+                <td class="font-semibold">Pulidora Angular 4.5" 1200W</td>
+                <td class="text-center">2</td>
+                <td class="text-center">1</td>
+                <td class="text-center font-bold text-error">
+                  <span class="error-box">-1</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="font-semibold">Careta Electrónica para Soldar Pro-T</td>
+                <td class="text-center">3</td>
+                <td class="text-center">3</td>
+                <td class="text-center font-bold text-muted">0</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Card: Observaciones -->
+      <div class="card">
+        <div class="card-header-icon mb-4">
+          <span class="material-symbols-outlined icon-primary">comment</span>
+          <h3>Observaciones y Justificación</h3>
+        </div>
+        <div class="comment-box">
+          <p>
+            "La presente solicitud se realiza para la reposición de herramientas y equipo de protección personal del ambiente de soldadura. El equipo actual presenta un desgaste superior al 80%, lo cual afecta la calidad de los procesos de formación y la seguridad de los aprendices de la ficha 2503201."
+          </p>
+        </div>
+        
+        <!-- Add comment action -->
+        <div class="comment-actions">
+          <div class="avatars-group">
+            <div class="avatar-circle">ML</div>
+            <div class="avatar-circle avatar-circle--alt">RS</div>
+            <div class="avatar-circle avatar-circle--gray">+1</div>
+          </div>
+          <button class="btn-link">
+            Añadir comentario <span class="material-symbols-outlined">add</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer Stats -->
+  <div class="audit-footer">
+    <div class="audit-info">
+      <span>ID Transacción: #TRX-998210-GIL</span>
+      <span>Hash: 8f9a2b...3c1e</span>
+    </div>
+    <div class="audit-status">
+      <span class="material-symbols-outlined">verified</span>
+      <span>Validado bajo estándar SENA-GIL-2024</span>
+    </div>
+  </div>
+
+</div>

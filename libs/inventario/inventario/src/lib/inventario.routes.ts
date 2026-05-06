@@ -43,6 +43,20 @@ export const INVENTARIO_ROUTES: Routes = [
           import('./pages/solicitudes-page/solicitudes-form/solicitudes-form.component').then(
             m => m.SolicitudesFormComponent
           ),
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./pages/solicitudes-page/solicitudes-detail/solicitudes-detail.component').then(
+            m => m.SolicitudesDetailComponent
+          ),
+      },
+      {
+        path: ':id/editar',
+        loadComponent: () =>
+          import('./pages/solicitudes-page/solicitudes-edit/solicitudes-edit.component').then(
+            m => m.SolicitudesEditComponent
+          ),
       }
     ]
   },
