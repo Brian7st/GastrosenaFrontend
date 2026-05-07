@@ -1,13 +1,13 @@
 import { Component, ChangeDetectionStrategy, signal, computed } from '@angular/core';
-import { CommonModule, CurrencyPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { ButtonComponent, KpiCardComponent } from '@restaurant/shared/ui';
+import { ButtonComponent } from '@restaurant/shared/ui';
 import { SolicitudGil } from '../../../models/solicitudes-gil.model';
 
 @Component({
   selector: 'app-solicitudes-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonComponent, KpiCardComponent, CurrencyPipe],
+  imports: [CommonModule, RouterModule, ButtonComponent],
   templateUrl: './solicitudes-list.component.html',
   styleUrls: ['./solicitudes-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -139,4 +139,33 @@ export class SolicitudesListComponent {
   onFilterEstado(v: string): void { console.log('Estado:', v);       }
   onFilterFecha(v: string): void  { console.log('Fecha:', v);        }
   onExportPdf(id: string | number): void { console.log('PDF:', id);  }
+
+  // ── Modal State ──────────────────────────────────────────────────────────
+  showDeleteModal = signal<boolean>(false);
+  itemToDelete = signal<any>(null);
+  deleteBlocked = signal<boolean>(false);
+
+  // ── Actions ──────────────────────────────────────────────────────────────
+  onDelete(item: any): void {
+    this.itemToDelete.set(item);
+    // Simulating block logic: Only 'Borrador' can be deleted
+    if (item.estado !== 'Borrador') {
+      this.deleteBlocked.set(true);
+    } else {
+      this.deleteBlocked.set(false);
+    }
+    this.showDeleteModal.set(true);
+  }
+
+  closeDeleteModal(): void {
+    this.showDeleteModal.set(false);
+    this.itemToDelete.set(null);
+  }
+
+  confirmDelete(): void {
+    // Implement actual delete logic here
+    const id = this.itemToDelete()?.codigo;
+    this.solicitudes.update(list => list.filter(item => item.codigo !== id));
+    this.closeDeleteModal();
+  }
 }
