@@ -1,0 +1,268 @@
+<div class="consolidado-page">
+  <!-- Header Section -->
+  <header class="page-header">
+    <div class="page-header__left">
+      <nav class="breadcrumb">
+        <ol>
+          <li><a (click)="goBack()">Consolidados</a></li>
+          <li class="separator"><span class="material-symbols-outlined">chevron_right</span></li>
+          <li class="current">Detalle</li>
+        </ol>
+      </nav>
+      <div class="page-header__title-row">
+        <h1 class="page-header__title">Detalle: <span class="text-primary">#CON-2023-0842</span></h1>
+        <span class="badge badge--success-soft">CONTABILIZADO</span>
+      </div>
+    </div>
+
+    <div class="page-header__actions">
+      <restaurant-button variant="surface" (click)="openExportModal()">
+        <span class="material-symbols-outlined btn-icon">download</span> Exportar
+      </restaurant-button>
+      <restaurant-button variant="danger" (click)="openReversarModal()">
+        <span class="material-symbols-outlined btn-icon">cancel</span> Reversar Consolidado
+      </restaurant-button>
+    </div>
+  </header>
+
+  <!-- Dashboard Stats Summary (Bento Grid) -->
+  <div class="kpi-grid">
+    <restaurant-kpi-card variant="states">
+      <div class="bento-card kpi-content">
+        <p class="kpi-content__label">Total Consolidado</p>
+        <div>
+          <span class="kpi-content__value">$142,500,000</span>
+          <p class="kpi-content__trend kpi-content__trend--up">
+            <span class="material-symbols-outlined">trending_up</span>
+            +12.5% vs Mes Anterior
+          </p>
+        </div>
+      </div>
+    </restaurant-kpi-card>
+
+    <restaurant-kpi-card variant="states">
+      <div class="bento-card kpi-content">
+        <p class="kpi-content__label">Vouchers Incluidos</p>
+        <div>
+          <span class="kpi-content__value">28 Formatos</span>
+          <p class="kpi-content__subtitle">GIL-F014 v.2023</p>
+        </div>
+      </div>
+    </restaurant-kpi-card>
+
+    <restaurant-kpi-card variant="states">
+      <div class="bento-card kpi-content">
+        <p class="kpi-content__label">Fecha de Cierre</p>
+        <div>
+          <span class="kpi-content__value">24 Oct, 2023</span>
+          <p class="kpi-content__subtitle">16:45 PM</p>
+        </div>
+      </div>
+    </restaurant-kpi-card>
+
+    <restaurant-kpi-card variant="states">
+      <div class="bento-card kpi-content">
+        <p class="kpi-content__label">Centro de Operación</p>
+        <div>
+          <span class="kpi-content__value">Bogotá D.C.</span>
+          <p class="kpi-content__subtitle">Sede Administrativa</p>
+        </div>
+      </div>
+    </restaurant-kpi-card>
+  </div>
+
+  <!-- Section 1: Subtotales Discriminados -->
+  <section class="bento-card p-0">
+    <div class="section-header">
+      <div class="section-header__title-container">
+        <div class="section-header__icon">
+          <span class="material-symbols-outlined">pie_chart</span>
+        </div>
+        <h3 class="section-header__title">Subtotales Discriminados</h3>
+      </div>
+      <span class="section-header__subtitle">Agrupado por categoría contable</span>
+    </div>
+
+    <restaurant-data-table>
+      <thead>
+        <tr>
+          <th class="th-left">Centro de Costo</th>
+          <th class="th-left">Categoría de Inventario</th>
+          <th class="th-right">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of subtotales; track item.cc) {
+          <tr>
+            <td>
+              <div class="td-flex-col">
+                <span class="td-bold">{{ item.cc }}</span>
+                <span class="td-muted">{{ item.area }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="td-medium">{{ item.categoria }}</span>
+            </td>
+            <td class="text-right">
+              <span class="td-value-primary">{{ item.subtotal }}</span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </restaurant-data-table>
+  </section>
+
+  <!-- Section 1.5: Tabla de Ejecución Detallada -->
+  <section class="bento-card p-0 table-overflow">
+    <div class="section-header">
+      <div class="section-header__title-container">
+        <div class="section-header__icon">
+          <span class="material-symbols-outlined">table_view</span>
+        </div>
+        <h3 class="section-header__title">Tabla de Ejecución Detallada</h3>
+      </div>
+    </div>
+
+    <restaurant-data-table>
+      <thead>
+        <tr>
+          <th class="th-left">Fecha</th>
+          <th class="th-left">Nº Factura</th>
+          <th class="th-left">CUFE</th>
+          <th class="th-left">Programa</th>
+          <th class="th-left">Ficha</th>
+          <th class="th-left">Cód. SENA</th>
+          <th class="th-left">Descripción</th>
+          <th class="th-right">Cant.</th>
+          <th class="th-right">Valor Unit.</th>
+          <th class="th-right">IVA%</th>
+          <th class="th-right">Subtotal</th>
+          <th class="th-right">ZESE</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of ejecucion; track item.factura) {
+          <tr>
+            <td class="td-muted whitespace-nowrap">{{ item.fecha }}</td>
+            <td class="td-medium whitespace-nowrap">{{ item.factura }}</td>
+            <td class="td-mono td-muted cursor-help" [title]="item.cufeFull">{{ item.cufe }}</td>
+            <td class="td-normal">{{ item.programa }}</td>
+            <td class="td-muted">{{ item.ficha }}</td>
+            <td class="td-muted whitespace-nowrap">{{ item.codigo }}</td>
+            <td class="td-normal">{{ item.desc }}</td>
+            <td class="text-right td-normal">{{ item.cant }}</td>
+            <td class="text-right td-normal whitespace-nowrap">{{ item.valorUnit }}</td>
+            <td class="text-right td-muted">{{ item.iva }}</td>
+            <td class="text-right td-medium whitespace-nowrap">{{ item.subtotal }}</td>
+            <td class="text-right td-normal">{{ item.zese }}</td>
+          </tr>
+        }
+      </tbody>
+      <tfoot dtFooter class="tfoot-totals">
+        <tr>
+          <td class="tfoot-totals__label" colspan="10">Totales</td>
+          <td class="text-right">
+            <div class="td-flex-col text-right">
+              <span class="tfoot-totals__sublabel">Σ Valor Neto</span>
+              <span class="tfoot-totals__value">$13,050,000</span>
+            </div>
+          </td>
+          <td class="text-right">
+            <div class="td-flex-col text-right">
+              <span class="tfoot-totals__sublabel">Σ IVA</span>
+              <span class="tfoot-totals__value">$2,479,500</span>
+            </div>
+          </td>
+        </tr>
+      </tfoot>
+    </restaurant-data-table>
+  </section>
+
+  <!-- Section 2: Listado de Formatos GIL-F014 -->
+  <section class="bento-card p-0">
+    <div class="section-header">
+      <div class="section-header__title-container">
+        <div class="section-header__icon">
+          <span class="material-symbols-outlined">description</span>
+        </div>
+        <h3 class="section-header__title">Listado de Formatos GIL-F014</h3>
+      </div>
+    </div>
+
+    <restaurant-data-table>
+      <thead>
+        <tr>
+          <th class="th-left">Código GIL</th>
+          <th class="th-left">Solicitante</th>
+          <th class="th-left">Programa</th>
+          <th class="th-left">CUFE</th>
+          <th class="th-left">Fecha</th>
+          <th class="th-right">Valor</th>
+          <th class="th-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of gils; track item.codigo) {
+          <tr>
+            <td>
+              <span class="badge badge--surface font-mono">{{ item.codigo }}</span>
+            </td>
+            <td>
+              <div class="td-flex-row">
+                <div class="avatar">{{ item.iniciales }}</div>
+                <span class="td-medium">{{ item.solicitante }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="td-muted">{{ item.programa }}</span>
+            </td>
+            <td>
+              <span class="td-mono-dashed cursor-help" [title]="item.cufeFull">{{ item.cufe }}</span>
+            </td>
+            <td>
+              <span class="td-muted">{{ item.fecha }}</span>
+            </td>
+            <td class="text-right">
+              <span class="td-bold">{{ item.valor }}</span>
+            </td>
+            <td class="text-center">
+              <button class="action-btn" title="Ver Detalle">
+                <span class="material-symbols-outlined">visibility</span>
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+      <div dtFooter class="dt-footer">
+        <span class="table-pagination__info">Mostrando 4 de 28 registros</span>
+        <div class="pagination-btns">
+          <button class="pagination-btn" disabled>
+            <span class="material-symbols-outlined">chevron_left</span>
+          </button>
+          <button class="pagination-btn pagination-btn--active">1</button>
+          <button class="pagination-btn">2</button>
+          <button class="pagination-btn">3</button>
+          <button class="pagination-btn">
+            <span class="material-symbols-outlined">chevron_right</span>
+          </button>
+        </div>
+      </div>
+    </restaurant-data-table>
+  </section>
+  <restaurant-exportar-consolidado-modal
+    *ngIf="showExportModal"
+    (close)="closeExportModal()"
+    (export)="onExport($event)">
+  </restaurant-exportar-consolidado-modal>
+
+  <restaurant-reversar-consolidado-modal
+    *ngIf="showReversarModal"
+    [consolidadoId]="'#CON-2023-0842'"
+    [periodo]="'Octubre 2024'"
+    [total]="'$ 1.452.300.000'"
+    [comprobantes]="12" 
+    [isBlocked]="isReversarBlocked"
+    (close)="closeReversarModal()"
+    (confirm)="confirmReversar()">
+  </restaurant-reversar-consolidado-modal>
+</div>

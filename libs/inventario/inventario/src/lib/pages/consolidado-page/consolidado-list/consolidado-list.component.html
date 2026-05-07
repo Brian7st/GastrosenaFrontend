@@ -1,0 +1,168 @@
+<div class="consolidado-page">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="page-header__left">
+      <h1 class="page-header__title">Consolidado de Ejecución Presupuestal</h1>
+      <p class="page-header__subtitle">Análisis contable y consolidación de comprobantes GIL-F014 para la vigencia fiscal actual.</p>
+    </div>
+    <div class="page-header__actions">
+      <restaurant-button variant="ghost" (click)="openExportModal()">
+        <span class="material-symbols-outlined btn-icon">download</span> Exportar
+      </restaurant-button>
+      <restaurant-button variant="primary" routerLink="/app/inventario/consolidado/nuevo">
+        <span class="material-symbols-outlined btn-icon">add</span> Generar Nuevo Consolidado
+      </restaurant-button>
+    </div>
+  </div>
+
+  <!-- Bento-Style KPI Grid (Using standard KpiCardComponent) -->
+  <div class="kpi-grid">
+    <restaurant-kpi-card 
+      label="Retención ZESE Acumulada" 
+      value="$1,452,890.00" 
+      icon="account_balance" 
+      iconColor="blue"
+      trend="+4.2%" 
+      [trendUp]="true">
+    </restaurant-kpi-card>
+
+    <restaurant-kpi-card 
+      label="Total IVA Acumulado" 
+      value="$3,842,120.45" 
+      icon="payments" 
+      iconColor="green"
+      trend="Estable" 
+      [trendUp]="null">
+    </restaurant-kpi-card>
+
+    <restaurant-kpi-card 
+      label="Total Ejecutado Neto" 
+      value="$12,980,500.00" 
+      icon="analytics" 
+      iconColor="red"
+      trend="Alerta" 
+      [trendUp]="false">
+    </restaurant-kpi-card>
+
+    <restaurant-kpi-card 
+      label="GILs Pendientes" 
+      value="14" 
+      icon="description" 
+      iconColor="orange">
+    </restaurant-kpi-card>
+  </div>
+
+  <!-- Table Section: Consolidados Históricos -->
+  <restaurant-data-table
+    tableTitle="Consolidados Históricos"
+    tableIcon="history"
+    searchPlaceholder="Buscar reporte o ID...">
+    
+    <thead>
+      <tr>
+        <th class="th-left">ID Consolidado</th>
+        <th class="th-left">Periodo/Mes</th>
+        <th class="th-left">Total Consolidado</th>
+        <th class="th-left">Estado Contable</th>
+        <th class="th-right">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of consolidados; track item.id) {
+        <tr>
+          <td>
+            <span class="td-value-primary td-mono">{{ item.id }}</span>
+          </td>
+          <td>
+            <div class="td-flex-col">
+              <span class="td-medium">{{ item.mes }}</span>
+              <span class="td-muted">{{ item.tipo }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="td-bold">{{ item.total }}</span>
+          </td>
+          <td>
+            <restaurant-status-badge [label]="item.estado" [variant]="item.variant"></restaurant-status-badge>
+          </td>
+          <td class="text-right">
+            <div class="action-buttons">
+              <button class="icon-btn-action" title="Ver Detalles" (click)="goToDetail(item.id)">
+                <span class="material-symbols-outlined">visibility</span>
+              </button>
+              <button class="icon-btn-action icon-btn-action--danger" title="Reversar / Eliminar" (click)="reversar(item.id)">
+                <span class="material-symbols-outlined">undo</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+    
+    <div dtFooter class="dt-footer">
+      <span class="table-pagination__info">Mostrando 4 de 12 registros de consolidados</span>
+      <div class="pagination-btns">
+        <button class="pagination-btn" disabled>
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        <button class="pagination-btn pagination-btn--active">1</button>
+        <button class="pagination-btn">2</button>
+        <button class="pagination-btn">3</button>
+        <button class="pagination-btn">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+      </div>
+    </div>
+  </restaurant-data-table>
+
+  <!-- Contextual Insight / Floating Cards -->
+  <div class="insights-grid">
+    <div class="insight-card insight-card--primary">
+      <div class="insight-card__content">
+        <h3 class="insight-card__title">Resumen de Cumplimiento</h3>
+        <p class="insight-card__text">La ejecución presupuestal del presente trimestre se encuentra en un 85% de avance respecto a la proyección anual GIL-F014.</p>
+        <button class="insight-card__btn">Ver Auditoría</button>
+      </div>
+      <div class="insight-card__visual">
+        <div class="progress-circle">
+          <span>85%</span>
+        </div>
+      </div>
+      <div class="insight-card__decor"></div>
+    </div>
+
+    <div class="insight-card insight-card--surface">
+      <div class="insight-card__header">
+        <div class="insight-icon-box">
+          <span class="material-symbols-outlined text-primary">description</span>
+        </div>
+        <div>
+          <h4 class="insight-card__subtitle">Instructivo GIL-F014</h4>
+          <p class="insight-card__date">Actualizado hace 2 días</p>
+        </div>
+      </div>
+      <p class="insight-card__text-dark">Revise los nuevos parámetros de consolidación para el IVA y retención en la fuente según la circular 012-2024.</p>
+      <a class="insight-card__link" href="#">
+        Descargar Guía PDF
+        <span class="material-symbols-outlined">open_in_new</span>
+      </a>
+    </div>
+  </div>
+
+  <restaurant-exportar-consolidado-modal
+    *ngIf="showExportModal"
+    (close)="closeExportModal()"
+    (export)="onExport($event)">
+  </restaurant-exportar-consolidado-modal>
+
+  <restaurant-reversar-consolidado-modal
+    *ngIf="showReversarModal && selectedReversarItem"
+    [consolidadoId]="selectedReversarItem.id"
+    [periodo]="selectedReversarItem.mes"
+    [total]="selectedReversarItem.total"
+    [comprobantes]="12" 
+    [isBlocked]="isReversarBlocked"
+    (close)="closeReversarModal()"
+    (confirm)="confirmReversar()">
+  </restaurant-reversar-consolidado-modal>
+</div>
