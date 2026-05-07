@@ -46,6 +46,7 @@
 
   &__actions {
     display: flex;
+    gap: 0.75rem;
   }
 }
 
@@ -55,7 +56,7 @@
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// KPI Grid & Content
+// KPI Grid
 // ─────────────────────────────────────────────────────────────────────────────
 .kpi-grid {
   display: grid;
@@ -71,148 +72,9 @@
   }
 }
 
-.kpi-content {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
-  border-radius: 1.5rem; /* Rounded full look from prototype */
-  box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.05);
-
-  &__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1rem;
-  }
-
-  &__label {
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--color-secundario-texto);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin: 0 0 0.25rem 0;
-  }
-
-  &__value {
-    font-family: var(--font-family-headline);
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: var(--color-en-superficie);
-    display: block;
-  }
-}
-
-.kpi-icon-box {
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  .material-symbols-outlined { font-size: 1.25rem; }
-}
-
-.kpi-pill {
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 0.25rem 0.5rem;
-  border-radius: 9999px;
-
-  &--primary {
-    background-color: rgba(var(--color-primario-rgb, 0, 110, 37), 0.1);
-    color: var(--color-primario);
-  }
-  &--tertiary {
-    background-color: rgba(var(--color-terciario-rgb, 186, 24, 48), 0.1);
-    color: var(--color-terciario);
-  }
-  &--muted {
-    color: var(--color-secundario-texto);
-  }
-}
-
-// Badges for Table
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-
-  &--success-soft {
-    background-color: var(--color-primario-contenedor);
-    color: var(--color-en-primario-contenedor);
-  }
-  &--info-soft {
-    background-color: rgba(var(--color-info-rgb, 9, 132, 227), 0.1);
-    color: var(--color-info, #0984e3);
-  }
-  &--surface {
-    background-color: var(--color-superficie-contenedor-mas-alto);
-    color: var(--color-en-superficie-variante);
-  }
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
-// Bento Cards & Table
+// Table Utilities
 // ─────────────────────────────────────────────────────────────────────────────
-.bento-card {
-  background-color: var(--color-superficie-contenedor-mas-bajo);
-  border: 1px solid rgba(var(--color-contorno-variante-rgb, 189, 202, 185), 0.2);
-  border-radius: 1.5rem;
-  padding: 1.5rem;
-  position: relative;
-  
-  &.p-0 { padding: 0; }
-}
-
-.table-shadow {
-  box-shadow: 0 8px 30px rgba(0,0,0,0.04);
-}
-
-.section-header {
-  padding: 1.5rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid var(--color-superficie-contenedor);
-
-  &__title {
-    font-family: var(--font-family-headline);
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin: 0;
-    color: var(--color-en-superficie);
-  }
-
-  &__actions {
-    display: flex;
-    gap: 0.5rem;
-  }
-}
-
-.action-btn-square {
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: var(--color-secundario-texto);
-  transition: background-color 0.2s;
-
-  &:hover {
-    background-color: var(--color-superficie-contenedor-bajo);
-  }
-  .material-symbols-outlined { font-size: 1.25rem; }
-}
-
-// Table Styles
-.table-overflow { overflow-x: auto; }
-
 th {
   padding: 1.25rem 2rem;
   font-size: 0.625rem;
@@ -271,18 +133,37 @@ tr:hover td {
   font-family: var(--font-family-mono);
 }
 
-.link-btn {
-  background: transparent;
+// Action Buttons in Table
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.icon-btn-action {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
   border: none;
-  color: var(--color-primario);
-  font-size: 0.875rem;
-  font-weight: 600;
+  background: transparent;
+  color: var(--color-secundario-texto);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: all 0.2s;
 
   &:hover {
-    color: var(--color-primario-hover);
+    background-color: var(--color-superficie-contenedor-alto);
+    color: var(--color-primario);
   }
+
+  &--danger:hover {
+    color: var(--color-error);
+    background-color: rgba(var(--color-error-rgb, 186, 26, 26), 0.1);
+  }
+
+  .material-symbols-outlined { font-size: 1.25rem; }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -330,12 +211,13 @@ tr:hover td {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Insights / Floating Cards
+// Insights / Floating Cards (Added top margin to fix spacing)
 // ─────────────────────────────────────────────────────────────────────────────
 .insights-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 2rem;
+  margin-top: 1.5rem; /* Fixing the spacing between table and lower cards */
 
   @media (min-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
@@ -482,12 +364,4 @@ tr:hover td {
   }
 }
 
-// Background overrides
-.bg-secondary-container { background-color: var(--color-secundario-contenedor); }
-.text-on-secondary-container { color: var(--color-en-secundario-contenedor); }
-.bg-primary-soft { background-color: rgba(var(--color-primario-rgb, 0, 110, 37), 0.1); }
 .text-primary { color: var(--color-primario); }
-.bg-tertiary-soft { background-color: rgba(var(--color-terciario-rgb, 186, 24, 48), 0.1); }
-.text-tertiary { color: var(--color-terciario); }
-.bg-warning-soft { background-color: rgba(253, 203, 110, 0.2); } // Using warning
-.text-warning { color: #d97706; } // standard warning text
