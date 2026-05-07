@@ -1,140 +1,183 @@
-# Gobierno de shared/ui — reglas cerradas
+# Gobierno de shared/ui
 
-> Documento vinculante. Todo lo que no esté explícitamente permitido aquí está prohibido.
-> Última actualización: 2026-05-07
+> Documento vinculante. Última actualización: 2026-05-07.
+> Todo lo que no esté explícitamente permitido aquí está prohibido.
+
+---
+
+## TL;DR — las 4 reglas que más se rompen
+
+1. **¿Querés crear un componente en shared?** → Primero el proceso de promoción. No al revés.
+2. **¿Vas a poner un color o tamaño?** → Solo con `var(--token)`. Nunca un valor hardcodeado.
+3. **¿Vas a usar un ícono?** → Solo Lucide. Registralo en `RESTAURANT_UI_BASE_ICONS`.
+4. **¿Cómo sabés si un componente está listo?** → Cumple el checklist del final de este doc.
 
 ---
 
 ## 1. Qué entra a `shared/ui`
 
-Un componente puede vivir en `shared/ui` solo si cumple **todas** estas condiciones:
+Un componente puede vivir en `shared/ui` **solo si cumple todo esto**:
 
-- Es consumido por **2 o más dominios distintos**
-- No contiene lógica de negocio ni referencias a un dominio específico
-- Usa **exclusivamente** tokens CSS de `_variables.scss` (sin hardcodes)
-- Soporta tema (claro/oscuro)
-- Tiene los **estados mínimos** cubiertos (ver sección 4)
-- Tiene entrada en el **showcase** (ver sección 5)
-- Tiene **documentación operativa** en Notion
+| Criterio | Descripción |
+|----------|-------------|
+| Reutilización | Lo usan **2 o más dominios distintos** |
+| Aislamiento | Sin lógica de negocio ni referencias a un dominio específico |
+| Tokens | Usa **exclusivamente** `var(--token)` de `_variables.scss` |
+| Estados | Cubre los estados mínimos (ver sección 4) |
+| Showcase | Tiene entrada en `/showcase` |
+| Documentación | Tiene ficha en Notion/Componentes |
 
-## 2. Qué se queda en `{dominio}/ui/`
+---
 
-Si el componente cumple alguna de estas condiciones, NO va a shared:
+## 2. Qué NO va a `shared/ui`
+
+Si el componente cumple alguna de estas condiciones, **se queda en `{dominio}/ui/`**:
 
 - Solo lo usa un dominio
-- Contiene lógica de negocio o referencias a un dominio
-- Es un wrapper muy fino de otro componente sin reutilización real
-- Es una vista o página, no un bloque UI
+- Tiene lógica de negocio o referencia datos de un dominio
+- Es un wrapper muy fino sin reutilización real
+- Es una vista o página completa, no un bloque UI
 
-## 3. Quién aprueba promociones a shared
+---
 
-El proceso es:
+## 3. Proceso de promoción a shared
 
-1. **El dev** abre un issue con etiqueta `promotion/shared-ui` describiendo:
-   - El componente y su API propuesta
-   - Los 2+ dominios que lo necesitan
-   - Los tokens que usa
-2. **El equipo de Arquitectura** (3 personas) evalúa en ≤ 2 días hábiles
-3. Se crea la rama `feat/shared/nombre-componente`
-4. El PR requiere **2 aprobaciones** del equipo de Arquitectura
+```
+1. Dev abre issue con etiqueta "promotion/shared-ui"
+   └── incluye: API propuesta, 2+ dominios que lo necesitan, tokens que usa
+
+2. Equipo de Arquitectura evalúa en ≤ 2 días hábiles
+
+3. Se crea rama feat/shared/nombre-componente
+
+4. PR con 2 aprobaciones del equipo de Arquitectura
+
 5. Merge solo por el tech lead
+```
 
-> Si urgente: hablar directamente con el tech lead. No saltear el proceso.
+> Si es urgente: hablar directamente con el tech lead. **Nunca saltear el proceso.**
 
-## 4. Criterios mínimos que debe cumplir un componente
+---
 
-### Tokens
-- Todo color, espacio, tipografía y sombra debe usar `var(--token)` de `_variables.scss`
-- Cero hardcodes de hex, rgb, px para colores, cero box-shadow inline
+## 4. Criterios mínimos de un componente
 
-### Estados mínimos (controles interactivos)
-| Estado    | Obligatorio |
-|-----------|-------------|
-| default   | ✅ |
-| hover     | ✅ |
-| focus     | ✅ (con `var(--focus-ring)`) |
-| disabled  | ✅ (opacity 0.5 + pointer-events none) |
-| error     | ✅ (para inputs y formularios) |
-| readonly  | Solo si aplica |
-| loading   | Solo si aplica |
+### Estados obligatorios
+
+| Estado | Cuándo |
+|--------|--------|
+| `default` | Siempre |
+| `hover` | Siempre |
+| `focus` con `var(--focus-ring)` | Siempre |
+| `disabled` — `opacity: 0.5` + `pointer-events: none` | Siempre |
+| `error` | En inputs y formularios |
+| `readonly` | Solo si aplica |
+| `loading` | Solo si aplica |
 
 ### Accesibilidad mínima
+
 - `role` semántico cuando el HTML nativo no alcanza
 - `aria-label` o `aria-labelledby` en controles sin texto visible
-- `aria-invalid` + `aria-describedby` para estados de error
+- `aria-invalid` + `aria-describedby` en estados de error
+- IDs únicos por instancia — nunca IDs estáticos en componentes reutilizables
 - Contraste mínimo WCAG AA
 
-### Código
-- `standalone: true`
-- `ChangeDetectionStrategy.OnPush`
+### Código Angular
+
+```typescript
+@Component({
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  // sin any, sin !, sin constructor injection
+})
+```
+
+- `standalone: true` + `ChangeDetectionStrategy.OnPush`
 - `inject()` en vez de constructor injection
 - Sin `any`, sin `!` non-null assertion innecesario
 - Spec con ≥ 1 test de render + ≥ 1 test de comportamiento
 
+---
+
 ## 5. Iconografía — política cerrada
 
-- **Librería oficial y única**: `@lucide/angular` via `LucideIconComponent`
-- Los íconos se registran en `restaurant-ui.providers.ts` (`RESTAURANT_UI_BASE_ICONS`)
-- **Prohibido**: `material-symbols-outlined`, Font Awesome, SVG inline no catalogado
-- Para agregar un ícono nuevo: agregarlo al array `RESTAURANT_UI_BASE_ICONS` en la misma PR
+| | |
+|--|--|
+| **Librería oficial** | `@lucide/angular` via `LucideIconComponent` |
+| **Registro** | `RESTAURANT_UI_BASE_ICONS` en `restaurant-ui.providers.ts` |
+| **Prohibido** | `material-symbols-outlined`, Font Awesome, SVG inline no catalogado |
+| **Para agregar un ícono** | Agregarlo al array `RESTAURANT_UI_BASE_ICONS` en la misma PR |
 
-## 6. Motion — reglas cerradas
+---
 
-Usar siempre los tokens de movimiento definidos en `_variables.scss`:
+## 6. Motion — tokens siempre, valores hardcodeados nunca
 
 ```scss
-transition: color var(--duration-fast) var(--ease-standard);
-transition: box-shadow var(--duration-base) var(--ease-standard);
+// ✅ correcto
+transition: color       var(--duration-fast) var(--ease-standard);
+transition: box-shadow  var(--duration-base) var(--ease-standard);
+
+// ❌ incorrecto
+transition: all 0.2s ease;
 ```
 
-- `--duration-fast` (150ms): micro-interacciones (hover, focus)
-- `--duration-base` (250ms): transiciones de estado
-- `--duration-slow` (400ms): animaciones de entrada/salida
-- **Prohibido**: valores de duración o easing hardcodeados
+| Token | Valor | Cuándo usarlo |
+|-------|-------|--------------|
+| `--duration-fast` | 150ms | Micro-interacciones: hover, focus |
+| `--duration-base` | 250ms | Transiciones de estado |
+| `--duration-slow` | 400ms | Animaciones de entrada/salida |
 
-## 7. Breakpoints — lista oficial
+---
 
-| Token              | Valor  | Uso |
-|--------------------|--------|-----|
-| `--breakpoint-sm`  | 576px  | Mobile landscape |
-| `--breakpoint-md`  | 768px  | Tablet |
-| `--breakpoint-lg`  | 1024px | Desktop |
-| `--breakpoint-xl`  | 1280px | Desktop wide |
+## 7. Breakpoints — escala oficial
+
+| Token | Valor | Uso típico |
+|-------|-------|-----------|
+| `--breakpoint-sm` | 576px | Mobile landscape |
+| `--breakpoint-md` | 768px | Tablet |
+| `--breakpoint-lg` | 1024px | Desktop |
+| `--breakpoint-xl` | 1280px | Desktop wide |
 | `--breakpoint-2xl` | 1440px | Ultrawide |
 
 ```scss
-// ✅ correcto — los CSS custom properties no funcionan en media queries, usar el valor
+// ✅ correcto — los tokens no funcionan en media queries, usar el valor directamente
 @media (max-width: 768px) { ... }
 
-// ❌ prohibido — breakpoints inventados o valores distintos a los oficiales
+// ❌ prohibido — valores que no están en la escala oficial
 @media (max-width: 800px) { ... }
+@media (max-width: 480px) { ... }
 ```
 
-## 8. Definición de "componente cerrado al 100%"
+---
 
-Un componente queda **cerrado** cuando cumple TODO esto:
+## 8. Gradientes
 
-- [ ] Vive en `shared/ui/src/lib/components/`
-- [ ] Exportado en `libs/shared/ui/src/index.ts`
-- [ ] Usa solo tokens CSS (`_variables.scss`)
-- [ ] Soporta tema claro/oscuro
-- [ ] Tiene estados mínimos según sección 4
-- [ ] Usa Lucide (no Material Symbols)
-- [ ] Tiene `*.spec.ts` con ≥ 70% coverage
-- [ ] Tiene entrada en el showcase
-- [ ] Documentado en Notion con: problema, cuándo usarlo, cuándo no, variantes, accesibilidad, deuda, comando showcase
-
-## 9. Gradientes
-
-- Permitidos **solo como tokens**. Actualmente: `var(--color-primario)` → `var(--color-primario-gradient-end)`
+- Permitidos **solo como tokens**
+- Actualmente: `var(--color-primario)` → `var(--color-primario-gradient-end)`
 - No se permiten gradientes decorativos sin token asociado
-- No se permiten gradientes de paleta externa (Tailwind, Bootstrap)
+- No se permiten gradientes de librerías externas (Tailwind, Bootstrap, etc.)
 
-## 10. Qué es componente, patrón o solución local
+---
+
+## 9. ¿Componente, patrón o solución local?
 
 | Caso | Dónde va |
 |------|----------|
 | Bloque UI genérico, 2+ dominios | `shared/ui` |
-| Composición de componentes shared (ej: form con InputComponent) | Patrón documentado en Notion/Patrones |
+| Composición de componentes shared (ej: form con varios inputs) | Patrón documentado en Notion/Patrones |
 | Bloque UI específico de un dominio | `{dominio}/ui/` |
-| Un-liner o wrapper de 3 líneas | Inline, no componentizar |
+| Un wrapper de 3 líneas o un one-liner | Inline — no componentizar |
+
+---
+
+## 10. Checklist de componente cerrado al 100%
+
+Un componente está **cerrado** cuando cumple **todo** sin excepción:
+
+- [ ] Vive en `shared/ui/src/lib/components/`
+- [ ] Exportado en `libs/shared/ui/src/index.ts`
+- [ ] Usa solo tokens CSS (`_variables.scss`) — cero hardcodes
+- [ ] Tiene todos los estados mínimos (sección 4)
+- [ ] Usa Lucide — sin Material Symbols
+- [ ] Tiene `*.spec.ts` con ≥ 70% coverage
+- [ ] Tiene entrada en el showcase (`/showcase`)
+- [ ] Tiene ficha en Notion con: propósito, cuándo usarlo, cuándo no, variantes, accesibilidad y deuda
