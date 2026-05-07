@@ -13,6 +13,7 @@ import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 export class SolicitudesEditComponent {
   
   solicitudId = signal<string>('GIL-2023-0892');
+  isBlocked = signal<boolean>(false);
   
   bienes = signal([
     {
@@ -28,7 +29,12 @@ export class SolicitudesEditComponent {
   constructor(private router: Router, private route: ActivatedRoute) {
     const paramId = this.route.snapshot.paramMap.get('id');
     if (paramId) {
-      this.solicitudId.set(`GIL-F-014-2024-${paramId}`);
+      if (paramId === 'bloqueado') {
+        this.solicitudId.set(`GIL-F-014-2024-BLOQUEADO`);
+        this.isBlocked.set(true);
+      } else {
+        this.solicitudId.set(`GIL-F-014-2024-${paramId}`);
+      }
     }
   }
 

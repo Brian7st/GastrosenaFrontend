@@ -6,19 +6,16 @@
   <!-- Header de Acción -->
   <div class="page-header">
     <div class="header-titles">
-      <div class="breadcrumbs" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-        <button class="btn-volver" (click)="onCancel()" style="display: flex; align-items: center; gap: 0.25rem; background: none; border: none; color: #006e25; font-weight: 600; font-size: 0.875rem; cursor: pointer; padding: 0;">
-          <span class="material-symbols-outlined icon-back" style="font-size: 16px;">arrow_back</span> Volver
-        </button>
-        <span class="separator" style="color: #d4d4d8;">/</span>
-        <span class="breadcrumb-text" style="color: #71717a; font-size: 0.875rem;">Detalle de Solicitud</span>
-      </div>
       <h2 class="title">Editar Solicitud GIL-F-014</h2>
       <p class="subtitle">Actualice la información de asignación de bienes de inventario.</p>
     </div>
-    <div class="header-status">
+    <div class="header-status" style="display: flex; align-items: center; gap: 1rem;">
       <span class="badge badge--active">Activo</span>
       <span class="header-id">ID: {{ solicitudId() }}</span>
+      <button (click)="onCancel()" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; font-weight: 500; color: #52525b; background: transparent; border: none; border-radius: 0.75rem; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#e4e4e7'" onmouseout="this.style.background='transparent'">
+        <span class="material-symbols-outlined text-lg">arrow_back</span>
+        Volver a Solicitudes
+      </button>
     </div>
   </div>
 
@@ -29,8 +26,14 @@
     ══════════════════════════════════════════════════════════════════════════ -->
     <div class="main-form-col">
       
+      <!-- Locked Banner -->
+      <div *ngIf="isBlocked()" class="bg-red-50 p-4 rounded-xl border border-red-200 flex items-center gap-3 mb-6">
+        <span class="material-symbols-outlined text-red-600">lock</span>
+        <p class="text-sm font-medium text-red-800">GIL Procesado — no se permiten modificaciones</p>
+      </div>
+
       <!-- Información del Solicitante -->
-      <div class="form-card">
+      <div class="form-card" [class.opacity-70]="isBlocked()" [class.pointer-events-none]="isBlocked()">
         <div class="card-header">
           <span class="material-symbols-outlined icon-primary">person</span>
           <h3>Información del Solicitante</h3>
@@ -56,7 +59,7 @@
       </div>
 
       <!-- Detalles del Bien -->
-      <div class="form-card">
+      <div class="form-card" [class.opacity-70]="isBlocked()" [class.pointer-events-none]="isBlocked()">
         <div class="card-header">
           <span class="material-symbols-outlined icon-primary">inventory_2</span>
           <h3>Detalles del Bien</h3>
@@ -64,19 +67,19 @@
         <div class="form-row-2">
           <div class="form-group col-span-2">
             <label>Descripción del Equipo</label>
-            <input type="text" class="form-control" value="Portátil Dell Latitude 5420 - Procesador i7, 16GB RAM" />
+            <input type="text" class="form-control" value="Portátil Dell Latitude 5420 - Procesador i7, 16GB RAM" [disabled]="isBlocked()" />
           </div>
           <div class="form-group">
             <label>Placa Inventario</label>
-            <input type="text" class="form-control" value="SENA-IV-2023-456" />
+            <input type="text" class="form-control" value="SENA-IV-2023-456" [disabled]="isBlocked()" />
           </div>
           <div class="form-group">
             <label>Número de Serie</label>
-            <input type="text" class="form-control" value="CZS984210L" />
+            <input type="text" class="form-control" value="CZS984210L" [disabled]="isBlocked()" />
           </div>
           <div class="form-group">
             <label>Estado Entrega</label>
-            <select class="form-control">
+            <select class="form-control" [disabled]="isBlocked()">
               <option selected>Excelente</option>
               <option>Bueno</option>
               <option>Regular</option>
@@ -84,13 +87,13 @@
           </div>
           <div class="form-group">
             <label>Fecha de Asignación</label>
-            <input type="date" class="form-control" value="2023-05-15" />
+            <input type="date" class="form-control" value="2023-05-15" [disabled]="isBlocked()" />
           </div>
         </div>
       </div>
 
       <!-- Trazabilidad Académica -->
-      <div class="form-card">
+      <div class="form-card" [class.opacity-70]="isBlocked()" [class.pointer-events-none]="isBlocked()">
         <div class="card-header">
           <span class="material-symbols-outlined icon-primary">school</span>
           <h3>Trazabilidad Académica</h3>
@@ -98,25 +101,25 @@
         <div class="form-row-2">
           <div class="form-group">
             <label>Vocero (Nombre Completo) <span class="required">*</span></label>
-            <input type="text" class="form-control" placeholder="Nombre del vocero" required />
+            <input type="text" class="form-control" placeholder="Nombre del vocero" required [disabled]="isBlocked()" />
           </div>
           <div class="form-group">
             <label>Vocero (Cédula) <span class="required">*</span></label>
-            <input type="text" class="form-control" placeholder="Ej. 1.000.000.000" required />
+            <input type="text" class="form-control" placeholder="Ej. 1.000.000.000" required [disabled]="isBlocked()" />
           </div>
           <div class="form-group col-span-2">
             <label>Resultado de Aprendizaje (RA) <span class="required">*</span></label>
-            <textarea class="form-control min-h-[80px]" placeholder="Ingrese el texto detallado del RA..." required></textarea>
+            <textarea class="form-control min-h-[80px]" placeholder="Ingrese el texto detallado del RA..." required [disabled]="isBlocked()"></textarea>
           </div>
           <div class="form-group">
             <label>Franja Horaria <span class="required">*</span></label>
-            <input type="text" class="form-control" placeholder="Ej. 06:00 AM - 12:00 PM" required />
+            <input type="text" class="form-control" placeholder="Ej. 06:00 AM - 12:00 PM" required [disabled]="isBlocked()" />
           </div>
         </div>
       </div>
 
       <!-- Bienes Solicitados -->
-      <div class="form-card">
+      <div class="form-card" [class.opacity-70]="isBlocked()" [class.pointer-events-none]="isBlocked()">
         <div class="card-header">
           <span class="material-symbols-outlined icon-primary">category</span>
           <h3>Bienes Solicitados</h3>
@@ -131,7 +134,7 @@
                 <th class="text-right">Cantidad</th>
                 <th class="text-right">Valor Unitario</th>
                 <th class="text-right">Subtotal</th>
-                <th class="text-center">Acción</th>
+                <th class="text-center" *ngIf="!isBlocked()">Acción</th>
               </tr>
             </thead>
             <tbody>
@@ -142,7 +145,7 @@
                 <td class="text-right font-medium text-dark">{{ bien.cantidad }}</td>
                 <td class="text-right text-muted">{{ bien.valorUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
                 <td class="text-right font-bold text-dark">{{ bien.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
-                <td class="text-center">
+                <td class="text-center" *ngIf="!isBlocked()">
                   <button type="button" class="btn-icon btn-icon--danger" (click)="onRemoveBien(i)">
                     <span class="material-symbols-outlined">delete</span>
                   </button>
@@ -151,13 +154,13 @@
             </tbody>
           </table>
         </div>
-        <button type="button" class="btn-link btn-link--add mt-4" (click)="onAddBien()">
+        <button type="button" class="btn-link btn-link--add mt-4" (click)="onAddBien()" *ngIf="!isBlocked()">
           <span class="material-symbols-outlined">add_circle</span> Agregar bien
         </button>
       </div>
 
       <!-- Actions -->
-      <div class="actions-footer">
+      <div class="actions-footer" *ngIf="!isBlocked()">
         <button class="btn btn--secondary" (click)="onCancel()">Cancelar</button>
         <button class="btn btn--primary" (click)="onSave()">Guardar Cambios</button>
       </div>

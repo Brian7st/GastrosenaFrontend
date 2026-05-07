@@ -3,17 +3,15 @@
 ══════════════════════════════════════════════════════════════════════════ -->
 <div class="form-page-container">
   
-  <!-- Page Header -->
-  <div class="page-header">
-    <div class="breadcrumbs" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-      <button class="btn-volver" (click)="onCancel()" style="display: flex; align-items: center; gap: 0.25rem; background: none; border: none; color: #006e25; font-weight: 600; font-size: 0.875rem; cursor: pointer; padding: 0;">
-        <span class="material-symbols-outlined icon-back" style="font-size: 16px;">arrow_back</span> Volver
-      </button>
-      <span class="separator" style="color: #d4d4d8;">/</span>
-      <span class="breadcrumb-text" style="color: #71717a; font-size: 0.875rem;">Solicitudes GIL</span>
+  <div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+    <div>
+      <h2 class="page-title">Nueva Solicitud GIL-F-014</h2>
+      <p class="page-subtitle">Complete la información requerida para el registro y movimiento de bienes institucionales.</p>
     </div>
-    <h2 class="page-title">Nueva Solicitud GIL-F-014</h2>
-    <p class="page-subtitle">Complete la información requerida para el registro y movimiento de bienes institucionales.</p>
+    <button (click)="onCancel()" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; font-weight: 500; color: #52525b; background: transparent; border: none; border-radius: 0.75rem; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#e4e4e7'" onmouseout="this.style.background='transparent'">
+      <span class="material-symbols-outlined text-lg">arrow_back</span>
+      Volver a Solicitudes
+    </button>
   </div>
 
   <!-- Main Form Card -->

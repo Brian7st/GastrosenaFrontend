@@ -5,17 +5,14 @@
   
   <div class="action-header">
     <div class="header-left">
-      <div class="breadcrumbs">
-        <button class="btn-volver" (click)="onVolver()">
-          <span class="material-symbols-outlined icon-back">arrow_back</span> Volver
-        </button>
-        <span class="separator">/</span>
-        <span class="breadcrumb-text">Solicitudes GIL</span>
-      </div>
       <h2 class="title">{{ solicitudId() }}</h2>
     </div>
 
-    <div class="header-actions">
+    <div class="header-actions" style="display: flex; align-items: center; gap: 1rem;">
+      <button (click)="onVolver()" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; font-weight: 500; color: #52525b; background: transparent; border: none; border-radius: 0.75rem; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#e4e4e7'" onmouseout="this.style.background='transparent'">
+        <span class="material-symbols-outlined text-lg">arrow_back</span>
+        Volver a Solicitudes
+      </button>
       <button class="btn-action" (click)="onEditar()" [disabled]="estadoActual() !== 'Borrador'">
         <span class="material-symbols-outlined">edit</span> Editar
       </button>
