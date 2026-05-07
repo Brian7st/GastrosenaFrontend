@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LucideIconComponent } from '../lucide-icon/lucide-icon.component';
 
 export type KpiCardIconColor = 'green' | 'blue' | 'red' | 'orange';
 
 @Component({
   selector: 'restaurant-kpi-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideIconComponent],
   template: `
     <div class="kpi-card" [class.kpi-card--states]="variant === 'states'">
       @if (variant === 'states') {
@@ -23,9 +24,9 @@ export type KpiCardIconColor = 'green' | 'blue' | 'red' | 'orange';
               [class.kpi-card__trend--neutral]="trendUp === null"
             >
               @if (trendUp === true) {
-                <span class="material-symbols-outlined">trending_up</span>
+                <lucide-icon name="trending-up" [size]="16"></lucide-icon>
               } @else if (trendUp === false) {
-                <span class="material-symbols-outlined">trending_down</span>
+                <lucide-icon name="trending-down" [size]="16"></lucide-icon>
               }
               <span>{{ trend }}</span>
             </div>
@@ -33,7 +34,7 @@ export type KpiCardIconColor = 'green' | 'blue' | 'red' | 'orange';
         </div>
         @if (icon) {
           <div class="kpi-card__icon" [class]="'kpi-card__icon--' + iconColor">
-            <span class="material-symbols-outlined">{{ icon }}</span>
+            <lucide-icon [name]="icon" [size]="24"></lucide-icon>
           </div>
         }
       }

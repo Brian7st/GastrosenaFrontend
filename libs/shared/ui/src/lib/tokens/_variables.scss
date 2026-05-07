@@ -110,7 +110,83 @@
   --radius-xl: 16px;
   --radius-pill: 999px;
 
-  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.06);
-  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-xs:           0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-sm:           0 2px 6px rgba(0, 0, 0, 0.08);
+  --shadow-md:           0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-hover:        0 4px 20px rgba(0, 0, 0, 0.08);
+  --shadow-card:         0 4px 20px rgba(0, 0, 0, 0.03);
+  --shadow-card-hover:   0 8px 32px rgba(0, 0, 0, 0.06);
+  --shadow-subtle:       0 4px 24px rgba(0, 0, 0, 0.04);
+  --shadow-primary:      0 8px 20px rgba(57, 169, 0, 0.2);
+  --shadow-primary-hover: 0 12px 28px rgba(57, 169, 0, 0.3);
+
+  /* Breakpoints — usar como referencia en media queries, no como variables directas */
+  --breakpoint-sm:  576px;
+  --breakpoint-md:  768px;
+  --breakpoint-lg:  1024px;
+  --breakpoint-xl:  1280px;
+  --breakpoint-2xl: 1440px;
+
+  /* Motion */
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+  --ease-standard:    cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-decelerate:  cubic-bezier(0, 0, 0.2, 1);
+  --ease-accelerate:  cubic-bezier(0.4, 0, 1, 1);
+
+  /* Focus */
+  --focus-ring: 0 0 0 3px rgba(57, 169, 0, 0.3);
+
+  /* Colores semánticos de feedback (alerts, mensajes) */
+  --color-success-bg:     #f0fdf4;
+  --color-success-text:   #166534;
+  --color-success-border: #bbf7d0;
+  --color-success-bg-subtle: rgba(0, 184, 148, 0.12);
+  --color-success-vivid:  #22c55e;
+
+  --color-error-bg:     #fef2f2;
+  --color-error-text:   #991b1b;
+  --color-error-border: #fecaca;
+
+  --color-warning-bg:     #fffbeb;
+  --color-warning-text:   #92400e;
+  --color-warning-border: #fde68a;
+  --color-warning-interactive:      #d97a00;
+  --color-warning-interactive-dark: #a15c00;
+  --color-warning-bg-subtle:        rgba(253, 203, 110, 0.28);
+  --color-warning-badge-bg:         rgba(253, 203, 110, 0.2);
+  --color-warning-badge-text:       #8a5b00;
+
+  --color-info-bg:     #eff6ff;
+  --color-info-text:   #1e40af;
+  --color-info-border: #bfdbfe;
+  --color-info-bg-subtle: rgba(9, 132, 227, 0.12);
+
+  --color-danger-bg-subtle: rgba(214, 48, 49, 0.12);
+
+  /* Colores de texto adicionales */
+  --color-text-heading: #111827;
+  --color-text-muted:   #6b7280;
+
+  /* Backdrop (overlays / modales) */
+  --color-backdrop: rgba(15, 23, 42, 0.45);
+
+  /* Skeleton shimmer */
+  --color-skeleton-shimmer: #f8fbf6;
+
+  /* Tabla */
+  --color-table-row-hover: rgba(248, 250, 252, 0.8);
+  --color-table-footer-bg: rgba(248, 250, 252, 0.3);
+
+  /* Botón primario — gradiente */
+  --color-primario-gradient-end: #28a745;
+
+  /* KPI icon colors */
+  --color-kpi-green-bg:   #f0fdf4;
+  --color-kpi-green:      #16a34a;
+  --color-kpi-blue-bg:    #eff6ff;
+  --color-kpi-blue:       #2563eb;
+  --color-kpi-orange-bg:  #fff7ed;
+  --color-kpi-orange:     #ea580c;
 }

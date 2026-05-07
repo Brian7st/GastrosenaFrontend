@@ -10,11 +10,14 @@
   font-family: var(--font-family-base);
   font-size: 0.8125rem;
   font-weight: 700;
-  transition: all 0.2s ease;
+  transition: background-color var(--duration-fast) var(--ease-standard),
+              box-shadow var(--duration-fast) var(--ease-standard),
+              transform var(--duration-fast) var(--ease-standard);
   white-space: nowrap;
 
-  .material-symbols-outlined {
-    font-size: 20px;
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
   }
 
   &:disabled {
@@ -26,13 +29,13 @@
   // ─── Variants ──────────────────────────────────────────────────────────────
 
   &--primary {
-    background: linear-gradient(135deg, var(--color-primario) 0%, #28a745 100%);
-    color: #fff;
-    box-shadow: 0 8px 20px rgba(0, 110, 37, 0.2);
+    background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-primario-gradient-end) 100%);
+    color: var(--color-en-primario);
+    box-shadow: var(--shadow-primary);
 
     &:hover {
       transform: scale(1.02);
-      box-shadow: 0 12px 28px rgba(0, 110, 37, 0.3);
+      box-shadow: var(--shadow-primary-hover);
     }
 
     &:active {

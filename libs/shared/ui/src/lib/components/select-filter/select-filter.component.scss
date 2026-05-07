@@ -1,11 +1,12 @@
 .select-filter {
   display: grid;
-  gap: var(--space-2);
+  gap: var(--space-1);
 }
 
 .select-filter__label {
   font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
 }
 
 .select-filter__wrapper {
@@ -15,17 +16,39 @@
 .select-filter__control {
   width: 100%;
   appearance: none;
-  padding: var(--space-3) 36px var(--space-3) var(--space-4);
+  padding: var(--space-3) var(--space-10) var(--space-3) var(--space-4);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface-primary);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  outline: none;
+  transition: border-color var(--duration-fast) var(--ease-standard),
+              box-shadow var(--duration-fast) var(--ease-standard);
+
+  &:hover {
+    border-color: var(--color-border-strong);
+  }
+
+  &:focus {
+    border-color: var(--color-primario);
+    box-shadow: var(--focus-ring);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--color-surface-tertiary);
+  }
 }
 
 .select-filter__icon {
   position: absolute;
   top: 50%;
-  right: 12px;
+  right: var(--space-3);
   transform: translateY(-50%);
   pointer-events: none;
-  color: var(--color-pizarra-500);
+  color: var(--color-text-secondary);
 }

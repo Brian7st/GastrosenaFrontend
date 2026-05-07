@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
+import { LucideIconComponent } from '../lucide-icon/lucide-icon.component';
 
 @Component({
   selector: 'restaurant-data-table',
   standalone: true,
-  imports: [],
+  imports: [LucideIconComponent],
   template: `
     <div class="dt-card">
 
@@ -12,14 +13,14 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewEn
         <div class="dt-controls">
           <div class="dt-controls__title">
             @if (tableIcon) {
-              <span class="material-symbols-outlined dt-controls__icon">{{ tableIcon }}</span>
+              <lucide-icon [name]="tableIcon" [size]="22" class="dt-controls__icon"></lucide-icon>
             }
             <h3 class="dt-controls__heading">{{ tableTitle }}</h3>
           </div>
           <div class="dt-controls__actions">
             @if (searchPlaceholder) {
               <div class="dt-search">
-                <span class="material-symbols-outlined dt-search__icon">search</span>
+                <lucide-icon name="search" [size]="18" class="dt-search__icon"></lucide-icon>
                 <input
                   type="text"
                   class="dt-search__input"
@@ -29,7 +30,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewEn
               </div>
             }
             <button class="dt-filter-btn">
-              <span class="material-symbols-outlined">filter_list</span>
+              <lucide-icon name="list-filter" [size]="16"></lucide-icon>
               Filtros
             </button>
           </div>
