@@ -2,17 +2,34 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { ButtonComponent, DataTableComponent, KpiCardComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
+import { ExportarConsolidadoModalComponent } from '../components/exportar-consolidado-modal/exportar-consolidado-modal.component';
 
 @Component({
   selector: 'restaurant-consolidado-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent, StatusBadgeComponent],
+  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent, StatusBadgeComponent, ExportarConsolidadoModalComponent],
   templateUrl: './consolidado-list.component.html',
   styleUrl: './consolidado-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConsolidadoListComponent {
   private router = inject(Router);
+
+  showExportModal = false;
+
+  openExportModal() {
+    this.showExportModal = true;
+  }
+
+  closeExportModal() {
+    this.showExportModal = false;
+  }
+
+  onExport(format: 'excel' | 'pdf') {
+    console.log('Exporting as', format);
+    // Add real export logic here
+    this.showExportModal = false;
+  }
 
   // Mocks para la tabla de consolidados históricos
   consolidados: Array<{ id: string; mes: string; tipo: string; total: string; estado: string; variant: 'success' | 'warning' | 'danger' | 'info' }> = [

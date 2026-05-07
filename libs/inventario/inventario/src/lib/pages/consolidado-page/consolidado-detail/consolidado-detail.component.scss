@@ -398,54 +398,51 @@ tr:hover td {
 // ─────────────────────────────────────────────────────────────────────────────
 // Pagination (Section 2)
 // ─────────────────────────────────────────────────────────────────────────────
-.pagination-footer {
-  padding: 1rem 2rem;
-  background-color: var(--color-superficie);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 1px solid var(--color-superficie-variante);
-
-  &__text {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--color-secundario-texto);
-  }
+.table-pagination__info {
+  font-size: var(--font-size-sm, 0.875rem);
+  color: var(--color-secundario-texto);
 }
 
-.pagination-controls {
+.pagination-btns {
   display: flex;
-  gap: 0.5rem;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
 }
 
 .pagination-btn {
-  width: 2rem;
-  height: 2rem;
-  border-radius: 0.25rem;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: none;
-  background-color: var(--color-superficie-contenedor-mas-bajo);
-  color: var(--color-en-superficie);
-  font-size: 0.75rem;
-  font-weight: 700;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-md, 0.375rem);
+  background: var(--color-superficie-contenedor-bajo);
+  border: 1px solid var(--color-superficie-contenedor);
+  color: var(--color-secundario-texto);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
 
-  &:hover:not(&--disabled):not(&--active) {
-    background-color: var(--color-superficie-contenedor-bajo);
+  &:hover:not(:disabled):not(.pagination-btn--active) {
+    background: var(--color-superficie-contenedor);
+    color: var(--color-en-superficie);
   }
 
   &--active {
-    background-color: var(--color-primario);
-    color: var(--color-superficie-contenedor-mas-bajo);
+    background: var(--color-primario);
+    border-color: var(--color-primario);
+    color: var(--color-en-primario);
+    font-weight: 600;
   }
 
-  &--disabled {
+  &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
 
-  .material-symbols-outlined { font-size: 1.125rem; }
+  .material-symbols-outlined {
+    font-size: 1.25rem;
+  }
 }

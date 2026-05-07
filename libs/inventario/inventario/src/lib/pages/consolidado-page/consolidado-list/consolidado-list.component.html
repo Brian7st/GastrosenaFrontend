@@ -6,10 +6,10 @@
       <p class="page-header__subtitle">Análisis contable y consolidación de comprobantes GIL-F014 para la vigencia fiscal actual.</p>
     </div>
     <div class="page-header__actions">
-      <restaurant-button variant="surface" icon="download">
+      <restaurant-button variant="ghost" (click)="openExportModal()">
         <span class="material-symbols-outlined btn-icon">download</span> Exportar
       </restaurant-button>
-      <restaurant-button variant="primary" icon="add">
+      <restaurant-button variant="primary">
         <span class="material-symbols-outlined btn-icon">add</span> Generar Nuevo Consolidado
       </restaurant-button>
     </div>
@@ -99,11 +99,18 @@
       }
     </tbody>
     
-    <div dtFooter class="pagination-footer">
-      <span class="pagination-footer__text">Mostrando 4 de 12 registros de consolidados</span>
-      <div class="pagination-controls">
-        <button class="pagination-btn pagination-btn--surface">Anterior</button>
-        <button class="pagination-btn pagination-btn--primary">Siguiente</button>
+    <div dtFooter class="dt-footer">
+      <span class="table-pagination__info">Mostrando 4 de 12 registros de consolidados</span>
+      <div class="pagination-btns">
+        <button class="pagination-btn" disabled>
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        <button class="pagination-btn pagination-btn--active">1</button>
+        <button class="pagination-btn">2</button>
+        <button class="pagination-btn">3</button>
+        <button class="pagination-btn">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
       </div>
     </div>
   </restaurant-data-table>
@@ -141,4 +148,10 @@
       </a>
     </div>
   </div>
+
+  <restaurant-exportar-consolidado-modal
+    *ngIf="showExportModal"
+    (close)="closeExportModal()"
+    (export)="onExport($event)">
+  </restaurant-exportar-consolidado-modal>
 </div>

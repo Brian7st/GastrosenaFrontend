@@ -1,5 +1,4 @@
 .consolidado-page {
-  padding: 2rem 3rem 6rem;
   min-height: 100%;
   background: var(--color-superficie, #f8f9fa);
   font-family: var(--font-family-base);
@@ -84,9 +83,14 @@ th {
   letter-spacing: 0.05em;
   background-color: rgba(var(--color-superficie-contenedor-bajo-rgb, 243, 244, 245), 0.5);
   border: none;
-  
-  &.th-left { text-align: left; }
-  &.th-right { text-align: right; }
+
+  &.th-left {
+    text-align: left;
+  }
+
+  &.th-right {
+    text-align: right;
+  }
 }
 
 td {
@@ -99,7 +103,9 @@ tr:hover td {
   background-color: var(--color-superficie-contenedor-bajo);
 }
 
-.text-right { text-align: right; }
+.text-right {
+  text-align: right;
+}
 
 .td-flex-col {
   display: flex;
@@ -163,50 +169,60 @@ tr:hover td {
     background-color: rgba(var(--color-error-rgb, 186, 26, 26), 0.1);
   }
 
-  .material-symbols-outlined { font-size: 1.25rem; }
+  .material-symbols-outlined {
+    font-size: 1.25rem;
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pagination (Table Footer)
 // ─────────────────────────────────────────────────────────────────────────────
-.pagination-footer {
-  padding: 1rem 2rem;
-  background-color: rgba(var(--color-superficie-contenedor-bajo-rgb, 243, 244, 245), 0.3);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  &__text {
-    font-size: 0.75rem;
-    color: var(--color-secundario-texto);
-  }
+.table-pagination__info {
+  font-size: var(--font-size-sm, 0.875rem);
+  color: var(--color-secundario-texto);
 }
 
-.pagination-controls {
+.pagination-btns {
   display: flex;
-  gap: 0.5rem;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
 }
 
 .pagination-btn {
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-md, 0.375rem);
+  background: var(--color-superficie-contenedor-bajo);
+  border: 1px solid var(--color-superficie-contenedor);
+  color: var(--color-secundario-texto);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
 
-  &--surface {
-    background-color: transparent;
-    color: var(--color-en-superficie-variante);
-    &:hover { background-color: var(--color-superficie-contenedor); }
+  &:hover:not(:disabled):not(.pagination-btn--active) {
+    background: var(--color-superficie-contenedor);
+    color: var(--color-en-superficie);
   }
 
-  &--primary {
-    background-color: var(--color-primario);
+  &--active {
+    background: var(--color-primario);
+    border-color: var(--color-primario);
     color: var(--color-en-primario);
-    box-shadow: var(--shadow-sm);
-    &:hover { background-color: var(--color-primario-hover); }
+    font-weight: 600;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .material-symbols-outlined {
+    font-size: 1.25rem;
   }
 }
 
@@ -217,7 +233,8 @@ tr:hover td {
   display: grid;
   grid-template-columns: 1fr;
   gap: 2rem;
-  margin-top: 1.5rem; /* Fixing the spacing between table and lower cards */
+  margin-top: 1.5rem;
+  /* Fixing the spacing between table and lower cards */
 
   @media (min-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
@@ -254,7 +271,10 @@ tr:hover td {
   &__visual {
     z-index: 10;
     display: none;
-    @media (min-width: 768px) { display: block; }
+
+    @media (min-width: 768px) {
+      display: block;
+    }
   }
 
   &__decor {
@@ -302,7 +322,9 @@ tr:hover td {
     cursor: pointer;
     transition: background-color 0.2s;
 
-    &:hover { background-color: rgba(255, 255, 255, 0.3); }
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
   }
 
   &__header {
@@ -332,9 +354,14 @@ tr:hover td {
     display: flex;
     align-items: center;
     gap: 0.25rem;
-    
-    &:hover { text-decoration: underline; }
-    .material-symbols-outlined { font-size: 0.875rem; }
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    .material-symbols-outlined {
+      font-size: 0.875rem;
+    }
   }
 }
 
@@ -364,4 +391,6 @@ tr:hover td {
   }
 }
 
-.text-primary { color: var(--color-primario); }
+.text-primary {
+  color: var(--color-primario);
+}
