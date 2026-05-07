@@ -78,5 +78,12 @@ export const shellRoutes: Routes = [
     ],
   },
 
+  // ── Showcase — herramienta de revisión del sistema de diseño (sin auth) ──
+  {
+    path: 'showcase',
+    loadComponent: () =>
+      import('./showcase/showcase.component').then(m => m.ShowcaseComponent),
+  },
+
   { path: '**', redirectTo: '' },
 ];

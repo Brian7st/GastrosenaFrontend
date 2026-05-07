@@ -1,0 +1,230 @@
+<div class="showcase">
+  <restaurant-page-header
+    title="Showcase — Sistema de Diseño"
+    subtitle="Revisión visual oficial de todos los componentes de shared/ui"
+  />
+
+  <!-- ── ButtonComponent ─────────────────────────────────────────────────── -->
+  <section class="showcase__section">
+    <h2 class="showcase__heading">ButtonComponent</h2>
+    <p class="showcase__meta">selector: <code>restaurant-button</code> · variantes: primary | surface | ghost | filter</p>
+    <div class="showcase__row">
+      <restaurant-button variant="primary">Primario</restaurant-button>
+      <restaurant-button variant="surface">Surface</restaurant-button>
+      <restaurant-button variant="ghost">Ghost</restaurant-button>
+      <restaurant-button variant="filter">Filter</restaurant-button>
+      <restaurant-button variant="primary" [disabled]="true">Disabled</restaurant-button>
+    </div>
+  </section>
+
+  <!-- ── AlertComponent ─────────────────────────────────────────────────── -->
+  <section class="showcase__section">
+    <h2 class="showcase__heading">AlertComponent</h2>
+    <p class="showcase__meta">selector: <code>restaurant-alert</code> · variantes: success | error | warning | info</p>
+    <div class="showcase__stack">
+      <restaurant-alert type="success" message="Operación completada con éxito." />
+      <restaurant-alert type="error" message="Ocurrió un error al guardar." />
+      <restaurant-alert type="warning" message="Este cambio no se puede deshacer." />
+      <restaurant-alert type="info" message="Revisá tus datos antes de continuar." />
+    </div>
+  </section>
+
+  <!-- ── StatusBadgeComponent ───────────────────────────────────────────── -->
+  <section class="showcase__section">
+    <h2 class="showcase__heading">StatusBadgeComponent</h2>
+    <p class="showcase__meta">selector: <code>restaurant-status-badge</code> · variantes: success | warning | danger | info</p>
+    <div class="showcase__row">
+      <restaurant-status-badge label="Activo" variant="success" />
+      <restaurant-status-badge label="Pendiente" variant="warning" />
+      <restaurant-status-badge label="Anulado" variant="danger" />
+      <restaurant-status-badge label="Registrado" variant="info" />
+    </div>
+  </section>
+
+  <!-- ── InputComponent ─────────────────────────────────────────────────── -->
+  <section class="showcase__section">
+    <h2 class="showcase__heading">InputComponent</h2>
+    <p class="showcase__meta">selector: <code>restaurant-input</code> · implementa ControlValueAccessor</p>
+    <div class="showcase__grid-2">
+      <restaurant-input label="Sin icono" placeholder="Escribí algo..." />
+      <restaurant-input label="Con icono izquierdo" placeholder="Buscar..." icon="search" iconPosition="left" />
+      <restaurant-input label="Con icono derecho" placeholder="Tu email" type="email" icon="user" iconPosition="right" />
+      <restaurant-input label="Con error" placeholder="Campo inválido" error="Este campo es requerido." />
+      <restaurant-input label="Con hint" placeholder="Ingresá tu usuario" hint="Usá tu correo institucional." />
+      <restaurant-input label="Readonly" [readonly]="true" placeholder="No editable" />
+      <restaurant-input label="Disabled" [disabled]="true" placeholder="No disponible" />
+      <restaurant-input label="Required" [required]="true" placeholder="Obligatorio" />
+    </div>
+  </section>
+
+  <!-- ── KpiCardComponent ───────────────────────────────────────────────── -->
+  <section class="showcase__section">
+    <h2 class="showcase__heading">KpiCardComponent</h2>
+    <p class="showcase__meta">selector: <code>restaurant-kpi-card</code> · variantes: default | states</p>
+    <div class="showcase__grid-3">
+      <restaurant-kpi-card label="Total" value="$1.200.000" icon="landmark" iconColor="green" trend="+12% vs mes anterior" [trendUp]="true" />
+      <restaurant-kpi-card label="Alertas" value="7 items" icon="warehouse" iconColor="red" trend="Crítico" [trendUp]="false" />
+      <restaurant-kpi-card label="Movimientos" value="34 altas" icon="refresh-cw" iconColor="blue" trend="Hoy" [trendUp]="null" />
+      <restaurant-kpi-card label="Facturas" value="128" icon="file-text" iconColor="green" trend="+8% este mes" [trendUp]="true" />
+      <restaurant-kpi-card label="Monto" value="$84.500" icon="banknote" iconColor="blue" trend="+3% período" [trendUp]="true" />
+      <restaurant-kpi-card label="Naranja" value="42" icon="package" iconColor="orange" trend="Sin cambio" [trendUp]="null" />
+    </div>
+  </section>
+
+  <!-- ── SearchFilterComponent ─────────────────────────────────────────── -->
+  <section class="showcase__section">
+    <h2 class="showcase__heading">SearchFilterComponent</h2>
+    <p class="showcase__meta">selector: <code>restaurant-search-filter</code></p>
+    <div class="showcase__row">
+      <restaurant-search-filter label="Buscar producto" placeholder="Escribí para filtrar..." [value]="searchValue()" (valueChange)="searchValue.set($event)" />
+      <span class="showcase__value">Valor: "{{ searchValue() }}"</span>
+    </div>
+  </section>
+
+  <!-- ── SelectFilterComponent ─────────────────────────────────────────── -->
+  <section class="showcase__section">
+    <h2 class="showcase__heading">SelectFilterComponent</h2>
+    <p class="showcase__meta">selector: <code>restaurant-select-filter</code></p>
+    <div class="showcase__row">
+      <restaurant-select-filter label="Filtrar por" [value]="selectValue()" [options]="selectOptions" (valueChange)="selectValue.set($event)" />
+      <span class="showcase__value">Valor: "{{ selectValue() }}"</span>
+    </div>
+  </section>
+
+  <!-- ── LoadingSkeletonComponent ───────────────────────────────────────── -->
+  <section class="showcase__section">
+    <h2 class="showcase__heading">LoadingSkeletonComponent</h2>
+    <p class="showcase__meta">selector: <code>restaurant-loading-skeleton</code></p>
+    <div class="showcase__grid-2">
+      <div>
+        <p class="showcase__label">3 líneas (default)</p>
+        <restaurant-loading-skeleton [lines]="3" />
+      </div>
+      <div>
+        <p class="showcase__label">6 líneas</p>
+        <restaurant-loading-skeleton [lines]="6" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PageHeaderComponent ────────────────────────────────────────────── -->
+  <section class="showcase__section">
+    <h2 class="showcase__heading">PageHeaderComponent</h2>
+    <p class="showcase__meta">selector: <code>restaurant-page-header</code></p>
+    <div class="showcase__stack">
+      <div class="showcase__demo-box">
+        <restaurant-page-header title="Solo título" />
+      </div>
+      <div class="showcase__demo-box">
+        <restaurant-page-header title="Con subtítulo" subtitle="Esta es la descripción de la sección." />
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SectionTitleComponent ─────────────────────────────────────────── -->
+  <section class="showcase__section">
+    <h2 class="showcase__heading">SectionTitleComponent</h2>
+    <p class="showcase__meta">selector: <code>restaurant-section-title</code> · align: left | center | right</p>
+    <div class="showcase__stack">
+      <restaurant-section-title title="Alineado a la izquierda" subtitle="Subtítulo descriptivo de esta sección." align="left" />
+      <restaurant-section-title title="Centrado" subtitle="Subtítulo centrado." align="center" />
+    </div>
+  </section>
+
+  <!-- ── EmptyStateComponent ───────────────────────────────────────────── -->
+  <section class="showcase__section">
+    <h2 class="showcase__heading">EmptyStateComponent</h2>
+    <p class="showcase__meta">selector: <code>restaurant-empty-state</code></p>
+    <restaurant-empty-state title="Sin resultados" message="No hay datos que coincidan con tu búsqueda." />
+  </section>
+
+  <!-- ── ExportButtonComponent ─────────────────────────────────────────── -->
+  <section class="showcase__section">
+    <h2 class="showcase__heading">ExportButtonComponent</h2>
+    <p class="showcase__meta">selector: <code>restaurant-export-button</code></p>
+    <div class="showcase__row">
+      <restaurant-export-button />
+      <restaurant-export-button label="Descargar CSV" />
+    </div>
+  </section>
+
+  <!-- ── CardComponent ─────────────────────────────────────────────────── -->
+  <section class="showcase__section">
+    <h2 class="showcase__heading">CardComponent</h2>
+    <p class="showcase__meta">selector: <code>restaurant-card</code></p>
+    <div class="showcase__grid-3">
+      <restaurant-card title="Producto con imagen" subtitle="Descripción del producto disponible en el menú." imageUrl="https://placehold.co/400x300/e9f8dd/39a900?text=Imagen" [price]="15000" />
+      <restaurant-card title="Sin imagen ni precio" subtitle="Solo título y descripción del elemento." />
+      <restaurant-card title="Con precio" subtitle="Plato principal disponible en temporada alta." [price]="32000" />
+    </div>
+  </section>
+
+  <!-- ── DataTableComponent ────────────────────────────────────────────── -->
+  <section class="showcase__section">
+    <h2 class="showcase__heading">DataTableComponent</h2>
+    <p class="showcase__meta">selector: <code>restaurant-data-table</code></p>
+    <restaurant-data-table
+      tableTitle="Inventario"
+      tableIcon="warehouse"
+      searchPlaceholder="Buscar producto..."
+      [columns]="tableColumns"
+      [rows]="tableRows"
+    />
+  </section>
+
+  <!-- ── ConfirmDialogComponent ────────────────────────────────────────── -->
+  <section class="showcase__section">
+    <h2 class="showcase__heading">ConfirmDialogComponent</h2>
+    <p class="showcase__meta">selector: <code>restaurant-confirm-dialog</code></p>
+    <restaurant-button variant="surface" (click)="confirmOpen.set(true)">Abrir diálogo</restaurant-button>
+    <restaurant-confirm-dialog
+      [open]="confirmOpen()"
+      title="¿Confirmás esta acción?"
+      message="Esta operación no se puede deshacer."
+      (confirm)="confirmOpen.set(false)"
+      (cancel)="confirmOpen.set(false)"
+    />
+  </section>
+
+  <!-- ── KeywordConfirmModalComponent ─────────────────────────────────── -->
+  <section class="showcase__section">
+    <h2 class="showcase__heading">KeywordConfirmModalComponent</h2>
+    <p class="showcase__meta">selector: <code>restaurant-keyword-confirm-modal</code> · accent: danger | warning</p>
+    <div class="showcase__row">
+      <restaurant-button variant="ghost" (click)="keywordOpen.set(true)">Danger</restaurant-button>
+      <restaurant-button variant="ghost" (click)="keywordWarningOpen.set(true)">Warning</restaurant-button>
+    </div>
+    <restaurant-keyword-confirm-modal
+      [open]="keywordOpen()"
+      title="Eliminar registro"
+      description="Esta acción eliminará el registro permanentemente."
+      keyword="ELIMINAR"
+      accent="danger"
+      (cancel)="keywordOpen.set(false)"
+      (confirm)="keywordOpen.set(false)"
+    />
+    <restaurant-keyword-confirm-modal
+      [open]="keywordWarningOpen()"
+      title="Anular factura"
+      description="La factura quedará anulada en el sistema."
+      keyword="ANULAR"
+      accent="warning"
+      (cancel)="keywordWarningOpen.set(false)"
+      (confirm)="keywordWarningOpen.set(false)"
+    />
+  </section>
+
+  <!-- ── LucideIconComponent ───────────────────────────────────────────── -->
+  <section class="showcase__section">
+    <h2 class="showcase__heading">LucideIconComponent — íconos disponibles</h2>
+    <p class="showcase__meta">selector: <code>lucide-icon</code> · 66 íconos registrados en RESTAURANT_UI_BASE_ICONS</p>
+    <div class="showcase__icon-grid">
+      @for (icon of lucideIcons; track icon) {
+        <div class="showcase__icon-item">
+          <lucide-icon [name]="icon" [size]="24"></lucide-icon>
+          <span>{{ icon }}</span>
+        </div>
+      }
+    </div>
+  </section>
+</div>

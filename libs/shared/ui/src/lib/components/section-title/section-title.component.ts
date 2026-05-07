@@ -12,16 +12,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
       }
     </div>
   `,
-  styles: [`
-    .section-title {
-      margin-bottom: 2.5rem;
-      &.align-center { text-align: center; }
-      &.align-left   { text-align: left; }
-      &.align-right  { text-align: right; }
-    }
-    .section-title__heading  { font-size: 1.875rem; font-weight: 700; margin-bottom: 0.5rem; }
-    .section-title__subtitle { color: #64748b; line-height: 1.7; max-width: 42rem; margin: 0 auto; }
-  `],
+  styleUrl: './section-title.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SectionTitleComponent {

@@ -28,7 +28,7 @@
     <restaurant-kpi-card
       label="Total Facturas"
       [value]="k.totalFacturas | number"
-      icon="description"
+      icon="file-text"
       iconColor="green"
       [trend]="'+' + k.tendenciaTotalFacturas + '% este mes'"
       [trendUp]="true"
@@ -37,7 +37,7 @@
     <restaurant-kpi-card
       label="Monto Mensual"
       [value]="'$' + (k.montoMensual | number:'1.2-2')"
-      icon="payments"
+      icon="banknote"
       iconColor="blue"
       [trend]="'+' + k.tendenciaMonto + '% vs periodo anterior'"
       [trendUp]="true"

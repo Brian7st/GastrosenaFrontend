@@ -1,3 +1,4 @@
+export * from './lib/components/input/input.component';
 export * from './lib/components/lucide-icon/lucide-icon.component';
 export * from './lib/components/data-table/data-table.component';
 export * from './lib/components/confirm-dialog/confirm-dialog.component';

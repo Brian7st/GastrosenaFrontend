@@ -1,35 +1,46 @@
-# Protocolo obligatorio — antes de cualquier cambio
+# Protocolo de inicio — obligatorio antes de cualquier cambio
 
-Antes de tocar UNA SOLA línea de código, debés hacer estas preguntas al desarrollador.
-No asumas nada. No empieces a codificar hasta tener todas las respuestas.
+> **Regla de oro:** no escribís una sola línea de código hasta completar este protocolo.
 
-## Preguntas obligatorias
+---
 
-1. **¿En qué dominio vas a trabajar?**
-   Opciones: `shell` | `auth` | `cocina` | `bar` | `restaurante` | `inventario` |
-   `abastecimiento` | `reportes` | `notificaciones` | `shared`
+## Paso 1 — Hacé estas 4 preguntas
 
-2. **¿Cuál es el RF o descripción del cambio?**
-   Ejemplo: "RF-C4.2.1 — agregar componente de tarjeta de receta"
+| # | Pregunta | Opciones válidas |
+|---|----------|-----------------|
+| 1 | ¿En qué dominio trabajás? | `shell` · `auth` · `cocina` · `bar` · `restaurante` · `inventario` · `abastecimiento` · `reportes` · `notificaciones` · `shared` |
+| 2 | ¿Cuál es el RF o descripción del cambio? | Ej: `RF-C4.2.1 — agregar tarjeta de receta` |
+| 3 | ¿Qué tipo de cambio es? | `feat` · `fix` · `chore` · `refactor` · `test` |
+| 4 | ¿El cambio toca solo ese dominio? | Si toca otro → **detener y coordinar con Arquitectura** |
 
-3. **¿Qué tipo de cambio es?**
-   Opciones: `feat` (nueva funcionalidad) | `fix` (bug) | `chore` (configuración) | `refactor` | `test`
+---
 
-4. **¿Confirmás que el cambio NO toca otro dominio?**
-   Si la respuesta es "sí toca otro dominio" → detener y coordinar con el equipo de Arquitectura.
+## Paso 2 — Leé los archivos del dominio
 
-## Luego de obtener las respuestas
+```
+.ai/domains/{dominio}.md     ← reglas específicas del dominio
+.ai/rules/architecture.md    ← dependencias entre módulos
+.ai/rules/code-quality.md    ← estándares de código
+```
 
-1. Leer el archivo `.ai/domains/{dominio}.md` para conocer las reglas específicas
-2. Leer `.ai/rules/architecture.md` para las reglas de dependencias
-3. Leer `.ai/rules/code-quality.md` para los estándares de código
-4. Confirmar con el dev: "Voy a trabajar en `libs/{dominio}/`, el commit será `{tipo}({dominio}): {descripción}`. ¿Correcto?"
-5. Solo entonces empezar
+---
 
-## Lo que NUNCA podés hacer sin preguntar
+## Paso 3 — Confirmá antes de empezar
 
-- Crear archivos fuera de `libs/{dominio-asignado}/`
-- Modificar cualquier archivo en `libs/shared/`
-- Modificar `tsconfig.base.json`, `.eslintrc.json`, `nx.json`, `apps/`
-- Instalar dependencias nuevas
-- Cambiar rutas en `shell.routes.ts`
+Decile al dev exactamente:
+
+> "Voy a trabajar en `libs/{dominio}/`, el commit será `{tipo}({dominio}): {descripción}`. ¿Correcto?"
+
+Solo arrancás cuando el dev confirma.
+
+---
+
+## Prohibido sin preguntar — siempre
+
+| Acción prohibida | Por qué |
+|-----------------|---------|
+| Crear archivos fuera de `libs/{dominio-asignado}/` | Rompe el aislamiento de dominio |
+| Modificar cualquier archivo en `libs/shared/` | Requiere aprobación de Arquitectura |
+| Modificar `tsconfig.base.json`, `.eslintrc.json`, `nx.json`, `apps/` | Afecta toda la plataforma |
+| Instalar dependencias nuevas | Requiere aprobación del tech lead |
+| Cambiar rutas en `shell.routes.ts` | Impacto global de navegación |

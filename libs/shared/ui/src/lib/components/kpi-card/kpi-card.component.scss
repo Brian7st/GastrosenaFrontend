@@ -2,7 +2,7 @@
   background: var(--color-superficie-contenedor-mas-bajo);
   border-radius: 0.75rem;
   padding: 1.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--shadow-card);
   border: 1px solid rgba(0, 0, 0, 0.03);
   display: flex;
   align-items: flex-start;
@@ -10,7 +10,7 @@
   transition: box-shadow 0.2s ease;
 
   &:hover {
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--shadow-card-hover);
   }
 
   &__body {
@@ -24,14 +24,14 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #6b7280;
+    color: var(--color-text-muted);
   }
 
   &__value {
     font-family: var(--font-family-headline);
     font-size: 1.875rem;
     font-weight: 700;
-    color: #111827;
+    color: var(--color-text-heading);
     line-height: 1.2;
     margin-top: 0.25rem;
   }
@@ -44,11 +44,11 @@
     font-weight: 600;
     margin-top: 0.75rem;
 
-    .material-symbols-outlined { font-size: 1rem; }
+    lucide-icon { width: 1rem; height: 1rem; }
 
     &--up      { color: var(--color-primario); }
     &--down    { color: var(--color-terciario); }
-    &--neutral { color: #6b7280; }
+    &--neutral { color: var(--color-text-muted); }
   }
 
   &__icon {
@@ -60,12 +60,12 @@
     justify-content: center;
     flex-shrink: 0;
 
-    .material-symbols-outlined { font-size: 1.5rem; }
+    lucide-icon { width: 1.5rem; height: 1.5rem; }
 
-    &--green  { background: #f0fdf4; color: #16a34a; }
-    &--blue   { background: #eff6ff; color: #2563eb; }
-    &--red    { background: #fef2f2; color: var(--color-terciario); }
-    &--orange { background: #fff7ed; color: #ea580c; }
+    &--green  { background: var(--color-kpi-green-bg);  color: var(--color-kpi-green); }
+    &--blue   { background: var(--color-kpi-blue-bg);   color: var(--color-kpi-blue); }
+    &--red    { background: var(--color-kpi-red-bg);    color: var(--color-kpi-red); }
+    &--orange { background: var(--color-kpi-orange-bg); color: var(--color-kpi-orange); }
   }
 
   // Variante para grilla de estados (usa ng-content)

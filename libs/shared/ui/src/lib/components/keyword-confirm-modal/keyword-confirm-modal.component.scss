@@ -4,7 +4,7 @@
   z-index: 500;
   display: grid;
   place-items: center;
-  background: rgba(15, 23, 42, 0.45);
+  background: var(--color-backdrop);
   padding: var(--space-6);
 }
 
@@ -22,7 +22,7 @@
 }
 
 .keyword-confirm-modal__accent--warning {
-  background: #d97a00;
+  background: var(--color-warning-interactive);
 }
 
 .keyword-confirm-modal__body {
@@ -37,13 +37,13 @@
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: rgba(214, 48, 49, 0.12);
+  background: var(--color-danger-bg-subtle);
   color: var(--color-danger);
 }
 
 .keyword-confirm-modal__icon--warning {
-  background: rgba(253, 203, 110, 0.28);
-  color: #a15c00;
+  background: var(--color-warning-bg-subtle);
+  color: var(--color-warning-interactive-dark);
 }
 
 .keyword-confirm-modal__title,
@@ -91,7 +91,7 @@
 }
 
 .keyword-confirm-modal__button--warning {
-  background: #d97a00;
+  background: var(--color-warning-interactive);
 }
 
 .keyword-confirm-modal__button--secondary {
