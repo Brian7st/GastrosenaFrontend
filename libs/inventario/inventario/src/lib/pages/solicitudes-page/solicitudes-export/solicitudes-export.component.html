@@ -1,0 +1,174 @@
+<!-- ══════════════════════════════════════════════════════════════════════════
+     Vista Previa y Exportación - Layout
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="export-page-container bg-zinc-900/10">
+  
+  <!-- Toolbar Overlay -->
+  <div class="export-toolbar">
+    <div class="toolbar-left">
+      <div class="icon-box">
+        <span class="material-symbols-outlined text-primary">picture_as_pdf</span>
+      </div>
+      <div>
+        <h2 class="title">Vista Previa: {{ solicitudId() }}_Inventario_2024.pdf</h2>
+        <p class="subtitle">Documento Oficial SENA</p>
+      </div>
+    </div>
+    <div class="toolbar-right">
+      <button class="btn-close" (click)="onClose()">
+        <span class="material-symbols-outlined text-lg">close</span>
+        Cerrar Vista Previa
+      </button>
+      <button class="btn-docx">
+        <span class="material-symbols-outlined text-lg">description</span>
+        Descargar .docx
+      </button>
+      <button class="btn-download">
+        <span class="material-symbols-outlined text-lg">download</span>
+        Descargar Ahora
+      </button>
+    </div>
+  </div>
+
+  <!-- PDF Container Scroll Area -->
+  <div class="pdf-scroll-area bg-zinc-200">
+    <!-- Paper Document -->
+    <div class="paper-document">
+      
+      <!-- Header Section -->
+      <header class="doc-header">
+        <div class="doc-logo">
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJSlkLKFKRSHBO_OOHVw8lpNgMhlcoWu1P7wvS3QoWiz-mZwjFhokjbVStJb2BrkeEHVlb2bWt62Apl3_cYcyk1mTdECV7viqhOdnYglkA_rSN-bIa_XtP_oWNEgdYnViHGZufCGVg0pVWeH24tev4VzAEIkTIE04NqGOPg9gXOzidVG1ulgVou7pn_QePJvUPzWmRW45494SzgcFn_Ic36leBo8Dt9eRlXEELbvJwbGaqHQy0N7-lGhRFhidgeaKgdtJyHDicxqPZ" alt="Logo SENA" />
+        </div>
+        <div class="doc-title-box">
+          <p class="doc-process">Proceso Gestión de Infraestructura y Logística</p>
+          <p class="doc-title">FORMATO SOLICITUD DE BIENES</p>
+        </div>
+        <div class="doc-meta-box">
+          <div class="meta-row"><span>Código:</span><strong>GIL-F-014</strong></div>
+          <div class="meta-row meta-row--border"><span>Versión:</span><strong>04</strong></div>
+          <div class="meta-row meta-row--border"><span>Fecha:</span><strong>15/03/2024</strong></div>
+        </div>
+      </header>
+
+      <!-- Document Meta Info -->
+      <div class="doc-info-grid">
+        <div class="info-item">
+          <span class="info-label">Regional:</span>
+          <span class="info-value">Distrito Capital</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Centro de Formación:</span>
+          <span class="info-value">Centro de Gestión Administrativa</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Solicitante:</span>
+          <span class="info-value">Admin_Precision_Ledger</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Fecha de Solicitud:</span>
+          <span class="info-value">12 de Octubre, 2024</span>
+        </div>
+      </div>
+
+      <!-- Items Table -->
+      <div class="doc-table-container">
+        <table class="doc-table">
+          <thead>
+            <tr>
+              <th class="w-12 text-left">Ítem</th>
+              <th class="text-left">Descripción de Bienes</th>
+              <th class="w-12 text-center">Unidad</th>
+              <th class="w-12 text-center">Cant.</th>
+              <th class="w-20 text-right">Valor Unitario</th>
+              <th class="w-20 text-right">Total</th>
+              <th class="w-24 text-left">Observaciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-center">01</td>
+              <td>Portátil Corporativo Core i7 16GB RAM - Serial: SN-9283-A</td>
+              <td class="text-center">UND</td>
+              <td class="text-center">05</td>
+              <td class="text-right">$3.500.000</td>
+              <td class="text-right">$17.500.000</td>
+              <td class="italic text-secondary">Asignación Aula 402</td>
+            </tr>
+            <tr>
+              <td class="text-center">02</td>
+              <td>Monitor Ultrawide 34" Curvo para Diseño Gráfico</td>
+              <td class="text-center">UND</td>
+              <td class="text-center">02</td>
+              <td class="text-right">$1.200.000</td>
+              <td class="text-right">$2.400.000</td>
+              <td class="italic text-secondary">Reposición por daño</td>
+            </tr>
+            <tr>
+              <td class="text-center">03</td>
+              <td>Silla Ergonómica con Soporte Lumbar Ajustable</td>
+              <td class="text-center">UND</td>
+              <td class="text-center">10</td>
+              <td class="text-right">$450.000</td>
+              <td class="text-right">$4.500.000</td>
+              <td class="italic text-secondary">Dotación personal planta</td>
+            </tr>
+            <!-- Filler rows -->
+            <tr class="filler-row"><td colspan="7"></td></tr>
+            <tr class="filler-row"><td colspan="7"></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Signatures Section -->
+      <div class="doc-signatures">
+        <div class="signature-box">
+          <div class="signature-line">
+            <p class="sig-title">ENTREGA</p>
+            <p class="sig-label">Nombre:</p>
+            <p class="sig-label mt-1">Identificación/Cédula:</p>
+          </div>
+        </div>
+        <div class="signature-box">
+          <div class="signature-line">
+            <p class="sig-title">VOCERO DE APRENDICES</p>
+            <p class="sig-label">Nombre:</p>
+            <p class="sig-label mt-1">Identificación/Cédula:</p>
+          </div>
+        </div>
+        <div class="signature-box relative">
+          <div class="stamp-bg">
+            <span class="material-symbols-outlined">verified</span>
+          </div>
+          <div class="signature-line">
+            <p class="sig-title">AUTORIZA</p>
+            <p class="sig-label">Nombre:</p>
+            <p class="sig-label mt-1">Identificación/Cédula:</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Note -->
+      <footer class="doc-footer">
+        <p>
+          Este documento es propiedad del Servicio Nacional de Aprendizaje - SENA. Cualquier reproducción no autorizada será sancionada de acuerdo con la normatividad vigente. <br/> Documento generado automáticamente por el sistema Precision Ledger para la Gestión de Bienes.
+        </p>
+      </footer>
+
+    </div>
+  </div>
+
+  <!-- Floating Tooltip -->
+  <div class="floating-tooltip">
+    <div class="zoom-controls">
+      <span class="material-symbols-outlined text-xl">zoom_in</span>
+      <span class="zoom-text">100%</span>
+    </div>
+    <div class="page-controls">
+      <button class="nav-btn"><span class="material-symbols-outlined">first_page</span></button>
+      <span class="page-text">Página 1 de 1</span>
+      <button class="nav-btn disabled"><span class="material-symbols-outlined">last_page</span></button>
+    </div>
+  </div>
+
+</div>
