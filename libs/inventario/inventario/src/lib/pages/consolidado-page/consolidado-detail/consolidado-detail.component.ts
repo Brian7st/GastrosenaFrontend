@@ -1,18 +1,25 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { ButtonComponent, DataTableComponent, KpiCardComponent } from '@restaurant/shared/ui';
+import { ExportarConsolidadoModalComponent } from '../components/exportar-consolidado-modal/exportar-consolidado-modal.component';
+import { ReversarConsolidadoModalComponent } from '../components/reversar-consolidado-modal/reversar-consolidado-modal.component';
 
 @Component({
   selector: 'restaurant-consolidado-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent],
+  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent, ExportarConsolidadoModalComponent, ReversarConsolidadoModalComponent],
   templateUrl: './consolidado-detail.component.html',
   styleUrl: './consolidado-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConsolidadoDetailComponent {
   private router = inject(Router);
+  private location = inject(Location);
+
+  showExportModal = false;
+  showReversarModal = false;
+  isReversarBlocked = false;
 
   // Mocks para la tabla de subtotales
   subtotales = [
@@ -36,6 +43,33 @@ export class ConsolidadoDetailComponent {
   ];
 
   goBack(): void {
-    this.router.navigate(['/app/inventario/bienes']);
+    this.router.navigate(['/app/inventario/consolidado']);
+  }
+
+  openExportModal() {
+    this.showExportModal = true;
+  }
+
+  closeExportModal() {
+    this.showExportModal = false;
+  }
+
+  onExport(format: 'excel' | 'pdf') {
+    console.log('Exporting detail as', format);
+    this.showExportModal = false;
+  }
+
+  openReversarModal() {
+    this.isReversarBlocked = false; // Mock
+    this.showReversarModal = true;
+  }
+
+  closeReversarModal() {
+    this.showReversarModal = false;
+  }
+
+  confirmReversar() {
+    console.log('Reversing detail!');
+    this.closeReversarModal();
   }
 }

@@ -16,11 +16,11 @@
     </div>
 
     <div class="page-header__actions">
-      <restaurant-button variant="surface">
-        <span class="material-symbols-outlined btn-icon">print</span> Imprimir
+      <restaurant-button variant="surface" (click)="openExportModal()">
+        <span class="material-symbols-outlined btn-icon">download</span> Exportar
       </restaurant-button>
-      <restaurant-button variant="primary">
-        <span class="material-symbols-outlined btn-icon">download</span> Exportar Reporte Contable
+      <restaurant-button variant="danger" (click)="openReversarModal()">
+        <span class="material-symbols-outlined btn-icon">cancel</span> Reversar Consolidado
       </restaurant-button>
     </div>
   </header>
@@ -248,5 +248,22 @@
         </div>
       </div>
     </restaurant-data-table>
-  </section>
+  </main>
+
+  <restaurant-exportar-consolidado-modal
+    *ngIf="showExportModal"
+    (close)="closeExportModal()"
+    (export)="onExport($event)">
+  </restaurant-exportar-consolidado-modal>
+
+  <restaurant-reversar-consolidado-modal
+    *ngIf="showReversarModal"
+    [consolidadoId]="'#CON-2023-0842'"
+    [periodo]="'Octubre 2024'"
+    [total]="'$ 1.452.300.000'"
+    [comprobantes]="12" 
+    [isBlocked]="isReversarBlocked"
+    (close)="closeReversarModal()"
+    (confirm)="confirmReversar()">
+  </restaurant-reversar-consolidado-modal>
 </div>

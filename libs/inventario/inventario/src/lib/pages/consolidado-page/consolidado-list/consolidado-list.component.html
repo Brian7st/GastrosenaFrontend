@@ -154,4 +154,15 @@
     (close)="closeExportModal()"
     (export)="onExport($event)">
   </restaurant-exportar-consolidado-modal>
+
+  <restaurant-reversar-consolidado-modal
+    *ngIf="showReversarModal && selectedReversarItem"
+    [consolidadoId]="selectedReversarItem.id"
+    [periodo]="selectedReversarItem.mes"
+    [total]="selectedReversarItem.total"
+    [comprobantes]="12" 
+    [isBlocked]="isReversarBlocked"
+    (close)="closeReversarModal()"
+    (confirm)="confirmReversar()">
+  </restaurant-reversar-consolidado-modal>
 </div>
