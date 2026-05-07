@@ -101,8 +101,7 @@ export const INVENTARIO_ROUTES: Routes = [
     children: [
       {
         path: '',
-        redirectTo: '1',
-        pathMatch: 'full'
+        loadComponent: () => import('./pages/consolidado-page/consolidado-list/consolidado-list.component').then(m => m.ConsolidadoListComponent)
       },
       {
         path: ':id',

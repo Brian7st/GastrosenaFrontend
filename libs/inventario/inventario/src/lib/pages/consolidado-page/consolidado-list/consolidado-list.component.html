@@ -1,0 +1,172 @@
+<div class="consolidado-page">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="page-header__left">
+      <h1 class="page-header__title">Consolidado de Ejecución Presupuestal</h1>
+      <p class="page-header__subtitle">Análisis contable y consolidación de comprobantes GIL-F014 para la vigencia fiscal actual.</p>
+    </div>
+    <div class="page-header__actions">
+      <restaurant-button variant="primary" icon="add">
+        <span class="material-symbols-outlined btn-icon">add</span> Generar Nuevo Consolidado
+      </restaurant-button>
+    </div>
+  </div>
+
+  <!-- Bento-Style KPI Grid -->
+  <div class="kpi-grid">
+    <!-- KPI Card 1 -->
+    <restaurant-kpi-card variant="states">
+      <div class="bento-card kpi-content">
+        <div class="kpi-content__header">
+          <div class="kpi-icon-box bg-secondary-container">
+            <span class="material-symbols-outlined text-on-secondary-container">account_balance</span>
+          </div>
+          <span class="kpi-pill kpi-pill--primary">+4.2%</span>
+        </div>
+        <div>
+          <p class="kpi-content__label">Total Retención ZESE Acumulada</p>
+          <span class="kpi-content__value">$1,452,890.00</span>
+        </div>
+      </div>
+    </restaurant-kpi-card>
+
+    <!-- KPI Card 2 -->
+    <restaurant-kpi-card variant="states">
+      <div class="bento-card kpi-content">
+        <div class="kpi-content__header">
+          <div class="kpi-icon-box bg-primary-soft">
+            <span class="material-symbols-outlined text-primary">payments</span>
+          </div>
+          <span class="kpi-pill kpi-pill--muted">Estable</span>
+        </div>
+        <div>
+          <p class="kpi-content__label">Total IVA Acumulado</p>
+          <span class="kpi-content__value">$3,842,120.45</span>
+        </div>
+      </div>
+    </restaurant-kpi-card>
+
+    <!-- KPI Card 3 -->
+    <restaurant-kpi-card variant="states">
+      <div class="bento-card kpi-content">
+        <div class="kpi-content__header">
+          <div class="kpi-icon-box bg-tertiary-soft">
+            <span class="material-symbols-outlined text-tertiary">analytics</span>
+          </div>
+          <span class="kpi-pill kpi-pill--tertiary">Alerta</span>
+        </div>
+        <div>
+          <p class="kpi-content__label">Total Ejecutado Neto</p>
+          <span class="kpi-content__value">$12,980,500.00</span>
+        </div>
+      </div>
+    </restaurant-kpi-card>
+
+    <!-- KPI Card 4 -->
+    <restaurant-kpi-card variant="states">
+      <div class="bento-card kpi-content">
+        <div class="kpi-content__header">
+          <div class="kpi-icon-box bg-warning-soft">
+            <span class="material-symbols-outlined text-warning">description</span>
+          </div>
+        </div>
+        <div>
+          <p class="kpi-content__label">GILs pendientes por consolidar</p>
+          <span class="kpi-content__value">14</span>
+        </div>
+      </div>
+    </restaurant-kpi-card>
+  </div>
+
+  <!-- Table Section: Consolidados Históricos -->
+  <div class="bento-card p-0 table-overflow table-shadow">
+    <div class="section-header">
+      <h2 class="section-header__title">Consolidados Históricos</h2>
+      <div class="section-header__actions">
+        <button class="action-btn-square">
+          <span class="material-symbols-outlined">filter_list</span>
+        </button>
+        <button class="action-btn-square">
+          <span class="material-symbols-outlined">download</span>
+        </button>
+      </div>
+    </div>
+
+    <restaurant-data-table>
+      <thead dtHeader>
+        <tr>
+          <th class="th-left">ID Consolidado</th>
+          <th class="th-left">Periodo/Mes</th>
+          <th class="th-left">Total Consolidado</th>
+          <th class="th-left">Estado Contable</th>
+          <th class="th-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of consolidados; track item.id) {
+          <tr>
+            <td>
+              <span class="td-value-primary td-mono">{{ item.id }}</span>
+            </td>
+            <td>
+              <div class="td-flex-col">
+                <span class="td-medium">{{ item.mes }}</span>
+                <span class="td-muted">{{ item.tipo }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="td-bold">{{ item.total }}</span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="item.estadoCss">{{ item.estado }}</span>
+            </td>
+            <td class="text-right">
+              <button class="link-btn" (click)="goToDetail(item.id)">Ver Detalles</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+      <div dtFooter class="pagination-footer">
+        <span class="pagination-footer__text">Mostrando 4 de 12 registros de consolidados</span>
+        <div class="pagination-controls">
+          <button class="pagination-btn pagination-btn--surface">Anterior</button>
+          <button class="pagination-btn pagination-btn--primary">Siguiente</button>
+        </div>
+      </div>
+    </restaurant-data-table>
+  </div>
+
+  <!-- Contextual Insight / Floating Cards -->
+  <div class="insights-grid">
+    <div class="insight-card insight-card--primary">
+      <div class="insight-card__content">
+        <h3 class="insight-card__title">Resumen de Cumplimiento</h3>
+        <p class="insight-card__text">La ejecución presupuestal del presente trimestre se encuentra en un 85% de avance respecto a la proyección anual GIL-F014.</p>
+        <button class="insight-card__btn">Ver Auditoría</button>
+      </div>
+      <div class="insight-card__visual">
+        <div class="progress-circle">
+          <span>85%</span>
+        </div>
+      </div>
+      <div class="insight-card__decor"></div>
+    </div>
+
+    <div class="insight-card insight-card--surface">
+      <div class="insight-card__header">
+        <div class="insight-icon-box">
+          <span class="material-symbols-outlined text-primary">description</span>
+        </div>
+        <div>
+          <h4 class="insight-card__subtitle">Instructivo GIL-F014</h4>
+          <p class="insight-card__date">Actualizado hace 2 días</p>
+        </div>
+      </div>
+      <p class="insight-card__text-dark">Revise los nuevos parámetros de consolidación para el IVA y retención en la fuente según la circular 012-2024.</p>
+      <a class="insight-card__link" href="#">
+        Descargar Guía PDF
+        <span class="material-symbols-outlined">open_in_new</span>
+      </a>
+    </div>
+  </div>
+</div>

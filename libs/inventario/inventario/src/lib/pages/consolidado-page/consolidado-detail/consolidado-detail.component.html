@@ -1,38 +1,39 @@
-<div class="p-8 max-w-7xl mx-auto space-y-8 consolidado-container">
-  <!-- Breadcrumb & Header -->
-  <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-    <div>
-      <nav class="flex items-center gap-2 text-xs text-gray-500 mb-2 uppercase tracking-wider font-semibold">
-        <span class="cursor-pointer hover:text-primary transition-colors" (click)="goBack()">Consolidados</span>
-        <span class="material-symbols-outlined text-[12px]">chevron_right</span>
-        <span class="text-primary font-bold">Detalle</span>
+<div class="consolidado-page">
+  <!-- Header Section -->
+  <header class="page-header">
+    <div class="page-header__left">
+      <nav class="breadcrumb">
+        <ol>
+          <li><a (click)="goBack()">Consolidados</a></li>
+          <li class="separator"><span class="material-symbols-outlined">chevron_right</span></li>
+          <li class="current">Detalle</li>
+        </ol>
       </nav>
-      <div class="flex items-center gap-4">
-        <h2 class="font-manrope text-3xl font-extrabold text-on-surface m-0">Detalle: <span class="text-primary">#CON-2023-0842</span></h2>
-        <span class="px-4 py-1 bg-primary-container text-on-primary-container text-xs font-bold rounded-full uppercase tracking-widest">Contabilizado</span>
+      <div class="page-header__title-row">
+        <h1 class="page-header__title">Detalle: <span class="text-primary">#CON-2023-0842</span></h1>
+        <span class="badge badge--success-soft">CONTABILIZADO</span>
       </div>
     </div>
-    <div class="flex gap-3">
-      <restaurant-button variant="surface">
-        <span class="material-symbols-outlined text-[18px]">print</span>
-        Imprimir
+
+    <div class="page-header__actions">
+      <restaurant-button variant="surface" icon="print">
+        <span class="material-symbols-outlined btn-icon">print</span> Imprimir
       </restaurant-button>
-      <restaurant-button variant="primary">
-        <span class="material-symbols-outlined text-[18px]">download</span>
-        Exportar Reporte Contable
+      <restaurant-button variant="primary" icon="download">
+        <span class="material-symbols-outlined btn-icon">download</span> Exportar Reporte Contable
       </restaurant-button>
     </div>
-  </div>
+  </header>
 
   <!-- Dashboard Stats Summary (Bento Grid) -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+  <div class="kpi-grid">
     <restaurant-kpi-card variant="states">
-      <div class="bg-surface-container-lowest p-6 rounded-xl border-none shadow-sm flex flex-col justify-between h-full">
-        <p class="text-xs font-bold text-gray-500 uppercase tracking-tight mb-4 m-0">Total Consolidado</p>
+      <div class="bento-card kpi-content">
+        <p class="kpi-content__label">Total Consolidado</p>
         <div>
-          <span class="font-manrope text-2xl font-extrabold">$142,500,000</span>
-          <p class="text-xs text-green-600 mt-1 flex items-center gap-1 font-medium m-0">
-            <span class="material-symbols-outlined text-[14px]">trending_up</span>
+          <span class="kpi-content__value">$142,500,000</span>
+          <p class="kpi-content__trend kpi-content__trend--up">
+            <span class="material-symbols-outlined">trending_up</span>
             +12.5% vs Mes Anterior
           </p>
         </div>
@@ -40,70 +41,70 @@
     </restaurant-kpi-card>
 
     <restaurant-kpi-card variant="states">
-      <div class="bg-surface-container-lowest p-6 rounded-xl border-none shadow-sm flex flex-col justify-between h-full">
-        <p class="text-xs font-bold text-gray-500 uppercase tracking-tight mb-4 m-0">Vouchers Incluidos</p>
+      <div class="bento-card kpi-content">
+        <p class="kpi-content__label">Vouchers Incluidos</p>
         <div>
-          <span class="font-manrope text-2xl font-extrabold">28 Formatos</span>
-          <p class="text-xs text-gray-400 mt-1 font-medium m-0">GIL-F014 v.2023</p>
+          <span class="kpi-content__value">28 Formatos</span>
+          <p class="kpi-content__subtitle">GIL-F014 v.2023</p>
         </div>
       </div>
     </restaurant-kpi-card>
 
     <restaurant-kpi-card variant="states">
-      <div class="bg-surface-container-lowest p-6 rounded-xl border-none shadow-sm flex flex-col justify-between h-full">
-        <p class="text-xs font-bold text-gray-500 uppercase tracking-tight mb-4 m-0">Fecha de Cierre</p>
+      <div class="bento-card kpi-content">
+        <p class="kpi-content__label">Fecha de Cierre</p>
         <div>
-          <span class="font-manrope text-2xl font-extrabold">24 Oct, 2023</span>
-          <p class="text-xs text-gray-400 mt-1 font-medium m-0">16:45 PM</p>
+          <span class="kpi-content__value">24 Oct, 2023</span>
+          <p class="kpi-content__subtitle">16:45 PM</p>
         </div>
       </div>
     </restaurant-kpi-card>
 
     <restaurant-kpi-card variant="states">
-      <div class="bg-surface-container-lowest p-6 rounded-xl border-none shadow-sm flex flex-col justify-between h-full">
-        <p class="text-xs font-bold text-gray-500 uppercase tracking-tight mb-4 m-0">Centro de Operación</p>
+      <div class="bento-card kpi-content">
+        <p class="kpi-content__label">Centro de Operación</p>
         <div>
-          <span class="font-manrope text-2xl font-extrabold">Bogotá D.C.</span>
-          <p class="text-xs text-gray-400 mt-1 font-medium m-0">Sede Administrativa</p>
+          <span class="kpi-content__value">Bogotá D.C.</span>
+          <p class="kpi-content__subtitle">Sede Administrativa</p>
         </div>
       </div>
     </restaurant-kpi-card>
   </div>
 
   <!-- Section 1: Subtotales Discriminados -->
-  <section class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden border-none">
-    <div class="px-8 py-6 flex justify-between items-center border-b border-gray-50">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-surface-container-low rounded-full flex items-center justify-center text-primary">
+  <section class="bento-card p-0">
+    <div class="section-header">
+      <div class="section-header__title-container">
+        <div class="section-header__icon">
           <span class="material-symbols-outlined">pie_chart</span>
         </div>
-        <h3 class="font-manrope text-xl font-bold m-0">Subtotales Discriminados</h3>
+        <h3 class="section-header__title">Subtotales Discriminados</h3>
       </div>
-      <span class="text-xs text-gray-400 font-medium italic">Agrupado por categoría contable</span>
+      <span class="section-header__subtitle">Agrupado por categoría contable</span>
     </div>
 
     <restaurant-data-table>
-      <thead dtHeader class="bg-surface-container-low border-b border-gray-100">
+      <thead dtHeader>
         <tr>
-          <th class="px-8 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-left">Centro de Costo</th>
-          <th class="px-8 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-left">Categoría de Inventario</th>
-          <th class="px-8 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-right">Subtotal</th>
+          <th class="th-left">Centro de Costo</th>
+          <th class="th-left">Categoría de Inventario</th>
+          <th class="th-right">Subtotal</th>
         </tr>
       </thead>
       <tbody>
         @for (item of subtotales; track item.cc) {
-          <tr class="hover:bg-surface-container-low transition-colors border-b border-gray-50">
-            <td class="px-8 py-4">
-              <div class="flex flex-col">
-                <span class="font-bold text-on-surface">{{ item.cc }}</span>
-                <span class="text-xs text-gray-400">{{ item.area }}</span>
+          <tr>
+            <td>
+              <div class="td-flex-col">
+                <span class="td-bold">{{ item.cc }}</span>
+                <span class="td-muted">{{ item.area }}</span>
               </div>
             </td>
-            <td class="px-8 py-4">
-              <span class="text-sm font-medium text-on-surface-variant">{{ item.categoria }}</span>
+            <td>
+              <span class="td-medium">{{ item.categoria }}</span>
             </td>
-            <td class="px-8 py-4 text-right">
-              <span class="font-manrope text-lg font-bold text-primary">{{ item.subtotal }}</span>
+            <td class="text-right">
+              <span class="td-value-primary">{{ item.subtotal }}</span>
             </td>
           </tr>
         }
@@ -112,68 +113,65 @@
   </section>
 
   <!-- Section 1.5: Tabla de Ejecución Detallada -->
-  <section class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden border-none overflow-x-auto">
-    <div class="px-8 py-6 flex justify-between items-center border-b border-gray-50">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-surface-container-low rounded-full flex items-center justify-center text-primary">
+  <section class="bento-card p-0 table-overflow">
+    <div class="section-header">
+      <div class="section-header__title-container">
+        <div class="section-header__icon">
           <span class="material-symbols-outlined">table_view</span>
         </div>
-        <h3 class="font-manrope text-xl font-bold m-0">Tabla de Ejecución Detallada</h3>
+        <h3 class="section-header__title">Tabla de Ejecución Detallada</h3>
       </div>
     </div>
 
     <restaurant-data-table>
-      <thead dtHeader class="bg-surface-container-low border-b border-gray-100">
+      <thead dtHeader>
         <tr>
-          <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-left">Fecha</th>
-          <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-left">Nº Factura</th>
-          <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-left">CUFE</th>
-          <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-left">Programa</th>
-          <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-left">Ficha</th>
-          <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-left">Cód. SENA</th>
-          <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-left">Descripción</th>
-          <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-right">Cant.</th>
-          <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-right">Valor Unit.</th>
-          <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-right">IVA%</th>
-          <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-right">Subtotal</th>
-          <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-right">ZESE</th>
+          <th class="th-left">Fecha</th>
+          <th class="th-left">Nº Factura</th>
+          <th class="th-left">CUFE</th>
+          <th class="th-left">Programa</th>
+          <th class="th-left">Ficha</th>
+          <th class="th-left">Cód. SENA</th>
+          <th class="th-left">Descripción</th>
+          <th class="th-right">Cant.</th>
+          <th class="th-right">Valor Unit.</th>
+          <th class="th-right">IVA%</th>
+          <th class="th-right">Subtotal</th>
+          <th class="th-right">ZESE</th>
         </tr>
       </thead>
       <tbody>
         @for (item of ejecucion; track item.factura) {
-          <tr class="hover:bg-surface-container-low transition-colors border-b border-gray-50">
-            <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">{{ item.fecha }}</td>
-            <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">{{ item.factura }}</td>
-            <td class="px-6 py-4 text-sm font-mono text-gray-500" [title]="item.cufeFull">{{ item.cufe }}</td>
-            <td class="px-6 py-4 text-sm text-gray-800">{{ item.programa }}</td>
-            <td class="px-6 py-4 text-sm text-gray-600">{{ item.ficha }}</td>
-            <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">{{ item.codigo }}</td>
-            <td class="px-6 py-4 text-sm text-gray-800">{{ item.desc }}</td>
-            <td class="px-6 py-4 text-sm text-gray-800 text-right">{{ item.cant }}</td>
-            <td class="px-6 py-4 text-sm text-gray-800 text-right whitespace-nowrap">{{ item.valorUnit }}</td>
-            <td class="px-6 py-4 text-sm text-gray-600 text-right">{{ item.iva }}</td>
-            <td class="px-6 py-4 text-sm font-medium text-gray-800 text-right whitespace-nowrap">{{ item.subtotal }}</td>
-            <td class="px-6 py-4 text-sm text-gray-800 text-right">{{ item.zese }}</td>
+          <tr>
+            <td class="td-muted whitespace-nowrap">{{ item.fecha }}</td>
+            <td class="td-medium whitespace-nowrap">{{ item.factura }}</td>
+            <td class="td-mono td-muted cursor-help" [title]="item.cufeFull">{{ item.cufe }}</td>
+            <td class="td-normal">{{ item.programa }}</td>
+            <td class="td-muted">{{ item.ficha }}</td>
+            <td class="td-muted whitespace-nowrap">{{ item.codigo }}</td>
+            <td class="td-normal">{{ item.desc }}</td>
+            <td class="text-right td-normal">{{ item.cant }}</td>
+            <td class="text-right td-normal whitespace-nowrap">{{ item.valorUnit }}</td>
+            <td class="text-right td-muted">{{ item.iva }}</td>
+            <td class="text-right td-medium whitespace-nowrap">{{ item.subtotal }}</td>
+            <td class="text-right td-normal">{{ item.zese }}</td>
           </tr>
         }
       </tbody>
-      <tfoot dtFooter class="bg-primary-container/10 border-t-2 border-primary/20">
+      <tfoot dtFooter class="tfoot-totals">
         <tr>
-          <td class="px-6 py-4 text-sm font-bold text-primary text-right uppercase tracking-widest" colspan="10">Totales</td>
-          <td class="px-6 py-4 text-sm font-bold text-primary text-right">
-            <div class="flex flex-col text-right">
-              <span class="text-xs text-primary/70 uppercase">Σ Valor Neto</span>
-              <span>$13,050,000</span>
+          <td class="tfoot-totals__label" colspan="10">Totales</td>
+          <td class="text-right">
+            <div class="td-flex-col text-right">
+              <span class="tfoot-totals__sublabel">Σ Valor Neto</span>
+              <span class="tfoot-totals__value">$13,050,000</span>
             </div>
           </td>
-          <td class="px-6 py-4 text-sm font-bold text-primary text-right">
-            <div class="flex flex-col text-right">
-              <span class="text-xs text-primary/70 uppercase">Σ IVA</span>
-              <span>$2,479,500</span>
+          <td class="text-right">
+            <div class="td-flex-col text-right">
+              <span class="tfoot-totals__sublabel">Σ IVA</span>
+              <span class="tfoot-totals__value">$2,479,500</span>
             </div>
-          </td>
-          <td class="px-6 py-4 text-sm font-bold text-primary text-right" style="display:none;">
-             <!-- placeholder for col span alignment if needed -->
           </td>
         </tr>
       </tfoot>
@@ -181,71 +179,71 @@
   </section>
 
   <!-- Section 2: Listado de Formatos GIL-F014 -->
-  <section class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden border-none">
-    <div class="px-8 py-6 flex justify-between items-center border-b border-gray-50">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-surface-container-low rounded-full flex items-center justify-center text-primary">
+  <section class="bento-card p-0">
+    <div class="section-header">
+      <div class="section-header__title-container">
+        <div class="section-header__icon">
           <span class="material-symbols-outlined">description</span>
         </div>
-        <h3 class="font-manrope text-xl font-bold m-0">Listado de Formatos GIL-F014</h3>
+        <h3 class="section-header__title">Listado de Formatos GIL-F014</h3>
       </div>
     </div>
 
     <restaurant-data-table>
-      <thead dtHeader class="bg-surface-container-low border-b border-gray-100">
+      <thead dtHeader>
         <tr>
-          <th class="px-8 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-left">Código GIL</th>
-          <th class="px-8 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-left">Solicitante</th>
-          <th class="px-8 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-left">Programa</th>
-          <th class="px-8 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-left">CUFE</th>
-          <th class="px-8 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-left">Fecha</th>
-          <th class="px-8 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-right">Valor</th>
-          <th class="px-8 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-center">Acciones</th>
+          <th class="th-left">Código GIL</th>
+          <th class="th-left">Solicitante</th>
+          <th class="th-left">Programa</th>
+          <th class="th-left">CUFE</th>
+          <th class="th-left">Fecha</th>
+          <th class="th-right">Valor</th>
+          <th class="th-center">Acciones</th>
         </tr>
       </thead>
       <tbody>
         @for (item of gils; track item.codigo) {
-          <tr class="group hover:bg-surface-container-low transition-all border-b border-gray-50">
-            <td class="px-8 py-4">
-              <span class="font-mono text-sm font-bold text-gray-700 bg-gray-100 px-2 py-1 rounded">{{ item.codigo }}</span>
+          <tr>
+            <td>
+              <span class="badge badge--surface font-mono">{{ item.codigo }}</span>
             </td>
-            <td class="px-8 py-4">
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-[10px] font-bold">{{ item.iniciales }}</div>
-                <span class="text-sm font-medium text-on-surface">{{ item.solicitante }}</span>
+            <td>
+              <div class="td-flex-row">
+                <div class="avatar">{{ item.iniciales }}</div>
+                <span class="td-medium">{{ item.solicitante }}</span>
               </div>
             </td>
-            <td class="px-8 py-4">
-              <span class="text-sm text-gray-600">{{ item.programa }}</span>
+            <td>
+              <span class="td-muted">{{ item.programa }}</span>
             </td>
-            <td class="px-8 py-4">
-              <span class="text-sm font-mono text-gray-500 border-b border-dashed border-gray-400 cursor-help" [title]="item.cufeFull">{{ item.cufe }}</span>
+            <td>
+              <span class="td-mono-dashed cursor-help" [title]="item.cufeFull">{{ item.cufe }}</span>
             </td>
-            <td class="px-8 py-4">
-              <span class="text-sm text-gray-500">{{ item.fecha }}</span>
+            <td>
+              <span class="td-muted">{{ item.fecha }}</span>
             </td>
-            <td class="px-8 py-4 text-right">
-              <span class="text-sm font-bold">{{ item.valor }}</span>
+            <td class="text-right">
+              <span class="td-bold">{{ item.valor }}</span>
             </td>
-            <td class="px-8 py-4 text-center">
-              <button class="p-2 rounded-full hover:bg-white text-gray-400 hover:text-primary transition-all cursor-pointer border-none bg-transparent">
-                <span class="material-symbols-outlined text-[20px]">visibility</span>
+            <td class="text-center">
+              <button class="action-btn" title="Ver Detalle">
+                <span class="material-symbols-outlined">visibility</span>
               </button>
             </td>
           </tr>
         }
       </tbody>
-      <div dtFooter class="px-8 py-4 bg-surface-container flex justify-between items-center border-t border-gray-100">
-        <span class="text-xs text-gray-500 font-medium">Mostrando 4 de 28 registros</span>
-        <div class="flex gap-2">
-          <button class="w-8 h-8 rounded flex items-center justify-center bg-white border-none text-gray-400 disabled:opacity-50 cursor-pointer" disabled>
-            <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+      <div dtFooter class="pagination-footer">
+        <span class="pagination-footer__text">Mostrando 4 de 28 registros</span>
+        <div class="pagination-controls">
+          <button class="pagination-btn pagination-btn--disabled" disabled>
+            <span class="material-symbols-outlined">chevron_left</span>
           </button>
-          <button class="w-8 h-8 rounded flex items-center justify-center bg-primary border-none text-white font-bold text-xs cursor-pointer">1</button>
-          <button class="w-8 h-8 rounded flex items-center justify-center bg-white border-none text-gray-600 font-bold text-xs hover:bg-gray-50 cursor-pointer">2</button>
-          <button class="w-8 h-8 rounded flex items-center justify-center bg-white border-none text-gray-600 font-bold text-xs hover:bg-gray-50 cursor-pointer">3</button>
-          <button class="w-8 h-8 rounded flex items-center justify-center bg-white border-none text-gray-400 hover:bg-gray-50 cursor-pointer">
-            <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+          <button class="pagination-btn pagination-btn--active">1</button>
+          <button class="pagination-btn">2</button>
+          <button class="pagination-btn">3</button>
+          <button class="pagination-btn">
+            <span class="material-symbols-outlined">chevron_right</span>
           </button>
         </div>
       </div>
