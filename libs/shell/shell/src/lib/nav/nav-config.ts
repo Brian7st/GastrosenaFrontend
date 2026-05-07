@@ -58,7 +58,7 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
           children: [
             { label: 'Gestión de Bienes',           ruta: '/app/inventario/bienes',             icono: 'package-open'     },
             { label: 'Facturas Electrónicas',       ruta: '/app/inventario/facturas',           icono: 'file-spreadsheet' },
-            { label: 'Solicitudes GIL-F-014',       ruta: '/app/inventario/solicitudes',        icono: 'clipboard-check'  },
+            { label: 'Solicitudes GIL-F-014',       ruta: '/app/inventario/solicitudes-gil',    icono: 'clipboard-check'  },
             { label: 'Consolidado de Ejecución',    ruta: '/app/inventario/consolidado',        icono: 'bar-chart-2'      },
             { label: 'Entradas y Salidas (Kardex)', ruta: '/app/inventario/kardex',             icono: 'arrow-left-right' },
             { label: 'Alertas de Stock',            ruta: '/app/inventario/alertas',            icono: 'alert-circle'     },

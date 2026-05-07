@@ -26,6 +26,48 @@ export const INVENTARIO_ROUTES: Routes = [
     component: BienDetailPageComponent,
   },
 
+  // ── GIL-F-014: Solicitudes de Abastecimiento ─────────────────────────────
+  {
+    path: 'solicitudes-gil',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./pages/solicitudes-page/solicitudes-list/solicitudes-list.component').then(
+            m => m.SolicitudesListComponent
+          ),
+      },
+      {
+        path: 'nueva',
+        loadComponent: () =>
+          import('./pages/solicitudes-page/solicitudes-form/solicitudes-form.component').then(
+            m => m.SolicitudesFormComponent
+          ),
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./pages/solicitudes-page/solicitudes-detail/solicitudes-detail.component').then(
+            m => m.SolicitudesDetailComponent
+          ),
+      },
+      {
+        path: ':id/editar',
+        loadComponent: () =>
+          import('./pages/solicitudes-page/solicitudes-edit/solicitudes-edit.component').then(
+            m => m.SolicitudesEditComponent
+          ),
+      },
+      {
+        path: ':id/exportar',
+        loadComponent: () =>
+          import('./pages/solicitudes-page/solicitudes-export/solicitudes-export.component').then(
+            m => m.SolicitudesExportComponent
+          ),
+      }
+    ]
+  },
+
   // ── FE: Facturas Electrónicas ────────────────────────────────────────────
   // Vista 1: Panel de Facturación (listado + KPIs)
   {
