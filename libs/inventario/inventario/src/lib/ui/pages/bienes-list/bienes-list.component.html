@@ -131,7 +131,7 @@
   <restaurant-kpi-card
     label="Valor Total Inventario"
     [value]="k.valorTotal | currency:'COP':'symbol-narrow':'1.0-0'"
-    icon="account_balance"
+    icon="landmark"
     iconColor="green"
     [trend]="'+' + k.tendenciaValor + '% vs mes anterior'"
     [trendUp]="true"
@@ -140,7 +140,7 @@
   <restaurant-kpi-card
     label="Bienes en Alerta"
     [value]="k.totalAlertas + ' Items'"
-    icon="inventory"
+    icon="warehouse"
     iconColor="red"
     trend="Crítico"
     [trendUp]="false"
@@ -149,7 +149,7 @@
   <restaurant-kpi-card
     label="Movimientos Recientes"
     [value]="k.movimientosHoy + ' Altas'"
-    icon="sync"
+    icon="refresh-cw"
     iconColor="blue"
     trend="Hoy"
     [trendUp]="null"
