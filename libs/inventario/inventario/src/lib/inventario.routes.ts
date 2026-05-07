@@ -94,4 +94,15 @@ export const INVENTARIO_ROUTES: Routes = [
     path: 'facturas/gil/:id',
     component: GilSolicitudDetailPageComponent,
   },
+
+  // ── Consolidado de Ejecución Presupuestal ────────────────────────────────
+  {
+    path: 'consolidado',
+    children: [
+      {
+        path: ':id',
+        loadComponent: () => import('./pages/consolidado-page/consolidado-detail/consolidado-detail.component').then(m => m.ConsolidadoDetailComponent)
+      }
+    ]
+  },
 ];

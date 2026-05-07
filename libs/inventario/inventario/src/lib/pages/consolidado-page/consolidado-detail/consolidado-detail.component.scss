@@ -1,0 +1,38 @@
+.consolidado-container {
+  font-family: var(--font-body);
+
+  .font-manrope {
+    font-family: var(--font-headline);
+  }
+
+  // The no-line rule enforcement
+  table {
+    border-collapse: collapse;
+    th {
+      border-bottom: 1px solid var(--color-outline-variant);
+      opacity: 0.8;
+    }
+  }
+
+  .bg-surface-container-lowest {
+    background-color: var(--color-surface-container-lowest);
+  }
+  .bg-surface-container-low {
+    background-color: var(--color-surface-container-low);
+  }
+  .bg-surface-container {
+    background-color: var(--color-surface-container);
+  }
+  .bg-primary-container {
+    background-color: var(--color-primary-container);
+  }
+  .text-primary {
+    color: var(--color-primary);
+  }
+  .text-on-surface {
+    color: var(--color-on-surface);
+  }
+  .text-on-primary-container {
+    color: var(--color-on-primary-container);
+  }
+}
