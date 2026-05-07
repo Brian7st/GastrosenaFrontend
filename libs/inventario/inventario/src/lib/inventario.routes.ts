@@ -104,6 +104,10 @@ export const INVENTARIO_ROUTES: Routes = [
         loadComponent: () => import('./pages/consolidado-page/consolidado-list/consolidado-list.component').then(m => m.ConsolidadoListComponent)
       },
       {
+        path: 'nuevo',
+        loadComponent: () => import('./pages/consolidado-page/consolidado-create/consolidado-create.component').then(m => m.ConsolidadoCreateComponent)
+      },
+      {
         path: ':id',
         loadComponent: () => import('./pages/consolidado-page/consolidado-detail/consolidado-detail.component').then(m => m.ConsolidadoDetailComponent)
       }
