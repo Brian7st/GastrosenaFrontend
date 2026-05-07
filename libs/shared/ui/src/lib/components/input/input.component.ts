@@ -24,6 +24,12 @@ import { LucideIconComponent } from '../lucide-icon/lucide-icon.component';
   ],
 })
 export class InputComponent implements ControlValueAccessor {
+  private static nextId = 0;
+
+  readonly inputId = `restaurant-input-${++InputComponent.nextId}`;
+  readonly errorId = `${this.inputId}-error`;
+  readonly hintId  = `${this.inputId}-hint`;
+
   label       = input<string>('');
   placeholder = input<string>('');
   type        = input<'text' | 'email' | 'password' | 'number' | 'tel' | 'url'>('text');
