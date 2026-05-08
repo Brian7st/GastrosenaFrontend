@@ -113,4 +113,15 @@ export const INVENTARIO_ROUTES: Routes = [
       }
     ]
   },
+
+  // ── Entradas y Salidas (Movimientos / Kardex) ────────────────────────────
+  {
+    path: 'movimientos',
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./pages/kardex-page/movimientos-list/movimientos-list.component').then(m => m.MovimientosListComponent)
+      }
+    ]
+  }
 ];
