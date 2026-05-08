@@ -1,0 +1,130 @@
+<div class="modal-overlay">
+  <!-- Modal Container -->
+  <div class="modal-content">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="header-info">
+        <div class="header-icon">
+          <lucide-icon name="log-out" [size]="24"></lucide-icon>
+        </div>
+        <div>
+          <div class="title-row">
+            <h3 class="modal-title">Registrar Salida de Producto</h3>
+            <span class="req-badge">REQ-45-S</span>
+          </div>
+          <p class="modal-subtitle">Control de Inventario</p>
+        </div>
+      </div>
+      <button class="close-btn" (click)="closeModal()">
+        <lucide-icon name="x" [size]="24"></lucide-icon>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <form [formGroup]="salidaForm" (ngSubmit)="onSubmit()" class="modal-body">
+      <div class="form-grid">
+        
+        <!-- Two Column Row: Product & Qty -->
+        <div class="product-qty-row">
+          <div class="form-group product-col">
+            <label>Producto o Código</label>
+            <div class="input-wrapper">
+              <lucide-icon name="scan-barcode" class="input-icon" [size]="18"></lucide-icon>
+              <input type="text" formControlName="producto" placeholder="Busque por nombre o escanee código" class="form-input" style="padding-left: 2.5rem; font-family: monospace;">
+            </div>
+          </div>
+          
+          <div class="form-group qty-col">
+            <label>Cantidad</label>
+            <div class="input-wrapper">
+              <input type="number" formControlName="cantidad" placeholder="0" class="form-input qty-input" [class.error]="salidaForm.get('cantidad')?.value > stockDisponible">
+              <span class="suffix">uds</span>
+            </div>
+            <p *ngIf="salidaForm.get('cantidad')?.value > stockDisponible" class="error-hint">
+              La cantidad excede el stock disponible ({{stockDisponible}})
+            </p>
+          </div>
+        </div>
+
+        <!-- Two Column Row: Date & Area -->
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Fecha</label>
+            <div class="input-wrapper">
+              <lucide-icon name="calendar" class="input-icon" [size]="18"></lucide-icon>
+              <input type="date" formControlName="fecha" class="form-input">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Área de Destino</label>
+            <div class="input-wrapper">
+              <select formControlName="areaDestino" class="form-select">
+                <option value="">Seleccione un área</option>
+                <option value="sistemas">Sistemas y Desarrollo</option>
+                <option value="administracion">Administración</option>
+                <option value="mantenimiento">Mantenimiento</option>
+                <option value="bienestar">Bienestar Estudiantil</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Instructor & Ficha -->
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Instructor</label>
+            <div class="input-wrapper">
+              <lucide-icon name="user" class="input-icon" [size]="18"></lucide-icon>
+              <input type="text" formControlName="instructor" placeholder="Nombre completo del instructor" class="form-input">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Ficha</label>
+            <div class="input-wrapper">
+              <lucide-icon name="hash" class="input-icon" [size]="18"></lucide-icon>
+              <input type="text" formControlName="ficha" placeholder="1234567" maxlength="7" class="form-input" style="font-family: monospace;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Category -->
+        <div class="form-group">
+          <label>Categoría de Alimento</label>
+          <select formControlName="categoria" class="form-select full-select">
+            <option value="" disabled selected>Seleccione una categoría</option>
+            <option value="abarrotes">Abarrotes</option>
+            <option value="lacteos">Lácteos</option>
+            <option value="frutas">Frutas y Vegetales</option>
+            <option value="carnes">Carnes y Pescados</option>
+          </select>
+        </div>
+
+        <!-- Purpose -->
+        <div class="form-group">
+          <label>Propósito</label>
+          <input type="text" formControlName="proposito" placeholder="Motivo de la salida (ej: Mantenimiento, Dotación)" class="form-input">
+        </div>
+
+        <!-- Observations -->
+        <div class="form-group">
+          <label>Observaciones</label>
+          <textarea formControlName="observaciones" rows="3" placeholder="Detalles adicionales del movimiento..." class="form-textarea"></textarea>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <restaurant-button variant="surface" (click)="closeModal()" type="button">Cancelar</restaurant-button>
+        <restaurant-button variant="primary" type="submit" [disabled]="salidaForm.invalid || salidaForm.get('cantidad')?.value > stockDisponible">
+          <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: bold;">
+            <lucide-icon name="check-circle" [size]="18"></lucide-icon>
+            Registrar Salida
+          </div>
+        </restaurant-button>
+      </div>
+    </form>
+  </div>
+</div>

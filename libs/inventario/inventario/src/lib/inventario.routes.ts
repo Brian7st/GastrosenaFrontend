@@ -113,4 +113,32 @@ export const INVENTARIO_ROUTES: Routes = [
       }
     ]
   },
+
+  // ── Entradas y Salidas (Movimientos / Kardex) ────────────────────────────
+  {
+    path: 'movimientos',
+    loadComponent: () => import('./pages/kardex-page/movimientos-list/movimientos-list.component').then(m => m.MovimientosListComponent),
+    children: [
+      {
+        path: 'entrada',
+        loadComponent: () => import('./pages/kardex-page/movimiento-entrada/movimiento-entrada.component').then(m => m.MovimientoEntradaComponent)
+      },
+      {
+        path: 'entrada-gil',
+        loadComponent: () => import('./pages/kardex-page/movimiento-entrada-gil/movimiento-entrada-gil.component').then(m => m.MovimientoEntradaGilComponent)
+      },
+      {
+        path: 'salida',
+        loadComponent: () => import('./pages/kardex-page/movimiento-salida/movimiento-salida.component').then(m => m.MovimientoSalidaComponent)
+      },
+      {
+        path: 'exportar',
+        loadComponent: () => import('./pages/kardex-page/movimiento-export/movimiento-export.component').then(m => m.MovimientoExportComponent)
+      }
+    ]
+  },
+  {
+    path: 'movimientos/:id',
+    loadComponent: () => import('./pages/kardex-page/movimiento-detail/movimiento-detail.component').then(m => m.MovimientoDetailComponent)
+  }
 ];
