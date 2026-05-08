@@ -1,0 +1,165 @@
+<div class="modal-overlay">
+  <!-- Modal Container -->
+  <div class="modal-content">
+    
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div>
+        <h2 class="modal-title">Registrar Entrada</h2>
+        <p class="modal-subtitle">Basado en Formulario GIL-F-014</p>
+      </div>
+      <button class="close-btn" (click)="closeModal()" aria-label="Cerrar modal">
+        <lucide-icon name="x" [size]="20"></lucide-icon>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+      
+      <!-- Form Info Section -->
+      <section class="info-section">
+        <!-- GIL Selector -->
+        <div class="form-group">
+          <label>CÓDIGO DE GIL-F-014 ORIGEN</label>
+          <div class="select-wrapper">
+            <select class="form-select">
+              <option value="" disabled>Seleccione un formulario aprobado...</option>
+              <option value="GIL-2023-089" selected>GIL-2023-089 - Traslado Sede Central (Aprobado)</option>
+              <option value="GIL-2023-091">GIL-2023-091 - Dotación Laboratorio (Procesado)</option>
+              <option value="GIL-2023-095">GIL-2023-095 - Equipos Cómputo (Aprobado)</option>
+            </select>
+            <lucide-icon name="chevron-down" [size]="18" class="icon-right"></lucide-icon>
+          </div>
+          <p class="hint-text">
+            <lucide-icon name="info" [size]="14"></lucide-icon>
+            Solo se listan formularios en estado Aprobado o Procesado.
+          </p>
+        </div>
+
+        <!-- Date -->
+        <div class="form-group">
+          <label>FECHA DE ENTRADA</label>
+          <input type="date" class="form-input">
+        </div>
+
+        <!-- Receiver -->
+        <div class="form-group">
+          <label>RESPONSABLE DE RECEPCIÓN</label>
+          <input type="text" class="form-input" placeholder="Nombre completo">
+        </div>
+      </section>
+
+      <!-- Items Table Section -->
+      <section>
+        <div class="items-header">
+          <h3>Ítems a Ingresar</h3>
+          <span class="items-badge">3 Ítems Encontrados</span>
+        </div>
+
+        <div class="items-table-container">
+          <div style="overflow-x: auto;">
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th>Nombre del Bien</th>
+                  <th>Código SENA</th>
+                  <th class="text-center">Cant. Solicitada</th>
+                  <th class="text-center" style="width: 10rem;">Cant. Recibida</th>
+                  <th class="text-right">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Valid Row 1 -->
+                <tr class="table-row">
+                  <td>
+                    <div class="item-name">Monitor Dell 24"</div>
+                    <div class="item-desc">P2419H</div>
+                  </td>
+                  <td class="code-text">SENA-EQ-1042</td>
+                  <td class="text-center">15</td>
+                  <td>
+                    <input type="number" class="qty-input" value="15" min="0" max="15">
+                  </td>
+                  <td class="text-right">
+                    <span class="status-ok">
+                      <span class="dot"></span> OK
+                    </span>
+                  </td>
+                </tr>
+
+                <!-- Invalid Row -->
+                <tr class="table-row table-row--error">
+                  <td>
+                    <div class="item-name item-name--error">
+                      <lucide-icon name="alert-circle" [size]="18" class="error-icon"></lucide-icon>
+                      Teclado Mecánico RGB
+                    </div>
+                    <div class="item-desc item-desc--error">K95 Platinum</div>
+                  </td>
+                  <td class="code-text code-text--error">--</td>
+                  <td class="text-center" style="color: #ba1a1a;">5</td>
+                  <td>
+                    <input type="number" class="qty-input" value="0" disabled>
+                  </td>
+                  <td class="text-right">
+                    <span class="status-error">
+                      <span class="err-title">NO EXISTE EN CATÁLOGO</span>
+                      <a href="javascript:void(0)" class="err-link">Crear producto faltante &rarr;</a>
+                    </span>
+                  </td>
+                </tr>
+
+                <!-- Valid Row 2 -->
+                <tr class="table-row">
+                  <td>
+                    <div class="item-name">Mouse Inalámbrico Logitech</div>
+                    <div class="item-desc">M330 Silent</div>
+                  </td>
+                  <td class="code-text">SENA-AC-4091</td>
+                  <td class="text-center">20</td>
+                  <td>
+                    <input type="number" class="qty-input" value="20" min="0" max="20">
+                  </td>
+                  <td class="text-right">
+                    <span class="status-ok">
+                      <span class="dot"></span> OK
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Error Summary -->
+        <div class="error-summary">
+          <lucide-icon name="alert-triangle" [size]="20" class="error-icon"></lucide-icon>
+          <div>
+            <h4>Errores en la validación del catálogo</h4>
+            <p>Existen ítems en el formulario GIL que no están registrados en el catálogo maestro. Debe solicitar la creación de estos bienes antes de poder procesar la entrada.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Observations -->
+      <section class="form-group">
+        <label>OBSERVACIONES DE ENTRADA (OPCIONAL)</label>
+        <textarea class="form-textarea" rows="2" placeholder="Añada notas sobre el estado físico de los bienes recibidos..."></textarea>
+      </section>
+
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <restaurant-button variant="surface" (click)="closeModal()">Cancelar</restaurant-button>
+      <!-- Disabled Primary CTA -->
+      <restaurant-button variant="surface" [disabled]="true" style="opacity: 0.6;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: bold;">
+          <lucide-icon name="save" [size]="18"></lucide-icon>
+          Registrar Entrada por GIL
+        </div>
+      </restaurant-button>
+    </div>
+
+  </div>
+</div>
