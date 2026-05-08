@@ -88,7 +88,7 @@
         <button class="control-btn">
           <lucide-icon name="filter" [size]="18"></lucide-icon> Filtros
         </button>
-        <button class="control-btn">
+        <button class="control-btn" routerLink="exportar">
           <lucide-icon name="download" [size]="18"></lucide-icon> Exportar
         </button>
       </div>
@@ -157,7 +157,7 @@
         </td>
         <td style="text-align: right;">
           <div class="actions-row">
-            <button class="action-icon" [routerLink]="['/movimientos', movimiento.id]" title="Ver Detalle">
+            <button class="action-icon" [routerLink]="[movimiento.id]" title="Ver Detalle">
               <lucide-icon name="eye" [size]="18"></lucide-icon>
             </button>
           </div>
@@ -167,3 +167,4 @@
     </tbody>
   </restaurant-data-table>
 </div>
+<router-outlet></router-outlet>

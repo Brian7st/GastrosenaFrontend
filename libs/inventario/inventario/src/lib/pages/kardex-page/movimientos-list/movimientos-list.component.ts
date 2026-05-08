@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { KpiCardComponent, DataTableComponent, LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 
 export interface Movimiento {
@@ -28,6 +28,7 @@ export interface Movimiento {
   imports: [
     CommonModule,
     RouterLink,
+    RouterOutlet,
     KpiCardComponent,
     DataTableComponent,
     LucideIconComponent,
