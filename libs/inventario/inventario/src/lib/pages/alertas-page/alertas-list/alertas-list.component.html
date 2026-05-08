@@ -1,0 +1,211 @@
+<div class="page-container">
+
+  <!-- ── TopNav ──────────────────────────────────────────────────────────── -->
+  <header class="topnav">
+    <nav class="topnav__links">
+      <a class="topnav__link topnav__link--active">Resumen</a>
+      <a class="topnav__link" (click)="irAHistorial()" role="button">Auditoría</a>
+      <a class="topnav__link" (click)="irAHistorial()" role="button">Historial</a>
+    </nav>
+    <div class="topnav__actions">
+      <div class="topnav__search">
+        <span class="material-symbols-outlined topnav__search-icon">search</span>
+        <input
+          type="text"
+          class="topnav__search-input"
+          placeholder="Buscar alertas..."
+          (input)="onSearch($event)"
+        />
+      </div>
+      <button class="btn-config" (click)="irAConfig()">Configurar Umbrales</button>
+    </div>
+  </header>
+
+  <!-- ── Page Header ─────────────────────────────────────────────────────── -->
+  <div class="page-header">
+    <h1 class="page-title">Alertas de Stock Mínimo</h1>
+    <p class="page-subtitle">Gestión proactiva de inventario crítico y riesgo financiero.</p>
+  </div>
+
+  <!-- ── KPI Grid ─────────────────────────────────────────────────────────── -->
+  <div class="kpi-grid">
+    <restaurant-kpi-card
+      label="Críticas"
+      [value]="kpiCriticas().toString()"
+      icon="alert-triangle"
+      iconColor="red"
+    ></restaurant-kpi-card>
+    <restaurant-kpi-card
+      label="Activas"
+      [value]="kpiActivas().toString()"
+      icon="bell"
+      iconColor="green"
+    ></restaurant-kpi-card>
+    <restaurant-kpi-card
+      label="Valor en Riesgo"
+      [value]="kpiValorRiesgo()"
+      icon="dollar-sign"
+      iconColor="orange"
+    ></restaurant-kpi-card>
+    <restaurant-kpi-card
+      label="Promedio sin Reposición"
+      [value]="kpiPromedioDias()"
+      icon="clock"
+      iconColor="blue"
+    ></restaurant-kpi-card>
+  </div>
+
+  <!-- ── Main Content Split ──────────────────────────────────────────────── -->
+  <div class="content-split">
+
+    <!-- ── Columna Izquierda: Lista de Alertas ──────────────────────────── -->
+    <div class="col-alertas">
+
+      <!-- Filtros -->
+      <div class="filter-bar">
+        <div class="filter-bar__search">
+          <span class="material-symbols-outlined filter-bar__icon">search</span>
+          <input
+            type="text"
+            class="filter-bar__input"
+            placeholder="Buscar por código o nombre..."
+            (input)="onSearch($event)"
+          />
+        </div>
+        <select class="filter-bar__select" (change)="onPrioridadChange($event)">
+          <option value="">Prioridad</option>
+          <option value="critica">Crítica</option>
+          <option value="alta">Alta</option>
+          <option value="media">Media</option>
+          <option value="baja">Baja</option>
+        </select>
+        <select class="filter-bar__select" (change)="onEstadoChange($event)">
+          <option value="">Estado</option>
+          <option value="activa">Activa</option>
+          <option value="resuelta">Resuelta</option>
+        </select>
+      </div>
+
+      <!-- Lista de Alertas -->
+      <div class="alertas-list">
+        @for (alerta of filteredAlertas(); track alerta.id) {
+          <div
+            class="alerta-card"
+            [class]="'alerta-card--' + alerta.prioridad"
+            (click)="irADetalle(alerta.id)"
+            role="button"
+          >
+            <!-- Ícono de prioridad -->
+            <div class="alerta-card__icon" [class]="'alerta-card__icon--' + alerta.prioridad">
+              <span class="material-symbols-outlined">
+                @if (alerta.prioridad === 'critica') { warning }
+                @else if (alerta.prioridad === 'alta') { error_outline }
+                @else { info }
+              </span>
+            </div>
+
+            <!-- Contenido principal -->
+            <div class="alerta-card__body">
+              <div class="alerta-card__header">
+                <div class="alerta-card__meta">
+                  <h3 class="alerta-card__nombre">{{ alerta.nombreBien }}</h3>
+                  @if (alerta.notificacionEnviada) {
+                    <div class="notif-badge">
+                      <span class="material-symbols-outlined notif-badge__icon">mail</span>
+                      Notificación enviada
+                    </div>
+                  }
+                  <p class="alerta-card__codigo">{{ alerta.codigoSena }}</p>
+                </div>
+                <restaurant-status-badge
+                  [label]="getPrioridadLabel(alerta.prioridad)"
+                  [variant]="getPrioridadVariant(alerta.prioridad)"
+                ></restaurant-status-badge>
+              </div>
+
+              <div class="alerta-card__stats">
+                <div class="alerta-stat">
+                  <p class="alerta-stat__label">Stock Actual</p>
+                  <p class="alerta-stat__value" [class]="'alerta-stat__value--' + alerta.prioridad">
+                    {{ alerta.stockActual }} / {{ alerta.stockMinimo }}{{ alerta.unidad }}
+                  </p>
+                </div>
+                <div class="alerta-stat">
+                  <p class="alerta-stat__label">Días Restantes</p>
+                  <p class="alerta-stat__value" [class]="'alerta-stat__value--' + alerta.prioridad">
+                    {{ alerta.diasRestantes }} días
+                  </p>
+                </div>
+                <div class="alerta-stat">
+                  <p class="alerta-stat__label">Valor en Riesgo</p>
+                  <p class="alerta-stat__value">{{ formatValor(alerta.valorEnRiesgo) }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botón Resolver -->
+            <div class="alerta-card__action">
+              <button
+                class="btn-resolver"
+                (click)="irAResolver($event, alerta.id)"
+              >
+                Resolver
+              </button>
+            </div>
+          </div>
+        }
+
+        @empty {
+          <div class="empty-state">
+            <span class="material-symbols-outlined empty-state__icon">check_circle</span>
+            <p class="empty-state__text">No hay alertas activas con los filtros seleccionados.</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- ── Columna Derecha: Panel lateral ───────────────────────────────── -->
+    <aside class="col-lateral">
+
+      <!-- Historial de Resoluciones -->
+      <div class="lateral-card">
+        <div class="lateral-card__header">
+          <h3 class="lateral-card__title">Historial de Resoluciones</h3>
+          <span class="material-symbols-outlined lateral-card__chevron">expand_more</span>
+        </div>
+        <div class="lateral-card__body">
+          @for (item of historial; track item.bien) {
+            <div class="historial-item">
+              <div class="historial-item__check">
+                <span class="material-symbols-outlined">check</span>
+              </div>
+              <div>
+                <p class="historial-item__bien">{{ item.bien }}</p>
+                <p class="historial-item__accion">{{ item.accion }}</p>
+                <p class="historial-item__tiempo">{{ item.tiempo }}</p>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Movimientos Recientes -->
+      <div class="lateral-card">
+        <h3 class="lateral-card__title lateral-card__title--pad">Movimientos Recientes</h3>
+        <div class="movimientos-list">
+          @for (mov of movimientos; track mov.nombre) {
+            <div class="movimiento-item">
+              <div class="movimiento-item__dot" [class]="'movimiento-item__dot--' + mov.tipo"></div>
+              <span class="movimiento-item__nombre">
+                {{ mov.tipo === 'entrada' ? 'Entrada' : 'Salida' }}: {{ mov.nombre }}
+              </span>
+              <span class="movimiento-item__cantidad">{{ mov.cantidad }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+</div>

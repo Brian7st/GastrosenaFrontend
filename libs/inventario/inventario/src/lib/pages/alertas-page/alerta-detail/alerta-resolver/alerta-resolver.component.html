@@ -1,0 +1,121 @@
+<div class="modal-overlay" (click)="cerrar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+
+    <!-- ── Header ──────────────────────────────────────────────────── -->
+    <div class="modal-header">
+      <div class="modal-header__info">
+        <h2 class="modal-title">Resolver Alerta de Inventario</h2>
+        <p class="modal-subtitle">Acciones correctivas para discrepancias o bajos niveles.</p>
+      </div>
+      <button class="modal-close" (click)="cerrar()" aria-label="Cerrar modal">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <!-- Bien afectado card -->
+    @if (alerta(); as a) {
+      <div class="bien-card">
+        <div class="bien-card__icon-wrap">
+          <span class="material-symbols-outlined">inventory_2</span>
+        </div>
+        <div>
+          <p class="bien-card__label">Activo Afectado</p>
+          <p class="bien-card__nombre">{{ a.nombreBien }}</p>
+        </div>
+        <div class="bien-card__badge">
+          <span class="material-symbols-outlined">warning</span>
+          <span>Prioridad: {{ prioridadLabel }}</span>
+        </div>
+      </div>
+    }
+
+    <!-- ── Body ────────────────────────────────────────────────────── -->
+    <div class="modal-body" [formGroup]="resolverForm">
+
+      <!-- Acción Tomada -->
+      <div class="form-group">
+        <label class="form-label">
+          Acción Tomada <span class="form-required">*</span>
+        </label>
+        <div class="action-dropdown">
+          <div class="action-dropdown__trigger">
+            <span>
+              @if (accionSeleccionada() === '') { Seleccione una acción... }
+              @else if (accionSeleccionada() === 'gil') { Generar Formato GIL-F-014 }
+              @else if (accionSeleccionada() === 'entrada_manual') { Registrar Entrada Manual }
+              @else { Marcar como Revisada (Sin acción adicional) }
+            </span>
+            <span class="material-symbols-outlined">expand_more</span>
+          </div>
+          <ul class="action-dropdown__list">
+            <li class="action-dropdown__item" (click)="selectAccion('gil')">
+              <span class="material-symbols-outlined action-dropdown__icon">description</span>
+              Generar Formato GIL-F-014
+            </li>
+            <li class="action-dropdown__item" (click)="selectAccion('entrada_manual')">
+              <span class="material-symbols-outlined action-dropdown__icon">edit_document</span>
+              Registrar Entrada Manual
+            </li>
+            <li class="action-dropdown__item" (click)="selectAccion('revisada')">
+              <span class="material-symbols-outlined action-dropdown__icon">task_alt</span>
+              Marcar como Revisada (Sin acción adicional)
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Documento de Referencia -->
+      <div class="form-group">
+        <label class="form-label" for="referencia">Documento de Referencia</label>
+        <input
+          id="referencia"
+          type="text"
+          class="form-input"
+          placeholder="Ej: GIL-F-014-001"
+          formControlName="referencia"
+        />
+        <span class="form-hint">Obligatorio si se genera formato GIL o entrada manual.</span>
+      </div>
+
+      <!-- Descripción -->
+      <div class="form-group">
+        <label class="form-label" for="descripcion">
+          Descripción de la gestión <span class="form-required">*</span>
+        </label>
+        <textarea
+          id="descripcion"
+          class="form-textarea"
+          rows="4"
+          placeholder="Detalle los hallazgos y justificación de la acción..."
+          formControlName="descripcion"
+        ></textarea>
+      </div>
+
+      <!-- Responsable (readonly) -->
+      <div class="form-group">
+        <label class="form-label" for="responsable">Responsable</label>
+        <div class="input-readonly-wrap">
+          <span class="material-symbols-outlined input-readonly-wrap__icon">person</span>
+          <input
+            id="responsable"
+            type="text"
+            class="form-input form-input--readonly"
+            formControlName="responsable"
+            readonly
+          />
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Footer ──────────────────────────────────────────────────── -->
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="cerrar()">Cancelar</button>
+      <button class="btn-confirm" (click)="onConfirmar()">
+        <span class="material-symbols-outlined">check_circle</span>
+        Confirmar Resolución
+      </button>
+    </div>
+
+  </div>
+</div>

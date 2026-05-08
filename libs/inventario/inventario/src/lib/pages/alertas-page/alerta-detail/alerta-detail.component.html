@@ -1,0 +1,160 @@
+@if (alerta(); as a) {
+  <div class="detail-container">
+
+    <!-- ── Header ────────────────────────────────────────────────────────── -->
+    <header class="detail-header">
+      <div class="detail-header__left">
+        <nav class="breadcrumb">
+          <a class="breadcrumb__link" (click)="volver()" role="button">Alertas de Stock</a>
+          <span class="material-symbols-outlined breadcrumb__sep">chevron_right</span>
+          <span class="breadcrumb__current">{{ a.codigoSena }}</span>
+        </nav>
+        <h1 class="detail-title">Detalle de Alerta: {{ a.nombreBien }}</h1>
+        <p class="detail-meta">
+          Código: {{ a.codigoSena }} &bull; Categoría: {{ a.categoria }} &bull; Ubicación: {{ a.ubicacion }}
+        </p>
+      </div>
+      <div class="detail-header__actions">
+        <button class="btn-ghost" (click)="irAUmbral()">
+          <span class="material-symbols-outlined">edit</span>
+          Editar Umbral
+        </button>
+        <button class="btn-primary" (click)="abrirResolver()">
+          <span class="material-symbols-outlined">check_circle</span>
+          Resolver Ahora
+        </button>
+      </div>
+    </header>
+
+    <!-- ── Content Grid ───────────────────────────────────────────────────── -->
+    <div class="detail-grid">
+
+      <!-- ── Columna izquierda ─────────────────────────────────────────── -->
+      <div class="col-main">
+
+        <!-- Tarjeta de Estado ─────────────────────────────────────────── -->
+        <section class="estado-card" [class]="'estado-card--' + a.prioridad">
+          <div class="estado-card__top-bar" [class]="'estado-card__top-bar--' + a.prioridad"></div>
+
+          <div class="estado-card__header">
+            <div class="estado-card__icon-wrap" [class]="'estado-card__icon-wrap--' + a.prioridad">
+              <span class="material-symbols-outlined estado-card__icon">oil_barrel</span>
+            </div>
+            <div>
+              <h2 class="estado-card__titulo">
+                @if (a.prioridad === 'critica') { Estado Crítico }
+                @else if (a.prioridad === 'alta') { Stock Bajo }
+                @else { Bajo Umbral }
+              </h2>
+              <p class="estado-card__subtitulo">
+                @if (a.prioridad === 'critica') { Requiere atención inmediata }
+                @else { Monitorear y gestionar
+              }</p>
+            </div>
+            <restaurant-status-badge
+              label="Bajo Stock"
+              [variant]="prioridadVariant()"
+              class="estado-card__badge"
+            ></restaurant-status-badge>
+          </div>
+
+          <div class="stock-grid">
+            <div>
+              <p class="stock-label">STOCK ACTUAL</p>
+              <p class="stock-value" [class]="'stock-value--' + a.prioridad">
+                {{ a.stockActual }}
+                <span class="stock-unit">{{ a.unidad }}</span>
+              </p>
+            </div>
+            <div>
+              <p class="stock-label">UMBRAL MÍNIMO</p>
+              <p class="stock-value stock-value--neutral">
+                {{ a.stockMinimo }}
+                <span class="stock-unit">{{ a.unidad }}</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Barra de progreso -->
+          <div class="progress-section">
+            <div class="progress-header">
+              <span>Capacidad: {{ porcentajeStock().toFixed(0) }}%</span>
+              <span>Objetivo: {{ a.stockObjetivo }}{{ a.unidad }}</span>
+            </div>
+            <div class="progress-track">
+              <div
+                class="progress-fill"
+                [class]="'progress-fill--' + a.prioridad"
+                [style.width.%]="porcentajeStock()"
+              ></div>
+            </div>
+            <p class="progress-note">
+              <span class="material-symbols-outlined progress-note__icon">info</span>
+              Proyección de agotamiento: {{ a.diasRestantes === 0 ? 'Hace 2 días' : 'En ' + a.diasRestantes + ' días' }}
+            </p>
+          </div>
+        </section>
+
+        <!-- Gráfico de Tendencia ──────────────────────────────────────── -->
+        <section class="chart-card">
+          <h2 class="chart-card__title">Tendencia de Stock (30 Días)</h2>
+          <div class="chart-wrapper">
+            <!-- Línea de umbral -->
+            <div class="chart-threshold">
+              <span class="chart-threshold__label">Mínimo ({{ a.stockMinimo }}{{ a.unidad }})</span>
+            </div>
+            <!-- Barras -->
+            <div class="chart-bars">
+              @for (punto of a.tendencia; track punto.fecha) {
+                <div
+                  class="chart-bar"
+                  [class]="punto.nivel <= 30 ? 'chart-bar--danger' : 'chart-bar--safe'"
+                  [style.height.%]="punto.nivel"
+                  [title]="punto.nivel + a.unidad + ' — ' + punto.fecha"
+                ></div>
+              }
+            </div>
+            <div class="chart-labels">
+              <span>Hace 30 días</span>
+              <span>Hoy</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ── Columna derecha: Timeline ──────────────────────────────────── -->
+      <aside class="col-timeline">
+        <section class="timeline-card">
+          <h2 class="timeline-card__title">Historial de Incidencias</h2>
+          <div class="timeline">
+            @for (item of a.historialIncidencias; track item.fecha) {
+              <div class="timeline-item">
+                <div
+                  class="timeline-item__dot"
+                  [class]="'timeline-item__dot--' + item.tipo"
+                ></div>
+                <div class="timeline-item__content">
+                  <p class="timeline-item__fecha">{{ item.fecha }}</p>
+                  <p class="timeline-item__titulo">
+                    @if (item.tipo === 'agotado') { Stock Agotado }
+                    @else if (item.tipo === 'alerta_umbral') { Alerta de Umbral }
+                    @else { Incidencia Resuelta }
+                  </p>
+                  <p class="timeline-item__desc">{{ item.descripcion }}</p>
+                </div>
+              </div>
+            }
+          </div>
+          <button class="timeline-card__ver-mas" (click)="volver()">
+            Ver historial completo
+          </button>
+        </section>
+      </aside>
+
+    </div>
+  </div>
+
+  <!-- ── Router outlet para modal Resolver ────────────────────────────── -->
+  <router-outlet></router-outlet>
+}
