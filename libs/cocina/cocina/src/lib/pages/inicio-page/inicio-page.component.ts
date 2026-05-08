@@ -52,16 +52,61 @@ export class InicioPageComponent {
     this.modalAbierto.set(true);
     this.cargando.set(true);
 
-    this.incidenciaService.obtenerPorTipo(tipo).subscribe({
-      next: (data) => {
-        this.incidencias.set(data);
-        this.cargando.set(false);
-      },
-      error: () => {
-        this.incidencias.set([]);
-        this.cargando.set(false);
+    // Datos quemados para previsualización (simulando respuesta del backend)
+    setTimeout(() => {
+      const mockData: AuditoriaIncidencia[] = [];
+      
+      if (tipo === 'CANCELACION') {
+        mockData.push(
+          {
+            idAuditoria: 'A-001',
+            comanda: { idComanda: 'CMD-10045', mesa: { numeroMesa: '5' }, nombreMesero: 'Carlos Ramírez' },
+            fechaRegistro: '2026-05-06T14:30:00',
+            detalleModificado: 'Bandeja Paisa, Sopa de Lentejas',
+            tipoIncidencia: 'CANCELACION',
+            motivo: 'El cliente se retiró del restaurante antes de que se empezara a preparar el plato debido a una emergencia.'
+          },
+          {
+            idAuditoria: 'A-002',
+            comanda: { idComanda: 'CMD-10048', mesa: { numeroMesa: '12' }, nombreMesero: 'Laura G.' },
+            fechaRegistro: '2026-05-06T15:15:00',
+            detalleModificado: 'Filete de Salmón en Salsa de Maracuyá',
+            tipoIncidencia: 'CANCELACION',
+            motivo: 'Falta de ingredientes críticos (Salmón fresco). Se ofreció alternativa pero fue rechazada.'
+          },
+          {
+            idAuditoria: 'A-003',
+            comanda: { idComanda: 'CMD-10052', mesa: { numeroMesa: '3' }, nombreMesero: 'Pedro L.' },
+            fechaRegistro: '2026-05-05T19:40:00',
+            detalleModificado: 'Hamburguesa Artesanal, Papas Fritas',
+            tipoIncidencia: 'CANCELACION',
+            motivo: 'Error al tomar el pedido, el comensal quería la versión vegana y se ordenó la tradicional.'
+          }
+        );
+      } else if (tipo === 'DEVOLUCION') {
+        mockData.push(
+          {
+            idAuditoria: 'D-001',
+            comanda: { idComanda: 'CMD-10030', mesa: { numeroMesa: '8' }, nombreMesero: 'Ana M.' },
+            fechaRegistro: '2026-05-06T13:20:00',
+            detalleModificado: 'Churrasco Término Medio',
+            tipoIncidencia: 'DEVOLUCION',
+            motivo: 'El plato llegó frío a la mesa y la carne estaba casi cruda. Cliente solicitó cambio inmediato.'
+          },
+          {
+            idAuditoria: 'D-002',
+            comanda: { idComanda: 'CMD-10035', mesa: { numeroMesa: '2' }, nombreMesero: 'David R.' },
+            fechaRegistro: '2026-05-06T14:10:00',
+            detalleModificado: 'Crema de Champiñones',
+            tipoIncidencia: 'DEVOLUCION',
+            motivo: 'La sopa tenía exceso de sal, incomible según el reporte del comensal.'
+          }
+        );
       }
-    });
+
+      this.incidencias.set(mockData);
+      this.cargando.set(false);
+    }, 600);
   }
 
   cerrarModal() {
