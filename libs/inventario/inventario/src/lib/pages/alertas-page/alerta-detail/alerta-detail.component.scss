@@ -171,7 +171,7 @@ $yellow:          #eab308;
 
     &--critica { background: rgba($tertiary, 0.1);  color: $tertiary; }
     &--alta    { background: rgba($orange, 0.1);    color: $orange; }
-    &--media   { background: rgba($yellow, 0.1);    color: darken($yellow, 10%); }
+    &--media   { background: rgba($yellow, 0.1);    color: #b08800; }
     &--baja    { background: rgba($primary, 0.1);   color: $primary; }
   }
 
@@ -220,7 +220,7 @@ $yellow:          #eab308;
 
   &--critica { color: $tertiary; }
   &--alta    { color: $orange; }
-  &--media   { color: darken($yellow, 15%); }
+  &--media   { color: #9a7700; }
   &--neutral { color: $on-surface; }
 }
 

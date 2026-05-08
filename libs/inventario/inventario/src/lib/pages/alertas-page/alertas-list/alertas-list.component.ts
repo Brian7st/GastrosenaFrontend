@@ -9,23 +9,19 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import {
   KpiCardComponent,
-  ButtonComponent,
   StatusBadgeComponent,
 } from '@restaurant/shared/ui';
 import {
   Alerta,
   AlertaPrioridad,
-  AlertaEstado,
   MOCK_ALERTAS,
-  RegistroHistorial,
-  MOCK_HISTORIAL,
 } from '../../../models/alerta.model';
 
 @Component({
   selector: 'restaurant-alertas-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, KpiCardComponent, ButtonComponent, StatusBadgeComponent],
+  imports: [CommonModule, RouterModule, KpiCardComponent, StatusBadgeComponent],
   templateUrl: './alertas-list.component.html',
   styleUrls: ['./alertas-list.component.scss'],
 })

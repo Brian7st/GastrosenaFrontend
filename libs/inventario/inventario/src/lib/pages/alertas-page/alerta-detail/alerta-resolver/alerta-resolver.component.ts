@@ -8,14 +8,13 @@ import {
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-import { ButtonComponent } from '@restaurant/shared/ui';
 import { MOCK_ALERTAS, Alerta, AccionResolver } from '../../../../models/alerta.model';
 
 @Component({
   selector: 'restaurant-alerta-resolver',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, ButtonComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './alerta-resolver.component.html',
   styleUrls: ['./alerta-resolver.component.scss'],
 })

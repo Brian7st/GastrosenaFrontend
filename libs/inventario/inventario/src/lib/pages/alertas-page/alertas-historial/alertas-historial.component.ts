@@ -7,14 +7,14 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { DataTableComponent, ButtonComponent } from '@restaurant/shared/ui';
+import { DataTableComponent } from '@restaurant/shared/ui';
 import { RegistroHistorial, AlertaPrioridad, MOCK_HISTORIAL } from '../../../models/alerta.model';
 
 @Component({
   selector: 'restaurant-alertas-historial',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, DataTableComponent, ButtonComponent],
+  imports: [CommonModule, RouterModule, DataTableComponent],
   templateUrl: './alertas-historial.component.html',
   styleUrls: ['./alertas-historial.component.scss'],
 })

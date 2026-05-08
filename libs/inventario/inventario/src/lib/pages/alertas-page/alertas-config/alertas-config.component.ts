@@ -7,14 +7,13 @@ import {
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { ButtonComponent } from '@restaurant/shared/ui';
 import { UmbralConfig, MOCK_UMBRALES } from '../../../models/alerta.model';
 
 @Component({
   selector: 'restaurant-alertas-config',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, FormsModule, ButtonComponent],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './alertas-config.component.html',
   styleUrls: ['./alertas-config.component.scss'],
 })

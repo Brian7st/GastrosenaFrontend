@@ -189,7 +189,7 @@ $yellow:          #eab308;
 
   &--critico { background: rgba($tertiary, 0.12); color: $tertiary; }
   &--alto    { background: rgba($orange, 0.12);   color: $orange; }
-  &--medio   { background: rgba($yellow, 0.15);   color: darken($yellow, 20%); }
+  &--medio   { background: rgba($yellow, 0.15);   color: #886600; }
   &--bajo    { background: rgba($primary, 0.1);   color: $primary; }
 }
 
@@ -252,7 +252,7 @@ $yellow:          #eab308;
   text-underline-offset: 2px;
   transition: color 0.15s;
 
-  &:hover { color: darken($primary, 10%); }
+  &:hover { color: #004d1a; }
   &__icon { font-size: 1rem; }
 }
 
