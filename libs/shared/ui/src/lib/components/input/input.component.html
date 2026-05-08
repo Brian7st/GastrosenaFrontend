@@ -1,0 +1,43 @@
+<div class="input-field" [class.input-field--error]="error()" [class.input-field--disabled]="disabled()">
+  @if (label()) {
+    <label [for]="inputId" class="input-field__label">
+      {{ label() }}
+      @if (required()) { <span class="input-field__required" aria-hidden="true">*</span> }
+    </label>
+  }
+
+  <div
+    class="input-field__wrapper"
+    [class.input-field__wrapper--icon-left]="icon() && iconPosition() === 'left'"
+    [class.input-field__wrapper--icon-right]="icon() && iconPosition() === 'right'"
+  >
+    @if (icon() && iconPosition() === 'left') {
+      <lucide-icon [name]="icon()!" [size]="16" class="input-field__icon input-field__icon--left"></lucide-icon>
+    }
+
+    <input
+      [id]="inputId"
+      class="input-field__input"
+      [type]="type()"
+      [placeholder]="placeholder()"
+      [disabled]="disabled()"
+      [readOnly]="readonly()"
+      [required]="required()"
+      [value]="value()"
+      [attr.aria-invalid]="error() ? 'true' : null"
+      [attr.aria-describedby]="error() ? errorId : hint() ? hintId : null"
+      (input)="onInput($event)"
+      (blur)="onBlur()"
+    />
+
+    @if (icon() && iconPosition() === 'right') {
+      <lucide-icon [name]="icon()!" [size]="16" class="input-field__icon input-field__icon--right"></lucide-icon>
+    }
+  </div>
+
+  @if (error()) {
+    <span [id]="errorId" class="input-field__error" role="alert">{{ error() }}</span>
+  } @else if (hint()) {
+    <span [id]="hintId" class="input-field__hint">{{ hint() }}</span>
+  }
+</div>

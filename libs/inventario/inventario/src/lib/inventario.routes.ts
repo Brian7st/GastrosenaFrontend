@@ -26,15 +26,67 @@ export const INVENTARIO_ROUTES: Routes = [
     component: BienDetailPageComponent,
   },
 
+  // ── GIL-F-014: Solicitudes de Abastecimiento ─────────────────────────────
+  {
+    path: 'solicitudes-gil',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./pages/solicitudes-page/solicitudes-list/solicitudes-list.component').then(
+            m => m.SolicitudesListComponent
+          ),
+      },
+      {
+        path: 'nueva',
+        loadComponent: () =>
+          import('./pages/solicitudes-page/solicitudes-form/solicitudes-form.component').then(
+            m => m.SolicitudesFormComponent
+          ),
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./pages/solicitudes-page/solicitudes-detail/solicitudes-detail.component').then(
+            m => m.SolicitudesDetailComponent
+          ),
+      },
+      {
+        path: ':id/editar',
+        loadComponent: () =>
+          import('./pages/solicitudes-page/solicitudes-edit/solicitudes-edit.component').then(
+            m => m.SolicitudesEditComponent
+          ),
+      },
+      {
+        path: ':id/exportar',
+        loadComponent: () =>
+          import('./pages/solicitudes-page/solicitudes-export/solicitudes-export.component').then(
+            m => m.SolicitudesExportComponent
+          ),
+      }
+    ]
+  },
+
   // ── FE: Facturas Electrónicas ────────────────────────────────────────────
   // Vista 1: Panel de Facturación (listado + KPIs)
   {
     path: 'facturas',
     component: FacturasListPageComponent,
   },
-  // Vista 3 & 4: Editar Factura FEL (activa o bloqueada)
+  // Vista de Importar Factura
+  {
+    path: 'facturas/importar',
+    loadComponent: () => import('./pages/facturas-page/factura-import/factura-import.component').then(m => m.FacturaImportPageComponent)
+  },
+  // Vista 3: Detalle de Factura FEL (Bento Grid)
   {
     path: 'facturas/:id',
+    loadComponent: () => import('./pages/facturas-page/factura-detail/factura-detail.component').then(m => m.FacturaDetailPageComponent)
+  },
+  // Vista 4: Editar Factura FEL (Editable/Lectura antigua)
+  {
+    path: 'facturas/:id/editar',
     component: FacturaEditPageComponent,
   },
   // Vista 5: Detalle Solicitud GIL F-014
@@ -42,4 +94,51 @@ export const INVENTARIO_ROUTES: Routes = [
     path: 'facturas/gil/:id',
     component: GilSolicitudDetailPageComponent,
   },
+
+  // ── Consolidado de Ejecución Presupuestal ────────────────────────────────
+  {
+    path: 'consolidado',
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./pages/consolidado-page/consolidado-list/consolidado-list.component').then(m => m.ConsolidadoListComponent)
+      },
+      {
+        path: 'nuevo',
+        loadComponent: () => import('./pages/consolidado-page/consolidado-create/consolidado-create.component').then(m => m.ConsolidadoCreateComponent)
+      },
+      {
+        path: ':id',
+        loadComponent: () => import('./pages/consolidado-page/consolidado-detail/consolidado-detail.component').then(m => m.ConsolidadoDetailComponent)
+      }
+    ]
+  },
+
+  // ── Entradas y Salidas (Movimientos / Kardex) ────────────────────────────
+  {
+    path: 'movimientos',
+    loadComponent: () => import('./pages/kardex-page/movimientos-list/movimientos-list.component').then(m => m.MovimientosListComponent),
+    children: [
+      {
+        path: 'entrada',
+        loadComponent: () => import('./pages/kardex-page/movimiento-entrada/movimiento-entrada.component').then(m => m.MovimientoEntradaComponent)
+      },
+      {
+        path: 'entrada-gil',
+        loadComponent: () => import('./pages/kardex-page/movimiento-entrada-gil/movimiento-entrada-gil.component').then(m => m.MovimientoEntradaGilComponent)
+      },
+      {
+        path: 'salida',
+        loadComponent: () => import('./pages/kardex-page/movimiento-salida/movimiento-salida.component').then(m => m.MovimientoSalidaComponent)
+      },
+      {
+        path: 'exportar',
+        loadComponent: () => import('./pages/kardex-page/movimiento-export/movimiento-export.component').then(m => m.MovimientoExportComponent)
+      }
+    ]
+  },
+  {
+    path: 'movimientos/:id',
+    loadComponent: () => import('./pages/kardex-page/movimiento-detail/movimiento-detail.component').then(m => m.MovimientoDetailComponent)
+  }
 ];

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { ButtonComponent, DataTableComponent, KpiCardComponent } from '@restaurant/shared/ui';
 import { FacturasFacade } from '../../../data-access/facturas.facade';
 import { Factura, EstadoFactura } from '../../../models/facturas.model';
 import { FacturaFormComponent } from '../../../ui/modals/factura-form/factura-form.component';
@@ -8,7 +9,7 @@ import { FacturaFormComponent } from '../../../ui/modals/factura-form/factura-fo
 @Component({
   selector: 'restaurant-facturas-list',
   standalone: true,
-  imports: [CommonModule, FacturaFormComponent],
+  imports: [CommonModule, ButtonComponent, DataTableComponent, KpiCardComponent, FacturaFormComponent],
   templateUrl: './facturas-list.component.html',
   styleUrl: './facturas-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,8 +31,7 @@ export class FacturasListPageComponent implements OnInit {
     this.facade.loadAll();
   }
 
-  onSearch(event: Event): void {
-    const query = (event.target as HTMLInputElement).value;
+  onSearch(query: string): void {
     this.searchQuery.set(query);
     this.facade.setFiltros({ busqueda: query });
   }
@@ -53,18 +53,30 @@ export class FacturasListPageComponent implements OnInit {
     this.router.navigate(['/app/inventario/facturas', factura.id]);
   }
 
+  onEditarFactura(factura: Factura): void {
+    this.router.navigate(['/app/inventario/facturas', factura.id, 'editar']);
+  }
+
+  onAnularFactura(factura: Factura): void {
+    console.log('Anular factura:', factura.id);
+  }
+
+  onImportar(): void {
+    this.router.navigate(['/app/inventario/facturas/importar']);
+  }
+
   onExportar(): void {
     console.log('Exportando facturas...');
   }
 
   getEstadoBadgeClass(estado: EstadoFactura): string {
     const map: Record<EstadoFactura, string> = {
-      Registrada: 'badge--registrada',
-      Verificada: 'badge--verificada',
-      Pagada:     'badge--pagada',
-      Anulada:    'badge--anulada',
+      Registrada: 'status-badge--registrada',
+      Verificada: 'status-badge--verificada',
+      Pagada:     'status-badge--pagada',
+      Anulada:    'status-badge--anulada',
     };
-    return map[estado] ?? 'badge--default';
+    return map[estado] ?? 'status-badge--default';
   }
 
   getProveedorIniciales(nombre: string): string {

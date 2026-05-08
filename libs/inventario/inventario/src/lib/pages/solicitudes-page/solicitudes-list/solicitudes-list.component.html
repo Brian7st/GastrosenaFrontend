@@ -1,0 +1,323 @@
+<!-- ══════════════════════════════════════════════════════════════════════════
+     Header: Título + Botón Nueva Solicitud
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="page-header-row">
+  <div>
+    <h1 class="page-title">Formato GIL-F-014</h1>
+    <p class="page-subtitle">Gestión de bienes y servicios — Centro de Servicios y Gestión Empresarial</p>
+  </div>
+  <restaurant-button variant="primary" routerLink="nueva">
+    <span class="material-symbols-outlined">add</span>
+    Nueva Solicitud
+  </restaurant-button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     KPI Grid — 4 tarjetas (del prototipo)
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="kpi-grid">
+
+  <!-- KPI: Total -->
+  <div class="kpi-card kpi-card--green">
+    <div class="kpi-card__header">
+      <div class="kpi-icon kpi-icon--green">
+        <span class="material-symbols-outlined">analytics</span>
+      </div>
+      <span class="kpi-label-top">TOTAL</span>
+    </div>
+    <p class="kpi-value">{{ totalSolicitudes() }}</p>
+    <p class="kpi-desc">Total de solicitudes</p>
+  </div>
+
+  <!-- KPI: Borradores -->
+  <div class="kpi-card kpi-card--slate">
+    <div class="kpi-card__header">
+      <div class="kpi-icon kpi-icon--slate">
+        <span class="material-symbols-outlined">edit_note</span>
+      </div>
+      <span class="kpi-label-top">BORRADORES</span>
+    </div>
+    <p class="kpi-value">{{ totalBorradores() }}</p>
+    <p class="kpi-desc">Pendientes por enviar</p>
+  </div>
+
+  <!-- KPI: En Trámite -->
+  <div class="kpi-card kpi-card--orange">
+    <div class="kpi-card__header">
+      <div class="kpi-icon kpi-icon--orange">
+        <span class="material-symbols-outlined">pending_actions</span>
+      </div>
+      <span class="kpi-label-top">EN TRÁMITE</span>
+    </div>
+    <p class="kpi-value">{{ enTramite() }}</p>
+    <p class="kpi-desc">Pendientes y validadas</p>
+  </div>
+
+  <!-- KPI: Finalizadas -->
+  <div class="kpi-card kpi-card--emerald">
+    <div class="kpi-card__header">
+      <div class="kpi-icon kpi-icon--emerald">
+        <span class="material-symbols-outlined">task_alt</span>
+      </div>
+      <span class="kpi-label-top">FINALIZADAS</span>
+    </div>
+    <p class="kpi-value">{{ finalizadas() }}</p>
+    <p class="kpi-desc">Aprobadas y procesadas</p>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     Tabla con filtros
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="card-container">
+
+  <!-- Barra de filtros -->
+  <div class="table-controls">
+    <div class="filters-left">
+
+      <!-- Filtro Estado -->
+      <div class="select-box">
+        <select (change)="onFilterEstado($any($event.target).value)">
+          <option *ngFor="let opt of estadoOptions" [value]="opt.value">{{ opt.label }}</option>
+        </select>
+        <span class="material-symbols-outlined dropdown-icon">expand_more</span>
+      </div>
+
+      <!-- Filtro Fecha -->
+      <div class="select-box">
+        <select (change)="onFilterFecha($any($event.target).value)">
+          <option *ngFor="let opt of fechaOptions" [value]="opt.value">{{ opt.label }}</option>
+        </select>
+        <span class="material-symbols-outlined dropdown-icon">calendar_month</span>
+      </div>
+
+      <!-- Buscar por instructor -->
+      <div class="search-box">
+        <span class="material-symbols-outlined search-icon">search</span>
+        <input type="text"
+               placeholder="Filtrar por Instructor..."
+               (input)="onSearch($any($event.target).value)" />
+      </div>
+    </div>
+
+    <p class="results-count">Mostrando 1–{{ solicitudes().length }} de {{ totalSolicitudes() }} resultados</p>
+  </div>
+
+  <!-- Tabla principal -->
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Fecha Solicitud</th>
+          <th>Solicitante</th>
+          <th>Grupo / Ficha</th>
+          <th>Estado</th>
+          <th>Total</th>
+          <th class="text-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let s of solicitudes()" class="table-row">
+
+          <!-- Código -->
+          <td>
+            <span class="code-bold">{{ s.codigo }}</span>
+          </td>
+
+          <!-- Fecha -->
+          <td class="text-secondary">{{ s.fecha }}</td>
+
+          <!-- Solicitante con avatar -->
+          <td>
+            <div class="solicitante-cell">
+              <div class="avatar" [ngClass]="'avatar--' + (s.avatarColor ?? 'slate')">
+                {{ getInitials(s.cuentadante) }}
+              </div>
+              <span class="solicitante-nombre">{{ s.cuentadante }}</span>
+            </div>
+          </td>
+
+          <!-- Ficha / Grupo -->
+          <td class="text-secondary">{{ s.ficha }}</td>
+
+          <!-- Estado badge -->
+          <td>
+            <span class="estado-badge"
+                  [ngClass]="{
+                    'estado-badge--borrador':  s.estado === 'Borrador',
+                    'estado-badge--pendiente': s.estado === 'Pendiente',
+                    'estado-badge--validado':  s.estado === 'Validado',
+                    'estado-badge--aprobado':  s.estado === 'Aprobado',
+                    'estado-badge--procesado': s.estado === 'Procesado'
+                  }">
+              {{ s.estado }}
+            </span>
+          </td>
+
+          <!-- Total COP -->
+          <td>
+            <span class="monto-text">{{ formatCOP(s.montoTotal ?? 0) }}</span>
+          </td>
+
+          <!-- Acciones: Ver · Editar · PDF · Eliminar -->
+          <td>
+            <div class="actions-row">
+              <button class="action-icon" [routerLink]="[s.id]" title="Ver Detalle">
+                <span class="material-symbols-outlined">visibility</span>
+              </button>
+              <button class="action-icon"
+                      [routerLink]="[s.id, 'editar']"
+                      [disabled]="!canEdit(s.estado)"
+                      title="Editar">
+                <span class="material-symbols-outlined"
+                      [class.opacity-40]="!canEdit(s.estado)">edit</span>
+              </button>
+              <button class="action-icon" (click)="onExportPdf(s.id)" title="Exportar PDF/DOCX">
+                <span class="material-symbols-outlined">picture_as_pdf</span>
+              </button>
+              <button class="action-icon action-icon--danger"
+                      (click)="onDelete(s)"
+                      title="Eliminar">
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginación -->
+  <div class="pagination-footer">
+    <button class="page-nav-btn">
+      <span class="material-symbols-outlined">chevron_left</span> Anterior
+    </button>
+    <div class="page-numbers">
+      <button class="page-btn page-btn--active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+    </div>
+    <button class="page-nav-btn">
+      Siguiente <span class="material-symbols-outlined">chevron_right</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     Cards inferiores: Notas del Formato + Resumen de Inversión
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="bottom-cards">
+
+  <!-- Notas del Formato -->
+  <div class="info-card info-card--light">
+    <div class="info-card__bg-icon">
+      <span class="material-symbols-outlined">info</span>
+    </div>
+    <h3 class="info-card__title">Notas del Formato</h3>
+    <p class="info-card__body">
+      El formato GIL-F-014 es indispensable para el trámite de solicitudes de bienes o servicios.
+      Asegúrese de que el instructor y el coordinador técnico hayan revisado las cantidades antes
+      de registrar formalmente.
+    </p>
+    <button class="info-card__link">Ver Manual de Diligenciamiento</button>
+  </div>
+
+  <!-- Resumen de Inversión -->
+  <div class="info-card info-card--dark">
+    <h3 class="info-card__title">Resumen de Inversión</h3>
+    <div class="investment-rows">
+      <div class="investment-row">
+        <span class="investment-label">Presupuesto Ejecutado</span>
+        <span class="investment-value">$45.800.000</span>
+      </div>
+      <div class="investment-row">
+        <span class="investment-label">En Trámite</span>
+        <span class="investment-value">$12.350.000</span>
+      </div>
+    </div>
+    <!-- Barra de progreso -->
+    <div class="progress-wrap">
+      <div class="progress-track">
+        <div class="progress-fill" style="width: 75%"></div>
+      </div>
+      <p class="progress-label">75% del presupuesto anual asignado</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     MODALES DE ELIMINACIÓN
+══════════════════════════════════════════════════════════════════════════ -->
+<div *ngIf="showDeleteModal()" class="modal-overlay">
+  <!-- Background Backdrop -->
+  <div class="modal-backdrop" (click)="closeDeleteModal()"></div>
+  
+  <!-- Modal Container: BLOQUEADO -->
+  <div *ngIf="deleteBlocked()" class="modal-container">
+    <div class="modal-header-strip"></div>
+    <div class="modal-header-label">
+      GIL Aprobado — eliminación bloqueada
+    </div>
+    <div class="modal-body">
+      <div class="modal-icon-container">
+        <span class="material-symbols-outlined modal-icon">warning</span>
+      </div>
+      <div class="modal-text-center">
+        <h3 class="modal-title">No se puede eliminar</h3>
+        <p class="modal-desc">
+          Este GIL ya fue aprobado y se encuentra en un estado inmutable para auditoría.
+        </p>
+      </div>
+      <div class="modal-actions">
+        <button (click)="closeDeleteModal()" class="btn-modal btn-modal--primary">
+          Entendido
+        </button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <span class="material-symbols-outlined icon-info">info</span>
+      <span class="footer-text">Identificador: {{ itemToDelete()?.codigo }}</span>
+    </div>
+  </div>
+
+  <!-- Modal Container: CONFIRMACIÓN -->
+  <div *ngIf="!deleteBlocked()" class="modal-container">
+    <div class="modal-header-strip"></div>
+    <div class="modal-body">
+      <div class="modal-icon-container">
+        <span class="material-symbols-outlined modal-icon">warning</span>
+      </div>
+      <div class="modal-text-center">
+        <h3 class="modal-title">¿Estás seguro de que deseas eliminar esta solicitud?</h3>
+        <p class="modal-desc">
+          Esta acción no se puede deshacer. Se eliminarán permanentemente todos los registros asociados al formato <span class="font-bold">{{ itemToDelete()?.codigo }}</span> del sistema.
+        </p>
+        <div class="modal-input-group">
+          <label for="confirm-delete">Por seguridad, escribe la palabra ELIMINAR para continuar</label>
+          <input #deleteInput id="confirm-delete" placeholder="ELIMINAR" type="text" class="modal-input" />
+        </div>
+      </div>
+      <div class="modal-actions-col">
+        <button (click)="confirmDelete()" [disabled]="deleteInput.value !== 'ELIMINAR'" class="btn-modal btn-modal--danger" [class.btn-modal--disabled]="deleteInput.value !== 'ELIMINAR'">
+          <span class="material-symbols-outlined">delete_forever</span>
+          Eliminar Solicitud
+        </button>
+        <button (click)="closeDeleteModal()" class="btn-modal btn-modal--secondary">
+          Cancelar
+        </button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <span class="material-symbols-outlined icon-info">info</span>
+      <span class="footer-text">Identificador: {{ itemToDelete()?.codigo }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- FAB -->
+<button class="fab" routerLink="nueva" title="Nueva Solicitud GIL-F-014">
+  <span class="material-symbols-outlined">add</span>
+</button>

@@ -1,0 +1,112 @@
+<div class="modal-overlay">
+  <!-- Modal Content -->
+  <div class="modal-content">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="header-info">
+        <div class="header-icon">
+          <lucide-icon name="inbox" [size]="28"></lucide-icon>
+        </div>
+        <div>
+          <h3 class="modal-title">Registrar Entrada de Producto</h3>
+          <p class="modal-subtitle">Complete la información para actualizar el stock.</p>
+        </div>
+      </div>
+      <button class="close-btn" (click)="closeModal()">
+        <lucide-icon name="x" [size]="24"></lucide-icon>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <form [formGroup]="entradaForm" (ngSubmit)="onSubmit()" class="modal-body">
+      <div class="form-grid">
+        <!-- Product Search -->
+        <div class="form-group full-width">
+          <label>Código o Nombre del Producto</label>
+          <div class="input-wrapper">
+            <lucide-icon name="barcode" class="input-icon" [size]="18"></lucide-icon>
+            <input type="text" formControlName="producto" placeholder="Buscar por código o nombre..." class="form-input">
+          </div>
+        </div>
+
+        <!-- Quantity -->
+        <div class="form-group">
+          <label>CANTIDAD</label>
+          <div class="input-wrapper">
+            <lucide-icon name="package-plus" class="input-icon" [size]="18"></lucide-icon>
+            <input type="number" formControlName="cantidad" placeholder="0" class="form-input">
+          </div>
+        </div>
+
+        <!-- Date -->
+        <div class="form-group">
+          <label>FECHA</label>
+          <div class="input-wrapper">
+            <lucide-icon name="calendar" class="input-icon" [size]="18"></lucide-icon>
+            <input type="date" formControlName="fecha" class="form-input">
+          </div>
+        </div>
+
+        <!-- Provider -->
+        <div class="form-group">
+          <label>PROVEEDOR</label>
+          <div class="input-wrapper">
+            <lucide-icon name="building-2" class="input-icon" [size]="18"></lucide-icon>
+            <select formControlName="proveedor" class="form-select">
+              <option value="">Seleccione proveedor...</option>
+              <option value="tech">TechSupply Global S.A.</option>
+              <option value="infrared">InfraRed Mayoristas</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Invoice Number (FEL) -->
+        <div class="form-group">
+          <label>NÚMERO DE FACTURA (FEL)</label>
+          <div class="input-wrapper">
+            <lucide-icon name="receipt" class="input-icon" [size]="18"></lucide-icon>
+            <select formControlName="factura" class="form-select">
+              <option value="">Seleccionar factura registrada...</option>
+              <option value="FAC-2026-045">FAC-2026-045 (Registrada)</option>
+              <option value="FAC-2026-046">FAC-2026-046 (Verificada)</option>
+            </select>
+          </div>
+          <span class="field-hint">Solo facturas en estado Registrada o Verificada</span>
+        </div>
+
+        <!-- Warehouse Location -->
+        <div class="form-group">
+          <label>UBICACIÓN</label>
+          <div class="input-wrapper">
+            <lucide-icon name="map-pin" class="input-icon" [size]="18"></lucide-icon>
+            <input type="text" formControlName="ubicacion" placeholder="Pasillo A - Estante 4" class="form-input">
+          </div>
+        </div>
+
+        <!-- Unit Price -->
+        <div class="form-group">
+          <label>VALOR UNITARIO</label>
+          <div class="input-wrapper">
+            <lucide-icon name="banknote" class="input-icon" [size]="18"></lucide-icon>
+            <input type="number" formControlName="valorUnitario" placeholder="0.00" class="form-input">
+          </div>
+        </div>
+
+        <!-- Observations -->
+        <div class="form-group full-width">
+          <label>OBSERVACIONES</label>
+          <textarea formControlName="observaciones" rows="3" placeholder="Detalles adicionales sobre el envío o estado del producto..." class="form-textarea"></textarea>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <restaurant-button variant="surface" (click)="closeModal()">Cancelar</restaurant-button>
+        <restaurant-button variant="primary" type="submit" [disabled]="entradaForm.invalid">
+          <lucide-icon name="check-circle" [size]="18" style="margin-right: 0.5rem;"></lucide-icon>
+          Registrar Entrada
+        </restaurant-button>
+      </div>
+    </form>
+  </div>
+</div>

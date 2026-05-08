@@ -1,0 +1,222 @@
+<!-- ══════════════════════════════════════════════════════════════════════════
+     Editar Solicitud - Layout
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="edit-page-container">
+  
+  <!-- Header de Acción -->
+  <div class="page-header">
+    <div class="header-titles">
+      <h2 class="title">Editar Solicitud GIL-F-014</h2>
+      <p class="subtitle">Actualice la información de asignación de bienes de inventario.</p>
+    </div>
+    <div class="header-status" style="display: flex; align-items: center; gap: 1rem;">
+      <span class="badge badge--active">Activo</span>
+      <span class="header-id">ID: {{ solicitudId() }}</span>
+      <button (click)="onCancel()" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; font-weight: 500; color: #52525b; background: transparent; border: none; border-radius: 0.75rem; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#e4e4e7'" onmouseout="this.style.background='transparent'">
+        <span class="material-symbols-outlined text-lg">arrow_back</span>
+        Volver a Solicitudes
+      </button>
+    </div>
+  </div>
+
+  <div class="edit-grid">
+    
+    <!-- ══════════════════════════════════════════════════════════════════════════
+         Columna Principal (Formularios)
+    ══════════════════════════════════════════════════════════════════════════ -->
+    <div class="main-form-col">
+      
+      <!-- Locked Banner -->
+      <div *ngIf="isBlocked()" class="bg-red-50 p-4 rounded-xl border border-red-200 flex items-center gap-3 mb-6">
+        <span class="material-symbols-outlined text-red-600">lock</span>
+        <p class="text-sm font-medium text-red-800">GIL Procesado — no se permiten modificaciones</p>
+      </div>
+
+      <!-- Información del Solicitante -->
+      <div class="form-card" [class.opacity-70]="isBlocked()" [class.pointer-events-none]="isBlocked()">
+        <div class="card-header">
+          <span class="material-symbols-outlined icon-primary">person</span>
+          <h3>Información del Solicitante</h3>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Nombre Completo</label>
+            <input type="text" class="form-control" value="Carlos Alberto Ruiz" />
+          </div>
+          <div class="form-group">
+            <label>Identificación</label>
+            <input type="text" class="form-control" value="1.098.345.221" />
+          </div>
+          <div class="form-group">
+            <label>Centro de Formación</label>
+            <input type="text" class="form-control" value="Centro de Servicios y Gestión Empresarial" />
+          </div>
+          <div class="form-group">
+            <label>Cargo</label>
+            <input type="text" class="form-control" value="Instructor Técnico" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Detalles del Bien -->
+      <div class="form-card" [class.opacity-70]="isBlocked()" [class.pointer-events-none]="isBlocked()">
+        <div class="card-header">
+          <span class="material-symbols-outlined icon-primary">inventory_2</span>
+          <h3>Detalles del Bien</h3>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group col-span-2">
+            <label>Descripción del Equipo</label>
+            <input type="text" class="form-control" value="Portátil Dell Latitude 5420 - Procesador i7, 16GB RAM" [disabled]="isBlocked()" />
+          </div>
+          <div class="form-group">
+            <label>Placa Inventario</label>
+            <input type="text" class="form-control" value="SENA-IV-2023-456" [disabled]="isBlocked()" />
+          </div>
+          <div class="form-group">
+            <label>Número de Serie</label>
+            <input type="text" class="form-control" value="CZS984210L" [disabled]="isBlocked()" />
+          </div>
+          <div class="form-group">
+            <label>Estado Entrega</label>
+            <select class="form-control" [disabled]="isBlocked()">
+              <option selected>Excelente</option>
+              <option>Bueno</option>
+              <option>Regular</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Fecha de Asignación</label>
+            <input type="date" class="form-control" value="2023-05-15" [disabled]="isBlocked()" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Trazabilidad Académica -->
+      <div class="form-card" [class.opacity-70]="isBlocked()" [class.pointer-events-none]="isBlocked()">
+        <div class="card-header">
+          <span class="material-symbols-outlined icon-primary">school</span>
+          <h3>Trazabilidad Académica</h3>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Vocero (Nombre Completo) <span class="required">*</span></label>
+            <input type="text" class="form-control" placeholder="Nombre del vocero" required [disabled]="isBlocked()" />
+          </div>
+          <div class="form-group">
+            <label>Vocero (Cédula) <span class="required">*</span></label>
+            <input type="text" class="form-control" placeholder="Ej. 1.000.000.000" required [disabled]="isBlocked()" />
+          </div>
+          <div class="form-group col-span-2">
+            <label>Resultado de Aprendizaje (RA) <span class="required">*</span></label>
+            <textarea class="form-control min-h-[80px]" placeholder="Ingrese el texto detallado del RA..." required [disabled]="isBlocked()"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Franja Horaria <span class="required">*</span></label>
+            <input type="text" class="form-control" placeholder="Ej. 06:00 AM - 12:00 PM" required [disabled]="isBlocked()" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Bienes Solicitados -->
+      <div class="form-card" [class.opacity-70]="isBlocked()" [class.pointer-events-none]="isBlocked()">
+        <div class="card-header">
+          <span class="material-symbols-outlined icon-primary">category</span>
+          <h3>Bienes Solicitados</h3>
+        </div>
+        <div class="table-container">
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Código SENA</th>
+                <th class="w-full">Descripción</th>
+                <th>UM</th>
+                <th class="text-right">Cantidad</th>
+                <th class="text-right">Valor Unitario</th>
+                <th class="text-right">Subtotal</th>
+                <th class="text-center" *ngIf="!isBlocked()">Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let bien of bienes(); let i = index">
+                <td class="font-medium text-dark">{{ bien.codigo }}</td>
+                <td class="text-muted">{{ bien.descripcion }}</td>
+                <td class="text-muted">{{ bien.um }}</td>
+                <td class="text-right font-medium text-dark">{{ bien.cantidad }}</td>
+                <td class="text-right text-muted">{{ bien.valorUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                <td class="text-right font-bold text-dark">{{ bien.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                <td class="text-center" *ngIf="!isBlocked()">
+                  <button type="button" class="btn-icon btn-icon--danger" (click)="onRemoveBien(i)">
+                    <span class="material-symbols-outlined">delete</span>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <button type="button" class="btn-link btn-link--add mt-4" (click)="onAddBien()" *ngIf="!isBlocked()">
+          <span class="material-symbols-outlined">add_circle</span> Agregar bien
+        </button>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions-footer" *ngIf="!isBlocked()">
+        <button class="btn btn--secondary" (click)="onCancel()">Cancelar</button>
+        <button class="btn btn--primary" (click)="onSave()">Guardar Cambios</button>
+      </div>
+
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════════
+         Columna Sidebar (Auditoría e Información)
+    ══════════════════════════════════════════════════════════════════════════ -->
+    <div class="sidebar-col">
+      
+      <!-- Historial -->
+      <div class="side-card side-card--history">
+        <h4>
+          <span class="material-symbols-outlined icon-history">history</span> Historial del Formato
+        </h4>
+        <div class="history-timeline">
+          <div class="timeline-item">
+            <div class="timeline-dot timeline-dot--completed">
+              <span class="material-symbols-outlined">check</span>
+            </div>
+            <div class="timeline-content">
+              <p class="history-title">Creado por Almacén</p>
+              <p class="history-date">14 Mayo, 2023 - 09:30 AM</p>
+            </div>
+          </div>
+          <div class="timeline-item timeline-item--last">
+            <div class="timeline-dot timeline-dot--current">
+              <span class="material-symbols-outlined">edit</span>
+            </div>
+            <div class="timeline-content">
+              <p class="history-title">Edición Actual</p>
+              <p class="history-date">Hoy - En proceso</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumen Bienes -->
+      <div class="side-card side-card--summary">
+        <h4>Resumen de Bienes</h4>
+        <p class="summary-text">Este formulario representa el soporte legal de la entrega física de bienes a funcionarios. Cualquier modificación será registrada en la auditoría del sistema.</p>
+        <div class="summary-total">
+          <span>Valor Asegurado</span>
+          <span>$3.250.000 COP</span>
+        </div>
+      </div>
+
+      <!-- Imagen Decorativa -->
+      <div class="image-card">
+        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTGH4OIkhgXE8-BA-PCI1lhsljA3bKfDhUY_zRWc3JsYTPcje_8PdiVmzrPTuC0FLNViRdifq1dre17wzJ0qQ36kYfHFKnWTzctUFKndjZMRMRNhJ5bUWJDIzbu9yf_mrzCGdp3dxMLlVSOGWzbmL8LpRwxFjlS6wlEQBxhQIG0jlrQ2-kKio40cfQxhzZaicXJ4IerDAbGjAUKBIQT9i4iiYyWBlllOyZv6co4bbEwP4jPN0FFA78MieOnUTbd_0NAT8FicHXxaUT" alt="Vista del equipo" />
+        <div class="image-overlay">
+          <p>Referencia visual del activo asignado</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

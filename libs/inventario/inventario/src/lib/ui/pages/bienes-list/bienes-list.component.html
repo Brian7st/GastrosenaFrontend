@@ -5,18 +5,18 @@
     <p class="page-subtitle">Control exhaustivo y trazabilidad de activos de formación.</p>
   </div>
   <div class="header-actions">
-    <button class="btn-surface" (click)="onImportBienes()">
+    <restaurant-button variant="surface" (click)="onImportBienes()">
       <span class="material-symbols-outlined">file_upload</span>
       Importar
-    </button>
-    <button class="btn-surface" (click)="onExportBienes()">
+    </restaurant-button>
+    <restaurant-button variant="surface" (click)="onExportBienes()">
       <span class="material-symbols-outlined">file_download</span>
       Exportar
-    </button>
-    <button class="btn-gradient" (click)="onNuevoBien()">
+    </restaurant-button>
+    <restaurant-button variant="primary" (click)="onNuevoBien()">
       <span class="material-symbols-outlined">add</span>
       Nuevo Bien
-    </button>
+    </restaurant-button>
   </div>
 </div>
 
@@ -33,10 +33,10 @@
         <span class="material-symbols-outlined search-icon">search</span>
         <input type="text" placeholder="Buscar por código o nombre..." (input)="onSearch($any($event.target).value)" />
       </div>
-      <button class="btn-filter">
+      <restaurant-button variant="filter">
         <span class="material-symbols-outlined">filter_list</span>
         Filtros
-      </button>
+      </restaurant-button>
     </div>
   </div>
 
@@ -47,7 +47,6 @@
         <thead>
           <tr>
             <th>CÓD. SENA</th>
-            <th>CÓD. PROVEEDOR</th>
             <th>Nombre</th>
             <th>Categoría</th>
             <th class="text-center">Stock</th>
@@ -62,9 +61,6 @@
           <tr *ngFor="let bien of bienes()" class="table-row">
             <td>
               <span class="code-mono">{{ bien.codigoSena }}</span>
-            </td>
-            <td>
-              <span class="code-mono">{{ bien.codigoProveedor }}</span>
             </td>
             <td>
               <p class="bien-nombre">{{ bien.nombre }}</p>
@@ -129,40 +125,36 @@
   </ng-template>
 </div>
 
-<!-- Summary Dashboard Stats (KPIs al fondo como en prototipo) -->
+<!-- Summary Dashboard Stats -->
 <div class="kpi-grid" *ngIf="kpis() as k">
-  <div class="kpi-card">
-    <div class="kpi-card__header">
-      <div class="kpi-icon kpi-icon--primary">
-        <span class="material-symbols-outlined filled">account_balance</span>
-      </div>
-      <span class="kpi-trend kpi-trend--success">+{{ k.tendenciaValor }}% vs mes anterior</span>
-    </div>
-    <p class="kpi-label">Valor Total Inventario</p>
-    <h4 class="kpi-value">{{ k.valorTotal | currency:'COP':'symbol-narrow':'1.0-0' }}</h4>
-  </div>
 
-  <div class="kpi-card">
-    <div class="kpi-card__header">
-      <div class="kpi-icon kpi-icon--danger">
-        <span class="material-symbols-outlined filled">inventory</span>
-      </div>
-      <span class="kpi-trend kpi-trend--danger">Crítico</span>
-    </div>
-    <p class="kpi-label">Bienes en Alerta</p>
-    <h4 class="kpi-value">{{ k.totalAlertas }} Items</h4>
-  </div>
+  <restaurant-kpi-card
+    label="Valor Total Inventario"
+    [value]="k.valorTotal | currency:'COP':'symbol-narrow':'1.0-0'"
+    icon="landmark"
+    iconColor="green"
+    [trend]="'+' + k.tendenciaValor + '% vs mes anterior'"
+    [trendUp]="true"
+  />
 
-  <div class="kpi-card">
-    <div class="kpi-card__header">
-      <div class="kpi-icon kpi-icon--info">
-        <span class="material-symbols-outlined filled">sync</span>
-      </div>
-      <span class="kpi-trend kpi-trend--muted">Hoy</span>
-    </div>
-    <p class="kpi-label">Movimientos Recientes</p>
-    <h4 class="kpi-value">{{ k.movimientosHoy }} Altas</h4>
-  </div>
+  <restaurant-kpi-card
+    label="Bienes en Alerta"
+    [value]="k.totalAlertas + ' Items'"
+    icon="warehouse"
+    iconColor="red"
+    trend="Crítico"
+    [trendUp]="false"
+  />
+
+  <restaurant-kpi-card
+    label="Movimientos Recientes"
+    [value]="k.movimientosHoy + ' Altas'"
+    icon="refresh-cw"
+    iconColor="blue"
+    trend="Hoy"
+    [trendUp]="null"
+  />
+
 </div>
 
 <!-- FAB -->

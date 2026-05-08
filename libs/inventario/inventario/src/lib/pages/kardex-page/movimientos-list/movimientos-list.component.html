@@ -1,0 +1,170 @@
+<div class="page-container">
+  <!-- Header & Actions -->
+  <div class="page-header-row">
+    <div>
+      <nav class="breadcrumb-nav">
+        <span>INVENTARIO</span>
+        <lucide-icon name="chevron-right" [size]="10"></lucide-icon>
+        <span class="active">ENTRADAS Y SALIDAS</span>
+      </nav>
+      <h1 class="page-title">Entradas y Salidas de Productos</h1>
+      <p class="page-subtitle">Registro histórico y gestión de flujos de almacén en tiempo real.</p>
+    </div>
+    <div class="header-actions">
+      <restaurant-button variant="surface" routerLink="salida">
+        <div class="btn-icon-text">
+          <lucide-icon name="outbox" [size]="20"></lucide-icon>
+          Nueva Salida
+        </div>
+      </restaurant-button>
+      
+      <restaurant-button variant="surface" routerLink="entrada-gil" class="btn-gil">
+        <div class="btn-icon-text">
+          <lucide-icon name="file-text" [size]="20"></lucide-icon>
+          Entrada GIL-F-014
+        </div>
+      </restaurant-button>
+      
+      <restaurant-button variant="primary" routerLink="entrada">
+        <div class="btn-icon-text">
+          <lucide-icon name="plus-circle" [size]="20"></lucide-icon>
+          Nueva Entrada
+        </div>
+      </restaurant-button>
+    </div>
+  </div>
+
+  <!-- KPIs Bento Grid -->
+  <div class="kpi-grid">
+    <restaurant-kpi-card
+      label="ENTRADAS HOY"
+      value="142"
+      icon="log-in"
+      iconColor="green"
+      trend="+12%"
+      [trendUp]="true"
+    ></restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      label="SALIDAS HOY"
+      value="86"
+      icon="log-out"
+      iconColor="orange"
+      trend="-4%"
+      [trendUp]="false"
+    ></restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      label="VALOR ENTRADAS"
+      value="$4.2M"
+      icon="banknote"
+      iconColor="blue"
+      trend="Semana Actual"
+      [trendUp]="null"
+    ></restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      label="PENDIENTES"
+      value="09"
+      icon="alert-circle"
+      iconColor="red"
+      trend="Requieren verificación"
+      [trendUp]="null"
+    ></restaurant-kpi-card>
+  </div>
+
+  <!-- Main Data Table Container -->
+  <restaurant-data-table
+    tableTitle="Historial de Movimientos"
+    tableIcon="history"
+    searchPlaceholder="Buscar movimientos, productos o usuarios..."
+  >
+    <div dtHeader class="dt-header-controls">
+      <div class="title-group">
+        <h2>Historial de Movimientos</h2>
+        <p>Filtrando últimos 30 días</p>
+      </div>
+      <div class="action-group">
+        <button class="control-btn">
+          <lucide-icon name="filter" [size]="18"></lucide-icon> Filtros
+        </button>
+        <button class="control-btn" routerLink="exportar">
+          <lucide-icon name="download" [size]="18"></lucide-icon> Exportar
+        </button>
+      </div>
+    </div>
+    
+    <thead>
+      <tr>
+        <th>Tipo</th>
+        <th>Producto</th>
+        <th>Código SENA</th>
+        <th style="text-align: center;">Cantidad</th>
+        <th>Fecha/Hora</th>
+        <th>Origen/Destino</th>
+        <th>Doc. origen</th>
+        <th style="text-align: right;">Valor</th>
+        <th style="text-align: center;">Estado</th>
+        <th style="text-align: right;">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (movimiento of movimientos; track movimiento.id) {
+      <tr class="table-row">
+        <td>
+          <span class="type-badge" [ngClass]="movimiento.tipo === 'ENTRADA' ? 'type-badge--entrada' : 'type-badge--salida'">
+            <lucide-icon [name]="movimiento.tipo === 'ENTRADA' ? 'arrow-down' : 'arrow-up'" [size]="14"></lucide-icon>
+            {{ movimiento.tipo === 'ENTRADA' ? 'Entrada' : 'Salida' }}
+          </span>
+        </td>
+        <td>
+          <p class="prod-name">{{ movimiento.productoNombre }}</p>
+          <p class="prod-sku">SKU: {{ movimiento.productoSku }}</p>
+        </td>
+        <td>
+          <span class="code-sena">{{ movimiento.codigoSena }}</span>
+        </td>
+        <td style="text-align: center;">
+          <span class="qty-val" [ngClass]="movimiento.tipo === 'ENTRADA' ? 'qty-val--entrada' : 'qty-val--salida'">
+            {{ movimiento.tipo === 'ENTRADA' ? '+' : '-' }}{{ movimiento.cantidad }}
+          </span>
+          <span class="qty-unit">{{ movimiento.unidad }}</span>
+        </td>
+        <td>
+          <p class="date-text">{{ movimiento.fecha }}</p>
+          <p class="time-text">{{ movimiento.hora }}</p>
+        </td>
+        <td>
+          <p class="origin-text">{{ movimiento.origenDestino }}</p>
+        </td>
+        <td>
+          <a href="javascript:void(0)" class="doc-link">
+            <lucide-icon name="external-link" [size]="14"></lucide-icon> {{ movimiento.docOrigen }}
+          </a>
+        </td>
+        <td style="text-align: right;">
+          <p class="money-val">{{ movimiento.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
+        </td>
+        <td style="text-align: center;">
+          <span class="status-badge"
+                [ngClass]="{
+                  'status-badge--completado': movimiento.estado === 'Completado',
+                  'status-badge--pendiente': movimiento.estado === 'Pendiente',
+                  'status-badge--cancelado': movimiento.estado === 'Cancelado'
+                }">
+            {{ movimiento.estado }}
+          </span>
+        </td>
+        <td style="text-align: right;">
+          <div class="actions-row">
+            <button class="action-icon" [routerLink]="[movimiento.id]" title="Ver Detalle">
+              <lucide-icon name="eye" [size]="18"></lucide-icon>
+            </button>
+          </div>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </restaurant-data-table>
+</div>
+<router-outlet></router-outlet>

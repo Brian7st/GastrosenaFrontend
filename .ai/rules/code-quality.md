@@ -1,20 +1,27 @@
-# Reglas de calidad de código
+# Calidad de código — estándares obligatorios
+
+## Resumen rápido
+
+| Área | Regla clave |
+|------|------------|
+| TypeScript | Sin `any`, sin `!` innecesario |
+| Angular | `OnPush` + `standalone: true` + `inject()` + Signals |
+| Estilos | Solo tokens CSS de `_variables.scss` — cero hardcodes |
+| Tests | `.spec.ts` obligatorio · ≥ 70% coverage · sin mocks de DB |
+| Comentarios | Solo el PORQUÉ, nunca el QUÉ |
+
+---
 
 ## TypeScript
 
-- **Sin `any`** — usar tipos genéricos o `unknown` con type guard
-- **Sin `!` non-null assertion** innecesario — validar antes
-- Interfaces sobre `type` para contratos de objetos
-- Enums para valores fijos de dominio
+- **Sin `any`** — usá genéricos o `unknown` con type guard
+- **Sin `!` non-null assertion** innecesario — validá antes
+- Preferí `interface` sobre `type` para contratos de objetos
+- Usá `enum` para valores fijos de dominio
 
-## Angular
+---
 
-- **Siempre `ChangeDetectionStrategy.OnPush`** en componentes nuevos
-- **Siempre `standalone: true`** — no usar NgModules
-- **`inject()`** en vez de constructor injection
-- **Signals** para estado local del componente (`signal()`, `computed()`)
-- Sin lógica de negocio en componentes — eso va en el facade o service
-- Sin estilos inline en templates — todo en el `.scss` del componente
+## Angular — componentes
 
 ```typescript
 // ✅ correcto
@@ -25,6 +32,7 @@
 export class MiComponent {
   private facade = inject(MiFacade);
   readonly items = this.facade.items;
+  readonly count = computed(() => this.items().length);
 }
 
 // ❌ incorrecto
@@ -36,29 +44,70 @@ export class MiComponent {
 }
 ```
 
-## Estilos
+**Siempre:**
+- `standalone: true`
+- `ChangeDetectionStrategy.OnPush`
+- `inject()` en vez de constructor injection
+- Signals para estado local (`signal()`, `computed()`)
 
-- **Sin colores, espaciados ni tipografía definidos fuera de** `libs/shared/ui/src/lib/tokens/_variables.scss`
-- Usar siempre las variables CSS: `var(--color-success)`, `var(--space-4)`, etc.
+**Nunca:**
+- Lógica de negocio en componentes — va en el facade o service
+- Estilos inline en templates — todo en el `.scss`
+
+---
+
+## Estilos — tokens siempre, hardcodes nunca
 
 ```scss
 // ✅ correcto
-.badge { background: var(--color-estado-listo); padding: var(--space-2); }
+.badge {
+  background: var(--color-estado-listo);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+}
 
 // ❌ incorrecto
-.badge { background: #00B894; padding: 8px; }
+.badge {
+  background: #00B894;
+  padding: 8px;
+  border-radius: 6px;
+}
 ```
+
+Fuente de verdad: `libs/shared/ui/src/lib/tokens/_variables.scss`
+
+**Prohibido además:**
+- `transition: all` — siempre propiedades explícitas
+- Duraciones o easing hardcodeados — usar `var(--duration-fast)`, `var(--ease-standard)`
+- Breakpoints inventados — ver escala oficial en `shared-ui-governance.md`
+
+---
 
 ## Tests
 
-- Todo componente nuevo lleva su `.spec.ts`
-- Todo service nuevo lleva su `.spec.ts`
-- Mínimo: 1 test de renderizado + 1 test de comportamiento por componente
-- Coverage mínimo 70% por librería
-- Sin mocks de base de datos — usar `of()` con datos de prueba reales
+```typescript
+// estructura mínima esperada
+it('should render', () => { /* valida que el componente existe */ });
+it('should emit on click', () => { /* valida comportamiento */ });
+```
+
+- Todo componente nuevo → su `.spec.ts`
+- Todo service nuevo → su `.spec.ts`
+- Coverage mínimo: **70% por librería**
+- Sin mocks de base de datos — usá `of()` con datos de prueba tipados
+
+---
 
 ## Comentarios
 
-- Sin comentarios que expliquen QUÉ hace el código — el nombre del símbolo ya lo dice
-- Solo comentar el PORQUÉ cuando hay una restricción no obvia o un workaround
-- Sin `TODO` sin ticket asociado
+```typescript
+// ✅ correcto — explica el PORQUÉ (restricción no obvia)
+// Angular no permite host binding en componentes standalone con encapsulation None
+@HostBinding('class') hostClass = 'dt-wrapper';
+
+// ❌ incorrecto — explica el QUÉ (el nombre ya lo dice)
+// Incrementa el contador
+this.count++;
+```
+
+- Sin `TODO` sin ticket asociado — si hay deuda, se registra en Notion/Roadmap
