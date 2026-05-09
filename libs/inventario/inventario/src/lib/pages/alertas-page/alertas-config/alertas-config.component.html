@@ -1,22 +1,31 @@
 <div class="page-container">
 
-  <!-- ── Page Header ─────────────────────────────────────────────────────── -->
-  <div class="page-header">
-    <div class="page-header__left">
-      <h1 class="page-title">Configuración de Umbrales y Notificaciones</h1>
-      <p class="page-subtitle">
-        Ajuste los niveles mínimos que disparan alertas automáticas en el sistema.
-        Mantenga un control preciso sobre su inventario crítico.
-      </p>
+  <!-- ── Action Header ──────────────────────────────────────────────────── -->
+  <header class="action-header">
+    <div class="header-left">
+      <button class="back-btn" (click)="volver()" aria-label="Volver">
+        <lucide-icon name="arrow-left" [size]="20"></lucide-icon>
+      </button>
+      <div>
+        <nav class="breadcrumb-nav">
+          <span>ALERTAS</span>
+          <lucide-icon name="chevron-right" [size]="10"></lucide-icon>
+          <span class="active">CONFIGURACIÓN</span>
+        </nav>
+        <h1 class="page-title">Configuración de Umbrales y Notificaciones</h1>
+        <p class="page-subtitle">
+          Ajuste los niveles mínimos que disparan alertas automáticas en el sistema.
+        </p>
+      </div>
     </div>
-    <div class="page-header__actions">
+    <div class="header-right">
       <button class="btn-reset" (click)="restablecerValores()">Restablecer Valores</button>
       <button class="btn-save" (click)="guardarConfig()">
         <span class="material-symbols-outlined">save</span>
         Guardar Configuración
       </button>
     </div>
-  </div>
+  </header>
 
   <!-- ── Lista de ítems ─────────────────────────────────────────────────── -->
   <div class="umbrales-list">

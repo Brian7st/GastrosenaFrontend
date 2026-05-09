@@ -1,30 +1,30 @@
 <div class="page-container">
 
-  <!-- ── TopNav ──────────────────────────────────────────────────────────── -->
-  <header class="topnav">
-    <nav class="topnav__links">
-      <a class="topnav__link topnav__link--active">Resumen</a>
-      <a class="topnav__link" (click)="irAHistorial()" role="button">Auditoría</a>
-      <a class="topnav__link" (click)="irAHistorial()" role="button">Historial</a>
-    </nav>
-    <div class="topnav__actions">
-      <div class="topnav__search">
-        <span class="material-symbols-outlined topnav__search-icon">search</span>
-        <input
-          type="text"
-          class="topnav__search-input"
-          placeholder="Buscar alertas..."
-          (input)="onSearch($event)"
-        />
-      </div>
-      <button class="btn-config" (click)="irAConfig()">Configurar Umbrales</button>
+  <!-- ── Header & Actions ─────────────────────────────────────────────────── -->
+  <div class="page-header-row">
+    <div>
+      <nav class="breadcrumb-nav">
+        <span>INVENTARIO</span>
+        <lucide-icon name="chevron-right" [size]="10"></lucide-icon>
+        <span class="active">ALERTAS DE STOCK</span>
+      </nav>
+      <h1 class="page-title">Alertas de Stock Mínimo</h1>
+      <p class="page-subtitle">Gestión proactiva de inventario crítico y riesgo financiero.</p>
     </div>
-  </header>
-
-  <!-- ── Page Header ─────────────────────────────────────────────────────── -->
-  <div class="page-header">
-    <h1 class="page-title">Alertas de Stock Mínimo</h1>
-    <p class="page-subtitle">Gestión proactiva de inventario crítico y riesgo financiero.</p>
+    <div class="header-actions">
+      <restaurant-button variant="surface" (click)="irAHistorial()">
+        <div class="btn-icon-text">
+          <lucide-icon name="history" [size]="20"></lucide-icon>
+          Historial
+        </div>
+      </restaurant-button>
+      <restaurant-button variant="surface" (click)="irAConfig()">
+        <div class="btn-icon-text">
+          <lucide-icon name="settings" [size]="20"></lucide-icon>
+          Configurar Umbrales
+        </div>
+      </restaurant-button>
+    </div>
   </div>
 
   <!-- ── KPI Grid ─────────────────────────────────────────────────────────── -->

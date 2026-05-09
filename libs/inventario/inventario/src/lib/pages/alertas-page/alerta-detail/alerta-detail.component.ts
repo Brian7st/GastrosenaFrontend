@@ -8,14 +8,14 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
-import { StatusBadgeComponent } from '@restaurant/shared/ui';
+import { StatusBadgeComponent, ButtonComponent, LucideIconComponent } from '@restaurant/shared/ui';
 import { MOCK_ALERTAS, Alerta } from '../../../models/alerta.model';
 
 @Component({
   selector: 'restaurant-alerta-detail',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, StatusBadgeComponent],
+  imports: [CommonModule, RouterModule, StatusBadgeComponent, ButtonComponent, LucideIconComponent],
   templateUrl: './alerta-detail.component.html',
   styleUrls: ['./alerta-detail.component.scss'],
 })

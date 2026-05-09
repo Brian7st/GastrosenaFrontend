@@ -1,28 +1,39 @@
 @if (alerta(); as a) {
   <div class="detail-container">
 
-    <!-- ── Header ────────────────────────────────────────────────────────── -->
-    <header class="detail-header">
-      <div class="detail-header__left">
-        <nav class="breadcrumb">
-          <a class="breadcrumb__link" (click)="volver()" role="button">Alertas de Stock</a>
-          <span class="material-symbols-outlined breadcrumb__sep">chevron_right</span>
-          <span class="breadcrumb__current">{{ a.codigoSena }}</span>
-        </nav>
-        <h1 class="detail-title">Detalle de Alerta: {{ a.nombreBien }}</h1>
-        <p class="detail-meta">
-          Código: {{ a.codigoSena }} &bull; Categoría: {{ a.categoria }} &bull; Ubicación: {{ a.ubicacion }}
-        </p>
+    <!-- ── Action Header (patrón Kardex) ──────────────────────────────────── -->
+    <header class="action-header">
+      <div class="header-left">
+        <button class="back-btn" (click)="volver()" aria-label="Volver">
+          <lucide-icon name="arrow-left" [size]="20"></lucide-icon>
+        </button>
+        <div>
+          <nav class="breadcrumb-nav">
+            <span>ALERTAS</span>
+            <lucide-icon name="chevron-right" [size]="10"></lucide-icon>
+            <span class="active">{{ a.codigoSena }}</span>
+          </nav>
+          <h1 class="page-title">
+            Detalle de Alerta: {{ a.nombreBien }}
+          </h1>
+          <p class="detail-meta">
+            Código: {{ a.codigoSena }} &bull; Categoría: {{ a.categoria }} &bull; Ubicación: {{ a.ubicacion }}
+          </p>
+        </div>
       </div>
-      <div class="detail-header__actions">
-        <button class="btn-ghost" (click)="irAUmbral()">
-          <span class="material-symbols-outlined">edit</span>
-          Editar Umbral
-        </button>
-        <button class="btn-primary" (click)="abrirResolver()">
-          <span class="material-symbols-outlined">check_circle</span>
-          Resolver Ahora
-        </button>
+      <div class="header-right">
+        <restaurant-button variant="surface" (click)="irAUmbral()">
+          <div class="btn-icon-text">
+            <lucide-icon name="settings" [size]="18"></lucide-icon>
+            Editar Umbral
+          </div>
+        </restaurant-button>
+        <restaurant-button variant="primary" (click)="abrirResolver()">
+          <div class="btn-icon-text">
+            <lucide-icon name="check-circle" [size]="18"></lucide-icon>
+            Resolver Ahora
+          </div>
+        </restaurant-button>
       </div>
     </header>
 

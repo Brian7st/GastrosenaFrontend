@@ -9,7 +9,9 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import {
   KpiCardComponent,
+  ButtonComponent,
   StatusBadgeComponent,
+  LucideIconComponent,
 } from '@restaurant/shared/ui';
 import {
   Alerta,
@@ -21,7 +23,7 @@ import {
   selector: 'restaurant-alertas-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, KpiCardComponent, StatusBadgeComponent],
+  imports: [CommonModule, RouterModule, KpiCardComponent, ButtonComponent, StatusBadgeComponent, LucideIconComponent],
   templateUrl: './alertas-list.component.html',
   styleUrls: ['./alertas-list.component.scss'],
 })
