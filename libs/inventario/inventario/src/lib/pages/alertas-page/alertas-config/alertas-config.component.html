@@ -1,0 +1,96 @@
+<div class="page-container">
+
+  <!-- ── Action Header ──────────────────────────────────────────────────── -->
+  <header class="action-header">
+    <div class="header-left">
+      <button class="back-btn" (click)="volver()" aria-label="Volver">
+        <lucide-icon name="arrow-left" [size]="20"></lucide-icon>
+      </button>
+      <div>
+        <nav class="breadcrumb-nav">
+          <span>ALERTAS</span>
+          <lucide-icon name="chevron-right" [size]="10"></lucide-icon>
+          <span class="active">CONFIGURACIÓN</span>
+        </nav>
+        <h1 class="page-title">Configuración de Umbrales y Notificaciones</h1>
+        <p class="page-subtitle">
+          Ajuste los niveles mínimos que disparan alertas automáticas en el sistema.
+        </p>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-reset" (click)="restablecerValores()">Restablecer Valores</button>
+      <button class="btn-save" (click)="guardarConfig()">
+        <span class="material-symbols-outlined">save</span>
+        Guardar Configuración
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Lista de ítems ─────────────────────────────────────────────────── -->
+  <div class="umbrales-list">
+    @for (umbral of umbrales(); track umbral.id) {
+      <div class="umbral-item" [class.umbral-item--alerta]="umbral.enAlerta">
+
+        <!-- Ícono y nombre del bien -->
+        <div class="umbral-item__bien">
+          <div class="umbral-item__icon-wrap" [class.umbral-item__icon-wrap--alerta]="umbral.enAlerta">
+            <span class="material-symbols-outlined">{{ umbral.icono }}</span>
+          </div>
+          <div>
+            <p class="umbral-item__nombre">{{ umbral.bien }}</p>
+            <p class="umbral-item__categoria">{{ umbral.categoria }}</p>
+            @if (umbral.enAlerta) {
+              <span class="umbral-item__alerta-badge">{{ umbral.categoria }}</span>
+            }
+          </div>
+        </div>
+
+        <!-- Stock Mínimo -->
+        <div class="umbral-item__field">
+          <label class="field-label" [class.field-label--alerta]="umbral.enAlerta">
+            STOCK MÍNIMO
+          </label>
+          <input
+            type="number"
+            class="field-input"
+            [class.field-input--alerta]="umbral.enAlerta"
+            [value]="umbral.stockMinimo"
+            (change)="updateStockMinimo(umbral.id, $event)"
+            min="0"
+          />
+        </div>
+
+        <!-- Toggle Alerta Email -->
+        <div class="umbral-item__field umbral-item__field--center">
+          <label class="field-label">ALERTA EMAIL</label>
+          <label class="toggle" [class.toggle--disabled]="!umbral.emailActivo">
+            <input
+              type="checkbox"
+              [checked]="umbral.emailActivo"
+              (change)="toggleEmail(umbral.id)"
+            />
+            <span class="toggle__track"></span>
+            <span class="toggle__thumb"></span>
+          </label>
+        </div>
+
+        <!-- Correos -->
+        <div class="umbral-item__field umbral-item__field--correos">
+          <label class="field-label" [class.field-label--dim]="!umbral.emailActivo">CORREO(S) DESTINO</label>
+          <input
+            type="text"
+            class="field-input"
+            [class.field-input--disabled]="!umbral.emailActivo"
+            [value]="umbral.correos"
+            [placeholder]="umbral.emailActivo ? 'email@empresa.com' : 'Alerta desactivada'"
+            [disabled]="!umbral.emailActivo"
+            (change)="updateCorreos(umbral.id, $event)"
+          />
+        </div>
+
+      </div>
+    }
+  </div>
+
+</div>
