@@ -140,5 +140,49 @@ export const INVENTARIO_ROUTES: Routes = [
   {
     path: 'movimientos/:id',
     loadComponent: () => import('./pages/kardex-page/movimiento-detail/movimiento-detail.component').then(m => m.MovimientoDetailComponent)
-  }
+  },
+
+  // ── Alertas de Stock ─────────────────────────────────────────────────────
+  {
+    path: 'alertas',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./pages/alertas-page/alertas-list/alertas-list.component').then(
+            m => m.AlertasListComponent
+          ),
+      },
+      {
+        path: 'historial',
+        loadComponent: () =>
+          import('./pages/alertas-page/alertas-historial/alertas-historial.component').then(
+            m => m.AlertasHistorialComponent
+          ),
+      },
+      {
+        path: 'configuracion',
+        loadComponent: () =>
+          import('./pages/alertas-page/alertas-config/alertas-config.component').then(
+            m => m.AlertasConfigComponent
+          ),
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./pages/alertas-page/alerta-detail/alerta-detail.component').then(
+            m => m.AlertaDetailComponent
+          ),
+        children: [
+          {
+            path: 'resolver',
+            loadComponent: () =>
+              import('./pages/alertas-page/alerta-detail/alerta-resolver/alerta-resolver.component').then(
+                m => m.AlertaResolverComponent
+              ),
+          },
+        ],
+      },
+    ],
+  },
 ];
