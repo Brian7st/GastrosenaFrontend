@@ -1,0 +1,98 @@
+<div class="modulo-container">
+  
+  <div class="actions-header">
+    <div class="search-container">
+      <div class="search-bar">
+        <lucide-icon name="search" size="18" class="icon"></lucide-icon>
+        <input type="text" (input)="onSearch($event)" placeholder="Buscar recetas por nombre, categoría o ingredientes...">
+      </div>
+    </div>
+    
+    <button (click)="abrirNuevaReceta()" class="btn-nueva">
+      <lucide-icon name="plus" size="18" style="margin-right: 6px;"></lucide-icon> Nueva Receta
+    </button>
+  </div>
+
+  <div class="recetas-grid">
+    @for (receta of recetasFiltradas(); track receta.idReceta) {
+      <div class="receta-card" [class]="'cat-' + (receta.nombreCategoria?.toLowerCase()?.replace(' ', '-') || 'default')">
+        
+        @if (receta.urlImagen) {
+          <div class="card-imagen">
+            <img [src]="receta.urlImagen" [alt]="receta.nombreReceta">
+            <span class="category-badge overlay">{{ receta.nombreCategoria | uppercase }}</span>
+          </div>
+        }
+
+        <div class="card-header" [class.no-image]="!!receta.urlImagen">
+          <div class="title-row">
+            <div class="title-header-wrapper">
+              <h3>{{ receta.nombreReceta }}</h3>
+              @if (receta.fechaCreacion) {
+                <span class="fecha-creacion">{{ receta.fechaCreacion | date:'dd MMM yyyy' }}</span>
+              }
+            </div>
+            @if (!receta.urlImagen) {
+              <span class="category-text">{{ receta.nombreCategoria }}</span>
+            }
+            <div class="details-row">
+              <span class="temp-text">{{ receta.temperatura }}</span>
+              <span class="separator">•</span>
+              <span class="time-text">{{ receta.tiempoPreparacion }} min</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-content">
+          <div class="ingredients-list">
+            @for (ing of receta.ingredientes?.slice(0, 3); track ing.idIngrediente) {
+              <span class="ing-chip">{{ ing.nombreIngrediente }}</span>
+            }
+            @if (receta.ingredientes && receta.ingredientes.length > 3) {
+              <span class="ing-chip more">+{{ receta.ingredientes.length - 3 }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <div class="price-tag">
+            <span class="currency">$</span>
+            <span class="amount">{{ receta.precioUnitario | number:'1.0-0' }}</span>
+          </div>
+          
+          <div class="action-buttons">
+            <button class="btn-main-action" (click)="verDetalle(receta)">
+              Ver Receta 
+            </button>
+            <div class="secondary-actions">
+              <button class="icon-btn edit" title="Editar" (click)="editarReceta(receta)">
+                <lucide-icon name="pencil" size="16"></lucide-icon>
+              </button>
+              <button class="icon-btn delete" title="Eliminar" (click)="eliminarReceta(receta.idReceta)">
+                <lucide-icon name="trash-2" size="16"></lucide-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    } @empty {
+      <div class="empty-state">
+        <p>No se encontraron recetas con "{{ searchTerm() }}"</p>
+      </div>
+    }
+  </div>
+
+  @if (mostrarDetalle() && recetaSeleccionada()) {
+    <restaurant-detalle-receta 
+      [receta]="recetaSeleccionada()!" 
+      (close)="cerrarModales()" 
+    ></restaurant-detalle-receta>
+  }
+
+  @if (mostrarGestion()) {
+    <restaurant-gestion-receta 
+      [receta]="recetaSeleccionada()" 
+      (close)="cerrarModales($event)" 
+    ></restaurant-gestion-receta>
+  }
+</div>

@@ -1,21 +1,13 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { EmptyStateComponent, PageHeaderComponent } from '@restaurant/shared/ui';
+import { RouterOutlet } from '@angular/router';
+import { PageHeaderComponent } from '@restaurant/shared/ui';
 
 @Component({
   selector: 'restaurant-cocina-page',
   standalone: true,
-  imports: [PageHeaderComponent, EmptyStateComponent],
-  template: `
-    <restaurant-page-header
-      title="Cocina"
-      subtitle="Pedidos, recetas, tiempos y menús."
-    ></restaurant-page-header>
-
-    <restaurant-empty-state
-      title="Base del dominio creada"
-      message="Esta librería ya existe con la estructura oficial del monorepo. El siguiente paso es migrar la implementación legacy respetando los boundaries."
-    ></restaurant-empty-state>
-  `,
+  imports: [RouterOutlet, PageHeaderComponent],
+  templateUrl: './cocina-page.component.html',
+  styleUrl: './cocina-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CocinaPageComponent {}
