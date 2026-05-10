@@ -1,0 +1,35 @@
+<div class="slideover-overlay" (click)="closePanel()">
+  <div class="slideover-panel" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="slideover-header">
+      <div>
+        <h2 class="slideover-title">Cargar GIL-F-014 a Presupuesto</h2>
+        <p class="slideover-subtitle">Solicitudes en estado <span class="estado-validado">Validado</span></p>
+      </div>
+      <button class="close-btn" (click)="closePanel()">
+        <lucide-icon name="x" [size]="20"></lucide-icon>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="slideover-body">
+      <p class="placeholder-text">
+        Lista de solicitudes GIL — en construcción (Fase 4)
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <div class="slideover-footer">
+      <div class="footer-summary">
+        <span class="footer-label">Seleccionados (0)</span>
+        <span class="footer-total">$0</span>
+      </div>
+      <restaurant-button variant="primary" [disabled]="true">
+        <div class="btn-icon-text">
+          <lucide-icon name="clipboard-check" [size]="18"></lucide-icon>
+          Comprometer al Presupuesto
+        </div>
+      </restaurant-button>
+    </div>
+  </div>
+</div>

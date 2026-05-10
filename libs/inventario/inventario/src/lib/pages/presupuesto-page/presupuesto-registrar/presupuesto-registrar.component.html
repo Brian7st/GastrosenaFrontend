@@ -1,0 +1,90 @@
+<div class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Registrar Presupuesto Inicial</h3>
+        <p class="modal-subtitle">Complete los detalles para asignar la bolsa presupuestal al nuevo periodo.</p>
+      </div>
+      <button class="close-btn" (click)="closeModal()">
+        <lucide-icon name="x" [size]="20"></lucide-icon>
+      </button>
+    </div>
+
+    <!-- Modal Form -->
+    <form [formGroup]="registroForm" (ngSubmit)="onSubmit()" class="modal-body">
+      <!-- Programa -->
+      <div class="form-field">
+        <label class="field-label">NOMBRE DEL PROGRAMA</label>
+        <div class="select-wrapper">
+          <lucide-icon name="building-2" [size]="18" class="field-icon"></lucide-icon>
+          <select formControlName="programaId" class="form-select">
+            <option value="" disabled>Seleccione un programa administrativo</option>
+            @for (p of programas; track p.id) {
+              <option [value]="p.id">{{ p.nombre }}</option>
+            }
+          </select>
+          <lucide-icon name="chevron-down" [size]="18" class="select-chevron"></lucide-icon>
+        </div>
+      </div>
+
+      <!-- Vigencia Fiscal -->
+      <div class="form-field">
+        <label class="field-label">VIGENCIA FISCAL <span class="required">*</span></label>
+        <div class="select-wrapper">
+          <lucide-icon name="calendar" [size]="18" class="field-icon"></lucide-icon>
+          <select formControlName="vigenciaFiscal" class="form-select">
+            @for (v of vigencias; track v) {
+              <option [value]="v">{{ v }}</option>
+            }
+          </select>
+          <lucide-icon name="chevron-down" [size]="18" class="select-chevron"></lucide-icon>
+        </div>
+      </div>
+
+      <!-- Nombre del Rubro -->
+      <div class="form-field">
+        <label class="field-label">NOMBRE DEL RUBRO</label>
+        <div class="input-wrapper">
+          <lucide-icon name="tag" [size]="18" class="field-icon"></lucide-icon>
+          <input type="text" formControlName="nombreRubro" class="form-input"
+                 placeholder="Ej: Adquisición de Materiales de Formación">
+        </div>
+      </div>
+
+      <!-- Código Presupuestal -->
+      <div class="form-field">
+        <label class="field-label">CÓDIGO PRESUPUESTAL</label>
+        <div class="input-wrapper">
+          <lucide-icon name="hash" [size]="18" class="field-icon"></lucide-icon>
+          <input type="text" formControlName="codigoPresupuestal" class="form-input"
+                 placeholder="Ej: XXX-XX-XX-XX">
+        </div>
+      </div>
+
+      <!-- Bolsa de Dinero Inicial -->
+      <div class="form-field">
+        <label class="field-label">BOLSA DE DINERO INICIAL</label>
+        <div class="money-input-wrapper">
+          <span class="money-prefix">$</span>
+          <input type="number" formControlName="bolsaInicial" class="form-input form-input--money"
+                 placeholder="0.00">
+          <span class="money-suffix">COP</span>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer">
+        <restaurant-button variant="surface" type="button" (click)="closeModal()">
+          Cancelar
+        </restaurant-button>
+        <restaurant-button variant="primary" type="submit" [disabled]="registroForm.invalid">
+          <div class="btn-icon-text">
+            <lucide-icon name="save" [size]="18"></lucide-icon>
+            Guardar Presupuesto
+          </div>
+        </restaurant-button>
+      </div>
+    </form>
+  </div>
+</div>
