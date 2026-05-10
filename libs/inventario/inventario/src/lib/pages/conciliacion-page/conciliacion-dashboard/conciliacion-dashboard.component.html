@@ -1,0 +1,149 @@
+<div class="page-container">
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       HEADER
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="page-header-row">
+    <div>
+      <p class="page-subtitle">WORKSPACE</p>
+      <h1 class="page-title">Módulo de Conciliación</h1>
+    </div>
+    <div class="header-actions">
+      <restaurant-button variant="primary" routerLink="toma-fisica">
+        <div class="btn-icon-text">
+          <lucide-icon name="plus" [size]="20"></lucide-icon>
+          Nueva Conciliación
+        </div>
+      </restaurant-button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       KPI GRID
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="kpi-grid">
+    <restaurant-kpi-card
+      label="ESTADO GLOBAL"
+      value="96%"
+      icon="check-circle-2"
+      iconColor="green"
+      trend="Óptimo"
+      [trendUp]="true"
+    ></restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      label="CONCILIACIONES TRIMESTRE"
+      value="12"
+      icon="calendar"
+      iconColor="blue"
+      trend="completadas"
+      [trendUp]="null"
+    ></restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      label="DIFERENCIAS CRÍTICAS"
+      value="3"
+      icon="alert-triangle"
+      iconColor="red"
+      trend="pendientes"
+      [trendUp]="false"
+    ></restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      label="PRECISIÓN PROMEDIO"
+      value="95%"
+      icon="target"
+      iconColor="green"
+      trend="+2%"
+      [trendUp]="true"
+    ></restaurant-kpi-card>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       MAIN LAYOUT: Categorías (Izquierda) + Sidebar (Derecha)
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="main-layout-grid">
+    
+    <!-- LEFT CONTENT -->
+    <div class="main-content">
+      <div class="section-header">
+        <h2 class="section-title">Toma Física por Categoría</h2>
+        <a routerLink="toma-fisica" class="link-action">Ver detalle</a>
+      </div>
+
+      <div class="categorias-grid">
+        @for (cat of categorias; track cat.nombre) {
+          <div class="categoria-card" [class.categoria-card--alert]="cat.tipo === 'alert'">
+            <div class="categoria-icon-box" [class.categoria-icon-box--alert]="cat.tipo === 'alert'">
+              <lucide-icon [name]="cat.icono" [size]="24"></lucide-icon>
+            </div>
+            <div class="categoria-info">
+              <h3 class="categoria-name">{{ cat.nombre }}</h3>
+              <p class="categoria-status" [class.categoria-status--alert]="cat.tipo === 'alert'">
+                @if (cat.tipo === 'alert') {
+                  <lucide-icon name="alert-triangle" [size]="14"></lucide-icon>
+                }
+                {{ cat.estado }}
+              </p>
+            </div>
+            <div class="categoria-arrow">
+              <lucide-icon name="chevron-right" [size]="20"></lucide-icon>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <div class="sidebar-content">
+      
+      <!-- TENDENCIA DE MERMA -->
+      <div class="sidebar-card">
+        <div class="sidebar-card-header">
+          <h3 class="sidebar-card-title">Tendencia de merma <span class="sidebar-card-subtitle">(6 meses)</span></h3>
+        </div>
+        <div class="tendencia-chart">
+          @for (item of tendencias; track item.mes) {
+            <div class="chart-col">
+              <div class="chart-bar-container">
+                <div class="chart-bar" [class.chart-bar--current]="item.isCurrent" [style.height.%]="item.valor"></div>
+              </div>
+              <span class="chart-label" [class.chart-label--current]="item.isCurrent">{{ item.mes }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- ACTIVIDAD RECIENTE -->
+      <div class="sidebar-card">
+        <div class="sidebar-card-header">
+          <h3 class="sidebar-card-title">Actividad Reciente</h3>
+        </div>
+        <div class="actividad-list">
+          @for (act of actividades; track act.id) {
+            <div class="actividad-item">
+              <div class="actividad-indicator">
+                <div class="indicator-ring" [ngClass]="'indicator-ring--' + act.estado">
+                  <div class="indicator-dot"></div>
+                </div>
+                <!-- Line connection could be added via CSS if needed, but keeping it simple as per prototype -->
+              </div>
+              <div class="actividad-content">
+                <p class="actividad-ubicacion">{{ act.ubicacion }}</p>
+                <p class="actividad-detalle" [ngClass]="{'actividad-detalle--alert': act.estado === 'alert'}">
+                  {{ act.detalle }}
+                </p>
+                <p class="actividad-tiempo">{{ act.tiempo }}</p>
+              </div>
+            </div>
+          }
+        </div>
+        <div class="sidebar-card-footer">
+          <button class="btn-full-width" routerLink="historial">Ver todo el historial</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

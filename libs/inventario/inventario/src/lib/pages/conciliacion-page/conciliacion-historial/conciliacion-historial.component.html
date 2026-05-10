@@ -1,0 +1,224 @@
+<div class="page-container">
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       HEADER
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="page-header-row">
+    <div>
+      <h1 class="page-title">Historial de Conciliaciones</h1>
+      <p class="page-subtitle">Revisión y auditoría de inventario físico vs sistema</p>
+    </div>
+    <div class="header-actions">
+      <restaurant-button variant="ghost">
+        <div class="btn-icon-text">
+          <lucide-icon name="download" [size]="18"></lucide-icon>
+          Exportar Reporte
+        </div>
+      </restaurant-button>
+      <restaurant-button variant="primary" routerLink="../toma-fisica">
+        <div class="btn-icon-text">
+          <lucide-icon name="plus" [size]="18"></lucide-icon>
+          Nueva Conciliación
+        </div>
+      </restaurant-button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       KPI ROW
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="kpi-row">
+    <!-- Total Conciliaciones -->
+    <div class="kpi-box">
+      <div class="kpi-icon kpi-icon--green">
+        <lucide-icon name="check-square" [size]="20"></lucide-icon>
+      </div>
+      <div class="kpi-content">
+        <p class="kpi-label">TOTAL CONCILIACIONES</p>
+        <div class="kpi-val-group">
+          <span class="kpi-value">48</span>
+          <span class="badge badge--green">
+            <lucide-icon name="trending-up" [size]="12"></lucide-icon> +12%
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Diferencias Críticas -->
+    <div class="kpi-box">
+      <div class="kpi-icon kpi-icon--red">
+        <lucide-icon name="alert-triangle" [size]="20"></lucide-icon>
+      </div>
+      <div class="kpi-content">
+        <p class="kpi-label">DIFERENCIAS CRÍTICAS</p>
+        <div class="kpi-val-group">
+          <span class="kpi-value">15</span>
+          <span class="badge badge--red">
+            <lucide-icon name="trending-down" [size]="12"></lucide-icon> -3%
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Precisión Promedio -->
+    <div class="kpi-box">
+      <div class="kpi-icon kpi-icon--blue">
+        <lucide-icon name="target" [size]="20"></lucide-icon>
+      </div>
+      <div class="kpi-content">
+        <p class="kpi-label">PRECISIÓN PROMEDIO</p>
+        <div class="kpi-val-group">
+          <span class="kpi-value">94.2%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tiempo Promedio -->
+    <div class="kpi-box">
+      <div class="kpi-icon kpi-icon--gray">
+        <lucide-icon name="clock" [size]="20"></lucide-icon>
+      </div>
+      <div class="kpi-content">
+        <p class="kpi-label">TIEMPO PROMEDIO</p>
+        <div class="kpi-val-group">
+          <span class="kpi-value">1.5h</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       MAIN GRID
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="main-layout-grid">
+    
+    <!-- LEFT CONTENT: TABLE -->
+    <div class="main-content">
+      <restaurant-data-table 
+        tableTitle="Registros Recientes" 
+        searchPlaceholder="Buscar ID, Ubicación...">
+        
+        <!-- Dropdowns in the header area handled by data-table projection if it supports it, 
+             otherwise we can add custom filters here via CSS override -->
+        <div dtHeader class="table-filters">
+          <div class="filter-dropdown">
+            <span>Todos</span>
+            <lucide-icon name="chevron-down" [size]="16"></lucide-icon>
+          </div>
+          <div class="filter-dropdown">
+            <span>Todos los estados</span>
+            <lucide-icon name="chevron-down" [size]="16"></lucide-icon>
+          </div>
+        </div>
+
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>FECHA</th>
+            <th>UBICACIÓN</th>
+            <th>ÍTEMS</th>
+            <th>PRECISIÓN</th>
+            <th>ESTADO</th>
+            <th class="text-center">ACCIÓN</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (reg of registros; track reg.id) {
+            <tr>
+              <td class="font-bold text-primary">{{ reg.id }}</td>
+              <td class="text-secondary whitespace-pre">{{ reg.fecha.replace(', ', '\n') }}</td>
+              <td class="text-secondary">{{ reg.ubicacion }}</td>
+              <td>
+                <div class="items-cell">
+                  <span class="font-medium text-primary">{{ reg.itemsTotal }}</span>
+                  <span class="dif-mini-badge">{{ reg.itemsDif }} dif</span>
+                </div>
+              </td>
+              <td>
+                <div class="precision-cell">
+                  <div class="precision-bar-bg">
+                    <div class="precision-bar-fill" [style.width.%]="reg.precision" [ngClass]="'fill--' + reg.estadoColor"></div>
+                  </div>
+                  <span class="text-secondary font-medium">{{ reg.precision }}%</span>
+                </div>
+              </td>
+              <td>
+                <span class="status-badge" [ngClass]="'status-badge--' + reg.estadoColor">
+                  {{ reg.estado }}
+                </span>
+              </td>
+              <td class="text-center">
+                <button class="action-btn" [routerLink]="['../', reg.id]">
+                  <lucide-icon name="eye" [size]="18"></lucide-icon>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </restaurant-data-table>
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <div class="sidebar-content">
+      
+      <!-- Top 3 Diferencias -->
+      <div class="sidebar-card">
+        <h3 class="sidebar-title">Top 3 Diferencias</h3>
+        <div class="top-list">
+          @for (item of topDiferencias; track item.producto) {
+            <div class="top-item">
+              <div class="top-icon">
+                <lucide-icon [name]="item.icon" [size]="18"></lucide-icon>
+              </div>
+              <span class="top-name">{{ item.producto }}</span>
+              <span class="top-dif">{{ item.dif }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Volumen vs Precision -->
+      <div class="sidebar-card">
+        <div class="sidebar-header-flex">
+          <h3 class="sidebar-title">Volumen vs Precisión</h3>
+          <lucide-icon name="more-vertical" [size]="18" class="text-disabled"></lucide-icon>
+        </div>
+        <p class="sidebar-subtitle">Análisis trimestral (Q3)</p>
+        
+        <div class="placeholder-chart">
+          <!-- CSS Bar chart matching prototype -->
+          <div class="vol-bars">
+            <div class="vol-col">
+              <div class="bar-pair">
+                <div class="bar vol" style="height: 40%"></div>
+                <div class="bar prec" style="height: 90%"></div>
+              </div>
+              <span>Jul</span>
+            </div>
+            <div class="vol-col">
+              <div class="bar-pair">
+                <div class="bar vol" style="height: 60%"></div>
+                <div class="bar prec" style="height: 95%"></div>
+              </div>
+              <span>Ago</span>
+            </div>
+            <div class="vol-col">
+              <div class="bar-pair">
+                <div class="bar vol" style="height: 80%"></div>
+                <div class="bar prec" style="height: 85%"></div>
+              </div>
+              <span>Sep</span>
+            </div>
+          </div>
+          <div class="chart-legend">
+            <div class="legend-item"><div class="dot vol-dot"></div><span>Volumen (Ítems)</span></div>
+            <div class="legend-item"><div class="dot prec-dot"></div><span>Precisión (%)</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
