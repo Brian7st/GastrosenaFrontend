@@ -185,4 +185,43 @@ export const INVENTARIO_ROUTES: Routes = [
       },
     ],
   },
+
+  // ── Presupuesto General ──────────────────────────────────────────────────
+  {
+    path: 'presupuesto',
+    loadComponent: () =>
+      import('./pages/presupuesto-page/presupuesto-dashboard/presupuesto-dashboard.component').then(
+        m => m.PresupuestoDashboardComponent
+      ),
+    children: [
+      {
+        path: 'registrar',
+        loadComponent: () =>
+          import('./pages/presupuesto-page/presupuesto-registrar/presupuesto-registrar.component').then(
+            m => m.PresupuestoRegistrarComponent
+          ),
+      },
+      {
+        path: 'traslado',
+        loadComponent: () =>
+          import('./pages/presupuesto-page/presupuesto-traslado/presupuesto-traslado.component').then(
+            m => m.PresupuestoTrasladoComponent
+          ),
+      },
+      {
+        path: 'exportar',
+        loadComponent: () =>
+          import('./pages/presupuesto-page/presupuesto-exportar/presupuesto-exportar.component').then(
+            m => m.PresupuestoExportarComponent
+          ),
+      },
+      {
+        path: 'cargar-gil',
+        loadComponent: () =>
+          import('./pages/presupuesto-page/presupuesto-cargar-gil/presupuesto-cargar-gil.component').then(
+            m => m.PresupuestoCargarGilComponent
+          ),
+      },
+    ],
+  },
 ];
