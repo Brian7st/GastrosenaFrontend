@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 import { ButtonComponent } from '@restaurant/shared/ui';
 import { DataTableComponent } from '@restaurant/shared/ui';
+import { KpiCardComponent } from '@restaurant/shared/ui';
 
 @Component({
   selector: 'restaurant-conciliacion-historial',
@@ -14,6 +15,7 @@ import { DataTableComponent } from '@restaurant/shared/ui';
     LucideIconComponent,
     ButtonComponent,
     DataTableComponent,
+    KpiCardComponent,
   ],
   templateUrl: './conciliacion-historial.component.html',
   styleUrl: './conciliacion-historial.component.scss',

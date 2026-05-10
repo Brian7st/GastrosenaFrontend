@@ -4,9 +4,14 @@
        HEADER
        ═══════════════════════════════════════════════════════════════════════ -->
   <div class="page-header-row">
-    <div>
-      <h1 class="page-title">Historial de Conciliaciones</h1>
-      <p class="page-subtitle">Revisión y auditoría de inventario físico vs sistema</p>
+    <div class="title-group">
+      <button class="back-btn" routerLink="../">
+        <lucide-icon name="arrow-left" [size]="24"></lucide-icon>
+      </button>
+      <div>
+        <h1 class="page-title">Historial de Conciliaciones</h1>
+        <p class="page-subtitle">Revisión y auditoría de inventario físico vs sistema</p>
+      </div>
     </div>
     <div class="header-actions">
       <restaurant-button variant="ghost">
@@ -28,63 +33,37 @@
        KPI ROW
        ═══════════════════════════════════════════════════════════════════════ -->
   <div class="kpi-row">
-    <!-- Total Conciliaciones -->
-    <div class="kpi-box">
-      <div class="kpi-icon kpi-icon--green">
-        <lucide-icon name="check-square" [size]="20"></lucide-icon>
-      </div>
-      <div class="kpi-content">
-        <p class="kpi-label">TOTAL CONCILIACIONES</p>
-        <div class="kpi-val-group">
-          <span class="kpi-value">48</span>
-          <span class="badge badge--green">
-            <lucide-icon name="trending-up" [size]="12"></lucide-icon> +12%
-          </span>
-        </div>
-      </div>
-    </div>
+    <restaurant-kpi-card
+      label="TOTAL CONCILIACIONES"
+      value="48"
+      iconName="check-square"
+      iconVariant="success"
+      trend="+12%"
+      trendDirection="up">
+    </restaurant-kpi-card>
 
-    <!-- Diferencias Críticas -->
-    <div class="kpi-box">
-      <div class="kpi-icon kpi-icon--red">
-        <lucide-icon name="alert-triangle" [size]="20"></lucide-icon>
-      </div>
-      <div class="kpi-content">
-        <p class="kpi-label">DIFERENCIAS CRÍTICAS</p>
-        <div class="kpi-val-group">
-          <span class="kpi-value">15</span>
-          <span class="badge badge--red">
-            <lucide-icon name="trending-down" [size]="12"></lucide-icon> -3%
-          </span>
-        </div>
-      </div>
-    </div>
+    <restaurant-kpi-card
+      label="DIFERENCIAS CRÍTICAS"
+      value="15"
+      iconName="alert-triangle"
+      iconVariant="alert"
+      trend="-3%"
+      trendDirection="down">
+    </restaurant-kpi-card>
 
-    <!-- Precisión Promedio -->
-    <div class="kpi-box">
-      <div class="kpi-icon kpi-icon--blue">
-        <lucide-icon name="target" [size]="20"></lucide-icon>
-      </div>
-      <div class="kpi-content">
-        <p class="kpi-label">PRECISIÓN PROMEDIO</p>
-        <div class="kpi-val-group">
-          <span class="kpi-value">94.2%</span>
-        </div>
-      </div>
-    </div>
+    <restaurant-kpi-card
+      label="PRECISIÓN PROMEDIO"
+      value="94.2%"
+      iconName="target"
+      iconVariant="info">
+    </restaurant-kpi-card>
 
-    <!-- Tiempo Promedio -->
-    <div class="kpi-box">
-      <div class="kpi-icon kpi-icon--gray">
-        <lucide-icon name="clock" [size]="20"></lucide-icon>
-      </div>
-      <div class="kpi-content">
-        <p class="kpi-label">TIEMPO PROMEDIO</p>
-        <div class="kpi-val-group">
-          <span class="kpi-value">1.5h</span>
-        </div>
-      </div>
-    </div>
+    <restaurant-kpi-card
+      label="TIEMPO PROMEDIO"
+      value="1.5h"
+      iconName="clock"
+      iconVariant="neutral">
+    </restaurant-kpi-card>
   </div>
 
   <!-- ═══════════════════════════════════════════════════════════════════════

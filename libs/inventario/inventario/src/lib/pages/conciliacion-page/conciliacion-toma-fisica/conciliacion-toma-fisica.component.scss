@@ -14,12 +14,35 @@
   align-items: center;
 }
 
+.title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-2);
+}
+
+.back-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-heading);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--transition-fast);
+
+  &:hover {
+    transform: translateX(-4px);
+  }
+}
+
 .page-title {
   font-family: var(--font-family-headline);
   font-size: var(--font-size-2xl);
   font-weight: 700;
   color: var(--color-text-heading);
-  margin: 0 0 var(--space-2) 0;
+  margin: 0;
 }
 
 .header-meta {
