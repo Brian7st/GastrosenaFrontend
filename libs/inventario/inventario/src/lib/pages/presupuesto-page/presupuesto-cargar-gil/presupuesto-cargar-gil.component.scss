@@ -1,0 +1,123 @@
+/* ==========================================================================
+   Presupuesto — Slide-over Cargar GIL
+   Tokens: _variables.scss
+   ========================================================================== */
+
+.slideover-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: flex-end;
+  background-color: var(--color-backdrop);
+  backdrop-filter: blur(6px);
+}
+
+.slideover-panel {
+  width: 100%;
+  max-width: 480px;
+  height: 100vh;
+  background-color: var(--color-superficie-contenedor-mas-bajo);
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  animation: slideIn var(--duration-base) var(--ease-decelerate) forwards;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.slideover-header {
+  padding: var(--space-6);
+  border-bottom: 1px solid var(--color-superficie-contenedor);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.slideover-title {
+  font-family: var(--font-family-headline);
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  color: var(--color-en-superficie);
+  margin: 0;
+}
+
+.slideover-subtitle {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin: var(--space-1) 0 0;
+}
+
+.estado-validado {
+  color: var(--color-primario);
+  font-weight: 700;
+}
+
+.close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-pill);
+  border: none;
+  background: transparent;
+  color: var(--color-pizarra-400);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+
+  &:hover { background-color: var(--color-superficie-contenedor-bajo); }
+  &:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+}
+
+.slideover-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-6);
+}
+
+.placeholder-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-pizarra-400);
+  text-align: center;
+  padding: var(--space-8);
+  background-color: var(--color-superficie-contenedor-bajo);
+  border-radius: var(--radius-md);
+}
+
+.slideover-footer {
+  padding: var(--space-6);
+  background-color: var(--color-superficie-contenedor);
+  border-top: 1px solid var(--color-superficie-contenedor);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.footer-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.footer-total {
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  color: var(--color-en-superficie);
+}
+
+.btn-icon-text {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 700;
+}
