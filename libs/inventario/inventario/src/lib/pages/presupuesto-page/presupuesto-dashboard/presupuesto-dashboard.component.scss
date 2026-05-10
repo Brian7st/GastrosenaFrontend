@@ -1,0 +1,680 @@
+/* ==========================================================================
+   Presupuesto General — Dashboard
+   Design System: The Precision Ledger
+   Tokens: _variables.scss
+   ========================================================================== */
+
+.page-container {
+  padding: var(--space-8);
+}
+
+/* ── Page Header ────────────────────────────────────────────────────────────── */
+.page-header-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+}
+
+.breadcrumb-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-pizarra-400);
+  margin-bottom: var(--space-2);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  .active {
+    color: var(--color-esmeralda-700);
+  }
+}
+
+.page-title {
+  font-family: var(--font-family-headline);
+  font-size: var(--font-size-2xl);
+  font-weight: 800;
+  color: var(--color-en-superficie);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.page-subtitle {
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  margin: var(--space-1) 0 0;
+  font-size: var(--font-size-md);
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.btn-icon-text {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 700;
+}
+
+/* ── KPI Grid ───────────────────────────────────────────────────────────────── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (min-width: 1280px) {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* ── Tabla Estructura Presupuestal (Card contenedora) ───────────────────────── */
+.estructura-card {
+  background-color: var(--color-superficie-contenedor-mas-bajo);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  margin-bottom: var(--space-8);
+}
+
+.estructura-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-6);
+}
+
+.estructura-title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.estructura-icon {
+  color: var(--color-primario);
+}
+
+.estructura-title {
+  font-family: var(--font-family-headline);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-en-superficie);
+  margin: 0;
+}
+
+.estructura-table-wrapper {
+  overflow-x: auto;
+}
+
+.estructura-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+
+  thead {
+    background-color: var(--color-superficie-contenedor-bajo);
+
+    th {
+      padding: var(--space-4) var(--space-6);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--color-contorno);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+  }
+
+  tbody {
+    td {
+      padding: var(--space-4) var(--space-6);
+      vertical-align: middle;
+    }
+  }
+
+  tfoot {
+    background-color: var(--color-superficie-contenedor-bajo);
+  }
+}
+
+.col-money {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.col-ejecucion {
+  text-align: center;
+  width: 120px;
+}
+
+/* ── Filas de Grupo (programa) ──────────────────────────────────────────────── */
+.grupo-row {
+  cursor: pointer;
+  background-color: var(--color-superficie-contenedor-bajo);
+  transition: background-color var(--duration-fast) var(--ease-standard);
+
+  &:hover {
+    background-color: var(--color-superficie-contenedor);
+  }
+
+  td {
+    font-weight: var(--font-weight-semibold);
+    border-top: 1px solid var(--color-superficie-contenedor);
+  }
+}
+
+.grupo-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.toggle-chevron {
+  color: var(--color-pizarra-400);
+  flex-shrink: 0;
+}
+
+.grupo-nombre {
+  font-family: var(--font-family-headline);
+  font-weight: 700;
+  color: var(--color-en-superficie);
+}
+
+.grupo-value {
+  color: var(--color-en-superficie);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* ── Filas de Rubro ─────────────────────────────────────────────────────────── */
+.rubro-row {
+  transition: background-color var(--duration-fast) var(--ease-standard);
+
+  &:hover {
+    background-color: var(--color-tabla-hover, rgba(248, 250, 252, 0.8));
+  }
+
+  td {
+    color: var(--color-pizarra-600);
+    font-weight: var(--font-weight-medium);
+  }
+}
+
+.rubro-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: var(--space-8);
+}
+
+.rubro-codigo {
+  font-size: 10px;
+  font-family: var(--font-family-mono);
+  color: var(--color-pizarra-400);
+  letter-spacing: 0.02em;
+}
+
+.rubro-nombre {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-en-superficie);
+}
+
+/* ── Badge de ejecución ─────────────────────────────────────────────────────── */
+.ejecucion-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+
+  &--critico {
+    background-color: var(--color-error-bg);
+    color: var(--color-error-text);
+  }
+
+  &--alto {
+    background-color: var(--color-warning-bg);
+    color: var(--color-warning-text);
+  }
+
+  &--normal {
+    background-color: var(--color-success-bg);
+    color: var(--color-success-text);
+  }
+}
+
+/* ── Barra de ejecución en rubros ───────────────────────────────────────────── */
+.ejecucion-bar-container {
+  width: 60px;
+  height: 4px;
+  background-color: var(--color-superficie-contenedor);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: var(--space-2);
+}
+
+.ejecucion-bar {
+  height: 100%;
+  background-color: var(--color-primario);
+  border-radius: var(--radius-pill);
+  transition: width var(--duration-base) var(--ease-standard);
+}
+
+.ejecucion-text {
+  font-size: 10px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-pizarra-500);
+}
+
+/* ── Fila Total ─────────────────────────────────────────────────────────────── */
+.total-row {
+  td {
+    padding: var(--space-5) var(--space-6);
+    border-top: 1px solid var(--color-superficie-contenedor);
+  }
+}
+
+.total-label {
+  font-family: var(--font-family-headline);
+  font-weight: 800;
+  font-size: var(--font-size-sm);
+  color: var(--color-en-superficie);
+  letter-spacing: 0.02em;
+}
+
+.total-value {
+  font-weight: 800;
+  color: var(--color-en-superficie);
+  font-size: var(--font-size-sm);
+}
+
+/* ── Bento Grid ─────────────────────────────────────────────────────────────── */
+.bento-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+
+  @media (min-width: 1024px) {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.bento-card {
+  background-color: var(--color-superficie-contenedor-mas-bajo);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-6);
+}
+
+.bento-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.bento-icon {
+  color: var(--color-primario);
+}
+
+.bento-card-title {
+  font-family: var(--font-family-headline);
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  color: var(--color-en-superficie);
+  margin: 0;
+}
+
+/* ── Chart (barras CSS) ─────────────────────────────────────────────────────── */
+.chart-container {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+  height: 160px;
+  padding-top: var(--space-4);
+}
+
+.chart-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.chart-bar-track {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  max-width: 32px;
+}
+
+.chart-bar {
+  width: 100%;
+  background-color: var(--color-primario);
+  opacity: 0.25;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  transition: height var(--duration-base) var(--ease-decelerate);
+  min-height: 4px;
+
+  &--actual {
+    opacity: 1;
+    background: linear-gradient(
+      to top,
+      var(--color-primario),
+      var(--color-primario-contenedor)
+    );
+  }
+}
+
+.chart-label {
+  font-size: 10px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-pizarra-400);
+  margin-top: var(--space-2);
+
+  &--actual {
+    color: var(--color-primario);
+    font-weight: 700;
+  }
+}
+
+/* ── Timeline (Próximos Vencimientos) ───────────────────────────────────────── */
+.timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.vencimiento-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  transition: background-color var(--duration-fast) var(--ease-standard);
+
+  &--critico {
+    background-color: var(--color-error-bg);
+
+    .vencimiento-icon-container {
+      color: var(--color-error-text);
+      background-color: var(--color-error-border);
+    }
+
+    .vencimiento-dias {
+      color: var(--color-error-text);
+      background-color: var(--color-error-border);
+    }
+  }
+
+  &--proximo {
+    background-color: var(--color-warning-bg);
+
+    .vencimiento-icon-container {
+      color: var(--color-warning-text);
+      background-color: var(--color-warning-border);
+    }
+
+    .vencimiento-dias {
+      color: var(--color-warning-text);
+      background-color: var(--color-warning-border);
+    }
+  }
+
+  &--normal {
+    background-color: var(--color-superficie-contenedor-bajo);
+
+    .vencimiento-icon-container {
+      color: var(--color-primario);
+      background-color: var(--color-success-bg);
+    }
+
+    .vencimiento-dias {
+      color: var(--color-pizarra-600);
+      background-color: var(--color-superficie-contenedor);
+    }
+  }
+}
+
+.vencimiento-icon-container {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.vencimiento-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.vencimiento-titulo {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-en-superficie);
+  margin: 0;
+}
+
+.vencimiento-fecha {
+  font-size: var(--font-size-xs);
+  color: var(--color-pizarra-400);
+  margin: 2px 0 0;
+}
+
+.vencimiento-dias {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+/* ── DataTable Historial Overrides ───────────────────────────────────────────── */
+.dt-header-controls {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .title-group {
+    h2 {
+      font-family: var(--font-family-headline);
+      font-size: var(--font-size-lg);
+      font-weight: 700;
+      margin: 0;
+      color: var(--color-en-superficie);
+    }
+    p {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      margin: var(--space-1) 0 0;
+    }
+  }
+
+  .action-group {
+    display: flex;
+    gap: var(--space-2);
+
+    .control-btn {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      background: var(--color-superficie-contenedor-bajo);
+      border-radius: var(--radius-lg);
+      border: none;
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-pizarra-600);
+      cursor: pointer;
+      transition: background-color var(--duration-fast) var(--ease-standard);
+
+      &:hover {
+        background: var(--color-superficie-contenedor);
+      }
+
+      &:focus-visible {
+        outline: none;
+        box-shadow: var(--focus-ring);
+      }
+    }
+  }
+}
+
+/* ── Celdas del Historial ───────────────────────────────────────────────────── */
+.table-row {
+  cursor: pointer;
+  border-left: 4px solid transparent;
+  transition: background-color var(--duration-fast) var(--ease-standard),
+              border-left-color var(--duration-fast) var(--ease-standard);
+
+  &:hover {
+    background-color: var(--color-table-row-hover);
+    border-left-color: var(--color-esmeralda-500);
+  }
+}
+
+.fecha-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-pizarra-600);
+  font-weight: var(--font-weight-medium);
+}
+
+.tipo-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+
+  &--compromiso {
+    background-color: var(--color-info-bg);
+    color: var(--color-info-text);
+  }
+
+  &--pago {
+    background-color: var(--color-success-bg);
+    color: var(--color-success-text);
+  }
+
+  &--traslado {
+    background-color: var(--color-warning-bg);
+    color: var(--color-warning-text);
+  }
+
+  &--anulacion {
+    background-color: var(--color-error-bg);
+    color: var(--color-error-text);
+  }
+}
+
+.doc-link {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-esmeralda-700);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    color: var(--color-esmeralda-800);
+  }
+}
+
+.programa-text {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-en-superficie);
+}
+
+.rubro-code {
+  font-size: var(--font-size-sm);
+  font-family: var(--font-family-mono);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-pizarra-500);
+  background: var(--color-superficie-contenedor-bajo);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.money-val {
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+  color: var(--color-en-superficie);
+
+  &--negativo {
+    color: var(--color-terciario);
+  }
+}
+
+.saldo-text {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-pizarra-600);
+}
+
+/* ── Alerta Flotante ────────────────────────────────────────────────────────── */
+.alerta-flotante {
+  position: fixed;
+  bottom: var(--space-8);
+  right: var(--space-8);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  background-color: var(--color-terciario);
+  color: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  animation: slideInUp var(--duration-slow) var(--ease-decelerate) forwards;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
