@@ -1,114 +1,128 @@
 <div class="comanda-container">
+  <restaurant-page-header title="Tablero de Comandas" subtitle="Gestión de pedidos en tiempo real"></restaurant-page-header>
 
   <!-- Filtros -->
-  <div class="filters-container">
-    <div class="search-wrapper">
-      <i class="bi bi-search"></i>
-      <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)"
-             placeholder="Buscar por mesa, mesero o plato..." class="search-bar">
+  <div class="filters-container showcase__row" style="margin-bottom: var(--space-6);">
+    <div style="flex: 1; min-width: 250px;">
+      <restaurant-search-filter 
+        label="Buscar comanda" 
+        placeholder="Buscar por mesa, mesero o plato..." 
+        [value]="searchTerm()" 
+        (valueChange)="searchTerm.set($event)"
+      ></restaurant-search-filter>
     </div>
 
-    <select [ngModel]="filtroEstado()" (ngModelChange)="filtroEstado.set($event)" class="filter-select">
-      <option>Todos los estados</option>
-      <option>En Espera</option>
-      <option>Preparando</option>
-      <option>Listo</option>
-    </select>
+    <div style="min-width: 180px;">
+      <restaurant-select-filter 
+        label="Estado" 
+        [value]="filtroEstado()" 
+        [options]="opcionesEstado" 
+        (valueChange)="filtroEstado.set($event)"
+      ></restaurant-select-filter>
+    </div>
 
-    <select [ngModel]="filtroPrioridad()" (ngModelChange)="filtroPrioridad.set($event)" class="filter-select">
-      <option>Todas las prioridades</option>
-      <option>Urgente</option>
-      <option>Alta</option>
-      <option>Normal</option>
-    </select>
+    <div style="min-width: 180px;">
+      <restaurant-select-filter 
+        label="Prioridad" 
+        [value]="filtroPrioridad()" 
+        [options]="opcionesPrioridad" 
+        (valueChange)="filtroPrioridad.set($event)"
+      ></restaurant-select-filter>
+    </div>
 
-    <select [ngModel]="filtroOrden()" (ngModelChange)="filtroOrden.set($event)" class="filter-select">
-      <option>Prioridad</option>
-      <option>Hora de llegada</option>
-      <option>Tiempo estimado</option>
-    </select>
+    <div style="min-width: 180px;">
+      <restaurant-select-filter 
+        label="Ordenar por" 
+        [value]="filtroOrden()" 
+        [options]="opcionesOrden" 
+        (valueChange)="filtroOrden.set($event)"
+      ></restaurant-select-filter>
+    </div>
   </div>
 
   <div class="comandas-grid">
     
     <div class="column col-espera">
-      <div class="col-header">
-        <span><i class="bi bi-clock-history"></i> En Espera</span>
-        <span class="counter">{{ enEspera().length }}</span>
+      <div class="col-header showcase__row" style="justify-content: space-between; margin-bottom: var(--space-4);">
+        <restaurant-section-title title="En Espera" align="left"></restaurant-section-title>
+        <span class="showcase__value">{{ enEspera().length }}</span>
       </div>
       @for (c of enEspera(); track c.id) {
-        <div class="comanda-card shadow-sm">
-          <div class="card-header">
-            <span class="mesa">{{ c.mesa }}</span>
-            <span class="prioridad" [class]="c.prioridad.toLowerCase()">{{ c.prioridad }}</span>
+        <restaurant-card [title]="c.mesa" style="margin-bottom: var(--space-4); display: block;">
+          <div style="display: flex; flex-direction: column; height: 100%; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2); margin-top: var(--space-2);">
+                <span class="mesero" style="font-size: var(--font-size-sm); color: var(--color-text-secondary);"><b>Mesero:</b> {{ c.mesero }}</span>
+                <restaurant-status-badge [label]="c.prioridad" [variant]="getBadgeVariant(c.prioridad)"></restaurant-status-badge>
+              </div>
+              <ul class="platos-list" style="margin: 0 0 var(--space-4) 0; padding-left: var(--space-4); font-size: var(--font-size-sm);">
+                @for (plato of c.platos; track plato) {
+                  <li>{{ plato }}</li>
+                }
+              </ul>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: var(--space-4); border-top: 1px solid var(--color-border);">
+              <span class="tiempo" style="font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-text-primary);"><lucide-icon name="clock" size="14"></lucide-icon> {{ c.tiempo }} min</span>
+              <restaurant-button variant="primary" (click)="cambiarEstado(c, 'Preparando')">Preparar</restaurant-button>
+            </div>
           </div>
-          <div class="card-body">
-            <p class="mesero"><b>Mesero:</b> {{ c.mesero }}</p>
-            <ul class="platos-list">
-              @for (plato of c.platos; track plato) {
-                <li>{{ plato }}</li>
-              }
-            </ul>
-          </div>
-          <div class="card-footer">
-            <span class="tiempo"><i class="bi bi-stopwatch"></i> {{ c.tiempo }} min</span>
-            <button class="btn-preparar" (click)="cambiarEstado(c, 'Preparando')">Preparar</button>
-          </div>
-        </div>
+        </restaurant-card>
       }
     </div>
 
     <div class="column col-preparando">
-      <div class="col-header">
-        <span><i class="bi bi-play-circle-fill"></i> Preparando</span>
-        <span class="counter">{{ preparando().length }}</span>
+      <div class="col-header showcase__row" style="justify-content: space-between; margin-bottom: var(--space-4);">
+        <restaurant-section-title title="Preparando" align="left"></restaurant-section-title>
+        <span class="showcase__value">{{ preparando().length }}</span>
       </div>
       @for (c of preparando(); track c.id) {
-        <div class="comanda-card shadow-sm">
-          <div class="card-header">
-            <span class="mesa">{{ c.mesa }}</span>
-            <span class="prioridad" [class]="c.prioridad.toLowerCase()">{{ c.prioridad }}</span>
+        <restaurant-card [title]="c.mesa" style="margin-bottom: var(--space-4); display: block;">
+          <div style="display: flex; flex-direction: column; height: 100%; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2); margin-top: var(--space-2);">
+                <span class="mesero" style="font-size: var(--font-size-sm); color: var(--color-text-secondary);"><b>Mesero:</b> {{ c.mesero }}</span>
+                <restaurant-status-badge [label]="c.prioridad" [variant]="getBadgeVariant(c.prioridad)"></restaurant-status-badge>
+              </div>
+              <ul class="platos-list" style="margin: 0 0 var(--space-4) 0; padding-left: var(--space-4); font-size: var(--font-size-sm);">
+                @for (plato of c.platos; track plato) {
+                  <li>{{ plato }}</li>
+                }
+              </ul>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: var(--space-4); border-top: 1px solid var(--color-border);">
+              <span class="tiempo" style="font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-warning);"><lucide-icon name="clock" size="14"></lucide-icon> {{ c.tiempo }} min</span>
+              <restaurant-button variant="success" (click)="cambiarEstado(c, 'Listo')">Listo</restaurant-button>
+            </div>
           </div>
-          <div class="card-body">
-            <p class="mesero"><b>Mesero:</b> {{ c.mesero }}</p>
-            <ul class="platos-list">
-              @for (plato of c.platos; track plato) {
-                <li>{{ plato }}</li>
-              }
-            </ul>
-          </div>
-          <div class="card-footer">
-            <span class="tiempo"><i class="bi bi-stopwatch"></i> {{ c.tiempo }} min</span>
-            <button class="btn-listo" (click)="cambiarEstado(c, 'Listo')">Listo</button>
-          </div>
-        </div>
+        </restaurant-card>
       }
     </div>
 
     <div class="column col-listo">
-      <div class="col-header">
-        <span><i class="bi bi-check-circle-fill"></i> Listo</span>
-        <span class="counter">{{ listos().length }}</span>
+      <div class="col-header showcase__row" style="justify-content: space-between; margin-bottom: var(--space-4);">
+        <restaurant-section-title title="Listo" align="left"></restaurant-section-title>
+        <span class="showcase__value">{{ listos().length }}</span>
       </div>
       @for (c of listos(); track c.id) {
-        <div class="comanda-card card-completed shadow-sm">
-          <div class="card-header">
-            <span class="mesa">{{ c.mesa }}</span>
-            <span class="prioridad done">Completado</span>
+        <restaurant-card [title]="c.mesa" style="margin-bottom: var(--space-4); display: block; opacity: 0.8;">
+          <div style="display: flex; flex-direction: column; height: 100%; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2); margin-top: var(--space-2);">
+                <span class="mesero" style="font-size: var(--font-size-sm); color: var(--color-text-secondary);"><b>Mesero:</b> {{ c.mesero }}</span>
+                <restaurant-status-badge label="Completado" variant="success"></restaurant-status-badge>
+              </div>
+              <ul class="platos-list" style="margin: 0 0 var(--space-4) 0; padding-left: var(--space-4); font-size: var(--font-size-sm);">
+                @for (plato of c.platos; track plato) {
+                  <li style="text-decoration: line-through; color: var(--color-text-muted);">{{ plato }}</li>
+                }
+              </ul>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: var(--space-4); border-top: 1px solid var(--color-border);">
+              <span class="finalizado" style="font-size: var(--font-size-sm); color: var(--color-success); font-weight: var(--font-weight-medium);">Esperando entrega</span>
+              <lucide-icon name="check-check" size="20" style="color: var(--color-success);"></lucide-icon>
+            </div>
           </div>
-          <div class="card-body">
-            <p class="mesero"><b>Mesero:</b> {{ c.mesero }}</p>
-            <ul class="platos-list">
-              @for (plato of c.platos; track plato) {
-                <li class="text-muted text-decoration-line-through">{{ plato }}</li>
-              }
-            </ul>
-          </div>
-          <div class="card-footer">
-            <span class="finalizado">Esperando entrega</span>
-            <i class="bi bi-check2-all text-success fs-4"></i>
-          </div>
-        </div>
+        </restaurant-card>
       }
     </div>
 

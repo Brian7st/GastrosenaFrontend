@@ -5,7 +5,7 @@ import { CategoriaService } from "../../data-access/categoria.service";
 import { RecetaService } from "../../data-access/receta.service";
 import { IngredienteService } from "../../data-access/ingrediente.service";
 import { Receta } from "../../models/receta.model";
-import { LucideIconComponent } from "@restaurant/shared/ui";
+import { LucideIconComponent, ButtonComponent, InputComponent } from "@restaurant/shared/ui";
 
 export function noDuplicatesValidator(fieldName: string): ValidatorFn {
   return (formArray: AbstractControl): ValidationErrors | null => {
@@ -21,7 +21,7 @@ export function noDuplicatesValidator(fieldName: string): ValidatorFn {
 @Component({
   selector: 'restaurant-gestion-receta',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, LucideIconComponent],
+  imports: [ReactiveFormsModule, CommonModule, LucideIconComponent, ButtonComponent, InputComponent],
   templateUrl: './gestion-receta.component.html',
   styleUrl: './gestion-receta.component.scss'
 })
@@ -194,8 +194,37 @@ export class GestionRecetaComponent implements OnInit {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = () => {
-        this.recipeForm.patchValue({ urlImagen: reader.result as string });
+      reader.onload = (e: any) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 800;
+          const MAX_HEIGHT = 800;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height = Math.round(height * (MAX_WIDTH / width));
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width = Math.round(width * (MAX_HEIGHT / height));
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+
+          // Comprimir como JPEG al 70% de calidad para evitar exceder el límite del paquete de MySQL
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          this.recipeForm.patchValue({ urlImagen: dataUrl });
+        };
+        img.src = e.target.result;
       };
       reader.readAsDataURL(file);
     }
