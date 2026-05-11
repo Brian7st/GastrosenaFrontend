@@ -1,0 +1,20 @@
+<div class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="header-icon">
+        <lucide-icon name="arrow-left-right" [size]="28"></lucide-icon>
+      </div>
+      <button class="close-btn" (click)="closeModal()">
+        <lucide-icon name="x" [size]="20"></lucide-icon>
+      </button>
+    </div>
+    <div class="modal-body">
+      <h3 class="modal-title">Traslado de Recursos Presupuestales</h3>
+      <p class="modal-subtitle">Transferencia de fondos entre rubros — en construcción.</p>
+    </div>
+    <div class="modal-footer">
+      <restaurant-button variant="surface" (click)="closeModal()">Cancelar</restaurant-button>
+      <restaurant-button variant="primary" [disabled]="true">Confirmar Traslado</restaurant-button>
+    </div>
+  </div>
+</div>
