@@ -1,0 +1,182 @@
+<div class="page-container">
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       HEADER
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="page-header-row">
+    <div>
+      <div class="title-group">
+        <button class="back-btn" routerLink="../">
+          <lucide-icon name="arrow-left" [size]="24"></lucide-icon>
+        </button>
+        <h1 class="page-title">Toma Física de Inventario</h1>
+      </div>
+      <div class="header-meta">
+        <div class="meta-item">
+          <lucide-icon name="calendar" [size]="16"></lucide-icon>
+          <span>{{ fecha }}</span>
+        </div>
+        <div class="meta-divider"></div>
+        <div class="meta-item">
+          <lucide-icon name="user" [size]="16"></lucide-icon>
+          <span>{{ responsable }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="location-selector">
+        <span>Almacén Principal - Cocina</span>
+        <lucide-icon name="chevron-down" [size]="16"></lucide-icon>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       SUMMARY CARDS
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-icon">
+        <lucide-icon name="list" [size]="20"></lucide-icon>
+      </div>
+      <div class="summary-content">
+        <p class="summary-label">ÍTEMS TOTALES</p>
+        <p class="summary-value">{{ itemsTotales() }}</p>
+      </div>
+    </div>
+
+    <div class="summary-card summary-card--success">
+      <div class="summary-icon">
+        <lucide-icon name="check-circle" [size]="20"></lucide-icon>
+      </div>
+      <div class="summary-content">
+        <p class="summary-label">PRECISIÓN</p>
+        <p class="summary-value summary-value--green">{{ precision() }}%</p>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon summary-icon--alert">
+        <lucide-icon name="alert-triangle" [size]="20"></lucide-icon>
+      </div>
+      <div class="summary-content">
+        <p class="summary-label">DIFERENCIAS</p>
+        <p class="summary-value summary-value--red">{{ diferenciasCount() }}</p>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon summary-icon--alert">
+        <lucide-icon name="trending-down" [size]="20"></lucide-icon>
+      </div>
+      <div class="summary-content">
+        <p class="summary-label">IMPACTO FINANCIERO</p>
+        <p class="summary-value" [class.summary-value--red]="impactoFinanciero() < 0">
+          {{ formatCurrency(impactoFinanciero()) }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       CONTROLS
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="table-controls">
+    <div class="tabs-group">
+      <button class="tab-btn tab-btn--active">TODOS</button>
+      <button class="tab-btn">DIFERENCIAS</button>
+      <button class="tab-btn">PENDIENTES</button>
+    </div>
+    
+    <div class="actions-group">
+      <restaurant-button variant="ghost">
+        <div class="btn-icon-text">
+          <lucide-icon name="save" [size]="18"></lucide-icon>
+          Guardar Borrador
+        </div>
+      </restaurant-button>
+      <restaurant-button variant="ghost">
+        <div class="btn-icon-text">
+          <lucide-icon name="download" [size]="18"></lucide-icon>
+          Exportar Acta
+        </div>
+      </restaurant-button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       INTERACTIVE TABLE
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="interactive-table-wrapper">
+    <table class="interactive-table">
+      <thead>
+        <tr>
+          <th>CÓD SENA</th>
+          <th>CATEGORÍA</th>
+          <th>PRODUCTO</th>
+          <th class="text-right">STOCK SIST.</th>
+          <th class="text-center">CONTEO FÍSICO</th>
+          <th class="text-center">DIF.</th>
+          <th class="text-right">VALOR UNIT.</th>
+          <th class="text-right">IMPACTO TOTAL</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of items(); track item.id) {
+          <tr>
+            <td class="font-medium text-secondary">{{ item.codigoSena }}</td>
+            <td class="text-secondary">{{ item.categoria }}</td>
+            <td class="font-bold text-primary">{{ item.producto }}</td>
+            <td class="text-right">{{ item.stockSistema }}</td>
+            <td class="text-center">
+              <input type="number" class="input-conteo" 
+                     [ngModel]="item.conteoFisico" 
+                     (ngModelChange)="updateConteoFisico(item.id, $event)"
+                     placeholder="--">
+            </td>
+            <td class="text-center">
+              @if (getDiferencia(item) !== null) {
+                <span class="dif-badge" 
+                      [class.dif-badge--zero]="getDiferencia(item) === 0"
+                      [class.dif-badge--neg]="(getDiferencia(item) || 0) < 0"
+                      [class.dif-badge--pos]="(getDiferencia(item) || 0) > 0">
+                  {{ (getDiferencia(item) || 0) > 0 ? '+' : '' }}{{ getDiferencia(item) }}
+                </span>
+              } @else {
+                <span class="text-disabled">-</span>
+              }
+            </td>
+            <td class="text-right text-secondary">${{ item.valorUnitario | number }}</td>
+            <td class="text-right font-medium" 
+                [class.text-red]="(getImpactoTotal(item) || 0) < 0"
+                [class.text-orange]="(getImpactoTotal(item) || 0) > 0">
+              {{ formatCurrency(getImpactoTotal(item)) }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       FOOTER ACTIONS
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="page-footer">
+    @if (pendientesCount() > 0) {
+      <div class="warning-alert">
+        <lucide-icon name="alert-circle" [size]="16"></lucide-icon>
+        <span>Quedan {{ pendientesCount() }} ítems sin contar</span>
+      </div>
+    } @else {
+      <div></div>
+    }
+    
+    <restaurant-button variant="primary">
+      <div class="btn-icon-text">
+        Finalizar y Ajustar Stock
+        <lucide-icon name="arrow-right" [size]="18"></lucide-icon>
+      </div>
+    </restaurant-button>
+  </div>
+
+</div>
