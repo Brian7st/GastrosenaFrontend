@@ -259,4 +259,41 @@ export const INVENTARIO_ROUTES: Routes = [
       },
     ],
   },
+
+  // ── Actas de Legalización ───────────────────────────────────────────────────
+  {
+    path: 'actas',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./pages/actas-page/actas-list/actas-list.component').then(
+            m => m.ActasListComponent
+          ),
+      },
+      {
+        path: 'nueva',
+        loadComponent: () =>
+          import('./pages/actas-page/actas-create/actas-create.component').then(
+            m => m.ActasCreateComponent
+          ),
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./pages/actas-page/actas-detail/actas-detail.component').then(
+            m => m.ActasDetailComponent
+          ),
+        children: [
+          {
+            path: 'cargar-firma',
+            loadComponent: () =>
+              import('./pages/actas-page/actas-upload/actas-upload.component').then(
+                m => m.ActasUploadComponent
+              ),
+          },
+        ],
+      },
+    ]
+  },
 ];
