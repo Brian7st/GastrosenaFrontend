@@ -6,7 +6,7 @@ import {
   inject,
 } from '@angular/core';
 import { CommonModule, UpperCasePipe, CurrencyPipe } from '@angular/common';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import {
   StatusBadgeComponent,
   LucideIconComponent,
@@ -29,6 +29,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
+    RouterModule,
     UpperCasePipe,
     CurrencyPipe,
     StatusBadgeComponent,
@@ -41,7 +42,7 @@ export class ActasDetailComponent {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-  // ── Estado reactivo ──────────────────────────────────────────────────────
+  // ── Estado reactivo ───────────────────────────────────────────────────────
   acta = signal<ActaLegalizacion>(MOCK_ACTAS[0]);
   insumos = signal<InsumoActa[]>(MOCK_INSUMOS);
   compromisos = signal<CompromisoActa[]>(MOCK_COMPROMISOS);

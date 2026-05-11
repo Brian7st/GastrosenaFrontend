@@ -1,0 +1,45 @@
+<!-- Modal Overlay con Glassmorphism -->
+<div class="acta-upload__overlay" (click)="cerrar()">
+  <div class="acta-upload__modal" (click)="$event.stopPropagation()">
+    <!-- Botón cerrar -->
+    <button class="acta-upload__close" (click)="cerrar()">
+      <lucide-icon name="x" [size]="20"></lucide-icon>
+    </button>
+
+    <!-- Header -->
+    <div class="acta-upload__header">
+      <div class="acta-upload__header-icon">
+        <lucide-icon name="upload" [size]="24"></lucide-icon>
+      </div>
+      <h2 class="acta-upload__title">Subir Acta Escaneada</h2>
+      <p class="acta-upload__description">
+        Suba el documento con firmas para archivar el acta formalmente en el sistema.
+      </p>
+    </div>
+
+    <!-- Drag & Drop Zone -->
+    <div class="acta-upload__dropzone" [class.acta-upload__dropzone--active]="isDragging()">
+      <div class="acta-upload__dropzone-icon">
+        <lucide-icon name="cloud-upload" [size]="32"></lucide-icon>
+      </div>
+      <h3 class="acta-upload__dropzone-title">Arrastre el archivo aquí</h3>
+      <p class="acta-upload__dropzone-subtitle">o haga clic para explorar su equipo</p>
+      <div class="acta-upload__dropzone-formats">
+        <span class="acta-upload__format-tag">PDF</span>
+        <span class="acta-upload__format-tag">JPG</span>
+        <span class="acta-upload__format-tag">PNG</span>
+      </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="acta-upload__footer">
+      <button class="acta-upload__btn-cancel" (click)="cerrar()">
+        Cancelar
+      </button>
+      <button class="acta-upload__btn-confirm">
+        Confirmar Carga
+        <lucide-icon name="arrow-right" [size]="16"></lucide-icon>
+      </button>
+    </div>
+  </div>
+</div>
