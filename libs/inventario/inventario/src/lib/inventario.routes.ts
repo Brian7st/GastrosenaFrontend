@@ -224,4 +224,25 @@ export const INVENTARIO_ROUTES: Routes = [
       },
     ],
   },
+
+  // ── Actas de Legalización ─────────────────────────────────────────────────
+  {
+    path: 'actas',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./pages/actas-page/actas-list/actas-list.component').then(
+            m => m.ActasListComponent
+          ),
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./pages/actas-page/actas-detail/actas-detail.component').then(
+            m => m.ActasDetailComponent
+          ),
+      },
+    ]
+  },
 ];
