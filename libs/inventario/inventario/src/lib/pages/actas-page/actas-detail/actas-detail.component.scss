@@ -213,6 +213,33 @@
   }
 }
 
+.acta-detail__btn-cargar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-primario);
+  background: none;
+  border: 1px solid var(--color-primario);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-standard),
+              color var(--duration-fast) var(--ease-standard);
+
+  &:hover {
+    background: var(--color-primario);
+    color: var(--color-en-primario);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+}
+
 .acta-detail__btn-aprobar {
   display: flex;
   align-items: center;

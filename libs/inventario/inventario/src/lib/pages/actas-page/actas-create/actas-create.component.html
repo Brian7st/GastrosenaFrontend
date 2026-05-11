@@ -10,11 +10,7 @@
       <div class="acta-create__step" [class.acta-create__step--active]="currentStep() === step.number"
            [class.acta-create__step--completed]="currentStep() > step.number">
         <div class="acta-create__step-circle">
-          @if (currentStep() > step.number) {
-            <lucide-icon name="check" [size]="18"></lucide-icon>
-          } @else {
-            {{ step.number }}
-          }
+          {{ step.number }}
         </div>
         <span class="acta-create__step-label">{{ step.label }}</span>
       </div>

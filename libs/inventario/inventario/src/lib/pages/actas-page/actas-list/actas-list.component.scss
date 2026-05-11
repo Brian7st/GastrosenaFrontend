@@ -3,8 +3,6 @@
 
 .actas-page {
   padding: var(--space-10) var(--space-8);
-  max-width: 1280px;
-  margin: 0 auto;
   width: 100%;
 }
 
@@ -217,6 +215,22 @@
 }
 
 // ── Tabla — estilos dentro de la data-table (Zero-Line Architecture) ──────────
+th {
+  text-align: left;
+  padding: var(--space-4);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+td {
+  padding: var(--space-4);
+  vertical-align: middle;
+}
+
 .text-center {
   text-align: center;
 }

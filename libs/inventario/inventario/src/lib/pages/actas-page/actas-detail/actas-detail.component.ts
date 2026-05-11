@@ -99,4 +99,8 @@ export class ActasDetailComponent {
   cambiarEstado(): void {
     // Placeholder para lógica futura
   }
+
+  cargarFirma(): void {
+    this.router.navigate(['cargar-firma'], { relativeTo: this.route });
+  }
 }
