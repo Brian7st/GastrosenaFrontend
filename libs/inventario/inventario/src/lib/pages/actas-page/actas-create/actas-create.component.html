@@ -1,0 +1,223 @@
+<div class="acta-create">
+  <!-- ── Título ──────────────────────────────────────────────────────── -->
+  <h2 class="acta-create__title">Generación de Acta</h2>
+
+  <!-- ── Stepper Horizontal ─────────────────────────────────────────── -->
+  <div class="acta-create__stepper">
+    <div class="acta-create__stepper-track"></div>
+    <div class="acta-create__stepper-progress" [style.width]="stepProgress()"></div>
+    @for (step of steps; track step.number; let i = $index) {
+      <div class="acta-create__step" [class.acta-create__step--active]="currentStep() === step.number"
+           [class.acta-create__step--completed]="currentStep() > step.number">
+        <div class="acta-create__step-circle">
+          @if (currentStep() > step.number) {
+            <lucide-icon name="check" [size]="18"></lucide-icon>
+          } @else {
+            {{ step.number }}
+          }
+        </div>
+        <span class="acta-create__step-label">{{ step.label }}</span>
+      </div>
+    }
+  </div>
+
+  <!-- ── Paso 1: Apertura ────────────────────────────────────────────── -->
+  @if (currentStep() === 1) {
+    <div class="acta-create__grid">
+      <!-- Contexto Institucional (Solo lectura) -->
+      <div class="acta-create__card acta-create__card--context">
+        <div class="acta-create__card-glow"></div>
+        <h3 class="acta-create__card-title">
+          <lucide-icon name="map-pin" [size]="18" class="acta-create__card-icon"></lucide-icon>
+          Contexto Institucional
+        </h3>
+        <div class="acta-create__fields">
+          <div class="acta-create__field">
+            <label class="acta-create__label">Lugar</label>
+            <div class="acta-create__readonly-field">
+              Escuela de Gastronomía
+              <lucide-icon name="lock" [size]="14" class="acta-create__lock-icon"></lucide-icon>
+            </div>
+          </div>
+          <div class="acta-create__field">
+            <label class="acta-create__label">Regional</label>
+            <div class="acta-create__readonly-field">
+              Regional Quindío — CCYT
+              <lucide-icon name="lock" [size]="14" class="acta-create__lock-icon"></lucide-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Datos de la Sesión -->
+      <div class="acta-create__card acta-create__card--session">
+        <h3 class="acta-create__card-title">
+          <lucide-icon name="file-text" [size]="18" class="acta-create__card-icon"></lucide-icon>
+          Datos de la Sesión
+        </h3>
+        <div class="acta-create__form-grid">
+          <div class="acta-create__form-field acta-create__form-field--full">
+            <label class="acta-create__label">Fecha de la Sesión</label>
+            <div class="acta-create__input-wrapper">
+              <lucide-icon name="calendar" [size]="16" class="acta-create__input-icon"></lucide-icon>
+              <input type="date" class="acta-create__input" />
+            </div>
+          </div>
+          <div class="acta-create__form-field">
+            <label class="acta-create__label">Hora Inicio</label>
+            <div class="acta-create__input-wrapper">
+              <lucide-icon name="clock" [size]="16" class="acta-create__input-icon"></lucide-icon>
+              <input type="time" class="acta-create__input" />
+            </div>
+          </div>
+          <div class="acta-create__form-field">
+            <label class="acta-create__label">Hora Fin</label>
+            <div class="acta-create__input-wrapper">
+              <lucide-icon name="clock" [size]="16" class="acta-create__input-icon"></lucide-icon>
+              <input type="time" class="acta-create__input" />
+            </div>
+          </div>
+          <div class="acta-create__form-field">
+            <label class="acta-create__label">Ficha de Caracterización</label>
+            <div class="acta-create__input-wrapper">
+              <lucide-icon name="hash" [size]="16" class="acta-create__input-icon"></lucide-icon>
+              <input type="text" class="acta-create__input" placeholder="Ej: 2456789" maxlength="7" />
+            </div>
+          </div>
+          <div class="acta-create__form-field">
+            <label class="acta-create__label">Instructor Responsable</label>
+            <div class="acta-create__input-wrapper">
+              <lucide-icon name="user" [size]="16" class="acta-create__input-icon"></lucide-icon>
+              <input type="text" class="acta-create__input" placeholder="Nombre completo" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agenda (Full Width) -->
+      <div class="acta-create__card acta-create__card--full">
+        <h3 class="acta-create__card-title">
+          <lucide-icon name="list" [size]="18" class="acta-create__card-icon"></lucide-icon>
+          Agenda de la Sesión
+        </h3>
+        <textarea
+          class="acta-create__textarea"
+          rows="5"
+          placeholder="Describa los puntos a tratar durante la sesión..."
+        ></textarea>
+      </div>
+    </div>
+  }
+
+  <!-- ── Paso 2: Desarrollo ──────────────────────────────────────────── -->
+  @if (currentStep() === 2) {
+    <div class="acta-create__grid acta-create__grid--single">
+      <div class="acta-create__card acta-create__card--full">
+        <h3 class="acta-create__card-title">
+          <lucide-icon name="book-open" [size]="18" class="acta-create__card-icon"></lucide-icon>
+          Desarrollo de la Sesión
+        </h3>
+        <div class="acta-create__form-grid">
+          <div class="acta-create__form-field acta-create__form-field--full">
+            <label class="acta-create__label">Resultado de Aprendizaje (RA)</label>
+            <textarea class="acta-create__textarea" rows="3" placeholder="Describa el resultado de aprendizaje esperado..."></textarea>
+          </div>
+          <div class="acta-create__form-field acta-create__form-field--full">
+            <label class="acta-create__label">Actividades Ejecutadas</label>
+            <textarea class="acta-create__textarea" rows="3" placeholder="Describa las actividades desarrolladas en la sesión..."></textarea>
+          </div>
+          <div class="acta-create__form-field acta-create__form-field--full">
+            <label class="acta-create__label">Observaciones Generales</label>
+            <textarea class="acta-create__textarea" rows="3" placeholder="Observaciones adicionales sobre el desarrollo..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ── Paso 3: Firmantes ───────────────────────────────────────────── -->
+  @if (currentStep() === 3) {
+    <div class="acta-create__grid acta-create__grid--single">
+      <div class="acta-create__card acta-create__card--full">
+        <h3 class="acta-create__card-title">
+          <lucide-icon name="users" [size]="18" class="acta-create__card-icon"></lucide-icon>
+          Asistentes y Firmantes
+        </h3>
+        <div class="acta-create__firmantes-list">
+          <div class="acta-create__firmante-row">
+            <div class="acta-create__firmante-avatar">
+              <lucide-icon name="user" [size]="16"></lucide-icon>
+            </div>
+            <div class="acta-create__firmante-info">
+              <span class="acta-create__firmante-name">Sebastián Betancourt</span>
+              <span class="acta-create__firmante-role">Instructor Cuentadante</span>
+            </div>
+            <restaurant-status-badge label="Pendiente" variant="warning"></restaurant-status-badge>
+          </div>
+          <div class="acta-create__firmante-row">
+            <div class="acta-create__firmante-avatar">
+              <lucide-icon name="user" [size]="16"></lucide-icon>
+            </div>
+            <div class="acta-create__firmante-info">
+              <span class="acta-create__firmante-name">Camila Rodríguez M.</span>
+              <span class="acta-create__firmante-role">Vocero de Aprendices</span>
+            </div>
+            <restaurant-status-badge label="Pendiente" variant="warning"></restaurant-status-badge>
+          </div>
+        </div>
+        <button class="acta-create__add-firmante">
+          <lucide-icon name="plus" [size]="16"></lucide-icon>
+          Agregar Firmante
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ── Paso 4: Vista Previa / Cierre ───────────────────────────────── -->
+  @if (currentStep() === 4) {
+    <div class="acta-create__grid acta-create__grid--single">
+      <div class="acta-create__card acta-create__card--full acta-create__card--preview">
+        <h3 class="acta-create__card-title">
+          <lucide-icon name="file-check" [size]="18" class="acta-create__card-icon"></lucide-icon>
+          Vista Previa del Acta
+        </h3>
+        <div class="acta-create__preview-notice">
+          <lucide-icon name="info" [size]="18"></lucide-icon>
+          <p>Revise la información antes de generar el acta. Una vez generada, se asignará un consecutivo y quedará en estado <strong>Borrador</strong>.</p>
+        </div>
+        <div class="acta-create__preview-summary">
+          <div class="acta-create__preview-item">
+            <span class="acta-create__preview-label">Estado inicial</span>
+            <restaurant-status-badge label="Borrador" variant="info"></restaurant-status-badge>
+          </div>
+          <div class="acta-create__preview-item">
+            <span class="acta-create__preview-label">Firmantes registrados</span>
+            <span class="acta-create__preview-value">2 personas</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ── Footer Actions ──────────────────────────────────────────────── -->
+  <div class="acta-create__footer">
+    @if (currentStep() > 1) {
+      <button class="acta-create__btn-back" (click)="prevStep()">
+        <lucide-icon name="arrow-left" [size]="18"></lucide-icon>
+        Anterior
+      </button>
+    }
+    <div class="acta-create__footer-spacer"></div>
+    @if (currentStep() < 4) {
+      <button class="acta-create__btn-next" (click)="nextStep()">
+        Siguiente
+        <lucide-icon name="arrow-right" [size]="18"></lucide-icon>
+      </button>
+    } @else {
+      <button class="acta-create__btn-generate" (click)="generarActa()">
+        <lucide-icon name="check" [size]="18"></lucide-icon>
+        Generar Acta
+      </button>
+    }
+  </div>
+</div>

@@ -225,7 +225,7 @@ export const INVENTARIO_ROUTES: Routes = [
     ],
   },
 
-  // ── Actas de Legalización ─────────────────────────────────────────────────
+  // ── Actas de Legalización ──────────────────────────────────────────────────
   {
     path: 'actas',
     children: [
@@ -234,6 +234,13 @@ export const INVENTARIO_ROUTES: Routes = [
         loadComponent: () =>
           import('./pages/actas-page/actas-list/actas-list.component').then(
             m => m.ActasListComponent
+          ),
+      },
+      {
+        path: 'nueva',
+        loadComponent: () =>
+          import('./pages/actas-page/actas-create/actas-create.component').then(
+            m => m.ActasCreateComponent
           ),
       },
       {
