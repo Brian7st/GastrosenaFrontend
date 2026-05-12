@@ -17,6 +17,12 @@
         margin-bottom: 0;
       }
     }
+
+    .header-actions {
+      display: flex;
+      gap: var(--space-4);
+      align-items: center;
+    }
   }
 
   &__stats {
@@ -48,35 +54,40 @@
 }
 
 .mesa-card {
-  position: relative; // Para el botón absoluto
+  display: block; // Necesario porque el host de angular es inline por defecto
+  position: relative; // Para los botones absolutos si los hay
 
-  // Botón flotante de notas
-  .note-btn {
-    position: absolute;
-    top: -12px;
-    right: -12px;
+  .icon-action-btn {
     width: 32px;
     height: 32px;
-    border-radius: 50%;
-    border: none;
-    background-color: var(--color-surface-secondary);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface-primary);
     color: var(--color-text-secondary);
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    box-shadow: var(--shadow-md);
     transition: all 0.2s ease;
-    z-index: 10;
 
     &:hover {
-      transform: scale(1.1);
-      background-color: var(--color-surface-hover);
+      background-color: var(--color-brand-light);
+      color: var(--color-brand-primary);
+      border-color: var(--color-brand-primary);
     }
 
     &.has-notes {
       background-color: var(--color-warning);
       color: #fff;
+      border-color: var(--color-warning);
+    }
+
+    &--danger {
+      &:hover {
+        background-color: rgba(var(--color-danger-rgb), 0.1);
+        color: var(--color-danger);
+        border-color: var(--color-danger);
+      }
     }
   }
 
@@ -85,6 +96,12 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: var(--space-4);
+  }
+
+  &__header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
   }
 
   &__number {

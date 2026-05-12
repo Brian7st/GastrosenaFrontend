@@ -6,10 +6,16 @@
       subtitle="Gestión de salón y pedidos en tiempo real"
     ></restaurant-page-header>
     
-    <restaurant-button (click)="abrirModal('agregar')">
-      <lucide-icon name="plus" [size]="18"></lucide-icon>
-      <span>Agregar Mesa</span>
-    </restaurant-button>
+    <div class="header-actions">
+      <restaurant-button variant="danger" (click)="abrirModal('eliminar-global')">
+        <lucide-icon name="trash-2" [size]="18"></lucide-icon>
+        <span>Eliminar Mesa</span>
+      </restaurant-button>
+      <restaurant-button (click)="abrirModal('agregar')">
+        <lucide-icon name="plus" [size]="18"></lucide-icon>
+        <span>Agregar Mesa</span>
+      </restaurant-button>
+    </div>
   </div>
 
   <!-- KPIs de Dashboard migrados -->
@@ -42,28 +48,24 @@
     <div class="mesas-grid">
       @for (mesa of mesas(); track mesa.id) {
         <restaurant-card
-          [class]="'mesa-card--' + mesa.estado"
+          [ngClass]="['mesa-card', 'mesa-card--' + mesa.estado]"
         >
-          <!-- Botón de notas flotante -->
-          <button 
-            class="note-btn" 
-            [class.has-notes]="mesa.notas"
-            (click)="abrirModal('notas', mesa)"
-            title="Notas/Observaciones"
-          >
-            @if (mesa.notas) {
-              <lucide-icon name="message-square-warning" [size]="16"></lucide-icon>
-            } @else {
-              <lucide-icon name="edit-3" [size]="16"></lucide-icon>
-            }
-          </button>
-
           <div class="mesa-card__header">
             <span class="mesa-card__number">Mesa {{ mesa.numero }}</span>
-            <restaurant-status-badge
-              [label]="mesa.estado"
-              [variant]="getBadgeType(mesa.estado)"
-            ></restaurant-status-badge>
+            <div class="mesa-card__header-right">
+              <restaurant-status-badge
+                [label]="mesa.estado"
+                [variant]="getBadgeType(mesa.estado)"
+              ></restaurant-status-badge>
+              <button 
+                class="icon-action-btn" 
+                [class.has-notes]="mesa.notas"
+                (click)="abrirModal('notas', mesa)"
+                title="Notas/Observaciones"
+              >
+                <lucide-icon name="pencil" [size]="16"></lucide-icon>
+              </button>
+            </div>
           </div>
 
           <div class="mesa-card__body">
@@ -230,6 +232,32 @@
             <restaurant-button (click)="liberarMesa(mesaSeleccionada()!.id)">
               <span>Liberar Mesa</span>
             </restaurant-button>
+          </div>
+        }
+
+        @if (modalActivo() === 'eliminar-global') {
+          <h3>Eliminar Mesa</h3>
+          <div class="form-group" style="margin: var(--space-4) 0;">
+            <label>Selecciona la mesa que deseas eliminar</label>
+            <div class="input-with-icon">
+              <select class="form-control select-control" [ngModel]="mesaIdParaEliminar()" (ngModelChange)="mesaIdParaEliminar.set(+$event)">
+                <option [value]="null">Seleccione una mesa...</option>
+                @for (m of mesas(); track m.id) {
+                  <option [value]="m.id">Mesa {{ m.numero }} ({{ m.estado }})</option>
+                }
+              </select>
+            </div>
+            <p style="font-size: var(--font-size-xs); color: var(--color-danger); margin-top: var(--space-2);">Esta acción no se puede deshacer.</p>
+          </div>
+          <div class="modal-actions">
+            <restaurant-button variant="ghost" (click)="cerrarModales()">
+              <span>Cancelar</span>
+            </restaurant-button>
+            @if (mesaIdParaEliminar()) {
+              <restaurant-button variant="danger" (click)="eliminarMesa(mesaIdParaEliminar()!)">
+                <span>Eliminar</span>
+              </restaurant-button>
+            }
           </div>
         }
 

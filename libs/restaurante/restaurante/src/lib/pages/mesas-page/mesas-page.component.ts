@@ -47,6 +47,9 @@ export class MesasPageComponent {
   nuevoAsientos = signal<number>(4);
   nuevaZona = signal<string>('');
   nuevoActivo = signal<boolean>(true);
+
+  // Signal para eliminar mesa
+  mesaIdParaEliminar = signal<number | null>(null);
   
   // Signals para abrir mesa
   nuevoComensal = signal<string>('');
@@ -63,6 +66,8 @@ export class MesasPageComponent {
       this.nuevoAsientos.set(4);
       this.nuevaZona.set('');
       this.nuevoActivo.set(true);
+    } else if (nombre === 'eliminar-global') {
+      this.mesaIdParaEliminar.set(null);
     } else if (mesa) {
       this.nuevoComensal.set(mesa.comensal || '');
       this.nuevaNota.set(mesa.notas || '');
