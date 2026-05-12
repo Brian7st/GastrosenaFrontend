@@ -23,6 +23,17 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: var(--space-6);
+
+    // Forzar misma altura en todas las tarjetas
+    restaurant-kpi-card {
+      display: block;
+      height: 100%;
+
+      ::ng-deep .kpi-card {
+        height: 100%;
+        box-sizing: border-box;
+      }
+    }
   }
 
   &__content {
