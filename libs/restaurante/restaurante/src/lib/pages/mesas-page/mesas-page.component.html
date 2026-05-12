@@ -152,11 +152,7 @@
             
             <div class="form-group">
               <label>Zona / Ubicación</label>
-              <select [ngModel]="nuevaZona()" (ngModelChange)="nuevaZona.set($event)" class="form-control select-control">
-                <option value="Salon Principal">Salon Principal</option>
-                <option value="Terraza">Terraza</option>
-                <option value="Barra">Barra</option>
-              </select>
+              <input type="text" [ngModel]="nuevaZona()" (ngModelChange)="nuevaZona.set($event)" class="form-control" placeholder="Ej: Salón Principal, Terraza, VIP...">
             </div>
 
             <div class="toggle-card" (click)="nuevoActivo.set(!nuevoActivo())">

@@ -45,7 +45,7 @@ export class MesasPageComponent {
   // Signals para crear mesa
   nuevoNumero = signal<number>(1);
   nuevoAsientos = signal<number>(4);
-  nuevaZona = signal<string>('Salon Principal');
+  nuevaZona = signal<string>('');
   nuevoActivo = signal<boolean>(true);
   
   // Signals para abrir mesa
@@ -61,7 +61,7 @@ export class MesasPageComponent {
       const nextNum = mesas.length > 0 ? Math.max(...mesas.map(m => m.numero)) + 1 : 1;
       this.nuevoNumero.set(nextNum);
       this.nuevoAsientos.set(4);
-      this.nuevaZona.set('Salon Principal');
+      this.nuevaZona.set('');
       this.nuevoActivo.set(true);
     } else if (mesa) {
       this.nuevoComensal.set(mesa.comensal || '');
