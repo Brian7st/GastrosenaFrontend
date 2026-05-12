@@ -10,6 +10,8 @@ export interface Mesa {
   comensal?: string;
   ordenActual?: Pedido | null;
   notas?: string;
+  zona?: string;
+  isActive?: boolean;
 }
 
 export interface RestauranteStats {

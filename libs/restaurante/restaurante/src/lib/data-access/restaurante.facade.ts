@@ -57,14 +57,21 @@ export class RestauranteFacade {
     localStorage.setItem('gastro_ordenes', JSON.stringify(this._ordenesHistorial()));
   }
 
-  agregarMesa(asientos: number) {
+  agregarMesa(numero: number, asientos: number, zona: string, isActive: boolean) {
     const mesas = this._mesas();
-    const nuevoNumero = mesas.length > 0 ? Math.max(...mesas.map(m => m.numero)) + 1 : 1;
+    // Validar si el número ya existe, si sí, calcular el siguiente
+    const existe = mesas.some(m => m.numero === numero);
+    const finalNumero = (numero > 0 && !existe) ? numero : (mesas.length > 0 ? Math.max(...mesas.map(m => m.numero)) + 1 : 1);
+    
+    // Usamos timestamp como ID para que siempre sea único, o el numero final si preferimos
+    const uniqueId = new Date().getTime(); 
     
     const nuevaMesa: Mesa = {
-      id: nuevoNumero,
-      numero: nuevoNumero,
+      id: uniqueId,
+      numero: finalNumero,
       asientos,
+      zona,
+      isActive,
       estado: 'libre',
       comensal: '',
       ordenActual: null,

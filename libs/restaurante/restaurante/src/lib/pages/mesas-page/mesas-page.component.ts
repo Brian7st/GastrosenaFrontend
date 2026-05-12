@@ -41,7 +41,14 @@ export class MesasPageComponent {
   // Estado local reactivo (Signals)
   modalActivo = signal<string | null>(null);
   mesaSeleccionada = signal<Mesa | null>(null);
+  
+  // Signals para crear mesa
+  nuevoNumero = signal<number>(1);
   nuevoAsientos = signal<number>(4);
+  nuevaZona = signal<string>('Salon Principal');
+  nuevoActivo = signal<boolean>(true);
+  
+  // Signals para abrir mesa
   nuevoComensal = signal<string>('');
   nuevaNota = signal<string>('');
 
@@ -49,12 +56,17 @@ export class MesasPageComponent {
     this.modalActivo.set(nombre);
     this.mesaSeleccionada.set(mesa);
     
-    if (mesa) {
-      this.nuevoAsientos.set(mesa.asientos);
+    if (nombre === 'agregar') {
+      const mesas = this.facade.mesas();
+      const nextNum = mesas.length > 0 ? Math.max(...mesas.map(m => m.numero)) + 1 : 1;
+      this.nuevoNumero.set(nextNum);
+      this.nuevoAsientos.set(4);
+      this.nuevaZona.set('Salon Principal');
+      this.nuevoActivo.set(true);
+    } else if (mesa) {
       this.nuevoComensal.set(mesa.comensal || '');
       this.nuevaNota.set(mesa.notas || '');
     } else {
-      this.nuevoAsientos.set(4);
       this.nuevoComensal.set('');
       this.nuevaNota.set('');
     }
@@ -66,7 +78,12 @@ export class MesasPageComponent {
   }
 
   crearMesa() {
-    this.facade.agregarMesa(this.nuevoAsientos());
+    this.facade.agregarMesa(
+      this.nuevoNumero(),
+      this.nuevoAsientos(),
+      this.nuevaZona(),
+      this.nuevoActivo()
+    );
     this.cerrarModales();
   }
 
