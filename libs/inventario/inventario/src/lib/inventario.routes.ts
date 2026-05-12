@@ -114,6 +114,41 @@ export const INVENTARIO_ROUTES: Routes = [
     ]
   },
 
+  // ── Conciliación de Inventario ───────────────────────────────────────────
+  {
+    path: 'conciliacion',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./pages/conciliacion-page/conciliacion-dashboard/conciliacion-dashboard.component').then(
+            m => m.ConciliacionDashboardComponent
+          ),
+      },
+      {
+        path: 'toma-fisica',
+        loadComponent: () =>
+          import('./pages/conciliacion-page/conciliacion-toma-fisica/conciliacion-toma-fisica.component').then(
+            m => m.ConciliacionTomaFisicaComponent
+          ),
+      },
+      {
+        path: 'historial',
+        loadComponent: () =>
+          import('./pages/conciliacion-page/conciliacion-historial/conciliacion-historial.component').then(
+            m => m.ConciliacionHistorialComponent
+          ),
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./pages/conciliacion-page/conciliacion-detalle/conciliacion-detalle.component').then(
+            m => m.ConciliacionDetalleComponent
+          ),
+      }
+    ]
+  },
+
   // ── Entradas y Salidas (Movimientos / Kardex) ────────────────────────────
   {
     path: 'movimientos',
@@ -261,6 +296,7 @@ export const INVENTARIO_ROUTES: Routes = [
       },
     ]
   },
+feat/inventario/paquete-probatorio
 
   // ── Paquete Probatorio ──────────────────────────────────────────────────
   {
@@ -305,4 +341,5 @@ export const INVENTARIO_ROUTES: Routes = [
       },
     ],
   },
+ develop
 ];

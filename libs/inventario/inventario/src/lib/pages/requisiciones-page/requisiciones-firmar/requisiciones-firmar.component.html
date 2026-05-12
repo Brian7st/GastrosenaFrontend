@@ -1,0 +1,124 @@
+<!-- Modal Overlay -->
+<div class="modal-overlay" (click)="close()"></div>
+
+<!-- Modal Container -->
+<div class="modal-container">
+  <div class="modal-card">
+
+    <!-- Modal Header -->
+    <div class="modal-card__header">
+      <div class="modal-card__title-group">
+        <div class="modal-card__icon-wrap">
+          <lucide-icon name="pen-tool" [size]="20"></lucide-icon>
+        </div>
+        <h2 class="modal-card__title">Confirmar Recepción de Insumos</h2>
+      </div>
+      <button class="modal-card__close" (click)="close()">
+        <lucide-icon name="x" [size]="20"></lucide-icon>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-card__body">
+
+      <!-- Info Alert -->
+      <div class="info-alert">
+        <lucide-icon name="info" [size]="20" class="info-alert__icon"></lucide-icon>
+        <p class="info-alert__text">
+          Al confirmar, usted declara que recibió los insumos detallados en la
+          <strong>REQ-2024-0892</strong> en las condiciones y cantidades estipuladas.
+        </p>
+      </div>
+
+      <!-- Items List -->
+      <div class="items-list">
+        <h3 class="items-list__label">Insumos Despachados</h3>
+        <div class="items-list__rows">
+          <div class="item-row">
+            <div class="item-row__qty">
+              <span class="item-row__qty-value">2.5</span>
+              <span class="item-row__qty-unit">Kg</span>
+            </div>
+            <div class="item-row__info">
+              <p class="item-row__name">Harina de Trigo Fuerte</p>
+              <p class="item-row__code">Lote: HT-992A</p>
+            </div>
+            <lucide-icon name="check-circle" [size]="20" class="item-row__check"></lucide-icon>
+          </div>
+          <div class="item-row">
+            <div class="item-row__qty">
+              <span class="item-row__qty-value">500</span>
+              <span class="item-row__qty-unit">Gr</span>
+            </div>
+            <div class="item-row__info">
+              <p class="item-row__name">Levadura Fresca</p>
+              <p class="item-row__code">Lote: LV-104B</p>
+            </div>
+            <lucide-icon name="check-circle" [size]="20" class="item-row__check"></lucide-icon>
+          </div>
+          <div class="item-row">
+            <div class="item-row__qty">
+              <span class="item-row__qty-value">3</span>
+              <span class="item-row__qty-unit">Lts</span>
+            </div>
+            <div class="item-row__info">
+              <p class="item-row__name">Aceite de Oliva Extra Virgen</p>
+              <p class="item-row__code">Lote: AO-001</p>
+            </div>
+            <lucide-icon name="check-circle" [size]="20" class="item-row__check"></lucide-icon>
+          </div>
+        </div>
+      </div>
+
+      <!-- Signatures Grid -->
+      <div class="signatures-grid">
+        <div class="signature-block">
+          <h4 class="signature-block__title">
+            <lucide-icon name="user" [size]="16"></lucide-icon> Firma Instructor
+          </h4>
+          <div class="form-field">
+            <label class="form-field__label">Nombre del Instructor</label>
+            <input class="form-field__input" type="text" readonly value="Sebastian Betancourt"/>
+          </div>
+          <div class="form-field">
+            <label class="form-field__label">Fecha de Firma</label>
+            <input class="form-field__input" type="text" readonly value="24 Oct 2026, 08:30 AM"/>
+          </div>
+        </div>
+        <div class="signature-block">
+          <h4 class="signature-block__title">
+            <lucide-icon name="graduation-cap" [size]="16"></lucide-icon> Firma Vocero de Aprendices
+          </h4>
+          <div class="form-field">
+            <label class="form-field__label">Nombre Completo</label>
+            <input class="form-field__input form-field__input--editable" type="text" placeholder="Ej. Ana María López"/>
+          </div>
+          <div class="form-field">
+            <label class="form-field__label">Documento de Identidad</label>
+            <input class="form-field__input form-field__input--editable" type="text" placeholder="Ej. 1002345678"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Verification Checkbox -->
+      <label class="verify-check">
+        <div class="verify-check__box-wrapper">
+          <input class="verify-check__input" type="checkbox"/>
+          <div class="verify-check__box">
+            <lucide-icon name="check" [size]="14"></lucide-icon>
+          </div>
+        </div>
+        <span class="verify-check__label">He verificado la calidad y cantidad de los productos recibidos.</span>
+      </label>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-card__footer">
+      <button class="btn-ghost" (click)="close()">Cancelar</button>
+      <button class="btn-primary">
+        <lucide-icon name="shield-check" [size]="18"></lucide-icon>
+        Confirmar y Firmar Recepción
+      </button>
+    </div>
+  </div>
+</div>
