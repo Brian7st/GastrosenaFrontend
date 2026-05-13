@@ -167,21 +167,27 @@
 
   // Estados semánticos en el card
   &--libre {
-    border-top: 4px solid var(--color-success);
+    ::ng-deep .card {
+      border-top: 4px solid var(--color-success);
+    }
     .mesa-icon-wrapper {
       background-color: rgba(var(--color-success-rgb), 0.1);
       color: var(--color-success);
     }
   }
   &--ocupada {
-    border-top: 4px solid var(--color-danger);
+    ::ng-deep .card {
+      border-top: 4px solid var(--color-danger);
+    }
     .mesa-icon-wrapper {
       background-color: rgba(var(--color-danger-rgb), 0.1);
       color: var(--color-danger);
     }
   }
   &--por_pagar {
-    border-top: 4px solid var(--color-warning);
+    ::ng-deep .card {
+      border-top: 4px solid var(--color-warning);
+    }
     .mesa-icon-wrapper {
       background-color: rgba(var(--color-warning-rgb), 0.1);
       color: var(--color-warning);
