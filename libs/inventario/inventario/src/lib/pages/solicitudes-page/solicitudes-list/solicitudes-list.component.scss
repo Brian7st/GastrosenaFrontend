@@ -257,7 +257,7 @@
   background: var(--color-surface-secondary);
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
 }
 
 .page-numbers {
@@ -611,35 +611,3 @@
 
 .font-bold { font-weight: 700; }
 
-/* ── FAB ────────────────────────────────────────────────────────────────────── */
-.fab {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-brand-primary-strong) 0%, var(--color-primario) 100%);
-  color: var(--color-en-primario);
-  border: none;
-  box-shadow: var(--shadow-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 50;
-  transition: transform var(--duration-fast) var(--ease-standard),
-              box-shadow var(--duration-fast) var(--ease-standard);
-
-  .material-symbols-outlined {
-    font-size: 28px;
-    transition: transform var(--duration-base) var(--ease-standard);
-  }
-
-  &:hover {
-    transform: scale(1.1);
-    box-shadow: var(--shadow-primary-hover);
-    .material-symbols-outlined { transform: rotate(90deg); }
-  }
-  &:active { transform: scale(0.95); }
-}
