@@ -1,12 +1,11 @@
 import { createFeature, createReducer, on } from '@ngrx/store';
-import { Usuario } from '@restaurant/shared/models';
-import { ImportarUsuariosResponse, RolOpcion } from '../../../models/usuarios.model';
+import { ImportarUsuariosResponse, RolOpcion, UsuarioDetalle } from '../../../models/usuarios.model';
 import { UsuariosActions } from '../actions/usuarios.actions';
 
 export interface UsuariosState {
-  usuarios:            Usuario[];
+  usuarios:            UsuarioDetalle[];
   roles:               RolOpcion[];
-  usuarioSeleccionado: Usuario | null;
+  usuarioSeleccionado: UsuarioDetalle | null;
   totalElements:       number;
   totalPages:          number;
   paginaActual:        number;
@@ -53,12 +52,8 @@ export const usuariosFeature = createFeature({
     })),
 
     // ── Cargar roles ──────────────────────────────────────────────────────────
-    on(UsuariosActions.cargarRolesExitoso, (state, { roles }) => ({
-      ...state, roles,
-    })),
-    on(UsuariosActions.cargarRolesFallido, (state, { error }) => ({
-      ...state, error,
-    })),
+    on(UsuariosActions.cargarRolesExitoso, (state, { roles }) => ({ ...state, roles })),
+    on(UsuariosActions.cargarRolesFallido, (state, { error }) => ({ ...state, error })),
 
     // ── Crear ─────────────────────────────────────────────────────────────────
     on(UsuariosActions.crearUsuario, state => ({

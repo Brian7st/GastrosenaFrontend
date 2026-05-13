@@ -1,12 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Usuario } from '@restaurant/shared/models';
 import { AppState } from '@restaurant/shared/state';
 import {
   ActualizarUsuarioRequest,
   CrearUsuarioRequest,
   FiltrosUsuarios,
   ImportarUsuariosRequest,
+  UsuarioDetalle,
 } from '../models/usuarios.model';
 import { UsuariosActions } from './store/actions/usuarios.actions';
 import { UsuariosState } from './store/reducers/usuarios.reducer';
@@ -14,8 +14,8 @@ import {
   selectError,
   selectHayError,
   selectImportando,
-  selectLoadingAccion,
   selectLoading,
+  selectLoadingAccion,
   selectResultadoImport,
   selectRoles,
   selectTotalActivos,
@@ -86,7 +86,7 @@ export class UsuariosFacade {
     this.store.dispatch(UsuariosActions.exportarUsuarios());
   }
 
-  seleccionarUsuario(usuario: Usuario): void {
+  seleccionarUsuario(usuario: UsuarioDetalle): void {
     this.store.dispatch(UsuariosActions.seleccionarUsuario({ usuario }));
   }
 

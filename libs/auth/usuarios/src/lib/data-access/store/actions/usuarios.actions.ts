@@ -1,5 +1,5 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
-import { Usuario, PaginatedResponse } from '@restaurant/shared/models';
+import { PaginatedResponse } from '@restaurant/shared/models';
 import {
   ActualizarUsuarioRequest,
   CrearUsuarioRequest,
@@ -7,6 +7,7 @@ import {
   ImportarUsuariosRequest,
   ImportarUsuariosResponse,
   RolOpcion,
+  UsuarioDetalle,
 } from '../../../models/usuarios.model';
 
 export const UsuariosActions = createActionGroup({
@@ -14,7 +15,7 @@ export const UsuariosActions = createActionGroup({
   events: {
     // ── Cargar lista ──────────────────────────────────────────────────────────
     'Cargar Usuarios':          props<{ filtros?: Partial<FiltrosUsuarios> }>(),
-    'Cargar Usuarios Exitoso':  props<{ response: PaginatedResponse<Usuario> }>(),
+    'Cargar Usuarios Exitoso':  props<{ response: PaginatedResponse<UsuarioDetalle> }>(),
     'Cargar Usuarios Fallido':  props<{ error: string }>(),
 
     // ── Cargar roles ──────────────────────────────────────────────────────────
@@ -24,12 +25,12 @@ export const UsuariosActions = createActionGroup({
 
     // ── Crear ─────────────────────────────────────────────────────────────────
     'Crear Usuario':            props<{ data: CrearUsuarioRequest }>(),
-    'Crear Usuario Exitoso':    props<{ usuario: Usuario }>(),
+    'Crear Usuario Exitoso':    props<{ usuario: UsuarioDetalle }>(),
     'Crear Usuario Fallido':    props<{ error: string }>(),
 
     // ── Actualizar ────────────────────────────────────────────────────────────
     'Actualizar Usuario':           props<{ id: string; data: ActualizarUsuarioRequest }>(),
-    'Actualizar Usuario Exitoso':   props<{ usuario: Usuario }>(),
+    'Actualizar Usuario Exitoso':   props<{ usuario: UsuarioDetalle }>(),
     'Actualizar Usuario Fallido':   props<{ error: string }>(),
 
     // ── Eliminar ──────────────────────────────────────────────────────────────
@@ -39,17 +40,17 @@ export const UsuariosActions = createActionGroup({
 
     // ── Activar ───────────────────────────────────────────────────────────────
     'Activar Usuario':              props<{ id: string }>(),
-    'Activar Usuario Exitoso':      props<{ usuario: Usuario }>(),
+    'Activar Usuario Exitoso':      props<{ usuario: UsuarioDetalle }>(),
     'Activar Usuario Fallido':      props<{ error: string }>(),
 
     // ── Desactivar ────────────────────────────────────────────────────────────
     'Desactivar Usuario':           props<{ id: string }>(),
-    'Desactivar Usuario Exitoso':   props<{ usuario: Usuario }>(),
+    'Desactivar Usuario Exitoso':   props<{ usuario: UsuarioDetalle }>(),
     'Desactivar Usuario Fallido':   props<{ error: string }>(),
 
     // ── Desbloquear cuenta ────────────────────────────────────────────────────
     'Desbloquear Cuenta':           props<{ id: string }>(),
-    'Desbloquear Cuenta Exitoso':   props<{ usuario: Usuario }>(),
+    'Desbloquear Cuenta Exitoso':   props<{ usuario: UsuarioDetalle }>(),
     'Desbloquear Cuenta Fallido':   props<{ error: string }>(),
 
     // ── Importar masivo ───────────────────────────────────────────────────────
@@ -63,7 +64,7 @@ export const UsuariosActions = createActionGroup({
     'Exportar Usuarios Fallido':    props<{ error: string }>(),
 
     // ── Selección local ───────────────────────────────────────────────────────
-    'Seleccionar Usuario':          props<{ usuario: Usuario }>(),
+    'Seleccionar Usuario':          props<{ usuario: UsuarioDetalle }>(),
     'Limpiar Seleccion':            emptyProps(),
   },
 });
