@@ -340,5 +340,4 @@ export const INVENTARIO_ROUTES: Routes = [
       },
     ],
   },
- develop
 ];
