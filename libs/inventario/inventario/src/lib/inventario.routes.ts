@@ -296,4 +296,48 @@ export const INVENTARIO_ROUTES: Routes = [
       },
     ]
   },
+
+  // ── Paquete Probatorio ──────────────────────────────────────────────────
+  {
+    path: 'paquete-probatorio',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./pages/paquete-probatorio-page/paquete-list/paquete-list.component').then(
+            m => m.PaqueteListComponent
+          ),
+      },
+      {
+        path: 'nuevo',
+        loadComponent: () =>
+          import('./pages/paquete-probatorio-page/paquete-create/paquete-create.component').then(
+            m => m.PaqueteCreateComponent
+          ),
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./pages/paquete-probatorio-page/paquete-detail/paquete-detail.component').then(
+            m => m.PaqueteDetailComponent
+          ),
+        children: [
+          {
+            path: 'adjuntar',
+            loadComponent: () =>
+              import('./pages/paquete-probatorio-page/paquete-upload/paquete-upload.component').then(
+                m => m.PaqueteUploadComponent
+              ),
+          },
+          {
+            path: 'requisicion',
+            loadComponent: () =>
+              import('./pages/paquete-probatorio-page/paquete-req-detail/paquete-req-detail.component').then(
+                m => m.PaqueteReqDetailComponent
+              ),
+          },
+        ],
+      },
+    ],
+  },
 ];

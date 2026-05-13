@@ -1,0 +1,182 @@
+<!-- Overlay/Backdrop -->
+<div class="req-detail__backdrop" (click)="cerrarPanel()"></div>
+
+<!-- Side Sheet Panel -->
+<aside class="req-detail__sheet" (click)="$event.stopPropagation()">
+  
+  <!-- Header -->
+  <header class="req-detail__header">
+    <div class="req-detail__header-info">
+      <div class="req-detail__status-row">
+        <span class="req-detail__badge">Despachada</span>
+        <span class="req-detail__date">15 Oct 2026, 02:30 PM</span>
+      </div>
+      <h2 class="req-detail__title">REQ-2024-0892</h2>
+    </div>
+    
+    <div class="req-detail__header-actions">
+      <button class="req-detail__action-btn" title="Incluir en paquete probatorio" (click)="incluirEnPaquete()">
+        <lucide-icon name="folder-archive" [size]="20"></lucide-icon>
+      </button>
+      <button class="req-detail__action-btn" title="Cerrar detalle" (click)="cerrarPanel()">
+        <lucide-icon name="x" [size]="20"></lucide-icon>
+      </button>
+    </div>
+  </header>
+
+  <!-- Scrollable Body -->
+  <div class="req-detail__body custom-scrollbar">
+    
+    <!-- Section 1: Info Sesión -->
+    <section class="req-detail__section">
+      <h3 class="req-detail__section-title">
+        <lucide-icon name="info" [size]="20" class="icon-primary"></lucide-icon>
+        Información de la Sesión
+      </h3>
+      
+      <div class="req-detail__info-grid">
+        <div class="req-detail__info-card">
+          <div class="req-detail__info-icon"><lucide-icon name="hash" [size]="20"></lucide-icon></div>
+          <div>
+            <p class="req-detail__info-label">Ficha</p>
+            <p class="req-detail__info-value">2560892</p>
+          </div>
+        </div>
+        <div class="req-detail__info-card">
+          <div class="req-detail__info-icon"><lucide-icon name="user" [size]="20"></lucide-icon></div>
+          <div>
+            <p class="req-detail__info-label">Instructor</p>
+            <p class="req-detail__info-value">Sebastian Betancourt</p>
+          </div>
+        </div>
+        <div class="req-detail__info-card">
+          <div class="req-detail__info-icon"><lucide-icon name="calendar" [size]="20"></lucide-icon></div>
+          <div>
+            <p class="req-detail__info-label">Fecha Programada</p>
+            <p class="req-detail__info-value">15 Oct 2026</p>
+          </div>
+        </div>
+        <div class="req-detail__info-card">
+          <div class="req-detail__info-icon"><lucide-icon name="clock" [size]="20"></lucide-icon></div>
+          <div>
+            <p class="req-detail__info-label">Horario</p>
+            <p class="req-detail__info-value">08:00 - 10:00</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Items -->
+    <section class="req-detail__section">
+      <div class="req-detail__items-header">
+        <h3 class="req-detail__section-title">
+          <lucide-icon name="package" [size]="20" class="icon-primary"></lucide-icon>
+          Ítems Solicitados
+        </h3>
+        <span class="req-detail__total-badge">Total: 3 ítems</span>
+      </div>
+
+      <!-- Categoria Abarrotes -->
+      <div class="req-detail__category">
+        <h4 class="req-detail__category-title">
+          <span class="req-detail__category-dot"></span>
+          Abarrotes
+        </h4>
+        
+        <div class="req-detail__table-header">
+          <div class="col-code">Código SENA</div>
+          <div class="col-name">Ítem</div>
+          <div class="col-um">UM</div>
+          <div class="col-qty">Sol.</div>
+          <div class="col-delivered">Entregada</div>
+        </div>
+        
+        <div class="req-detail__table-row">
+          <div class="col-code">121401-01</div>
+          <div class="col-name">Aceite Vegetal</div>
+          <div class="col-um">L</div>
+          <div class="col-qty">5</div>
+          <div class="col-delivered"><span class="highlight-qty">5</span></div>
+        </div>
+        <div class="req-detail__table-row">
+          <div class="col-code">121402-05</div>
+          <div class="col-name">Arroz Blanco</div>
+          <div class="col-um">kg</div>
+          <div class="col-qty">10</div>
+          <div class="col-delivered"><span class="highlight-qty">10</span></div>
+        </div>
+      </div>
+
+      <!-- Categoria Lácteos -->
+      <div class="req-detail__category">
+        <h4 class="req-detail__category-title">
+          <span class="req-detail__category-dot"></span>
+          Lácteos
+        </h4>
+        <div class="req-detail__table-row">
+          <div class="col-code">121503-12</div>
+          <div class="col-name">Leche Entera</div>
+          <div class="col-um">L</div>
+          <div class="col-qty">12</div>
+          <div class="col-delivered"><span class="highlight-qty">12</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Timeline -->
+    <section class="req-detail__section">
+      <h3 class="req-detail__section-title">
+        <lucide-icon name="history" [size]="20" class="icon-primary"></lucide-icon>
+        Historial de Estados
+      </h3>
+      
+      <div class="req-detail__timeline">
+        <!-- Ghost Line -->
+        <div class="req-detail__timeline-line"></div>
+        
+        <div class="req-detail__timeline-item">
+          <div class="req-detail__timeline-icon"><lucide-icon name="file-edit" [size]="14"></lucide-icon></div>
+          <div class="req-detail__timeline-content">
+            <h4>Borrador</h4>
+            <p>Requisición creada por Sebastian Betancourt.</p>
+            <span class="date">12 Oct 2026, 10:15 AM</span>
+          </div>
+        </div>
+
+        <div class="req-detail__timeline-item">
+          <div class="req-detail__timeline-icon"><lucide-icon name="send" [size]="14"></lucide-icon></div>
+          <div class="req-detail__timeline-content">
+            <h4>Enviada</h4>
+            <p>Enviada a almacén para su revisión.</p>
+            <span class="date">12 Oct 2026, 10:15 AM</span>
+          </div>
+        </div>
+
+        <div class="req-detail__timeline-item req-detail__timeline-item--active">
+          <div class="req-detail__timeline-icon"><lucide-icon name="truck" [size]="14"></lucide-icon></div>
+          <div class="req-detail__timeline-content">
+            <h4>Despachada</h4>
+            <p>Ítems preparados y listos en almacén.</p>
+            <span class="date">15 Oct 2026, 02:30 PM</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Footer Actions -->
+  <footer class="req-detail__footer">
+    <button class="btn-secondary">
+      <lucide-icon name="download" [size]="18"></lucide-icon>
+      Descargar Soporte
+    </button>
+    <button class="btn-primary" (click)="incluirEnPaquete()">
+      <div class="btn-primary-inner">
+        <lucide-icon name="pen-tool" [size]="18"></lucide-icon>
+        Firmar y Marcar como Recibido
+      </div>
+      <span class="btn-hint">Pasará a estado "Firmada"</span>
+    </button>
+  </footer>
+</aside>

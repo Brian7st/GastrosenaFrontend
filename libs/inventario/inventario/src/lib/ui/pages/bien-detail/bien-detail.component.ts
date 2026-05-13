@@ -5,11 +5,12 @@ import { Bien, MovimientoBien } from '../../../models/inventario.model';
 import { BienesService } from '../../../data-access/services/bienes.service';
 import { BienFormComponent } from '../../modals/bien-form/bien-form.component';
 import { BienFormDto } from '../../../models/inventario.model';
+import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 
 @Component({
   selector: 'restaurant-bien-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, BienFormComponent],
+  imports: [CommonModule, RouterModule, BienFormComponent, BackButtonComponent],
   templateUrl: './bien-detail.component.html',
   styleUrl: './bien-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -63,7 +64,7 @@ export class BienDetailPageComponent implements OnInit {
   }
 
   onExportarHistorial(): void {
-    console.log('Exportando historial del bien:', this.bien()?.codigoSena);
+    this.router.navigate(['/app/inventario/bienes/exportar']);
   }
 
   getTipoClass(tipo: string): string {

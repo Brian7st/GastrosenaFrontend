@@ -175,3 +175,19 @@
   (close)="onCloseForm()"
   (save)="onSaveFactura($event)"
 ></restaurant-factura-form>
+
+<!-- ── MODAL: Anular Factura ── -->
+<restaurant-keyword-confirm-modal
+  [open]="showAnularModal()"
+  title="¿Anular esta factura?"
+  description="Esta acción marcará la factura como Anulada y no podrá revertirse."
+  keyword="ANULAR"
+  keywordLabel="Escribe ANULAR para confirmar"
+  confirmLabel="Sí, anular factura"
+  cancelLabel="Cancelar"
+  [identifierLabel]="'Factura'"
+  [identifierValue]="facturaParaAnular()?.proveedor ?? ''"
+  accent="danger"
+  (confirm)="onConfirmarAnular()"
+  (cancel)="onCancelarAnular()"
+/>

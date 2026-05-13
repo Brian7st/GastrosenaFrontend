@@ -1,0 +1,201 @@
+<!-- ── Page Header ─────────────────────────────────────────────────── -->
+<div class="paquete-page">
+  <div class="paquete-page__header">
+    <div class="paquete-page__header-text">
+      <p class="paquete-page__overline">Módulo Auditoría</p>
+      <h1 class="paquete-page__title">Gestión de Paquetes Probatorios</h1>
+      <p class="paquete-page__subtitle">Dossier de auditoría legal para legalización de materiales de formación.</p>
+    </div>
+    <button class="paquete-page__btn-crear" (click)="crearPaquete()">
+      <lucide-icon name="plus" [size]="16"></lucide-icon>
+      Crear Expediente
+    </button>
+  </div>
+
+  <!-- ── KPI Cards ──────────────────────────────────────────────────── -->
+  <div class="paquete-page__kpis">
+    <div class="paquete-page__kpi-card">
+      <div class="paquete-page__kpi-header">
+        <span class="paquete-page__kpi-label">Total</span>
+        <lucide-icon name="folders" [size]="16" class="paquete-page__kpi-icon"></lucide-icon>
+      </div>
+      <span class="paquete-page__kpi-value">{{ kpiTotal() }}</span>
+    </div>
+    <div class="paquete-page__kpi-card paquete-page__kpi-card--borrador">
+      <div class="paquete-page__kpi-header">
+        <span class="paquete-page__kpi-label">Borrador</span>
+        <lucide-icon name="file-edit" [size]="16" class="paquete-page__kpi-icon"></lucide-icon>
+      </div>
+      <span class="paquete-page__kpi-value">{{ kpiBorrador() }}</span>
+    </div>
+    <div class="paquete-page__kpi-card paquete-page__kpi-card--revision">
+      <div class="paquete-page__kpi-header">
+        <span class="paquete-page__kpi-label">En revisión</span>
+        <lucide-icon name="clock" [size]="16" class="paquete-page__kpi-icon"></lucide-icon>
+      </div>
+      <span class="paquete-page__kpi-value">{{ kpiEnRevision() }}</span>
+    </div>
+    <div class="paquete-page__kpi-card paquete-page__kpi-card--completo">
+      <div class="paquete-page__kpi-header">
+        <span class="paquete-page__kpi-label">Completo</span>
+        <lucide-icon name="check-circle" [size]="16" class="paquete-page__kpi-icon"></lucide-icon>
+      </div>
+      <span class="paquete-page__kpi-value">{{ kpiCompleto() }}</span>
+    </div>
+    <div class="paquete-page__kpi-card paquete-page__kpi-card--archivado">
+      <div class="paquete-page__kpi-header">
+        <span class="paquete-page__kpi-label">Archivado</span>
+        <lucide-icon name="archive" [size]="16" class="paquete-page__kpi-icon"></lucide-icon>
+      </div>
+      <span class="paquete-page__kpi-value">{{ kpiArchivado() }}</span>
+    </div>
+  </div>
+
+  <!-- ── Filtros ────────────────────────────────────────────────────── -->
+  <div class="paquete-page__filters">
+    <div class="paquete-page__filter-search">
+      <lucide-icon name="search" [size]="14" class="paquete-page__filter-search-icon"></lucide-icon>
+      <input
+        type="text"
+        placeholder="Buscar por ID, instructor o ficha..."
+        (input)="onSearch($event)"
+      />
+    </div>
+
+    <div class="paquete-page__filter-select">
+      <select (change)="onEstadoChange($event)">
+        <option value="">Todos los estados</option>
+        <option value="borrador">Borrador</option>
+        <option value="en_revision">En revisión</option>
+        <option value="completo">Completo</option>
+        <option value="archivado">Archivado</option>
+        <option value="incompleto">Incompleto</option>
+      </select>
+      <lucide-icon name="chevron-down" [size]="14" class="paquete-page__filter-chevron"></lucide-icon>
+    </div>
+
+    <div class="paquete-page__filter-select">
+      <select (change)="onProgramaChange($event)">
+        <option value="">Todos los programas</option>
+        <option value="gastronomía">Gastronomía</option>
+        <option value="panadería">Panadería</option>
+        <option value="pastelería">Pastelería</option>
+        <option value="sommelier">Sommelier</option>
+      </select>
+      <lucide-icon name="chevron-down" [size]="14" class="paquete-page__filter-chevron"></lucide-icon>
+    </div>
+
+    <div class="paquete-page__filter-date">
+      <lucide-icon name="calendar" [size]="14" class="paquete-page__filter-date-icon"></lucide-icon>
+      <input type="date" />
+      <span class="paquete-page__filter-date-separator">-</span>
+      <input type="date" />
+    </div>
+
+    <button class="paquete-page__filter-clear" (click)="limpiarFiltros()">
+      <lucide-icon name="filter-x" [size]="14"></lucide-icon>
+      Limpiar
+    </button>
+  </div>
+
+  <!-- ── Tabla de Paquetes ────────────────────────────────────────── -->
+  <restaurant-data-table>
+    <thead>
+      <tr>
+        <th>ID Expediente</th>
+        <th>Detalle / Ficha</th>
+        <th class="text-center">Estado</th>
+        <th>GIL Vinculado</th>
+        <th>Documentos Base</th>
+        <th>Responsable</th>
+        <th>Fecha</th>
+        <th class="text-center">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (paquete of filteredPaquetes(); track paquete.id) {
+        <tr class="paquete-table__row" (click)="irADetalle(paquete.id)">
+          <!-- ID Expediente -->
+          <td>
+            <a
+              class="paquete-table__expediente"
+              (click)="irADetalle(paquete.id); $event.stopPropagation()"
+            >
+              {{ paquete.expediente }}
+            </a>
+          </td>
+
+          <!-- Detalle / Ficha -->
+          <td>
+            <p class="paquete-table__titulo">{{ paquete.titulo }}</p>
+            <p class="paquete-table__ficha">Ficha {{ paquete.ficha }} · {{ paquete.programa }}</p>
+          </td>
+
+          <!-- Estado -->
+          <td class="text-center">
+            <restaurant-status-badge
+              [label]="getEstadoLabel(paquete.estado)"
+              [variant]="getEstadoVariant(paquete.estado)"
+            ></restaurant-status-badge>
+          </td>
+
+          <!-- GIL Vinculado -->
+          <td>
+            <span class="paquete-table__gil">{{ paquete.gilVinculado }}</span>
+          </td>
+
+          <!-- Documentos Base (Checklist) -->
+          <td>
+            <div class="paquete-table__docs">
+              @for (doc of paquete.documentos; track doc.tipo) {
+                <div class="paquete-table__doc-item" [class.paquete-table__doc-item--missing]="!doc.vinculado">
+                  @if (doc.vinculado) {
+                    <lucide-icon name="check-circle-2" [size]="14" class="paquete-table__doc-icon--ok"></lucide-icon>
+                  } @else {
+                    <lucide-icon name="circle" [size]="14" class="paquete-table__doc-icon--pending"></lucide-icon>
+                  }
+                  <span>{{ doc.tipo === 'acta' ? 'Acta' : doc.tipo === 'requisicion' ? 'Requisición' : 'Asistencia' }}</span>
+                </div>
+              }
+            </div>
+          </td>
+
+          <!-- Responsable -->
+          <td>
+            <div class="paquete-table__responsable">
+              <div class="paquete-table__responsable-avatar">
+                {{ getIniciales(paquete) }}
+              </div>
+              <span class="paquete-table__responsable-name">{{ paquete.responsable }}</span>
+            </div>
+          </td>
+
+          <!-- Fecha -->
+          <td class="paquete-table__fecha">{{ paquete.fecha }}</td>
+
+          <!-- Acciones -->
+          <td class="text-center">
+            <div class="paquete-table__actions">
+              @if (paquete.estado === 'incompleto') {
+                <button
+                  class="paquete-table__action-btn paquete-table__action-btn--completar"
+                  title="Completar Paquete"
+                  (click)="irADetalle(paquete.id); $event.stopPropagation()"
+                >
+                  Completar
+                </button>
+              }
+              <button
+                class="paquete-table__action-btn paquete-table__action-btn--ver"
+                title="Ver Paquete"
+                (click)="irADetalle(paquete.id); $event.stopPropagation()"
+              >
+                Ver
+              </button>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </restaurant-data-table>
+</div>
