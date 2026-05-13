@@ -1,0 +1,140 @@
+<div class="evaluacion-container" (click)="cerrarMenuEvaluar()">
+
+  <!-- ===== CABECERA ===== -->
+  <div class="page-header">
+    <button id="btn-volver-masiva" class="btn-volver" type="button" (click)="volver(); $event.stopPropagation()">
+      <span class="volver-chevron">‹</span> Volver
+    </button>
+    <div class="header-info">
+      <h1 class="page-title">Evaluación Masiva</h1>
+      <p class="page-subtitle">
+        Seleccione los aprendices a evaluar ·
+        <strong>{{ cantidadSeleccionados() }} seleccionado(s)</strong>
+      </p>
+    </div>
+  </div>
+
+  <!-- ===== TABLA ===== -->
+  <div class="tabla-wrapper">
+    <table class="tabla-aprendices" aria-label="Listado de aprendices para evaluación masiva">
+
+      <!-- Encabezado -->
+      <thead>
+        <tr>
+          <th class="col-check">
+            <input
+              id="check-all"
+              type="checkbox"
+              class="custom-check"
+              [checked]="todosSeleccionados()"
+              [indeterminate]="algunoSeleccionado()"
+              (change)="toggleSelectAll()"
+              (click)="$event.stopPropagation()"
+              aria-label="Seleccionar todos los aprendices"
+            />
+          </th>
+          <th class="col-aprendiz">Aprendiz</th>
+          <th class="col-ficha">Ficha</th>
+          <th class="col-jornada">Jornada</th>
+          <th class="col-estado">Estado</th>
+        </tr>
+      </thead>
+
+      <!-- Filas -->
+      <tbody>
+        @for (aprendiz of aprendices(); track aprendiz.id) {
+          <tr
+            class="fila-aprendiz"
+            [class.fila-seleccionada]="isSelected(aprendiz.id)"
+            (click)="toggleSelection(aprendiz.id); $event.stopPropagation()"
+          >
+            <!-- Checkbox -->
+            <td class="col-check">
+              <input
+                [id]="'check-' + aprendiz.id"
+                type="checkbox"
+                class="custom-check"
+                [checked]="isSelected(aprendiz.id)"
+                (change)="toggleSelection(aprendiz.id)"
+                (click)="$event.stopPropagation()"
+                [attr.aria-label]="'Seleccionar ' + aprendiz.nombreCompleto"
+              />
+            </td>
+
+            <!-- Aprendiz (avatar + nombre) -->
+            <td class="col-aprendiz" (click)="goToIndividual(aprendiz.id); $event.stopPropagation()">
+              <div class="aprendiz-cell">
+                <span class="avatar" [attr.data-inicial]="aprendiz.inicial">{{ aprendiz.inicial }}</span>
+                <span class="nombre">{{ aprendiz.nombreCompleto }}</span>
+              </div>
+            </td>
+
+            <!-- Ficha -->
+            <td class="col-ficha">{{ aprendiz.ficha }}</td>
+
+            <!-- Jornada -->
+            <td class="col-jornada">{{ aprendiz.jornada }}</td>
+
+            <!-- Estado -->
+            <td class="col-estado">
+              <span class="estado-badge"
+                [class.estado-pendiente]="aprendiz.estado === 'Pendiente'"
+                [class.estado-aprobo]="aprendiz.estado === 'Aprobó'"
+                [class.estado-no-aprobo]="aprendiz.estado === 'No Aprobó'"
+              >
+                {{ aprendiz.estado }}
+              </span>
+            </td>
+          </tr>
+        }
+      </tbody>
+
+    </table>
+  </div>
+
+  <!-- ===== BOTÓN EVALUAR (desplegable) ===== -->
+  <div class="evaluar-bar" (click)="$event.stopPropagation()">
+    <div class="evaluar-dropdown-wrapper">
+
+      <!-- Menú desplegable (se abre hacia arriba) -->
+      @if (menuEvaluarAbierto()) {
+        <div class="evaluar-menu" role="menu" aria-label="Opciones de evaluación">
+          <button
+            id="btn-aprobo-masiva"
+            class="evaluar-option evaluar-option--aprobo"
+            type="button"
+            role="menuitem"
+            (click)="submitEvaluacionMasiva('aprobo')"
+          >
+            <span class="option-icon">✓</span> Aprobó
+          </button>
+          <button
+            id="btn-no-aprobo-masiva"
+            class="evaluar-option evaluar-option--no-aprobo"
+            type="button"
+            role="menuitem"
+            (click)="submitEvaluacionMasiva('no_aprobo')"
+          >
+            <span class="option-icon">✗</span> No Aprobó
+          </button>
+        </div>
+      }
+
+      <!-- Botón principal -->
+      <button
+        id="btn-evaluar-masiva"
+        class="btn-evaluar"
+        type="button"
+        [disabled]="cantidadSeleccionados() === 0"
+        (click)="toggleMenuEvaluar()"
+        [attr.aria-expanded]="menuEvaluarAbierto()"
+        aria-haspopup="menu"
+      >
+        EVALUAR
+        <span class="evaluar-caret" [class.caret-up]="menuEvaluarAbierto()">▲</span>
+      </button>
+
+    </div>
+  </div>
+
+</div>
