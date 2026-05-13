@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ListaPageComponentComponent } from './lista-page.component';
+import { ListaPageComponent } from './lista-page.component';
 
-describe('ListaPageComponentComponent', () => {
-  let component: ListaPageComponentComponent;
-  let fixture: ComponentFixture<ListaPageComponentComponent>;
+describe('ListaPageComponent', () => {
+  let component: ListaPageComponent;
+  let fixture: ComponentFixture<ListaPageComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ListaPageComponentComponent],
+      imports: [ListaPageComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ListaPageComponentComponent);
+    fixture = TestBed.createComponent(ListaPageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
