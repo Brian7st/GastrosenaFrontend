@@ -1,0 +1,91 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  signal,
+  computed,
+  inject,
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule, Router } from '@angular/router';
+import { DataTableComponent, LucideIconComponent } from '@restaurant/shared/ui';
+import { RegistroHistorial, AlertaPrioridad, MOCK_HISTORIAL } from '../../../models/alerta.model';
+
+@Component({
+  selector: 'restaurant-alertas-historial',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, RouterModule, DataTableComponent, LucideIconComponent],
+  templateUrl: './alertas-historial.component.html',
+  styleUrls: ['./alertas-historial.component.scss'],
+})
+export class AlertasHistorialComponent {
+  private router = inject(Router);
+
+  registros = signal<RegistroHistorial[]>(MOCK_HISTORIAL);
+  filtroBien = signal<string>('');
+  filtroResponsable = signal<string>('');
+
+  total = computed(() => this.registros().length);
+
+  filteredRegistros = computed(() => {
+    const bien = this.filtroBien();
+    const resp = this.filtroResponsable();
+    return this.registros().filter(r => {
+      const matchBien = !bien || r.bien.toLowerCase().includes(bien.toLowerCase());
+      const matchResp = !resp || r.responsable.toLowerCase().includes(resp.toLowerCase());
+      return matchBien && matchResp;
+    });
+  });
+
+  // ── Helpers de UI ────────────────────────────────────────────────────────
+  getPrioridadLabel(p: AlertaPrioridad): string {
+    const map: Record<AlertaPrioridad, string> = {
+      critica: 'Crítica (Mermas)',
+      alta:    'Alta (Bajo Stock)',
+      media:   'Media (Revisión)',
+      baja:    'Baja',
+    };
+    return map[p];
+  }
+
+  getPrioridadClass(p: AlertaPrioridad): string {
+    const map: Record<AlertaPrioridad, string> = {
+      critica: 'badge--critico',
+      alta:    'badge--alto',
+      media:   'badge--medio',
+      baja:    'badge--bajo',
+    };
+    return map[p];
+  }
+
+  getAccionClass(accion: string): string {
+    if (accion.includes('Entrada'))  return 'accion--entrada';
+    if (accion.includes('GIL'))      return 'accion--gil';
+    if (accion.includes('Revisada')) return 'accion--revisada';
+    return '';
+  }
+
+  getAccionIcon(accion: string): string {
+    if (accion.includes('Entrada'))  return 'task_alt';
+    if (accion.includes('GIL'))      return 'contract_edit';
+    if (accion.includes('Revisada')) return 'visibility';
+    return 'check';
+  }
+
+  // ── Navegación ───────────────────────────────────────────────────────────
+  volver(): void {
+    this.router.navigate(['/app/inventario/alertas']);
+  }
+
+  onBienChange(event: Event): void {
+    this.filtroBien.set((event.target as HTMLSelectElement).value);
+  }
+
+  onResponsableChange(event: Event): void {
+    this.filtroResponsable.set((event.target as HTMLSelectElement).value);
+  }
+
+  exportarCSV(): void {
+    console.log('Exportando historial CSV...');
+  }
+}

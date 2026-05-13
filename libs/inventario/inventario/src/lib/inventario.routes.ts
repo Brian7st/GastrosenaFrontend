@@ -114,6 +114,41 @@ export const INVENTARIO_ROUTES: Routes = [
     ]
   },
 
+  // ── Conciliación de Inventario ───────────────────────────────────────────
+  {
+    path: 'conciliacion',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./pages/conciliacion-page/conciliacion-dashboard/conciliacion-dashboard.component').then(
+            m => m.ConciliacionDashboardComponent
+          ),
+      },
+      {
+        path: 'toma-fisica',
+        loadComponent: () =>
+          import('./pages/conciliacion-page/conciliacion-toma-fisica/conciliacion-toma-fisica.component').then(
+            m => m.ConciliacionTomaFisicaComponent
+          ),
+      },
+      {
+        path: 'historial',
+        loadComponent: () =>
+          import('./pages/conciliacion-page/conciliacion-historial/conciliacion-historial.component').then(
+            m => m.ConciliacionHistorialComponent
+          ),
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./pages/conciliacion-page/conciliacion-detalle/conciliacion-detalle.component').then(
+            m => m.ConciliacionDetalleComponent
+          ),
+      }
+    ]
+  },
+
   // ── Entradas y Salidas (Movimientos / Kardex) ────────────────────────────
   {
     path: 'movimientos',
@@ -140,5 +175,220 @@ export const INVENTARIO_ROUTES: Routes = [
   {
     path: 'movimientos/:id',
     loadComponent: () => import('./pages/kardex-page/movimiento-detail/movimiento-detail.component').then(m => m.MovimientoDetailComponent)
-  }
+  },
+
+  // ── Alertas de Stock ─────────────────────────────────────────────────────
+  {
+    path: 'alertas',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./pages/alertas-page/alertas-list/alertas-list.component').then(
+            m => m.AlertasListComponent
+          ),
+      },
+      {
+        path: 'historial',
+        loadComponent: () =>
+          import('./pages/alertas-page/alertas-historial/alertas-historial.component').then(
+            m => m.AlertasHistorialComponent
+          ),
+      },
+      {
+        path: 'configuracion',
+        loadComponent: () =>
+          import('./pages/alertas-page/alertas-config/alertas-config.component').then(
+            m => m.AlertasConfigComponent
+          ),
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./pages/alertas-page/alerta-detail/alerta-detail.component').then(
+            m => m.AlertaDetailComponent
+          ),
+        children: [
+          {
+            path: 'resolver',
+            loadComponent: () =>
+              import('./pages/alertas-page/alerta-detail/alerta-resolver/alerta-resolver.component').then(
+                m => m.AlertaResolverComponent
+              ),
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── Presupuesto General ──────────────────────────────────────────────────
+  {
+    path: 'presupuesto',
+    loadComponent: () =>
+      import('./pages/presupuesto-page/presupuesto-dashboard/presupuesto-dashboard.component').then(
+        m => m.PresupuestoDashboardComponent
+      ),
+    children: [
+      {
+        path: 'registrar',
+        loadComponent: () =>
+          import('./pages/presupuesto-page/presupuesto-registrar/presupuesto-registrar.component').then(
+            m => m.PresupuestoRegistrarComponent
+          ),
+      },
+      {
+        path: 'traslado',
+        loadComponent: () =>
+          import('./pages/presupuesto-page/presupuesto-traslado/presupuesto-traslado.component').then(
+            m => m.PresupuestoTrasladoComponent
+          ),
+      },
+      {
+        path: 'exportar',
+        loadComponent: () =>
+          import('./pages/presupuesto-page/presupuesto-exportar/presupuesto-exportar.component').then(
+            m => m.PresupuestoExportarComponent
+          ),
+      },
+      {
+        path: 'cargar-gil',
+        loadComponent: () =>
+          import('./pages/presupuesto-page/presupuesto-cargar-gil/presupuesto-cargar-gil.component').then(
+            m => m.PresupuestoCargarGilComponent
+          ),
+      },
+    ],
+  },
+
+  // ── Actas de Legalización ───────────────────────────────────────────────────
+  {
+    path: 'actas',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./pages/actas-page/actas-list/actas-list.component').then(
+            m => m.ActasListComponent
+          ),
+      },
+      {
+        path: 'nueva',
+        loadComponent: () =>
+          import('./pages/actas-page/actas-create/actas-create.component').then(
+            m => m.ActasCreateComponent
+          ),
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./pages/actas-page/actas-detail/actas-detail.component').then(
+            m => m.ActasDetailComponent
+          ),
+        children: [
+          {
+            path: 'cargar-firma',
+            loadComponent: () =>
+              import('./pages/actas-page/actas-upload/actas-upload.component').then(
+                m => m.ActasUploadComponent
+              ),
+          },
+        ],
+      },
+    ]
+  },
+
+  // ── Paquete Probatorio ──────────────────────────────────────────────────
+  {
+    path: 'paquete-probatorio',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./pages/paquete-probatorio-page/paquete-list/paquete-list.component').then(
+            m => m.PaqueteListComponent
+          ),
+      },
+      {
+        path: 'nuevo',
+        loadComponent: () =>
+          import('./pages/paquete-probatorio-page/paquete-create/paquete-create.component').then(
+            m => m.PaqueteCreateComponent
+          ),
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./pages/paquete-probatorio-page/paquete-detail/paquete-detail.component').then(
+            m => m.PaqueteDetailComponent
+          ),
+        children: [
+          {
+            path: 'adjuntar',
+            loadComponent: () =>
+              import('./pages/paquete-probatorio-page/paquete-upload/paquete-upload.component').then(
+                m => m.PaqueteUploadComponent
+              ),
+          },
+          {
+            path: 'requisicion',
+            loadComponent: () =>
+              import('./pages/paquete-probatorio-page/paquete-req-detail/paquete-req-detail.component').then(
+                m => m.PaqueteReqDetailComponent
+              ),
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── Requisiciones (Formato 45-S) ────────────────────────────────────────
+  {
+    path: 'requisiciones',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./pages/requisiciones-page/requisiciones-dashboard/requisiciones-dashboard.component').then(
+            m => m.RequisicionesDashboardComponent
+          ),
+        children: [
+          {
+            path: 'detalle/:id',
+            loadComponent: () =>
+              import('./pages/requisiciones-page/requisiciones-detalle/requisiciones-detalle.component').then(
+                m => m.RequisicionesDetalleComponent
+              ),
+          },
+          {
+            path: 'despacho/:id',
+            loadComponent: () =>
+              import('./pages/requisiciones-page/requisiciones-despacho/requisiciones-despacho.component').then(
+                m => m.RequisicionesDespachoComponent
+              ),
+          },
+        ]
+      },
+      {
+        path: 'nueva',
+        loadComponent: () =>
+          import('./pages/requisiciones-page/requisiciones-create/requisiciones-create.component').then(
+            m => m.RequisicionesCreateComponent
+          ),
+      },
+      {
+        path: 'firmar/:id',
+        loadComponent: () =>
+          import('./pages/requisiciones-page/requisiciones-firmar/requisiciones-firmar.component').then(
+            m => m.RequisicionesFirmarComponent
+          ),
+      },
+      {
+        path: 'resumen/:id',
+        loadComponent: () =>
+          import('./pages/requisiciones-page/requisiciones-resumen/requisiciones-resumen.component').then(
+            m => m.RequisicionesResumenComponent
+          ),
+      }
+    ],
+  },
 ];

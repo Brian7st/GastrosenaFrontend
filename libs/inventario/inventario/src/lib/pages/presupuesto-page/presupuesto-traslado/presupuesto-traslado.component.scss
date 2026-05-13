@@ -1,0 +1,92 @@
+@use '../presupuesto-registrar/presupuesto-registrar.component' as registrar;
+
+/* Hereda estilos base del modal de registrar */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-backdrop);
+  backdrop-filter: blur(8px);
+  padding: var(--space-4);
+}
+
+.modal-content {
+  background-color: var(--color-superficie-contenedor-mas-bajo);
+  width: 100%;
+  max-width: 600px;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  animation: modal-in var(--duration-base) var(--ease-decelerate) forwards;
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-header {
+  padding: var(--space-8) var(--space-8) var(--space-4);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.header-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-success-bg);
+  color: var(--color-primario);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-pill);
+  border: none;
+  background: transparent;
+  color: var(--color-pizarra-400);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+
+  &:hover { background-color: var(--color-superficie-contenedor-bajo); }
+  &:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+}
+
+.modal-body {
+  padding: 0 var(--space-8) var(--space-6);
+}
+
+.modal-title {
+  font-family: var(--font-family-headline);
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  color: var(--color-en-superficie);
+  margin: 0;
+  letter-spacing: -0.025em;
+}
+
+.modal-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: var(--space-1) 0 0;
+}
+
+.modal-footer {
+  padding: var(--space-6) var(--space-8);
+  background-color: var(--color-superficie-contenedor-mas-bajo);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-4);
+  border-top: 1px solid var(--color-superficie-contenedor);
+}

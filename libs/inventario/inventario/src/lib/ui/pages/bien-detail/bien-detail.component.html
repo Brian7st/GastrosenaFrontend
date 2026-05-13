@@ -1,8 +1,6 @@
 <!-- Breadcrumb + Back -->
 <div class="breadcrumb">
-  <button class="back-btn" (click)="onVolver()">
-    <span class="material-symbols-outlined">arrow_back</span>
-  </button>
+  <inventario-back-button (clicked)="onVolver()" />
   <nav class="breadcrumb-nav">
     <span class="breadcrumb-link" (click)="onVolver()">Inventario</span>
     <span class="material-symbols-outlined breadcrumb-sep">chevron_right</span>

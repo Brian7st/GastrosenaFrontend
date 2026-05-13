@@ -1,0 +1,643 @@
+// ── Actas de Legalización — Vista de Detalle (Paper UI) ────────────────────────
+// Tokens de _variables.scss (Precision Ledger Design System)
+
+// ── Topbar contextual ──────────────────────────────────────────────────────────
+.acta-detail__topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-8);
+  height: 64px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-pizarra-100);
+  box-shadow: var(--shadow-xs);
+}
+
+.acta-detail__topbar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.acta-detail__back-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: none;
+  border: none;
+  color: var(--color-en-superficie);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  cursor: pointer;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  transition: color var(--duration-fast) var(--ease-standard);
+
+  &:hover { color: var(--color-primario); }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+}
+
+.acta-detail__topbar-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--color-superficie-variante);
+}
+
+.acta-detail__topbar-title {
+  font-family: var(--font-family-headline);
+  font-weight: 700;
+  color: var(--color-primario);
+  letter-spacing: -0.01em;
+}
+
+.acta-detail__topbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.acta-detail__export-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-superficie-contenedor-bajo);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-en-superficie);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+
+  &:hover { background: var(--color-superficie-contenedor); }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+}
+
+.acta-detail__status-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: linear-gradient(135deg, var(--color-primario), var(--color-primario-gradient-end));
+  color: var(--color-en-primario);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: var(--shadow-primary);
+  transition: transform var(--duration-fast) var(--ease-standard),
+              opacity var(--duration-fast) var(--ease-standard);
+
+  &:hover {
+    opacity: 0.92;
+    transform: scale(0.98);
+  }
+
+  &:active { transform: scale(0.95); }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+}
+
+// ── Canvas principal ───────────────────────────────────────────────────────────
+.acta-detail__canvas {
+  padding: var(--space-6) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+// ── Action Bar ─────────────────────────────────────────────────────────────────
+.acta-detail__action-bar {
+  width: 100%;
+  max-width: 56rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+  background: var(--color-superficie-contenedor-mas-bajo);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+  border: 1px solid var(--color-pizarra-100);
+}
+
+.acta-detail__action-bar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.acta-detail__action-bar-label {
+  font-family: var(--font-family-headline);
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+  color: var(--color-en-superficie);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.acta-detail__action-bar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.acta-detail__btn-devolver {
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-error);
+  background: none;
+  border: 1px solid rgba(186, 26, 26, 0.2);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-standard),
+              color var(--duration-fast) var(--ease-standard);
+
+  &:hover {
+    background: var(--color-error-bg);
+    color: var(--color-error-text);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+}
+
+.acta-detail__btn-archivar {
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-secundario);
+  background: none;
+  border: 1px solid var(--color-superficie-variante);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-standard),
+              color var(--duration-fast) var(--ease-standard);
+
+  &:hover {
+    background: var(--color-secundario-contenedor);
+    color: var(--color-en-secundario-contenedor);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+}
+
+.acta-detail__btn-cargar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-primario);
+  background: none;
+  border: 1px solid var(--color-primario);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-standard),
+              color var(--duration-fast) var(--ease-standard);
+
+  &:hover {
+    background: var(--color-primario);
+    color: var(--color-en-primario);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+}
+
+.acta-detail__btn-aprobar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-6);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-en-primario);
+  background: var(--color-primario);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  box-shadow: var(--shadow-xs);
+  transition: background-color var(--duration-fast) var(--ease-standard);
+
+  &:hover { background: var(--color-primario-hover); }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+}
+
+// ── Paper / Documento ──────────────────────────────────────────────────────────
+.acta-detail__paper {
+  background: var(--color-superficie-contenedor-mas-bajo);
+  width: 100%;
+  max-width: 56rem;
+  min-height: 66rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-pizarra-100);
+  padding: var(--space-10) var(--space-16);
+  position: relative;
+  overflow: hidden;
+}
+
+// ── Cabecera del documento ─────────────────────────────────────────────────────
+.acta-detail__doc-header {
+  text-align: center;
+  margin-bottom: var(--space-12);
+}
+
+.acta-detail__doc-logo {
+  width: 5rem;
+  height: 5rem;
+  margin: 0 auto var(--space-6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primario);
+  opacity: 0.7;
+}
+
+.acta-detail__doc-institution {
+  font-family: var(--font-family-headline);
+  font-weight: 700;
+  font-size: var(--font-size-xl);
+  color: var(--color-en-superficie);
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--space-2);
+  text-transform: uppercase;
+}
+
+.acta-detail__doc-regional {
+  font-family: var(--font-family-headline);
+  font-weight: 600;
+  font-size: var(--font-size-lg);
+  color: var(--color-en-secundario-contenedor);
+  margin: 0 0 var(--space-6);
+  text-transform: uppercase;
+}
+
+.acta-detail__doc-badge {
+  display: inline-block;
+  border: 2px solid var(--color-superficie-variante);
+  padding: var(--space-3) var(--space-8);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-8);
+  background: var(--color-superficie);
+}
+
+.acta-detail__doc-badge-text {
+  font-family: var(--font-family-headline);
+  font-weight: 700;
+  font-size: var(--font-size-xl);
+  color: var(--color-primario);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.acta-detail__doc-comite {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  color: var(--color-en-superficie);
+  font-weight: 500;
+  margin: 0;
+}
+
+.acta-detail__doc-comite-label {
+  display: block;
+  font-size: var(--font-size-sm);
+  color: var(--color-en-secundario-contenedor);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--space-1);
+}
+
+// ── Cuerpo del documento ───────────────────────────────────────────────────────
+.acta-detail__doc-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+// ── Sección card (datos sesión) ────────────────────────────────────────────────
+.acta-detail__section-card {
+  background: var(--color-superficie);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  border: 1px solid var(--color-pizarra-100);
+}
+
+.acta-detail__session-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ── Secciones generales ────────────────────────────────────────────────────────
+.acta-detail__section-title {
+  font-family: var(--font-family-headline);
+  font-weight: 700;
+  font-size: var(--font-size-lg);
+  color: var(--color-en-superficie);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-4);
+}
+
+.acta-detail__section-indicator {
+  width: 6px;
+  height: 20px;
+  background: var(--color-primario);
+  border-radius: var(--radius-pill);
+  flex-shrink: 0;
+}
+
+.acta-detail__section-content {
+  padding-left: var(--space-4);
+}
+
+.acta-detail__section-text {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  color: var(--color-en-secundario-contenedor);
+  line-height: 1.6;
+  margin: 0;
+}
+
+// ── Labels y valores ───────────────────────────────────────────────────────────
+.acta-detail__field-label {
+  display: block;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-en-secundario-contenedor);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--space-1);
+}
+
+.acta-detail__field-value {
+  display: block;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  color: var(--color-en-superficie);
+
+  &--medium { font-weight: 500; }
+}
+
+// ── Desarrollo card ────────────────────────────────────────────────────────────
+.acta-detail__desarrollo-card {
+  background: var(--color-superficie);
+  padding: var(--space-5);
+  border-radius: var(--radius-md);
+  border-left: 4px solid var(--color-superficie-variante);
+}
+
+.acta-detail__desarrollo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4) var(--space-8);
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.acta-detail__desarrollo-full {
+  grid-column: 1 / -1;
+}
+
+.acta-detail__doc-soporte {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-superficie-contenedor-alto);
+  color: var(--color-en-superficie);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+// ── Tablas internas (Insumos y Compromisos) ────────────────────────────────────
+.acta-detail__insumos-table-wrapper,
+.acta-detail__compromisos-table-wrapper {
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-pizarra-100);
+}
+
+.acta-detail__insumos-table,
+.acta-detail__compromisos-table {
+  width: 100%;
+  text-align: left;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  border-collapse: collapse;
+
+  thead {
+    background: var(--color-superficie-contenedor-bajo);
+
+    th {
+      padding: var(--space-4) var(--space-6);
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      color: var(--color-en-secundario-contenedor);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+  }
+
+  tbody {
+    tr {
+      transition: background-color var(--duration-fast) var(--ease-standard);
+
+      &:hover { background: var(--color-table-row-hover); }
+    }
+
+    tr + tr {
+      border-top: 1px solid var(--color-pizarra-50);
+    }
+
+    td {
+      padding: var(--space-4) var(--space-6);
+      color: var(--color-en-superficie);
+    }
+  }
+
+  tfoot {
+    background: var(--color-superficie-contenedor-mas-bajo);
+    border-top: 2px solid var(--color-superficie-variante);
+
+    td {
+      padding: var(--space-3) var(--space-6);
+    }
+  }
+}
+
+.acta-detail__insumo-codigo {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-xs);
+}
+
+.text-center { text-align: center; }
+.text-right  { text-align: right; }
+
+.acta-detail__total-label {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-en-secundario-contenedor);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.acta-detail__total-value {
+  font-size: var(--font-size-md);
+  font-weight: 500;
+  color: var(--color-en-superficie);
+}
+
+.acta-detail__total-row {
+  background: rgba(57, 169, 0, 0.05);
+}
+
+.acta-detail__grand-total-label {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-primario);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.acta-detail__grand-total-value {
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  color: var(--color-primario);
+}
+
+.acta-detail__compromiso-fecha {
+  color: var(--color-en-secundario-contenedor);
+}
+
+// ── Firmas ─────────────────────────────────────────────────────────────────────
+.acta-detail__firmas-section {
+  padding-top: var(--space-12);
+  margin-top: var(--space-12);
+  border-top: 1px solid var(--color-pizarra-100);
+}
+
+.acta-detail__firmas-title {
+  font-family: var(--font-family-headline);
+  font-weight: 700;
+  font-size: var(--font-size-lg);
+  color: var(--color-en-superficie);
+  text-align: center;
+  margin: 0 0 var(--space-10);
+}
+
+.acta-detail__firmas-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-12) var(--space-16);
+  max-width: 48rem;
+  margin: 0 auto;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.acta-detail__firma-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.acta-detail__firma-line {
+  width: 100%;
+  height: 4rem;
+  border-bottom: 2px dashed var(--color-pizarra-300);
+  margin-bottom: var(--space-2);
+}
+
+.acta-detail__firma-nombre {
+  font-family: var(--font-family-base);
+  font-weight: 700;
+  font-size: var(--font-size-md);
+  color: var(--color-en-superficie);
+  text-align: center;
+}
+
+.acta-detail__firma-cargo {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  color: var(--color-en-secundario-contenedor);
+  text-align: center;
+}
+
+// ── Responsive ─────────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .acta-detail__topbar {
+    padding: 0 var(--space-4);
+    flex-wrap: wrap;
+    height: auto;
+    padding-top: var(--space-3);
+    padding-bottom: var(--space-3);
+    gap: var(--space-3);
+  }
+
+  .acta-detail__paper {
+    padding: var(--space-6) var(--space-4);
+    min-height: auto;
+  }
+
+  .acta-detail__action-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .acta-detail__action-bar-right {
+    flex-wrap: wrap;
+  }
+}

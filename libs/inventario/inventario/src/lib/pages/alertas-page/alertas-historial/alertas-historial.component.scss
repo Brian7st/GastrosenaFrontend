@@ -1,0 +1,354 @@
+/* ==========================================================================
+   Historial de Gestión de Alertas
+   ========================================================================== */
+
+$primary:         #006e25;
+$primary-light:   #28a745;
+$surface:         #f8f9fa;
+$surface-low:     #f3f4f5;
+$surface-high:    #e7e8e9;
+$surface-highest: #e1e3e4;
+$on-surface:      #191c1d;
+$on-surface-var:  #3e4a3c;
+$tertiary:        #ba1830;
+$orange:          #f97316;
+$yellow:          #eab308;
+
+.page-container {
+  padding: 0;
+  min-height: 100%;
+  background: $surface;
+}
+
+// ── Action Header (patrón Kardex) ──────────────────────────────────────────
+.action-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 2rem 2rem 1.5rem;
+  flex-wrap: wrap;
+
+  .header-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background: $surface-high;
+  border: none;
+  color: $on-surface;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  margin-top: 0.375rem;
+
+  &:hover { background: $surface-highest; }
+}
+
+.breadcrumb-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: $on-surface-var;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.375rem;
+
+  .active { color: $on-surface; }
+}
+
+.page-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: $on-surface;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.25rem;
+}
+
+.page-subtitle {
+  font-size: 0.875rem;
+  color: $on-surface-var;
+  margin: 0;
+}
+
+// ── Table section ──────────────────────────────────────────────────────────
+.table-section {
+  padding: 0 2rem 2rem;
+}
+
+// ── Custom header dentro del DataTable (dtHeader) ──────────────────────────
+.dt-header-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba($surface-highest, 0.6);
+  gap: 1rem;
+  flex-wrap: wrap;
+
+  .title-group {
+    h2 {
+      font-family: 'Manrope', sans-serif;
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: $on-surface;
+      margin: 0;
+    }
+    p {
+      font-size: 0.8125rem;
+      color: $on-surface-var;
+      margin: 0.25rem 0 0;
+    }
+  }
+
+  .action-group {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    flex-wrap: wrap;
+  }
+}
+
+// ── Filtros ─────────────────────────────────────────────────────────────────
+.filter-select-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.filter-icon {
+  position: absolute;
+  left: 0.625rem;
+  font-size: 1rem;
+  color: $on-surface-var;
+  pointer-events: none;
+}
+
+.filter-select {
+  background: $surface-low;
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.5rem 1rem 0.5rem 2rem;
+  font-size: 0.875rem;
+  color: $on-surface;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  padding-right: 1.5rem;
+
+  &:focus { box-shadow: 0 0 0 2px rgba($primary-light, 0.4); }
+}
+
+.control-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: linear-gradient(135deg, $primary 0%, $primary-light 100%);
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba($primary, 0.25);
+  transition: opacity 0.2s;
+
+  .material-symbols-outlined { font-size: 1rem; }
+  &:hover { opacity: 0.9; }
+}
+
+// ── Table rows (hover) ─────────────────────────────────────────────────────
+.table-row {
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover { background: $surface-low !important; }
+}
+
+.td-empty {
+  text-align: center;
+  padding: 2rem;
+  color: $on-surface-var;
+  font-size: 0.875rem;
+}
+
+// ── Bien cell ──────────────────────────────────────────────────────────────
+.bien-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  &__icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.5rem;
+    background: white;
+    border: 1px solid rgba($surface-highest, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $on-surface-var;
+    flex-shrink: 0;
+
+    .material-symbols-outlined { font-size: 1.25rem; }
+  }
+
+  &__nombre {
+    font-weight: 600;
+    color: $on-surface;
+    margin: 0 0 0.125rem;
+    font-size: 0.9375rem;
+  }
+
+  &__lote {
+    font-size: 0.75rem;
+    color: $on-surface-var;
+    margin: 0;
+  }
+}
+
+// ── Priority badge ─────────────────────────────────────────────────────────
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+
+  &--critico { background: rgba($tertiary, 0.12); color: $tertiary; }
+  &--alto    { background: rgba($orange, 0.12);   color: $orange; }
+  &--medio   { background: rgba($yellow, 0.15);   color: #886600; }
+  &--bajo    { background: rgba($primary, 0.1);   color: $primary; }
+}
+
+// ── Accion badge ───────────────────────────────────────────────────────────
+.accion-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+
+  &--entrada  { background: rgba($primary, 0.08); color: #00531a; border-color: rgba($primary, 0.2); }
+  &--gil      { background: rgba($surface-highest, 0.5); color: $on-surface-var; border-color: rgba($surface-highest, 0.8); }
+  &--revisada { background: $surface-high; color: $on-surface; border-color: rgba($surface-highest, 0.6); }
+
+  &__icon { font-size: 0.875rem; }
+}
+
+// ── Responsable cell ───────────────────────────────────────────────────────
+.responsable-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+
+  &__avatar {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, $primary 0%, $primary-light 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  &__nombre {
+    font-weight: 500;
+    color: $on-surface;
+    font-size: 0.875rem;
+  }
+}
+
+// ── Referencia link ────────────────────────────────────────────────────────
+.ref-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: $primary;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: rgba($primary, 0.3);
+  text-underline-offset: 2px;
+  transition: color 0.15s;
+
+  &:hover { color: #004d1a; }
+  &__icon { font-size: 1rem; }
+}
+
+// ── Fecha cell ─────────────────────────────────────────────────────────────
+.fecha-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  &__date {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $on-surface;
+  }
+
+  &__hora {
+    font-size: 0.75rem;
+    color: $on-surface-var;
+    margin-top: 0.125rem;
+  }
+}
+
+// ── Paginación (dtFooter) ──────────────────────────────────────────────────
+.dt-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid rgba($surface-highest, 0.6);
+
+  &__info {
+    font-size: 0.875rem;
+    color: $on-surface-var;
+  }
+
+  &__btns { display: flex; gap: 0.375rem; }
+
+  &__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+    border: none;
+    background: transparent;
+    color: $on-surface-var;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    .material-symbols-outlined { font-size: 1rem; }
+    &:hover:not(:disabled) { background: $surface-high; }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+  }
+}

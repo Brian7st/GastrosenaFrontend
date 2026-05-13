@@ -1,9 +1,15 @@
 import { Routes } from '@angular/router';
-import { RestaurantePageComponent } from './ui/restaurante-page.component';
+import { MesasPageComponent } from './pages/mesas-page/mesas-page.component';
 
 export const RESTAURANTE_ROUTES: Routes = [
   {
     path: '',
-    component: RestaurantePageComponent,
+    pathMatch: 'full',
+    redirectTo: 'mesas'
+  },
+  {
+    path: 'mesas',
+    component: MesasPageComponent,
   },
 ];
+

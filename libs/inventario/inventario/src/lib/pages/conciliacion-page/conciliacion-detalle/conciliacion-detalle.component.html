@@ -1,0 +1,165 @@
+<div class="page-container">
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       HEADER
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="header-section">
+    <div class="header-top">
+      <div class="title-group">
+        <button class="back-btn" routerLink="../historial">
+          <lucide-icon name="arrow-left" [size]="24"></lucide-icon>
+        </button>
+        <h1 class="page-title">Detalle de Conciliación</h1>
+      </div>
+      <restaurant-button variant="primary">
+        <div class="btn-icon-text">
+          <lucide-icon name="download" [size]="18"></lucide-icon>
+          Exportar Acta
+        </div>
+      </restaurant-button>
+    </div>
+
+    <div class="info-badges-row">
+      <div class="info-badge">
+        <lucide-icon name="hash" [size]="14"></lucide-icon>
+        <span>ID #{{ detalle.id }}</span>
+      </div>
+      <div class="info-badge">
+        <lucide-icon name="calendar" [size]="14"></lucide-icon>
+        <span>{{ detalle.fecha }}</span>
+      </div>
+      <div class="info-badge">
+        <lucide-icon name="user" [size]="14"></lucide-icon>
+        <span>{{ detalle.responsable }} (Resp.)</span>
+      </div>
+      <div class="info-badge">
+        <lucide-icon name="box" [size]="14"></lucide-icon>
+        <span>{{ detalle.almacen }}</span>
+      </div>
+    </div>
+
+    <div class="status-badge">
+      <span>{{ detalle.estado }}</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       KPI ROW (5 CARDS)
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-card-header">
+        <lucide-icon name="layout-list" [size]="16"></lucide-icon>
+        <span class="kpi-card-title">Total ítems</span>
+      </div>
+      <span class="kpi-card-value">{{ detalle.totalItems }}</span>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-card-header">
+        <lucide-icon name="check-circle-2" [size]="16" class="text-success"></lucide-icon>
+        <span class="kpi-card-title">Ítems correctos</span>
+      </div>
+      <span class="kpi-card-value">{{ detalle.itemsCorrectos }}</span>
+    </div>
+
+    <div class="kpi-card kpi-card--danger-border">
+      <div class="kpi-card-header">
+        <lucide-icon name="alert-triangle" [size]="16" class="text-danger"></lucide-icon>
+        <span class="kpi-card-title">Diferencias</span>
+      </div>
+      <span class="kpi-card-value text-danger">{{ detalle.diferencias }}</span>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-card-header">
+        <lucide-icon name="target" [size]="16"></lucide-icon>
+        <span class="kpi-card-title">Precisión</span>
+      </div>
+      <span class="kpi-card-value">{{ detalle.precision }}%</span>
+    </div>
+
+    <div class="kpi-card kpi-card--danger-outline">
+      <div class="kpi-card-header">
+        <lucide-icon name="trending-down" [size]="16" class="text-danger"></lucide-icon>
+        <span class="kpi-card-title">Valoración monetaria</span>
+      </div>
+      <span class="kpi-card-value text-danger">-${{ (detalle.valoracionMonetaria * -1) | number }}</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       TABLE SECTION
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="table-section">
+    <div class="table-header">
+      <h2 class="section-title">Detalle de Diferencias</h2>
+      <button class="filter-btn">
+        <lucide-icon name="filter" [size]="18"></lucide-icon>
+      </button>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="dif-table">
+        <thead>
+          <tr>
+            <th>BIEN</th>
+            <th>CATEGORÍA</th>
+            <th class="text-right">STOCK SIS.</th>
+            <th class="text-right">FÍSICO</th>
+            <th class="text-center">DIF.</th>
+            <th class="text-right">VALOR UNIT.</th>
+            <th class="text-right">IMPACTO $</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of diferenciasList; track item.codigo) {
+            <tr>
+              <td>
+                <div class="bien-info">
+                  <!-- Using an icon to represent the image placeholder in prototype -->
+                  <div class="bien-icon">
+                    <lucide-icon name="package" [size]="20"></lucide-icon>
+                  </div>
+                  <div class="bien-text">
+                    <span class="bien-name">{{ item.producto }}</span>
+                    <span class="bien-code">{{ item.codigo }}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="text-secondary">{{ item.categoria }}</td>
+              <td class="text-right text-secondary">{{ item.stockSis }}</td>
+              <td class="text-right font-bold">{{ item.fisico }}</td>
+              <td class="text-center">
+                <span class="dif-badge" [ngClass]="item.isPositive ? 'dif-badge--pos' : 'dif-badge--neg'">
+                  {{ item.dif }}
+                </span>
+              </td>
+              <td class="text-right text-secondary">${{ item.valorUnit | number }}</td>
+              <td class="text-right font-bold" [ngClass]="item.isPositive ? 'text-success' : 'text-danger'">
+                {{ item.impacto > 0 ? '+' : '' }}${{ (item.impacto < 0 ? (item.impacto * -1) : item.impacto) | number }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <!-- TABLE FOOTER AGGREGATES -->
+      <div class="table-aggregates">
+        <div class="aggregate-group">
+          <span class="aggregate-label">Σ PÉRDIDAS</span>
+          <span class="aggregate-value text-danger">-${{ (detalle.perdidas * -1) | number }}</span>
+        </div>
+        <div class="aggregate-group">
+          <span class="aggregate-label">Σ SOBRANTES</span>
+          <span class="aggregate-value text-success">+${{ detalle.sobrantes | number }}</span>
+        </div>
+        <div class="aggregate-neto">
+          <span class="aggregate-label">NETO</span>
+          <span class="aggregate-value text-danger">-${{ (detalle.valoracionMonetaria * -1) | number }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

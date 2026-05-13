@@ -42,9 +42,9 @@
 
 /* ── Card Container (tabla envuelta) ───────────────────────────────────────── */
 .card-container {
-  background: white;
-  border-radius: 1.5rem;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+  background: var(--color-superficie-contenedor-mas-bajo);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-subtle);
   overflow: hidden;
 }
 
@@ -129,7 +129,7 @@
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  text-align: left;
+  text-align: center;
 
   th {
     padding: 1rem 0.75rem;
@@ -345,48 +345,16 @@
   }
 }
 
-/* ── KPI Grid layout (host styles for the grid wrapper) ───────────────────── */
+/* ── KPI Grid layout ───────────────────────────────────────────────────────── */
 .kpi-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.5rem;
-  margin-top: 3rem;
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
 
   @media (min-width: 768px) {
     grid-template-columns: repeat(3, 1fr);
   }
-}
-
-/* ── FAB ───────────────────────────────────────────────────────────────────── */
-.fab {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #006e25 0%, #28a745 100%);
-  color: white;
-  border: none;
-  box-shadow: 0 8px 24px rgba(0, 110, 37, 0.35);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 50;
-  transition: transform 0.2s, box-shadow 0.2s;
-
-  .material-symbols-outlined {
-    font-size: 28px;
-    transition: transform 0.3s;
-  }
-
-  &:hover {
-    transform: scale(1.1);
-
-    .material-symbols-outlined { transform: rotate(90deg); }
-  }
-  &:active { transform: scale(0.95); }
 }
 
 /* ── Material Symbols helper ───────────────────────────────────────────────── */

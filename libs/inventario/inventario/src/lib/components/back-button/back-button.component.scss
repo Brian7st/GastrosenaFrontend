@@ -1,0 +1,35 @@
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-contorno-variante);
+  background: var(--color-superficie-contenedor-mas-bajo);
+  color: var(--color-en-fondo);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard);
+
+  .material-symbols-outlined {
+    font-size: 20px;
+    line-height: 1;
+  }
+
+  &:hover {
+    background: var(--color-superficie-contenedor-alto);
+    box-shadow: var(--shadow-xs);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+
+  &:active {
+    background: var(--color-superficie-contenedor-mas-alto);
+  }
+}

@@ -2,9 +2,9 @@
   <!-- Header Section -->
   <header class="page-header">
     <div class="page-header__left">
+      <inventario-back-button (clicked)="goBack()" />
       <nav class="breadcrumb">
         <ol>
-
           <li><a routerLink="/app/inventario/facturas">Facturas</a></li>
           <li class="separator"><span class="material-symbols-outlined">chevron_right</span></li>
           <li class="current">FEL</li>
@@ -187,7 +187,7 @@
               <p class="font-bold"><span class="material-symbols-outlined">payments</span> $1,011,047.00</p>
             </div>
 
-            <button class="linked-btn group">
+            <button class="linked-btn group" (click)="onVerGil('GIL-F-014-001')">
               Ver GIL completo
               <span class="material-symbols-outlined group-hover-translate">arrow_right_alt</span>
             </button>

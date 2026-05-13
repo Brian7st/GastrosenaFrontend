@@ -14,6 +14,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Page Header & Breadcrumb
 // ─────────────────────────────────────────────────────────────────────────────
+
 .page-header {
   display: flex;
   flex-direction: column;
@@ -324,6 +325,14 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Table Adjustments
 // ─────────────────────────────────────────────────────────────────────────────
+
+// Centrar encabezados de columna dentro del bento-card de artículos
+.bento-card {
+  thead th {
+    text-align: center;
+  }
+}
+
 .row-highlight-tertiary {
   background-color: rgba(var(--color-terciario-contenedor-rgb, 255, 85, 95), 0.05);
 }

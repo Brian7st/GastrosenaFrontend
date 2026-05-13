@@ -1,0 +1,236 @@
+// ── Actas — Modal de Carga de Acta Firmada ──────────────────────────────────────
+// Glassmorphism overlay pattern (Precision Ledger)
+
+.acta-upload__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-backdrop);
+  backdrop-filter: blur(6px);
+  padding: var(--space-4);
+}
+
+.acta-upload__modal {
+  background: var(--color-superficie-contenedor-mas-bajo);
+  border-radius: 1.5rem;
+  padding: var(--space-8) var(--space-10);
+  width: 100%;
+  max-width: 36rem;
+  box-shadow: 0 16px 48px -12px rgba(25, 28, 29, 0.15);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+// ── Close ──────────────────────────────────────────────────────────────────────
+.acta-upload__close {
+  position: absolute;
+  top: var(--space-6);
+  right: var(--space-6);
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-standard),
+              color var(--duration-fast) var(--ease-standard);
+
+  &:hover {
+    background: var(--color-superficie-contenedor);
+    color: var(--color-en-superficie);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+}
+
+// ── Header ─────────────────────────────────────────────────────────────────────
+.acta-upload__header {
+  margin-bottom: var(--space-8);
+}
+
+.acta-upload__header-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  background: var(--color-superficie-contenedor-alto);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primario);
+  margin-bottom: var(--space-6);
+}
+
+.acta-upload__title {
+  font-family: var(--font-family-headline);
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-en-superficie);
+  margin: 0 0 var(--space-2);
+}
+
+.acta-upload__description {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+// ── Dropzone ───────────────────────────────────────────────────────────────────
+.acta-upload__dropzone {
+  border: 1.5px dashed rgba(189, 202, 185, 0.6);
+  background: var(--color-superficie-contenedor-bajo);
+  border-radius: var(--radius-lg);
+  padding: var(--space-10);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color var(--duration-base) var(--ease-standard),
+              border-color var(--duration-base) var(--ease-standard);
+
+  &:hover {
+    background: var(--color-superficie-contenedor);
+  }
+
+  &--active {
+    border-color: var(--color-primario);
+    background: rgba(57, 169, 0, 0.05);
+  }
+}
+
+.acta-upload__dropzone-icon {
+  width: 4rem;
+  height: 4rem;
+  background: var(--color-superficie-contenedor-mas-bajo);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primario);
+  opacity: 0.8;
+  margin-bottom: var(--space-4);
+  box-shadow: var(--shadow-xs);
+  transition: transform var(--duration-slow) var(--ease-standard);
+
+  .acta-upload__dropzone:hover & {
+    transform: scale(1.05);
+  }
+}
+
+.acta-upload__dropzone-title {
+  font-family: var(--font-family-headline);
+  font-weight: 600;
+  font-size: var(--font-size-md);
+  color: var(--color-en-superficie);
+  margin: 0 0 var(--space-1);
+}
+
+.acta-upload__dropzone-subtitle {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-4);
+}
+
+.acta-upload__dropzone-formats {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.acta-upload__format-tag {
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-superficie-contenedor-alto);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+// ── Footer ─────────────────────────────────────────────────────────────────────
+.acta-upload__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-10);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-superficie-contenedor);
+}
+
+.acta-upload__btn-cancel {
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-pill);
+  border: none;
+  background: transparent;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-en-superficie);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+
+  &:hover { background: var(--color-superficie-contenedor); }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+}
+
+.acta-upload__btn-confirm {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-8);
+  border-radius: var(--radius-pill);
+  border: none;
+  background: linear-gradient(135deg, var(--color-primario), var(--color-primario-gradient-end));
+  color: var(--color-en-primario);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-primary);
+  transition: box-shadow var(--duration-fast) var(--ease-standard),
+              transform var(--duration-fast) var(--ease-standard);
+
+  &:hover {
+    box-shadow: var(--shadow-primary-hover);
+    transform: translateY(-2px);
+  }
+
+  &:active { transform: translateY(0); }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+}
+
+// ── Responsive ─────────────────────────────────────────────────────────────────
+@media (max-width: 576px) {
+  .acta-upload__modal {
+    padding: var(--space-6);
+    border-radius: var(--radius-xl);
+  }
+
+  .acta-upload__dropzone {
+    padding: var(--space-6);
+  }
+}

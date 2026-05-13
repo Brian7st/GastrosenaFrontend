@@ -1,0 +1,119 @@
+<!-- ── Page Header ─────────────────────────────────────────────────── -->
+<div class="actas-page">
+  <div class="actas-page__header">
+    <div class="actas-page__header-text">
+      <p class="actas-page__overline">Registro Documental</p>
+      <h1 class="actas-page__title">Listado General de Actas de Legalización</h1>
+    </div>
+    <button class="actas-page__btn-nueva" (click)="crearActa()">
+      <lucide-icon name="plus" [size]="16"></lucide-icon>
+      Nueva Acta
+    </button>
+  </div>
+
+  <!-- ── Filtros ────────────────────────────────────────────────────── -->
+  <div class="actas-page__filters">
+    <div class="actas-page__filter-select">
+      <select (change)="onEstadoChange($event)">
+        <option value="">Todos los Estados</option>
+        <option value="borrador">Borrador</option>
+        <option value="pendiente">Pendiente Firmas</option>
+        <option value="firmada">Firmada</option>
+        <option value="revisada">Revisada</option>
+        <option value="archivada">Archivada</option>
+      </select>
+      <lucide-icon name="chevron-down" [size]="14" class="actas-page__filter-chevron"></lucide-icon>
+    </div>
+
+    <div class="actas-page__filter-search">
+      <lucide-icon name="search" [size]="14" class="actas-page__filter-search-icon"></lucide-icon>
+      <input
+        type="text"
+        placeholder="Buscar Instructor..."
+        (input)="onSearch($event)"
+      />
+    </div>
+
+    <div class="actas-page__filter-date">
+      <lucide-icon name="calendar" [size]="14" class="actas-page__filter-date-icon"></lucide-icon>
+      <input type="date" />
+      <span class="actas-page__filter-date-separator">-</span>
+      <input type="date" />
+    </div>
+
+    <div class="actas-page__filter-ficha">
+      <input
+        type="text"
+        placeholder="Ficha..."
+        (input)="onFichaChange($event)"
+      />
+    </div>
+
+    <button class="actas-page__filter-clear" (click)="limpiarFiltros()">
+      <lucide-icon name="filter-x" [size]="14"></lucide-icon>
+      Limpiar Filtros
+    </button>
+  </div>
+
+  <!-- ── Tabla de Actas ─────────────────────────────────────────────── -->
+  <restaurant-data-table>
+    <thead>
+      <tr>
+        <th>Consecutivo</th>
+        <th>Fecha Taller</th>
+        <th>Ficha / Programa</th>
+        <th>Chef / Instructor</th>
+        <th>Requisición</th>
+        <th class="text-center">Estado</th>
+        <th class="text-center">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (acta of filteredActas(); track acta.id) {
+        <tr class="actas-table__row" (click)="irADetalle(acta.id)">
+          <td>
+            <span class="actas-table__consecutivo">{{ acta.consecutivo }}</span>
+          </td>
+          <td class="actas-table__fecha">{{ acta.fechaTaller }}</td>
+          <td>
+            <p class="actas-table__programa">{{ acta.programa }}</p>
+            <p class="actas-table__ficha">Ficha {{ acta.ficha }}</p>
+          </td>
+          <td>
+            <div class="actas-table__instructor">
+              <div class="actas-table__instructor-avatar">
+                <lucide-icon name="user" [size]="14"></lucide-icon>
+              </div>
+              {{ acta.instructor }}
+            </div>
+          </td>
+          <td class="actas-table__requisicion">{{ acta.requisicion }}</td>
+          <td class="text-center">
+            <restaurant-status-badge
+              [label]="getEstadoLabel(acta.estado)"
+              [variant]="getEstadoVariant(acta.estado)"
+            ></restaurant-status-badge>
+          </td>
+          <td class="text-center">
+            <div class="actas-table__actions">
+              <button
+                class="actas-table__action-btn"
+                title="Ver Acta"
+                (click)="irADetalle(acta.id); $event.stopPropagation()"
+              >
+                <lucide-icon name="eye" [size]="16"></lucide-icon>
+              </button>
+              <button
+                class="actas-table__action-btn"
+                title="Exportar PDF"
+                (click)="$event.stopPropagation()"
+              >
+                <lucide-icon name="download" [size]="16"></lucide-icon>
+              </button>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </restaurant-data-table>
+</div>

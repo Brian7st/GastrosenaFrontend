@@ -9,9 +9,7 @@
   <!-- ── PAGE HEADER ── -->
   <div class="page-header">
     <div class="page-header__left">
-      <button class="back-btn" (click)="onVolver()">
-        <span class="material-symbols-outlined">arrow_back</span>
-      </button>
+      <inventario-back-button (clicked)="onVolver()" />
       <div>
         <div class="page-header__breadcrumb">
           <span>SENA FEL</span>
@@ -106,7 +104,7 @@
         <span class="material-symbols-outlined">table_rows</span>
         <h3>Detalle de Productos/Servicios</h3>
       </div>
-      <button class="btn btn--add-item" *ngIf="!isBlocked()">
+      <button class="btn btn--add-item" *ngIf="!isBlocked()" (click)="onAgregarItem()">
         <span class="material-symbols-outlined">add_circle</span>
         Agregar Ítem
       </button>
@@ -125,24 +123,57 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of f.items">
-            <td class="td--num">{{ item.cantidad }}</td>
-            <td>{{ item.descripcion }}</td>
-            <td class="td--currency">{{ formatMoney(item.precioUnitario, f.moneda) }}</td>
+          <tr *ngFor="let item of localItems(); let i = index">
+            <td class="td--num">
+              <input *ngIf="!isBlocked(); else showCantidad"
+                class="td-input td-input--num"
+                type="number" min="1"
+                [ngModel]="item.cantidad"
+                (ngModelChange)="onItemChange(i, 'cantidad', +$event)"
+              />
+              <ng-template #showCantidad>{{ item.cantidad }}</ng-template>
+            </td>
+            <td>
+              <input *ngIf="!isBlocked(); else showDesc"
+                class="td-input td-input--desc"
+                type="text"
+                [ngModel]="item.descripcion"
+                (ngModelChange)="onItemChange(i, 'descripcion', $event)"
+                placeholder="Descripción del producto..."
+              />
+              <ng-template #showDesc>{{ item.descripcion }}</ng-template>
+            </td>
+            <td class="td--currency">
+              <input *ngIf="!isBlocked(); else showPrecio"
+                class="td-input td-input--num"
+                type="number" min="0"
+                [ngModel]="item.precioUnitario"
+                (ngModelChange)="onItemChange(i, 'precioUnitario', +$event)"
+              />
+              <ng-template #showPrecio>{{ formatMoney(item.precioUnitario, f.moneda) }}</ng-template>
+            </td>
             <td class="td--iva">
-              <div class="iva-select">
-                {{ item.iva }}%
-                <span class="material-symbols-outlined" *ngIf="!isBlocked()">expand_more</span>
+              <div class="iva-select" *ngIf="!isBlocked(); else showIva">
+                <select
+                  [ngModel]="item.iva"
+                  (ngModelChange)="onItemChange(i, 'iva', +$event)"
+                >
+                  <option [value]="0">0%</option>
+                  <option [value]="5">5%</option>
+                  <option [value]="19">19%</option>
+                </select>
+                <span class="material-symbols-outlined">expand_more</span>
               </div>
+              <ng-template #showIva>{{ item.iva }}%</ng-template>
             </td>
             <td class="td--currency td--bold">{{ formatMoney(item.total, f.moneda) }}</td>
             <td *ngIf="!isBlocked()">
-              <button class="icon-btn icon-btn--danger">
+              <button class="icon-btn icon-btn--danger" (click)="onEliminarItem(i)">
                 <span class="material-symbols-outlined">delete</span>
               </button>
             </td>
           </tr>
-          <tr *ngIf="f.items.length === 0">
+          <tr *ngIf="localItems().length === 0">
             <td [attr.colspan]="isBlocked() ? 5 : 6" class="empty-row">
               Sin ítems registrados
             </td>

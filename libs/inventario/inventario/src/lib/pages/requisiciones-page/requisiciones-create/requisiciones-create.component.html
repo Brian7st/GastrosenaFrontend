@@ -1,0 +1,215 @@
+<div class="page-container">
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       CONTEXT BAR
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="context-bar">
+    <div class="context-bar__item">
+      <lucide-icon name="tag" [size]="16"></lucide-icon>
+      <span class="context-bar__label">Ficha 2501234 — Gastronomía</span>
+    </div>
+    <div class="context-bar__divider"></div>
+    <div class="context-bar__item">
+      <lucide-icon name="calendar" [size]="16"></lucide-icon>
+      <span>Octubre 24, 2026</span>
+    </div>
+    <div class="context-bar__divider"></div>
+    <div class="context-bar__item">
+      <lucide-icon name="clock" [size]="16"></lucide-icon>
+      <span>07:00 - 12:00</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       HEADER & SEARCH
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="create-header">
+    <div style="display: flex; justify-content: flex-start; margin-bottom: var(--space-6);">
+      <button class="btn-outline" routerLink="/app/inventario/requisiciones" style="display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-4); border-radius: var(--radius-lg); border: 1px solid var(--color-contorno); background: transparent; color: var(--color-en-superficie); font-weight: 700; font-size: var(--font-size-sm); cursor: pointer;">
+        <lucide-icon name="arrow-left" [size]="18"></lucide-icon>
+        Volver a la Bandeja
+      </button>
+    </div>
+
+    <h1 class="page-title">Nueva Requisición de Insumos</h1>
+    <p class="page-subtitle">Seleccione los productos necesarios para su práctica formativa</p>
+
+    <div class="search-bar">
+      <lucide-icon name="search" [size]="20" class="search-bar__icon"></lucide-icon>
+      <input class="search-bar__input" type="text" placeholder="Buscador de catálogo central (Ej: Harina, Aceite, Pollo...)"/>
+      <button class="search-bar__filter-btn">
+        <lucide-icon name="filter" [size]="16"></lucide-icon>
+        Filtros
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       CATEGORY ACCORDIONS
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="category-list">
+
+    <!-- Category 1: Abarrotes (Expanded) -->
+    <div class="category-accordion category-accordion--open">
+      <button class="category-accordion__header" (click)="toggleCategory('abarrotes')">
+        <div class="category-accordion__title-group">
+          <div class="category-accordion__icon">
+            <lucide-icon name="package" [size]="20"></lucide-icon>
+          </div>
+          <div>
+            <h3 class="category-accordion__title">Abarrotes</h3>
+            <p class="category-accordion__subtitle">Granos, aceites, harinas y enlatados</p>
+          </div>
+        </div>
+        <lucide-icon name="chevron-down" [size]="24" class="category-accordion__chevron"></lucide-icon>
+      </button>
+
+      <div class="category-accordion__body">
+        <div class="product-grid">
+
+          <!-- Critical Item: Aceite de Oliva -->
+          <div class="product-card product-card--critical">
+            <div class="product-card__content">
+              <div class="product-card__img-wrapper">
+                <img alt="Aceite de Oliva" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDz5odEdf2MHXYYWdfoNqNJ3cc1juNPk4ScYIFlUE0kXm-yyZcWOmA5vLQixUlgpSx7ftw9as2SmdDYKTjdtDepdMMrkKBMc8nEur8P7enlC2UR6KD61gUfytkT1ri388SylO4S4WRU_kY8jA8VIytosh7naFNsW00P1zI4FvSJ3nNl6E9Xhfzo5TVZ_Yot8LSQCy3nB-6lq-At2wj5im77z-vZp-YayG_iSkKDwxVDQwxmNScEP2Sxclv4ujbngQFbeOGVhMFizeEI"/>
+              </div>
+              <div class="product-card__info">
+                <div class="product-card__name-row">
+                  <h4 class="product-card__name">Aceite de Oliva</h4>
+                  <span class="product-card__tag product-card__tag--critical">CRÍTICO</span>
+                </div>
+                <p class="product-card__unit">Botella x 500ml</p>
+                <div class="product-card__qty-row">
+                  <div class="product-card__qty-controls">
+                    <button class="qty-btn qty-btn--minus">-</button>
+                    <input class="qty-input" type="number" value="5"/>
+                    <button class="qty-btn qty-btn--plus">+</button>
+                  </div>
+                  <span class="product-card__qty-label">Cant. a pedir</span>
+                </div>
+              </div>
+            </div>
+            <div class="product-card__alert">
+              <lucide-icon name="alert-triangle" [size]="14"></lucide-icon>
+              Stock Insuficiente. Solo hay 2 unidades en bodega
+            </div>
+          </div>
+
+          <!-- Regular Item: Arroz -->
+          <div class="product-card">
+            <div class="product-card__content">
+              <div class="product-card__img-wrapper">
+                <img alt="Arroz Blanco" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASZJggpzB7RaxQNj7efZQA1WnbuWPnaO2oNd-SQUsNAMbBRxvgA6e39DH8nJw0khS9o3pwHI1Sss5LGmM2ciuqU4HhoXSsCc_LJqtjPlCKATkftYmPGZNesGCUWbxwqaDwQgsbIZ-JkPW0MpQKrCpmBTphRN0zT49AEKeKmYgPWdvgbTdBDrv9nNWkVCDyAGhcrW7BPUKB5fSL4ubGLwo8dAB6Z059VTnWTUhimvNGTSx8r8iqKQIbTyiRIEvrdENNoB1JNz8EiPwK"/>
+              </div>
+              <div class="product-card__info">
+                <h4 class="product-card__name">Arroz Blanco Superior</h4>
+                <p class="product-card__unit">Bulto x 1kg</p>
+                <div class="product-card__qty-row">
+                  <div class="product-card__qty-controls">
+                    <button class="qty-btn qty-btn--minus">-</button>
+                    <input class="qty-input" type="number" value="12"/>
+                    <button class="qty-btn qty-btn--plus">+</button>
+                  </div>
+                  <span class="product-card__qty-label">Cant. a pedir</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Regular Item: Sal -->
+          <div class="product-card">
+            <div class="product-card__content">
+              <div class="product-card__img-wrapper">
+                <img alt="Sal Refinada" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGIPZ1n9IXHDEEGtnYTqdvEUZSijNdk4xtrjpHaf7JmZE0Qvb8rp-yh0sI1UjxRWfko46K0Dn5JJTGR6ccc5KGIUvYyOgO-IStuaDCKHGEULPBRzO_qeZwAJ7u1m8GIkvHRaO3bg99KnQPIHcVOorU_1ZHdzp37XjJUru6GMnJyZCJauIhVUmxLgBAxatJohVhwMIUhS2P5iAWgqTAHqVKwbF4m8yjGB95VVFmvKJPMFscAjfSzZdp4UgZ8x7Ooe58Vj2Mg0cn4fZ_"/>
+              </div>
+              <div class="product-card__info">
+                <h4 class="product-card__name">Sal Refinada</h4>
+                <p class="product-card__unit">Bolsa x 500g</p>
+                <div class="product-card__qty-row">
+                  <div class="product-card__qty-controls">
+                    <button class="qty-btn qty-btn--minus">-</button>
+                    <input class="qty-input" type="number" value="3"/>
+                    <button class="qty-btn qty-btn--plus">+</button>
+                  </div>
+                  <span class="product-card__qty-label">Cant. a pedir</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category 2: Lácteos (Collapsed) -->
+    <div class="category-accordion">
+      <button class="category-accordion__header" (click)="toggleCategory('lacteos')">
+        <div class="category-accordion__title-group">
+          <div class="category-accordion__icon category-accordion__icon--secondary">
+            <lucide-icon name="milk" [size]="20"></lucide-icon>
+          </div>
+          <div>
+            <h3 class="category-accordion__title">Lácteos</h3>
+            <p class="category-accordion__subtitle">Leche, quesos, yogur y huevos</p>
+          </div>
+        </div>
+        <lucide-icon name="chevron-down" [size]="24" class="category-accordion__chevron"></lucide-icon>
+      </button>
+    </div>
+
+    <!-- Category 3: Frutas y Vegetales (Collapsed) -->
+    <div class="category-accordion">
+      <button class="category-accordion__header" (click)="toggleCategory('frutas')">
+        <div class="category-accordion__title-group">
+          <div class="category-accordion__icon">
+            <lucide-icon name="apple" [size]="20"></lucide-icon>
+          </div>
+          <div>
+            <h3 class="category-accordion__title">Frutas y Vegetales</h3>
+            <p class="category-accordion__subtitle">Productos frescos del campo</p>
+          </div>
+        </div>
+        <lucide-icon name="chevron-down" [size]="24" class="category-accordion__chevron"></lucide-icon>
+      </button>
+    </div>
+
+    <!-- Category 4: Carnes/Pescados (Collapsed) -->
+    <div class="category-accordion">
+      <button class="category-accordion__header" (click)="toggleCategory('carnes')">
+        <div class="category-accordion__title-group">
+          <div class="category-accordion__icon category-accordion__icon--tertiary">
+            <lucide-icon name="beef" [size]="20"></lucide-icon>
+          </div>
+          <div>
+            <h3 class="category-accordion__title">Carnes / Pescados</h3>
+            <p class="category-accordion__subtitle">Proteínas frescas y procesadas</p>
+          </div>
+        </div>
+        <lucide-icon name="chevron-down" [size]="24" class="category-accordion__chevron"></lucide-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       STICKY SUMMARY BAR
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="summary-bar">
+    <div class="summary-bar__stats">
+      <div class="summary-bar__stat">
+        <span class="summary-bar__stat-label">Items</span>
+        <span class="summary-bar__stat-value">24</span>
+      </div>
+      <div class="summary-bar__stat-divider"></div>
+      <div class="summary-bar__stat">
+        <span class="summary-bar__stat-label">Alertas</span>
+        <span class="summary-bar__stat-value summary-bar__stat-value--alert">01</span>
+      </div>
+    </div>
+    <div class="summary-bar__message">
+      <lucide-icon name="info" [size]="14"></lucide-icon>
+      Acción Requerida: Validar Cantidad de Aceite
+    </div>
+    <button class="summary-bar__cta" routerLink="../requisiciones/resumen/nueva">
+      <span>Revisar Pedido</span>
+      <lucide-icon name="shopping-cart" [size]="20"></lucide-icon>
+    </button>
+  </div>
+</div>
