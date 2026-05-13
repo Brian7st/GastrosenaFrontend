@@ -296,7 +296,6 @@ export const INVENTARIO_ROUTES: Routes = [
       },
     ]
   },
-feat/inventario/paquete-probatorio
 
   // ── Paquete Probatorio ──────────────────────────────────────────────────
   {
@@ -341,5 +340,4 @@ feat/inventario/paquete-probatorio
       },
     ],
   },
- develop
 ];
