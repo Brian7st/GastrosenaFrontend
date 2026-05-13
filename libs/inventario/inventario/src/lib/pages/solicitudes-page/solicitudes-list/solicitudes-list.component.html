@@ -13,67 +13,47 @@
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════════════
-     KPI Grid — 4 tarjetas (del prototipo)
+     KPI Grid — 4 tarjetas con restaurant-kpi-card
 ══════════════════════════════════════════════════════════════════════════ -->
 <div class="kpi-grid">
 
-  <!-- KPI: Total -->
-  <div class="kpi-card kpi-card--green">
-    <div class="kpi-card__header">
-      <div class="kpi-icon kpi-icon--green">
-        <span class="material-symbols-outlined">analytics</span>
-      </div>
-      <span class="kpi-label-top">TOTAL</span>
-    </div>
-    <p class="kpi-value">{{ totalSolicitudes() }}</p>
-    <p class="kpi-desc">Total de solicitudes</p>
-  </div>
+  <restaurant-kpi-card
+    label="Total Solicitudes"
+    [value]="totalSolicitudes() | number"
+    icon="file-text"
+    iconColor="green"
+  />
 
-  <!-- KPI: Borradores -->
-  <div class="kpi-card kpi-card--slate">
-    <div class="kpi-card__header">
-      <div class="kpi-icon kpi-icon--slate">
-        <span class="material-symbols-outlined">edit_note</span>
-      </div>
-      <span class="kpi-label-top">BORRADORES</span>
-    </div>
-    <p class="kpi-value">{{ totalBorradores() }}</p>
-    <p class="kpi-desc">Pendientes por enviar</p>
-  </div>
+  <restaurant-kpi-card
+    label="Borradores"
+    [value]="totalBorradores() | number"
+    icon="pencil"
+    iconColor="blue"
+  />
 
-  <!-- KPI: En Trámite -->
-  <div class="kpi-card kpi-card--orange">
-    <div class="kpi-card__header">
-      <div class="kpi-icon kpi-icon--orange">
-        <span class="material-symbols-outlined">pending_actions</span>
-      </div>
-      <span class="kpi-label-top">EN TRÁMITE</span>
-    </div>
-    <p class="kpi-value">{{ enTramite() }}</p>
-    <p class="kpi-desc">Pendientes y validadas</p>
-  </div>
+  <restaurant-kpi-card
+    label="En Trámite"
+    [value]="enTramite() | number"
+    icon="clock"
+    iconColor="orange"
+  />
 
-  <!-- KPI: Finalizadas -->
-  <div class="kpi-card kpi-card--emerald">
-    <div class="kpi-card__header">
-      <div class="kpi-icon kpi-icon--emerald">
-        <span class="material-symbols-outlined">task_alt</span>
-      </div>
-      <span class="kpi-label-top">FINALIZADAS</span>
-    </div>
-    <p class="kpi-value">{{ finalizadas() }}</p>
-    <p class="kpi-desc">Aprobadas y procesadas</p>
-  </div>
+  <restaurant-kpi-card
+    label="Finalizadas"
+    [value]="finalizadas() | number"
+    icon="check-circle"
+    iconColor="green"
+  />
 
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════════════
      Tabla con filtros
 ══════════════════════════════════════════════════════════════════════════ -->
-<div class="card-container">
+<restaurant-data-table tableTitle="Solicitudes GIL-F-014" tableIcon="clipboard-list">
 
   <!-- Barra de filtros -->
-  <div class="table-controls">
+  <div dtHeader class="table-controls">
     <div class="filters-left">
 
       <!-- Filtro Estado -->
@@ -104,106 +84,99 @@
     <p class="results-count">Mostrando 1–{{ solicitudes().length }} de {{ totalSolicitudes() }} resultados</p>
   </div>
 
-  <!-- Tabla principal -->
-  <div class="table-scroll">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Código</th>
-          <th>Fecha Solicitud</th>
-          <th>Solicitante</th>
-          <th>Grupo / Ficha</th>
-          <th>Estado</th>
-          <th>Total</th>
-          <th class="text-right">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let s of solicitudes()" class="table-row">
+  <!-- Cabecera de tabla -->
+  <thead>
+    <tr>
+      <th>Código</th>
+      <th>Fecha Solicitud</th>
+      <th>Solicitante</th>
+      <th>Grupo / Ficha</th>
+      <th>Estado</th>
+      <th>Total</th>
+      <th class="text-right">Acciones</th>
+    </tr>
+  </thead>
 
-          <!-- Código -->
-          <td>
-            <span class="code-bold">{{ s.codigo }}</span>
-          </td>
+  <!-- Filas de datos -->
+  <tbody>
+    <tr *ngFor="let s of solicitudes()">
 
-          <!-- Fecha -->
-          <td class="text-secondary">{{ s.fecha }}</td>
+      <!-- Código -->
+      <td>
+        <span class="code-bold">{{ s.codigo }}</span>
+      </td>
 
-          <!-- Solicitante con avatar -->
-          <td>
-            <div class="solicitante-cell">
-              <div class="avatar" [ngClass]="'avatar--' + (s.avatarColor ?? 'slate')">
-                {{ getInitials(s.cuentadante) }}
-              </div>
-              <span class="solicitante-nombre">{{ s.cuentadante }}</span>
-            </div>
-          </td>
+      <!-- Fecha -->
+      <td class="text-secondary">{{ s.fecha }}</td>
 
-          <!-- Ficha / Grupo -->
-          <td class="text-secondary">{{ s.ficha }}</td>
+      <!-- Solicitante con avatar -->
+      <td>
+        <div class="solicitante-cell">
+          <div class="avatar" [ngClass]="'avatar--' + (s.avatarColor ?? 'slate')">
+            {{ getInitials(s.cuentadante) }}
+          </div>
+          <span class="solicitante-nombre">{{ s.cuentadante }}</span>
+        </div>
+      </td>
 
-          <!-- Estado badge -->
-          <td>
-            <span class="estado-badge"
-                  [ngClass]="{
-                    'estado-badge--borrador':  s.estado === 'Borrador',
-                    'estado-badge--pendiente': s.estado === 'Pendiente',
-                    'estado-badge--validado':  s.estado === 'Validado',
-                    'estado-badge--aprobado':  s.estado === 'Aprobado',
-                    'estado-badge--procesado': s.estado === 'Procesado'
-                  }">
-              {{ s.estado }}
-            </span>
-          </td>
+      <!-- Ficha / Grupo -->
+      <td class="text-secondary">{{ s.ficha }}</td>
 
-          <!-- Total COP -->
-          <td>
-            <span class="monto-text">{{ formatCOP(s.montoTotal ?? 0) }}</span>
-          </td>
+      <!-- Estado badge -->
+      <td>
+        <span class="estado-badge"
+              [ngClass]="{
+                'estado-badge--borrador':  s.estado === 'Borrador',
+                'estado-badge--pendiente': s.estado === 'Pendiente',
+                'estado-badge--validado':  s.estado === 'Validado',
+                'estado-badge--aprobado':  s.estado === 'Aprobado',
+                'estado-badge--procesado': s.estado === 'Procesado'
+              }">
+          {{ s.estado }}
+        </span>
+      </td>
 
-          <!-- Acciones: Ver · Editar · PDF · Eliminar -->
-          <td>
-            <div class="actions-row">
-              <button class="action-icon" [routerLink]="[s.id]" title="Ver Detalle">
-                <span class="material-symbols-outlined">visibility</span>
-              </button>
-              <button class="action-icon"
-                      [routerLink]="[s.id, 'editar']"
-                      [disabled]="!canEdit(s.estado)"
-                      title="Editar">
-                <span class="material-symbols-outlined"
-                      [class.opacity-40]="!canEdit(s.estado)">edit</span>
-              </button>
-              <button class="action-icon" (click)="onExportPdf(s.id)" title="Exportar PDF/DOCX">
-                <span class="material-symbols-outlined">picture_as_pdf</span>
-              </button>
-              <button class="action-icon action-icon--danger"
-                      (click)="onDelete(s)"
-                      title="Eliminar">
-                <span class="material-symbols-outlined">delete</span>
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+      <!-- Total COP -->
+      <td>
+        <span class="monto-text">{{ formatCOP(s.montoTotal ?? 0) }}</span>
+      </td>
+
+      <!-- Acciones: Ver · Editar · PDF · Eliminar -->
+      <td>
+        <div class="actions-row">
+          <button class="action-icon" [routerLink]="[s.id]" title="Ver Detalle">
+            <span class="material-symbols-outlined">visibility</span>
+          </button>
+          <button class="action-icon"
+                  [routerLink]="[s.id, 'editar']"
+                  [disabled]="!canEdit(s.estado)"
+                  title="Editar">
+            <span class="material-symbols-outlined"
+                  [class.opacity-40]="!canEdit(s.estado)">edit</span>
+          </button>
+          <button class="action-icon" (click)="onExportPdf(s.id)" title="Exportar PDF/DOCX">
+            <span class="material-symbols-outlined">picture_as_pdf</span>
+          </button>
+          <button class="action-icon action-icon--danger"
+                  (click)="onDelete(s)"
+                  title="Eliminar">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
+        </div>
+      </td>
+    </tr>
+  </tbody>
 
   <!-- Paginación -->
-  <div class="pagination-footer">
-    <button class="page-nav-btn">
-      <span class="material-symbols-outlined">chevron_left</span> Anterior
-    </button>
+  <div dtFooter class="pagination-footer">
     <div class="page-numbers">
       <button class="page-btn page-btn--active">1</button>
       <button class="page-btn">2</button>
       <button class="page-btn">3</button>
     </div>
-    <button class="page-nav-btn">
-      Siguiente <span class="material-symbols-outlined">chevron_right</span>
-    </button>
   </div>
-</div>
+
+</restaurant-data-table>
 
 <!-- ══════════════════════════════════════════════════════════════════════════
      Cards inferiores: Notas del Formato + Resumen de Inversión
@@ -254,7 +227,7 @@
 <div *ngIf="showDeleteModal()" class="modal-overlay">
   <!-- Background Backdrop -->
   <div class="modal-backdrop" (click)="closeDeleteModal()"></div>
-  
+
   <!-- Modal Container: BLOQUEADO -->
   <div *ngIf="deleteBlocked()" class="modal-container">
     <div class="modal-header-strip"></div>
@@ -317,7 +290,3 @@
   </div>
 </div>
 
-<!-- FAB -->
-<button class="fab" routerLink="nueva" title="Nueva Solicitud GIL-F-014">
-  <span class="material-symbols-outlined">add</span>
-</button>

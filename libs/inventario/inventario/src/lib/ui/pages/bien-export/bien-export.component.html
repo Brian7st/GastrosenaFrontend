@@ -2,21 +2,12 @@
 
   <!-- Breadcrumb + Back -->
   <div class="breadcrumb">
-    <button class="back-btn" (click)="onVolver()">
-      <span class="material-symbols-outlined">arrow_back</span>
-    </button>
+    <inventario-back-button (clicked)="onVolver()" />
     <nav class="breadcrumb-nav">
       <span class="breadcrumb-link" (click)="onVolver()">Inventario</span>
       <span class="material-symbols-outlined breadcrumb-sep">chevron_right</span>
       <span class="breadcrumb-current">Exportar</span>
     </nav>
-  </div>
-
-  <div class="page-header">
-    <div class="search-bar">
-      <span class="material-symbols-outlined">search</span>
-      <input type="text" placeholder="Buscar reportes o bienes..." />
-    </div>
   </div>
 
   <div class="export-title-block">

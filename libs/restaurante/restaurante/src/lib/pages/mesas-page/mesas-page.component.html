@@ -237,7 +237,7 @@
 
         @if (modalActivo() === 'eliminar-global') {
           <h3>Eliminar Mesa</h3>
-          <div class="form-group form-group--spaced">
+          <div class="form-group" style="margin: var(--space-4) 0;">
             <label>Selecciona la mesa que deseas eliminar</label>
             <div class="input-with-icon">
               <select class="form-control select-control" [ngModel]="mesaIdParaEliminar()" (ngModelChange)="mesaIdParaEliminar.set(+$event)">
@@ -247,7 +247,7 @@
                 }
               </select>
             </div>
-            <p class="danger-help-text">Esta acción no se puede deshacer.</p>
+            <p style="font-size: var(--font-size-xs); color: var(--color-danger); margin-top: var(--space-2);">Esta acción no se puede deshacer.</p>
           </div>
           <div class="modal-actions">
             <restaurant-button variant="ghost" (click)="cerrarModales()">

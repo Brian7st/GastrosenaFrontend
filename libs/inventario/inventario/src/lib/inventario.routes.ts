@@ -296,4 +296,99 @@ export const INVENTARIO_ROUTES: Routes = [
       },
     ]
   },
+
+  // ── Paquete Probatorio ──────────────────────────────────────────────────
+  {
+    path: 'paquete-probatorio',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./pages/paquete-probatorio-page/paquete-list/paquete-list.component').then(
+            m => m.PaqueteListComponent
+          ),
+      },
+      {
+        path: 'nuevo',
+        loadComponent: () =>
+          import('./pages/paquete-probatorio-page/paquete-create/paquete-create.component').then(
+            m => m.PaqueteCreateComponent
+          ),
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./pages/paquete-probatorio-page/paquete-detail/paquete-detail.component').then(
+            m => m.PaqueteDetailComponent
+          ),
+        children: [
+          {
+            path: 'adjuntar',
+            loadComponent: () =>
+              import('./pages/paquete-probatorio-page/paquete-upload/paquete-upload.component').then(
+                m => m.PaqueteUploadComponent
+              ),
+          },
+          {
+            path: 'requisicion',
+            loadComponent: () =>
+              import('./pages/paquete-probatorio-page/paquete-req-detail/paquete-req-detail.component').then(
+                m => m.PaqueteReqDetailComponent
+              ),
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── Requisiciones (Formato 45-S) ────────────────────────────────────────
+  {
+    path: 'requisiciones',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./pages/requisiciones-page/requisiciones-dashboard/requisiciones-dashboard.component').then(
+            m => m.RequisicionesDashboardComponent
+          ),
+        children: [
+          {
+            path: 'detalle/:id',
+            loadComponent: () =>
+              import('./pages/requisiciones-page/requisiciones-detalle/requisiciones-detalle.component').then(
+                m => m.RequisicionesDetalleComponent
+              ),
+          },
+          {
+            path: 'despacho/:id',
+            loadComponent: () =>
+              import('./pages/requisiciones-page/requisiciones-despacho/requisiciones-despacho.component').then(
+                m => m.RequisicionesDespachoComponent
+              ),
+          },
+        ]
+      },
+      {
+        path: 'nueva',
+        loadComponent: () =>
+          import('./pages/requisiciones-page/requisiciones-create/requisiciones-create.component').then(
+            m => m.RequisicionesCreateComponent
+          ),
+      },
+      {
+        path: 'firmar/:id',
+        loadComponent: () =>
+          import('./pages/requisiciones-page/requisiciones-firmar/requisiciones-firmar.component').then(
+            m => m.RequisicionesFirmarComponent
+          ),
+      },
+      {
+        path: 'resumen/:id',
+        loadComponent: () =>
+          import('./pages/requisiciones-page/requisiciones-resumen/requisiciones-resumen.component').then(
+            m => m.RequisicionesResumenComponent
+          ),
+      }
+    ],
+  },
 ];
