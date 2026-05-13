@@ -1,11 +1,13 @@
 import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
+import { ButtonComponent } from '@restaurant/shared/ui';
+import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 
 @Component({
   selector: 'app-solicitudes-edit',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ButtonComponent, BackButtonComponent],
   templateUrl: './solicitudes-edit.component.html',
   styleUrls: ['./solicitudes-edit.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
