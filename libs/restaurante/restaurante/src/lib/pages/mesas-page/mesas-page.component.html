@@ -1,0 +1,267 @@
+<div class="mesas-page">
+  <!-- Header con botón de acción principal -->
+  <div class="mesas-page__header">
+    <restaurant-page-header
+      title="Control de Mesas"
+      subtitle="Gestión de salón y pedidos en tiempo real"
+    ></restaurant-page-header>
+    
+    <div class="header-actions">
+      <restaurant-button variant="danger" (click)="abrirModal('eliminar-global')">
+        <lucide-icon name="trash-2" [size]="18"></lucide-icon>
+        <span>Eliminar Mesa</span>
+      </restaurant-button>
+      <restaurant-button (click)="abrirModal('agregar')">
+        <lucide-icon name="plus" [size]="18"></lucide-icon>
+        <span>Agregar Mesa</span>
+      </restaurant-button>
+    </div>
+  </div>
+
+  <!-- KPIs de Dashboard migrados -->
+  <div class="mesas-page__stats">
+    <restaurant-kpi-card
+      label="Mesas Totales"
+      [value]="stats().totalMesas.toString()"
+      icon="users"
+      iconColor="blue"
+    ></restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      label="Ocupación"
+      [value]="stats().porcentajeOcupacion + '%'"
+      icon="layout-grid"
+      iconColor="green"
+      [trend]="stats().mesasOcupadas + ' ocupadas'"
+    ></restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      label="Pedidos Pendientes"
+      [value]="stats().pedidosPendientes.toString()"
+      icon="clock"
+      iconColor="orange"
+    ></restaurant-kpi-card>
+  </div>
+
+  <!-- Grid de Mesas -->
+  <section class="mesas-page__content">
+    <div class="mesas-grid">
+      @for (mesa of mesas(); track mesa.id) {
+        <restaurant-card
+          [ngClass]="['mesa-card', 'mesa-card--' + mesa.estado]"
+        >
+          <div class="mesa-card__header">
+            <span class="mesa-card__number">Mesa {{ mesa.numero }}</span>
+            <div class="mesa-card__header-right">
+              <restaurant-status-badge
+                [label]="mesa.estado"
+                [variant]="getBadgeType(mesa.estado)"
+              ></restaurant-status-badge>
+              <button 
+                class="icon-action-btn" 
+                [class.has-notes]="mesa.notas"
+                (click)="abrirModal('notas', mesa)"
+                title="Notas/Observaciones"
+              >
+                <lucide-icon name="pencil" [size]="16"></lucide-icon>
+              </button>
+            </div>
+          </div>
+
+          <div class="mesa-card__body">
+            <div class="mesa-icon-wrapper">
+               <lucide-icon name="utensils" [size]="32"></lucide-icon>
+            </div>
+            <div class="mesa-card__info-row">
+              <div class="mesa-card__info">
+                <lucide-icon name="users" [size]="14"></lucide-icon>
+                <span>{{ mesa.asientos }} as.</span>
+              </div>
+              @if (mesa.comensal) {
+                <div class="mesa-card__client">
+                  <lucide-icon name="user" [size]="14"></lucide-icon>
+                  <span>{{ mesa.comensal }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="mesa-card__footer">
+            @if (mesa.estado === 'libre') {
+              <restaurant-button
+                class="full-width"
+                variant="primary"
+                (click)="abrirModal('abrir', mesa)"
+              >
+                <span>Asignar Mesa</span>
+              </restaurant-button>
+            } @else if (mesa.estado === 'ocupada') {
+              <restaurant-button
+                class="full-width"
+                variant="danger"
+                (click)="abrirModal('liberar', mesa)"
+              >
+                <span>Liberar</span>
+              </restaurant-button>
+            } @else if (mesa.estado === 'por_pagar') {
+              <restaurant-button
+                class="full-width"
+                variant="warning"
+                (click)="abrirModal('cobrar', mesa)"
+              >
+                <span>Cobrar</span>
+              </restaurant-button>
+            }
+          </div>
+        </restaurant-card>
+      } @empty {
+        <div class="empty-container">
+          <restaurant-empty-state
+            title="No hay mesas configuradas"
+            message="Comienza agregando una nueva mesa para el salón."
+          ></restaurant-empty-state>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Modales -->
+  @if (modalActivo()) {
+    <div class="modal-overlay" (click)="cerrarModales()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        
+        @if (modalActivo() === 'agregar') {
+          <div class="modal-header-colored">
+            <h3>Crear Nueva Mesa</h3>
+            <button class="close-btn" (click)="cerrarModales()">
+              <lucide-icon name="x" [size]="20"></lucide-icon>
+            </button>
+          </div>
+          <div class="modal-body-custom">
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label>Número de Mesa</label>
+                <input type="number" [ngModel]="nuevoNumero()" (ngModelChange)="nuevoNumero.set($event)" class="form-control">
+              </div>
+              <div class="form-group flex-1">
+                <label>Capacidad</label>
+                <div class="input-with-icon">
+                  <input type="number" [ngModel]="nuevoAsientos()" (ngModelChange)="nuevoAsientos.set($event)" class="form-control">
+                  <lucide-icon name="users" [size]="16" class="input-icon"></lucide-icon>
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label>Zona / Ubicación</label>
+              <input type="text" [ngModel]="nuevaZona()" (ngModelChange)="nuevaZona.set($event)" class="form-control" placeholder="Ej: Salón Principal, Terraza, VIP...">
+            </div>
+
+            <div class="toggle-card" (click)="nuevoActivo.set(!nuevoActivo())">
+              <div class="toggle-info">
+                <h4>Estado Activo</h4>
+                <p>La mesa estará disponible para reservas inmediatamente</p>
+              </div>
+              <label class="switch" (click)="$event.stopPropagation()">
+                <input type="checkbox" [ngModel]="nuevoActivo()" (ngModelChange)="nuevoActivo.set($event)">
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+          
+          <restaurant-button class="full-width" variant="primary" (click)="crearMesa()">
+            <div class="btn-content-centered">
+              <lucide-icon name="check-circle" [size]="18"></lucide-icon>
+              <span>Guardar Mesa</span>
+            </div>
+          </restaurant-button>
+        }
+
+        @if (modalActivo() === 'abrir') {
+          <h3>Abrir Mesa {{ mesaSeleccionada()?.numero }}</h3>
+          <div class="form-group">
+            <label>Nombre del Comensal o Referencia</label>
+            <input type="text" [ngModel]="nuevoComensal()" (ngModelChange)="nuevoComensal.set($event)" class="form-control" placeholder="Ej: Familia Pérez">
+          </div>
+          <div class="modal-actions">
+            <restaurant-button variant="ghost" (click)="cerrarModales()">
+              <span>Cancelar</span>
+            </restaurant-button>
+            <restaurant-button (click)="abrirMesa(mesaSeleccionada()!.id)">
+              <span>Confirmar Asignación</span>
+            </restaurant-button>
+          </div>
+        }
+
+        @if (modalActivo() === 'notas') {
+          <div class="modal-header-flex">
+            <lucide-icon name="edit" [size]="18"></lucide-icon>
+            <h3>Notas Mesa {{ mesaSeleccionada()?.numero }}</h3>
+          </div>
+          <div class="form-group">
+            <textarea 
+              [ngModel]="nuevaNota()" 
+              (ngModelChange)="nuevaNota.set($event)" 
+              class="form-control textarea" 
+              rows="4" 
+              placeholder="Escribe alguna observación..."
+            ></textarea>
+          </div>
+          <div class="modal-actions-between">
+            <restaurant-button variant="ghost" class="btn-icon-danger" (click)="nuevaNota.set(''); guardarNotas()">
+              <lucide-icon name="trash-2" [size]="16"></lucide-icon>
+            </restaurant-button>
+            <div class="right-actions">
+              <restaurant-button variant="surface" (click)="cerrarModales()">
+                <span>Cerrar</span>
+              </restaurant-button>
+              <restaurant-button (click)="guardarNotas()">
+                <span>Guardar</span>
+              </restaurant-button>
+            </div>
+          </div>
+        }
+
+        @if (modalActivo() === 'liberar' || modalActivo() === 'cobrar') {
+          <h3>¿Liberar Mesa {{ mesaSeleccionada()?.numero }}?</h3>
+          <p>Se cerrará la cuenta y la mesa quedará Libre.</p>
+          <div class="modal-actions">
+            <restaurant-button variant="ghost" (click)="cerrarModales()">
+              <span>Cancelar</span>
+            </restaurant-button>
+            <restaurant-button (click)="liberarMesa(mesaSeleccionada()!.id)">
+              <span>Liberar Mesa</span>
+            </restaurant-button>
+          </div>
+        }
+
+        @if (modalActivo() === 'eliminar-global') {
+          <h3>Eliminar Mesa</h3>
+          <div class="form-group" style="margin: var(--space-4) 0;">
+            <label>Selecciona la mesa que deseas eliminar</label>
+            <div class="input-with-icon">
+              <select class="form-control select-control" [ngModel]="mesaIdParaEliminar()" (ngModelChange)="mesaIdParaEliminar.set(+$event)">
+                <option [value]="null">Seleccione una mesa...</option>
+                @for (m of mesas(); track m.id) {
+                  <option [value]="m.id">Mesa {{ m.numero }} ({{ m.estado }})</option>
+                }
+              </select>
+            </div>
+            <p style="font-size: var(--font-size-xs); color: var(--color-danger); margin-top: var(--space-2);">Esta acción no se puede deshacer.</p>
+          </div>
+          <div class="modal-actions">
+            <restaurant-button variant="ghost" (click)="cerrarModales()">
+              <span>Cancelar</span>
+            </restaurant-button>
+            @if (mesaIdParaEliminar()) {
+              <restaurant-button variant="danger" (click)="eliminarMesa(mesaIdParaEliminar()!)">
+                <span>Eliminar</span>
+              </restaurant-button>
+            }
+          </div>
+        }
+
+      </div>
+    </div>
+  }
+</div>
