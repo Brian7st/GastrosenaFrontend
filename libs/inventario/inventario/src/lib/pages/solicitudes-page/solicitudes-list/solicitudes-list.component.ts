@@ -1,13 +1,13 @@
 import { Component, ChangeDetectionStrategy, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { ButtonComponent } from '@restaurant/shared/ui';
+import { ButtonComponent, DataTableComponent, KpiCardComponent } from '@restaurant/shared/ui';
 import { SolicitudGil } from '../../../models/solicitudes-gil.model';
 
 @Component({
   selector: 'app-solicitudes-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonComponent],
+  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent],
   templateUrl: './solicitudes-list.component.html',
   styleUrls: ['./solicitudes-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
