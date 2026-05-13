@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FacturasFacade } from '../../../data-access/facturas.facade';
 import { Factura, FacturaItem, ConciliacionItem, MonedaFEL } from '../../../models/facturas.model';
+import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 
 @Component({
   selector: 'restaurant-factura-edit',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, BackButtonComponent],
   templateUrl: './factura-edit.component.html',
   styleUrl: './factura-edit.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,12 +23,13 @@ export class FacturaEditPageComponent implements OnInit {
   loading = this.facade.loading;
 
   // Editable fields (local state)
-  nitCliente   = signal('');
-  razonSocial  = signal('');
-  tipoDoc      = signal('Factura Electrónica');
-  fechaEmision = signal('');
-  moneda       = signal<MonedaFEL>('COP');
+  nitCliente    = signal('');
+  razonSocial   = signal('');
+  tipoDoc       = signal('Factura Electrónica');
+  fechaEmision  = signal('');
+  moneda        = signal<MonedaFEL>('COP');
   notasInternas = signal('');
+  localItems    = signal<FacturaItem[]>([]);
 
   isBlocked = computed(() => {
     const f = this.factura();
@@ -50,6 +52,7 @@ export class FacturaEditPageComponent implements OnInit {
           this.fechaEmision.set(f.fechaEmision);
           this.moneda.set(f.moneda);
           this.notasInternas.set(f.notasInternas ?? '');
+          this.localItems.set([...f.items]);
         }
       }, 100);
     }
@@ -61,6 +64,27 @@ export class FacturaEditPageComponent implements OnInit {
 
   onExportar(): void {
     console.log('Exportando factura...');
+  }
+
+  onAgregarItem(): void {
+    this.localItems.update(items => [
+      ...items,
+      { descripcion: '', cantidad: 1, precioUnitario: 0, iva: 19, total: 0 },
+    ]);
+  }
+
+  onEliminarItem(index: number): void {
+    this.localItems.update(items => items.filter((_, i) => i !== index));
+  }
+
+  onItemChange(index: number, field: keyof FacturaItem, value: string | number): void {
+    this.localItems.update(items => {
+      const updated = [...items];
+      const item = { ...updated[index], [field]: value } as FacturaItem;
+      item.total = item.cantidad * item.precioUnitario * (1 + item.iva / 100);
+      updated[index] = item;
+      return updated;
+    });
   }
 
   onAnular(): void {

@@ -53,7 +53,7 @@
     align-items: center;
     gap: 0.5rem;
     font-size: 0.75rem;
-    color: #6b7280;
+    color: var(--color-text-muted);
     margin-bottom: 0.25rem;
   }
 
@@ -68,7 +68,7 @@
 
   &__icon {
     font-size: 1.5rem;
-    color: #9ca3af;
+    color: var(--color-text-disabled);
   }
 
   h1 {
@@ -81,31 +81,13 @@
 
   &__sub {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--color-text-muted);
     margin: 0.25rem 0 0;
   }
 
   &__doc-id { color: var(--color-primario); }
 }
 
-.back-btn {
-  width: 2.25rem;
-  height: 2.25rem;
-  background: var(--color-superficie-contenedor-mas-bajo);
-  border: 1px solid var(--color-superficie-contenedor);
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #4b5563;
-  transition: all 0.15s;
-  flex-shrink: 0;
-  margin-top: 0.25rem;
-
-  &:hover { border-color: var(--color-primario); color: var(--color-primario); }
-  .material-symbols-outlined { font-size: 1.125rem; }
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Edit Card
@@ -141,7 +123,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #6b7280;
+    color: var(--color-text-muted);
   }
 
   input, select, textarea {
@@ -167,7 +149,7 @@
       background: var(--color-superficie-contenedor);
     }
 
-    &::placeholder { color: #9ca3af; }
+    &::placeholder { color: var(--color-text-disabled); }
   }
 }
 
@@ -204,7 +186,7 @@
     top: 50%;
     transform: translateY(-50%);
     font-size: 1.125rem;
-    color: #9ca3af;
+    color: var(--color-text-disabled);
     pointer-events: none;
   }
 }
@@ -224,7 +206,7 @@
 
     .material-symbols-outlined {
       font-size: 1.125rem;
-      color: #9ca3af;
+      color: var(--color-text-disabled);
     }
 
     h3 {
@@ -263,7 +245,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #6b7280;
+    color: var(--color-text-muted);
     white-space: nowrap;
   }
 
@@ -290,12 +272,47 @@
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  .material-symbols-outlined { font-size: 1rem; color: #9ca3af; }
+  .material-symbols-outlined { font-size: 1rem; color: var(--color-text-muted); }
+
+  select {
+    appearance: none;
+    background: transparent;
+    border: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-en-superficie);
+    cursor: pointer;
+    padding-right: 1rem;
+  }
+}
+
+// Inputs editables dentro de la tabla de ítems
+.td-input {
+  width: 100%;
+  background: var(--color-superficie-contenedor-bajo);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 0.3rem 0.5rem;
+  font-size: 0.875rem;
+  font-family: var(--font-family-base);
+  color: var(--color-en-superficie);
+  transition: border-color var(--duration-fast) var(--ease-standard),
+              box-shadow var(--duration-fast) var(--ease-standard);
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primario);
+    box-shadow: var(--focus-ring);
+    background: var(--color-superficie-contenedor-mas-bajo);
+  }
+
+  &--num  { width: 5rem; text-align: center; }
+  &--desc { width: 100%; min-width: 10rem; }
 }
 
 .empty-row {
   text-align: center;
-  color: #9ca3af;
+  color: var(--color-text-disabled);
   font-style: italic;
 }
 
@@ -333,7 +350,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #6b7280;
+    color: var(--color-text-muted);
   }
 
   textarea {
@@ -404,7 +421,9 @@
   font-weight: 600;
   font-size: 0.875rem;
   padding: 0.625rem 1.125rem;
-  transition: all 0.15s ease;
+  transition: background-color var(--duration-fast) var(--ease-standard),
+            color var(--duration-fast) var(--ease-standard),
+            box-shadow var(--duration-fast) var(--ease-standard);
 
   .material-symbols-outlined { font-size: 1rem; }
 
@@ -459,8 +478,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.15s;
-  color: #9ca3af;
+  transition: background-color var(--duration-fast) var(--ease-standard),
+            color var(--duration-fast) var(--ease-standard);
+  color: var(--color-text-disabled);
 
   .material-symbols-outlined { font-size: 1.125rem; }
 
@@ -503,7 +523,7 @@
   justify-content: center;
   min-height: 60vh;
   gap: 1rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-size: 0.875rem;
 }
 
