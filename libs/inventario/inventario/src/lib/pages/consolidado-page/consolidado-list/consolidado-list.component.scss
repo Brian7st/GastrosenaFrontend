@@ -251,7 +251,7 @@ tr:hover td {
   overflow: hidden;
 
   &--primary {
-    background: linear-gradient(to bottom right, var(--color-en-primario-contenedor), var(--color-primario));
+    background-color: var(--color-primario);
     color: var(--color-en-primario);
     flex-direction: row;
     align-items: center;
