@@ -13,6 +13,7 @@ Monorepo Angular 20 + Nx para el sistema de gestión del restaurante SENA (23 de
 | [Bases globales monorepo](docs/bases-globales-monorepo.md) | Fundamentos del monorepo |
 | [Migración inventario](docs/inventario-migracion-monorepo.md) | Notas de migración del módulo inventario |
 | [Clasificación componentes inventario](docs/clasificacion-componentes-inventario.md) | Taxonomía de componentes |
+| [Shared UI Showcase](docs/shared-ui-showcase.md) | Guía del showcase visual para documentar `shared/ui` |
 
 ## Gobernanza de IA
 
