@@ -6,6 +6,7 @@ import {
   DataTableComponent,
   LucideIconComponent,
   ButtonComponent,
+  StatusBadgeComponent,
 } from '@restaurant/shared/ui';
 import {
   Programa,
@@ -31,6 +32,7 @@ import {
     DataTableComponent,
     LucideIconComponent,
     ButtonComponent,
+    StatusBadgeComponent,
   ],
   templateUrl: './presupuesto-dashboard.component.html',
   styleUrls: ['./presupuesto-dashboard.component.scss'],
@@ -100,9 +102,20 @@ export class PresupuestoDashboardComponent {
 
   /** Helper: clase CSS del badge de ejecución */
   getEjecucionClass(porcentaje: number): string {
-    if (porcentaje >= 90) return 'ejecucion-badge--critico';
-    if (porcentaje >= 70) return 'ejecucion-badge--alto';
-    return 'ejecucion-badge--normal';
+    if (porcentaje >= 90) return 'ejecucion-danger';
+    if (porcentaje >= 70) return 'ejecucion-warning';
+    return 'ejecucion-success';
+  }
+
+  /** Helper: mapeo de tipo de afectación a estado de badge */
+  getTipoBadgeStatus(tipo: string): 'info' | 'success' | 'warning' | 'danger' {
+    switch (tipo.toLowerCase()) {
+      case 'pago': return 'success';
+      case 'traslado': return 'warning';
+      case 'anulación': return 'danger';
+      case 'compromiso': 
+      default: return 'info';
+    }
   }
 
   /** Helper: clase CSS del badge de tipo afectación */
