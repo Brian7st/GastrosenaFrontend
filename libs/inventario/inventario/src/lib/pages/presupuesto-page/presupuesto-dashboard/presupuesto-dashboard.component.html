@@ -10,12 +10,6 @@
       </p>
     </div>
     <div class="header-actions">
-      <restaurant-button variant="surface" routerLink="cargar-gil">
-        <div class="btn-icon-text">
-          <lucide-icon name="upload" [size]="20"></lucide-icon>
-          Cargar GIL
-        </div>
-      </restaurant-button>
       <restaurant-button variant="surface" routerLink="exportar">
         <div class="btn-icon-text">
           <lucide-icon name="download" [size]="20"></lucide-icon>
@@ -200,6 +194,12 @@
        ═══════════════════════════════════════════════════════════════════════ -->
   <restaurant-data-table tableTitle="Historial de Afectación Presupuestal" tableIcon="history"
     searchPlaceholder="Buscar afectaciones, documentos o rubros...">
+    <restaurant-button dtActions variant="surface" routerLink="cargar-gil">
+      <div class="btn-icon-text">
+        <lucide-icon name="upload" [size]="18"></lucide-icon>
+        Cargar GIL
+      </div>
+    </restaurant-button>
     <thead>
       <tr>
         <th class="text-center">Fecha</th>
@@ -245,6 +245,7 @@
     </tbody>
     
     <div dtFooter class="pagination-footer">
+      <span class="results-count">Mostrando 1–{{ afectaciones().length }} de {{ afectaciones().length }} resultados</span>
       <div class="page-numbers">
         <button class="page-btn page-btn--active">1</button>
         <button class="page-btn">2</button>

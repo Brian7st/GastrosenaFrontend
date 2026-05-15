@@ -500,14 +500,6 @@
 /* ── Celdas del Historial ───────────────────────────────────────────────────── */
 .table-row {
   cursor: pointer;
-  border-left: 4px solid transparent;
-  transition: background-color var(--duration-fast) var(--ease-standard),
-              border-left-color var(--duration-fast) var(--ease-standard);
-
-  &:hover {
-    background-color: var(--color-table-row-hover);
-    border-left-color: var(--color-esmeralda-500);
-  }
 }
 
 .fecha-text {
@@ -572,9 +564,18 @@
 /* ── Paginación ────────────────────────────────────────────────────────────── */
 .pagination-footer {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   padding: var(--space-4) var(--space-6);
   border-top: 1px solid var(--color-superficie-contenedor);
+
+  .results-count {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-pizarra-500);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
 
   .page-numbers {
     display: flex;

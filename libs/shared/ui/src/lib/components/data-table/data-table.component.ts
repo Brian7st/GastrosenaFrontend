@@ -33,6 +33,7 @@ import { LucideIconComponent } from '../lucide-icon/lucide-icon.component';
               <lucide-icon name="list-filter" [size]="16"></lucide-icon>
               Filtros
             </button>
+            <ng-content select="[dtActions]"></ng-content>
           </div>
         </div>
       }
