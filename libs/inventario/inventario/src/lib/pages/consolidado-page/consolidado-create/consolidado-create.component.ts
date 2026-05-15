@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { ButtonComponent, DataTableComponent } from '@restaurant/shared/ui';
+import { ButtonComponent, DataTableComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
+import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 
 interface GilItem {
   id: string;
@@ -19,7 +20,7 @@ interface GilItem {
 @Component({
   selector: 'restaurant-consolidado-create',
   standalone: true,
-  imports: [CommonModule, ButtonComponent, DataTableComponent],
+  imports: [CommonModule, ButtonComponent, DataTableComponent, StatusBadgeComponent, BackButtonComponent],
   templateUrl: './consolidado-create.component.html',
   styleUrl: './consolidado-create.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

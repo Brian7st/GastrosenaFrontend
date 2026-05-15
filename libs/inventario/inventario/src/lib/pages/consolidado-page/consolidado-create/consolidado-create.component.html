@@ -2,15 +2,7 @@
   <!-- TopAppBar equivalent (Page Header) -->
   <header class="page-header">
     <div class="page-header__left">
-      <nav class="breadcrumb">
-        <ol>
-          <li><a (click)="goBack()">Consolidados</a></li>
-          <li class="separator"><span class="material-symbols-outlined">chevron_right</span></li>
-          <li class="current">Generar Nuevo</li>
-          <li class="separator"><span class="material-symbols-outlined">chevron_right</span></li>
-          <li class="current">Selección de GILs</li>
-        </ol>
-      </nav>
+      <inventario-back-button (clicked)="goBack()"></inventario-back-button>
       <div class="page-header__title-row">
         <h1 class="page-header__title">Seleccionar GIL-F-014 para Consolidar</h1>
       </div>
@@ -71,15 +63,15 @@
                   [checked]="allSelected" 
                   (change)="toggleAll($event)" />
               </th>
-              <th>Código GIL</th>
-              <th>Instructor</th>
-              <th>Programa / Ficha</th>
-              <th>Fecha</th>
-              <th class="th-right">Valor Total</th>
-              <th>Estado</th>
+              <th class="th-center">Código GIL</th>
+              <th class="th-center">Instructor</th>
+              <th class="th-center">Programa / Ficha</th>
+              <th class="th-center">Fecha</th>
+              <th class="th-center">Valor Total</th>
+              <th class="th-center">Estado</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody class="text-black text-center">
             @for (item of gils; track item.id) {
               <tr [class.tr--disabled]="item.estado !== 'Disponible'" (click)="toggleSelection(item)">
                 <td class="td-center">
@@ -104,20 +96,19 @@
                 <td>
                   <span class="td-muted">{{ item.fecha }}</span>
                 </td>
-                <td class="text-right">
+                <td class="text-center">
                   <span class="td-bold">{{ item.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
                 </td>
-                <td>
-                  <span class="badge" [ngClass]="item.estado === 'Disponible' ? 'badge--success-soft' : 'badge--surface'">
-                    <ng-container *ngIf="item.estado === 'Disponible'">
-                      <span class="badge-dot"></span>
-                      Disponible
-                    </ng-container>
-                    <ng-container *ngIf="item.estado !== 'Disponible'">
+                <td class="text-center">
+                  <ng-container *ngIf="item.estado === 'Disponible'">
+                    <restaurant-status-badge label="Activo" variant="success"></restaurant-status-badge>
+                  </ng-container>
+                  <ng-container *ngIf="item.estado !== 'Disponible'">
+                    <span class="badge badge--surface">
                       <span class="material-symbols-outlined text-[14px] mr-1">link</span>
                       En {{ item.consolidadoRef }}
-                    </ng-container>
-                  </span>
+                    </span>
+                  </ng-container>
                 </td>
               </tr>
             }

@@ -4,11 +4,12 @@ import { Router, RouterModule } from '@angular/router';
 import { ButtonComponent, DataTableComponent, KpiCardComponent } from '@restaurant/shared/ui';
 import { ExportarConsolidadoModalComponent } from '../components/exportar-consolidado-modal/exportar-consolidado-modal.component';
 import { ReversarConsolidadoModalComponent } from '../components/reversar-consolidado-modal/reversar-consolidado-modal.component';
+import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 
 @Component({
   selector: 'restaurant-consolidado-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent, ExportarConsolidadoModalComponent, ReversarConsolidadoModalComponent],
+  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent, ExportarConsolidadoModalComponent, ReversarConsolidadoModalComponent, BackButtonComponent],
   templateUrl: './consolidado-detail.component.html',
   styleUrl: './consolidado-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -44,6 +45,10 @@ export class ConsolidadoDetailComponent {
 
   goBack(): void {
     this.router.navigate(['/app/inventario/consolidado']);
+  }
+
+  goToGilDetail(codigo: string): void {
+    this.router.navigate(['/app/inventario/solicitudes-gil', codigo]);
   }
 
   openExportModal() {
