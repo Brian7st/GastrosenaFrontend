@@ -194,25 +194,19 @@
        ═══════════════════════════════════════════════════════════════════════ -->
   <restaurant-data-table tableTitle="Historial de Afectación Presupuestal" tableIcon="history"
     searchPlaceholder="Buscar afectaciones, documentos o rubros...">
-    <div dtHeader class="dt-header-controls">
-      <div class="title-group">
-        <h2>Historial de Afectación Presupuestal</h2>
-        <p>Últimos movimientos presupuestales registrados</p>
+    <restaurant-button dtActions variant="surface" routerLink="cargar-gil">
+      <div class="btn-icon-text">
+        <lucide-icon name="upload" [size]="18"></lucide-icon>
+        Cargar GIL
       </div>
-      <div class="action-group">
-        <button class="control-btn" routerLink="cargar-gil">
-          <lucide-icon name="upload" [size]="18"></lucide-icon> Cargar GIL
-        </button>
-      </div>
-    </div>
-
+    </restaurant-button>
     <thead>
       <tr>
-        <th>Fecha</th>
-        <th>Tipo</th>
-        <th>Documento</th>
-        <th>Programa</th>
-        <th>Rubro</th>
+        <th class="text-center">Fecha</th>
+        <th class="text-center">Tipo</th>
+        <th class="text-center">Documento</th>
+        <th class="text-center">Programa</th>
+        <th class="text-center">Rubro</th>
         <th style="text-align: right;">Valor</th>
         <th style="text-align: right;">Saldo Resultante</th>
       </tr>
@@ -220,24 +214,22 @@
     <tbody>
       @for (a of afectaciones(); track a.id) {
       <tr class="table-row">
-        <td>
+        <td class="text-center">
           <span class="fecha-text">{{ a.fecha }}</span>
         </td>
-        <td>
-          <span class="tipo-badge" [ngClass]="getTipoBadgeClass(a.tipo)">
-            {{ a.tipo }}
-          </span>
+        <td class="text-center">
+          <restaurant-status-badge [status]="getTipoBadgeStatus(a.tipo)" [label]="a.tipo"></restaurant-status-badge>
         </td>
-        <td>
+        <td class="text-center">
           <a href="javascript:void(0)" class="doc-link">
             <lucide-icon name="external-link" [size]="14"></lucide-icon>
             {{ a.documentoId }}
           </a>
         </td>
-        <td>
+        <td class="text-center">
           <span class="programa-text">{{ a.programa }}</span>
         </td>
-        <td>
+        <td class="text-center">
           <span class="rubro-code">{{ a.rubro }}</span>
         </td>
         <td style="text-align: right;">
@@ -251,15 +243,16 @@
       </tr>
       }
     </tbody>
+    
+    <div dtFooter class="pagination-footer">
+      <span class="results-count">Mostrando 1–{{ afectaciones().length }} de {{ afectaciones().length }} resultados</span>
+      <div class="page-numbers">
+        <button class="page-btn page-btn--active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+      </div>
+    </div>
   </restaurant-data-table>
-
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       ALERTA FLOTANTE — Rubros en nivel crítico
-       ═══════════════════════════════════════════════════════════════════════ -->
-  <div class="alerta-flotante">
-    <lucide-icon name="alert-triangle" [size]="18"></lucide-icon>
-    <span><strong>3 Rubros</strong> en Nivel Crítico de Ejecución</span>
-  </div>
 </div>
 
 <!-- Router outlet para modales (registrar, traslado, exportar, cargar-gil) -->
