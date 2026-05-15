@@ -99,9 +99,7 @@ td {
   transition: background-color 0.2s;
 }
 
-tr:hover td {
-  background-color: var(--color-superficie-contenedor-bajo);
-}
+
 
 .text-right {
   text-align: right;
@@ -132,7 +130,6 @@ tr:hover td {
   font-family: var(--font-family-mono);
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--color-primario);
 }
 
 .td-mono {

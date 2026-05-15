@@ -47,6 +47,10 @@ export class ConsolidadoDetailComponent {
     this.router.navigate(['/app/inventario/consolidado']);
   }
 
+  goToGilDetail(codigo: string): void {
+    this.router.navigate(['/app/inventario/solicitudes-gil', codigo]);
+  }
+
   openExportModal() {
     this.showExportModal = true;
   }
