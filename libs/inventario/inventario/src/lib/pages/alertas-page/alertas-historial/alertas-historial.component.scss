@@ -88,39 +88,53 @@ $yellow:          #eab308;
   padding: 0 2rem 2rem;
 }
 
-// ── Custom header dentro del DataTable (dtHeader) ──────────────────────────
-.dt-header-controls {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid rgba($surface-highest, 0.6);
-  gap: 1rem;
-  flex-wrap: wrap;
-
-  .title-group {
-    h2 {
-      font-family: 'Manrope', sans-serif;
-      font-size: 1.125rem;
-      font-weight: 700;
-      color: $on-surface;
-      margin: 0;
-    }
-    p {
-      font-size: 0.8125rem;
-      color: $on-surface-var;
-      margin: 0.25rem 0 0;
-    }
-  }
-
-  .action-group {
-    display: flex;
-    align-items: center;
-    gap: 0.625rem;
-    flex-wrap: wrap;
-  }
+// ── Paginación ─────────────────────────────────────────────────────────────
+.table-pagination__info {
+  font-size: 0.875rem;
+  color: $on-surface-var;
 }
 
+.pagination-btns {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.375rem;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #475569;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled):not(.pagination-btn--active) {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #f1f5f9;
+  }
+
+  &--active {
+    background: var(--color-primario);
+    color: white;
+    border-color: var(--color-primario);
+  }
+
+  .material-symbols-outlined {
+    font-size: 1.25rem;
+  }
+}
 // ── Filtros ─────────────────────────────────────────────────────────────────
 .filter-select-wrap {
   position: relative;
@@ -319,36 +333,4 @@ $yellow:          #eab308;
   }
 }
 
-// ── Paginación (dtFooter) ──────────────────────────────────────────────────
-.dt-pagination {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 1.5rem;
-  border-top: 1px solid rgba($surface-highest, 0.6);
 
-  &__info {
-    font-size: 0.875rem;
-    color: $on-surface-var;
-  }
-
-  &__btns { display: flex; gap: 0.375rem; }
-
-  &__btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2rem;
-    height: 2rem;
-    border-radius: 0.5rem;
-    border: none;
-    background: transparent;
-    color: $on-surface-var;
-    cursor: pointer;
-    transition: background 0.15s;
-
-    .material-symbols-outlined { font-size: 1rem; }
-    &:hover:not(:disabled) { background: $surface-high; }
-    &:disabled { opacity: 0.4; cursor: not-allowed; }
-  }
-}

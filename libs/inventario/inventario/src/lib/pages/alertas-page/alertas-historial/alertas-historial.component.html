@@ -3,18 +3,19 @@
   <!-- ── Action Header ──────────────────────────────────────────────────── -->
   <header class="action-header">
     <div class="header-left">
-      <button class="back-btn" (click)="volver()" aria-label="Volver">
-        <lucide-icon name="arrow-left" [size]="20"></lucide-icon>
-      </button>
+      <inventario-back-button (clicked)="volver()"></inventario-back-button>
       <div>
-        <nav class="breadcrumb-nav">
-          <span>ALERTAS</span>
-          <lucide-icon name="chevron-right" [size]="10"></lucide-icon>
-          <span class="active">HISTORIAL</span>
-        </nav>
         <h1 class="page-title">Historial de Gestión de Alertas</h1>
         <p class="page-subtitle">Registro auditable de resoluciones y movimientos de inventario.</p>
       </div>
+    </div>
+    <div class="header-right">
+      <restaurant-button variant="primary" (click)="exportarCSV()">
+        <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: bold;">
+          <lucide-icon name="download" [size]="18"></lucide-icon>
+          Exportar
+        </div>
+      </restaurant-button>
     </div>
   </header>
 
@@ -25,12 +26,12 @@
       tableIcon="history"
       searchPlaceholder="Buscar por bien, responsable..."
     >
-      <div dtHeader class="dt-header-controls">
-        <div class="title-group">
-          <h2>Registros de Alertas</h2>
-          <p>Filtrando últimos 30 días</p>
+      <div dtHeader class="dt-controls">
+        <div class="dt-controls__title">
+          <lucide-icon name="history" [size]="22" class="dt-controls__icon"></lucide-icon>
+          <h3 class="dt-controls__heading">Registros de Alertas</h3>
         </div>
-        <div class="action-group">
+        <div class="dt-controls__actions">
           <div class="filter-select-wrap">
             <span class="material-symbols-outlined filter-icon">category</span>
             <select class="filter-select" (change)="onBienChange($event)">
@@ -51,9 +52,10 @@
               <option value="Elena">Elena Ruiz</option>
             </select>
           </div>
-          <button class="control-btn" (click)="exportarCSV()">
-            <span class="material-symbols-outlined">download</span> Exportar
-          </button>
+          <div class="dt-search">
+            <lucide-icon name="search" [size]="18" class="dt-search__icon"></lucide-icon>
+            <input type="text" class="dt-search__input" placeholder="Buscar por bien, responsable...">
+          </div>
         </div>
       </div>
 
@@ -128,15 +130,16 @@
       </tbody>
 
       <!-- Paginación -->
-      <div dtFooter class="dt-pagination">
-        <span class="dt-pagination__info">
+      <div dtFooter class="dt-footer">
+        <span class="table-pagination__info">
           Mostrando 1 a {{ filteredRegistros().length }} de {{ total() }} registros
         </span>
-        <div class="dt-pagination__btns">
-          <button class="dt-pagination__btn" disabled>
+        <div class="pagination-btns">
+          <button class="pagination-btn" disabled>
             <span class="material-symbols-outlined">chevron_left</span>
           </button>
-          <button class="dt-pagination__btn">
+          <button class="pagination-btn pagination-btn--active">1</button>
+          <button class="pagination-btn">
             <span class="material-symbols-outlined">chevron_right</span>
           </button>
         </div>
