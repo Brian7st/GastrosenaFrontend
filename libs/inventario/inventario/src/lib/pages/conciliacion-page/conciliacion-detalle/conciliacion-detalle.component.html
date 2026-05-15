@@ -6,9 +6,7 @@
   <div class="header-section">
     <div class="header-top">
       <div class="title-group">
-        <button class="back-btn" routerLink="../historial">
-          <lucide-icon name="arrow-left" [size]="24"></lucide-icon>
-        </button>
+        <inventario-back-button (clicked)="goBack()" />
         <h1 class="page-title">Detalle de Conciliación</h1>
       </div>
       <restaurant-button variant="primary">
@@ -46,46 +44,44 @@
   <!-- ═══════════════════════════════════════════════════════════════════════
        KPI ROW (5 CARDS)
        ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       KPI ROW (5 CARDS)
+       ═══════════════════════════════════════════════════════════════════════ -->
   <div class="kpi-grid">
-    <div class="kpi-card">
-      <div class="kpi-card-header">
-        <lucide-icon name="layout-list" [size]="16"></lucide-icon>
-        <span class="kpi-card-title">Total ítems</span>
-      </div>
-      <span class="kpi-card-value">{{ detalle.totalItems }}</span>
-    </div>
+    <restaurant-kpi-card
+      label="Total ítems"
+      [value]="detalle.totalItems"
+      iconName="list"
+      iconVariant="neutral">
+    </restaurant-kpi-card>
 
-    <div class="kpi-card">
-      <div class="kpi-card-header">
-        <lucide-icon name="check-circle-2" [size]="16" class="text-success"></lucide-icon>
-        <span class="kpi-card-title">Ítems correctos</span>
-      </div>
-      <span class="kpi-card-value">{{ detalle.itemsCorrectos }}</span>
-    </div>
+    <restaurant-kpi-card
+      label="Ítems correctos"
+      [value]="detalle.itemsCorrectos"
+      iconName="check-circle-2"
+      iconVariant="success">
+    </restaurant-kpi-card>
 
-    <div class="kpi-card kpi-card--danger-border">
-      <div class="kpi-card-header">
-        <lucide-icon name="alert-triangle" [size]="16" class="text-danger"></lucide-icon>
-        <span class="kpi-card-title">Diferencias</span>
-      </div>
-      <span class="kpi-card-value text-danger">{{ detalle.diferencias }}</span>
-    </div>
+    <restaurant-kpi-card
+      label="Diferencias"
+      [value]="detalle.diferencias"
+      iconName="alert-triangle"
+      iconVariant="alert">
+    </restaurant-kpi-card>
 
-    <div class="kpi-card">
-      <div class="kpi-card-header">
-        <lucide-icon name="target" [size]="16"></lucide-icon>
-        <span class="kpi-card-title">Precisión</span>
-      </div>
-      <span class="kpi-card-value">{{ detalle.precision }}%</span>
-    </div>
+    <restaurant-kpi-card
+      label="Precisión"
+      [value]="detalle.precision + '%'"
+      iconName="check-circle"
+      iconVariant="info">
+    </restaurant-kpi-card>
 
-    <div class="kpi-card kpi-card--danger-outline">
-      <div class="kpi-card-header">
-        <lucide-icon name="trending-down" [size]="16" class="text-danger"></lucide-icon>
-        <span class="kpi-card-title">Valoración monetaria</span>
-      </div>
-      <span class="kpi-card-value text-danger">-${{ (detalle.valoracionMonetaria * -1) | number }}</span>
-    </div>
+    <restaurant-kpi-card
+      label="Valoración monetaria"
+      [value]="'-$' + (detalle.valoracionMonetaria * -1)"
+      iconName="trending-down"
+      iconVariant="alert">
+    </restaurant-kpi-card>
   </div>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
@@ -93,7 +89,10 @@
        ═══════════════════════════════════════════════════════════════════════ -->
   <div class="table-section">
     <div class="table-header">
-      <h2 class="section-title">Detalle de Diferencias</h2>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <lucide-icon name="file-text" [size]="20" class="text-secondary"></lucide-icon>
+        <h2 class="section-title">Detalle de Diferencias</h2>
+      </div>
       <button class="filter-btn">
         <lucide-icon name="filter" [size]="18"></lucide-icon>
       </button>

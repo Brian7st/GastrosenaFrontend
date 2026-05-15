@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { LucideIconComponent } from '@restaurant/shared/ui';
 import { ButtonComponent } from '@restaurant/shared/ui';
 import { DataTableComponent } from '@restaurant/shared/ui';
 import { KpiCardComponent } from '@restaurant/shared/ui';
+import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'restaurant-conciliacion-historial',
@@ -16,6 +17,7 @@ import { KpiCardComponent } from '@restaurant/shared/ui';
     ButtonComponent,
     DataTableComponent,
     KpiCardComponent,
+    BackButtonComponent,
   ],
   templateUrl: './conciliacion-historial.component.html',
   styleUrl: './conciliacion-historial.component.scss',

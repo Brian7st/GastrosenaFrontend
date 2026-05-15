@@ -6,9 +6,7 @@
   <div class="page-header-row">
     <div>
       <div class="title-group">
-        <button class="back-btn" routerLink="../">
-          <lucide-icon name="arrow-left" [size]="24"></lucide-icon>
-        </button>
+        <inventario-back-button (clicked)="goBack()" />
         <h1 class="page-title">Toma Física de Inventario</h1>
       </div>
       <div class="header-meta">
@@ -35,47 +33,33 @@
        SUMMARY CARDS
        ═══════════════════════════════════════════════════════════════════════ -->
   <div class="summary-grid">
-    <div class="summary-card">
-      <div class="summary-icon">
-        <lucide-icon name="list" [size]="20"></lucide-icon>
-      </div>
-      <div class="summary-content">
-        <p class="summary-label">ÍTEMS TOTALES</p>
-        <p class="summary-value">{{ itemsTotales() }}</p>
-      </div>
-    </div>
+    <restaurant-kpi-card
+      label="ÍTEMS TOTALES"
+      [value]="itemsTotales()"
+      iconName="list"
+      iconVariant="neutral">
+    </restaurant-kpi-card>
 
-    <div class="summary-card summary-card--success">
-      <div class="summary-icon">
-        <lucide-icon name="check-circle" [size]="20"></lucide-icon>
-      </div>
-      <div class="summary-content">
-        <p class="summary-label">PRECISIÓN</p>
-        <p class="summary-value summary-value--green">{{ precision() }}%</p>
-      </div>
-    </div>
+    <restaurant-kpi-card
+      label="PRECISIÓN"
+      [value]="precision() + '%'"
+      iconName="check-circle"
+      iconVariant="success">
+    </restaurant-kpi-card>
 
-    <div class="summary-card">
-      <div class="summary-icon summary-icon--alert">
-        <lucide-icon name="alert-triangle" [size]="20"></lucide-icon>
-      </div>
-      <div class="summary-content">
-        <p class="summary-label">DIFERENCIAS</p>
-        <p class="summary-value summary-value--red">{{ diferenciasCount() }}</p>
-      </div>
-    </div>
+    <restaurant-kpi-card
+      label="DIFERENCIAS"
+      [value]="diferenciasCount()"
+      iconName="alert-triangle"
+      iconVariant="alert">
+    </restaurant-kpi-card>
 
-    <div class="summary-card">
-      <div class="summary-icon summary-icon--alert">
-        <lucide-icon name="trending-down" [size]="20"></lucide-icon>
-      </div>
-      <div class="summary-content">
-        <p class="summary-label">IMPACTO FINANCIERO</p>
-        <p class="summary-value" [class.summary-value--red]="impactoFinanciero() < 0">
-          {{ formatCurrency(impactoFinanciero()) }}
-        </p>
-      </div>
-    </div>
+    <restaurant-kpi-card
+      label="IMPACTO FINANCIERO"
+      [value]="formatCurrency(impactoFinanciero())"
+      iconName="trending-down"
+      iconVariant="alert">
+    </restaurant-kpi-card>
   </div>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
