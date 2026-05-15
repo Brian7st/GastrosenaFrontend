@@ -32,7 +32,8 @@ export interface Movimiento {
     KpiCardComponent,
     DataTableComponent,
     LucideIconComponent,
-    ButtonComponent
+    ButtonComponent,
+    StatusBadgeComponent
   ],
   templateUrl: './movimientos-list.component.html',
   styleUrls: ['./movimientos-list.component.scss'],

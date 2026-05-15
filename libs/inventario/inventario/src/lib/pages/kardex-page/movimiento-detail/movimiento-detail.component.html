@@ -2,9 +2,7 @@
   <!-- Action Header -->
   <header class="action-header">
     <div class="header-left">
-      <button class="back-btn" (click)="goBack()" aria-label="Volver">
-        <lucide-icon name="arrow-left" [size]="20"></lucide-icon>
-      </button>
+      <inventario-back-button (clicked)="goBack()"></inventario-back-button>
       <div>
         <h1 class="page-title">
           Detalle de Movimiento #MOV-2024-0156

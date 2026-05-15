@@ -152,11 +152,6 @@
   cursor: pointer;
   border-left: 4px solid transparent;
   transition: all 0.2s ease;
-
-  &:hover {
-    background-color: #f8fafc !important;
-    border-left-color: #10b981;
-  }
 }
 
 .type-badge {
@@ -318,9 +313,9 @@
   }
 
   &--active {
-    background: #047857;
+    background: var(--color-primario);
     color: white;
-    border-color: #047857;
+    border-color: var(--color-primario);
   }
 
   .material-symbols-outlined {

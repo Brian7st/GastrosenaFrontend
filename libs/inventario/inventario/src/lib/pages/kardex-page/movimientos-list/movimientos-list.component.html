@@ -15,7 +15,7 @@
 
       <restaurant-button variant="primary" routerLink="salida">
         <div class="btn-icon-text">
-          <lucide-icon name="outbox" [size]="20"></lucide-icon>
+          <lucide-icon name="minus-circle" [size]="20"></lucide-icon>
           Nueva Salida
         </div>
       </restaurant-button>
@@ -77,10 +77,16 @@
 
   <!-- Main Data Table Container -->
   <restaurant-data-table>
-    <div dtHeader class="dt-header-controls" style="justify-content: flex-end;">
-      <div class="dt-search">
-        <lucide-icon name="search" [size]="18" class="dt-search__icon"></lucide-icon>
-        <input type="text" class="dt-search__input" placeholder="Buscar movimientos, productos o usuarios...">
+    <div dtHeader class="dt-controls">
+      <div class="dt-controls__title">
+        <lucide-icon name="history" [size]="22" class="dt-controls__icon"></lucide-icon>
+        <h3 class="dt-controls__heading">Historial de Movimientos</h3>
+      </div>
+      <div class="dt-controls__actions">
+        <div class="dt-search">
+          <lucide-icon name="search" [size]="18" class="dt-search__icon"></lucide-icon>
+          <input type="text" class="dt-search__input" placeholder="Buscar movimientos, productos o usuarios...">
+        </div>
       </div>
     </div>
     
