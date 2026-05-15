@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git checkout *)",
+      "Bash(dir \"C:\\\\Users\\\\darwi\\\\.claude\" /s /b)",
+      "PowerShell(head -30)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(gh pr create --title 'fix\\(inventario\\): consistencia visual y funcional vistas FEL [RF-5.1]' --base develop --body ' *)",
+      "Bash(git pull *)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "Bash(npx nx *)",
+      "Bash(npx tsc *)",
+      "Bash(git commit *)",
+      "Bash(gh pr create --base develop --title 'fix\\(inventario\\): consistencia visual vistas GIL-F-014' --body ' *)"
+    ]
+  }
+}

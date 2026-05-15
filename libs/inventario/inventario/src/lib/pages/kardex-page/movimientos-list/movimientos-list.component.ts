@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterOutlet } from '@angular/router';
-import { KpiCardComponent, DataTableComponent, LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
+import { KpiCardComponent, DataTableComponent, LucideIconComponent, ButtonComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
 
 export interface Movimiento {
   id: string;
@@ -32,7 +32,8 @@ export interface Movimiento {
     KpiCardComponent,
     DataTableComponent,
     LucideIconComponent,
-    ButtonComponent
+    ButtonComponent,
+    StatusBadgeComponent
   ],
   templateUrl: './movimientos-list.component.html',
   styleUrls: ['./movimientos-list.component.scss'],
@@ -92,4 +93,12 @@ export class MovimientosListComponent {
       estado: 'Completado'
     }
   ];
+  getVariant(estado: string): 'success' | 'warning' | 'danger' | 'info' {
+    switch (estado) {
+      case 'Completado': return 'success';
+      case 'Pendiente': return 'warning';
+      case 'Cancelado': return 'danger';
+      default: return 'info';
+    }
+  }
 }
