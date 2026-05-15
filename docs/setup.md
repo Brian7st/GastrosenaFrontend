@@ -443,3 +443,30 @@ Verificá que el alias esté declarado en `tsconfig.base.json` apuntando a la ub
 # Listar todos los proyectos disponibles
 nx show projects
 ```
+
+---
+
+## 11. Showcase interno de shared/ui
+
+```bash
+npx nx serve shared-ui-showcase
+```
+
+Usalo para:
+
+- revisar visualmente los componentes compartidos
+- sacar screenshots limpios
+- alimentar la documentación del sistema de diseño en Notion
+
+El showcase nuevo está organizado por secciones de documentación:
+
+- Button
+- Feedback
+- Filtros
+- Headers y títulos
+- Data display
+- Confirmaciones
+
+Además, la shell expone una ruta pública `/showcase` para revisión rápida sin auth.
+
+Ver también: [`docs/shared-ui-showcase.md`](shared-ui-showcase.md)
