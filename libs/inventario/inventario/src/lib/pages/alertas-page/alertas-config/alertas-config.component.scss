@@ -111,7 +111,7 @@ $tertiary:        #ba1830;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: linear-gradient(135deg, $primary 0%, $primary-light 100%);
+  background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-primario-gradient-end) 100%);
   color: white;
   border: none;
   border-radius: 0.75rem;
