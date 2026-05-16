@@ -64,25 +64,25 @@ export class ConciliacionDashboardComponent {
   categorias = [
     {
       nombre: 'Abarrotes',
-      icono: 'refrigerator', // closest lucide icon
+      icono: 'box', // valid lucide icon
       estado: 'Última toma: Hace 2 días',
       tipo: 'normal',
     },
     {
       nombre: 'Lácteos',
-      icono: 'milk',
+      icono: 'coffee',
       estado: 'Última toma: Hoy, 08:30 AM',
       tipo: 'normal',
     },
     {
       nombre: 'Carnes',
-      icono: 'beef',
+      icono: 'utensils',
       estado: 'Revisión requerida',
       tipo: 'alert',
     },
     {
       nombre: 'Frutas-Vegetales',
-      icono: 'leaf',
+      icono: 'package-open',
       estado: 'Última toma: Ayer',
       tipo: 'normal',
     },
