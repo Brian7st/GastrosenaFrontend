@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Input, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
 import { CardComponent, LucideIconComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
 
@@ -12,8 +13,12 @@ import { CardComponent, LucideIconComponent, StatusBadgeComponent } from '@resta
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PedidosMenuGridComponent {
+  @Input() set searchTerm(val: string) {
+    this._searchTerm = val.toLowerCase();
+  }
+  private _searchTerm = '';
   // Datos temporales simulando el backend
-  products = [
+  private _products = [
     { id: '1', name: 'Coffee Latte', price: 21.20, originalPrice: 26.20, available: 72, sold: 14, discount: '20% OFF', image: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300&q=80' },
     { id: '2', name: 'Bolognese Spaghetti', price: 21.20, available: 8, sold: 32, image: 'https://images.unsplash.com/photo-1622973536968-3ead9e780960?w=300&q=80' },
     { id: '3', name: 'Thanos Burger', price: 21.20, available: 12, sold: 73, image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300&q=80' },
@@ -24,9 +29,21 @@ export class PedidosMenuGridComponent {
     { id: '8', name: 'Mie Sedap', price: 21.20, available: 2, sold: 34, image: 'https://images.unsplash.com/photo-1612929633738-8fe01f72810c?w=300&q=80' }
   ];
 
+  get products() {
+    if (!this._searchTerm) return this._products;
+    return this._products.filter(p => p.name.toLowerCase().includes(this._searchTerm));
+  }
+
   private facade = inject(RestauranteFacade);
+  private router = inject(Router);
 
   agregarProducto(product: any) {
+    if (!this.facade.pedidoActivo()) {
+      alert('Atención: Debes tener una mesa asignada para poder agregar productos al pedido.');
+      this.router.navigate(['/restaurante/mesas']);
+      return;
+    }
+
     // Cuando integras con el backend, agregarías un modal para pedir 'observaciones' si es necesario
     this.facade.agregarProductoAlPedido(
       product.id,
