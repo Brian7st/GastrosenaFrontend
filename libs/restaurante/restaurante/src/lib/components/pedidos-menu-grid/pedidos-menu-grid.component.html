@@ -1,0 +1,33 @@
+<div class="menu-header">
+  <h2>Select Menu</h2>
+  <button class="filter-btn">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+    Filter
+  </button>
+</div>
+
+<div class="menu-grid">
+  @for (product of products; track product.id) {
+    <div class="product-card" (click)="agregarProducto(product)" style="cursor: pointer;">
+      <div class="image-container">
+        <img [src]="product.image" [alt]="product.name" loading="lazy" />
+        @if (product.discount) {
+          <span class="discount-badge">{{ product.discount }}</span>
+        }
+      </div>
+      <div class="info-container">
+        <h3 class="product-name">{{ product.name }}</h3>
+        <p class="stats">{{ product.available }} Disponibles • {{ product.sold }} Vendidos</p>
+        <div class="price-row">
+          <div class="prices">
+            @if (product.originalPrice) {
+              <span class="original-price">${{ product.originalPrice | number:'1.2-2' }}</span>
+            }
+            <span class="current-price">${{ product.price | number:'1.2-2' }}</span>
+          </div>
+          <span class="unit">/ Porción</span>
+        </div>
+      </div>
+    </div>
+  }
+</div>
