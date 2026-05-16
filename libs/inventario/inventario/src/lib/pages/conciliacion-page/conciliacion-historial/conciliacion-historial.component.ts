@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { LucideIconComponent } from '@restaurant/shared/ui';
 import { ButtonComponent } from '@restaurant/shared/ui';
 import { DataTableComponent } from '@restaurant/shared/ui';
 import { KpiCardComponent } from '@restaurant/shared/ui';
@@ -63,5 +64,11 @@ export class ConciliacionHistorialComponent {
     { producto: 'Azúcar Refinada', dif: '-8 Kg', icon: 'package' },
     { producto: 'Carne de Res', dif: '-5 Kg', icon: 'beef' },
   ];
+
+  constructor(private location: Location) {}
+
+  goBack() {
+    this.location.back();
+  }
 
 }
