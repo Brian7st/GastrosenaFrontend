@@ -35,6 +35,17 @@
   }
 </div>
 
+<div class="cart-notes">
+  <label for="order-notes">Observaciones del Pedido</label>
+  <textarea 
+    id="order-notes" 
+    class="notes-textarea" 
+    placeholder="Ej: Para llevar, sin sal..."
+    [ngModel]="observacionesGenerales()"
+    (ngModelChange)="observacionesGenerales.set($event)"
+  ></textarea>
+</div>
+
 <div class="cart-summary">
   @if (pedidoActivo(); as pedido) {
     <div class="summary-total">
