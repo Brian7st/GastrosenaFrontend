@@ -10,7 +10,9 @@ import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import {
   StatusBadgeComponent,
   LucideIconComponent,
+  ButtonComponent,
 } from '@restaurant/shared/ui';
+import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import {
   ActaLegalizacion,
   ActaEstado,
@@ -34,6 +36,8 @@ import {
     CurrencyPipe,
     StatusBadgeComponent,
     LucideIconComponent,
+    ButtonComponent,
+    BackButtonComponent,
   ],
   templateUrl: './actas-detail.component.html',
   styleUrls: ['./actas-detail.component.scss'],

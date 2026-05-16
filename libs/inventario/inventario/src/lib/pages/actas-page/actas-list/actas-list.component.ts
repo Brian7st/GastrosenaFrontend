@@ -11,6 +11,7 @@ import {
   DataTableComponent,
   StatusBadgeComponent,
   LucideIconComponent,
+  ButtonComponent,
 } from '@restaurant/shared/ui';
 import {
   ActaLegalizacion,
@@ -27,6 +28,7 @@ import {
     DataTableComponent,
     StatusBadgeComponent,
     LucideIconComponent,
+    ButtonComponent,
   ],
   templateUrl: './actas-list.component.html',
   styleUrls: ['./actas-list.component.scss'],
@@ -70,7 +72,7 @@ export class ActasListComponent {
     const map: Record<ActaEstado, 'success' | 'warning' | 'danger' | 'info'> = {
       borrador: 'info',
       pendiente: 'warning',
-      firmada: 'info',
+      firmada: 'success',
       revisada: 'success',
       archivada: 'info',
     };

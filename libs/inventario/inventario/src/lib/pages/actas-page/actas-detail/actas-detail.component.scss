@@ -23,28 +23,7 @@
   gap: var(--space-4);
 }
 
-.acta-detail__back-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  background: none;
-  border: none;
-  color: var(--color-en-superficie);
-  font-family: var(--font-family-base);
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-  cursor: pointer;
-  padding: var(--space-2);
-  border-radius: var(--radius-md);
-  transition: color var(--duration-fast) var(--ease-standard);
 
-  &:hover { color: var(--color-primario); }
-
-  &:focus-visible {
-    outline: none;
-    box-shadow: var(--focus-ring);
-  }
-}
 
 .acta-detail__topbar-divider {
   width: 1px;
