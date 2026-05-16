@@ -17,7 +17,7 @@
   <!-- ── Header ────────────────────────────────────────────────────── -->
   <div class="paquete-detail__header">
     <div class="paquete-detail__header-left">
-      <restaurant-back-button fallbackUrl="/app/inventario/paquete-probatorio" label="Volver al Listado"></restaurant-back-button>
+      <inventario-back-button (clicked)="volver()" />
       <div class="paquete-detail__header-title-row">
         <h1 class="paquete-detail__title">Detalle paquete: {{ p.expediente }}</h1>
         <restaurant-status-badge

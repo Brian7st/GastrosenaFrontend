@@ -11,8 +11,8 @@ import { ActivatedRoute, Router, RouterOutlet, RouterLink } from '@angular/route
 import {
   StatusBadgeComponent,
   LucideIconComponent,
-  BackButtonComponent,
 } from '@restaurant/shared/ui';
+import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import {
   PaqueteProbatorio,
   PaqueteEstado,

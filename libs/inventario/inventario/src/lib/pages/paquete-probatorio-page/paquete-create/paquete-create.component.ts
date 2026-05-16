@@ -7,7 +7,8 @@ import {
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { LucideIconComponent, BackButtonComponent } from '@restaurant/shared/ui';
+import { LucideIconComponent } from '@restaurant/shared/ui';
+import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 
 @Component({
   selector: 'restaurant-paquete-create',
