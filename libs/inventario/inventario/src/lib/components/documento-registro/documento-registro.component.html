@@ -1,0 +1,69 @@
+<div class="doc-registro-page">
+
+  <!-- ── HEADER ── -->
+  <header class="doc-header">
+    <div class="doc-header__left">
+      <inventario-back-button (clicked)="back.emit()" />
+
+      <nav class="breadcrumb" *ngIf="breadcrumbs.length">
+        <ol>
+          <ng-container *ngFor="let crumb of breadcrumbs; let last = last">
+            <li *ngIf="!last">
+              <a [routerLink]="crumb.routerLink">{{ crumb.label }}</a>
+            </li>
+            <li *ngIf="!last" class="separator">
+              <span class="material-symbols-outlined">chevron_right</span>
+            </li>
+            <li *ngIf="last" class="current">{{ crumb.label }}</li>
+          </ng-container>
+        </ol>
+      </nav>
+
+      <div class="doc-header__title-block">
+        <h1 class="doc-header__title">{{ title }}</h1>
+        <p class="doc-header__subtitle" *ngIf="subtitle">{{ subtitle }}</p>
+      </div>
+    </div>
+
+    <!-- Slot para acciones extra en el header (botones de exportar, etc.) -->
+    <div class="doc-header__actions">
+      <ng-content select="[docHeaderActions]" />
+    </div>
+  </header>
+
+  <!-- ── ALERTS (estados, errores, advertencias) ── -->
+  <div class="doc-alerts">
+    <ng-content select="[docAlerts]" />
+  </div>
+
+  <!-- ── ZONA DE CARGA DE ARCHIVO (opcional) ── -->
+  <div class="doc-upload">
+    <ng-content select="[docUpload]" />
+  </div>
+
+  <!-- ── CUERPO DEL FORMULARIO ── -->
+  <div class="doc-body">
+    <ng-content />
+  </div>
+
+</div>
+
+<!-- ── FOOTER FIJO ── -->
+<div class="doc-footer">
+  <button class="doc-footer__btn doc-footer__btn--ghost" type="button" (click)="cancel.emit()">
+    Cancelar
+  </button>
+  <div class="doc-footer__actions">
+    <ng-content select="[docFooterExtra]" />
+    <button
+      class="doc-footer__btn doc-footer__btn--primary"
+      type="button"
+      [disabled]="saving"
+      (click)="save.emit()"
+    >
+      <span class="material-symbols-outlined" *ngIf="saving">progress_activity</span>
+      <span class="material-symbols-outlined" *ngIf="!saving">save</span>
+      {{ saving ? 'Guardando…' : saveLabel }}
+    </button>
+  </div>
+</div>

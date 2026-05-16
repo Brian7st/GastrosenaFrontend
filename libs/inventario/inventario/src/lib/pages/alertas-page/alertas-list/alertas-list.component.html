@@ -3,11 +3,7 @@
   <!-- ── Header & Actions ─────────────────────────────────────────────────── -->
   <div class="page-header-row">
     <div>
-      <nav class="breadcrumb-nav">
-        <span>INVENTARIO</span>
-        <lucide-icon name="chevron-right" [size]="10"></lucide-icon>
-        <span class="active">ALERTAS DE STOCK</span>
-      </nav>
+
       <h1 class="page-title">Alertas de Stock Mínimo</h1>
       <p class="page-subtitle">Gestión proactiva de inventario crítico y riesgo financiero.</p>
     </div>
@@ -32,7 +28,7 @@
     <restaurant-kpi-card
       label="Críticas"
       [value]="kpiCriticas().toString()"
-      icon="alert-triangle"
+      icon="triangle-alert"
       iconColor="red"
     ></restaurant-kpi-card>
     <restaurant-kpi-card
@@ -44,7 +40,7 @@
     <restaurant-kpi-card
       label="Valor en Riesgo"
       [value]="kpiValorRiesgo()"
-      icon="dollar-sign"
+      icon="banknote"
       iconColor="orange"
     ></restaurant-kpi-card>
     <restaurant-kpi-card

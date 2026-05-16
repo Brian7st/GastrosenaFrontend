@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BienExportConfig } from '../../../models/inventario.model';
+import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 
 interface FormatoExport {
   id: 'excel' | 'pdf' | 'csv';
@@ -15,7 +16,7 @@ interface FormatoExport {
 @Component({
   selector: 'restaurant-bien-export',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, BackButtonComponent],
   templateUrl: './bien-export.component.html',
   styleUrl: './bien-export.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -81,6 +82,3 @@ export class BienExportPageComponent {
     this.router.navigate(['/app/inventario/bienes']);
   }
 }
-
-// Fix: Angular inject needs to be imported
-import { inject } from '@angular/core';

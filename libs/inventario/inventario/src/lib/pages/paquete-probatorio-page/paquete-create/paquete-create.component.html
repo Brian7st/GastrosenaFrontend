@@ -1,0 +1,150 @@
+<div class="paquete-create">
+  <!-- ── Header ────────────────────────────────────────────────────── -->
+  <div class="paquete-create__header">
+    <button class="paquete-create__back-btn" (click)="volver()">
+      <lucide-icon name="arrow-left" [size]="14"></lucide-icon>
+      Volver al Listado
+    </button>
+    <h1 class="paquete-create__title">Crear Nuevo Paquete Probatorio</h1>
+    <p class="paquete-create__subtitle">Complete la información requerida para iniciar un nuevo expediente de legalización.</p>
+  </div>
+
+  <div class="paquete-create__content">
+    
+    <!-- ── Stepper Indicator ─────────────────────────────────────────── -->
+    <div class="paquete-create__stepper">
+      <div class="paquete-create__step" [class.paquete-create__step--active]="currentStep() >= 1" [class.paquete-create__step--completed]="currentStep() > 1">
+        <div class="paquete-create__step-icon">
+          @if (currentStep() > 1) {
+            <lucide-icon name="check" [size]="14"></lucide-icon>
+          } @else {
+            1
+          }
+        </div>
+        <span class="paquete-create__step-label">Información General</span>
+      </div>
+      
+      <div class="paquete-create__step-connector" [class.paquete-create__step-connector--active]="currentStep() > 1"></div>
+      
+      <div class="paquete-create__step" [class.paquete-create__step--active]="currentStep() === 2">
+        <div class="paquete-create__step-icon">2</div>
+        <span class="paquete-create__step-label">Requerimientos</span>
+      </div>
+    </div>
+
+    <!-- ── Formulario ────────────────────────────────────────────────── -->
+    <form [formGroup]="createForm" class="paquete-create__form-container">
+      
+      <!-- Paso 1: Información General -->
+      @if (currentStep() === 1) {
+        <div class="paquete-create__section">
+          <h2 class="paquete-create__section-title">Información del Expediente</h2>
+          
+          <div class="paquete-create__form-grid">
+            <div class="form-group">
+              <label>ID Expediente</label>
+              <input type="text" formControlName="expediente" readonly class="input-readonly" />
+            </div>
+            
+            <div class="form-group">
+              <label>Título / Descripción corta <span class="required">*</span></label>
+              <input type="text" formControlName="titulo" placeholder="Ej. Insumos Cárnicos Semestre 1" />
+              @if (createForm.controls.titulo.touched && createForm.controls.titulo.errors?.['required']) {
+                <span class="error-text">El título es requerido</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label>Programa de Formación <span class="required">*</span></label>
+              <select formControlName="programa">
+                <option value="">Seleccione un programa...</option>
+                <option value="Gastronomía">Gastronomía</option>
+                <option value="Panadería">Panadería</option>
+                <option value="Pastelería">Pastelería</option>
+                <option value="Sommelier">Sommelier</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Ficha <span class="required">*</span></label>
+              <input type="text" formControlName="ficha" placeholder="Ej. 2574832" />
+            </div>
+
+            <div class="form-group">
+              <label>GIL Vinculado (Opcional)</label>
+              <input type="text" formControlName="gilVinculado" placeholder="Ej. GIL-88392-A" />
+            </div>
+
+            <div class="form-group">
+              <label>Instructor / Responsable <span class="required">*</span></label>
+              <input type="text" formControlName="responsable" placeholder="Nombre del responsable" />
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Paso 2: Requerimientos -->
+      @if (currentStep() === 2) {
+        <div class="paquete-create__section">
+          <div class="paquete-create__section-header">
+            <h2 class="paquete-create__section-title">Documentos Requeridos</h2>
+            <p class="paquete-create__section-subtitle">Al crear el paquete, se requerirá adjuntar los siguientes documentos para completarlo.</p>
+          </div>
+
+          <div class="paquete-create__req-grid">
+            <div class="paquete-create__req-card">
+              <div class="paquete-create__req-icon">
+                <lucide-icon name="file-text" [size]="20"></lucide-icon>
+              </div>
+              <div class="paquete-create__req-content">
+                <h3>Acta de Legalización</h3>
+                <p>Obligatorio para justificar el uso de insumos.</p>
+              </div>
+            </div>
+
+            <div class="paquete-create__req-card">
+              <div class="paquete-create__req-icon">
+                <lucide-icon name="scroll-text" [size]="20"></lucide-icon>
+              </div>
+              <div class="paquete-create__req-content">
+                <h3>Requisición (45-S)</h3>
+                <p>Obligatorio para cruce de inventario.</p>
+              </div>
+            </div>
+
+            <div class="paquete-create__req-card">
+              <div class="paquete-create__req-icon">
+                <lucide-icon name="users" [size]="20"></lucide-icon>
+              </div>
+              <div class="paquete-create__req-content">
+                <h3>Registro de Asistencia</h3>
+                <p>Evidencia fotográfica o listado firmado.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- ── Footer Actions ────────────────────────────────────────────── -->
+      <div class="paquete-create__actions">
+        @if (currentStep() === 1) {
+          <button type="button" class="btn-secondary" (click)="cancelar()">Cancelar</button>
+          <button type="button" class="btn-primary" (click)="siguientePaso()">
+            Siguiente Paso
+            <lucide-icon name="arrow-right" [size]="16"></lucide-icon>
+          </button>
+        } @else {
+          <button type="button" class="btn-secondary" (click)="pasoAnterior()">
+            <lucide-icon name="arrow-left" [size]="16"></lucide-icon>
+            Anterior
+          </button>
+          <button type="button" class="btn-primary" (click)="guardarPaquete()">
+            <lucide-icon name="save" [size]="16"></lucide-icon>
+            Crear Paquete
+          </button>
+        }
+      </div>
+
+    </form>
+  </div>
+</div>

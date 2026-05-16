@@ -4,6 +4,9 @@
     "types": ["jest"]
   },
   "files": [],
-  "include": ["libs/**/*.ts", "apps/**/*.ts"],
-  "references": []
+  "references": [],
+  "include": [
+    "libs/**/*.ts",
+    "apps/**/*.ts"
+  ]
 }

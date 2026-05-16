@@ -3,15 +3,12 @@
 ══════════════════════════════════════════════════════════════════════════ -->
 <div class="form-page-container">
   
-  <div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+  <div class="page-header">
+    <inventario-back-button (clicked)="onCancel()" />
     <div>
       <h2 class="page-title">Nueva Solicitud GIL-F-014</h2>
       <p class="page-subtitle">Complete la información requerida para el registro y movimiento de bienes institucionales.</p>
     </div>
-    <button (click)="onCancel()" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; font-weight: 500; color: #52525b; background: transparent; border: none; border-radius: 0.75rem; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#e4e4e7'" onmouseout="this.style.background='transparent'">
-      <span class="material-symbols-outlined text-lg">arrow_back</span>
-      Volver a Solicitudes
-    </button>
   </div>
 
   <!-- Main Form Card -->
@@ -189,11 +186,11 @@
 
   <!-- Action Buttons -->
   <div class="actions-footer">
-    <button class="btn btn--secondary" type="button" (click)="onCancel()">Cancelar</button>
-    <button class="btn btn--primary" type="button" (click)="onSave()">
+    <restaurant-button variant="ghost" (click)="onCancel()">Cancelar</restaurant-button>
+    <restaurant-button variant="primary" (click)="onSave()">
       <span class="material-symbols-outlined">save</span>
       Crear Solicitud
-    </button>
+    </restaurant-button>
   </div>
 
 </div>

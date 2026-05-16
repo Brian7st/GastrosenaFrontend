@@ -4,6 +4,9 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 import { ButtonComponent } from '@restaurant/shared/ui';
+import { KpiCardComponent } from '@restaurant/shared/ui';
+import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import { Location } from '@angular/common';
 
 interface TomaFisicaItem {
   id: string;
@@ -24,6 +27,8 @@ interface TomaFisicaItem {
     FormsModule,
     LucideIconComponent,
     ButtonComponent,
+    KpiCardComponent,
+    BackButtonComponent,
   ],
   templateUrl: './conciliacion-toma-fisica.component.html',
   styleUrl: './conciliacion-toma-fisica.component.scss',
@@ -72,15 +77,18 @@ export class ConciliacionTomaFisicaComponent {
     },
   ]);
 
-  // Computed signals
+  // Computed stats
   itemsTotales = computed(() => this.items().length);
-  
+  pendientesCount = computed(() => this.items().filter(i => i.conteoFisico === null).length);
+
+  constructor(private location: Location) {}
+
+  goBack() {
+    this.location.back();
+  }
+
   itemsContados = computed(() => 
     this.items().filter(item => item.conteoFisico !== null).length
-  );
-  
-  pendientesCount = computed(() => 
-    this.itemsTotales() - this.itemsContados()
   );
 
   diferenciasCount = computed(() => 

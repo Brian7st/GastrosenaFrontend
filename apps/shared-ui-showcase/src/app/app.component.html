@@ -1,0 +1,304 @@
+<div class="showcase-shell">
+  <aside class="showcase-sidebar">
+    <div class="showcase-sidebar__brand">
+      <span class="showcase-sidebar__eyebrow">shared/ui</span>
+      <h1>Showcase interno</h1>
+      <p>Render aislado de componentes reales para revisión visual y screenshots limpios.</p>
+    </div>
+
+    <nav class="showcase-nav" aria-label="Secciones del showcase">
+      @for (section of sections; track section.id) {
+        <a class="showcase-nav__link" [href]="'#' + section.id">
+          <strong>{{ section.title }}</strong>
+          <span>{{ section.description }}</span>
+        </a>
+      }
+    </nav>
+  </aside>
+
+  <main class="showcase-content">
+    <section class="showcase-hero">
+      <restaurant-page-header
+        title="Shared UI Showcase"
+        subtitle="Base visual para documentar componentes reales sin depender de pantallas de dominio."
+      />
+
+      <div class="showcase-hero__notes">
+        <div class="showcase-note">
+          <strong>Objetivo</strong>
+          <p>Tomar capturas limpias, comparar variantes y detectar deuda visual antes de subir a Notion.</p>
+        </div>
+        <div class="showcase-note">
+          <strong>Fuente</strong>
+          <p>Todos los bloques acá usan componentes importados desde <code>@restaurant/shared/ui</code>.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="showcase-section" id="button">
+      <restaurant-section-title
+        title="Button"
+        subtitle="Jerarquía visual y casos de acción frecuentes en una vista administrativa."
+        align="left"
+      />
+
+      <div class="shot-grid shot-grid--4">
+        <article class="shot-card">
+          <h3>Primary</h3>
+          <p>Acción principal de la pantalla.</p>
+          <div class="shot-stage shot-stage--center">
+            <restaurant-button variant="primary">Guardar cambios</restaurant-button>
+          </div>
+        </article>
+
+        <article class="shot-card">
+          <h3>Surface</h3>
+          <p>Acción secundaria visible, pero no dominante.</p>
+          <div class="shot-stage shot-stage--center">
+            <restaurant-button variant="surface">Cancelar</restaurant-button>
+          </div>
+        </article>
+
+        <article class="shot-card">
+          <h3>Ghost</h3>
+          <p>Acción liviana, útil para limpieza o navegación local.</p>
+          <div class="shot-stage shot-stage--center">
+            <restaurant-button variant="ghost">Ver detalle</restaurant-button>
+          </div>
+        </article>
+
+        <article class="shot-card">
+          <h3>Filter</h3>
+          <p>Acción propia de contexto de filtros.</p>
+          <div class="shot-stage shot-stage--center">
+            <restaurant-button variant="filter">Aplicar filtros</restaurant-button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="showcase-section" id="feedback">
+      <restaurant-section-title
+        title="Feedback"
+        subtitle="Mensajes de sistema y estados compactos para tablas o resúmenes."
+        align="left"
+      />
+
+      <div class="shot-grid shot-grid--2">
+        <article class="shot-card">
+          <h3>Alertas</h3>
+          <div class="shot-stack">
+            <restaurant-alert type="success" message="Los cambios se guardaron correctamente." />
+            <restaurant-alert type="info" message="La exportación está usando los filtros activos." />
+            <restaurant-alert type="warning" message="Hay campos pendientes antes de aprobar." />
+            <restaurant-alert type="error" message="No se pudo procesar la solicitud." />
+          </div>
+        </article>
+
+        <article class="shot-card">
+          <h3>Status badge</h3>
+          <div class="shot-stage shot-stage--stack">
+            <restaurant-status-badge label="Pagada" variant="success" />
+            <restaurant-status-badge label="Pendiente" variant="warning" />
+            <restaurant-status-badge label="Anulada" variant="danger" />
+            <restaurant-status-badge label="Registrada" variant="info" />
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="showcase-section" id="filters">
+      <restaurant-section-title
+        title="Filtros"
+        subtitle="Ejemplo aislado de búsqueda y selección simple con datos de inventario."
+        align="left"
+      />
+
+      <div class="shot-grid shot-grid--2">
+        <article class="shot-card">
+          <h3>Search Filter</h3>
+          <div class="shot-stage">
+            <restaurant-search-filter
+              label="Buscar bien"
+              placeholder="Placa, descripción o ubicación"
+              [value]="searchValue()"
+              (valueChange)="onSearchChange($event)"
+            />
+          </div>
+          <p class="shot-caption">Valor actual: {{ searchValue() || 'vacío' }}</p>
+        </article>
+
+        <article class="shot-card">
+          <h3>Select Filter</h3>
+          <div class="shot-stage">
+            <restaurant-select-filter
+              label="Estado"
+              [value]="selectedState()"
+              [options]="filterOptions"
+              (valueChange)="onSelectChange($event)"
+            />
+          </div>
+          <p class="shot-caption">Valor actual: {{ selectedState() || 'Todos' }}</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="showcase-section" id="headers">
+      <restaurant-section-title
+        title="Headers y títulos"
+        subtitle="Jerarquía editorial básica para páginas y subbloques."
+        align="left"
+      />
+
+      <div class="shot-grid shot-grid--2">
+        <article class="shot-card">
+          <h3>Page Header</h3>
+          <div class="shot-stage">
+            <restaurant-page-header
+              title="Inventario de bienes"
+              subtitle="Consultá, filtrá y gestioná el estado del stock institucional."
+            />
+          </div>
+        </article>
+
+        <article class="shot-card">
+          <h3>Section Title</h3>
+          <div class="shot-stage">
+            <restaurant-section-title
+              title="Resumen operativo"
+              subtitle="Indicadores rápidos para decidir antes de entrar al detalle."
+              align="left"
+            />
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="showcase-section" id="data-display">
+      <restaurant-section-title
+        title="Data display"
+        subtitle="Casos de lectura rápida y exploración de datos que suelen documentarse con captura."
+        align="left"
+      />
+
+      <div class="shot-grid shot-grid--3">
+        <article class="shot-card">
+          <h3>KPI Card</h3>
+          <div class="shot-stage shot-stage--stack">
+            <restaurant-kpi-card
+              label="Bienes activos"
+              value="128"
+              icon="package"
+              iconColor="green"
+              trend="+8% vs. semana anterior"
+              [trendUp]="true"
+            />
+            <restaurant-kpi-card
+              label="Pendientes por validar"
+              value="14"
+              icon="schedule"
+              iconColor="orange"
+              trend="2 casos críticos"
+              [trendUp]="null"
+            />
+          </div>
+        </article>
+
+        <article class="shot-card">
+          <h3>Loading Skeleton</h3>
+          <div class="shot-stage">
+            <restaurant-loading-skeleton [lines]="4" />
+          </div>
+        </article>
+
+        <article class="shot-card">
+          <h3>Empty State</h3>
+          <div class="shot-stage">
+            <restaurant-empty-state
+              title="No encontramos resultados"
+              message="Probá cambiar el texto de búsqueda o limpiar los filtros activos."
+            />
+          </div>
+        </article>
+      </div>
+
+      <article class="shot-card shot-card--wide">
+        <h3>Data Table</h3>
+        <div class="shot-stage">
+          <restaurant-data-table
+            tableTitle="Bienes registrados"
+            tableIcon="inventory_2"
+            searchPlaceholder="Buscar en tabla"
+            [columns]="['Placa', 'Descripción', 'Estado', 'Ubicación']"
+            [rows]="rows"
+          />
+        </div>
+      </article>
+
+      <div class="shot-grid shot-grid--2">
+        <article class="shot-card">
+          <h3>Card</h3>
+          <div class="shot-stage shot-stage--center">
+            <restaurant-card
+              title="Combo ejecutivo"
+              subtitle="Almuerzo institucional"
+              imageUrl="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80"
+              [price]="18500"
+            />
+          </div>
+        </article>
+
+        <article class="shot-card">
+          <h3>Export Button</h3>
+          <p>Útil para capturar la acción especializada sin ruido de tabla.</p>
+          <div class="shot-stage shot-stage--center">
+            <restaurant-export-button label="Exportar inventario" />
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="showcase-section" id="confirmations">
+      <restaurant-section-title
+        title="Confirmaciones"
+        subtitle="Patrones de fricción antes de acciones sensibles o irreversibles."
+        align="left"
+      />
+
+      <div class="shot-grid shot-grid--2">
+        <article class="shot-card">
+          <div class="shot-card__header">
+            <h3>Confirm Dialog</h3>
+            <restaurant-button variant="surface" (click)="reopenDialogs()">Reabrir demos</restaurant-button>
+          </div>
+          <div class="shot-stage">
+            <restaurant-confirm-dialog
+              [open]="confirmOpen()"
+              title="Anular factura"
+              message="Esta acción cambia el estado del documento y debe quedar trazabilidad."
+              (cancel)="closeConfirm()"
+              (confirm)="closeConfirm()"
+            />
+          </div>
+        </article>
+
+        <article class="shot-card">
+          <h3>Keyword Confirm Modal</h3>
+          <div class="shot-stage">
+            <restaurant-keyword-confirm-modal
+              [open]="keywordOpen()"
+              title="Eliminar historial de movimiento"
+              description="Esta acción no se puede deshacer y afecta la trazabilidad del bien."
+              keyword="ELIMINAR"
+              identifierLabel="Bien"
+              identifierValue="INV-1024"
+              confirmLabel="Eliminar definitivamente"
+              (cancel)="closeKeyword()"
+              (confirm)="closeKeyword()"
+            />
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+</div>
