@@ -14,7 +14,7 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
   selector: 'restaurant-alertas-config',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, BackButtonComponent, LucideIconComponent],
+  imports: [CommonModule, BackButtonComponent],
   templateUrl: './alertas-config.component.html',
   styleUrls: ['./alertas-config.component.scss'],
 })
