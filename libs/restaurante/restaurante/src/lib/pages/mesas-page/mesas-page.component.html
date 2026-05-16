@@ -96,13 +96,22 @@
                 <span>Asignar Mesa</span>
               </restaurant-button>
             } @else if (mesa.estado === 'ocupada') {
-              <restaurant-button
-                class="full-width"
-                variant="danger"
-                (click)="abrirModal('liberar', mesa)"
-              >
-                <span>Liberar</span>
-              </restaurant-button>
+              <div style="display: flex; gap: 0.5rem; width: 100%;">
+                <restaurant-button
+                  style="flex: 1"
+                  variant="primary"
+                  (click)="verPedido(mesa.id)"
+                >
+                  <span>Pedido</span>
+                </restaurant-button>
+                <restaurant-button
+                  style="flex: 1"
+                  variant="danger"
+                  (click)="abrirModal('liberar', mesa)"
+                >
+                  <span>Liberar</span>
+                </restaurant-button>
+              </div>
             } @else if (mesa.estado === 'por_pagar') {
               <restaurant-button
                 class="full-width"

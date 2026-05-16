@@ -10,6 +10,7 @@ import {
   LucideIconComponent,
   EmptyStateComponent,
 } from '@restaurant/shared/ui';
+import { Router } from '@angular/router';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
 import { Mesa } from '../../models/restaurante.model';
 
@@ -33,6 +34,7 @@ import { Mesa } from '../../models/restaurante.model';
 })
 export class MesasPageComponent {
   private facade = inject(RestauranteFacade);
+  private router = inject(Router);
 
   // Signals del Facade
   mesas = this.facade.mesas;
@@ -95,8 +97,15 @@ export class MesasPageComponent {
   abrirMesa(id: number) {
     if (this.nuevoComensal().trim()) {
       this.facade.abrirMesa(id, this.nuevoComensal());
+      this.facade.seleccionarMesaParaPedido(id);
       this.cerrarModales();
+      this.router.navigate(['/restaurante/pedidos']);
     }
+  }
+
+  verPedido(id: number) {
+    this.facade.seleccionarMesaParaPedido(id);
+    this.router.navigate(['/restaurante/pedidos']);
   }
 
   guardarNotas() {
