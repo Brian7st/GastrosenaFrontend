@@ -2,6 +2,15 @@
   display: block;
 }
 
+.contenido-principal {
+  transition: margin-left 0.25s ease, max-width 0.25s ease;
+
+  &--colapsada {
+    margin-left: 4rem;
+    max-width: calc(100vw - 4rem);
+  }
+}
+
 .contenido-principal__contenedor {
   min-height: calc(100vh - 6rem);
 }

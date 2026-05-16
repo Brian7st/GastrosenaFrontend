@@ -4,7 +4,7 @@ export const TOP_MENU_CONFIG: TopNavLink[] = [];
 
 export const SIDEBAR_CONFIG: BarraLateralConfig = {
   titulo:    'GastroSena',
-  subtitulo: 'MONOREPO ANGULAR 20',
+  subtitulo: '',
   logoUrl:   '',
   grupos: [
     {

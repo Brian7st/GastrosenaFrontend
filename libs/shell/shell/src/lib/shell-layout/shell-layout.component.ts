@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AuthService } from '@restaurant/shared/auth';
 import { BarraLateralComponent } from './sidebar/barra-lateral.component';
@@ -19,4 +19,9 @@ export class ShellLayoutComponent {
   protected readonly sidebarConfig = SIDEBAR_CONFIG;
   protected readonly topMenu = TOP_MENU_CONFIG;
   protected readonly currentUser = computed(() => this.authService.currentUser());
+  protected readonly sidebarColapsada = signal(false);
+
+  toggleSidebar(): void {
+    this.sidebarColapsada.update(v => !v);
+  }
 }

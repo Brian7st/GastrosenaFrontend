@@ -1,4 +1,4 @@
-import { Component, Input, computed, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, computed, effect, inject, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { LucideBox, LucideDynamicIcon, LucideLogOut, LucideSettings, LucideUser } from '@lucide/angular';
@@ -30,7 +30,19 @@ export class BarraLateralComponent {
     grupos: [],
   };
 
+  readonly colapsada = input(false);
+
+  @Output() readonly expandir = new EventEmitter<void>();
+
   readonly expandedItems = signal(new Set<string>());
+
+  constructor() {
+    effect(() => {
+      if (this.colapsada()) {
+        this.expandedItems.set(new Set());
+      }
+    });
+  }
 
   protected readonly visibleGroups = computed(() => {
     const currentRole = this.authService.currentUser()?.rol;
@@ -44,6 +56,10 @@ export class BarraLateralComponent {
   });
 
   toggleItem(ruta: string): void {
+    if (this.colapsada()) {
+      this.expandir.emit();
+      return;
+    }
     this.expandedItems.update(current => {
       const next = new Set(current);
       if (next.has(ruta)) {

@@ -1,4 +1,4 @@
-<aside class="barra-lateral">
+<aside class="barra-lateral" [class.barra-lateral--colapsada]="colapsada()">
   <div class="barra-lateral__encabezado">
     <div class="barra-lateral__logo-contenedor">
       <div class="barra-lateral__logo-icono barra-lateral__logo-icono--imagen">
@@ -9,10 +9,9 @@
         }
       </div>
       <div class="barra-lateral__logo-texto">
-        <h1 class="barra-lateral__titulo">{{ config.titulo }}</h1>
-        @if (config.subtitulo) {
-          <p class="barra-lateral__subtitulo">{{ config.subtitulo }}</p>
-        }
+        <h1 class="barra-lateral__titulo">
+          <span class="barra-lateral__titulo-gastro">Gastro</span><span class="barra-lateral__titulo-sena">Sena</span>
+        </h1>
       </div>
     </div>
   </div>
@@ -30,6 +29,7 @@
                 [class.barra-lateral__enlace--expandido]="isExpanded(item.ruta)"
                 (click)="toggleItem(item.ruta)"
                 type="button"
+                [title]="colapsada() ? item.label : ''"
               >
                 @if (item.icono) {
                   <svg [lucideIcon]="item.icono!" class="barra-lateral__icono"></svg>
@@ -54,6 +54,7 @@
                       [routerLink]="child.ruta"
                       routerLinkActive="barra-lateral__subenlace--activo"
                       class="barra-lateral__subenlace"
+                      [title]="colapsada() ? child.label : ''"
                     >
                       @if (child.icono) {
                         <svg [lucideIcon]="child.icono!" class="barra-lateral__subicono"></svg>
@@ -73,6 +74,7 @@
                 [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
                 class="barra-lateral__enlace"
                 [class.barra-lateral__enlace--con-insignia]="item.insignia !== undefined"
+                [title]="colapsada() ? item.label : ''"
               >
                 @if (item.icono) {
                   <svg [lucideIcon]="item.icono!" class="barra-lateral__icono"></svg>
@@ -94,15 +96,15 @@
   </nav>
 
   <div class="barra-lateral__pie">
-    <a href="#" class="barra-lateral__enlace">
+    <a href="#" class="barra-lateral__enlace" [title]="colapsada() ? 'Configuración' : ''">
       <svg lucideSettings class="barra-lateral__icono"></svg>
       <span class="barra-lateral__texto">Configuración</span>
     </a>
-    <a href="#" class="barra-lateral__enlace">
+    <a href="#" class="barra-lateral__enlace" [title]="colapsada() ? 'Perfil' : ''">
       <svg lucideUser class="barra-lateral__icono"></svg>
       <span class="barra-lateral__texto">Perfil</span>
     </a>
-    <a href="#" class="barra-lateral__enlace barra-lateral__enlace--peligro">
+    <a href="#" class="barra-lateral__enlace barra-lateral__enlace--peligro" [title]="colapsada() ? 'Cerrar Sesión' : ''">
       <svg lucideLogOut class="barra-lateral__icono"></svg>
       <span class="barra-lateral__texto">Cerrar Sesión</span>
     </a>

@@ -1,4 +1,13 @@
-<header class="barra-superior">
+<header class="barra-superior" [class.barra-superior--colapsada]="sidebarColapsada">
+  <button
+    class="barra-superior__toggle-sidebar"
+    type="button"
+    [title]="sidebarColapsada ? 'Expandir menú' : 'Contraer menú'"
+    (click)="toggleSidebar.emit()"
+  >
+    <svg [lucideIcon]="sidebarColapsada ? 'chevron-right' : 'chevron-left'"></svg>
+  </button>
+
   @if (enlaces.length > 0) {
     <nav class="barra-superior__nav">
       @for (enlace of enlaces; track enlace.ruta) {
