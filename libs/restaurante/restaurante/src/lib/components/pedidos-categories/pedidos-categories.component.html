@@ -1,0 +1,15 @@
+<div class="categories-header">
+  <h2>Categories</h2>
+</div>
+
+<div class="categories-list">
+  <div 
+    class="category-card" 
+    *ngFor="let cat of categories"
+    [class.active]="cat.active"
+  >
+    <div class="icon">{{ cat.icon }}</div>
+    <span class="name">{{ cat.name }}</span>
+    <span class="count">{{ cat.items }}</span>
+  </div>
+</div>

@@ -1,11 +1,12 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
+import { ButtonComponent, LucideIconComponent } from '@restaurant/shared/ui';
 
 @Component({
   selector: 'lib-pedidos-cart',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonComponent, LucideIconComponent],
   templateUrl: './pedidos-cart.component.html',
   styleUrls: ['./pedidos-cart.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

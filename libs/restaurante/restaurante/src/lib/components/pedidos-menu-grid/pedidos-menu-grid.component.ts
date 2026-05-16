@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
+import { CardComponent, LucideIconComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
 
 @Component({
   selector: 'lib-pedidos-menu-grid',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, CardComponent, LucideIconComponent, StatusBadgeComponent],
   templateUrl: './pedidos-menu-grid.component.html',
   styleUrls: ['./pedidos-menu-grid.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

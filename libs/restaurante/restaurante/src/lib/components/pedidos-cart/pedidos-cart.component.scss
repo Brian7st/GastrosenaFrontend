@@ -1,0 +1,228 @@
+.cart-header {
+  margin-bottom: 1.5rem;
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0;
+  }
+}
+
+.cart-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 1.5rem;
+
+  /* Custom scrollbar para el carrito */
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--color-border);
+    border-radius: 4px;
+  }
+
+  .item-row {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+
+    .item-image {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      overflow: hidden;
+      flex-shrink: 0;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .item-details {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+
+      .name {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--color-text-primary);
+        margin: 0 0 0.15rem 0;
+      }
+
+      .category {
+        font-size: 0.75rem;
+        color: var(--color-text-secondary);
+        margin-bottom: 0.5rem;
+      }
+
+      .quantity-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+
+        button {
+          width: 24px;
+          height: 24px;
+          border-radius: var(--radius-sm);
+          border: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+          cursor: pointer;
+          
+          &.btn-minus {
+            background-color: transparent;
+            color: var(--color-error);
+            border: 1px solid var(--color-error);
+          }
+          
+          &.btn-plus {
+            background-color: var(--color-primary);
+            color: white;
+          }
+        }
+
+        .qty {
+          font-size: 0.9rem;
+          font-weight: 700;
+          color: var(--color-text-primary);
+        }
+      }
+    }
+
+    .item-pricing {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      
+      .prices {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+
+        .original {
+          font-size: 0.75rem;
+          color: var(--color-text-secondary);
+          text-decoration: line-through;
+        }
+
+        .current {
+          font-size: 0.95rem;
+          font-weight: 700;
+          color: var(--color-primary);
+        }
+      }
+    }
+  }
+}
+
+.cart-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 1.5rem;
+  border-top: 2px dashed var(--color-border);
+  margin-bottom: 1.5rem;
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+
+    .label {
+      color: var(--color-text-secondary);
+    }
+    
+    .value {
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    &.discount .value {
+      color: var(--color-primary);
+    }
+  }
+
+  .summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+    
+    .label {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--color-text-primary);
+    }
+    
+    .value {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--color-text-primary);
+    }
+  }
+}
+
+.payment-method {
+  margin-bottom: 1.5rem;
+  
+  h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0 0 1rem 0;
+  }
+
+  .methods-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+
+    .method-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem;
+      background-color: var(--color-background-soft);
+      border: 2px solid transparent;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s;
+
+      .icon {
+        font-size: 1.25rem;
+        margin-bottom: 0.25rem;
+      }
+
+      span {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--color-text-secondary);
+      }
+
+      &.active {
+        background-color: var(--color-primary-light);
+        border-color: var(--color-primary);
+        
+        span {
+          color: var(--color-primary);
+        }
+      }
+    }
+  }
+}
+
+::ng-deep .full-width-btn {
+  width: 100%;
+  display: block;
+}

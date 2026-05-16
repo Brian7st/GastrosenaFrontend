@@ -1,18 +1,18 @@
 <div class="menu-header">
-  <h2>Select Menu</h2>
+  <h2>Menú</h2>
   <button class="filter-btn">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-    Filter
+    <lucide-icon name="filter" [size]="16"></lucide-icon>
+    Filtrar
   </button>
 </div>
 
 <div class="menu-grid">
   @for (product of products; track product.id) {
-    <div class="product-card" (click)="agregarProducto(product)" style="cursor: pointer;">
+    <restaurant-card class="product-card" (click)="agregarProducto(product)">
       <div class="image-container">
         <img [src]="product.image" [alt]="product.name" loading="lazy" />
         @if (product.discount) {
-          <span class="discount-badge">{{ product.discount }}</span>
+          <restaurant-status-badge class="discount-badge" [label]="product.discount" variant="info"></restaurant-status-badge>
         }
       </div>
       <div class="info-container">
@@ -28,6 +28,6 @@
           <span class="unit">/ Porción</span>
         </div>
       </div>
-    </div>
+    </restaurant-card>
   }
 </div>

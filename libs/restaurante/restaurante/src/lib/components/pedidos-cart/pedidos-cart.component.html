@@ -11,9 +11,13 @@
           <span class="category">{{ item.observacion || 'Sin observaciones' }}</span>
           
           <div class="quantity-controls">
-            <button class="btn-minus" (click)="decrementar(i)">-</button>
+            <button class="btn-minus" (click)="decrementar(i)">
+              <lucide-icon name="minus" [size]="14"></lucide-icon>
+            </button>
             <span class="qty">{{ item.cantidad }}</span>
-            <button class="btn-plus" (click)="incrementar(i)">+</button>
+            <button class="btn-plus" (click)="incrementar(i)">
+              <lucide-icon name="plus" [size]="14"></lucide-icon>
+            </button>
           </div>
         </div>
         
@@ -40,6 +44,10 @@
   }
 </div>
 
-<button class="process-btn" [disabled]="!pedidoActivo()?.items?.length" (click)="confirmarPedido()">
-  Confirmar Pedido
-</button>
+<restaurant-button 
+  class="full-width-btn" 
+  variant="primary" 
+  [disabled]="!pedidoActivo()?.items?.length" 
+  (click)="confirmarPedido()">
+  <span>Confirmar Pedido</span>
+</restaurant-button>
