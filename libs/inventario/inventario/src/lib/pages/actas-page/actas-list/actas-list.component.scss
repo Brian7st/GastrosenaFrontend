@@ -1,248 +1,159 @@
 // ── Actas de Legalización — Listado ────────────────────────────────────────────
 // Sigue tokens de _variables.scss (Precision Ledger Design System)
 
-.actas-page {
-  padding: var(--space-10) var(--space-8);
-  width: 100%;
+.page-container {
+  padding: var(--space-8);
 }
 
-// ── Page Header ────────────────────────────────────────────────────────────────
-.actas-page__header {
+/* ── Page Header ────────────────────────────────────────────────────────────── */
+.page-header-row {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
+  flex-direction: column;
+  gap: var(--space-6);
   margin-bottom: var(--space-8);
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
 }
 
-.actas-page__overline {
-  font-size: var(--font-size-sm);
-  font-weight: 700;
-  color: var(--color-primario);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin: 0 0 var(--space-2);
-}
-
-.actas-page__title {
+.page-title {
   font-family: var(--font-family-headline);
   font-size: var(--font-size-2xl);
-  font-weight: 700;
+  font-weight: 800;
   color: var(--color-en-superficie);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   margin: 0;
 }
 
-.actas-page__btn-nueva {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  background: linear-gradient(180deg, var(--color-primario), var(--color-primario-gradient-end));
-  color: var(--color-en-primario);
-  border: none;
-  border-radius: var(--radius-lg);
-  padding: var(--space-3) var(--space-6);
-  font-family: var(--font-family-base);
-  font-size: var(--font-size-sm);
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: var(--shadow-subtle);
-  transition: opacity var(--duration-fast) var(--ease-standard);
-
-  &:hover { opacity: 0.9; }
-
-  &:focus-visible {
-    outline: none;
-    box-shadow: var(--focus-ring);
-  }
+.page-subtitle {
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  margin: var(--space-1) 0 0;
+  font-size: var(--font-size-md);
 }
 
-// ── Filtros ────────────────────────────────────────────────────────────────────
-.actas-page__filters {
+.header-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-4);
+  gap: var(--space-3);
   align-items: center;
-  margin-bottom: var(--space-6);
 }
 
-.actas-page__filter-select {
-  position: relative;
-
-  select {
-    appearance: none;
-    background: var(--color-superficie-contenedor-mas-bajo);
-    border: 1px solid var(--color-pizarra-200);
-    color: var(--color-en-superficie);
-    font-size: var(--font-size-sm);
-    font-family: var(--font-family-base);
-    border-radius: var(--radius-lg);
-    padding: 0.625rem var(--space-10) 0.625rem var(--space-4);
-    cursor: pointer;
-    box-shadow: var(--shadow-subtle);
-    transition: box-shadow var(--duration-fast) var(--ease-standard);
-
-    &:focus {
-      outline: none;
-      box-shadow: var(--focus-ring);
-    }
-  }
-}
-
-.actas-page__filter-chevron {
-  position: absolute;
-  right: var(--space-3);
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--color-pizarra-400);
-  pointer-events: none;
-}
-
-.actas-page__filter-search {
-  position: relative;
-
-  input {
-    background: var(--color-superficie-contenedor-mas-bajo);
-    border: 1px solid var(--color-pizarra-200);
-    border-radius: var(--radius-lg);
-    padding: 0.625rem var(--space-4) 0.625rem calc(var(--space-4) + 20px);
-    font-size: var(--font-size-sm);
-    font-family: var(--font-family-base);
-    color: var(--color-en-superficie);
-    width: 12rem;
-    box-shadow: var(--shadow-subtle);
-    transition: box-shadow var(--duration-fast) var(--ease-standard);
-
-    &::placeholder { color: var(--color-pizarra-400); }
-
-    &:focus {
-      outline: none;
-      box-shadow: var(--focus-ring);
-    }
-  }
-}
-
-.actas-page__filter-search-icon {
-  position: absolute;
-  left: var(--space-3);
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--color-pizarra-400);
-  pointer-events: none;
-}
-
-.actas-page__filter-date {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  background: var(--color-superficie-contenedor-mas-bajo);
-  border: 1px solid var(--color-pizarra-200);
-  border-radius: var(--radius-lg);
-  padding: 0.625rem var(--space-4);
-  box-shadow: var(--shadow-subtle);
-
-  &:focus-within {
-    box-shadow: var(--focus-ring);
-  }
-
-  input {
-    background: transparent;
-    border: none;
-    padding: 0;
-    color: var(--color-en-superficie);
-    font-size: var(--font-size-sm);
-    font-family: var(--font-family-base);
-    outline: none;
-
-    &:focus { box-shadow: none; }
-  }
-}
-
-.actas-page__filter-date-icon {
-  color: var(--color-pizarra-400);
-  flex-shrink: 0;
-}
-
-.actas-page__filter-date-separator {
-  color: var(--color-pizarra-400);
-  font-size: var(--font-size-sm);
-  margin: 0 var(--space-1);
-}
-
-.actas-page__filter-ficha {
-  input {
-    background: var(--color-superficie-contenedor-mas-bajo);
-    border: 1px solid var(--color-pizarra-200);
-    border-radius: var(--radius-lg);
-    padding: 0.625rem var(--space-4);
-    font-size: var(--font-size-sm);
-    font-family: var(--font-family-base);
-    color: var(--color-en-superficie);
-    width: 8rem;
-    box-shadow: var(--shadow-subtle);
-
-    &::placeholder { color: var(--color-pizarra-400); }
-
-    &:focus {
-      outline: none;
-      box-shadow: var(--focus-ring);
-    }
-  }
-}
-
-.actas-page__filter-clear {
+.btn-icon-text {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  margin-left: auto;
+  font-weight: 700;
+}
+
+/* ── Controles de Tabla (dtHeader) ────────────────────────────────────────── */
+.dt-controls {
+  padding: var(--space-6);
+  border-bottom: 1px solid var(--color-pizarra-100);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  @media (min-width: 1024px) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.dt-controls__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-en-superficie);
+
+  .dt-controls__icon {
+    color: var(--color-primario);
+    opacity: 0.8;
+  }
+
+  .dt-controls__heading {
+    font-family: var(--font-family-headline);
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    margin: 0;
+  }
+}
+
+.dt-controls__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+/* ── Inputs y Selects de Filtro ─────────────────────────────────────────── */
+.dt-filter__select,
+.dt-filter__input,
+.dt-search__input {
   background: var(--color-superficie-contenedor-mas-bajo);
   border: 1px solid var(--color-pizarra-200);
-  color: var(--color-pizarra-600);
   border-radius: var(--radius-lg);
   padding: 0.625rem var(--space-4);
-  font-family: var(--font-family-base);
   font-size: var(--font-size-sm);
-  font-weight: 700;
-  cursor: pointer;
+  font-family: var(--font-family-base);
+  color: var(--color-en-superficie);
   box-shadow: var(--shadow-subtle);
-  transition: background-color var(--duration-fast) var(--ease-standard);
+  transition: all var(--duration-fast) var(--ease-standard);
 
-  &:hover { background: var(--color-pizarra-50); }
-
-  &:focus-visible {
+  &:focus {
     outline: none;
+    border-color: var(--color-primario);
     box-shadow: var(--focus-ring);
   }
 }
 
-// ── Tabla — estilos dentro de la data-table (Zero-Line Architecture) ──────────
-th {
-  text-align: left;
-  padding: var(--space-4);
-  font-family: var(--font-family-base);
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 600;
-}
-
-td {
-  padding: var(--space-4);
-  vertical-align: middle;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.actas-table__row {
+.dt-filter__select {
   cursor: pointer;
+  padding-right: var(--space-10);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  appearance: none;
+}
+
+.dt-search {
+  position: relative;
+  
+  .dt-search__icon {
+    position: absolute;
+    left: var(--space-4);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-pizarra-400);
+    pointer-events: none;
+  }
+
+  .dt-search__input {
+    padding-left: 2.75rem;
+    width: 100%;
+    min-width: 15rem;
+  }
+}
+
+/* ── Estilos de Fila y Celdas ────────────────────────────────────────── */
+.table-row {
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+
+  &:hover {
+    background-color: var(--color-table-row-hover);
+  }
 }
 
 .actas-table__consecutivo {
   font-family: var(--font-family-headline);
   font-weight: 700;
-  color: var(--color-en-superficie);
+  color: var(--color-primario);
 }
 
 .actas-table__fecha {
@@ -252,7 +163,7 @@ td {
 
 .actas-table__programa {
   font-size: var(--font-size-sm);
-  font-weight: 500;
+  font-weight: 600;
   color: var(--color-en-superficie);
   margin: 0;
 }
@@ -261,6 +172,7 @@ td {
   font-size: var(--font-size-xs);
   color: var(--color-secundario);
   margin: var(--space-1) 0 0;
+  font-weight: 500;
 }
 
 .actas-table__instructor {
@@ -273,8 +185,8 @@ td {
 }
 
 .actas-table__instructor-avatar {
-  width: 2rem;
-  height: 2rem;
+  width: 1.75rem;
+  height: 1.75rem;
   border-radius: 50%;
   background: var(--color-superficie-contenedor-alto);
   display: flex;
@@ -287,66 +199,85 @@ td {
 .actas-table__requisicion {
   font-size: var(--font-size-sm);
   color: var(--color-secundario);
+  font-weight: 600;
 }
 
-.actas-table__actions {
+/* ── Acciones ────────────────────────────────────────────────────────── */
+.actions-row {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: var(--space-2);
 }
 
-.actas-table__action-btn {
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  border: none;
-  background: transparent;
+.action-icon {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
   color: var(--color-pizarra-400);
   cursor: pointer;
-  transition: background-color var(--duration-fast) var(--ease-standard),
-              color var(--duration-fast) var(--ease-standard);
+  transition: all var(--duration-fast) var(--ease-standard);
 
   &:hover {
-    background: var(--color-pizarra-200);
+    background: var(--color-superficie);
+    box-shadow: var(--shadow-sm);
     color: var(--color-primario);
-  }
-
-  &:focus-visible {
-    outline: none;
-    box-shadow: var(--focus-ring);
   }
 }
 
-// ── Responsive ─────────────────────────────────────────────────────────────────
-@media (max-width: 768px) {
-  .actas-page {
-    padding: var(--space-6) var(--space-4);
+/* ── Footer y Paginación ───────────────────────────────────────────────── */
+.dt-footer {
+  padding: var(--space-4) var(--space-6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--color-pizarra-100);
+  background: var(--color-superficie-contenedor-mas-bajo);
+}
+
+.table-pagination__info {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.pagination-btns {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-pizarra-200);
+  background: var(--color-superficie);
+  color: var(--color-pizarra-600);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-standard);
+
+  &:hover:not(:disabled):not(.pagination-btn--active) {
+    background: var(--color-pizarra-50);
+    border-color: var(--color-pizarra-300);
   }
 
-  .actas-page__header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-4);
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
   }
 
-  .actas-page__filters {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .actas-page__filter-clear {
-    margin-left: 0;
-  }
-
-  .actas-page__filter-search input {
-    width: 100%;
-  }
-
-  .actas-page__filter-ficha input {
-    width: 100%;
+  &--active {
+    background: var(--color-primario);
+    color: var(--color-en-primario);
+    border-color: var(--color-primario);
+    font-weight: 700;
   }
 }

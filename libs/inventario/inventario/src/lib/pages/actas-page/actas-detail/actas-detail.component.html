@@ -1,10 +1,7 @@
 <!-- ── Contextual Action Bar (Top) ─────────────────────────────────── -->
 <header class="acta-detail__topbar">
   <div class="acta-detail__topbar-left">
-    <button class="acta-detail__back-btn" (click)="volver()">
-      <lucide-icon name="arrow-left" [size]="18"></lucide-icon>
-      Volver
-    </button>
+    <inventario-back-button (clicked)="volver()" />
     <div class="acta-detail__topbar-divider"></div>
     <span class="acta-detail__topbar-title">{{ acta().consecutivo }}</span>
   </div>

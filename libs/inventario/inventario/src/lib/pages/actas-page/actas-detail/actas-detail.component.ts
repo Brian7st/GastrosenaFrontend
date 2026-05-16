@@ -11,6 +11,7 @@ import {
   StatusBadgeComponent,
   LucideIconComponent,
 } from '@restaurant/shared/ui';
+import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import {
   ActaLegalizacion,
   ActaEstado,
@@ -34,6 +35,7 @@ import {
     CurrencyPipe,
     StatusBadgeComponent,
     LucideIconComponent,
+    BackButtonComponent,
   ],
   templateUrl: './actas-detail.component.html',
   styleUrls: ['./actas-detail.component.scss'],
