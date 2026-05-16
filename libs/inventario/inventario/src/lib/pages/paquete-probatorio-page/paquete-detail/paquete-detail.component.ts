@@ -11,6 +11,7 @@ import { ActivatedRoute, Router, RouterOutlet, RouterLink } from '@angular/route
 import {
   StatusBadgeComponent,
   LucideIconComponent,
+  BackButtonComponent,
 } from '@restaurant/shared/ui';
 import {
   PaqueteProbatorio,
@@ -36,6 +37,7 @@ interface TimelineEntry {
     RouterLink,
     StatusBadgeComponent,
     LucideIconComponent,
+    BackButtonComponent,
   ],
   templateUrl: './paquete-detail.component.html',
   styleUrls: ['./paquete-detail.component.scss'],

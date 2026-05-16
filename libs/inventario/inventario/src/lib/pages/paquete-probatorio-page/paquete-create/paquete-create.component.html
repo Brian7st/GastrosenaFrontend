@@ -1,10 +1,7 @@
 <div class="paquete-create">
   <!-- ── Header ────────────────────────────────────────────────────── -->
   <div class="paquete-create__header">
-    <button class="paquete-create__back-btn" (click)="volver()">
-      <lucide-icon name="arrow-left" [size]="14"></lucide-icon>
-      Volver al Listado
-    </button>
+    <restaurant-back-button fallbackUrl="/app/inventario/paquete-probatorio" label="Volver al Listado"></restaurant-back-button>
     <h1 class="paquete-create__title">Crear Nuevo Paquete Probatorio</h1>
     <p class="paquete-create__subtitle">Complete la información requerida para iniciar un nuevo expediente de legalización.</p>
   </div>

@@ -11,6 +11,8 @@ import {
   DataTableComponent,
   StatusBadgeComponent,
   LucideIconComponent,
+  KpiCardComponent,
+  ButtonComponent,
 } from '@restaurant/shared/ui';
 import {
   PaqueteProbatorio,
@@ -27,6 +29,8 @@ import {
     DataTableComponent,
     StatusBadgeComponent,
     LucideIconComponent,
+    KpiCardComponent,
+    ButtonComponent,
   ],
   templateUrl: './paquete-list.component.html',
   styleUrls: ['./paquete-list.component.scss'],
