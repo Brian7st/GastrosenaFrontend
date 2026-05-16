@@ -8,12 +8,13 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LucideIconComponent } from '@restaurant/shared/ui';
+import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 
 @Component({
   selector: 'restaurant-paquete-create',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule, LucideIconComponent],
+  imports: [CommonModule, ReactiveFormsModule, LucideIconComponent, BackButtonComponent],
   templateUrl: './paquete-create.component.html',
   styleUrls: ['./paquete-create.component.scss'],
 })
