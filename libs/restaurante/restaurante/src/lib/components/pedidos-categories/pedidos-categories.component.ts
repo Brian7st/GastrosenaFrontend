@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -10,14 +10,36 @@ import { CommonModule } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PedidosCategoriesComponent {
-  // Lista temporal para maqueta. Luego vendrá del Facade.
+  @Output() categorySelected = new EventEmitter<string>();
+  @Output() subcategorySelected = new EventEmitter<string>();
+
   categories = [
-    { id: 'all', name: 'All Menu', items: '116 items', icon: '🍽️', active: true },
-    { id: 'coffee', name: 'Coffee', items: '24 items', icon: '☕', active: false },
-    { id: 'tea', name: 'Tea', items: '15 items', icon: '🍵', active: false },
-    { id: 'mocktail', name: 'Mocktail', items: '8 items', icon: '🍹', active: false },
-    { id: 'rice', name: 'Rice', items: '12 items', icon: '🍚', active: false },
-    { id: 'pasta', name: 'Pasta', items: '8 items', icon: '🍝', active: false },
-    { id: 'burger', name: 'Burger', items: '16 items', icon: '🍔', active: false },
+    { id: 'all', name: 'Todo', icon: '🍽️' },
+    { id: 'entrada', name: 'Entradas', icon: '🥗' },
+    { id: 'plato_fuerte', name: 'Plato Fuerte', icon: '🥩' },
+    { id: 'postre', name: 'Postres', icon: '🍰' },
+    { id: 'bebidas', name: 'Bebidas', icon: '🍹' },
   ];
+
+  subcategoriesBebidas = [
+    { id: 'calientes', name: 'Calientes' },
+    { id: 'frias', name: 'Frías' },
+    { id: 'sin_alcohol', name: 'Sin Alcohol' },
+    { id: 'con_alcohol', name: 'Con Alcohol' },
+  ];
+
+  activeCategory = signal<string>('all');
+  activeSubcategory = signal<string>('');
+
+  selectCategory(id: string) {
+    this.activeCategory.set(id);
+    this.activeSubcategory.set('');
+    this.categorySelected.emit(id);
+    this.subcategorySelected.emit('');
+  }
+
+  selectSubcategory(id: string) {
+    this.activeSubcategory.set(id);
+    this.subcategorySelected.emit(id);
+  }
 }
