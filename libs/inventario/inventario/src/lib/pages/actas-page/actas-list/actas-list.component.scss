@@ -1,11 +1,159 @@
 // ── Actas de Legalización — Listado ────────────────────────────────────────────
 // Sigue tokens de _variables.scss (Precision Ledger Design System)
 
-// ── Tabla — estilos específicos (Zero-Line Architecture) ──────────
+.page-container {
+  padding: var(--space-8);
+}
+
+/* ── Page Header ────────────────────────────────────────────────────────────── */
+.page-header-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+}
+
+.page-title {
+  font-family: var(--font-family-headline);
+  font-size: var(--font-size-2xl);
+  font-weight: 800;
+  color: var(--color-en-superficie);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.page-subtitle {
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  margin: var(--space-1) 0 0;
+  font-size: var(--font-size-md);
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.btn-icon-text {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 700;
+}
+
+/* ── Controles de Tabla (dtHeader) ────────────────────────────────────────── */
+.dt-controls {
+  padding: var(--space-6);
+  border-bottom: 1px solid var(--color-pizarra-100);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  @media (min-width: 1024px) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.dt-controls__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-en-superficie);
+
+  .dt-controls__icon {
+    color: var(--color-primario);
+    opacity: 0.8;
+  }
+
+  .dt-controls__heading {
+    font-family: var(--font-family-headline);
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    margin: 0;
+  }
+}
+
+.dt-controls__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+/* ── Inputs y Selects de Filtro ─────────────────────────────────────────── */
+.dt-filter__select,
+.dt-filter__input,
+.dt-search__input {
+  background: var(--color-superficie-contenedor-mas-bajo);
+  border: 1px solid var(--color-pizarra-200);
+  border-radius: var(--radius-lg);
+  padding: 0.625rem var(--space-4);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-family-base);
+  color: var(--color-en-superficie);
+  box-shadow: var(--shadow-subtle);
+  transition: all var(--duration-fast) var(--ease-standard);
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primario);
+    box-shadow: var(--focus-ring);
+  }
+}
+
+.dt-filter__select {
+  cursor: pointer;
+  padding-right: var(--space-10);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  appearance: none;
+}
+
+.dt-search {
+  position: relative;
+  
+  .dt-search__icon {
+    position: absolute;
+    left: var(--space-3);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-pizarra-400);
+    pointer-events: none;
+  }
+
+  .dt-search__input {
+    padding-left: calc(var(--space-4) + 20px);
+    width: 100%;
+    min-width: 15rem;
+  }
+}
+
+/* ── Estilos de Fila y Celdas ────────────────────────────────────────── */
+.table-row {
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+
+  &:hover {
+    background-color: var(--color-table-row-hover);
+  }
+}
+
 .actas-table__consecutivo {
   font-family: var(--font-family-headline);
   font-weight: 700;
-  color: var(--color-en-superficie);
+  color: var(--color-primario);
 }
 
 .actas-table__fecha {
@@ -15,7 +163,7 @@
 
 .actas-table__programa {
   font-size: var(--font-size-sm);
-  font-weight: 500;
+  font-weight: 600;
   color: var(--color-en-superficie);
   margin: 0;
 }
@@ -24,6 +172,7 @@
   font-size: var(--font-size-xs);
   color: var(--color-secundario);
   margin: var(--space-1) 0 0;
+  font-weight: 500;
 }
 
 .actas-table__instructor {
@@ -36,8 +185,8 @@
 }
 
 .actas-table__instructor-avatar {
-  width: 2rem;
-  height: 2rem;
+  width: 1.75rem;
+  height: 1.75rem;
   border-radius: 50%;
   background: var(--color-superficie-contenedor-alto);
   display: flex;
@@ -50,4 +199,85 @@
 .actas-table__requisicion {
   font-size: var(--font-size-sm);
   color: var(--color-secundario);
+  font-weight: 600;
+}
+
+/* ── Acciones ────────────────────────────────────────────────────────── */
+.actions-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.action-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  color: var(--color-pizarra-400);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-standard);
+
+  &:hover {
+    background: var(--color-superficie);
+    box-shadow: var(--shadow-sm);
+    color: var(--color-primario);
+  }
+}
+
+/* ── Footer y Paginación ───────────────────────────────────────────────── */
+.dt-footer {
+  padding: var(--space-4) var(--space-6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--color-pizarra-100);
+  background: var(--color-superficie-contenedor-mas-bajo);
+}
+
+.table-pagination__info {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.pagination-btns {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-pizarra-200);
+  background: var(--color-superficie);
+  color: var(--color-pizarra-600);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-standard);
+
+  &:hover:not(:disabled):not(.pagination-btn--active) {
+    background: var(--color-pizarra-50);
+    border-color: var(--color-pizarra-300);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &--active {
+    background: var(--color-primario);
+    color: var(--color-en-primario);
+    border-color: var(--color-primario);
+    font-weight: 700;
+  }
 }
