@@ -6,4 +6,8 @@ export const BAR_ROUTES: Routes = [
     path: '',
     component: BarPageComponent,
   },
+  {
+    path: 'comandas',
+    loadComponent: () => import('./pages/comandas-page/comandas-page.component').then((m) => m.ComandasComponent)
+  }
 ];
