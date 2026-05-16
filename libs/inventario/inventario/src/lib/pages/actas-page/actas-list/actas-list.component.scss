@@ -126,7 +126,7 @@
   
   .dt-search__icon {
     position: absolute;
-    left: var(--space-3);
+    left: var(--space-4);
     top: 50%;
     transform: translateY(-50%);
     color: var(--color-pizarra-400);
@@ -134,7 +134,7 @@
   }
 
   .dt-search__input {
-    padding-left: calc(var(--space-4) + 20px);
+    padding-left: 2.75rem;
     width: 100%;
     min-width: 15rem;
   }
