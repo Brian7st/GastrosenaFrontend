@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { PedidosCategoriesComponent } from '../../components/pedidos-categories/pedidos-categories.component';
 import { PedidosMenuGridComponent } from '../../components/pedidos-menu-grid/pedidos-menu-grid.component';
 import { PedidosCartComponent } from '../../components/pedidos-cart/pedidos-cart.component';
@@ -26,6 +26,7 @@ import { LucideIconComponent } from '@restaurant/shared/ui';
 export class PedidosPageComponent {
   public facade = inject(RestauranteFacade);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   searchTerm = signal('');
   selectedCategory = signal('all');
@@ -40,6 +41,6 @@ export class PedidosPageComponent {
   fechaActual = new Date();
 
   volverAMesas() {
-    this.router.navigate(['/restaurante/mesas']);
+    this.router.navigate(['../mesas'], { relativeTo: this.route });
   }
 }

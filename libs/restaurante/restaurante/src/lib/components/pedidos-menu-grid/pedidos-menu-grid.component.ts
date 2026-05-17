@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, Input, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
 import { CardComponent, LucideIconComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
 
@@ -55,11 +55,12 @@ export class PedidosMenuGridComponent {
 
   private facade = inject(RestauranteFacade);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   agregarProducto(product: any) {
     if (!this.facade.pedidoActivo()) {
       alert('Atención: Debes tener una mesa asignada para poder agregar productos al pedido.');
-      this.router.navigate(['/restaurante/mesas']);
+      this.router.navigate(['../mesas'], { relativeTo: this.route });
       return;
     }
 
