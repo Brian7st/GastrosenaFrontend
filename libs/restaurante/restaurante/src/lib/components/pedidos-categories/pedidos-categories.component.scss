@@ -101,8 +101,8 @@
     }
 
     &.active {
-      background-color: var(--color-primary);
-      color: white;
+      background-color: var(--color-primary-light);
+      color: var(--color-primary);
       border-color: var(--color-primary);
     }
   }
