@@ -18,7 +18,7 @@
     height: 6px;
   }
   &::-webkit-scrollbar-thumb {
-    background-color: #cbd5e1;
+    background-color: var(--color-border);
     border-radius: 4px;
   }
 
@@ -80,7 +80,7 @@
     height: 4px;
   }
   &::-webkit-scrollbar-thumb {
-    background-color: #cbd5e1;
+    background-color: var(--color-border);
     border-radius: 4px;
   }
 

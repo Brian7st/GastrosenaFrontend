@@ -10,22 +10,6 @@
     color: var(--color-text-primary);
     margin: 0;
   }
-
-  .filter-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: none;
-    border: none;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--color-text-secondary);
-    cursor: pointer;
-    
-    &:hover {
-      color: var(--color-primary);
-    }
-  }
 }
 
 .menu-grid {
@@ -120,7 +104,6 @@
           margin-bottom: 0.15rem;
         }
       }
-    }
     }
   }
 
