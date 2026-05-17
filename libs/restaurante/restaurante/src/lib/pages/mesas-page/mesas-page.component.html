@@ -96,13 +96,22 @@
                 <span>Asignar Mesa</span>
               </restaurant-button>
             } @else if (mesa.estado === 'ocupada') {
-              <restaurant-button
-                class="full-width"
-                variant="danger"
-                (click)="abrirModal('liberar', mesa)"
-              >
-                <span>Liberar</span>
-              </restaurant-button>
+              <div class="mesa-card__actions">
+                <restaurant-button
+                  class="flex-1"
+                  variant="primary"
+                  (click)="verPedido(mesa.id)"
+                >
+                  <span>Pedido</span>
+                </restaurant-button>
+                <restaurant-button
+                  class="flex-1"
+                  variant="danger"
+                  (click)="abrirModal('liberar', mesa)"
+                >
+                  <span>Liberar</span>
+                </restaurant-button>
+              </div>
             } @else if (mesa.estado === 'por_pagar') {
               <restaurant-button
                 class="full-width"
@@ -237,7 +246,7 @@
 
         @if (modalActivo() === 'eliminar-global') {
           <h3>Eliminar Mesa</h3>
-          <div class="form-group" style="margin: var(--space-4) 0;">
+          <div class="form-group delete-mesa-group">
             <label>Selecciona la mesa que deseas eliminar</label>
             <div class="input-with-icon">
               <select class="form-control select-control" [ngModel]="mesaIdParaEliminar()" (ngModelChange)="mesaIdParaEliminar.set(+$event)">
@@ -247,7 +256,7 @@
                 }
               </select>
             </div>
-            <p style="font-size: var(--font-size-xs); color: var(--color-danger); margin-top: var(--space-2);">Esta acción no se puede deshacer.</p>
+            <p class="delete-mesa-warning">Esta acción no se puede deshacer.</p>
           </div>
           <div class="modal-actions">
             <restaurant-button variant="ghost" (click)="cerrarModales()">

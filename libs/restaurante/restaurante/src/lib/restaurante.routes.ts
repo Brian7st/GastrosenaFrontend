@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { MesasPageComponent } from './pages/mesas-page/mesas-page.component';
+import { PedidosPageComponent } from './pages/pedidos-page/pedidos-page.component';
 
 export const RESTAURANTE_ROUTES: Routes = [
   {
@@ -10,6 +11,10 @@ export const RESTAURANTE_ROUTES: Routes = [
   {
     path: 'mesas',
     component: MesasPageComponent,
+  },
+  {
+    path: 'pedidos',
+    component: PedidosPageComponent,
   },
 ];
 
