@@ -30,3 +30,6 @@ coverage/
 .DS_Store
 Thumbs.db
 log_implementacion.md
+
+# Documentos locales de desarrollo (no subir al repo)
+docs/informacionRestaurante/
