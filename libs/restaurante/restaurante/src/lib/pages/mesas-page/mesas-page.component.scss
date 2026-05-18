@@ -468,14 +468,83 @@
     }
   }
 
-  .delete-mesa-group {
-    margin: var(--space-4) 0;
+  .modal-body-scrollable {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-bottom: var(--space-4);
   }
 
-  .delete-mesa-warning {
-    font-size: var(--font-size-xs);
-    color: var(--color-danger);
-    margin-top: var(--space-2);
-    margin-bottom: 0;
+  .tabs-container {
+    display: flex;
+    gap: var(--space-2);
+    padding: 0 var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: var(--space-4);
+
+    .tab-btn {
+      flex: 1;
+      padding: var(--space-3) var(--space-4);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        color: var(--color-brand-primary);
+        background-color: rgba(var(--color-brand-primary-rgb), 0.05);
+      }
+
+      &.active {
+        color: var(--color-brand-primary);
+        border-bottom-color: var(--color-brand-primary);
+      }
+    }
+  }
+
+  .mesa-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: 0 var(--space-6);
+
+    .mesa-list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-3);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background-color: var(--color-fondo);
+
+      .mesa-list-info {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+      }
+
+      .mesa-list-number {
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-text-primary);
+      }
+
+      .badge-inactiva {
+        font-size: var(--font-size-xs);
+        padding: var(--space-1) var(--space-2);
+        border-radius: var(--radius-full);
+        background-color: var(--color-border);
+        color: var(--color-text-secondary);
+      }
+    }
+
+    .empty-msg {
+      text-align: center;
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
+      padding: var(--space-4) 0;
+    }
   }
 }

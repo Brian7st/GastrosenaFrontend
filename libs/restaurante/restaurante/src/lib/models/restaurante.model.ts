@@ -8,6 +8,7 @@ export interface Mesa {
   asientos: number;
   estado: EstadoMesa;
   comensal?: string;
+  cantidadComensales?: number;
   ordenActual?: Pedido | null;
   notas?: string;
   zona?: string;
