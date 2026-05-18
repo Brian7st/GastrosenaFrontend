@@ -7,9 +7,9 @@
     ></restaurant-page-header>
     
     <div class="header-actions">
-      <restaurant-button variant="danger" (click)="abrirModal('eliminar-global')">
-        <lucide-icon name="trash-2" [size]="18"></lucide-icon>
-        <span>Eliminar Mesa</span>
+      <restaurant-button variant="surface" (click)="abrirModal('gestion-mesas')">
+        <lucide-icon name="layout-grid" [size]="18"></lucide-icon>
+        <span>Mesas</span>
       </restaurant-button>
       <restaurant-button (click)="abrirModal('agregar')">
         <lucide-icon name="plus" [size]="18"></lucide-icon>
@@ -46,7 +46,7 @@
   <!-- Grid de Mesas -->
   <section class="mesas-page__content">
     <div class="mesas-grid">
-      @for (mesa of mesas(); track mesa.id) {
+      @for (mesa of mesasActivas(); track mesa.id) {
         <restaurant-card
           [ngClass]="['mesa-card', 'mesa-card--' + mesa.estado]"
         >
@@ -75,7 +75,7 @@
             <div class="mesa-card__info-row">
               <div class="mesa-card__info">
                 <lucide-icon name="users" [size]="14"></lucide-icon>
-                <span>{{ mesa.asientos }} as.</span>
+                <span>{{ mesa.cantidadComensales || 0 }} pers.</span>
               </div>
               @if (mesa.comensal) {
                 <div class="mesa-card__client">
@@ -147,18 +147,9 @@
             </button>
           </div>
           <div class="modal-body-custom">
-            <div class="form-row">
-              <div class="form-group flex-1">
-                <label>Número de Mesa</label>
-                <input type="number" [ngModel]="nuevoNumero()" (ngModelChange)="nuevoNumero.set($event)" class="form-control">
-              </div>
-              <div class="form-group flex-1">
-                <label>Capacidad</label>
-                <div class="input-with-icon">
-                  <input type="number" [ngModel]="nuevoAsientos()" (ngModelChange)="nuevoAsientos.set($event)" class="form-control">
-                  <lucide-icon name="users" [size]="16" class="input-icon"></lucide-icon>
-                </div>
-              </div>
+            <div class="form-group">
+              <label>Número de Mesa</label>
+              <input type="number" [ngModel]="nuevoNumero()" (ngModelChange)="nuevoNumero.set($event)" class="form-control">
             </div>
             
             <div class="form-group">
@@ -191,6 +182,13 @@
           <div class="form-group">
             <label>Nombre del Comensal o Referencia</label>
             <input type="text" [ngModel]="nuevoComensal()" (ngModelChange)="nuevoComensal.set($event)" class="form-control" placeholder="Ej: Familia Pérez">
+          </div>
+          <div class="form-group">
+            <label>Cantidad de Personas</label>
+            <div class="input-with-icon">
+              <input type="number" min="1" [ngModel]="nuevaCantidadComensales()" (ngModelChange)="nuevaCantidadComensales.set($event)" class="form-control">
+              <lucide-icon name="users" [size]="16" class="input-icon"></lucide-icon>
+            </div>
           </div>
           <div class="modal-actions">
             <restaurant-button variant="ghost" (click)="cerrarModales()">
@@ -244,28 +242,60 @@
           </div>
         }
 
-        @if (modalActivo() === 'eliminar-global') {
-          <h3>Eliminar Mesa</h3>
-          <div class="form-group delete-mesa-group">
-            <label>Selecciona la mesa que deseas eliminar</label>
-            <div class="input-with-icon">
-              <select class="form-control select-control" [ngModel]="mesaIdParaEliminar()" (ngModelChange)="mesaIdParaEliminar.set(+$event)">
-                <option [value]="null">Seleccione una mesa...</option>
-                @for (m of mesas(); track m.id) {
-                  <option [value]="m.id">Mesa {{ m.numero }} ({{ m.estado }})</option>
-                }
-              </select>
-            </div>
-            <p class="delete-mesa-warning">Esta acción no se puede deshacer.</p>
+        @if (modalActivo() === 'gestion-mesas') {
+          <div class="modal-header-colored">
+            <h3>Gestión de Mesas</h3>
+            <button class="close-btn" (click)="cerrarModales()">
+              <lucide-icon name="x" [size]="20"></lucide-icon>
+            </button>
           </div>
-          <div class="modal-actions">
-            <restaurant-button variant="ghost" (click)="cerrarModales()">
-              <span>Cancelar</span>
-            </restaurant-button>
-            @if (mesaIdParaEliminar()) {
-              <restaurant-button variant="danger" (click)="eliminarMesa(mesaIdParaEliminar()!)">
-                <span>Eliminar</span>
-              </restaurant-button>
+          
+          <div class="tabs-container">
+            <button class="tab-btn" [class.active]="tabActivo() === 'desactivar'" (click)="tabActivo.set('desactivar')">
+              Desactivar
+            </button>
+            <button class="tab-btn" [class.active]="tabActivo() === 'activar'" (click)="tabActivo.set('activar')">
+              Activar
+            </button>
+          </div>
+
+          <div class="modal-body-custom modal-body-scrollable">
+            @if (tabActivo() === 'desactivar') {
+              <div class="mesa-list">
+                @for (m of mesasActivas(); track m.id) {
+                  <div class="mesa-list-item">
+                    <div class="mesa-list-info">
+                      <span class="mesa-list-number">Mesa {{ m.numero }}</span>
+                      <restaurant-status-badge [label]="m.estado" [variant]="getBadgeType(m.estado)"></restaurant-status-badge>
+                    </div>
+                    <restaurant-button 
+                      variant="danger" 
+                      [disabled]="m.estado !== 'libre'"
+                      (click)="cambiarEstadoMesa(m.id, false)"
+                      [title]="m.estado !== 'libre' ? 'No se puede desactivar una mesa ocupada' : ''">
+                      <span>Desactivar</span>
+                    </restaurant-button>
+                  </div>
+                } @empty {
+                  <p class="empty-msg">No hay mesas activas disponibles.</p>
+                }
+              </div>
+            } @else {
+              <div class="mesa-list">
+                @for (m of mesasInactivas(); track m.id) {
+                  <div class="mesa-list-item">
+                    <div class="mesa-list-info">
+                      <span class="mesa-list-number">Mesa {{ m.numero }}</span>
+                      <span class="badge-inactiva">Desactivada</span>
+                    </div>
+                    <restaurant-button variant="primary" (click)="cambiarEstadoMesa(m.id, true)">
+                      <span>Activar</span>
+                    </restaurant-button>
+                  </div>
+                } @empty {
+                  <p class="empty-msg">No hay mesas desactivadas.</p>
+                }
+              </div>
             }
           </div>
         }

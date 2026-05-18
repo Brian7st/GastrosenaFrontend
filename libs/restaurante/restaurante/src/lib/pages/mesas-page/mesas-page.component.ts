@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { 
@@ -39,11 +39,14 @@ export class MesasPageComponent {
 
   // Signals del Facade
   mesas = this.facade.mesas;
+  mesasActivas = computed(() => this.mesas().filter(m => m.isActive !== false));
+  mesasInactivas = computed(() => this.mesas().filter(m => m.isActive === false));
   stats = this.facade.stats;
 
   // Estado local reactivo (Signals)
   modalActivo = signal<string | null>(null);
   mesaSeleccionada = signal<Mesa | null>(null);
+  tabActivo = signal<'desactivar' | 'activar'>('desactivar');
   
   // Signals para crear mesa
   nuevoNumero = signal<number>(1);
@@ -51,12 +54,12 @@ export class MesasPageComponent {
   nuevaZona = signal<string>('');
   nuevoActivo = signal<boolean>(true);
 
-  // Signal para eliminar mesa
-  mesaIdParaEliminar = signal<number | null>(null);
+  // Eliminamos mesaIdParaEliminar ya que no usaremos eliminar-global
   
   // Signals para abrir mesa
   nuevoComensal = signal<string>('');
   nuevaNota = signal<string>('');
+  nuevaCantidadComensales = signal<number>(1);
 
   abrirModal(nombre: string, mesa: Mesa | null = null) {
     this.modalActivo.set(nombre);
@@ -66,17 +69,19 @@ export class MesasPageComponent {
       const mesas = this.facade.mesas();
       const nextNum = mesas.length > 0 ? Math.max(...mesas.map(m => m.numero)) + 1 : 1;
       this.nuevoNumero.set(nextNum);
-      this.nuevoAsientos.set(4);
+      this.nuevoAsientos.set(1);
       this.nuevaZona.set('');
       this.nuevoActivo.set(true);
-    } else if (nombre === 'eliminar-global') {
-      this.mesaIdParaEliminar.set(null);
+    } else if (nombre === 'gestion-mesas') {
+      this.tabActivo.set('desactivar');
     } else if (mesa) {
       this.nuevoComensal.set(mesa.comensal || '');
       this.nuevaNota.set(mesa.notas || '');
+      this.nuevaCantidadComensales.set(mesa.cantidadComensales || 1);
     } else {
       this.nuevoComensal.set('');
       this.nuevaNota.set('');
+      this.nuevaCantidadComensales.set(1);
     }
   }
 
@@ -97,7 +102,7 @@ export class MesasPageComponent {
 
   abrirMesa(id: number) {
     if (this.nuevoComensal().trim()) {
-      this.facade.abrirMesa(id, this.nuevoComensal());
+      this.facade.abrirMesa(id, this.nuevoComensal(), this.nuevaCantidadComensales());
       this.facade.seleccionarMesaParaPedido(id);
       this.cerrarModales();
       this.router.navigate(['../pedidos'], { relativeTo: this.route });
@@ -120,6 +125,10 @@ export class MesasPageComponent {
   eliminarMesa(id: number) {
     this.facade.eliminarMesa(id);
     this.cerrarModales();
+  }
+
+  cambiarEstadoMesa(id: number, isActive: boolean) {
+    this.facade.cambiarEstadoActivoMesa(id, isActive);
   }
 
   liberarMesa(id: number) {
