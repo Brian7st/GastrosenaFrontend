@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { ButtonComponent, DataTableComponent, KpiCardComponent } from '@restaurant/shared/ui';
 import { ExportarConsolidadoModalComponent } from '../components/exportar-consolidado-modal/exportar-consolidado-modal.component';
 import { ReversarConsolidadoModalComponent } from '../components/reversar-consolidado-modal/reversar-consolidado-modal.component';
@@ -14,13 +14,23 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
   styleUrl: './consolidado-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ConsolidadoDetailComponent {
+export class ConsolidadoDetailComponent implements OnInit {
   private router = inject(Router);
   private location = inject(Location);
+  private route = inject(ActivatedRoute);
 
-  showExportModal = false;
-  showReversarModal = false;
-  isReversarBlocked = false;
+  ngOnInit() {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (!id) {
+      this.router.navigate(['/app/inventario/consolidado']);
+      return;
+    }
+    // TODO: llamar a consolidadoFacade.cargarConsolidado(id)
+  }
+
+  showExportModal = signal(false);
+  showReversarModal = signal(false);
+  isReversarBlocked = signal(false);
 
   // Mocks para la tabla de subtotales
   subtotales = [
@@ -51,30 +61,30 @@ export class ConsolidadoDetailComponent {
     this.router.navigate(['/app/inventario/solicitudes-gil', codigo]);
   }
 
-  openExportModal() {
-    this.showExportModal = true;
+  openExportModal(): void {
+    this.showExportModal.set(true);
   }
 
-  closeExportModal() {
-    this.showExportModal = false;
+  closeExportModal(): void {
+    this.showExportModal.set(false);
   }
 
-  onExport(format: 'excel' | 'pdf') {
-    console.log('Exporting detail as', format);
-    this.showExportModal = false;
+  onExport(format: 'excel' | 'pdf'): void {
+    // TODO: llamar a consolidadoFacade.exportar(format)
+    this.showExportModal.set(false);
   }
 
-  openReversarModal() {
-    this.isReversarBlocked = false; // Mock
-    this.showReversarModal = true;
+  openReversarModal(): void {
+    this.isReversarBlocked.set(false); // Mock
+    this.showReversarModal.set(true);
   }
 
-  closeReversarModal() {
-    this.showReversarModal = false;
+  closeReversarModal(): void {
+    this.showReversarModal.set(false);
   }
 
-  confirmReversar() {
-    console.log('Reversing detail!');
+  confirmReversar(): void {
+    // TODO: llamar a consolidadoFacade.reversarConsolidado(this.route.snapshot.paramMap.get('id')!)
     this.closeReversarModal();
   }
 }

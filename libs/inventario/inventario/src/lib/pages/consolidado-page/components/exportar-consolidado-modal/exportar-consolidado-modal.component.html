@@ -17,8 +17,8 @@
         <!-- Option 1: Excel -->
         <button 
           class="format-card" 
-          [class.format-card--active]="selectedFormat === 'excel'"
-          (click)="selectedFormat = 'excel'">
+          [class.format-card--active]="selectedFormat() === 'excel'"
+          (click)="selectedFormat.set('excel')">
           <div class="format-card__icon-wrap">
             <span class="material-symbols-outlined format-card__icon text-primary">table_chart</span>
           </div>
@@ -30,7 +30,7 @@
             <span class="material-symbols-outlined">check_circle</span>
             <span>Incluye retenciones ZESE</span>
           </div>
-          <div class="format-card__check" *ngIf="selectedFormat === 'excel'">
+          <div class="format-card__check" *ngIf="selectedFormat() === 'excel'">
             <span class="material-symbols-outlined">check_circle</span>
           </div>
         </button>
@@ -38,8 +38,8 @@
         <!-- Option 2: PDF -->
         <button 
           class="format-card" 
-          [class.format-card--active]="selectedFormat === 'pdf'"
-          (click)="selectedFormat = 'pdf'">
+          [class.format-card--active]="selectedFormat() === 'pdf'"
+          (click)="selectedFormat.set('pdf')">
           <div class="format-card__icon-wrap">
             <span class="material-symbols-outlined format-card__icon text-tertiary">picture_as_pdf</span>
           </div>
@@ -47,7 +47,7 @@
           <p class="format-card__desc">
             Documento formal listo para firma digital y presentación de informes mensuales ante contabilidad.
           </p>
-          <div class="format-card__check" *ngIf="selectedFormat === 'pdf'">
+          <div class="format-card__check" *ngIf="selectedFormat() === 'pdf'">
             <span class="material-symbols-outlined">check_circle</span>
           </div>
         </button>
