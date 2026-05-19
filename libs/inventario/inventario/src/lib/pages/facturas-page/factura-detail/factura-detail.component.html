@@ -1,4 +1,5 @@
 <div class="factura-detail-page">
+  <ng-container *ngIf="factura() as f; else loadingTpl">
   <!-- Header Section -->
   <header class="page-header">
     <div class="page-header__left">
@@ -7,12 +8,12 @@
         <ol>
           <li><a routerLink="/app/inventario/facturas">Facturas</a></li>
           <li class="separator"><span class="material-symbols-outlined">chevron_right</span></li>
-          <li class="current">FEL</li>
+          <li class="current">{{ f.numeroFEL }}</li>
         </ol>
       </nav>
       <div class="page-header__title-row">
-        <h1 class="page-header__title">Factura Electrónica</h1>
-        <span class="badge badge--verificada">VERIFICADA</span>
+        <h1 class="page-header__title">Factura Electrónica {{ f.numeroFEL }}</h1>
+        <span class="badge" [ngClass]="'badge--' + (f.estado === 'Verificada' ? 'verificada' : (f.estado === 'Anulada' ? 'error' : 'primary-soft'))">{{ f.estado | uppercase }}</span>
       </div>
     </div>
 
@@ -36,8 +37,8 @@
           <!-- Emisor -->
           <div class="party-info">
             <span class="party-info__label">Emisor</span>
-            <h3 class="party-info__name">INVERSIONES QDE S.A.S</h3>
-            <p class="party-info__doc">NIT 900802002-1</p>
+            <h3 class="party-info__name">{{ f.razonSocial || f.proveedor }}</h3>
+            <p class="party-info__doc">NIT {{ f.nitEmisor }}</p>
             <p class="party-info__location">
               <span class="material-symbols-outlined">location_on</span> Armenia
             </p>
@@ -46,7 +47,7 @@
           <div class="party-info">
             <span class="party-info__label">Receptor</span>
             <h3 class="party-info__name">SERVICIO NACIONAL DE APRENDIZAJE</h3>
-            <p class="party-info__doc">NIT 899999034</p>
+            <p class="party-info__doc">NIT {{ f.nitReceptor }}</p>
             <p class="party-info__location">
               <span class="material-symbols-outlined">location_on</span> Armenia
             </p>
@@ -59,11 +60,11 @@
         <div class="metadata-grid">
           <div class="metadata-item">
             <span class="metadata-item__label">Fecha Emisión</span>
-            <p class="metadata-item__value">29 May 2025</p>
+            <p class="metadata-item__value">{{ f.fechaEmision | date:'dd MMM yyyy' }}</p>
           </div>
           <div class="metadata-item">
             <span class="metadata-item__label">Vencimiento</span>
-            <p class="metadata-item__value">29 Jun 2025</p>
+            <p class="metadata-item__value">{{ (f.fechaVencimiento | date:'dd MMM yyyy') || 'N/A' }}</p>
           </div>
           <div class="metadata-item">
             <span class="metadata-item__label">Forma Pago</span>
@@ -72,7 +73,7 @@
           <div class="metadata-item">
             <span class="metadata-item__label">Orden Compra</span>
             <a href="#" class="metadata-item__link group">
-              08 - Sebastian Betancourt
+              {{ f.ordenCompra || 'N/A' }}
               <span class="material-symbols-outlined icon-arrow">arrow_forward</span>
             </a>
           </div>
@@ -94,36 +95,17 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td class="text-center font-medium text-secondary">1</td>
-              <td class="font-medium">Salchichas Manguera Tipo Suiza</td>
+            <tr *ngFor="let item of f.items; let i = index">
+              <td class="text-center font-medium text-secondary">{{ i + 1 }}</td>
+              <td class="font-medium">{{ item.descripcion }}</td>
               <td class="text-secondary">UND</td>
-              <td class="text-right">11</td>
-              <td class="text-right">$28,546</td>
-              <td class="text-right text-secondary">19%</td>
-              <td class="text-right font-semibold">$314,006</td>
+              <td class="text-right">{{ item.cantidad }}</td>
+              <td class="text-right">{{ item.precioUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+              <td class="text-right text-secondary">{{ item.iva }}%</td>
+              <td class="text-right font-semibold">{{ item.total | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
             </tr>
-            <tr class="row-highlight-tertiary">
-              <td class="text-center font-medium text-secondary">2</td>
-              <td class="font-medium">Harina de Trigo Fortificada</td>
-              <td class="text-secondary">UND</td>
-              <td class="text-right">10</td>
-              <td class="text-right">$5,700</td>
-              <td class="text-right"><span class="badge badge--tertiary">5%</span></td>
-              <td class="text-right font-semibold">$57,000</td>
-            </tr>
-            <tr class="row-highlight-surface">
-              <td class="text-center font-medium text-secondary">3</td>
-              <td class="font-medium text-secondary">Papa Pastusa Lavada</td>
-              <td class="text-secondary">Gr</td>
-              <td class="text-right">10,000</td>
-              <td class="text-right">$6.00</td>
-              <td class="text-right text-secondary">0%</td>
-              <td class="text-right font-semibold">$60,000</td>
-            </tr>
-            <tr>
-              <td class="text-center font-medium text-secondary">...</td>
-              <td colspan="6" class="text-secondary italic">5 ítems adicionales omitidos en esta vista...</td>
+            <tr *ngIf="!f.items || f.items.length === 0">
+              <td colspan="7" class="text-center text-secondary py-4">No hay artículos registrados.</td>
             </tr>
           </tbody>
         </restaurant-data-table>
@@ -144,7 +126,7 @@
             <div class="cufe-box">
               <div class="cufe-box__text">
                 <span class="cufe-box__label">CUFE</span>
-                <span class="cufe-box__value">8a9f...c2d1e</span>
+                <span class="cufe-box__value" [title]="f.cufe">{{ f.cufe ? (f.cufe | slice:0:10) + '...' + (f.cufe | slice:-5) : 'N/A' }}</span>
               </div>
               <button class="icon-btn" title="Copiar CUFE">
                 <span class="material-symbols-outlined">content_copy</span>
@@ -177,17 +159,17 @@
             <div class="linked-header">
               <div>
                 <span class="linked-header__label">Documento Vinculado</span>
-                <h4 class="linked-header__title">GIL-F-014-001</h4>
+                <h4 class="linked-header__title">{{ f.gilVinculado || 'Sin vincular' }}</h4>
               </div>
-              <span class="badge badge--primary-soft text-[10px]">APROBADO</span>
+              <span class="badge badge--primary-soft text-[10px]" *ngIf="f.gilVinculado">VINCULADO</span>
             </div>
 
-            <div class="linked-details">
-              <p><span class="material-symbols-outlined">person</span> Sebastian Betancourt</p>
-              <p class="font-bold"><span class="material-symbols-outlined">payments</span> $1,011,047.00</p>
+            <div class="linked-details" *ngIf="f.gilVinculado">
+              <p><span class="material-symbols-outlined">person</span> {{ f.instructorCuentadante || 'Responsable' }}</p>
+              <p class="font-bold"><span class="material-symbols-outlined">payments</span> {{ f.total | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
             </div>
 
-            <button class="linked-btn group" (click)="onVerGil('GIL-F-014-001')">
+            <button class="linked-btn group" *ngIf="f.gilVinculado" (click)="onVerGil(f.gilVinculado)">
               Ver GIL completo
               <span class="material-symbols-outlined group-hover-translate">arrow_right_alt</span>
             </button>
@@ -219,7 +201,7 @@
         <div class="summary__body">
           <div class="summary-row">
             <span class="summary-row__label">Valor Bruto</span>
-            <span class="summary-row__value font-medium">$850,000.00</span>
+            <span class="summary-row__value font-medium">{{ f.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
           </div>
           <div class="summary-row text-tertiary">
             <span class="summary-row__label">Descuento</span>
@@ -230,7 +212,7 @@
 
           <div class="summary-row">
             <span class="summary-row__label font-semibold">Subtotal Base</span>
-            <span class="summary-row__value font-bold">$850,000.00</span>
+            <span class="summary-row__value font-bold">{{ f.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
           </div>
 
           <!-- Desglose IVA -->
@@ -242,18 +224,18 @@
             </div>
             <div class="summary-row summary-row--sm">
               <span class="summary-row__label">IVA 5%</span>
-              <span class="summary-row__value">$2,850.00</span>
+              <span class="summary-row__value">$0.00</span>
             </div>
             <div class="summary-row summary-row--sm">
               <span class="summary-row__label">IVA 19%</span>
-              <span class="summary-row__value">$158,197.00</span>
+              <span class="summary-row__value">$0.00</span>
             </div>
 
             <div class="divider my-2"></div>
 
             <div class="summary-row">
               <span class="summary-row__label font-semibold">Total IVA</span>
-              <span class="summary-row__value font-bold">$161,047.00</span>
+              <span class="summary-row__value font-bold">{{ f.ivaTotal | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
             </div>
           </div>
 
@@ -263,9 +245,9 @@
               <span class="summary-row__label">Retención ZESE</span>
               <span class="material-symbols-outlined text-[14px] text-outline">info</span>
             </div>
-            <span class="summary-row__value font-medium">$0.00</span>
+            <span class="summary-row__value font-medium">{{ f.retencionZESE || 0 }}%</span>
 
-            <div class="tooltip">Aplica tarifa 0% por régimen especial ZESE registrado.</div>
+            <div class="tooltip">Aplica tarifa {{ f.retencionZESE || 0 }}% por régimen especial ZESE registrado.</div>
           </div>
         </div>
 
@@ -273,11 +255,19 @@
         <div class="summary__footer">
           <span class="summary__footer-label">Total a Pagar</span>
           <div class="text-right">
-            <span class="summary__footer-total">$1,011,047.00</span>
-            <p class="summary__footer-currency">COP • Pesos Colombianos</p>
+            <span class="summary__footer-total">{{ f.total | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+            <p class="summary__footer-currency">{{ f.moneda }} • Pesos Colombianos</p>
           </div>
         </div>
       </section>
     </div>
   </div>
+  </ng-container>
+
+  <ng-template #loadingTpl>
+    <div class="flex flex-col items-center justify-center p-12 text-secondary">
+      <span class="material-symbols-outlined animate-spin text-4xl mb-4">sync</span>
+      <p>Cargando información de la factura...</p>
+    </div>
+  </ng-template>
 </div>

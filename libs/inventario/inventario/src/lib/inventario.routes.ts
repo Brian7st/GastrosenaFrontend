@@ -2,9 +2,6 @@ import { Routes } from '@angular/router';
 import { BienesListPageComponent } from './ui/pages/bienes-list/bienes-list.component';
 import { BienDetailPageComponent } from './ui/pages/bien-detail/bien-detail.component';
 import { BienExportPageComponent } from './ui/pages/bien-export/bien-export.component';
-import { FacturasListPageComponent } from './pages/facturas-page/facturas-list/facturas-list.component';
-import { FacturaEditPageComponent } from './pages/facturas-page/factura-edit/factura-edit.component';
-import { GilSolicitudDetailPageComponent } from './pages/facturas-page/gil-solicitud-detail/gil-solicitud-detail.component';
 
 export const INVENTARIO_ROUTES: Routes = [
   // ── Gestión de Bienes ────────────────────────────────────────────────────
@@ -72,12 +69,17 @@ export const INVENTARIO_ROUTES: Routes = [
   // Vista 1: Panel de Facturación (listado + KPIs)
   {
     path: 'facturas',
-    component: FacturasListPageComponent,
+    loadComponent: () => import('./pages/facturas-page/facturas-list/facturas-list.component').then(m => m.FacturasListPageComponent),
   },
   // Vista de Importar Factura
   {
     path: 'facturas/importar',
     loadComponent: () => import('./pages/facturas-page/factura-import/factura-import.component').then(m => m.FacturaImportPageComponent)
+  },
+  // Vista 5: Detalle Solicitud GIL F-014
+  {
+    path: 'facturas/gil/:id',
+    loadComponent: () => import('./pages/facturas-page/gil-solicitud-detail/gil-solicitud-detail.component').then(m => m.GilSolicitudDetailPageComponent),
   },
   // Vista 3: Detalle de Factura FEL (Bento Grid)
   {
@@ -87,12 +89,7 @@ export const INVENTARIO_ROUTES: Routes = [
   // Vista 4: Editar Factura FEL (Editable/Lectura antigua)
   {
     path: 'facturas/:id/editar',
-    component: FacturaEditPageComponent,
-  },
-  // Vista 5: Detalle Solicitud GIL F-014
-  {
-    path: 'facturas/gil/:id',
-    component: GilSolicitudDetailPageComponent,
+    loadComponent: () => import('./pages/facturas-page/factura-edit/factura-edit.component').then(m => m.FacturaEditPageComponent),
   },
 
   // ── Consolidado de Ejecución Presupuestal ────────────────────────────────
