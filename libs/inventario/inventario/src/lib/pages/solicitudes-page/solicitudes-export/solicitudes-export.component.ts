@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'app-solicitudes-export',
+  selector: 'restaurant-solicitudes-export',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './solicitudes-export.component.html',

@@ -5,7 +5,7 @@ import { ButtonComponent, DataTableComponent, KpiCardComponent } from '@restaura
 import { SolicitudGil } from '../../../models/solicitudes-gil.model';
 
 @Component({
-  selector: 'app-solicitudes-list',
+  selector: 'restaurant-solicitudes-list',
   standalone: true,
   imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent],
   templateUrl: './solicitudes-list.component.html',

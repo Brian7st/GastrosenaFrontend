@@ -5,7 +5,7 @@ import { ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 
 @Component({
-  selector: 'app-solicitudes-form',
+  selector: 'restaurant-solicitudes-form',
   standalone: true,
   imports: [CommonModule, RouterModule, ButtonComponent, BackButtonComponent],
   templateUrl: './solicitudes-form.component.html',

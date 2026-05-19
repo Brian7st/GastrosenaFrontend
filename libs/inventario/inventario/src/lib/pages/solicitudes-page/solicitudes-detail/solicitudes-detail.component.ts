@@ -4,7 +4,7 @@ import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 
 @Component({
-  selector: 'app-solicitudes-detail',
+  selector: 'restaurant-solicitudes-detail',
   standalone: true,
   imports: [CommonModule, RouterModule, BackButtonComponent],
   templateUrl: './solicitudes-detail.component.html',
