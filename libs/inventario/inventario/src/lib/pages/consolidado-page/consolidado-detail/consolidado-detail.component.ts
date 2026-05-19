@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { ButtonComponent, DataTableComponent, KpiCardComponent } from '@restaurant/shared/ui';
 import { ExportarConsolidadoModalComponent } from '../components/exportar-consolidado-modal/exportar-consolidado-modal.component';
 import { ReversarConsolidadoModalComponent } from '../components/reversar-consolidado-modal/reversar-consolidado-modal.component';
@@ -14,9 +14,19 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
   styleUrl: './consolidado-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ConsolidadoDetailComponent {
+export class ConsolidadoDetailComponent implements OnInit {
   private router = inject(Router);
   private location = inject(Location);
+  private route = inject(ActivatedRoute);
+
+  ngOnInit() {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (!id) {
+      this.router.navigate(['/app/inventario/consolidado']);
+      return;
+    }
+    // TODO: llamar a consolidadoFacade.cargarConsolidado(id)
+  }
 
   showExportModal = signal(false);
   showReversarModal = signal(false);
