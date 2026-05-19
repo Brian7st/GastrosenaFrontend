@@ -1,7 +1,5 @@
 import { Routes } from '@angular/router';
-import { BienesListPageComponent } from './ui/pages/bienes-list/bienes-list.component';
-import { BienDetailPageComponent } from './ui/pages/bien-detail/bien-detail.component';
-import { BienExportPageComponent } from './ui/pages/bien-export/bien-export.component';
+
 import { FacturasListPageComponent } from './pages/facturas-page/facturas-list/facturas-list.component';
 import { FacturaEditPageComponent } from './pages/facturas-page/factura-edit/factura-edit.component';
 import { GilSolicitudDetailPageComponent } from './pages/facturas-page/gil-solicitud-detail/gil-solicitud-detail.component';
@@ -15,15 +13,15 @@ export const INVENTARIO_ROUTES: Routes = [
   },
   {
     path: 'bienes',
-    component: BienesListPageComponent,
+    loadComponent: () => import('./ui/pages/bienes-list/bienes-list.component').then(m => m.BienesListPageComponent)
   },
   {
     path: 'bienes/exportar',
-    component: BienExportPageComponent,
+    loadComponent: () => import('./ui/pages/bien-export/bien-export.component').then(m => m.BienExportPageComponent)
   },
   {
     path: 'bienes/:id',
-    component: BienDetailPageComponent,
+    loadComponent: () => import('./ui/pages/bien-detail/bien-detail.component').then(m => m.BienDetailPageComponent)
   },
 
   // ── GIL-F-014: Solicitudes de Abastecimiento ─────────────────────────────
