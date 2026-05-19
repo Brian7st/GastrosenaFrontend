@@ -1,0 +1,150 @@
+<div class="modal-backdrop" (click)="cerrar.emit()" (keydown.escape)="cerrar.emit()" role="dialog" aria-modal="true" tabindex="-1">
+  <form class="modal" [formGroup]="form" (ngSubmit)="onGuardar()" (click)="$event.stopPropagation()" novalidate>
+
+    <!-- Header -->
+    <div class="modal__header">
+      <div class="modal__header-icon modal__header-icon--user">
+        <lucide-icon name="user-plus" [size]="20"></lucide-icon>
+      </div>
+      <div>
+        <h2 class="modal__title">Nuevo Usuario</h2>
+        <p class="modal__subtitle">Completá los datos para crear la cuenta</p>
+      </div>
+      <button class="modal__close" type="button" (click)="cerrar.emit()" aria-label="Cerrar">
+        <lucide-icon name="x" [size]="18"></lucide-icon>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal__body">
+
+      <div class="modal__row">
+        <div class="modal__field">
+          <label class="modal__label" for="uf-nombre">Nombre *</label>
+          <input
+            id="uf-nombre"
+            class="modal__input"
+            [class.modal__input--error]="form.controls.nombre.invalid && form.controls.nombre.touched"
+            type="text"
+            formControlName="nombre"
+            placeholder="Juan"
+          />
+          @if (form.controls.nombre.invalid && form.controls.nombre.touched) {
+            <span class="modal__error">Campo requerido</span>
+          }
+        </div>
+
+        <div class="modal__field">
+          <label class="modal__label" for="uf-apellidos">Apellidos *</label>
+          <input
+            id="uf-apellidos"
+            class="modal__input"
+            [class.modal__input--error]="form.controls.apellidos.invalid && form.controls.apellidos.touched"
+            type="text"
+            formControlName="apellidos"
+            placeholder="Pérez"
+          />
+          @if (form.controls.apellidos.invalid && form.controls.apellidos.touched) {
+            <span class="modal__error">Campo requerido</span>
+          }
+        </div>
+      </div>
+
+      <div class="modal__field">
+        <label class="modal__label" for="uf-email">Email *</label>
+        <input
+          id="uf-email"
+          class="modal__input"
+          [class.modal__input--error]="form.controls.email.invalid && form.controls.email.touched"
+          type="email"
+          formControlName="email"
+          placeholder="juan@gastrosena.co"
+        />
+        @if (form.controls.email.invalid && form.controls.email.touched) {
+          <span class="modal__error">Ingresá un email válido</span>
+        }
+      </div>
+
+      <div class="modal__row">
+        <div class="modal__field">
+          <label class="modal__label" for="uf-documento">Documento *</label>
+          <input
+            id="uf-documento"
+            class="modal__input"
+            [class.modal__input--error]="form.controls.documento.invalid && form.controls.documento.touched"
+            type="text"
+            formControlName="documento"
+            placeholder="1234567890"
+          />
+          @if (form.controls.documento.invalid && form.controls.documento.touched) {
+            <span class="modal__error">Campo requerido</span>
+          }
+        </div>
+
+        <div class="modal__field">
+          <label class="modal__label" for="uf-telefono">Teléfono *</label>
+          <input
+            id="uf-telefono"
+            class="modal__input"
+            [class.modal__input--error]="form.controls.telefono.invalid && form.controls.telefono.touched"
+            type="tel"
+            formControlName="telefono"
+            placeholder="+57 300 000 0000"
+          />
+          @if (form.controls.telefono.invalid && form.controls.telefono.touched) {
+            <span class="modal__error">Campo requerido</span>
+          }
+        </div>
+      </div>
+
+      <div class="modal__field">
+        <label class="modal__label" for="uf-rol">Rol *</label>
+        <div class="modal__select-wrapper">
+          <select
+            id="uf-rol"
+            class="modal__select"
+            [class.modal__select--error]="form.controls.idRol.invalid && form.controls.idRol.touched"
+            formControlName="idRol"
+          >
+            <option value="" disabled>Seleccioná un rol</option>
+            @for (rol of rolOptions; track rol) {
+              <option [value]="rol">{{ rol }}</option>
+            }
+          </select>
+          <lucide-icon name="chevron-down" [size]="16" class="modal__select-icon"></lucide-icon>
+        </div>
+        @if (form.controls.idRol.invalid && form.controls.idRol.touched) {
+          <span class="modal__error">Seleccioná un rol</span>
+        }
+      </div>
+
+      <div class="modal__field">
+        <label class="modal__label" for="uf-contrasena">Contraseña *</label>
+        <input
+          id="uf-contrasena"
+          class="modal__input"
+          [class.modal__input--error]="form.controls.contrasena.invalid && form.controls.contrasena.touched"
+          type="password"
+          formControlName="contrasena"
+          placeholder="Mínimo 8 caracteres"
+        />
+        @if (form.controls.contrasena.invalid && form.controls.contrasena.touched) {
+          <span class="modal__error">Mínimo 8 caracteres</span>
+        }
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="modal__footer">
+      <button class="modal__btn modal__btn--ghost" type="button" (click)="cerrar.emit()">
+        Cancelar
+      </button>
+      <button class="modal__btn modal__btn--primary" type="submit">
+        <lucide-icon name="user-plus" [size]="16"></lucide-icon>
+        Crear Usuario
+      </button>
+    </div>
+
+  </form>
+</div>

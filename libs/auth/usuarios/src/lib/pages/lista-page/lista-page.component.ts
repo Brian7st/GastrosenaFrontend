@@ -19,8 +19,10 @@ import {
 } from '@restaurant/shared/ui';
 import { ExportarUsuariosComponent } from '../../components/exportar-usuarios/exportar-usuarios.component';
 import { ImportarUsuariosComponent } from '../../components/importar-usuarios/importar-usuarios.component';
+import { UsuarioFormComponent } from '../../components/usuario-form/usuario-form.component';
 import { UsuariosFacade } from '../../data-access/usuarios.facade';
 import {
+  CrearUsuarioRequest,
   ExportarConfig,
   ImportarUsuariosRequest,
   RolOpcion,
@@ -55,6 +57,7 @@ const ROL_CLASS_MAP: Record<Rol, string> = {
     SelectFilterComponent,
     ExportarUsuariosComponent,
     ImportarUsuariosComponent,
+    UsuarioFormComponent,
   ],
   templateUrl: './lista-page.component.html',
   styleUrl:    './lista-page.component.scss',
@@ -71,7 +74,6 @@ export class ListaPageComponent implements OnInit {
   readonly resultadoImport = toSignal(this.facade.resultadoImport$, { initialValue: null });
   readonly mensajeExport   = toSignal(this.facade.mensajeExport$,   { initialValue: null });
 
-  // Corrección 3 — opciones de rol dinámicas desde el store
   private readonly roles = toSignal(this.facade.roles$, { initialValue: [] as RolOpcion[] });
   readonly rolOpciones   = computed(() => [
     { value: '', label: 'Todos los roles' },
@@ -82,6 +84,7 @@ export class ListaPageComponent implements OnInit {
   readonly rolFiltro       = signal('');
   readonly mostrarExportar = signal(false);
   readonly mostrarImportar = signal(false);
+  readonly mostrarFormulario = signal(false);
 
   readonly usuariosFiltrados = computed(() => {
     const q   = this.busqueda().toLowerCase();
@@ -98,7 +101,7 @@ export class ListaPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.facade.cargarUsuarios();
-    this.facade.cargarRoles(); // Corrección 3
+    this.facade.cargarRoles();
   }
 
   getIniciales(u: UsuarioDetalle): string {
@@ -109,13 +112,20 @@ export class ListaPageComponent implements OnInit {
     return ROL_CLASS_MAP[rol] ?? 'default';
   }
 
-  // Corrección 1 — pasar config al facade
+  onCrearUsuario(): void {
+    this.mostrarFormulario.set(true);
+  }
+
+  onGuardar(data: CrearUsuarioRequest): void {
+    this.facade.crearUsuario(data);
+    this.mostrarFormulario.set(false);
+  }
+
   onExportar(config: ExportarConfig): void {
     this.facade.exportarUsuarios(config);
     this.mostrarExportar.set(false);
   }
 
-  // Corrección 6 — no cerrar modal; mostrar resultado adentro
   onImportar(req: ImportarUsuariosRequest): void {
     this.facade.importarMasivo(req);
   }

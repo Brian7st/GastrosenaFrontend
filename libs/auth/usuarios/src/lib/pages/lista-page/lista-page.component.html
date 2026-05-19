@@ -15,7 +15,7 @@
         <lucide-icon name="download" [size]="16"></lucide-icon>
         Exportar
       </button>
-      <button class="lista-page__btn lista-page__btn--primary" type="button">
+      <button class="lista-page__btn lista-page__btn--primary" type="button" (click)="onCrearUsuario()">
         <lucide-icon name="user-plus" [size]="16"></lucide-icon>
         Nuevo Usuario
       </button>
@@ -153,7 +153,6 @@
   ></restaurant-exportar-usuarios>
 }
 
-<!-- Corrección 6 — pasar resultado e importando al modal -->
 @if (mostrarImportar()) {
   <restaurant-importar-usuarios
     [resultado]="resultadoImport()"
@@ -161,4 +160,11 @@
     (cerrar)="mostrarImportar.set(false)"
     (importar)="onImportar($event)"
   ></restaurant-importar-usuarios>
+}
+
+@if (mostrarFormulario()) {
+  <restaurant-usuario-form
+    (cerrar)="mostrarFormulario.set(false)"
+    (guardar)="onGuardar($event)"
+  ></restaurant-usuario-form>
 }
