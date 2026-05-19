@@ -61,29 +61,29 @@ export class ConsolidadoDetailComponent implements OnInit {
     this.router.navigate(['/app/inventario/solicitudes-gil', codigo]);
   }
 
-  openExportModal() {
+  openExportModal(): void {
     this.showExportModal.set(true);
   }
 
-  closeExportModal() {
+  closeExportModal(): void {
     this.showExportModal.set(false);
   }
 
-  onExport(format: 'excel' | 'pdf') {
+  onExport(format: 'excel' | 'pdf'): void {
     // TODO: llamar a consolidadoFacade.exportar(format)
     this.showExportModal.set(false);
   }
 
-  openReversarModal() {
+  openReversarModal(): void {
     this.isReversarBlocked.set(false); // Mock
     this.showReversarModal.set(true);
   }
 
-  closeReversarModal() {
+  closeReversarModal(): void {
     this.showReversarModal.set(false);
   }
 
-  confirmReversar() {
+  confirmReversar(): void {
     // TODO: llamar a consolidadoFacade.reversarConsolidado(this.route.snapshot.paramMap.get('id')!)
     this.closeReversarModal();
   }

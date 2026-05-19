@@ -36,15 +36,15 @@ export class ConsolidadoListComponent {
     gilsPendientes: 14
   });
 
-  openExportModal() {
+  openExportModal(): void {
     this.showExportModal.set(true);
   }
 
-  closeExportModal() {
+  closeExportModal(): void {
     this.showExportModal.set(false);
   }
 
-  onExport(format: 'excel' | 'pdf') {
+  onExport(format: 'excel' | 'pdf'): void {
     // TODO: llamar a consolidadoFacade.exportar(format)
     this.showExportModal.set(false);
   }
@@ -52,12 +52,12 @@ export class ConsolidadoListComponent {
   // Mocks para la tabla de consolidados históricos
   consolidados = signal<Consolidado[]>(ConsolidadoMock);
 
-  goToDetail(id: string) {
+  goToDetail(id: string): void {
     // Navigate to the detail view based on ID
     this.router.navigate(['/app/inventario/consolidado', id]);
   }
 
-  reversar(id: string) {
+  reversar(id: string): void {
     const item = this.consolidados().find(c => c.id === id);
     if (item) {
       this.selectedReversarItem.set(item);
@@ -67,12 +67,12 @@ export class ConsolidadoListComponent {
     }
   }
 
-  closeReversarModal() {
+  closeReversarModal(): void {
     this.showReversarModal.set(false);
     this.selectedReversarItem.set(null);
   }
 
-  confirmReversar() {
+  confirmReversar(): void {
     if (this.selectedReversarItem()) {
       // TODO: llamar a consolidadoFacade.reversarConsolidado(this.selectedReversarItem()!.id)
     }
