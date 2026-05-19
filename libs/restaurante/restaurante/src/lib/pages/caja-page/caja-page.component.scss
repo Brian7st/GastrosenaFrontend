@@ -121,6 +121,18 @@
     }
   }
 
+  .caja-page__section-title {
+    margin-top: var(--space-4);
+    
+    h2 {
+      font-size: var(--font-size-xl);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-4);
+      padding-bottom: var(--space-2);
+      border-bottom: 2px solid var(--color-border);
+    }
+  }
+
   .icon-green { color: var(--color-success); }
   .text-green { color: var(--color-success); }
 
@@ -129,4 +141,13 @@
 
   .icon-purple { color: #6f42c1; }
   .text-purple { color: #6f42c1; }
+
+  .icon-orange { color: #fd7e14; }
+  .text-orange { color: #fd7e14; }
+
+  .icon-gray { color: var(--color-text-secondary); }
+  .text-gray { color: var(--color-text-secondary); }
+
+  .icon-red { color: var(--color-danger); }
+  .text-red { color: var(--color-danger); }
 }

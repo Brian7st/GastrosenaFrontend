@@ -99,8 +99,8 @@
         </div>
         <div class="modal-body-custom text-center">
           <p class="total-label">TOTAL A COBRAR</p>
-          <h2 class="total-amount">${{ mesaSeleccionada().total | number }}</h2>
-          <p class="invoice-sub">Factura: {{ mesaSeleccionada().id }}</p>
+          <h2 class="total-amount">${{ mesaSeleccionada()?.subtotal | number }}</h2>
+          <p class="invoice-sub">Factura: {{ mesaSeleccionada()?.id }}</p>
           
           <div class="payment-methods">
             <p class="methods-title">Seleccionar Método de Pago</p>
@@ -148,10 +148,10 @@
             <lucide-icon name="check-circle-2" [size]="48" class="icon-success"></lucide-icon>
           </div>
           <h2>¡Pago Exitoso!</h2>
-          <p>El pago de la <strong>{{ mesaSeleccionada().nombre }}</strong> se ha registrado correctamente mediante <strong>{{ metodoSeleccionado() }}</strong>.</p>
+          <p>El pago de la <strong>{{ mesaSeleccionada()?.nombreMesa }}</strong> se ha registrado correctamente mediante <strong>{{ metodoSeleccionado() }}</strong>.</p>
           <div class="success-details">
             <span>Total Pagado:</span>
-            <span class="amount">${{ mesaSeleccionada().total | number }}</span>
+            <span class="amount">${{ mesaSeleccionada()?.subtotal | number }}</span>
           </div>
           <restaurant-button variant="primary" class="full-width mt-4" (click)="finalizarTodo()">
             <span>Entendido</span>

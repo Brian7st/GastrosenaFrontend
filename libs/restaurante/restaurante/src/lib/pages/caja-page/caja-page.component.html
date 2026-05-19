@@ -10,32 +10,36 @@
     </div>
   </div>
 
-  <div class="caja-page__stats">
+  <div class="alert alert-danger mt-4" *ngIf="!facade.isCajaAbierta()" style="margin: 0 var(--space-6) var(--space-6);">
+    <strong>¡Caja Cerrada!</strong> Debes realizar la apertura de caja para poder facturar o registrar pagos.
+  </div>
+
+  <div class="caja-page__stats" *ngIf="facade.cajaStats() as stats">
     <restaurant-kpi-card
       label="Pedidos Listos"
-      value="2"
-      icon="dollar-sign"
+      [value]="stats.pedidosListos.toString()"
+      icon="check-circle"
       iconColor="green"
     ></restaurant-kpi-card>
 
     <restaurant-kpi-card
       label="Mesas por Pagar"
-      value="1"
+      [value]="stats.mesasPorPagar.toString()"
       icon="credit-card"
       iconColor="blue"
     ></restaurant-kpi-card>
 
     <restaurant-kpi-card
       label="Facturas Hoy"
-      value="4"
+      [value]="stats.facturasHoy.toString()"
       icon="file-text"
       iconColor="purple"
     ></restaurant-kpi-card>
 
     <restaurant-kpi-card
       label="Total Facturado"
-      value="$150.535"
-      icon="coins"
+      [value]="(stats.totalFacturado | currency:'USD':'symbol':'1.0-0') || '$0'"
+      icon="wallet"
       iconColor="orange"
     ></restaurant-kpi-card>
   </div>
@@ -51,9 +55,9 @@
         <p class="action-desc">Crear facturas para pedidos finalizados</p>
         <div class="action-info">
           <span>Pedidos disponibles:</span>
-          <span class="badge-count">2</span>
+          <span class="badge-count">{{ facade.cajaStats().pedidosListos }}</span>
         </div>
-        <restaurant-button variant="primary" class="full-width" (click)="irANuevaFactura()">
+        <restaurant-button variant="primary" class="full-width" (click)="irANuevaFactura()" [disabled]="!facade.isCajaAbierta()">
           <lucide-icon name="plus" [size]="18"></lucide-icon>
           <span>Crear Nueva Factura</span>
         </restaurant-button>
@@ -68,9 +72,9 @@
         <p class="action-desc">Consultar facturas existentes</p>
         <div class="action-info">
           <span>Total facturas:</span>
-          <span class="badge-count">4</span>
+          <span class="badge-count">{{ facade.cajaStats().facturasHoy }}</span>
         </div>
-        <restaurant-button variant="surface" class="full-width" (click)="irABuscar()">
+        <restaurant-button variant="primary" class="full-width" (click)="irABuscar()">
           <lucide-icon name="search" [size]="18"></lucide-icon>
           <span>Ir al Buscador</span>
         </restaurant-button>
@@ -85,11 +89,58 @@
         <p class="action-desc">Procesar pagos de mesas activas</p>
         <div class="action-info">
           <span>Mesas por pagar:</span>
-          <span class="badge-count">1</span>
+          <span class="badge-count">{{ facade.cajaStats().mesasPorPagar }}</span>
         </div>
-        <restaurant-button variant="surface" class="full-width" (click)="irARegistrarPago()">
+        <restaurant-button variant="primary" class="full-width" (click)="irARegistrarPago()" [disabled]="!facade.isCajaAbierta()">
           <lucide-icon name="credit-card" [size]="18"></lucide-icon>
           <span>Procesar Pagos</span>
+        </restaurant-button>
+      </div>
+    </div>
+  </section>
+
+  <div class="caja-page__section-title">
+    <h2>Control de Efectivo y Auditoría</h2>
+  </div>
+
+  <section class="caja-page__actions">
+    <div class="actions-grid">
+      <!-- Action Card: Apertura -->
+      <div class="action-card opening-card">
+        <div class="action-header">
+          <lucide-icon name="unlock" [size]="24" class="icon-orange"></lucide-icon>
+          <h3 class="text-orange">Apertura de Caja</h3>
+        </div>
+        <p class="action-desc">Definir fondo base e iniciar turno</p>
+        <restaurant-button variant="primary" class="full-width" (click)="irAApertura()">
+          <lucide-icon name="unlock" [size]="18"></lucide-icon>
+          <span>Abrir Caja</span>
+        </restaurant-button>
+      </div>
+
+      <!-- Action Card: Movimientos -->
+      <div class="action-card movements-card">
+        <div class="action-header">
+          <lucide-icon name="arrow-right-left" [size]="24" class="icon-gray"></lucide-icon>
+          <h3 class="text-gray">Movimientos</h3>
+        </div>
+        <p class="action-desc">Ingresos y egresos de caja menor</p>
+        <restaurant-button variant="primary" class="full-width" (click)="irAMovimientos()" [disabled]="!facade.isCajaAbierta()">
+          <lucide-icon name="arrow-right-left" [size]="18"></lucide-icon>
+          <span>Registrar Movimiento</span>
+        </restaurant-button>
+      </div>
+
+      <!-- Action Card: Cierre -->
+      <div class="action-card closing-card">
+        <div class="action-header">
+          <lucide-icon name="lock" [size]="24" class="icon-red"></lucide-icon>
+          <h3 class="text-red">Cierre de Caja</h3>
+        </div>
+        <p class="action-desc">Arqueo ciego y reporte Z del turno</p>
+        <restaurant-button variant="primary" class="full-width" (click)="irACierre()" [disabled]="!facade.isCajaAbierta()">
+          <lucide-icon name="lock" [size]="18"></lucide-icon>
+          <span>Cerrar Caja</span>
         </restaurant-button>
       </div>
     </div>
