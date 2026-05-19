@@ -15,7 +15,7 @@
       <div class="form-grid">
         <div class="field Full">
           <restaurant-input formControlName="nombreReceta" label="Nombre de la Receta *" placeholder="Ej: Pasta Carbonara"
-                 [error]="esCampoInvalido('nombreReceta') ? 'El nombre es obligatorio (min 5 letras).' : ''"></restaurant-input>
+                 [error]="recipeForm.get('nombreReceta')?.hasError('soloLetras') ? 'El nombre solo puede contener letras y espacios.' : esCampoInvalido('nombreReceta') ? 'El nombre es obligatorio (min 5 letras).' : ''"></restaurant-input>
         </div>
 
         <div class="field">
@@ -29,11 +29,13 @@
         </div>
 
         <div class="field">
-          <restaurant-input type="number" formControlName="tiempoPreparacion" label="Tiempo de Preparación (min) *"></restaurant-input>
+          <restaurant-input type="number" formControlName="tiempoPreparacion" label="Tiempo de Preparación (min) *"
+            [error]="recipeForm.get('tiempoPreparacion')?.hasError('max') ? 'El tiempo no puede exceder 720 min.' : esCampoInvalido('tiempoPreparacion') ? 'El tiempo debe ser mayor a 0.' : ''"></restaurant-input>
         </div>
 
         <div class="field">
-          <restaurant-input type="number" formControlName="precioUnitario" label="Precio Unitario ($) *"></restaurant-input>
+          <restaurant-input type="number" formControlName="precioUnitario" label="Precio Unitario ($) *"
+            [error]="recipeForm.get('precioUnitario')?.hasError('max') ? 'El precio excede el límite permitido.' : esCampoInvalido('precioUnitario') ? 'El precio no puede ser negativo.' : ''"></restaurant-input>
         </div>
 
         <div class="field">
