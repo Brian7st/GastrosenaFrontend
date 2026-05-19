@@ -1,0 +1,51 @@
+<div class="caja-nueva-page">
+  <div class="header-section">
+    <restaurant-button variant="ghost" (click)="volver()">
+      <lucide-icon name="arrow-left" [size]="18"></lucide-icon>
+      <span>Volver a Caja</span>
+    </restaurant-button>
+    <restaurant-page-header
+      title="Crear Nueva Factura"
+      subtitle="Generación manual de factura"
+    ></restaurant-page-header>
+  </div>
+
+  <div class="forms-grid">
+    <restaurant-card class="form-block">
+      <div class="block-header">
+        <lucide-icon name="user" [size]="20" class="icon-primary"></lucide-icon>
+        <div class="title-group">
+          <h5>Datos del Cliente</h5>
+          <span class="subtitle">Información del cliente (opcional)</span>
+        </div>
+      </div>
+      
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="Nombre del Cliente">
+        <input type="text" class="form-control" placeholder="Documento de Identidad">
+        <input type="tel" class="form-control" placeholder="Teléfono de contacto">
+      </div>
+    </restaurant-card>
+    
+    <restaurant-card class="form-block">
+      <div class="block-header">
+        <lucide-icon name="shopping-cart" [size]="20" class="icon-success"></lucide-icon>
+        <div class="title-group">
+          <h5 class="text-success">Agregar Productos</h5>
+          <span class="subtitle">Añade productos al pedido</span>
+        </div>
+      </div>
+      
+      <div class="input-grid">
+        <input type="text" class="form-control product-name" placeholder="Nombre del Producto">
+        <input type="number" class="form-control product-cant" placeholder="Cant.">
+        <input type="number" class="form-control product-price" placeholder="Precio Unitario">
+      </div>
+
+      <restaurant-button variant="outline" class="mt-4 full-width">
+        <lucide-icon name="plus" [size]="18"></lucide-icon>
+        <span>Agregar Producto</span>
+      </restaurant-button>
+    </restaurant-card>
+  </div>
+</div>

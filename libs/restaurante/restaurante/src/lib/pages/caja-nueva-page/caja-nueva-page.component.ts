@@ -3,39 +3,30 @@ import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { 
   PageHeaderComponent, 
-  KpiCardComponent, 
+  CardComponent, 
   ButtonComponent,
   LucideIconComponent
 } from '@restaurant/shared/ui';
 
 @Component({
-  selector: 'restaurant-caja-page',
+  selector: 'restaurant-caja-nueva-page',
   standalone: true,
   imports: [
     CommonModule,
     PageHeaderComponent,
-    KpiCardComponent,
+    CardComponent,
     ButtonComponent,
     LucideIconComponent
   ],
-  templateUrl: './caja-page.component.html',
-  styleUrl: './caja-page.component.scss',
+  templateUrl: './caja-nueva-page.component.html',
+  styleUrl: './caja-nueva-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CajaPageComponent {
+export class CajaNuevaPageComponent {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-  irANuevaFactura() {
-    this.router.navigate(['./nueva'], { relativeTo: this.route });
-  }
-
-  irABuscar() {
-    this.router.navigate(['./buscar'], { relativeTo: this.route });
-  }
-
-  irARegistrarPago() {
-    this.router.navigate(['./pagar'], { relativeTo: this.route });
+  volver() {
+    this.router.navigate(['..'], { relativeTo: this.route });
   }
 }
-

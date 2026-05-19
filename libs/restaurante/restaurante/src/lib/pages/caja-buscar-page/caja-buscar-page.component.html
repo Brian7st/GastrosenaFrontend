@@ -1,0 +1,139 @@
+<div class="caja-buscar-page">
+  <div class="header-section">
+    <restaurant-button variant="ghost" (click)="volver()">
+      <lucide-icon name="arrow-left" [size]="18"></lucide-icon>
+      <span>Volver a Caja</span>
+    </restaurant-button>
+    <restaurant-page-header
+      title="Buscar Facturas"
+      subtitle="Consulta e impresión de facturas anteriores"
+    ></restaurant-page-header>
+  </div>
+
+  <restaurant-card class="search-filters">
+    <div class="block-header">
+      <lucide-icon name="search" [size]="20" class="icon-primary"></lucide-icon>
+      <div class="title-group">
+        <h5>Criterios de Búsqueda</h5>
+        <span class="subtitle">Busca facturas por mesa, mesero o rango de fechas</span>
+      </div>
+    </div>
+
+    <div class="filter-controls">
+      <div class="radio-group">
+        <label class="radio-label">
+          <input type="radio" name="criterio" checked> 
+          <span>Buscar por Mesa</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="criterio"> 
+          <span>Buscar por Mesero</span>
+        </label>
+      </div>
+
+      <div class="inputs-row">
+        <select class="form-control select-control">
+          <option value="">Seleccionar Mesero / Mesa</option>
+        </select>
+        <div class="date-range">
+          <input type="date" class="form-control">
+          <input type="date" class="form-control">
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <restaurant-button variant="primary">
+          <lucide-icon name="search" [size]="18"></lucide-icon>
+          <span>Buscar Facturas</span>
+        </restaurant-button>
+        <restaurant-button variant="ghost" class="btn-icon-danger">
+          <lucide-icon name="trash-2" [size]="18"></lucide-icon>
+          <span>Limpiar Filtros</span>
+        </restaurant-button>
+        <restaurant-button variant="outline">
+          <lucide-icon name="download" [size]="18"></lucide-icon>
+          <span>Exportar Todas</span>
+        </restaurant-button>
+      </div>
+    </div>
+  </restaurant-card>
+
+  <div class="results-section">
+    <div class="results-header">
+      <h6>Facturas Encontradas</h6>
+      <span class="results-badge">1 factura</span>
+    </div>
+
+    <div class="results-grid">
+      <restaurant-card 
+        class="factura-item" 
+        (click)="verDetalle({id: 'INV-2024-002', total: '$59.500'})">
+        <div class="factura-content">
+          <div class="factura-info">
+            <span class="id">INV-2024-002</span>
+            <span class="details">Cliente Mesa 3 • Mesa 3 • 15 de enero de 2024</span>
+          </div>
+          <div class="factura-status">
+            <span class="price">$59.500</span>
+            <restaurant-status-badge label="Pendiente" variant="warning"></restaurant-status-badge>
+          </div>
+        </div>
+      </restaurant-card>
+    </div>
+  </div>
+
+  @if (mostrarModalDetalle()) {
+    <div class="modal-overlay" (click)="cerrarModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header-colored blue-bg">
+          <h3>Detalle de Factura</h3>
+          <button class="close-btn" (click)="cerrarModal()">
+            <lucide-icon name="x" [size]="20"></lucide-icon>
+          </button>
+        </div>
+        
+        <div class="modal-body-custom">
+          <div class="invoice-main-info text-center">
+            <span class="label">ID FACTURA</span>
+            <h2>{{ facturaSeleccionada()?.id }}</h2>
+          </div>
+          
+          <div class="info-grid">
+            <div class="info-item"><span>Cliente:</span> <strong>Cliente Mesa 3</strong></div>
+            <div class="info-item"><span>Mesa:</span> <strong>Mesa 3</strong></div>
+            <div class="info-item"><span>Mesero:</span> <strong>Instructor</strong></div>
+            <div class="info-item"><span>Fecha:</span> <strong>15/01/2024</strong></div>
+          </div>
+          
+          <div class="products-section">
+            <h6>Productos / Consumo</h6>
+            <div class="product-row">
+              <span>Hamburguesa Especial x1</span>
+              <span>$45.000</span>
+            </div>
+            <div class="product-row">
+              <span>Gaseosa 350ml x2</span>
+              <span>$5.000</span>
+            </div>
+          </div>
+          
+          <div class="billing-summary">
+            <div class="summary-row"><span>Subtotal:</span> <span>$50.000</span></div>
+            <div class="summary-row"><span>IVA (19%):</span> <span>$9.500</span></div>
+            <div class="summary-row total"><span>TOTAL:</span> <strong>{{ facturaSeleccionada()?.total }}</strong></div>
+          </div>
+        </div>
+        
+        <div class="modal-actions-between">
+          <restaurant-button variant="ghost" (click)="cerrarModal()">
+            <span>Cerrar</span>
+          </restaurant-button>
+          <restaurant-button variant="primary" (click)="irAPagar()">
+            <lucide-icon name="credit-card" [size]="18"></lucide-icon>
+            <span>Registrar Pago</span>
+          </restaurant-button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
