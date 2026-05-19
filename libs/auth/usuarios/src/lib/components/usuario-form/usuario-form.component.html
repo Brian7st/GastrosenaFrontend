@@ -4,11 +4,11 @@
     <!-- Header -->
     <div class="modal__header">
       <div class="modal__header-icon modal__header-icon--user">
-        <lucide-icon name="user-plus" [size]="20"></lucide-icon>
+        <lucide-icon [name]="modoEdicion ? 'pencil' : 'user-plus'" [size]="20"></lucide-icon>
       </div>
       <div>
-        <h2 class="modal__title">Nuevo Usuario</h2>
-        <p class="modal__subtitle">Completá los datos para crear la cuenta</p>
+        <h2 class="modal__title">{{ modoEdicion ? 'Editar Usuario' : 'Nuevo Usuario' }}</h2>
+        <p class="modal__subtitle">{{ modoEdicion ? 'Modificá los datos del usuario' : 'Completá los datos para crear la cuenta' }}</p>
       </div>
       <button class="modal__close" type="button" (click)="cerrar.emit()" aria-label="Cerrar">
         <lucide-icon name="x" [size]="18"></lucide-icon>
@@ -59,6 +59,7 @@
           type="email"
           formControlName="email"
           placeholder="juan@gastrosena.co"
+          [attr.readonly]="modoEdicion ? true : null"
         />
         @if (form.controls.email.invalid && form.controls.email.touched) {
           <span class="modal__error">Ingresá un email válido</span>
@@ -75,6 +76,7 @@
             type="text"
             formControlName="documento"
             placeholder="1234567890"
+            [attr.readonly]="modoEdicion ? true : null"
           />
           @if (form.controls.documento.invalid && form.controls.documento.touched) {
             <span class="modal__error">Campo requerido</span>
@@ -119,14 +121,16 @@
       </div>
 
       <div class="modal__field">
-        <label class="modal__label" for="uf-contrasena">Contraseña *</label>
+        <label class="modal__label" for="uf-contrasena">
+          Contraseña {{ modoEdicion ? '(opcional)' : '*' }}
+        </label>
         <input
           id="uf-contrasena"
           class="modal__input"
           [class.modal__input--error]="form.controls.contrasena.invalid && form.controls.contrasena.touched"
           type="password"
           formControlName="contrasena"
-          placeholder="Mínimo 8 caracteres"
+          [placeholder]="modoEdicion ? 'Dejá en blanco para no cambiarla' : 'Mínimo 8 caracteres'"
         />
         @if (form.controls.contrasena.invalid && form.controls.contrasena.touched) {
           <span class="modal__error">Mínimo 8 caracteres</span>
@@ -141,8 +145,8 @@
         Cancelar
       </button>
       <button class="modal__btn modal__btn--primary" type="submit">
-        <lucide-icon name="user-plus" [size]="16"></lucide-icon>
-        Crear Usuario
+        <lucide-icon [name]="modoEdicion ? 'save' : 'user-plus'" [size]="16"></lucide-icon>
+        {{ modoEdicion ? 'Guardar Cambios' : 'Crear Usuario' }}
       </button>
     </div>
 

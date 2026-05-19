@@ -29,6 +29,29 @@ import {
   UsuarioDetalle,
 } from '../../models/usuarios.model';
 
+const MOCK_USUARIOS: UsuarioDetalle[] = [
+  { id: '1', nombre: 'María',  apellidos: 'González', email: 'maria@gastrosena.edu.co',
+    documento: '1234567890', telefono: '+57 301 234 5678', rol: Rol.ADMINISTRADOR,
+    activo: true,  creadoEn: new Date('2024-01-15'), ultimoAcceso: '2024-01-15',
+    cuentaBloqueada: false, intentosFallidos: 0 },
+  { id: '2', nombre: 'Carlos', apellidos: 'Ramírez',  email: 'carlos@gastrosena.edu.co',
+    documento: '0987654321', telefono: '+57 300 123 4567', rol: Rol.CHEF,
+    activo: true,  creadoEn: new Date('2024-01-14'), ultimoAcceso: '2024-01-14',
+    cuentaBloqueada: false, intentosFallidos: 0 },
+  { id: '3', nombre: 'Ana',    apellidos: 'López',    email: 'ana@gastrosena.edu.co',
+    documento: '1122334455', telefono: '+57 302 345 6789', rol: Rol.MESERO,
+    activo: true,  creadoEn: new Date('2024-01-19'), ultimoAcceso: '2024-01-19',
+    cuentaBloqueada: false, intentosFallidos: 0 },
+  { id: '4', nombre: 'José',   apellidos: 'Martín',   email: 'jose@gastrosena.edu.co',
+    documento: '5566778899', telefono: '+57 303 456 7890', rol: Rol.BARTENDER,
+    activo: false, creadoEn: new Date('2024-01-14'), ultimoAcceso: '2024-01-14',
+    cuentaBloqueada: true, intentosFallidos: 3 },
+  { id: '5', nombre: 'Laura',  apellidos: 'Silva',    email: 'laura@gastrosena.edu.co',
+    documento: '9988776655', telefono: '+57 304 567 8901', rol: Rol.CAJERO,
+    activo: true,  creadoEn: new Date('2024-01-15'), ultimoAcceso: '2024-01-15',
+    cuentaBloqueada: false, intentosFallidos: 0 },
+];
+
 const ROL_CLASS_MAP: Record<Rol, string> = {
   [Rol.ADMINISTRADOR]:   'admin',
   [Rol.CONTADORA]:       'contadora',
@@ -80,11 +103,15 @@ export class ListaPageComponent implements OnInit {
     ...this.roles().map(r => ({ value: r.idRol, label: r.nombreRol })),
   ]);
 
-  readonly busqueda        = signal('');
-  readonly rolFiltro       = signal('');
-  readonly mostrarExportar = signal(false);
-  readonly mostrarImportar = signal(false);
+  readonly busqueda          = signal('');
+  readonly rolFiltro         = signal('');
+  readonly mostrarExportar   = signal(false);
+  readonly mostrarImportar   = signal(false);
   readonly mostrarFormulario = signal(false);
+
+  private readonly mockUsuarios    = signal<UsuarioDetalle[]>(MOCK_USUARIOS);
+  readonly usuarioEditando         = signal<UsuarioDetalle | null>(null);
+  private readonly usandoMock      = computed(() => this.usuarios().length === 0);
 
   readonly usuariosFiltrados = computed(() => {
     const q   = this.busqueda().toLowerCase();
@@ -98,6 +125,32 @@ export class ListaPageComponent implements OnInit {
       return matchBusq && matchRol;
     });
   });
+
+  readonly usuariosMostrar = computed(() => {
+    if (this.usandoMock()) {
+      const q   = this.busqueda().toLowerCase();
+      const rol = this.rolFiltro();
+      return this.mockUsuarios().filter(u => {
+        const matchBusq = !q ||
+          u.nombre.toLowerCase().includes(q) ||
+          u.apellidos.toLowerCase().includes(q) ||
+          u.email.toLowerCase().includes(q);
+        const matchRol = !rol || u.rol === rol;
+        return matchBusq && matchRol;
+      });
+    }
+    return this.usuariosFiltrados();
+  });
+
+  readonly totalMostrar     = computed(() =>
+    this.usandoMock() ? this.mockUsuarios().length : this.totalElements()
+  );
+  readonly activosMostrar   = computed(() =>
+    this.usandoMock() ? this.mockUsuarios().filter(u => u.activo).length : this.totalActivos()
+  );
+  readonly inactivosMostrar = computed(() =>
+    this.usandoMock() ? this.mockUsuarios().filter(u => !u.activo).length : this.totalInactivos()
+  );
 
   ngOnInit(): void {
     this.facade.cargarUsuarios();
@@ -113,12 +166,45 @@ export class ListaPageComponent implements OnInit {
   }
 
   onCrearUsuario(): void {
+    this.usuarioEditando.set(null);
     this.mostrarFormulario.set(true);
   }
 
-  onGuardar(data: CrearUsuarioRequest): void {
-    this.facade.crearUsuario(data);
+  onEditarUsuario(u: UsuarioDetalle): void {
+    this.usuarioEditando.set(u);
+    this.mostrarFormulario.set(true);
+  }
+
+  onCerrarFormulario(): void {
+    this.usuarioEditando.set(null);
     this.mostrarFormulario.set(false);
+  }
+
+  onGuardarUsuario(data: CrearUsuarioRequest): void {
+    const editando = this.usuarioEditando();
+    if (this.usandoMock()) {
+      const { idRol, contrasena: _pw, ...rest } = data;
+      if (editando) {
+        this.mockUsuarios.update(list =>
+          list.map(u => u.id === editando.id ? { ...u, ...rest, rol: idRol as Rol } : u)
+        );
+      } else {
+        const nuevo: UsuarioDetalle = {
+          id: Date.now().toString(),
+          ...rest,
+          rol: idRol as Rol,
+          activo: true,
+          creadoEn: new Date(),
+          ultimoAcceso: null,
+          cuentaBloqueada: false,
+          intentosFallidos: 0,
+        };
+        this.mockUsuarios.update(list => [...list, nuevo]);
+      }
+    } else {
+      this.facade.crearUsuario(data);
+    }
+    this.onCerrarFormulario();
   }
 
   onExportar(config: ExportarConfig): void {
@@ -131,6 +217,10 @@ export class ListaPageComponent implements OnInit {
   }
 
   onEliminar(id: string): void {
-    this.facade.eliminarUsuario(id);
+    if (this.usandoMock()) {
+      this.mockUsuarios.update(list => list.filter(u => u.id !== id));
+    } else {
+      this.facade.eliminarUsuario(id);
+    }
   }
 }
