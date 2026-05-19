@@ -26,12 +26,8 @@ export class SolicitudesEditComponent implements OnInit {
   ngOnInit(): void {
     const paramId = this.route.snapshot.paramMap.get('id');
     if (paramId) {
-      if (paramId === 'bloqueado') {
-        this.solicitudId.set(`GIL-F-014-2024-BLOQUEADO`);
-        this.isBlocked.set(true);
-      } else {
-        this.solicitudId.set(`GIL-F-014-2024-${paramId}`);
-      }
+      // TODO: llamar a solicitudesFacade.cargarSolicitudById(paramId) y derivar isBlocked del estado recibido
+      this.solicitudId.set(paramId);
     }
   }
 

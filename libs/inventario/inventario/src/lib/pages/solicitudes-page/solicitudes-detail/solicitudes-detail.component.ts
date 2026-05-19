@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal, computed, inject, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
@@ -25,7 +25,8 @@ export class SolicitudesDetailComponent implements OnInit {
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
-      this.solicitudId.set(`GIL-F-014-2024-00${idParam}`);
+      // TODO: llamar a solicitudesFacade.cargarSolicitudById(idParam) cuando exista la facade
+      this.solicitudId.set(idParam);
     }
   }
 
@@ -68,9 +69,6 @@ export class SolicitudesDetailComponent implements OnInit {
   }
 
   onEnviarAprobacion(): void {
-    // Mock action
-    if(this.estadoActual() === 'Borrador') {
-      this.estadoActual.set('Pendiente');
-    }
+    // TODO: llamar a solicitudesFacade.cambiarEstado(id, 'Pendiente')
   }
 }
