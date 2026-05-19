@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import { BienSolicitud, BIENES_SOLICITUD_MOCK } from '../../../models/solicitudes-gil.mock';
 
 @Component({
   selector: 'restaurant-solicitudes-form',
@@ -17,16 +18,7 @@ export class SolicitudesFormComponent implements OnInit {
 
   fechaSolicitud = signal('2024-05-20');
   
-  bienes = signal([
-    {
-      codigo: 'ALM-001',
-      descripcion: 'Harina de Trigo x 50kg',
-      um: 'Bto',
-      cantidad: 2,
-      valorUnitario: 150000,
-      subtotal: 300000
-    }
-  ]);
+  bienes = signal<BienSolicitud[]>([...BIENES_SOLICITUD_MOCK]);
 
   ngOnInit(): void { /* no route params needed here */ }
 
@@ -35,7 +27,7 @@ export class SolicitudesFormComponent implements OnInit {
   }
 
   onSave(): void {
-    console.log('Guardando solicitud...');
+    // TODO: llamar a solicitudesFacade.crearSolicitud(dto) cuando exista la facade
     this.router.navigate(['/app/inventario/solicitudes-gil']);
   }
 

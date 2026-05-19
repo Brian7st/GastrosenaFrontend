@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import { BienSolicitud, BIENES_SOLICITUD_MOCK } from '../../../models/solicitudes-gil.mock';
 
 @Component({
   selector: 'restaurant-solicitudes-edit',
@@ -12,21 +13,12 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
   styleUrl: './solicitudes-edit.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SolicitudesEditComponent {
+export class SolicitudesEditComponent implements OnInit {
   
   solicitudId = signal<string>('GIL-2023-0892');
   isBlocked = signal<boolean>(false);
   
-  bienes = signal([
-    {
-      codigo: 'ALM-001',
-      descripcion: 'Harina de Trigo x 50kg',
-      um: 'Bto',
-      cantidad: 2,
-      valorUnitario: 150000,
-      subtotal: 300000
-    }
-  ]);
+  bienes = signal<BienSolicitud[]>([...BIENES_SOLICITUD_MOCK]);
 
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -49,6 +41,7 @@ export class SolicitudesEditComponent {
   }
 
   onSave(): void {
+    // TODO: llamar a solicitudesFacade.actualizarSolicitud(id, dto) cuando exista la facade
     const rawId = this.route.snapshot.paramMap.get('id') || '001';
     this.router.navigate(['/app/inventario/solicitudes-gil', rawId]);
   }

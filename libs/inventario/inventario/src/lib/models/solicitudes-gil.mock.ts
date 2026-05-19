@@ -1,6 +1,7 @@
 import { SolicitudGil } from './solicitudes-gil.model';
 
-export const SOLICITUDES_GIL_MOCK: SolicitudGil[] = [
+// ── Alias requerido por los componentes ──────────────────────────────────────
+export const SOLICITUDES_MOCK: SolicitudGil[] = [
   {
     id: 1,
     codigo: 'GIL-F-014-2024-001',
@@ -70,5 +71,29 @@ export const SOLICITUDES_GIL_MOCK: SolicitudGil[] = [
     totalBienes: 6,
     montoTotal: 890000,
     avatarColor: 'slate',
+  },
+];
+
+/** @deprecated Use SOLICITUDES_MOCK — kept for backward-compat with SolicitudesService */
+export const SOLICITUDES_GIL_MOCK = SOLICITUDES_MOCK;
+
+// ── Bienes por solicitud (ítems de formulario) ───────────────────────────────
+export interface BienSolicitud {
+  codigo: string;
+  descripcion: string;
+  um: string;
+  cantidad: number;
+  valorUnitario: number;
+  subtotal: number;
+}
+
+export const BIENES_SOLICITUD_MOCK: BienSolicitud[] = [
+  {
+    codigo: 'ALM-001',
+    descripcion: 'Harina de Trigo x 50kg',
+    um: 'Bto',
+    cantidad: 2,
+    valorUnitario: 150000,
+    subtotal: 300000,
   },
 ];
