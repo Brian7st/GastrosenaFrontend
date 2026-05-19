@@ -6,12 +6,12 @@
 
 .comanda-tabs {
   display: flex;
-  background-color: var(--color-surface, #f1f5f9);
+  background-color: var(--color-surface-primary);
   padding: var(--space-2, 5px);
   border-radius: var(--radius-md, 10px);
   gap: var(--space-2, 5px);
   margin: var(--space-4, 1rem) var(--space-6, 2rem) var(--space-3, 0.5rem);
-  border: 1px solid var(--color-border, #e2e8f0);
+  border: 1px solid var(--color-border);
 
   .tab-btn {
     flex: 1;
@@ -19,22 +19,22 @@
     border: none;
     border-radius: var(--radius-sm, 7px);
     background: transparent;
-    color: var(--color-text-secondary, #64748b);
+    color: var(--color-text-secondary);
     font-size: var(--text-sm, 0.9rem);
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     cursor: pointer;
     transition: 0.3s;
     text-align: center;
     text-decoration: none;
 
     &.active {
-      background: var(--color-background, white);
-      color: var(--color-text-primary, #1e293b);
-      box-shadow: var(--shadow-sm, 0 2px 4px rgba(0,0,0,0.05));
+      background: var(--color-surface-secondary);
+      color: var(--color-text-primary);
+      box-shadow: var(--shadow-card);
     }
     
     &:hover:not(.active) {
-      background-color: var(--color-surface-hover, rgba(255, 255, 255, 0.5));
+      background-color: var(--color-surface-primary);
     }
   }
 }

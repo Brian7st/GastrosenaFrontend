@@ -22,7 +22,6 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
             { label: 'Inicio',    ruta: '/app/cocina/inicio',    icono: 'layout-dashboard' },
             { label: 'Comandas',  ruta: '/app/cocina/comandas',  icono: 'clipboard-list'   },
             { label: 'Recetas',   ruta: '/app/cocina/recetas',   icono: 'book-open'        },
-            { label: 'Menú',      ruta: '/app/cocina/menu',      icono: 'utensils'         },
             { label: 'Actividad', ruta: '/app/cocina/actividad', icono: 'graduation-cap'   },
           ],
         },
@@ -31,7 +30,6 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
           children: [
             { label: 'Comandas', ruta: '/app/bar/comandas', icono: 'clipboard-list' },
             { label: 'Recetas', ruta: '/app/bar/recetas', icono: 'book-open'      },
-            { label: 'Menú',    ruta: '/app/bar/menu',    icono: 'list'           },
           ],
         },
       ],
