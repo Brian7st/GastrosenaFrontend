@@ -8,7 +8,7 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
   standalone: true,
   imports: [CommonModule, RouterModule, BackButtonComponent],
   templateUrl: './solicitudes-detail.component.html',
-  styleUrls: ['./solicitudes-detail.component.scss'],
+  styleUrl: './solicitudes-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SolicitudesDetailComponent {

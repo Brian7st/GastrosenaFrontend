@@ -1,92 +1,28 @@
-import { Component, ChangeDetectionStrategy, signal, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ButtonComponent, DataTableComponent, KpiCardComponent } from '@restaurant/shared/ui';
-import { SolicitudGil } from '../../../models/solicitudes-gil.model';
+import { SolicitudGil, EstadoGil } from '../../../models/solicitudes-gil.model';
+import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 
 @Component({
   selector: 'restaurant-solicitudes-list',
   standalone: true,
   imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent],
   templateUrl: './solicitudes-list.component.html',
-  styleUrls: ['./solicitudes-list.component.scss'],
+  styleUrl: './solicitudes-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SolicitudesListComponent {
+export class SolicitudesListComponent implements OnInit {
 
-  // ─── Mock data fielado al prototipo ────────────────────────────────────────
-  solicitudes = signal<SolicitudGil[]>([
-    {
-      id: 1,
-      codigo: 'GIL-F-014-2024-001',
-      fecha: '24 Oct, 2024',
-      centroCostos: 'CBA Mosquera',
-      area: 'Gastronomía',
-      cuentadante: 'Carlos Alberto Ruiz',
-      destino: 'Cocina Principal',
-      ficha: 'ADSO-2670687',
-      estado: 'Borrador',
-      totalBienes: 8,
-      montoTotal: 1240000,
-      avatarColor: 'blue',
-    },
-    {
-      id: 2,
-      codigo: 'GIL-F-014-2024-002',
-      fecha: '22 Oct, 2024',
-      centroCostos: 'CBA Mosquera',
-      area: 'Mantenimiento',
-      cuentadante: 'Martha Lucía Gomez',
-      destino: 'Taller Técnico',
-      ficha: 'MANT-2550122',
-      estado: 'Pendiente',
-      totalBienes: 5,
-      montoTotal: 450500,
-      avatarColor: 'purple',
-    },
-    {
-      id: 3,
-      codigo: 'GIL-F-014-2024-003',
-      fecha: '20 Oct, 2024',
-      centroCostos: 'CBA Mosquera',
-      area: 'Gestión Empresarial',
-      cuentadante: 'Fernando Vallejo',
-      destino: 'Aula 301',
-      ficha: 'GEST-2899341',
-      estado: 'Validado',
-      totalBienes: 12,
-      montoTotal: 2890000,
-      avatarColor: 'amber',
-    },
-    {
-      id: 4,
-      codigo: 'GIL-F-014-2024-004',
-      fecha: '18 Oct, 2024',
-      centroCostos: 'CBA Mosquera',
-      area: 'Gastronomía',
-      cuentadante: 'Lucía Mercedes Prada',
-      destino: 'Cocina Caliente',
-      ficha: 'ADSO-2670687',
-      estado: 'Aprobado',
-      totalBienes: 20,
-      montoTotal: 3150000,
-      avatarColor: 'green',
-    },
-    {
-      id: 5,
-      codigo: 'GIL-F-014-2024-005',
-      fecha: '15 Oct, 2024',
-      centroCostos: 'CBA Mosquera',
-      area: 'Mantenimiento',
-      cuentadante: 'Roberto Jaramillo',
-      destino: 'Laboratorio',
-      ficha: 'MANT-2550122',
-      estado: 'Procesado',
-      totalBienes: 6,
-      montoTotal: 890000,
-      avatarColor: 'slate',
-    },
-  ]);
+  private facade = inject(SolicitudesFacade);
+
+  solicitudes = this.facade.solicitudes;
+  loading = this.facade.loading;
+
+  ngOnInit(): void {
+    this.facade.loadAll();
+  }
 
   // ─── KPIs calculados (4 tarjetas del prototipo) ────────────────────────────
   totalSolicitudes   = computed(() => this.solicitudes().length);
@@ -135,9 +71,9 @@ export class SolicitudesListComponent {
     return estado === 'Borrador' || estado === 'Pendiente';
   }
 
-  onSearch(term: string): void    { console.log('Buscar:', term);    }
-  onFilterEstado(v: string): void { console.log('Estado:', v);       }
-  onFilterFecha(v: string): void  { console.log('Fecha:', v);        }
+  onSearch(term: string): void    { this.facade.setFiltros({ busqueda: term });    }
+  onFilterEstado(v: any): void { this.facade.setFiltros({ estado: v ? (v as EstadoGil) : undefined });       }
+  onFilterFecha(v: string): void  { this.facade.setFiltros({ fechaRango: v });        }
   onExportPdf(id: string | number): void { console.log('PDF:', id);  }
 
   // ── Modal State ──────────────────────────────────────────────────────────
@@ -163,9 +99,10 @@ export class SolicitudesListComponent {
   }
 
   confirmDelete(): void {
-    // Implement actual delete logic here
     const id = this.itemToDelete()?.codigo;
-    this.solicitudes.update(list => list.filter(item => item.codigo !== id));
+    if (id) {
+      this.facade.eliminarSolicitud(id);
+    }
     this.closeDeleteModal();
   }
 }

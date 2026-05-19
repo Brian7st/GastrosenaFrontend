@@ -7,7 +7,7 @@ import { RouterModule, Router, ActivatedRoute } from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './solicitudes-export.component.html',
-  styleUrls: ['./solicitudes-export.component.scss'],
+  styleUrl: './solicitudes-export.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SolicitudesExportComponent {

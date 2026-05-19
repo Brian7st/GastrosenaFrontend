@@ -9,7 +9,7 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
   standalone: true,
   imports: [CommonModule, RouterModule, ButtonComponent, BackButtonComponent],
   templateUrl: './solicitudes-edit.component.html',
-  styleUrls: ['./solicitudes-edit.component.scss'],
+  styleUrl: './solicitudes-edit.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SolicitudesEditComponent {
