@@ -7,8 +7,10 @@ import {
   signal,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { DatePipe } from '@angular/common';
 import { Rol } from '@restaurant/shared/models';
 import {
+  AlertComponent,
   DataTableComponent,
   KpiCardComponent,
   LucideIconComponent,
@@ -21,23 +23,9 @@ import { UsuariosFacade } from '../../data-access/usuarios.facade';
 import {
   ExportarConfig,
   ImportarUsuariosRequest,
+  RolOpcion,
   UsuarioDetalle,
 } from '../../models/usuarios.model';
-
-const ROL_OPCIONES_FILTRO = [
-  { value: '',                    label: 'Todos los roles'  },
-  { value: Rol.ADMINISTRADOR,     label: 'Administrador'    },
-  { value: Rol.CHEF,              label: 'Chef'             },
-  { value: Rol.MESERO,            label: 'Mesero'           },
-  { value: Rol.BARTENDER,         label: 'Bartender'        },
-  { value: Rol.CAJERO,            label: 'Cajero'           },
-  { value: Rol.CONTADORA,         label: 'Contadora'        },
-  { value: Rol.INSTRUCTOR,        label: 'Instructor'       },
-  { value: Rol.LIDER_BAR,         label: 'Líder Bar'        },
-  { value: Rol.AUXILIAR_COCINA,   label: 'Aux. Cocina'      },
-  { value: Rol.ADMIN_COCINA,      label: 'Admin Cocina'     },
-  { value: Rol.ADMIN_BAR,         label: 'Admin Bar'        },
-];
 
 const ROL_CLASS_MAP: Record<Rol, string> = {
   [Rol.ADMINISTRADOR]:   'admin',
@@ -58,6 +46,8 @@ const ROL_CLASS_MAP: Record<Rol, string> = {
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    DatePipe,
+    AlertComponent,
     DataTableComponent,
     KpiCardComponent,
     LucideIconComponent,
@@ -72,18 +62,26 @@ const ROL_CLASS_MAP: Record<Rol, string> = {
 export class ListaPageComponent implements OnInit {
   private readonly facade = inject(UsuariosFacade);
 
-  readonly usuarios       = toSignal(this.facade.usuarios$,       { initialValue: [] as UsuarioDetalle[] });
-  readonly totalElements  = toSignal(this.facade.totalElements$,  { initialValue: 0 });
-  readonly totalActivos   = toSignal(this.facade.totalActivos$,   { initialValue: 0 });
-  readonly totalInactivos = toSignal(this.facade.totalInactivos$, { initialValue: 0 });
-  readonly loading        = toSignal(this.facade.loading$,        { initialValue: false });
+  readonly usuarios        = toSignal(this.facade.usuarios$,        { initialValue: [] as UsuarioDetalle[] });
+  readonly totalElements   = toSignal(this.facade.totalElements$,   { initialValue: 0 });
+  readonly totalActivos    = toSignal(this.facade.totalActivos$,    { initialValue: 0 });
+  readonly totalInactivos  = toSignal(this.facade.totalInactivos$,  { initialValue: 0 });
+  readonly loading         = toSignal(this.facade.loading$,         { initialValue: false });
+  readonly importando      = toSignal(this.facade.importando$,      { initialValue: false });
+  readonly resultadoImport = toSignal(this.facade.resultadoImport$, { initialValue: null });
+  readonly mensajeExport   = toSignal(this.facade.mensajeExport$,   { initialValue: null });
+
+  // Corrección 3 — opciones de rol dinámicas desde el store
+  private readonly roles = toSignal(this.facade.roles$, { initialValue: [] as RolOpcion[] });
+  readonly rolOpciones   = computed(() => [
+    { value: '', label: 'Todos los roles' },
+    ...this.roles().map(r => ({ value: r.idRol, label: r.nombreRol })),
+  ]);
 
   readonly busqueda        = signal('');
   readonly rolFiltro       = signal('');
   readonly mostrarExportar = signal(false);
   readonly mostrarImportar = signal(false);
-
-  readonly rolOpciones = ROL_OPCIONES_FILTRO;
 
   readonly usuariosFiltrados = computed(() => {
     const q   = this.busqueda().toLowerCase();
@@ -100,6 +98,7 @@ export class ListaPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.facade.cargarUsuarios();
+    this.facade.cargarRoles(); // Corrección 3
   }
 
   getIniciales(u: UsuarioDetalle): string {
@@ -110,22 +109,15 @@ export class ListaPageComponent implements OnInit {
     return ROL_CLASS_MAP[rol] ?? 'default';
   }
 
-  formatUltimoAcceso(fecha: string | null): string {
-    if (!fecha) return '—';
-    return new Date(fecha).toLocaleDateString('es-AR', {
-      day: '2-digit', month: 'short', year: 'numeric',
-    });
-  }
-
+  // Corrección 1 — pasar config al facade
   onExportar(config: ExportarConfig): void {
-    void config;
-    this.facade.exportarUsuarios();
+    this.facade.exportarUsuarios(config);
     this.mostrarExportar.set(false);
   }
 
+  // Corrección 6 — no cerrar modal; mostrar resultado adentro
   onImportar(req: ImportarUsuariosRequest): void {
     this.facade.importarMasivo(req);
-    this.mostrarImportar.set(false);
   }
 
   onEliminar(id: string): void {

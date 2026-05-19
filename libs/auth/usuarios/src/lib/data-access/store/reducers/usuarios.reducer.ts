@@ -2,6 +2,11 @@ import { createFeature, createReducer, on } from '@ngrx/store';
 import { ImportarUsuariosResponse, RolOpcion, UsuarioDetalle } from '../../../models/usuarios.model';
 import { UsuariosActions } from '../actions/usuarios.actions';
 
+export interface MensajeExport {
+  texto: string;
+  tipo:  'success' | 'error';
+}
+
 export interface UsuariosState {
   usuarios:            UsuarioDetalle[];
   roles:               RolOpcion[];
@@ -14,6 +19,7 @@ export interface UsuariosState {
   error:               string | null;
   importando:          boolean;
   resultadoImport:     ImportarUsuariosResponse | null;
+  mensajeExport:       MensajeExport | null;
 }
 
 const initialState: UsuariosState = {
@@ -28,6 +34,7 @@ const initialState: UsuariosState = {
   error:               null,
   importando:          false,
   resultadoImport:     null,
+  mensajeExport:       null,
 };
 
 export const usuariosFeature = createFeature({
@@ -148,13 +155,18 @@ export const usuariosFeature = createFeature({
 
     // ── Exportar ──────────────────────────────────────────────────────────────
     on(UsuariosActions.exportarUsuarios, state => ({
-      ...state, loadingAccion: true,
+      ...state, loadingAccion: true, mensajeExport: null,
     })),
     on(UsuariosActions.exportarUsuariosExitoso, state => ({
-      ...state, loadingAccion: false,
+      ...state,
+      loadingAccion: false,
+      mensajeExport: { texto: 'Exportación completada exitosamente.', tipo: 'success' as const },
     })),
     on(UsuariosActions.exportarUsuariosFallido, (state, { error }) => ({
-      ...state, loadingAccion: false, error,
+      ...state,
+      loadingAccion: false,
+      error,
+      mensajeExport: { texto: error, tipo: 'error' as const },
     })),
 
     // ── Selección local ───────────────────────────────────────────────────────

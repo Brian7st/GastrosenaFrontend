@@ -6,6 +6,7 @@ import { PaginatedResponse } from '@restaurant/shared/models';
 import {
   ActualizarUsuarioRequest,
   CrearUsuarioRequest,
+  ExportarConfig,
   FiltrosUsuarios,
   ImportarUsuariosRequest,
   ImportarUsuariosResponse,
@@ -68,9 +69,14 @@ export class UsuariosService extends BaseHttpService {
     );
   }
 
-  exportarUsuarios(): Observable<Blob> {
-    return this.http.get(this.buildUrl(`${this.resource}/exportar`), {
-      responseType: 'blob',
-    });
+  exportarUsuarios(config: ExportarConfig): Observable<Blob> {
+    const params = new HttpParams()
+      .set('formato',          config.formato)
+      .set('incluirInactivos', String(config.incluirInactivos))
+      .set('rol',              config.rol);
+    return this.http.get(
+      this.buildUrl(`${this.resource}/exportar`),
+      { params, responseType: 'blob' },
+    );
   }
 }
