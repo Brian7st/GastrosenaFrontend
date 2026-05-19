@@ -78,11 +78,11 @@ export class SolicitudesListComponent implements OnInit {
 
   // ── Modal State ──────────────────────────────────────────────────────────
   showDeleteModal = signal<boolean>(false);
-  itemToDelete = signal<any>(null);
+  itemToDelete = signal<SolicitudGil | null>(null);
   deleteBlocked = signal<boolean>(false);
 
   // ── Actions ──────────────────────────────────────────────────────────────
-  onDelete(item: any): void {
+  onDelete(item: SolicitudGil): void {
     this.itemToDelete.set(item);
     // Simulating block logic: Only 'Borrador' can be deleted
     if (item.estado !== 'Borrador') {

@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { ButtonComponent } from '@restaurant/shared/ui';
@@ -28,7 +28,10 @@ export class SolicitudesEditComponent {
     }
   ]);
 
-  constructor(private router: Router, private route: ActivatedRoute) {
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
+  ngOnInit(): void {
     const paramId = this.route.snapshot.paramMap.get('id');
     if (paramId) {
       if (paramId === 'bloqueado') {

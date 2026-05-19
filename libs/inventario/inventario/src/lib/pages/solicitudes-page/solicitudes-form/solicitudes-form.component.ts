@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ButtonComponent } from '@restaurant/shared/ui';
@@ -12,8 +12,9 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
   styleUrl: './solicitudes-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SolicitudesFormComponent {
-  // Datos mock del formulario para renderizado (según prototipo)
+export class SolicitudesFormComponent implements OnInit {
+  private router = inject(Router);
+
   fechaSolicitud = signal('2024-05-20');
   
   bienes = signal([
@@ -27,7 +28,7 @@ export class SolicitudesFormComponent {
     }
   ]);
 
-  constructor(private router: Router) {}
+  ngOnInit(): void { /* no route params needed here */ }
 
   onCancel(): void {
     this.router.navigate(['/app/inventario/solicitudes-gil']);

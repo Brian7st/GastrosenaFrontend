@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
@@ -11,7 +11,7 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
   styleUrl: './solicitudes-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SolicitudesDetailComponent {
+export class SolicitudesDetailComponent implements OnInit {
   
   // ─── Mocks basados en prototipo ─────────────────────────
   solicitudId = signal<string>('GIL-F-014-2024-001');
@@ -19,8 +19,10 @@ export class SolicitudesDetailComponent {
   fechaCreacion = signal('24 Oct 2024');
   totalEstimado = signal(1240000);
 
-  constructor(private router: Router, private route: ActivatedRoute) {
-    // Si viene un ID en la ruta, podríamos cargarlo (mock behavior)
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
+  ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
       this.solicitudId.set(`GIL-F-014-2024-00${idParam}`);
