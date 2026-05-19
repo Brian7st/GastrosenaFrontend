@@ -65,7 +65,7 @@ export class SolicitudesDetailComponent implements OnInit {
   }
 
   onDownloadPdf(): void {
-    console.log('Descargando PDF...');
+    // TODO: llamar a servicio de exportación PDF
   }
 
   onEnviarAprobacion(): void {

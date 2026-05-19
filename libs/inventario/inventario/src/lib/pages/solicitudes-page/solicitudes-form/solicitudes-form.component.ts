@@ -32,7 +32,7 @@ export class SolicitudesFormComponent implements OnInit {
   }
 
   onAddCuentadante(): void {
-    console.log('Agregar cuentadante');
+    // TODO: abrir selector de cuentadante
   }
 
   onAddBien(): void {
