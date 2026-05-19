@@ -4,15 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { ButtonComponent, DataTableComponent, KpiCardComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
 import { ExportarConsolidadoModalComponent } from '../components/exportar-consolidado-modal/exportar-consolidado-modal.component';
 import { ReversarConsolidadoModalComponent } from '../components/reversar-consolidado-modal/reversar-consolidado-modal.component';
-
-interface Consolidado {
-  id: string;
-  mes: string;
-  tipo: string;
-  total: string;
-  estado: string;
-  variant: 'success' | 'warning' | 'danger' | 'info';
-}
+import { Consolidado, ConsolidadoMock } from '../../../models/consolidado.model';
 
 @Component({
   selector: 'restaurant-consolidado-list',
@@ -45,12 +37,7 @@ export class ConsolidadoListComponent {
   }
 
   // Mocks para la tabla de consolidados históricos
-  consolidados = signal<Consolidado[]>([
-    { id: '#CON-2023-12-01', mes: 'Diciembre 2023', tipo: 'Cierre Anual', total: '$45,200,000.00', estado: 'Contabilizado', variant: 'success' },
-    { id: '#CON-2023-11-28', mes: 'Noviembre 2023', tipo: 'Regular', total: '$38,150,000.00', estado: 'Generado', variant: 'info' },
-    { id: '#CON-2023-10-15', mes: 'Octubre 2023', tipo: 'Regular', total: '$29,400,000.00', estado: 'Borrador', variant: 'warning' },
-    { id: '#CON-2023-09-30', mes: 'Septiembre 2023', tipo: 'Regular', total: '$41,200,000.00', estado: 'Contabilizado', variant: 'success' }
-  ]);
+  consolidados = signal<Consolidado[]>(ConsolidadoMock);
 
   goToDetail(id: string) {
     // Navigate to the detail view based on ID
