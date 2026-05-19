@@ -1,0 +1,97 @@
+<div class="caja-page">
+  <div class="caja-page__header">
+    <restaurant-page-header
+      title="Módulo de Facturación"
+      subtitle="Panel de control para facturación y procesamiento de pagos"
+    ></restaurant-page-header>
+    
+    <div class="badge-container">
+      <span class="badge">Instructor</span>
+    </div>
+  </div>
+
+  <div class="caja-page__stats">
+    <restaurant-kpi-card
+      label="Pedidos Listos"
+      value="2"
+      icon="dollar-sign"
+      iconColor="green"
+    ></restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      label="Mesas por Pagar"
+      value="1"
+      icon="credit-card"
+      iconColor="blue"
+    ></restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      label="Facturas Hoy"
+      value="4"
+      icon="file-text"
+      iconColor="purple"
+    ></restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      label="Total Facturado"
+      value="$150.535"
+      icon="coins"
+      iconColor="orange"
+    ></restaurant-kpi-card>
+  </div>
+
+  <section class="caja-page__actions">
+    <div class="actions-grid">
+      <!-- Action Card: Generar Factura -->
+      <div class="action-card generate-card">
+        <div class="action-header">
+          <lucide-icon name="banknote" [size]="24" class="icon-green"></lucide-icon>
+          <h3 class="text-green">Generar Factura</h3>
+        </div>
+        <p class="action-desc">Crear facturas para pedidos finalizados</p>
+        <div class="action-info">
+          <span>Pedidos disponibles:</span>
+          <span class="badge-count">2</span>
+        </div>
+        <restaurant-button variant="primary" class="full-width" (click)="irANuevaFactura()">
+          <lucide-icon name="plus" [size]="18"></lucide-icon>
+          <span>Crear Nueva Factura</span>
+        </restaurant-button>
+      </div>
+
+      <!-- Action Card: Buscar Factura -->
+      <div class="action-card search-card">
+        <div class="action-header">
+          <lucide-icon name="search" [size]="24" class="icon-blue"></lucide-icon>
+          <h3 class="text-blue">Buscar Factura</h3>
+        </div>
+        <p class="action-desc">Consultar facturas existentes</p>
+        <div class="action-info">
+          <span>Total facturas:</span>
+          <span class="badge-count">4</span>
+        </div>
+        <restaurant-button variant="surface" class="full-width" (click)="irABuscar()">
+          <lucide-icon name="search" [size]="18"></lucide-icon>
+          <span>Ir al Buscador</span>
+        </restaurant-button>
+      </div>
+
+      <!-- Action Card: Registrar Pago -->
+      <div class="action-card pay-card">
+        <div class="action-header">
+          <lucide-icon name="credit-card" [size]="24" class="icon-purple"></lucide-icon>
+          <h3 class="text-purple">Registrar Pago</h3>
+        </div>
+        <p class="action-desc">Procesar pagos de mesas activas</p>
+        <div class="action-info">
+          <span>Mesas por pagar:</span>
+          <span class="badge-count">1</span>
+        </div>
+        <restaurant-button variant="surface" class="full-width" (click)="irARegistrarPago()">
+          <lucide-icon name="credit-card" [size]="18"></lucide-icon>
+          <span>Procesar Pagos</span>
+        </restaurant-button>
+      </div>
+    </div>
+  </section>
+</div>
