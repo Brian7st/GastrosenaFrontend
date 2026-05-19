@@ -1,14 +1,14 @@
 import { Component, ChangeDetectionStrategy, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { ButtonComponent, DataTableComponent, KpiCardComponent } from '@restaurant/shared/ui';
+import { RouterModule, Router } from '@angular/router';
+import { ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmModalComponent } from '@restaurant/shared/ui';
 import { SolicitudGil, EstadoGil } from '../../../models/solicitudes-gil.model';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 
 @Component({
   selector: 'restaurant-solicitudes-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent],
+  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmModalComponent],
   templateUrl: './solicitudes-list.component.html',
   styleUrl: './solicitudes-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -16,6 +16,7 @@ import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 export class SolicitudesListComponent implements OnInit {
 
   private facade = inject(SolicitudesFacade);
+  private router  = inject(Router);
 
   solicitudes = this.facade.solicitudes;
   loading = this.facade.loading;
@@ -71,10 +72,18 @@ export class SolicitudesListComponent implements OnInit {
     return estado === 'Borrador' || estado === 'Pendiente';
   }
 
-  onSearch(term: string): void    { this.facade.setFiltros({ busqueda: term });    }
-  onFilterEstado(v: any): void { this.facade.setFiltros({ estado: v ? (v as EstadoGil) : undefined });       }
-  onFilterFecha(v: string): void  { this.facade.setFiltros({ fechaRango: v });        }
-  onExportPdf(id: string | number): void { console.log('PDF:', id);  }
+  onSearch(term: string): void        { this.facade.setFiltros({ busqueda: term }); }
+  onFilterEstado(v: string): void      {
+    // TODO: llamar a solicitudesFacade.setFiltros(...) cuando exista la facade
+    this.facade.setFiltros({ estado: v ? (v as EstadoGil) : undefined });
+  }
+  onFilterFecha(v: string): void       {
+    // TODO: llamar a solicitudesFacade.setFiltros(...) cuando exista la facade
+    this.facade.setFiltros({ fechaRango: v });
+  }
+  onExportPdf(id: string | number): void {
+    this.router.navigate(['/app/inventario/solicitudes-gil', id, 'exportar']);
+  }
 
   // ── Modal State ──────────────────────────────────────────────────────────
   showDeleteModal = signal<boolean>(false);
