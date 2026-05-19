@@ -68,7 +68,7 @@
       </tr>
     </thead>
     <tbody class="text-black text-center">
-      @for (item of consolidados; track item.id) {
+      @for (item of consolidados(); track item.id) {
         <tr>
           <td>
             <span class="td-value-primary td-mono">{{ item.id }}</span>
@@ -150,18 +150,18 @@
   </div>
 
   <restaurant-exportar-consolidado-modal
-    *ngIf="showExportModal"
+    *ngIf="showExportModal()"
     (close)="closeExportModal()"
     (export)="onExport($event)">
   </restaurant-exportar-consolidado-modal>
 
   <restaurant-reversar-consolidado-modal
-    *ngIf="showReversarModal && selectedReversarItem"
-    [consolidadoId]="selectedReversarItem.id"
-    [periodo]="selectedReversarItem.mes"
-    [total]="selectedReversarItem.total"
+    *ngIf="showReversarModal() && selectedReversarItem()"
+    [consolidadoId]="selectedReversarItem()!.id"
+    [periodo]="selectedReversarItem()!.mes"
+    [total]="selectedReversarItem()!.total"
     [comprobantes]="12" 
-    [isBlocked]="isReversarBlocked"
+    [isBlocked]="isReversarBlocked()"
     (close)="closeReversarModal()"
     (confirm)="confirmReversar()">
   </restaurant-reversar-consolidado-modal>

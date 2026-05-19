@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { ButtonComponent, DataTableComponent, KpiCardComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
@@ -25,32 +25,32 @@ interface Consolidado {
 export class ConsolidadoListComponent {
   private router = inject(Router);
 
-  showExportModal = false;
-  showReversarModal = false;
-  selectedReversarItem: Consolidado | null = null;
-  isReversarBlocked = false;
+  showExportModal = signal(false);
+  showReversarModal = signal(false);
+  selectedReversarItem = signal<Consolidado | null>(null);
+  isReversarBlocked = signal(false);
 
   openExportModal() {
-    this.showExportModal = true;
+    this.showExportModal.set(true);
   }
 
   closeExportModal() {
-    this.showExportModal = false;
+    this.showExportModal.set(false);
   }
 
   onExport(format: 'excel' | 'pdf') {
     console.log('Exporting as', format);
     // Add real export logic here
-    this.showExportModal = false;
+    this.showExportModal.set(false);
   }
 
   // Mocks para la tabla de consolidados históricos
-  consolidados: Array<Consolidado> = [
+  consolidados = signal<Consolidado[]>([
     { id: '#CON-2023-12-01', mes: 'Diciembre 2023', tipo: 'Cierre Anual', total: '$45,200,000.00', estado: 'Contabilizado', variant: 'success' },
     { id: '#CON-2023-11-28', mes: 'Noviembre 2023', tipo: 'Regular', total: '$38,150,000.00', estado: 'Generado', variant: 'info' },
     { id: '#CON-2023-10-15', mes: 'Octubre 2023', tipo: 'Regular', total: '$29,400,000.00', estado: 'Borrador', variant: 'warning' },
     { id: '#CON-2023-09-30', mes: 'Septiembre 2023', tipo: 'Regular', total: '$41,200,000.00', estado: 'Contabilizado', variant: 'success' }
-  ];
+  ]);
 
   goToDetail(id: string) {
     // Navigate to the detail view based on ID
@@ -58,26 +58,23 @@ export class ConsolidadoListComponent {
   }
 
   reversar(id: string) {
-    const item = this.consolidados.find(c => c.id === id);
+    const item = this.consolidados().find(c => c.id === id);
     if (item) {
-      this.selectedReversarItem = item;
+      this.selectedReversarItem.set(item);
       // Mock logic: block if variant is 'success' (e.g. Contabilizado) just to show both modals for demo.
-      this.isReversarBlocked = item.variant === 'success';
-      this.showReversarModal = true;
+      this.isReversarBlocked.set(item.variant === 'success');
+      this.showReversarModal.set(true);
     }
   }
 
   closeReversarModal() {
-    this.showReversarModal = false;
-    this.selectedReversarItem = null;
+    this.showReversarModal.set(false);
+    this.selectedReversarItem.set(null);
   }
 
   confirmReversar() {
-    if (this.selectedReversarItem) {
-      this.selectedReversarItem.estado = 'Reversado';
-      this.selectedReversarItem.variant = 'danger';
-      // Force change detection by re-assigning array if needed, but OnPush might require it:
-      this.consolidados = [...this.consolidados];
+    if (this.selectedReversarItem()) {
+      this.consolidados.update(list => list.map(c => c.id === this.selectedReversarItem()!.id ? { ...c, estado: 'Reversado', variant: 'danger' } : c));
     }
     this.closeReversarModal();
   }

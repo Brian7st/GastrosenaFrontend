@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { ButtonComponent, DataTableComponent, KpiCardComponent } from '@restaurant/shared/ui';
@@ -18,9 +18,9 @@ export class ConsolidadoDetailComponent {
   private router = inject(Router);
   private location = inject(Location);
 
-  showExportModal = false;
-  showReversarModal = false;
-  isReversarBlocked = false;
+  showExportModal = signal(false);
+  showReversarModal = signal(false);
+  isReversarBlocked = signal(false);
 
   // Mocks para la tabla de subtotales
   subtotales = [
@@ -52,25 +52,25 @@ export class ConsolidadoDetailComponent {
   }
 
   openExportModal() {
-    this.showExportModal = true;
+    this.showExportModal.set(true);
   }
 
   closeExportModal() {
-    this.showExportModal = false;
+    this.showExportModal.set(false);
   }
 
   onExport(format: 'excel' | 'pdf') {
     console.log('Exporting detail as', format);
-    this.showExportModal = false;
+    this.showExportModal.set(false);
   }
 
   openReversarModal() {
-    this.isReversarBlocked = false; // Mock
-    this.showReversarModal = true;
+    this.isReversarBlocked.set(false); // Mock
+    this.showReversarModal.set(true);
   }
 
   closeReversarModal() {
-    this.showReversarModal = false;
+    this.showReversarModal.set(false);
   }
 
   confirmReversar() {

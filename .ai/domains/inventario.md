@@ -20,6 +20,29 @@
 - `StockLevelIndicatorComponent`
 - `BienDetailCardComponent`
 
+## Conectar vistas al backend
+
+Cuando vayas a reemplazar los mocks de una vista con HTTP real, usá estos prompts:
+
+**Paso 1 — Iniciá la conversación** con el contenido de `.ai/prompts/conectar-vista-backend.md`
+**Paso 2 — Agregá al final** el archivo específico de la vista:
+
+| Vista | Archivo de prompt |
+|---|---|
+| Bienes | `.ai/prompts/vistas/bienes.md` |
+| Facturas | `.ai/prompts/vistas/facturas.md` |
+| Solicitudes GIL | `.ai/prompts/vistas/solicitudes-gil.md` |
+| Alertas | `.ai/prompts/vistas/alertas.md` |
+| Presupuesto | `.ai/prompts/vistas/presupuesto.md` |
+| Actas | `.ai/prompts/vistas/actas.md` |
+| Paquete Probatorio | `.ai/prompts/vistas/paquete-probatorio.md` |
+| Requisiciones | `.ai/prompts/vistas/requisiciones.md` |
+| Kardex | `.ai/prompts/vistas/kardex.md` |
+| Conciliación | `.ai/prompts/vistas/conciliacion.md` |
+| Consolidado | `.ai/prompts/vistas/consolidado.md` |
+
+---
+
 ## Estructura de carpetas
 
 ```
