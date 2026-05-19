@@ -16,13 +16,13 @@ export class RestauranteFacade {
 
   // KPIs computados
   readonly stats = computed<RestauranteStats>(() => {
-    const mesas = this._mesas();
-    const totalMesas = mesas.length;
-    const mesasOcupadas = mesas.filter(m => m.estado !== 'libre').length;
+    const mesasActivas = this._mesas().filter(m => m.isActive !== false);
+    const totalMesas = mesasActivas.length;
+    const mesasOcupadas = mesasActivas.filter(m => m.estado !== 'libre').length;
     const porcentajeOcupacion = totalMesas > 0 ? Math.round((mesasOcupadas / totalMesas) * 100) : 0;
     
     // Contar pedidos que no estén ENTREGADOS o CANCELADOS en las mesas activas
-    const pedidosPendientes = mesas.filter(m => 
+    const pedidosPendientes = mesasActivas.filter(m => 
       m.ordenActual && 
       m.ordenActual.estado !== EstadoPedido.ENTREGADO && 
       m.ordenActual.estado !== EstadoPedido.CANCELADO
@@ -76,6 +76,7 @@ export class RestauranteFacade {
       isActive,
       estado: 'libre',
       comensal: '',
+      cantidadComensales: undefined,
       ordenActual: null,
       notas: ''
     };
@@ -84,7 +85,7 @@ export class RestauranteFacade {
     this.guardarDatos();
   }
 
-  abrirMesa(id: number, comensal: string) {
+  abrirMesa(id: number, comensal: string, cantidadComensales: number) {
     this._mesas.update(mesas => mesas.map(m => {
       if (m.id === id) {
         // Crear orden inicial simulada
@@ -100,7 +101,7 @@ export class RestauranteFacade {
           total: 0
         };
         this._ordenesHistorial.set([nuevaOrden, ...this._ordenesHistorial()]);
-        return { ...m, estado: 'ocupada', comensal, ordenActual: nuevaOrden };
+        return { ...m, estado: 'ocupada', comensal, cantidadComensales, ordenActual: nuevaOrden };
       }
       return m;
     }));
@@ -112,10 +113,15 @@ export class RestauranteFacade {
     this.guardarDatos();
   }
 
+  cambiarEstadoActivoMesa(id: number, isActive: boolean) {
+    this._mesas.update(mesas => mesas.map(m => m.id === id ? { ...m, isActive } : m));
+    this.guardarDatos();
+  }
+
   liberarMesa(id: number) {
     this._mesas.update(mesas => mesas.map(m => {
       if (m.id === id) {
-        return { ...m, estado: 'libre', comensal: '', ordenActual: null };
+        return { ...m, estado: 'libre', comensal: '', cantidadComensales: undefined, ordenActual: null };
       }
       return m;
     }));
