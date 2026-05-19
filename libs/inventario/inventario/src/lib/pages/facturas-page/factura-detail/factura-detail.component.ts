@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { ButtonComponent, DataTableComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import { FacturasFacade } from '../../../data-access/facturas.facade';
 
 @Component({
   selector: 'restaurant-factura-detail',
@@ -14,8 +15,18 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
 })
 export class FacturaDetailPageComponent implements OnInit {
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private facade = inject(FacturasFacade);
 
-  ngOnInit(): void {}
+  factura = this.facade.facturaSeleccionada;
+  loading = this.facade.loading;
+
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.facade.cargarFactura(id);
+    }
+  }
 
   goBack(): void {
     this.router.navigate(['/app/inventario/facturas']);
