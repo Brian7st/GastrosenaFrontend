@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { 
@@ -7,6 +7,8 @@ import {
   ButtonComponent,
   LucideIconComponent
 } from '@restaurant/shared/ui';
+import { RestauranteFacade } from '../../data-access/restaurante.facade';
+import { PedidoResumenResponse } from '../../models/restaurante.model';
 
 @Component({
   selector: 'restaurant-caja-pagar-page',
@@ -22,40 +24,35 @@ import {
   styleUrl: './caja-pagar-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CajaPagarPageComponent {
+export class CajaPagarPageComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private facade = inject(RestauranteFacade);
 
   mostrarModalDetalle = signal(false);
   mostrarModalCobro = signal(false);
   mostrarModalExito = signal(false);
   
   metodoSeleccionado = signal('Efectivo');
+  mesaSeleccionada = signal<PedidoResumenResponse | null>(null);
 
-  mesaSeleccionada = signal<any>({
-    id: 'INV-2024-002',
-    nombre: 'Mesa 5',
-    cliente: 'Juan Pérez',
-    mesero: 'María González',
-    hora: '20:48:00',
-    productos: [
-      { nombre: 'Hamburguesa Doble', cantidad: 1, precio: 25000 },
-      { nombre: 'Jugo de Mora', cantidad: 1, precio: 7000 }
-    ],
-    subtotal: 32000,
-    iva: 6080,
-    total: 38080
-  });
+  mesasPorPagar = this.facade.pedidosParaCobro;
+
+  ngOnInit() {
+    this.facade.cargarPedidosParaCobro();
+  }
 
   volver() {
     this.router.navigate(['..'], { relativeTo: this.route });
   }
 
-  verDetalle() {
+  verDetalle(mesa: PedidoResumenResponse) {
+    this.mesaSeleccionada.set(mesa);
     this.mostrarModalDetalle.set(true);
   }
 
-  abrirCobro() {
+  abrirCobro(mesa?: PedidoResumenResponse) {
+    if (mesa) this.mesaSeleccionada.set(mesa);
     this.mostrarModalDetalle.set(false);
     this.mostrarModalCobro.set(true);
   }
@@ -71,13 +68,18 @@ export class CajaPagarPageComponent {
   }
 
   confirmarPago() {
-    console.log(`Pago registrado con ${this.metodoSeleccionado()} para ${this.mesaSeleccionada().id}`);
-    this.mostrarModalCobro.set(false);
-    this.mostrarModalExito.set(true);
+    const mesa = this.mesaSeleccionada();
+    if (mesa) {
+      this.facade.procesarPagoFinal(mesa.id, this.metodoSeleccionado());
+      this.mostrarModalCobro.set(false);
+      this.mostrarModalExito.set(true);
+    }
   }
 
   finalizarTodo() {
     this.cerrarModales();
+    this.facade.cargarPedidosParaCobro();
     this.volver();
   }
 }
+

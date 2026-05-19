@@ -20,30 +20,36 @@
     </div>
 
     <div class="mesas-list">
-      <restaurant-card class="mesa-card">
-        <div class="mesa-info" (click)="verDetalle()">
-          <div class="icon-container purple-bg">
-            <lucide-icon name="credit-card" [size]="24"></lucide-icon>
+      @for (mesa of mesasPorPagar(); track mesa.id) {
+        <restaurant-card class="mesa-card">
+          <div class="mesa-info" (click)="verDetalle(mesa)">
+            <div class="icon-container purple-bg">
+              <lucide-icon name="credit-card" [size]="24"></lucide-icon>
+            </div>
+            <div class="details">
+              <span class="mesa-name">{{ mesa.nombreMesa }}</span>
+              <span class="mesa-meta">Comensales: {{ mesa.numeroComensales }}</span>
+              <span class="mesa-time">{{ mesa.fechaCreacion | date:'shortTime' }}</span>
+            </div>
           </div>
-          <div class="details">
-            <span class="mesa-name">{{ mesaSeleccionada().nombre }}</span>
-            <span class="mesa-meta">Mesero: {{ mesaSeleccionada().mesero }} • {{ mesaSeleccionada().productos.length }} ítems</span>
-            <span class="mesa-time">{{ mesaSeleccionada().hora }}</span>
-          </div>
-        </div>
 
-        <div class="mesa-actions">
-          <span class="mesa-price">${{ mesaSeleccionada().total | number }}</span>
-          <restaurant-button variant="primary" (click)="abrirCobro()">
-            <span>Procesar Pago</span>
-          </restaurant-button>
+          <div class="mesa-actions">
+            <span class="mesa-price">${{ mesa.subtotal | number }}</span>
+            <restaurant-button variant="primary" (click)="abrirCobro(mesa)">
+              <span>Procesar Pago</span>
+            </restaurant-button>
+          </div>
+        </restaurant-card>
+      } @empty {
+        <div class="empty-state">
+          <p>No hay mesas pendientes de pago.</p>
         </div>
-      </restaurant-card>
+      }
     </div>
   </restaurant-card>
 
   <!-- Modal Detalle -->
-  @if (mostrarModalDetalle()) {
+  @if (mostrarModalDetalle() && mesaSeleccionada()) {
     <div class="modal-overlay" (click)="cerrarModales()">
       <div class="modal-content" (click)="$event.stopPropagation()">
         <div class="modal-header-colored info-bg">
@@ -55,27 +61,17 @@
         <div class="modal-body-custom">
           <div class="invoice-id text-center">
             <small>ID FACTURA</small>
-            <h2>{{ mesaSeleccionada().id }}</h2>
+            <h2>{{ mesaSeleccionada()?.id | slice:0:8 }}</h2>
           </div>
           <div class="info-grid">
-            <div class="info-item"><span>Cliente:</span> <strong>{{ mesaSeleccionada().cliente }}</strong></div>
-            <div class="info-item"><span>Mesa:</span> <strong>{{ mesaSeleccionada().nombre }}</strong></div>
-            <div class="info-item"><span>Mesero:</span> <strong>{{ mesaSeleccionada().mesero }}</strong></div>
-            <div class="info-item"><span>Fecha:</span> <strong>05/04/2026</strong></div>
+            <div class="info-item"><span>Mesa:</span> <strong>{{ mesaSeleccionada()?.nombreMesa }}</strong></div>
+            <div class="info-item"><span>Comensales:</span> <strong>{{ mesaSeleccionada()?.numeroComensales }}</strong></div>
+            <div class="info-item"><span>Fecha:</span> <strong>{{ mesaSeleccionada()?.fechaCreacion | date:'shortDate' }}</strong></div>
           </div>
-          <div class="products-list">
-            <h6>Productos / Consumo</h6>
-            @for (item of mesaSeleccionada().productos; track item.nombre) {
-              <div class="product-item">
-                <span>{{ item.nombre }} x{{ item.cantidad }}</span>
-                <span>${{ item.precio | number }}</span>
-              </div>
-            }
-          </div>
+          <!-- TODO: Traer los detalles completos con GET /api/pedidos/{id} si el subtotal no fuera suficiente -->
           <div class="billing-rows">
-            <div class="row"><span>Subtotal:</span> <span>${{ mesaSeleccionada().subtotal | number }}</span></div>
-            <div class="row"><span>IVA (19%):</span> <span>${{ mesaSeleccionada().iva | number }}</span></div>
-            <div class="row total"><span>TOTAL:</span> <strong>${{ mesaSeleccionada().total | number }}</strong></div>
+            <div class="row"><span>Subtotal:</span> <span>${{ mesaSeleccionada()?.subtotal | number }}</span></div>
+            <div class="row total"><span>TOTAL:</span> <strong>${{ mesaSeleccionada()?.subtotal | number }}</strong></div>
           </div>
         </div>
         <div class="modal-actions-between">

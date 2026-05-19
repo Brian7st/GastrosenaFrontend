@@ -1,18 +1,28 @@
-import { Injectable, signal, computed } from '@angular/core';
-import { Mesa, RestauranteStats } from '../models/restaurante.model';
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { Mesa, RestauranteStats, PedidoResumenResponse } from '../models/restaurante.model';
 import { Pedido, EstadoPedido } from '@restaurant/shared/models';
+import { RestauranteService } from './restaurante.service';
 
 @Injectable({ providedIn: 'root' })
 export class RestauranteFacade {
+  private restauranteService = inject(RestauranteService);
+
   // Estado privado con Signals
   private _mesas = signal<Mesa[]>([]);
   private _ordenesHistorial = signal<Pedido[]>([]);
   private _pedidoActivo = signal<Pedido | null>(null);
+  
+  // Estado de Caja
+  private _pedidosParaCobro = signal<PedidoResumenResponse[]>([]);
+  private _historialFacturas = signal<PedidoResumenResponse[]>([]);
 
   // Selectores públicos (Signals)
   readonly mesas = this._mesas.asReadonly();
   readonly ordenesHistorial = this._ordenesHistorial.asReadonly();
   readonly pedidoActivo = this._pedidoActivo.asReadonly();
+  readonly pedidosParaCobro = this._pedidosParaCobro.asReadonly();
+  readonly historialFacturas = this._historialFacturas.asReadonly();
+
 
   // KPIs computados
   readonly stats = computed<RestauranteStats>(() => {
@@ -213,6 +223,34 @@ export class RestauranteFacade {
     this._ordenesHistorial.update(historial => [pedidoConfirmado, ...historial]);
     this.limpiarPedidoActivo();
     this.guardarDatos();
+  }
+
+  // --- Módulo de Caja (Facturación y Pagos) ---
+
+  cargarPedidosParaCobro() {
+    this.restauranteService.getPedidosPorEstado('ENTREGADO').subscribe({
+      next: (pedidos) => this._pedidosParaCobro.set(pedidos),
+      error: (err) => console.error('Error cargando pedidos para cobro', err)
+    });
+  }
+
+  cargarHistorialFacturas() {
+    this.restauranteService.getPedidosPorEstado('FACTURADO').subscribe({
+      next: (pedidos) => this._historialFacturas.set(pedidos),
+      error: (err) => console.error('Error cargando historial de facturas', err)
+    });
+  }
+
+  procesarPagoFinal(pedidoId: string, metodo: string) {
+    this.restauranteService.registrarPago(pedidoId, metodo).subscribe({
+      next: () => {
+        // Remover de la lista de pendientes localmente
+        this._pedidosParaCobro.update(lista => lista.filter(p => p.id !== pedidoId));
+        // Recargar historial
+        this.cargarHistorialFacturas();
+      },
+      error: (err) => console.error('Error registrando pago', err)
+    });
   }
 }
 

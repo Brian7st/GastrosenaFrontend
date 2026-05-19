@@ -61,28 +61,32 @@
   <div class="results-section">
     <div class="results-header">
       <h6>Facturas Encontradas</h6>
-      <span class="results-badge">1 factura</span>
+      <span class="results-badge">{{ facturas().length }} factura(s)</span>
     </div>
 
     <div class="results-grid">
-      <restaurant-card 
-        class="factura-item" 
-        (click)="verDetalle({id: 'INV-2024-002', total: '$59.500'})">
-        <div class="factura-content">
-          <div class="factura-info">
-            <span class="id">INV-2024-002</span>
-            <span class="details">Cliente Mesa 3 • Mesa 3 • 15 de enero de 2024</span>
+      @for (factura of facturas(); track factura.id) {
+        <restaurant-card 
+          class="factura-item" 
+          (click)="verDetalle(factura)">
+          <div class="factura-content">
+            <div class="factura-info">
+              <span class="id">{{ factura.id | slice:0:8 }}</span>
+              <span class="details">{{ factura.nombreMesa }} • Comensales: {{ factura.numeroComensales }} • {{ factura.fechaCreacion | date:'shortDate' }}</span>
+            </div>
+            <div class="factura-status">
+              <span class="price">${{ factura.subtotal | number }}</span>
+              <restaurant-status-badge [label]="factura.estado" variant="success"></restaurant-status-badge>
+            </div>
           </div>
-          <div class="factura-status">
-            <span class="price">$59.500</span>
-            <restaurant-status-badge label="Pendiente" variant="warning"></restaurant-status-badge>
-          </div>
-        </div>
-      </restaurant-card>
+        </restaurant-card>
+      } @empty {
+        <div class="empty-state">No se encontraron facturas con esos criterios.</div>
+      }
     </div>
   </div>
 
-  @if (mostrarModalDetalle()) {
+  @if (mostrarModalDetalle() && facturaSeleccionada()) {
     <div class="modal-overlay" (click)="cerrarModal()">
       <div class="modal-content" (click)="$event.stopPropagation()">
         <div class="modal-header-colored blue-bg">
@@ -95,32 +99,18 @@
         <div class="modal-body-custom">
           <div class="invoice-main-info text-center">
             <span class="label">ID FACTURA</span>
-            <h2>{{ facturaSeleccionada()?.id }}</h2>
+            <h2>{{ facturaSeleccionada()?.id | slice:0:8 }}</h2>
           </div>
           
           <div class="info-grid">
-            <div class="info-item"><span>Cliente:</span> <strong>Cliente Mesa 3</strong></div>
-            <div class="info-item"><span>Mesa:</span> <strong>Mesa 3</strong></div>
-            <div class="info-item"><span>Mesero:</span> <strong>Instructor</strong></div>
-            <div class="info-item"><span>Fecha:</span> <strong>15/01/2024</strong></div>
-          </div>
-          
-          <div class="products-section">
-            <h6>Productos / Consumo</h6>
-            <div class="product-row">
-              <span>Hamburguesa Especial x1</span>
-              <span>$45.000</span>
-            </div>
-            <div class="product-row">
-              <span>Gaseosa 350ml x2</span>
-              <span>$5.000</span>
-            </div>
+            <div class="info-item"><span>Mesa:</span> <strong>{{ facturaSeleccionada()?.nombreMesa }}</strong></div>
+            <div class="info-item"><span>Comensales:</span> <strong>{{ facturaSeleccionada()?.numeroComensales }}</strong></div>
+            <div class="info-item"><span>Fecha:</span> <strong>{{ facturaSeleccionada()?.fechaCreacion | date:'shortDate' }}</strong></div>
           </div>
           
           <div class="billing-summary">
-            <div class="summary-row"><span>Subtotal:</span> <span>$50.000</span></div>
-            <div class="summary-row"><span>IVA (19%):</span> <span>$9.500</span></div>
-            <div class="summary-row total"><span>TOTAL:</span> <strong>{{ facturaSeleccionada()?.total }}</strong></div>
+            <div class="summary-row"><span>Subtotal:</span> <span>${{ facturaSeleccionada()?.subtotal | number }}</span></div>
+            <div class="summary-row total"><span>TOTAL:</span> <strong>${{ facturaSeleccionada()?.subtotal | number }}</strong></div>
           </div>
         </div>
         
@@ -128,9 +118,10 @@
           <restaurant-button variant="ghost" (click)="cerrarModal()">
             <span>Cerrar</span>
           </restaurant-button>
-          <restaurant-button variant="primary" (click)="irAPagar()">
-            <lucide-icon name="credit-card" [size]="18"></lucide-icon>
-            <span>Registrar Pago</span>
+          <!-- Si la factura necesita re-impresión o acción extra -->
+          <restaurant-button variant="primary" (click)="cerrarModal()">
+            <lucide-icon name="printer" [size]="18"></lucide-icon>
+            <span>Imprimir Recibo</span>
           </restaurant-button>
         </div>
       </div>
