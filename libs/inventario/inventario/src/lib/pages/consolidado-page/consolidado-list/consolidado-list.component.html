@@ -19,7 +19,7 @@
   <div class="kpi-grid">
     <restaurant-kpi-card 
       label="Retención ZESE Acumulada" 
-      value="$1,452,890.00" 
+      [value]="kpis().retencionZese | currency:'COP':'symbol-narrow':'1.0-0'" 
       icon="landmark" 
       iconColor="blue"
       trend="+4.2%" 
@@ -28,7 +28,7 @@
 
     <restaurant-kpi-card 
       label="Total IVA Acumulado" 
-      value="$3,842,120.45" 
+      [value]="kpis().ivaAcumulado | currency:'COP':'symbol-narrow':'1.0-0'" 
       icon="banknote" 
       iconColor="green"
       trend="Estable" 
@@ -37,7 +37,7 @@
 
     <restaurant-kpi-card 
       label="Total Ejecutado Neto" 
-      value="$12,980,500.00" 
+      [value]="kpis().totalEjecutado | currency:'COP':'symbol-narrow':'1.0-0'" 
       icon="bar-chart-2" 
       iconColor="red"
       trend="Alerta" 
@@ -46,7 +46,7 @@
 
     <restaurant-kpi-card 
       label="GILs Pendientes" 
-      value="14" 
+      [value]="kpis().gilsPendientes" 
       icon="file-text" 
       iconColor="orange">
     </restaurant-kpi-card>
@@ -71,7 +71,7 @@
       @for (item of consolidados(); track item.id) {
         <tr>
           <td>
-            <span class="td-value-primary td-mono">{{ item.id }}</span>
+            <span class="td-value-primary td-mono">#{{ item.id }}</span>
           </td>
           <td>
             <div class="td-flex-col">

@@ -63,7 +63,7 @@ export class ConsolidadoCreateComponent {
   }
 
   confirmar(): void {
-    console.log('Generando Consolidado con:', this.gils().filter(g => g.selected));
+    // TODO: llamar a consolidadoFacade.generarConsolidado(this.gils().filter(g => g.selected).map(g => g.id))
     this.router.navigate(['/app/inventario/consolidado']);
   }
 }

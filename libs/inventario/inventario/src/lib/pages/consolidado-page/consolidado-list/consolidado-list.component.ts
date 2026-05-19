@@ -6,6 +6,13 @@ import { ExportarConsolidadoModalComponent } from '../components/exportar-consol
 import { ReversarConsolidadoModalComponent } from '../components/reversar-consolidado-modal/reversar-consolidado-modal.component';
 import { Consolidado, ConsolidadoMock } from '../../../models/consolidado.model';
 
+interface ConsolidadoKpis {
+  retencionZese: number;
+  ivaAcumulado: number;
+  totalEjecutado: number;
+  gilsPendientes: number;
+}
+
 @Component({
   selector: 'restaurant-consolidado-list',
   standalone: true,
@@ -22,6 +29,13 @@ export class ConsolidadoListComponent {
   selectedReversarItem = signal<Consolidado | null>(null);
   isReversarBlocked = signal(false);
 
+  kpis = signal<ConsolidadoKpis>({
+    retencionZese: 1452890,
+    ivaAcumulado: 3842120.45,
+    totalEjecutado: 12980500,
+    gilsPendientes: 14
+  });
+
   openExportModal() {
     this.showExportModal.set(true);
   }
@@ -31,8 +45,7 @@ export class ConsolidadoListComponent {
   }
 
   onExport(format: 'excel' | 'pdf') {
-    console.log('Exporting as', format);
-    // Add real export logic here
+    // TODO: llamar a consolidadoFacade.exportar(format)
     this.showExportModal.set(false);
   }
 
@@ -41,7 +54,7 @@ export class ConsolidadoListComponent {
 
   goToDetail(id: string) {
     // Navigate to the detail view based on ID
-    this.router.navigate(['/app/inventario/consolidado', id.replace('#', '')]);
+    this.router.navigate(['/app/inventario/consolidado', id]);
   }
 
   reversar(id: string) {
@@ -61,7 +74,7 @@ export class ConsolidadoListComponent {
 
   confirmReversar() {
     if (this.selectedReversarItem()) {
-      this.consolidados.update(list => list.map(c => c.id === this.selectedReversarItem()!.id ? { ...c, estado: 'Reversado', variant: 'danger' } : c));
+      // TODO: llamar a consolidadoFacade.reversarConsolidado(this.selectedReversarItem()!.id)
     }
     this.closeReversarModal();
   }

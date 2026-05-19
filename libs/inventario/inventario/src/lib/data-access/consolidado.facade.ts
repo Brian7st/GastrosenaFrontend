@@ -66,7 +66,7 @@ export class ConsolidadoFacade {
       next: () => {
         // Optimistic update
         this._consolidados.update(list => 
-          list.map(c => c.id === id || c.id.replace('#', '') === id ? { ...c, estado: 'Reversado', variant: 'danger' } : c)
+          list.map(c => c.id === id ? { ...c, estado: 'Reversado', variant: 'danger' } : c)
         );
         this._loading.set(false);
       },

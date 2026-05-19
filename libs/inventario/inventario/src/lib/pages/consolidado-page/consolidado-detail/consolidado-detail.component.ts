@@ -70,7 +70,7 @@ export class ConsolidadoDetailComponent implements OnInit {
   }
 
   onExport(format: 'excel' | 'pdf') {
-    console.log('Exporting detail as', format);
+    // TODO: llamar a consolidadoFacade.exportar(format)
     this.showExportModal.set(false);
   }
 
@@ -84,7 +84,7 @@ export class ConsolidadoDetailComponent implements OnInit {
   }
 
   confirmReversar() {
-    console.log('Reversing detail!');
+    // TODO: llamar a consolidadoFacade.reversarConsolidado(this.route.snapshot.paramMap.get('id')!)
     this.closeReversarModal();
   }
 }

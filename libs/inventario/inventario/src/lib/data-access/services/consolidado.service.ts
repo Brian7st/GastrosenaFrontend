@@ -12,12 +12,12 @@ export class ConsolidadoService {
   }
 
   getConsolidado(id: string): Observable<Consolidado | undefined> {
-    const found = ConsolidadoMock.find(c => c.id === id || c.id.replace('#', '') === id);
+    const found = ConsolidadoMock.find(c => c.id === id);
     return of(found).pipe(delay(500));
   }
 
   generarConsolidado(gils: string[]): Observable<Consolidado> {
-    const newId = `#CON-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+    const newId = `CON-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
     const newConsolidado: Consolidado = {
       id: newId,
       mes: 'Mes Actual',
@@ -32,7 +32,7 @@ export class ConsolidadoService {
   }
 
   reversarConsolidado(id: string): Observable<boolean> {
-    const found = ConsolidadoMock.find(c => c.id === id || c.id.replace('#', '') === id);
+    const found = ConsolidadoMock.find(c => c.id === id);
     if (found) {
       found.estado = 'Reversado';
       found.variant = 'danger';
