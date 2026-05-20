@@ -1,12 +1,13 @@
 import { inject, Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Usuario } from '@restaurant/shared/models';
 import { AppState } from '@restaurant/shared/state';
 import {
   ActualizarUsuarioRequest,
   CrearUsuarioRequest,
+  ExportarConfig,
   FiltrosUsuarios,
   ImportarUsuariosRequest,
+  UsuarioDetalle,
 } from '../models/usuarios.model';
 import { UsuariosActions } from './store/actions/usuarios.actions';
 import { UsuariosState } from './store/reducers/usuarios.reducer';
@@ -14,8 +15,9 @@ import {
   selectError,
   selectHayError,
   selectImportando,
-  selectLoadingAccion,
   selectLoading,
+  selectLoadingAccion,
+  selectMensajeExport,
   selectResultadoImport,
   selectRoles,
   selectTotalActivos,
@@ -43,6 +45,7 @@ export class UsuariosFacade {
   readonly totalInactivos$      = this.store.select(selectTotalInactivos);
   readonly importando$          = this.store.select(selectImportando);
   readonly resultadoImport$     = this.store.select(selectResultadoImport);
+  readonly mensajeExport$       = this.store.select(selectMensajeExport);
   readonly hayError$            = this.store.select(selectHayError);
 
   // ── Comandos ──────────────────────────────────────────────────────────────
@@ -82,11 +85,11 @@ export class UsuariosFacade {
     this.store.dispatch(UsuariosActions.importarMasivo({ request }));
   }
 
-  exportarUsuarios(): void {
-    this.store.dispatch(UsuariosActions.exportarUsuarios());
+  exportarUsuarios(config: ExportarConfig): void {
+    this.store.dispatch(UsuariosActions.exportarUsuarios({ config }));
   }
 
-  seleccionarUsuario(usuario: Usuario): void {
+  seleccionarUsuario(usuario: UsuarioDetalle): void {
     this.store.dispatch(UsuariosActions.seleccionarUsuario({ usuario }));
   }
 

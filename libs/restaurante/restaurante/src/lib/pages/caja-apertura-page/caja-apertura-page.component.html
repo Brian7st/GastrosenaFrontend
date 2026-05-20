@@ -1,0 +1,43 @@
+<div class="caja-apertura-page">
+  <div class="header-section">
+    <restaurant-page-header
+      title="Apertura de Caja"
+      subtitle="Definir el fondo base para iniciar el turno"
+    ></restaurant-page-header>
+  </div>
+
+  <div class="form-block">
+    <div class="card">
+      <div class="block-header">
+        <div class="title-group">
+          <h5>Base Inicial</h5>
+          <span class="subtitle">Ingrese los datos para abrir la caja</span>
+        </div>
+        
+        <div class="alert alert-warning mt-4" *ngIf="facade.turnoCaja()?.estado === 'ABIERTA'">
+          <strong>¡Atención!</strong> Ya existe un turno de caja abierto en este momento.
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Base de Caja (Efectivo)</label>
+        <input type="number" class="form-control" placeholder="$ 0" [formControl]="baseInicialCtrl" />
+      </div>
+
+      <div class="input-group mt-4">
+        <label>Responsable</label>
+        <input type="text" class="form-control" value="Instructor Activo" disabled />
+      </div>
+
+      <div class="form-actions mt-4">
+        <restaurant-button variant="surface" (click)="volver()">
+          Cancelar
+        </restaurant-button>
+        <restaurant-button variant="primary" (click)="confirmarApertura()" [disabled]="baseInicialCtrl.invalid || facade.turnoCaja()?.estado === 'ABIERTA'">
+          <lucide-icon name="log-in" [size]="18"></lucide-icon>
+          <span>Abrir Caja</span>
+        </restaurant-button>
+      </div>
+    </div>
+  </div>
+</div>

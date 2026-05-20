@@ -13,6 +13,7 @@ export const {
   selectError,
   selectImportando,
   selectResultadoImport,
+  selectMensajeExport,
 } = usuariosFeature;
 
 export const selectTotalActivos = createSelector(
