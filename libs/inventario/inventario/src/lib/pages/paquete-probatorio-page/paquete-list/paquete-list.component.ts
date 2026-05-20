@@ -4,6 +4,7 @@ import {
   computed,
   signal,
   inject,
+  OnInit,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -14,11 +15,8 @@ import {
   KpiCardComponent,
   ButtonComponent,
 } from '@restaurant/shared/ui';
-import {
-  PaqueteProbatorio,
-  PaqueteEstado,
-  MOCK_PAQUETES,
-} from '../../../models/paquete.model';
+import { PaqueteProbatorio, PaqueteEstado } from '../../../models/paquete.model';
+import { PaqueteFacade } from '../../../data-access/paquete.facade';
 
 @Component({
   selector: 'restaurant-paquete-list',
@@ -35,19 +33,25 @@ import {
   templateUrl: './paquete-list.component.html',
   styleUrl: './paquete-list.component.scss',
 })
-export class PaqueteListComponent {
+export class PaqueteListComponent implements OnInit {
   private router = inject(Router);
+  private facade = inject(PaqueteFacade);
 
-  // ── Estado reactivo ──────────────────────────────────────────────────────
-  allPaquetes = signal<PaqueteProbatorio[]>(MOCK_PAQUETES);
-  searchText = signal<string>('');
-  estadoFilter = signal<string>('');
+  // ── Estado reactivo desde facade ─────────────────────────────────────────
+  allPaquetes    = this.facade.paquetes;
+  loading        = this.facade.loading;
+  searchText     = signal<string>('');
+  estadoFilter   = signal<string>('');
   programaFilter = signal<string>('');
+
+  ngOnInit(): void {
+    this.facade.loadAll();
+  }
 
   // ── Paquetes filtrados ───────────────────────────────────────────────────
   filteredPaquetes = computed(() => {
-    const text = this.searchText().toLowerCase();
-    const estado = this.estadoFilter();
+    const text     = this.searchText().toLowerCase();
+    const estado   = this.estadoFilter();
     const programa = this.programaFilter().toLowerCase();
 
     return this.allPaquetes().filter(p => {
@@ -56,38 +60,38 @@ export class PaqueteListComponent {
         p.expediente.toLowerCase().includes(text) ||
         p.responsable.toLowerCase().includes(text) ||
         p.ficha.toLowerCase().includes(text);
-      const matchEstado = !estado || p.estado === estado;
+      const matchEstado   = !estado   || p.estado === estado;
       const matchPrograma = !programa || p.programa.toLowerCase().includes(programa);
       return matchText && matchEstado && matchPrograma;
     });
   });
 
-  // ── KPIs ─────────────────────────────────────────────────────────────────
-  kpiTotal = computed(() => this.allPaquetes().length);
-  kpiBorrador = computed(() => this.allPaquetes().filter(p => p.estado === 'borrador').length);
+  // ── KPIs computados ──────────────────────────────────────────────────────
+  kpiTotal     = computed(() => this.allPaquetes().length);
+  kpiBorrador  = computed(() => this.allPaquetes().filter(p => p.estado === 'borrador').length);
   kpiEnRevision = computed(() => this.allPaquetes().filter(p => p.estado === 'en_revision').length);
-  kpiCompleto = computed(() => this.allPaquetes().filter(p => p.estado === 'completo').length);
+  kpiCompleto  = computed(() => this.allPaquetes().filter(p => p.estado === 'completo').length);
   kpiArchivado = computed(() => this.allPaquetes().filter(p => p.estado === 'archivado').length);
 
   // ── Helpers de UI ────────────────────────────────────────────────────────
   getEstadoLabel(estado: PaqueteEstado): string {
     const map: Record<PaqueteEstado, string> = {
-      borrador: 'Borrador',
+      borrador:    'Borrador',
       en_revision: 'En revisión',
-      completo: 'Completo',
-      archivado: 'Archivado',
-      incompleto: 'Incompleto',
+      completo:    'Completo',
+      archivado:   'Archivado',
+      incompleto:  'Incompleto',
     };
     return map[estado];
   }
 
   getEstadoVariant(estado: PaqueteEstado): 'success' | 'warning' | 'danger' | 'info' {
     const map: Record<PaqueteEstado, 'success' | 'warning' | 'danger' | 'info'> = {
-      borrador: 'info',
+      borrador:    'info',
       en_revision: 'warning',
-      completo: 'success',
-      archivado: 'info',
-      incompleto: 'danger',
+      completo:    'success',
+      archivado:   'info',
+      incompleto:  'danger',
     };
     return map[estado];
   }
@@ -106,7 +110,7 @@ export class PaqueteListComponent {
       .slice(0, 2);
   }
 
-  // ── Eventos de filtro ──────────────────────────────────────────────────
+  // ── Eventos de filtro ────────────────────────────────────────────────────
   onSearch(event: Event): void {
     this.searchText.set((event.target as HTMLInputElement).value);
   }
@@ -125,7 +129,7 @@ export class PaqueteListComponent {
     this.programaFilter.set('');
   }
 
-  // ── Navegación ─────────────────────────────────────────────────────────
+  // ── Navegación ───────────────────────────────────────────────────────────
   crearPaquete(): void {
     this.router.navigate(['/app/inventario/paquete-probatorio/nuevo']);
   }
