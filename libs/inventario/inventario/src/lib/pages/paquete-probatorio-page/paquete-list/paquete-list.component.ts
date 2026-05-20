@@ -33,7 +33,7 @@ import {
     ButtonComponent,
   ],
   templateUrl: './paquete-list.component.html',
-  styleUrls: ['./paquete-list.component.scss'],
+  styleUrl: './paquete-list.component.scss',
 })
 export class PaqueteListComponent {
   private router = inject(Router);
