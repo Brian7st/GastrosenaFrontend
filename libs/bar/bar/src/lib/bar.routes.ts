@@ -17,5 +17,21 @@ export const BAR_ROUTES: Routes = [
   {
     path: 'menu',
     loadComponent: () => import('./pages/menu-page/menu-page.component').then((m) => m.MenuPageComponent)
+  },
+  {
+    path: 'actividad',
+    loadComponent: () => import('./pages/actividad-page/actividad-page.component').then((m) => m.ActividadPageComponent)
+  },
+  {
+    path: 'actividades',
+    loadComponent: () => import('./pages/actividades-list-page/actividades-list-page.component').then((m) => m.ActividadesListPageComponent)
+  },
+  {
+    path: 'evaluacion-masiva',
+    loadComponent: () => import('./pages/evaluacion-masiva-page/evaluacion-masiva-page.component').then((m) => m.EvaluacionMasivaPageComponent)
+  },
+  {
+    path: 'evaluacion-individual',
+    loadComponent: () => import('./pages/evaluacion-individual-page/evaluacion-individual-page.component').then((m) => m.EvaluacionIndividualPageComponent)
   }
 ];

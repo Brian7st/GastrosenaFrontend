@@ -68,6 +68,11 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
               ruta: '/app/bar/recetas',
               icono: 'book-open',
             },
+            {
+              label: 'Evaluar',
+              ruta: '/app/bar/actividad',
+              icono: 'graduation-cap',
+            },
           ],
         },
       ],
