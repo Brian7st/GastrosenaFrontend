@@ -45,11 +45,6 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
               icono: 'book-open',
             },
             {
-              label: 'Menú',
-              ruta: '/app/cocina/menu',
-              icono: 'utensils',
-            },
-            {
               label: 'Evaluar',
               ruta: '/app/cocina/actividad',
               icono: 'graduation-cap',
