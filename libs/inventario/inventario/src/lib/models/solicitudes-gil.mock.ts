@@ -1,4 +1,5 @@
 import { SolicitudGil, BienSolicitud } from './solicitudes-gil.model';
+export { BienSolicitud };
 
 // ── Bienes por solicitud (ítems de formulario) ───────────────────────────────
 
