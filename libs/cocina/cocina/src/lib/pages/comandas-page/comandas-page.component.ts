@@ -3,11 +3,33 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ComandaCardComponent } from '../../components/comanda-card/comanda-card.component';
 import { ComandaService, Comanda } from '../../data-access/comanda.service';
+import {
+  LucideIconComponent,
+  PageHeaderComponent,
+  SearchFilterComponent,
+  SelectFilterComponent,
+  CardComponent,
+  ButtonComponent,
+  StatusBadgeComponent,
+  SectionTitleComponent
+} from '@restaurant/shared/ui';
 
 @Component({
   selector: 'restaurant-comandas-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, ComandaCardComponent],
+  imports: [
+    CommonModule, 
+    FormsModule,
+    ComandaCardComponent,
+    LucideIconComponent,
+    PageHeaderComponent,
+    SearchFilterComponent,
+    SelectFilterComponent,
+    CardComponent,
+    ButtonComponent,
+    StatusBadgeComponent,
+    SectionTitleComponent
+  ],
   templateUrl: './comandas-page.component.html',
   styleUrl: './comandas-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,6 +44,26 @@ export class ComandasPageComponent implements OnInit {
 
   comandas = signal<Comanda[]>([]);
   errorToast = signal<string | null>(null);
+
+  opcionesEstado = [
+    { label: 'Todos los estados', value: 'Todos los estados' },
+    { label: 'PENDIENTE', value: 'PENDIENTE' },
+    { label: 'PREPARANDO', value: 'PREPARANDO' },
+    { label: 'LISTO', value: 'LISTO' }
+  ];
+  
+  opcionesPrioridad = [
+    { label: 'Todas las prioridades', value: 'Todas las prioridades' },
+    { label: 'URGENTE', value: 'URGENTE' },
+    { label: 'ALTA', value: 'ALTA' },
+    { label: 'NORMAL', value: 'NORMAL' }
+  ];
+  
+  opcionesOrden = [
+    { label: 'Prioridad', value: 'Prioridad' },
+    { label: 'Hora de llegada', value: 'Hora de llegada' },
+    { label: 'Tiempo estimado', value: 'Tiempo estimado' }
+  ];
 
   ngOnInit() {
     this.cargarComandas();
@@ -163,5 +205,11 @@ export class ComandasPageComponent implements OnInit {
         ]
       }
     ];
+  }
+
+  getBadgeVariant(prioridad: string): 'danger' | 'warning' | 'info' | 'success' {
+    if (prioridad === 'Urgente') return 'danger';
+    if (prioridad === 'Alta') return 'warning';
+    return 'info';
   }
 }

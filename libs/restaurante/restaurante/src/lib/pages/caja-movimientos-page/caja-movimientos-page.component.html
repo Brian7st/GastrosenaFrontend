@@ -1,0 +1,47 @@
+<div class="caja-movimientos-page">
+  <div class="header-section">
+    <restaurant-page-header
+      title="Movimientos de Caja"
+      subtitle="Registrar ingresos y egresos de efectivo adicionales"
+    ></restaurant-page-header>
+  </div>
+
+  <div class="form-block">
+    <div class="card">
+      <div class="block-header">
+        <div class="title-group">
+          <h5>Nuevo Movimiento</h5>
+          <span class="subtitle">Ingrese los datos del movimiento de caja menor</span>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Tipo de Movimiento</label>
+        <select class="form-control">
+          <option value="ingreso">Ingreso (Entrada)</option>
+          <option value="egreso">Egreso (Salida)</option>
+        </select>
+      </div>
+
+      <div class="input-group mt-4">
+        <label>Monto</label>
+        <input type="number" class="form-control" placeholder="$ 0" />
+      </div>
+
+      <div class="input-group mt-4">
+        <label>Concepto / Observación</label>
+        <textarea class="form-control" rows="3" placeholder="Razón del movimiento..."></textarea>
+      </div>
+
+      <div class="form-actions mt-6">
+        <restaurant-button variant="surface" (click)="volver()">
+          Cancelar
+        </restaurant-button>
+        <restaurant-button variant="primary">
+          <lucide-icon name="save" [size]="18"></lucide-icon>
+          <span>Registrar Movimiento</span>
+        </restaurant-button>
+      </div>
+    </div>
+  </div>
+</div>

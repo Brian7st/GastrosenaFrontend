@@ -3,12 +3,28 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { IncidenciaService } from '../../data-access/incidencia.service';
 import { AuditoriaIncidencia } from '../../models/incidencia.model';
-import { LucideIconComponent } from '@restaurant/shared/ui';
+import {
+  LucideIconComponent,
+  PageHeaderComponent,
+  KpiCardComponent,
+  SectionTitleComponent,
+  StatusBadgeComponent,
+  ButtonComponent
+} from '@restaurant/shared/ui';
 
 @Component({
   selector: 'restaurant-inicio-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, LucideIconComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    LucideIconComponent,
+    PageHeaderComponent,
+    KpiCardComponent,
+    SectionTitleComponent,
+    StatusBadgeComponent,
+    ButtonComponent
+  ],
   templateUrl: './inicio-page.component.html',
   styleUrls: ['./inicio-page.component.scss']
 })
@@ -133,5 +149,11 @@ export class InicioPageComponent {
       'MODIFICACION': 'Detalle de modificación:'
     };
     return etiquetas[tipo] || 'Motivo:';
+  }
+
+  getBadgeVariant(estado: string): 'success' | 'warning' | 'danger' | 'info' {
+    if (estado === 'Preparando') return 'warning';
+    if (estado === 'Listo') return 'success';
+    return 'info';
   }
 }

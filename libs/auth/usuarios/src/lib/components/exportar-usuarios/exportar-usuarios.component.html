@@ -1,0 +1,91 @@
+<div class="modal-backdrop" (click)="cerrar.emit()" (keydown.escape)="cerrar.emit()" role="dialog" aria-modal="true" tabindex="-1">
+  <div class="modal" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="modal__header">
+      <div class="modal__header-icon modal__header-icon--export">
+        <lucide-icon name="download" [size]="20"></lucide-icon>
+      </div>
+      <div>
+        <h2 class="modal__title">Exportar Usuarios</h2>
+        <p class="modal__subtitle">Descargá el listado en el formato que necesitás</p>
+      </div>
+      <button class="modal__close" type="button" (click)="cerrar.emit()" aria-label="Cerrar">
+        <lucide-icon name="x" [size]="18"></lucide-icon>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal__body">
+
+      <!-- Formato -->
+      <div class="modal__field">
+        <label class="modal__label" for="exp-formato">Formato de exportación</label>
+        <div class="modal__select-wrapper">
+          <select
+            id="exp-formato"
+            class="modal__select"
+            [value]="formato()"
+            (change)="onFormatoChange($event)"
+          >
+            <option value="excel">Excel (.xlsx)</option>
+            <option value="csv">CSV (.csv)</option>
+          </select>
+          <lucide-icon name="chevron-down" [size]="16" class="modal__select-icon"></lucide-icon>
+        </div>
+      </div>
+
+      <!-- Filtro por rol -->
+      <div class="modal__field">
+        <label class="modal__label" for="exp-rol">Filtrar por rol</label>
+        <div class="modal__select-wrapper">
+          <select
+            id="exp-rol"
+            class="modal__select"
+            [value]="filtroRol()"
+            (change)="onRolChange($event)"
+          >
+            @for (opcion of rolOpciones; track opcion.value) {
+              <option [value]="opcion.value">{{ opcion.label }}</option>
+            }
+          </select>
+          <lucide-icon name="chevron-down" [size]="16" class="modal__select-icon"></lucide-icon>
+        </div>
+      </div>
+
+      <!-- Incluir inactivos -->
+      <label class="modal__checkbox">
+        <input
+          type="checkbox"
+          class="modal__checkbox-input"
+          [checked]="incluirInactivos()"
+          (change)="onInactivosChange($event)"
+        />
+        <span class="modal__checkbox-label">Incluir usuarios inactivos</span>
+      </label>
+
+      <!-- Info -->
+      <div class="modal__info">
+        <lucide-icon name="info" [size]="16" class="modal__info-icon"></lucide-icon>
+        <p class="modal__info-text">
+          Se exportarán
+          <strong>{{ totalUsuarios }} usuario{{ totalUsuarios === 1 ? '' : 's' }}</strong>
+          con los filtros seleccionados.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="modal__footer">
+      <button class="modal__btn modal__btn--ghost" type="button" (click)="cerrar.emit()">
+        Cancelar
+      </button>
+      <button class="modal__btn modal__btn--primary" type="button" (click)="onExportar()">
+        <lucide-icon name="download" [size]="16"></lucide-icon>
+        Exportar
+      </button>
+    </div>
+
+  </div>
+</div>

@@ -1,4 +1,5 @@
 <div class="comanda-container">
+  <restaurant-page-header title="Tablero de Comandas" subtitle="Gestión de pedidos en tiempo real"></restaurant-page-header>
 
   @if (errorToast()) {
   <div class="toast-error shadow">
@@ -7,40 +8,50 @@
   }
 
   <!-- Filtros -->
-  <div class="filters-container">
-    <div class="search-wrapper">
-      <i class="bi bi-search"></i>
-      <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)"
-        placeholder="Buscar por mesa, mesero o plato..." class="search-bar">
+  <div class="filters-container showcase__row" style="margin-bottom: var(--space-6);">
+    <div style="flex: 1; min-width: 250px;">
+      <restaurant-search-filter 
+        label="Buscar comanda" 
+        placeholder="Buscar por mesa, mesero o plato..." 
+        [value]="searchTerm()" 
+        (valueChange)="searchTerm.set($event)"
+      ></restaurant-search-filter>
     </div>
 
-    <select [ngModel]="filtroEstado()" (ngModelChange)="filtroEstado.set($event)" class="filter-select">
-      <option>Todos los estados</option>
-      <option>En Espera</option>
-      <option>Preparando</option>
-      <option>Listo</option>
-    </select>
+    <div style="min-width: 180px;">
+      <restaurant-select-filter 
+        label="Estado" 
+        [value]="filtroEstado()" 
+        [options]="opcionesEstado" 
+        (valueChange)="filtroEstado.set($event)"
+      ></restaurant-select-filter>
+    </div>
 
-    <select [ngModel]="filtroPrioridad()" (ngModelChange)="filtroPrioridad.set($event)" class="filter-select">
-      <option>Todas las prioridades</option>
-      <option>Urgente</option>
-      <option>Alta</option>
-      <option>Normal</option>
-    </select>
+    <div style="min-width: 180px;">
+      <restaurant-select-filter 
+        label="Prioridad" 
+        [value]="filtroPrioridad()" 
+        [options]="opcionesPrioridad" 
+        (valueChange)="filtroPrioridad.set($event)"
+      ></restaurant-select-filter>
+    </div>
 
-    <select [ngModel]="filtroOrden()" (ngModelChange)="filtroOrden.set($event)" class="filter-select">
-      <option>Prioridad</option>
-      <option>Hora de llegada</option>
-      <option>Tiempo estimado</option>
-    </select>
+    <div style="min-width: 180px;">
+      <restaurant-select-filter 
+        label="Ordenar por" 
+        [value]="filtroOrden()" 
+        [options]="opcionesOrden" 
+        (valueChange)="filtroOrden.set($event)"
+      ></restaurant-select-filter>
+    </div>
   </div>
 
   <div class="comandas-grid">
 
     <div class="column col-espera">
-      <div class="col-header">
-        <span><i class="bi bi-clock-history"></i> En Espera</span>
-        <span class="counter">{{ enEspera().length }}</span>
+      <div class="col-header showcase__row" style="justify-content: space-between; margin-bottom: var(--space-4);">
+        <restaurant-section-title title="En Espera" align="left"></restaurant-section-title>
+        <span class="showcase__value">{{ enEspera().length }}</span>
       </div>
       @for (c of enEspera(); track c.idComanda) {
       <restaurant-comanda-card class="comanda-card-wrapper shadow-sm" [comanda]="c"
@@ -51,9 +62,9 @@
     </div>
 
     <div class="column col-preparando">
-      <div class="col-header">
-        <span><i class="bi bi-play-circle-fill"></i> Preparando</span>
-        <span class="counter">{{ preparando().length }}</span>
+      <div class="col-header showcase__row" style="justify-content: space-between; margin-bottom: var(--space-4);">
+        <restaurant-section-title title="Preparando" align="left"></restaurant-section-title>
+        <span class="showcase__value">{{ preparando().length }}</span>
       </div>
       @for (c of preparando(); track c.idComanda) {
       <restaurant-comanda-card class="comanda-card-wrapper shadow-sm" [comanda]="c"
@@ -64,9 +75,9 @@
     </div>
 
     <div class="column col-listo">
-      <div class="col-header">
-        <span><i class="bi bi-check-circle-fill"></i> Listo</span>
-        <span class="counter">{{ listos().length }}</span>
+      <div class="col-header showcase__row" style="justify-content: space-between; margin-bottom: var(--space-4);">
+        <restaurant-section-title title="Listo" align="left"></restaurant-section-title>
+        <span class="showcase__value">{{ listos().length }}</span>
       </div>
       @for (c of listos(); track c.idComanda) {
       <restaurant-comanda-card class="comanda-card-wrapper shadow-sm card-completed" [comanda]="c"

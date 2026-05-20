@@ -1,4 +1,4 @@
-import { Bien, BienKpis } from './inventario.model';
+import { Bien, BienKpis, MovimientoBien } from './inventario.model';
 
 export const BIENES_MOCK: Bien[] = [
   {
@@ -110,3 +110,9 @@ export const BIENES_KPIS_MOCK: BienKpis = {
   movimientosHoy: 156,
   tendenciaValor: 12,
 };
+
+export const MOVIMIENTOS_MOCK: MovimientoBien[] = [
+  { id: 1, fecha: '2024-05-14', tipo: 'ENTRADA', responsable: 'Admin Central', ubicacion: 'Almacén General', cantidad: 5, observacion: 'Reposición de stock anual' },
+  { id: 2, fecha: '2024-04-22', tipo: 'SALIDA', responsable: 'Coord. Sistemas', ubicacion: 'Laboratorio 302', cantidad: -2, observacion: 'Asignación a nuevos instructores' },
+  { id: 3, fecha: '2024-03-10', tipo: 'TRASLADO', responsable: 'Gestión Activos', ubicacion: 'Sede Norte', cantidad: 0, observacion: 'Mantenimiento preventivo trimestral' },
+];

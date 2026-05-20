@@ -1,23 +1,27 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 
 @Component({
-  selector: 'inventario-presupuesto-exportar',
+  selector: 'restaurant-presupuesto-exportar',
   standalone: true,
   imports: [CommonModule, LucideIconComponent, ButtonComponent],
   templateUrl: './presupuesto-exportar.component.html',
-  styleUrls: ['./presupuesto-exportar.component.scss'],
+  styleUrl: './presupuesto-exportar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PresupuestoExportarComponent {
   private router = inject(Router);
 
-  formatoSeleccionado: 'excel' | 'pdf' = 'excel';
+  formatoSeleccionado = signal<'excel' | 'pdf'>('excel');
 
   setFormato(formato: 'excel' | 'pdf'): void {
-    this.formatoSeleccionado = formato;
+    this.formatoSeleccionado.set(formato);
+  }
+
+  onExportar(): void {
+    // TODO: llamar a presupuestoFacade.exportar(this.formatoSeleccionado())
   }
 
   closeModal(): void {

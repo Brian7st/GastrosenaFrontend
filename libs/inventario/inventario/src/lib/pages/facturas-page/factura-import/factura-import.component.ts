@@ -46,21 +46,22 @@ export class FacturaImportPageComponent {
   private processFile(file: File): void {
     this.fileName.set(file.name);
     this.importStatus.set('loading');
+    this.validateFile(file);
+  }
 
-    // Simulación de parse: en producción se llama al servicio de parseo XML/PDF.
-    setTimeout(() => {
-      const isXml = file.name.toLowerCase().endsWith('.xml');
-      const isValidSize = file.size <= 10 * 1024 * 1024;
+  private validateFile(file: File): void {
+    // TODO: reemplazar por llamada a FacturasService.importarXML(file)
+    const isXml = file.name.toLowerCase().endsWith('.xml');
+    const isValidSize = file.size <= 10 * 1024 * 1024;
 
-      if (!isValidSize) {
-        this.importStatus.set('error');
-        return;
-      }
+    if (!isValidSize) {
+      this.importStatus.set('error');
+      return;
+    }
 
-      // XML → éxito directo; PDF → advertencia por falta de OC vinculada
-      this.importStatus.set(isXml ? 'success' : 'warning');
-      this.fileLoaded.set(true);
-    }, 800);
+    // XML → éxito directo; PDF → advertencia por falta de OC vinculada
+    this.importStatus.set(isXml ? 'success' : 'warning');
+    this.fileLoaded.set(true);
   }
 
   goBack(): void {

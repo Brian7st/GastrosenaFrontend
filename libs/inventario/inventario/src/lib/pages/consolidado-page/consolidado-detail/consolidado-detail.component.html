@@ -2,13 +2,7 @@
   <!-- Header Section -->
   <header class="page-header">
     <div class="page-header__left">
-      <nav class="breadcrumb">
-        <ol>
-          <li><a (click)="goBack()">Consolidados</a></li>
-          <li class="separator"><span class="material-symbols-outlined">chevron_right</span></li>
-          <li class="current">Detalle</li>
-        </ol>
-      </nav>
+      <inventario-back-button (clicked)="goBack()"></inventario-back-button>
       <div class="page-header__title-row">
         <h1 class="page-header__title">Detalle: <span class="text-primary">#CON-2023-0842</span></h1>
         <span class="badge badge--success-soft">CONTABILIZADO</span>
@@ -179,30 +173,24 @@
   </section>
 
   <!-- Section 2: Listado de Formatos GIL-F014 -->
-  <section class="bento-card p-0">
-    <div class="section-header">
-      <div class="section-header__title-container">
-        <div class="section-header__icon">
-          <span class="material-symbols-outlined">description</span>
-        </div>
-        <h3 class="section-header__title">Listado de Formatos GIL-F014</h3>
-      </div>
-    </div>
-
-    <restaurant-data-table>
-      <thead>
-        <tr>
-          <th class="th-left">Código GIL</th>
-          <th class="th-left">Solicitante</th>
-          <th class="th-left">Programa</th>
-          <th class="th-left">CUFE</th>
-          <th class="th-left">Fecha</th>
-          <th class="th-right">Valor</th>
-          <th class="th-center">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (item of gils; track item.codigo) {
+  <restaurant-data-table
+    tableTitle="Listado de Formatos GIL-F014"
+    tableIcon="description"
+    searchPlaceholder="Buscar por código GIL o solicitante...">
+    
+    <thead>
+      <tr>
+        <th class="th-center">Código GIL</th>
+        <th class="th-center">Solicitante</th>
+        <th class="th-center">Programa</th>
+        <th class="th-center">CUFE</th>
+        <th class="th-center">Fecha</th>
+        <th class="th-center">Valor</th>
+        <th class="th-center">Acciones</th>
+      </tr>
+    </thead>
+    <tbody class="text-black text-center">
+      @for (item of gils; track item.codigo) {
           <tr>
             <td>
               <span class="badge badge--surface font-mono">{{ item.codigo }}</span>
@@ -222,11 +210,11 @@
             <td>
               <span class="td-muted">{{ item.fecha }}</span>
             </td>
-            <td class="text-right">
+            <td class="text-center">
               <span class="td-bold">{{ item.valor }}</span>
             </td>
             <td class="text-center">
-              <button class="action-btn" title="Ver Detalle">
+              <button class="action-btn" title="Ver Detalle" (click)="goToGilDetail(item.codigo)">
                 <span class="material-symbols-outlined">visibility</span>
               </button>
             </td>
@@ -248,20 +236,19 @@
         </div>
       </div>
     </restaurant-data-table>
-  </section>
   <restaurant-exportar-consolidado-modal
-    *ngIf="showExportModal"
+    *ngIf="showExportModal()"
     (close)="closeExportModal()"
     (export)="onExport($event)">
   </restaurant-exportar-consolidado-modal>
 
   <restaurant-reversar-consolidado-modal
-    *ngIf="showReversarModal"
+    *ngIf="showReversarModal()"
     [consolidadoId]="'#CON-2023-0842'"
     [periodo]="'Octubre 2024'"
     [total]="'$ 1.452.300.000'"
     [comprobantes]="12" 
-    [isBlocked]="isReversarBlocked"
+    [isBlocked]="isReversarBlocked()"
     (close)="closeReversarModal()"
     (confirm)="confirmReversar()">
   </restaurant-reversar-consolidado-modal>

@@ -1,19 +1,22 @@
-import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'app-solicitudes-export',
+  selector: 'restaurant-solicitudes-export',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './solicitudes-export.component.html',
-  styleUrls: ['./solicitudes-export.component.scss'],
+  styleUrl: './solicitudes-export.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SolicitudesExportComponent {
+export class SolicitudesExportComponent implements OnInit {
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
   solicitudId = signal<string>('GIL-F-014-2024-001');
 
-  constructor(private router: Router, private route: ActivatedRoute) {
+  ngOnInit(): void {
     const paramId = this.route.snapshot.paramMap.get('id');
     if (paramId) {
       this.solicitudId.set(`GIL-F-014-2024-${paramId}`);

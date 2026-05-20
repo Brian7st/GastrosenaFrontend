@@ -1,5 +1,12 @@
 {
   "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["jest"]
+  },
   "files": [],
-  "references": []
+  "references": [],
+  "include": [
+    "libs/**/*.ts",
+    "apps/**/*.ts"
+  ]
 }

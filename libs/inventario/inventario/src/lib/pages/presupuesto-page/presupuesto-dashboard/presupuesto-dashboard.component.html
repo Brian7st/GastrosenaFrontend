@@ -2,11 +2,12 @@
   <!-- ═══════════════════════════════════════════════════════════════════════
        HEADER
        ═══════════════════════════════════════════════════════════════════════ -->
-  <div class="page-header-row">
+  @if (resumen()) {
+    <div class="page-header-row">
     <div>
       <h1 class="page-title">Presupuesto General de Gastos</h1>
       <p class="page-subtitle">
-        Vigencia Fiscal {{ resumen().vigenciaFiscal }} — Corte: {{ resumen().corte }}
+        Vigencia Fiscal {{ resumen()!.vigenciaFiscal }} — Corte: {{ resumen()!.corte }}
       </p>
     </div>
     <div class="header-actions">
@@ -29,22 +30,23 @@
        KPI GRID (5 cards — Bento)
        ═══════════════════════════════════════════════════════════════════════ -->
   <div class="kpi-grid">
-    <restaurant-kpi-card label="TOTAL APROPIACIÓN" [value]="formatCompact(resumen().totalApropiacion)" icon="landmark"
-      iconColor="blue" [trend]="'+' + resumen().variacionAnual + '% vs ' + (resumen().vigenciaFiscal - 1)"
+    <restaurant-kpi-card label="TOTAL APROPIACIÓN" [value]="resumen()!.totalApropiacion | formatoMoneda" icon="landmark"
+      iconColor="blue" [trend]="'+' + resumen()!.variacionAnual + '% vs ' + (resumen()!.vigenciaFiscal - 1)"
       [trendUp]="true"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="COMPROMETIDO" [value]="formatCompact(resumen().totalComprometido)" icon="file-check"
-      iconColor="orange" [trend]="resumen().porcentajeEjecucion + '% ejecutado'" [trendUp]="null"></restaurant-kpi-card>
+    <restaurant-kpi-card label="COMPROMETIDO" [value]="resumen()!.totalComprometido | formatoMoneda" icon="file-check"
+      iconColor="orange" [trend]="resumen()!.porcentajeEjecucion + '% ejecutado'" [trendUp]="null"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="PAGADO REAL" [value]="formatCompact(resumen().totalPagado)" icon="banknote"
+    <restaurant-kpi-card label="PAGADO REAL" [value]="resumen()!.totalPagado | formatoMoneda" icon="banknote"
       iconColor="green" trend="Verificado a la fecha" [trendUp]="null"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="DISPONIBLE" [value]="formatCompact(resumen().totalDisponible)" icon="wallet"
+    <restaurant-kpi-card label="DISPONIBLE" [value]="resumen()!.totalDisponible | formatoMoneda" icon="wallet"
       iconColor="blue" trend="Saldo sin comprometer" [trendUp]="null"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="TOTAL ZESE APLICADA" [value]="formatCompact(resumen().totalZese)" icon="percent"
+    <restaurant-kpi-card label="TOTAL ZESE APLICADA" [value]="resumen()!.totalZese | formatoMoneda" icon="percent"
       iconColor="red" trend="Retención 0.625%" [trendUp]="null"></restaurant-kpi-card>
   </div>
+  }
 
   <!-- ═══════════════════════════════════════════════════════════════════════
        TABLA DE ESTRUCTURA PRESUPUESTAL (colapsable por programa)
@@ -87,11 +89,11 @@
                 <span class="grupo-nombre">{{ programa.nombre }}</span>
               </div>
             </td>
-            <td class="col-money grupo-value">{{ formatCurrency(programa.totalApropiacion) }}</td>
-            <td class="col-money grupo-value">{{ formatCurrency(programa.totalDisponible) }}</td>
-            <td class="col-money grupo-value">{{ formatCurrency(programa.totalComprometido) }}</td>
-            <td class="col-money grupo-value">{{ formatCurrency(programa.totalPagado) }}</td>
-            <td class="col-money grupo-value">{{ formatCurrency(programa.totalZese) }}</td>
+            <td class="col-money grupo-value">{{ programa.totalApropiacion | formatoMoneda:false }}</td>
+            <td class="col-money grupo-value">{{ programa.totalDisponible | formatoMoneda:false }}</td>
+            <td class="col-money grupo-value">{{ programa.totalComprometido | formatoMoneda:false }}</td>
+            <td class="col-money grupo-value">{{ programa.totalPagado | formatoMoneda:false }}</td>
+            <td class="col-money grupo-value">{{ programa.totalZese | formatoMoneda:false }}</td>
             <td class="col-ejecucion">
               <span class="ejecucion-badge" [ngClass]="getEjecucionClass(programa.porcentajeEjecucion)">
                 {{ programa.porcentajeEjecucion }}%
@@ -108,11 +110,11 @@
                 <span class="rubro-nombre">{{ rubro.nombre }}</span>
               </div>
             </td>
-            <td class="col-money">{{ formatCurrency(rubro.apropiacionInicial) }}</td>
-            <td class="col-money">{{ formatCurrency(rubro.disponible) }}</td>
-            <td class="col-money">{{ formatCurrency(rubro.comprometido) }}</td>
-            <td class="col-money">{{ formatCurrency(rubro.pagado) }}</td>
-            <td class="col-money">{{ formatCurrency(rubro.retencionZese) }}</td>
+            <td class="col-money">{{ rubro.apropiacionInicial | formatoMoneda:false }}</td>
+            <td class="col-money">{{ rubro.disponible | formatoMoneda:false }}</td>
+            <td class="col-money">{{ rubro.comprometido | formatoMoneda:false }}</td>
+            <td class="col-money">{{ rubro.pagado | formatoMoneda:false }}</td>
+            <td class="col-money">{{ rubro.retencionZese | formatoMoneda:false }}</td>
             <td class="col-ejecucion">
               <div class="ejecucion-bar-container">
                 <div class="ejecucion-bar" [style.width.%]="rubro.porcentajeEjecucion"></div>
@@ -127,14 +129,14 @@
         <tfoot>
           <tr class="total-row">
             <td class="col-estructura total-label">TOTAL CONSOLIDADO</td>
-            <td class="col-money total-value">{{ formatCurrency(resumen().totalApropiacion) }}</td>
-            <td class="col-money total-value">{{ formatCurrency(resumen().totalDisponible) }}</td>
-            <td class="col-money total-value">{{ formatCurrency(resumen().totalComprometido) }}</td>
-            <td class="col-money total-value">{{ formatCurrency(resumen().totalPagado) }}</td>
-            <td class="col-money total-value">{{ formatCurrency(resumen().totalZese) }}</td>
+            <td class="col-money total-value">{{ resumen()!.totalApropiacion | formatoMoneda:false }}</td>
+            <td class="col-money total-value">{{ resumen()!.totalDisponible | formatoMoneda:false }}</td>
+            <td class="col-money total-value">{{ resumen()!.totalComprometido | formatoMoneda:false }}</td>
+            <td class="col-money total-value">{{ resumen()!.totalPagado | formatoMoneda:false }}</td>
+            <td class="col-money total-value">{{ resumen()!.totalZese | formatoMoneda:false }}</td>
             <td class="col-ejecucion">
-              <span class="ejecucion-badge" [ngClass]="getEjecucionClass(resumen().porcentajeEjecucion)">
-                {{ resumen().porcentajeEjecucion }}%
+              <span class="ejecucion-badge" [ngClass]="getEjecucionClass(resumen()!.porcentajeEjecucion)">
+                {{ resumen()!.porcentajeEjecucion }}%
               </span>
             </td>
           </tr>
@@ -194,25 +196,19 @@
        ═══════════════════════════════════════════════════════════════════════ -->
   <restaurant-data-table tableTitle="Historial de Afectación Presupuestal" tableIcon="history"
     searchPlaceholder="Buscar afectaciones, documentos o rubros...">
-    <div dtHeader class="dt-header-controls">
-      <div class="title-group">
-        <h2>Historial de Afectación Presupuestal</h2>
-        <p>Últimos movimientos presupuestales registrados</p>
+    <restaurant-button dtActions variant="surface" routerLink="cargar-gil">
+      <div class="btn-icon-text">
+        <lucide-icon name="upload" [size]="18"></lucide-icon>
+        Cargar GIL
       </div>
-      <div class="action-group">
-        <button class="control-btn" routerLink="cargar-gil">
-          <lucide-icon name="upload" [size]="18"></lucide-icon> Cargar GIL
-        </button>
-      </div>
-    </div>
-
+    </restaurant-button>
     <thead>
       <tr>
-        <th>Fecha</th>
-        <th>Tipo</th>
-        <th>Documento</th>
-        <th>Programa</th>
-        <th>Rubro</th>
+        <th class="text-center">Fecha</th>
+        <th class="text-center">Tipo</th>
+        <th class="text-center">Documento</th>
+        <th class="text-center">Programa</th>
+        <th class="text-center">Rubro</th>
         <th style="text-align: right;">Valor</th>
         <th style="text-align: right;">Saldo Resultante</th>
       </tr>
@@ -220,46 +216,45 @@
     <tbody>
       @for (a of afectaciones(); track a.id) {
       <tr class="table-row">
-        <td>
+        <td class="text-center">
           <span class="fecha-text">{{ a.fecha }}</span>
         </td>
-        <td>
-          <span class="tipo-badge" [ngClass]="getTipoBadgeClass(a.tipo)">
-            {{ a.tipo }}
-          </span>
+        <td class="text-center">
+          <restaurant-status-badge [status]="getTipoConfig(a.tipo).status" [class]="getTipoConfig(a.tipo).cssClass" [label]="a.tipo"></restaurant-status-badge>
         </td>
-        <td>
+        <td class="text-center">
           <a href="javascript:void(0)" class="doc-link">
             <lucide-icon name="external-link" [size]="14"></lucide-icon>
             {{ a.documentoId }}
           </a>
         </td>
-        <td>
+        <td class="text-center">
           <span class="programa-text">{{ a.programa }}</span>
         </td>
-        <td>
+        <td class="text-center">
           <span class="rubro-code">{{ a.rubro }}</span>
         </td>
         <td style="text-align: right;">
           <span class="money-val" [class.money-val--negativo]="a.valor < 0">
-            {{ formatCurrency(a.valor) }}
+            {{ a.valor | formatoMoneda:false }}
           </span>
         </td>
         <td style="text-align: right;">
-          <span class="saldo-text">{{ formatCurrency(a.saldoResultante) }}</span>
+          <span class="saldo-text">{{ a.saldoResultante | formatoMoneda:false }}</span>
         </td>
       </tr>
       }
     </tbody>
+    
+    <div dtFooter class="pagination-footer">
+      <span class="results-count">Mostrando 1–{{ afectaciones().length }} de {{ afectaciones().length }} resultados</span>
+      <div class="page-numbers">
+        <button class="page-btn page-btn--active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+      </div>
+    </div>
   </restaurant-data-table>
-
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       ALERTA FLOTANTE — Rubros en nivel crítico
-       ═══════════════════════════════════════════════════════════════════════ -->
-  <div class="alerta-flotante">
-    <lucide-icon name="alert-triangle" [size]="18"></lucide-icon>
-    <span><strong>3 Rubros</strong> en Nivel Crítico de Ejecución</span>
-  </div>
 </div>
 
 <!-- Router outlet para modales (registrar, traslado, exportar, cargar-gil) -->

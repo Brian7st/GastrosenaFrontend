@@ -1,25 +1,42 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { ButtonComponent, DataTableComponent, KpiCardComponent } from '@restaurant/shared/ui';
 import { ExportarConsolidadoModalComponent } from '../components/exportar-consolidado-modal/exportar-consolidado-modal.component';
 import { ReversarConsolidadoModalComponent } from '../components/reversar-consolidado-modal/reversar-consolidado-modal.component';
+import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import { ConsolidadoFacade } from '../../../data-access/consolidado.facade';
 
 @Component({
   selector: 'restaurant-consolidado-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent, ExportarConsolidadoModalComponent, ReversarConsolidadoModalComponent],
+  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent, ExportarConsolidadoModalComponent, ReversarConsolidadoModalComponent, BackButtonComponent],
   templateUrl: './consolidado-detail.component.html',
   styleUrl: './consolidado-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ConsolidadoDetailComponent {
-  private router = inject(Router);
+export class ConsolidadoDetailComponent implements OnInit {
+  private router   = inject(Router);
   private location = inject(Location);
+  private route    = inject(ActivatedRoute);
+  private facade   = inject(ConsolidadoFacade);
 
-  showExportModal = false;
-  showReversarModal = false;
-  isReversarBlocked = false;
+  // ── Estado reactivo desde facade ─────────────────────────────────────────
+  consolidado = this.facade.consolidadoSeleccionado;
+  loading     = this.facade.loading;
+
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (!id) {
+      this.router.navigate(['/app/inventario/consolidado']);
+      return;
+    }
+    this.facade.cargarConsolidado(id);
+  }
+
+  showExportModal = signal(false);
+  showReversarModal = signal(false);
+  isReversarBlocked = signal(false);
 
   // Mocks para la tabla de subtotales
   subtotales = [
@@ -46,30 +63,35 @@ export class ConsolidadoDetailComponent {
     this.router.navigate(['/app/inventario/consolidado']);
   }
 
-  openExportModal() {
-    this.showExportModal = true;
+  goToGilDetail(codigo: string): void {
+    this.router.navigate(['/app/inventario/solicitudes-gil', codigo]);
   }
 
-  closeExportModal() {
-    this.showExportModal = false;
+  openExportModal(): void {
+    this.showExportModal.set(true);
   }
 
-  onExport(format: 'excel' | 'pdf') {
-    console.log('Exporting detail as', format);
-    this.showExportModal = false;
+  closeExportModal(): void {
+    this.showExportModal.set(false);
   }
 
-  openReversarModal() {
-    this.isReversarBlocked = false; // Mock
-    this.showReversarModal = true;
+  onExport(_format: 'excel' | 'pdf'): void {
+    // Exportación real pendiente de integración HTTP
+    this.showExportModal.set(false);
   }
 
-  closeReversarModal() {
-    this.showReversarModal = false;
+  openReversarModal(): void {
+    this.isReversarBlocked.set(false);
+    this.showReversarModal.set(true);
   }
 
-  confirmReversar() {
-    console.log('Reversing detail!');
+  closeReversarModal(): void {
+    this.showReversarModal.set(false);
+  }
+
+  confirmReversar(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) this.facade.reversarConsolidado(id);
     this.closeReversarModal();
   }
 }

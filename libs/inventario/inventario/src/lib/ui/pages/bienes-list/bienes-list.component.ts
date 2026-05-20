@@ -6,7 +6,7 @@ import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { BienFormComponent } from '../../modals/bien-form/bien-form.component';
 import { BienImportModalComponent } from '../../modals/bien-import/bien-import.component';
 import { BienDeleteModalComponent } from '../../modals/bien-delete-modal/bien-delete-modal.component';
-import { Bien, BienFormDto } from '../../../models/inventario.model';
+import { Bien, BienFormDto, BienImportRow, EstadoBien } from '../../../models/inventario.model';
 
 @Component({
   selector: 'restaurant-bienes-list',
@@ -52,7 +52,7 @@ export class BienesListPageComponent implements OnInit {
     this.showImportModal.set(true);
   }
 
-  onProcessImport(data: any[]): void {
+  onProcessImport(data: BienImportRow[]): void {
     console.log('Procesando importación de', data.length, 'registros');
     this.showImportModal.set(false);
     this.facade.loadAll();
@@ -75,7 +75,11 @@ export class BienesListPageComponent implements OnInit {
   }
 
   onSaveBien(dto: BienFormDto): void {
-    console.log('Guardando bien:', dto);
+    if (this.formMode() === 'create') {
+      this.facade.crearBien(dto);
+    } else {
+      this.facade.actualizarBien(this.selectedBien()!.id, dto);
+    }
     this.showFormModal.set(false);
   }
 
@@ -93,5 +97,15 @@ export class BienesListPageComponent implements OnInit {
       this.facade.eliminarBien(this.selectedBien()!.id);
       this.showDeleteModal.set(false);
     }
+  }
+
+  getEstadoBadgeClass(estado: EstadoBien): string {
+    const map: Record<EstadoBien, string> = {
+      'Activo': 'estado-badge--activo',
+      'Bajo Stock': 'estado-badge--bajo',
+      'Agotado': 'estado-badge--agotado',
+      'Inactivo': 'estado-badge--inactivo'
+    };
+    return map[estado] || '';
   }
 }

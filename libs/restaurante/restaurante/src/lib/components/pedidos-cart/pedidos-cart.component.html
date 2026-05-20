@@ -1,0 +1,64 @@
+<div class="cart-header">
+  <h2>Detalle del Pedido</h2>
+</div>
+
+<div class="cart-items">
+  @if (pedidoActivo(); as pedido) {
+    @for (item of pedido.items; track item.productoId; let i = $index) {
+      <div class="item-row">
+        <div class="item-details">
+          <h4 class="name">{{ item.nombre }}</h4>
+          <span class="category">{{ item.observacion || 'Sin observaciones' }}</span>
+          
+          <div class="quantity-controls">
+            <button class="btn-minus" (click)="decrementar(i)">
+              <lucide-icon name="minus" [size]="14"></lucide-icon>
+            </button>
+            <span class="qty">{{ item.cantidad }}</span>
+            <button class="btn-plus" (click)="incrementar(i)">
+              <lucide-icon name="plus" [size]="14"></lucide-icon>
+            </button>
+          </div>
+        </div>
+        
+        <div class="item-pricing">
+          <div class="prices">
+            <span class="current">${{ item.precioUnit | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    } @empty {
+      <div class="empty-cart">
+        <p>No hay productos en el pedido.</p>
+      </div>
+    }
+  }
+</div>
+
+<div class="cart-notes">
+  <label for="order-notes">Observaciones del Pedido</label>
+  <textarea 
+    id="order-notes" 
+    class="notes-textarea" 
+    placeholder="Ej: Para llevar, sin sal..."
+    [ngModel]="observacionesGenerales()"
+    (ngModelChange)="observacionesGenerales.set($event)"
+  ></textarea>
+</div>
+
+<div class="cart-summary">
+  @if (pedidoActivo(); as pedido) {
+    <div class="summary-total">
+      <span class="label">Total</span>
+      <span class="value">${{ pedido.total | number:'1.2-2' }}</span>
+    </div>
+  }
+</div>
+
+<restaurant-button 
+  class="full-width-btn" 
+  variant="primary" 
+  [disabled]="!pedidoActivo()?.items?.length" 
+  (click)="confirmarPedido()">
+  <span>Confirmar Pedido</span>
+</restaurant-button>

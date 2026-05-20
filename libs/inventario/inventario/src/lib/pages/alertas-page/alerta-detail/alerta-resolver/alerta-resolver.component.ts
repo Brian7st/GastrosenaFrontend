@@ -2,13 +2,15 @@ import {
   ChangeDetectionStrategy,
   Component,
   signal,
+  computed,
   inject,
   OnInit,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-import { MOCK_ALERTAS, Alerta, AccionResolver } from '../../../../models/alerta.model';
+import { Alerta, AccionResolver } from '../../../../models/alerta.model';
+import { AlertasFacade } from '../../../../data-access/alertas.facade';
 
 @Component({
   selector: 'restaurant-alerta-resolver',
@@ -16,14 +18,15 @@ import { MOCK_ALERTAS, Alerta, AccionResolver } from '../../../../models/alerta.
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './alerta-resolver.component.html',
-  styleUrls: ['./alerta-resolver.component.scss'],
+  styleUrl: './alerta-resolver.component.scss',
 })
 export class AlertaResolverComponent implements OnInit {
   private router  = inject(Router);
   private route   = inject(ActivatedRoute);
   private fb      = inject(FormBuilder);
+  private facade  = inject(AlertasFacade);
 
-  alerta = signal<Alerta | undefined>(undefined);
+  alerta = this.facade.alertaSeleccionada;
   accionSeleccionada = signal<AccionResolver | ''>('');
 
   resolverForm: FormGroup = this.fb.group({
@@ -33,19 +36,27 @@ export class AlertaResolverComponent implements OnInit {
     responsable: [{ value: 'Administrador Centro de Formación', disabled: true }],
   });
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     // El id está en el padre (alertas/:id/resolver)
     const id = this.route.parent?.snapshot.paramMap.get('id');
-    const found = MOCK_ALERTAS.find(a => a.id === id);
-    this.alerta.set(found ?? MOCK_ALERTAS[0]);
+    if (id && this.facade.alertaSeleccionada()?.id !== id) {
+       const alerta = await this.facade.cargarAlerta(id);
+       if (!alerta) {
+         this.router.navigate(['/app/inventario/alertas']);
+         return;
+       }
+    } else if (!id) {
+       this.router.navigate(['/app/inventario/alertas']);
+       return;
+     }
   }
 
-  get prioridadLabel(): string {
+  prioridadLabel = computed(() => {
     const map: Record<string, string> = {
       critica: 'Crítica', alta: 'Alta', media: 'Media', baja: 'Baja',
     };
     return map[this.alerta()?.prioridad ?? 'critica'] ?? 'Crítica';
-  }
+  });
 
   selectAccion(accion: AccionResolver): void {
     this.accionSeleccionada.set(accion);
@@ -54,7 +65,10 @@ export class AlertaResolverComponent implements OnInit {
 
   onConfirmar(): void {
     if (this.resolverForm.valid) {
-      console.log('Resolución confirmada:', this.resolverForm.getRawValue());
+      const id = this.alerta()?.id;
+      if (id) {
+        this.facade.resolverAlerta(id, this.resolverForm.getRawValue() as Record<string, unknown>);
+      }
       this.cerrar();
     }
   }

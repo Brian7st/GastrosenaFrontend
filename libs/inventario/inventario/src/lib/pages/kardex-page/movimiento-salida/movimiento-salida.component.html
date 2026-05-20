@@ -37,11 +37,11 @@
           <div class="form-group qty-col">
             <label>Cantidad</label>
             <div class="input-wrapper">
-              <input type="number" formControlName="cantidad" placeholder="0" class="form-input qty-input" [class.error]="salidaForm.get('cantidad')?.value > stockDisponible">
+              <input type="number" formControlName="cantidad" placeholder="0" class="form-input qty-input" [class.error]="salidaForm.get('cantidad')?.value > stockDisponible()">
               <span class="suffix">uds</span>
             </div>
-            <p *ngIf="salidaForm.get('cantidad')?.value > stockDisponible" class="error-hint">
-              La cantidad excede el stock disponible ({{stockDisponible}})
+            <p *ngIf="salidaForm.get('cantidad')?.value > stockDisponible()" class="error-hint">
+              La cantidad excede el stock disponible ({{stockDisponible()}})
             </p>
           </div>
         </div>

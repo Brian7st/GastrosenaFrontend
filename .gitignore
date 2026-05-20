@@ -30,3 +30,11 @@ coverage/
 .DS_Store
 Thumbs.db
 log_implementacion.md
+
+# Documentos locales de desarrollo (no subir al repo)
+docs/informacionRestaurante/
+
+# Inteligencia Artificial - prompts y especificaciones locales
+.ai/domains/inventario.md
+.ai/prompts/vistas/
+.ai/prompts/conectar-vista-backend.md

@@ -496,75 +496,10 @@
   white-space: nowrap;
 }
 
-/* ── DataTable Historial Overrides ───────────────────────────────────────────── */
-.dt-header-controls {
-  padding: var(--space-6);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-
-  @media (min-width: 768px) {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .title-group {
-    h2 {
-      font-family: var(--font-family-headline);
-      font-size: var(--font-size-lg);
-      font-weight: 700;
-      margin: 0;
-      color: var(--color-en-superficie);
-    }
-    p {
-      font-size: var(--font-size-sm);
-      color: var(--color-text-secondary);
-      margin: var(--space-1) 0 0;
-    }
-  }
-
-  .action-group {
-    display: flex;
-    gap: var(--space-2);
-
-    .control-btn {
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-      padding: var(--space-2) var(--space-4);
-      background: var(--color-superficie-contenedor-bajo);
-      border-radius: var(--radius-lg);
-      border: none;
-      font-size: var(--font-size-sm);
-      font-weight: var(--font-weight-semibold);
-      color: var(--color-pizarra-600);
-      cursor: pointer;
-      transition: background-color var(--duration-fast) var(--ease-standard);
-
-      &:hover {
-        background: var(--color-superficie-contenedor);
-      }
-
-      &:focus-visible {
-        outline: none;
-        box-shadow: var(--focus-ring);
-      }
-    }
-  }
-}
-
+/* ── Eliminado dt-header-controls ────────────────────────────────────────────────────────── */
 /* ── Celdas del Historial ───────────────────────────────────────────────────── */
 .table-row {
   cursor: pointer;
-  border-left: 4px solid transparent;
-  transition: background-color var(--duration-fast) var(--ease-standard),
-              border-left-color var(--duration-fast) var(--ease-standard);
-
-  &:hover {
-    background-color: var(--color-table-row-hover);
-    border-left-color: var(--color-esmeralda-500);
-  }
 }
 
 .fecha-text {
@@ -573,34 +508,11 @@
   font-weight: var(--font-weight-medium);
 }
 
-.tipo-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-pill);
-  font-size: var(--font-size-xs);
-  font-weight: 700;
-
-  &--compromiso {
-    background-color: var(--color-info-bg);
-    color: var(--color-info-text);
-  }
-
-  &--pago {
-    background-color: var(--color-success-bg);
-    color: var(--color-success-text);
-  }
-
-  &--traslado {
-    background-color: var(--color-warning-bg);
-    color: var(--color-warning-text);
-  }
-
-  &--anulacion {
-    background-color: var(--color-error-bg);
-    color: var(--color-error-text);
-  }
+.text-center {
+  text-align: center;
 }
+
+
 
 .doc-link {
   font-size: var(--font-size-sm);
@@ -649,32 +561,57 @@
   color: var(--color-pizarra-600);
 }
 
-/* ── Alerta Flotante ────────────────────────────────────────────────────────── */
-.alerta-flotante {
-  position: fixed;
-  bottom: var(--space-8);
-  right: var(--space-8);
-  z-index: 50;
+/* ── Paginación ────────────────────────────────────────────────────────────── */
+.pagination-footer {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: var(--space-3);
   padding: var(--space-4) var(--space-6);
-  background-color: var(--color-terciario);
-  color: white;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  animation: slideInUp var(--duration-slow) var(--ease-decelerate) forwards;
-}
+  border-top: 1px solid var(--color-superficie-contenedor);
 
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+  .results-count {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-pizarra-500);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .page-numbers {
+    display: flex;
+    gap: var(--space-2);
+
+    .page-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-superficie-contenedor);
+      background-color: var(--color-superficie-contenedor-mas-bajo);
+      color: var(--color-pizarra-600);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-standard);
+
+      &:hover {
+        background-color: var(--color-superficie-contenedor-bajo);
+        color: var(--color-en-superficie);
+      }
+
+      &--active {
+        background-color: var(--color-primario);
+        color: var(--color-en-primario);
+        border-color: var(--color-primario);
+        font-weight: var(--font-weight-semibold);
+
+        &:hover {
+          background-color: var(--color-primario-hover);
+          color: var(--color-en-primario);
+        }
+      }
+    }
   }
 }

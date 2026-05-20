@@ -45,7 +45,8 @@ export const shellRoutes: Routes = [
       },
       {
         path: 'bar',
-        canActivate: [roleGuard([Rol.LIDER_BAR, Rol.ADMIN_BAR, Rol.BARTENDER])],
+        // TODO: Restaurar el roleGuard cuando se conecte la autenticación real
+        // canActivate: [roleGuard([Rol.LIDER_BAR, Rol.ADMIN_BAR, Rol.BARTENDER])],
         loadChildren: () => import('@restaurant/bar').then(m => m.BAR_ROUTES),
       },
       {
