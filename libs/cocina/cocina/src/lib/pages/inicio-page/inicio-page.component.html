@@ -1,62 +1,72 @@
 <div class="dashboard-container">
-  <header class="dashboard-header">
-    <div class="titles">
-      <h1>Panel Principal</h1>
-      <p>Gestión integral de Gastro SENA - Módulo Cocina</p>
-    </div>
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-4);">
+    <restaurant-page-header
+      title="Panel Principal"
+      subtitle="Gestión integral de Gastro SENA - Módulo Cocina"
+      style="margin-bottom: 0;"
+    ></restaurant-page-header>
+    
     <div class="date-badge">{{ fechaActual }}</div>
-  </header>
+  </div>
 
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="info">
-        <span>Comandas Activas</span>
-        <h2>{{ estadisticas.activos }}</h2>
-      </div>
-      <div class="stat-icon orange"><lucide-icon name="clock" size="24"></lucide-icon></div>
+  <div class="showcase__grid-3 stats-grid">
+    <restaurant-kpi-card 
+      label="Comandas Activas" 
+      [value]="estadisticas.activos.toString()" 
+      icon="clock" 
+      iconColor="orange"
+    ></restaurant-kpi-card>
+
+    <restaurant-kpi-card 
+      label="Completadas Hoy" 
+      [value]="estadisticas.completados.toString()" 
+      icon="check-circle" 
+      iconColor="green"
+    ></restaurant-kpi-card>
+
+    <div (click)="abrirModal('CANCELACION')" style="cursor: pointer;">
+      <restaurant-kpi-card 
+        label="Canceladas" 
+        [value]="estadisticas.cancelados.toString()" 
+        icon="x-circle" 
+        iconColor="red"
+      ></restaurant-kpi-card>
     </div>
 
-    <div class="stat-card">
-      <div class="info">
-        <span>Completadas Hoy</span>
-        <h2>{{ estadisticas.completados }}</h2>
-      </div>
-      <div class="stat-icon green"><lucide-icon name="check-circle" size="24"></lucide-icon></div>
-    </div>
-
-    <div class="stat-card clickable" (click)="abrirModal('CANCELACION')">
-      <div class="info">
-        <span>Canceladas</span>
-        <h2>{{ estadisticas.cancelados }}</h2>
-      </div>
-      <div class="stat-icon red"><lucide-icon name="x-circle" size="24"></lucide-icon></div>
-    </div>
-
-    <div class="stat-card clickable" (click)="abrirModal('DEVOLUCION')">
-      <div class="info">
-        <span>Devueltas</span>
-        <h2>{{ estadisticas.devueltos }}</h2>
-      </div>
-      <div class="stat-icon yellow"><lucide-icon name="arrow-left-right" size="24"></lucide-icon></div>
+    <div (click)="abrirModal('DEVOLUCION')" style="cursor: pointer;">
+      <restaurant-kpi-card 
+        label="Devueltas" 
+        [value]="estadisticas.devueltos.toString()" 
+        icon="arrow-left-right" 
+        iconColor="yellow"
+      ></restaurant-kpi-card>
     </div>
   </div>
 
-  <section class="recent-section">
-    <div class="section-header">
-      <h3>Últimas comandas en cocina</h3>
-      <p>Monitoreo rápido de actividad</p>
-    </div>
+  <section class="recent-section showcase__section">
+    <restaurant-section-title 
+      title="Últimas comandas en cocina" 
+      subtitle="Monitoreo rápido de actividad" 
+      align="left"
+    ></restaurant-section-title>
 
-    <div class="order-item" *ngFor="let pedido of pedidosPendientes">
-      <div class="left">
-        <span class="mesa-tag">Mesa {{ pedido.mesa }}</span>
-        <span class="status-badge" [ngClass]="pedido.clase">{{ pedido.estado }}</span>
-        <p class="order-details">{{ pedido.platos }}</p>
+    <div class="order-list showcase__stack">
+      <div class="order-item showcase__row" *ngFor="let pedido of pedidosPendientes" style="justify-content: space-between; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-secondary);">
+        <div class="left showcase__row">
+          <span class="showcase__value">Mesa {{ pedido.mesa }}</span>
+          <restaurant-status-badge 
+            [label]="pedido.estado" 
+            [variant]="getBadgeVariant(pedido.estado)"
+          ></restaurant-status-badge>
+          <p class="order-details" style="margin: 0; font-size: var(--font-size-sm);">{{ pedido.platos }}</p>
+        </div>
+        <span class="time" style="font-size: var(--font-size-sm); color: var(--color-text-secondary);"><lucide-icon name="clock" size="14"></lucide-icon> {{ pedido.tiempo }}</span>
       </div>
-      <span class="time">{{ pedido.tiempo }}</span>
     </div>
 
-    <button routerLink="/app/cocina/comandas" class="btn-all-orders">Ir a Comandas →</button>
+    <div style="margin-top: var(--space-4);">
+      <restaurant-button routerLink="/app/cocina/comandas" variant="primary" style="width: 100%; display: block;">Ir a Comandas →</restaurant-button>
+    </div>
   </section>
 </div>
 

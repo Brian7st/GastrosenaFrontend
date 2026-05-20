@@ -1,22 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal } from '@angular/core';
+import { CommonModule, Location } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { LucideIconComponent } from '@restaurant/shared/ui';
-import { ButtonComponent } from '@restaurant/shared/ui';
-import { KpiCardComponent } from '@restaurant/shared/ui';
+import { LucideIconComponent, ButtonComponent, KpiCardComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
-import { Location } from '@angular/common';
-
-interface TomaFisicaItem {
-  id: string;
-  codigoSena: string;
-  categoria: string;
-  producto: string;
-  stockSistema: number;
-  conteoFisico: number | null;
-  valorUnitario: number;
-}
+import { TomaFisicaItem } from '../../../models/conciliacion.model';
+import { ConciliacionFacade } from '../../../data-access/conciliacion.facade';
 
 @Component({
   selector: 'restaurant-conciliacion-toma-fisica',
@@ -34,56 +23,32 @@ interface TomaFisicaItem {
   styleUrl: './conciliacion-toma-fisica.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ConciliacionTomaFisicaComponent {
-  fecha = '24 Oct 2023';
-  responsable = 'Chef Instructor';
+export class ConciliacionTomaFisicaComponent implements OnInit {
+  private location = inject(Location);
+  private facade   = inject(ConciliacionFacade);
 
-  items = signal<TomaFisicaItem[]>([
-    {
-      id: '1',
-      codigoSena: 'HRN-001',
-      categoria: 'Abarrotes',
-      producto: 'Harina de Trigo (Kg)',
-      stockSistema: 150,
-      conteoFisico: 150,
-      valorUnitario: 3500,
-    },
-    {
-      id: '2',
-      codigoSena: 'LCH-042',
-      categoria: 'Lácteos',
-      producto: 'Leche Entera (L)',
-      stockSistema: 85,
-      conteoFisico: 80,
-      valorUnitario: 4200,
-    },
-    {
-      id: '3',
-      codigoSena: 'CRN-112',
-      categoria: 'Cárnicos',
-      producto: 'Solomillo de Res (Kg)',
-      stockSistema: 12,
-      conteoFisico: 14,
-      valorUnitario: 45000,
-    },
-    {
-      id: '4',
-      codigoSena: 'ESP-008',
-      categoria: 'Especias',
-      producto: 'Pimienta Negra (g)',
-      stockSistema: 500,
-      conteoFisico: null,
-      valorUnitario: 150,
-    },
-  ]);
+  fecha       = signal('24 Oct 2023');
+  responsable = signal('Chef Instructor');
+
+  /** Señal local mutable: el usuario edita los conteos durante la sesión */
+  items = signal<TomaFisicaItem[]>([]);
+
+  ngOnInit(): void {
+    this.facade.cargarTomaFisicaItems();
+    // Seed local signal con los ítems del facade al cargar
+    effect(() => {
+      const loaded = this.facade.tomaFisicaItems();
+      if (loaded.length > 0 && this.items().length === 0) {
+        this.items.set([...loaded]);
+      }
+    }, { allowSignalWrites: true });
+  }
 
   // Computed stats
   itemsTotales = computed(() => this.items().length);
   pendientesCount = computed(() => this.items().filter(i => i.conteoFisico === null).length);
 
-  constructor(private location: Location) {}
-
-  goBack() {
+  goBack(): void {
     this.location.back();
   }
 
@@ -122,7 +87,7 @@ export class ConciliacionTomaFisicaComponent {
   }
 
   // Update handler for reactivity
-  updateConteoFisico(id: string, value: number | null) {
+  updateConteoFisico(id: string, value: number | null): void {
     this.items.update(items => 
       items.map(item => item.id === id ? { ...item, conteoFisico: value } : item)
     );
@@ -131,9 +96,9 @@ export class ConciliacionTomaFisicaComponent {
   // UI Formatters
   formatCurrency(value: number | null): string {
     if (value === null) return '-';
-    const isNegative = value < 0;
-    const absValue = Math.abs(value);
-    const formatted = new Intl.NumberFormat('es-CO').format(absValue);
-    return isNegative ? `-$${formatted}` : `+$${formatted}`.replace('+$-', '-$').replace('+$0', '$0');
+    if (value === 0) return '$0';
+    const signo = value < 0 ? '-' : '+';
+    const formatted = new Intl.NumberFormat('es-CO').format(Math.abs(value));
+    return `${signo}$${formatted}`;
   }
 }

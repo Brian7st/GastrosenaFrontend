@@ -156,6 +156,10 @@
     transform: translateY(-2px);
   }
 
+  &--borrador {
+    border-left-color: var(--color-error-text);
+  }
+
   &--enviada {
     border-left-color: var(--color-warning-interactive);
   }

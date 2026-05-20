@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { EmptyStateComponent } from '@restaurant/shared/ui';
 
 @Component({
-  selector: 'restaurant-menu-page',
+  selector: 'restaurant-bar-menu-page',
   standalone: true,
   imports: [EmptyStateComponent],
   template: `

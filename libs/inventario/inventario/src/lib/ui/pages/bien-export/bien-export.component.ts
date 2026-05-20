@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BienExportConfig } from '../../../models/inventario.model';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import { BienExportService } from '../../../data-access/services/bien-export.service';
+import { InventarioFacade } from '../../../data-access/inventario.facade';
 
 interface FormatoExport {
   id: 'excel' | 'pdf' | 'csv';
@@ -23,6 +25,8 @@ interface FormatoExport {
 })
 export class BienExportPageComponent {
   private router = inject(Router);
+  private bienExportService = inject(BienExportService);
+  private facade = inject(InventarioFacade);
 
   selectedFormato = signal<'excel' | 'pdf' | 'csv'>('excel');
   soloActivos = signal(true);
@@ -71,11 +75,16 @@ export class BienExportPageComponent {
         ? { inicio: this.fechaInicio(), fin: this.fechaFin() }
         : undefined,
     };
-    console.log('Generando reporte:', config);
-    setTimeout(() => {
-      this.isGenerating.set(false);
-      alert(`Reporte ${config.formato.toUpperCase()} generado exitosamente.`);
-    }, 1500);
+
+    const bienesParaExportar = this.facade.bienes();
+
+    if (config.formato === 'csv') {
+      this.bienExportService.exportToCsv(bienesParaExportar);
+    } else {
+      this.bienExportService.exportToPdf(bienesParaExportar);
+    }
+
+    this.isGenerating.set(false);
   }
 
   onVolver(): void {

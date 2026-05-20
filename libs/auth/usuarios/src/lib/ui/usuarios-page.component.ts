@@ -1,3 +1,4 @@
+
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { EmptyStateComponent, PageHeaderComponent } from '@restaurant/shared/ui';
 

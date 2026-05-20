@@ -2,15 +2,8 @@
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "namedInputs": {
     "default": ["{projectRoot}/**/*", "sharedGlobals"],
-    "production": [
-      "default",
-      "!{projectRoot}/**/*.spec.ts",
-      "!{projectRoot}/**/*.test.ts"
-    ],
-    "sharedGlobals": [
-      "{workspaceRoot}/tsconfig.base.json",
-      "{workspaceRoot}/.eslintrc.json"
-    ]
+    "production": ["default", "!{projectRoot}/**/*.spec.ts", "!{projectRoot}/**/*.test.ts"],
+    "sharedGlobals": ["{workspaceRoot}/tsconfig.base.json", "{workspaceRoot}/.eslintrc.json"]
   },
   "targetDefaults": {
     "build": {
@@ -33,5 +26,10 @@
     "appsDir": "apps",
     "libsDir": "libs"
   },
-  "defaultProject": "restaurant-app"
+  "defaultProject": "restaurant-app",
+  "generators": {
+    "@nx/angular:component": {
+      "style": "css"
+    }
+  }
 }

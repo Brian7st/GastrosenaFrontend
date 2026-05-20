@@ -11,18 +11,15 @@ import {
 import {
   Programa,
   PresupuestoResumen,
-  AfectacionPresupuestal,
   VencimientoProximo,
   EjecucionMensual,
-  MOCK_RESUMEN,
-  MOCK_PROGRAMAS,
-  MOCK_AFECTACIONES,
-  MOCK_VENCIMIENTOS,
-  MOCK_EJECUCION_MENSUAL,
 } from '../../../models/presupuesto.model';
+import { PresupuestoFacade } from '../../../data-access/presupuesto.facade';
+import { OnInit, inject } from '@angular/core';
+import { FormatoMonedaPipe } from '../../../pipes/formato-moneda.pipe';
 
 @Component({
-  selector: 'inventario-presupuesto-dashboard',
+  selector: 'restaurant-presupuesto-dashboard',
   standalone: true,
   imports: [
     CommonModule,
@@ -33,17 +30,20 @@ import {
     LucideIconComponent,
     ButtonComponent,
     StatusBadgeComponent,
+    FormatoMonedaPipe,
   ],
   templateUrl: './presupuesto-dashboard.component.html',
-  styleUrls: ['./presupuesto-dashboard.component.scss'],
+  styleUrl: './presupuesto-dashboard.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PresupuestoDashboardComponent {
+export class PresupuestoDashboardComponent implements OnInit {
+  public facade = inject(PresupuestoFacade);
+
   /** Datos de resumen presupuestal */
-  resumen = signal<PresupuestoResumen>(MOCK_RESUMEN);
+  resumen = this.facade.resumen;
 
   /** Programas con sus rubros (tabla colapsable) */
-  programas = signal<Programa[]>(MOCK_PROGRAMAS);
+  programas = this.facade.programas;
 
   /** Estado de expansión por programa id */
   expandidos = signal<Record<string, boolean>>({
@@ -53,13 +53,17 @@ export class PresupuestoDashboardComponent {
   });
 
   /** Historial de afectaciones */
-  afectaciones = signal<AfectacionPresupuestal[]>(MOCK_AFECTACIONES);
+  afectaciones = this.facade.afectaciones;
 
   /** Próximos vencimientos */
-  vencimientos = signal<VencimientoProximo[]>(MOCK_VENCIMIENTOS);
+  vencimientos = this.facade.vencimientos;
 
   /** Ejecución mensual para gráfico de barras */
-  ejecucionMensual = signal<EjecucionMensual[]>(MOCK_EJECUCION_MENSUAL);
+  ejecucionMensual = this.facade.ejecucionMensual;
+
+  ngOnInit(): void {
+    this.facade.loadAll();
+  }
 
   /** Toggle de grupo colapsable */
   togglePrograma(programaId: string): void {
@@ -74,32 +78,6 @@ export class PresupuestoDashboardComponent {
     return this.expandidos()[programaId] ?? false;
   }
 
-  /** Helper: formateo de moneda (para template) */
-  formatCurrency(value: number): string {
-    return new Intl.NumberFormat('es-CO', {
-      style: 'currency',
-      currency: 'COP',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  }
-
-  /** Helper: formato compacto para KPI cards ($2.450M, $15.6M, $892K) */
-  formatCompact(value: number): string {
-    const abs = Math.abs(value);
-    const sign = value < 0 ? '-' : '';
-    if (abs >= 1_000_000_000) {
-      return `${sign}$${(abs / 1_000_000_000).toFixed(1).replace('.', ',')}B`;
-    }
-    if (abs >= 1_000_000) {
-      return `${sign}$${(abs / 1_000_000).toFixed(0)}M`;
-    }
-    if (abs >= 1_000) {
-      return `${sign}$${(abs / 1_000).toFixed(0)}K`;
-    }
-    return `${sign}$${abs}`;
-  }
-
   /** Helper: clase CSS del badge de ejecución */
   getEjecucionClass(porcentaje: number): string {
     if (porcentaje >= 90) return 'ejecucion-danger';
@@ -107,25 +85,19 @@ export class PresupuestoDashboardComponent {
     return 'ejecucion-success';
   }
 
-  /** Helper: mapeo de tipo de afectación a estado de badge */
-  getTipoBadgeStatus(tipo: string): 'info' | 'success' | 'warning' | 'danger' {
+  /** Helper: configuración unificada para badges de tipo de afectación */
+  getTipoConfig(tipo: string): { status: 'info'|'success'|'warning'|'danger'; cssClass: string } {
     switch (tipo.toLowerCase()) {
-      case 'pago': return 'success';
-      case 'traslado': return 'warning';
-      case 'anulación': return 'danger';
-      case 'compromiso': 
-      default: return 'info';
-    }
-  }
-
-  /** Helper: clase CSS del badge de tipo afectación */
-  getTipoBadgeClass(tipo: string): string {
-    switch (tipo) {
-      case 'Compromiso': return 'tipo-badge--compromiso';
-      case 'Pago':       return 'tipo-badge--pago';
-      case 'Traslado':   return 'tipo-badge--traslado';
-      case 'Anulación':  return 'tipo-badge--anulacion';
-      default:           return '';
+      case 'pago':
+        return { status: 'success', cssClass: 'tipo-badge--pago' };
+      case 'traslado':
+        return { status: 'warning', cssClass: 'tipo-badge--traslado' };
+      case 'anulación':
+      case 'anulacion':
+        return { status: 'danger', cssClass: 'tipo-badge--anulacion' };
+      case 'compromiso':
+      default:
+        return { status: 'info', cssClass: 'tipo-badge--compromiso' };
     }
   }
 

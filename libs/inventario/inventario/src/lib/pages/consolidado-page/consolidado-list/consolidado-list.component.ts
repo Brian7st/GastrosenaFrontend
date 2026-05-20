@@ -1,17 +1,17 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { ButtonComponent, DataTableComponent, KpiCardComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
 import { ExportarConsolidadoModalComponent } from '../components/exportar-consolidado-modal/exportar-consolidado-modal.component';
 import { ReversarConsolidadoModalComponent } from '../components/reversar-consolidado-modal/reversar-consolidado-modal.component';
+import { Consolidado } from '../../../models/consolidado.model';
+import { ConsolidadoFacade } from '../../../data-access/consolidado.facade';
 
-interface Consolidado {
-  id: string;
-  mes: string;
-  tipo: string;
-  total: string;
-  estado: string;
-  variant: 'success' | 'warning' | 'danger' | 'info';
+interface ConsolidadoKpis {
+  retencionZese: number;
+  ivaAcumulado: number;
+  totalEjecutado: number;
+  gilsPendientes: number;
 }
 
 @Component({
@@ -22,63 +22,64 @@ interface Consolidado {
   styleUrl: './consolidado-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ConsolidadoListComponent {
+export class ConsolidadoListComponent implements OnInit {
   private router = inject(Router);
+  private facade = inject(ConsolidadoFacade);
 
-  showExportModal = false;
-  showReversarModal = false;
-  selectedReversarItem: Consolidado | null = null;
-  isReversarBlocked = false;
+  // ── Estado reactivo desde facade ─────────────────────────────────────────
+  consolidados = this.facade.consolidados;
+  loading      = this.facade.loading;
 
-  openExportModal() {
-    this.showExportModal = true;
+  showExportModal      = signal(false);
+  showReversarModal    = signal(false);
+  selectedReversarItem = signal<Consolidado | null>(null);
+  isReversarBlocked    = signal(false);
+
+  kpis = signal<ConsolidadoKpis>({
+    retencionZese:  1452890,
+    ivaAcumulado:   3842120.45,
+    totalEjecutado: 12980500,
+    gilsPendientes: 14,
+  });
+
+  ngOnInit(): void {
+    this.facade.loadAll();
   }
 
-  closeExportModal() {
-    this.showExportModal = false;
+  openExportModal(): void {
+    this.showExportModal.set(true);
   }
 
-  onExport(format: 'excel' | 'pdf') {
-    console.log('Exporting as', format);
-    // Add real export logic here
-    this.showExportModal = false;
+  closeExportModal(): void {
+    this.showExportModal.set(false);
   }
 
-  // Mocks para la tabla de consolidados históricos
-  consolidados: Array<Consolidado> = [
-    { id: '#CON-2023-12-01', mes: 'Diciembre 2023', tipo: 'Cierre Anual', total: '$45,200,000.00', estado: 'Contabilizado', variant: 'success' },
-    { id: '#CON-2023-11-28', mes: 'Noviembre 2023', tipo: 'Regular', total: '$38,150,000.00', estado: 'Generado', variant: 'info' },
-    { id: '#CON-2023-10-15', mes: 'Octubre 2023', tipo: 'Regular', total: '$29,400,000.00', estado: 'Borrador', variant: 'warning' },
-    { id: '#CON-2023-09-30', mes: 'Septiembre 2023', tipo: 'Regular', total: '$41,200,000.00', estado: 'Contabilizado', variant: 'success' }
-  ];
-
-  goToDetail(id: string) {
-    // Navigate to the detail view based on ID
-    this.router.navigate(['/app/inventario/consolidado', id.replace('#', '')]);
+  onExport(_format: 'excel' | 'pdf'): void {
+    // Exportación real pendiente de integración HTTP
+    this.showExportModal.set(false);
   }
 
-  reversar(id: string) {
-    const item = this.consolidados.find(c => c.id === id);
+  goToDetail(id: string): void {
+    this.router.navigate(['/app/inventario/consolidado', id]);
+  }
+
+  reversar(id: string): void {
+    const item = this.consolidados().find(c => c.id === id);
     if (item) {
-      this.selectedReversarItem = item;
-      // Mock logic: block if variant is 'success' (e.g. Contabilizado) just to show both modals for demo.
-      this.isReversarBlocked = item.variant === 'success';
-      this.showReversarModal = true;
+      this.selectedReversarItem.set(item);
+      this.isReversarBlocked.set(item.variant === 'success');
+      this.showReversarModal.set(true);
     }
   }
 
-  closeReversarModal() {
-    this.showReversarModal = false;
-    this.selectedReversarItem = null;
+  closeReversarModal(): void {
+    this.showReversarModal.set(false);
+    this.selectedReversarItem.set(null);
   }
 
-  confirmReversar() {
-    if (this.selectedReversarItem) {
-      this.selectedReversarItem.estado = 'Reversado';
-      this.selectedReversarItem.variant = 'danger';
-      // Force change detection by re-assigning array if needed, but OnPush might require it:
-      this.consolidados = [...this.consolidados];
-    }
+  confirmReversar(): void {
+    const id = this.selectedReversarItem()?.id;
+    if (id) this.facade.reversarConsolidado(id);
     this.closeReversarModal();
   }
 }

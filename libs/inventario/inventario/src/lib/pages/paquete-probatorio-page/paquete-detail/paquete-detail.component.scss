@@ -2,8 +2,7 @@
 // Sigue tokens de _variables.scss (Precision Ledger Design System)
 
 .paquete-detail {
-  padding: var(--space-10) var(--space-8);
-  width: 100%;
+  padding: var(--space-4) var(--space-8);
 }
 
 // ── Status Banner ──────────────────────────────────────────────────────────────
@@ -44,33 +43,7 @@
   gap: var(--space-3);
 }
 
-.paquete-detail__back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  background: var(--color-superficie-contenedor-bajo);
-  border: 1px solid rgba(189, 202, 185, 0.2);
-  color: var(--color-text-secondary);
-  border-radius: var(--radius-md);
-  padding: var(--space-1) var(--space-3);
-  font-family: var(--font-family-base);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  cursor: pointer;
-  transition: color var(--duration-fast) var(--ease-standard),
-              background-color var(--duration-fast) var(--ease-standard);
-  width: fit-content;
 
-  &:hover {
-    color: var(--color-primario);
-    background: var(--color-superficie-contenedor);
-  }
-
-  &:focus-visible {
-    outline: none;
-    box-shadow: var(--focus-ring);
-  }
-}
 
 .paquete-detail__header-title-row {
   display: flex;
@@ -372,7 +345,7 @@
   justify-content: center;
   gap: var(--space-1);
   width: 100%;
-  background: var(--color-primario);
+  background: linear-gradient(180deg, var(--color-primario), var(--color-primario-gradient-end));
   color: var(--color-en-primario);
   border: none;
   border-radius: var(--radius-md);

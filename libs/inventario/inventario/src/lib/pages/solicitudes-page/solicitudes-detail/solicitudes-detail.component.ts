@@ -1,17 +1,17 @@
-import { Component, ChangeDetectionStrategy, signal, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 
 @Component({
-  selector: 'app-solicitudes-detail',
+  selector: 'restaurant-solicitudes-detail',
   standalone: true,
   imports: [CommonModule, RouterModule, BackButtonComponent],
   templateUrl: './solicitudes-detail.component.html',
-  styleUrls: ['./solicitudes-detail.component.scss'],
+  styleUrl: './solicitudes-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SolicitudesDetailComponent {
+export class SolicitudesDetailComponent implements OnInit {
   
   // ─── Mocks basados en prototipo ─────────────────────────
   solicitudId = signal<string>('GIL-F-014-2024-001');
@@ -19,11 +19,14 @@ export class SolicitudesDetailComponent {
   fechaCreacion = signal('24 Oct 2024');
   totalEstimado = signal(1240000);
 
-  constructor(private router: Router, private route: ActivatedRoute) {
-    // Si viene un ID en la ruta, podríamos cargarlo (mock behavior)
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
+  ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
-      this.solicitudId.set(`GIL-F-014-2024-00${idParam}`);
+      // TODO: llamar a solicitudesFacade.cargarSolicitudById(idParam) cuando exista la facade
+      this.solicitudId.set(idParam);
     }
   }
 
@@ -62,13 +65,10 @@ export class SolicitudesDetailComponent {
   }
 
   onDownloadPdf(): void {
-    console.log('Descargando PDF...');
+    // TODO: llamar a servicio de exportación PDF
   }
 
   onEnviarAprobacion(): void {
-    // Mock action
-    if(this.estadoActual() === 'Borrador') {
-      this.estadoActual.set('Pendiente');
-    }
+    // TODO: llamar a solicitudesFacade.cambiarEstado(id, 'Pendiente')
   }
 }

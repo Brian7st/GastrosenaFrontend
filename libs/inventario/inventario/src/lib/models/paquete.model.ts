@@ -136,3 +136,11 @@ export const MOCK_PAQUETES: PaqueteProbatorio[] = [
     fecha: '28/04/2026',
   },
 ];
+
+export interface TimelineEntry {
+  estado: string;
+  fecha: string;
+  activo: boolean;
+  tipo: 'success' | 'error' | 'neutral';
+  detalle?: string;
+}

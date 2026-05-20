@@ -8,14 +8,15 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LucideIconComponent } from '@restaurant/shared/ui';
+import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 
 @Component({
   selector: 'restaurant-paquete-create',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule, LucideIconComponent],
+  imports: [CommonModule, ReactiveFormsModule, LucideIconComponent, BackButtonComponent],
   templateUrl: './paquete-create.component.html',
-  styleUrls: ['./paquete-create.component.scss'],
+  styleUrl: './paquete-create.component.scss',
 })
 export class PaqueteCreateComponent {
   private router = inject(Router);
@@ -23,7 +24,7 @@ export class PaqueteCreateComponent {
 
   // ── Formulario ──────────────────────────────────────────────────────────
   createForm = this.fb.nonNullable.group({
-    expediente: ['PKT-2026-021', Validators.required], // Auto-generado idealmente
+    expediente: ['', Validators.required], // Auto-generado idealmente
     titulo: ['', Validators.required],
     programa: ['', Validators.required],
     ficha: ['', Validators.required],
@@ -59,8 +60,8 @@ export class PaqueteCreateComponent {
 
   guardarPaquete(): void {
     if (this.createForm.valid) {
-      // Simular guardado y redirección
-      console.log('Guardando paquete...', this.createForm.value);
+      // TODO(paquete-facade): llamar facade.crearPaquete(this.createForm.getRawValue())
+      console.warn('guardarPaquete: pendiente integración con PaqueteFacade');
       this.volver();
     }
   }
