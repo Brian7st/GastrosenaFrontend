@@ -12,12 +12,12 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
 import { RegistroHistorial, AlertaPrioridad, MOCK_HISTORIAL } from '../../../models/alerta.model';
 
 @Component({
-  selector: 'inventario-alertas-historial',
+  selector: 'restaurant-alertas-historial',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, LucideIconComponent, DataTableComponent, ButtonComponent, BackButtonComponent],
   templateUrl: './alertas-historial.component.html',
-  styleUrls: ['./alertas-historial.component.scss'],
+  styleUrl: './alertas-historial.component.scss',
 })
 export class AlertasHistorialComponent {
   private router = inject(Router);
@@ -87,6 +87,6 @@ export class AlertasHistorialComponent {
   }
 
   exportarCSV(): void {
-    console.log('Exportando historial CSV...');
+    // TODO: llamar a alertasService.exportarHistorialCSV()
   }
 }
