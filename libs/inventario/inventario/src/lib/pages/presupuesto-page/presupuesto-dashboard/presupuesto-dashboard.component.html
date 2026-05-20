@@ -30,20 +30,20 @@
        KPI GRID (5 cards — Bento)
        ═══════════════════════════════════════════════════════════════════════ -->
   <div class="kpi-grid">
-    <restaurant-kpi-card label="TOTAL APROPIACIÓN" [value]=" | formatoMoneda.totalApropiacion)" icon="landmark"
+    <restaurant-kpi-card label="TOTAL APROPIACIÓN" [value]="resumen( | formatoMoneda.totalApropiacion)" icon="landmark"
       iconColor="blue" [trend]="'+' + resumen().variacionAnual + '% vs ' + (resumen().vigenciaFiscal - 1)"
       [trendUp]="true"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="COMPROMETIDO" [value]=" | formatoMoneda.totalComprometido)" icon="file-check"
+    <restaurant-kpi-card label="COMPROMETIDO" [value]="resumen( | formatoMoneda.totalComprometido)" icon="file-check"
       iconColor="orange" [trend]="resumen().porcentajeEjecucion + '% ejecutado'" [trendUp]="null"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="PAGADO REAL" [value]=" | formatoMoneda.totalPagado)" icon="banknote"
+    <restaurant-kpi-card label="PAGADO REAL" [value]="resumen( | formatoMoneda.totalPagado)" icon="banknote"
       iconColor="green" trend="Verificado a la fecha" [trendUp]="null"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="DISPONIBLE" [value]=" | formatoMoneda.totalDisponible)" icon="wallet"
+    <restaurant-kpi-card label="DISPONIBLE" [value]="resumen( | formatoMoneda.totalDisponible)" icon="wallet"
       iconColor="blue" trend="Saldo sin comprometer" [trendUp]="null"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="TOTAL ZESE APLICADA" [value]=" | formatoMoneda!.totalZese)" icon="percent"
+    <restaurant-kpi-card label="TOTAL ZESE APLICADA" [value]="resumen( | formatoMoneda!.totalZese)" icon="percent"
       iconColor="red" trend="Retención 0.625%" [trendUp]="null"></restaurant-kpi-card>
   </div>
   }
@@ -89,13 +89,13 @@
                 <span class="grupo-nombre">{{ programa.nombre }}</span>
               </div>
             </td>
-            <td class="col-money grupo-value">{{  | formatoMoneda:false }}</td>
-            <td class="col-money grupo-value">{{  | formatoMoneda:false }}</td>
-            <td class="col-money grupo-value">{{  | formatoMoneda:false }}</td>
-            <td class="col-money grupo-value">{{  | formatoMoneda:false }}</td>
-            <td class="col-money grupo-value">{{  | formatoMoneda:false }}</td>
+            <td class="col-money grupo-value">{{ programa.totalApropiacion) }}</td>
+            <td class="col-money grupo-value">{{ formatCurrency(programa.totalDisponible | formatoMoneda:false }}</td>
+            <td class="col-money grupo-value">{{ programa.totalComprometido) }}</td>
+            <td class="col-money grupo-value">{{ formatCurrency(programa.totalPagado | formatoMoneda:false }}</td>
+            <td class="col-money grupo-value">{{ programa.totalZese) }}</td>
             <td class="col-ejecucion">
-              <span class="ejecucion-badge" [ngClass]="getEjecucionClass(programa.porcentajeEjecucion)">
+              <span class="ejecucion-badge" [ngClass]="getEjecucionClass(programa.porcentajeEjecucion | formatoMoneda:false">
                 {{ programa.porcentajeEjecucion }}%
               </span>
             </td>
@@ -110,11 +110,11 @@
                 <span class="rubro-nombre">{{ rubro.nombre }}</span>
               </div>
             </td>
-            <td class="col-money">{{  | formatoMoneda:false }}</td>
-            <td class="col-money">{{  | formatoMoneda:false }}</td>
-            <td class="col-money">{{  | formatoMoneda:false }}</td>
-            <td class="col-money">{{  | formatoMoneda:false }}</td>
-            <td class="col-money">{{  | formatoMoneda:false }}</td>
+            <td class="col-money">{{ rubro.apropiacionInicial) }}</td>
+            <td class="col-money">{{ formatCurrency(rubro.disponible | formatoMoneda:false }}</td>
+            <td class="col-money">{{ rubro.comprometido) }}</td>
+            <td class="col-money">{{ formatCurrency(rubro.pagado | formatoMoneda:false }}</td>
+            <td class="col-money">{{ rubro.retencionZese) }}</td>
             <td class="col-ejecucion">
               <div class="ejecucion-bar-container">
                 <div class="ejecucion-bar" [style.width.%]="rubro.porcentajeEjecucion"></div>
@@ -129,11 +129,11 @@
         <tfoot>
           <tr class="total-row">
             <td class="col-estructura total-label">TOTAL CONSOLIDADO</td>
-            <td class="col-money total-value">{{  | formatoMoneda:false.totalApropiacion) }}</td>
-            <td class="col-money total-value">{{  | formatoMoneda:false.totalDisponible) }}</td>
-            <td class="col-money total-value">{{  | formatoMoneda:false.totalComprometido) }}</td>
-            <td class="col-money total-value">{{  | formatoMoneda:false.totalPagado) }}</td>
-            <td class="col-money total-value">{{  | formatoMoneda:false.totalZese) }}</td>
+            <td class="col-money total-value">{{ formatCurrency(resumen( | formatoMoneda:false.totalApropiacion) }}</td>
+            <td class="col-money total-value">{{ resumen().totalDisponible | formatoMoneda:false }}</td>
+            <td class="col-money total-value">{{ resumen().totalComprometido | formatoMoneda:false }}</td>
+            <td class="col-money total-value">{{ resumen().totalPagado | formatoMoneda:false }}</td>
+            <td class="col-money total-value">{{ resumen().totalZese | formatoMoneda:false }}</td>
             <td class="col-ejecucion">
               <span class="ejecucion-badge" [ngClass]="getEjecucionClass(resumen().porcentajeEjecucion)">
                 {{ resumen().porcentajeEjecucion }}%
@@ -236,11 +236,11 @@
         </td>
         <td style="text-align: right;">
           <span class="money-val" [class.money-val--negativo]="a.valor < 0">
-            {{  | formatoMoneda:false }}
+            {{ a.valor) }}
           </span>
         </td>
         <td style="text-align: right;">
-          <span class="saldo-text">{{  | formatoMoneda:false }}</span>
+          <span class="saldo-text">{{ formatCurrency(a.saldoResultante | formatoMoneda:false }}</span>
         </td>
       </tr>
       }
