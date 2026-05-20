@@ -70,7 +70,6 @@ export class AlertaDetailComponent implements OnInit {
   }
 
   abrirResolver(): void {
-    const id = this.alerta()?.id;
     this.router.navigate(['resolver'], { relativeTo: this.route });
   }
 

@@ -64,10 +64,7 @@ export class AlertaResolverComponent implements OnInit {
 
   onConfirmar(): void {
     if (this.resolverForm.valid) {
-      const id = this.alerta()?.id;
-      if (id) {
-         this.facade.resolverAlerta(id, this.resolverForm.getRawValue());
-      }
+      // TODO: llamar a alertasFacade.resolverAlerta(this.alerta()!.id, this.resolverForm.getRawValue())
       this.cerrar();
     }
   }

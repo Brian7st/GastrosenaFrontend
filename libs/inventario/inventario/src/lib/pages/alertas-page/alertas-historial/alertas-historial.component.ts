@@ -87,6 +87,6 @@ export class AlertasHistorialComponent {
   }
 
   exportarCSV(): void {
-    console.log('Exportando historial CSV...');
+    // TODO: llamar a alertasService.exportarHistorialCSV()
   }
 }
