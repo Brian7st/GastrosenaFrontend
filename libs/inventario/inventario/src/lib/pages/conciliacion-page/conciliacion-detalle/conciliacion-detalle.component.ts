@@ -1,11 +1,8 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { CommonModule, Location } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { LucideIconComponent } from '@restaurant/shared/ui';
-import { ButtonComponent } from '@restaurant/shared/ui';
-import { KpiCardComponent } from '@restaurant/shared/ui';
+import { LucideIconComponent, ButtonComponent, KpiCardComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
-import { Location } from '@angular/common';
 
 @Component({
   selector: 'restaurant-conciliacion-detalle',
@@ -75,7 +72,7 @@ export class ConciliacionDetalleComponent {
     },
   ];
 
-  constructor(private location: Location) {}
+  private location = inject(Location);
 
   goBack() {
     this.location.back();

@@ -1,9 +1,8 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { LucideIconComponent } from '@restaurant/shared/ui';
-import { ButtonComponent } from '@restaurant/shared/ui';
-import { KpiCardComponent } from '@restaurant/shared/ui';
+import { LucideIconComponent, ButtonComponent, KpiCardComponent } from '@restaurant/shared/ui';
+import { ConciliacionFacade } from '../../../data-access/conciliacion.facade';
 
 @Component({
   selector: 'restaurant-conciliacion-dashboard',
@@ -19,8 +18,15 @@ import { KpiCardComponent } from '@restaurant/shared/ui';
   styleUrl: './conciliacion-dashboard.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ConciliacionDashboardComponent {
-  // Mock data based on the prototype
+export class ConciliacionDashboardComponent implements OnInit {
+  protected facade = inject(ConciliacionFacade);
+
+  // Signals expuestos desde la facade (solo lectura)
+  conciliaciones = this.facade.conciliaciones;
+  loading = this.facade.loading;
+  error = this.facade.error;
+
+  // ─── Datos de UI locales (no pertenecen a la capa de datos) ───
   tendencias = [
     { mes: 'Ene', valor: 60, isCurrent: false },
     { mes: 'Feb', valor: 50, isCurrent: false },
@@ -64,7 +70,7 @@ export class ConciliacionDashboardComponent {
   categorias = [
     {
       nombre: 'Abarrotes',
-      icono: 'box', // valid lucide icon
+      icono: 'box',
       estado: 'Última toma: Hace 2 días',
       tipo: 'normal',
     },
@@ -87,4 +93,8 @@ export class ConciliacionDashboardComponent {
       tipo: 'normal',
     },
   ];
+
+  ngOnInit(): void {
+    this.facade.loadAll();
+  }
 }
