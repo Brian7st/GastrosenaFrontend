@@ -13,6 +13,38 @@
 
 ---
 
+## Progreso general
+
+```mermaid
+pie title Avance total del proyecto
+    "Implementado" : 63
+    "Pendiente" : 37
+```
+
+### Por módulo
+
+```mermaid
+xychart-beta
+    title "Avance por módulo (%)"
+    x-axis ["Auth/Usuarios", "Cocina", "Bar", "Restaurante", "Inventario", "Reportes", "Notificaciones"]
+    y-axis "Progreso (%)" 0 --> 100
+    bar [60, 70, 40, 80, 90, 0, 0]
+```
+
+| Módulo | RFs asignados | Implementado | Pendiente | Progreso |
+|--------|--------------|-------------|-----------|----------|
+| Auth / Usuarios | RF1.2–1.4, RF2.x | Login, Forgot-Password, Lista usuarios | Roles, Cuentas | `██████░░░░` 60% |
+| Cocina | RF-C 4.0–4.9 | Inicio, Comandas, Recetas, Actividad, Actividades, Eval. masiva, Eval. individual | ~3 RFs sin mapear | `███████░░░` 70% |
+| Bar | RF-C 4.10–4.19 | Landing, Comandas, Recetas, Menú | ~6 RFs sin implementar | `████░░░░░░` 40% |
+| Restaurante | RF3.x | Mesas, Pedidos, Caja completa (6 sub-flujos) | Detalles menores RF3.x | `████████░░` 80% |
+| Inventario | RF-F, RF-P, RF-Q, RF-5.x | 11 sub-módulos completos (35 rutas) | Ajustes finales | `█████████░` 90% |
+| Reportes | RF-R | — | Todas las páginas internas | `░░░░░░░░░░` 0% |
+| Notificaciones | RF-N | — | Todas las páginas internas | `░░░░░░░░░░` 0% |
+
+> **Avance estimado: ~63%** — basado en features por RF, no solo conteo de rutas.
+
+---
+
 ## Diagrama general
 
 ```mermaid
@@ -31,7 +63,6 @@ flowchart TD
     APP --> REST["/app/restaurante"]
     APP --> USERS["/app/usuarios"]
     APP --> REP["/app/reportes 🔶"]
-    APP --> ABAST["/app/abastecimiento 🔶"]
     APP --> NOTIF["/app/notificaciones 🔶"]
 ```
 
@@ -215,31 +246,10 @@ flowchart TD
 
 ### Módulos stub
 
-Estos módulos están registrados en el router pero sin páginas internas aún.
-
 | Módulo | Ruta | Estado |
 |--------|------|--------|
-| Reportes | `/app/reportes` | 🔶 Solo landing (`ReportesPageComponent`) |
-| Abastecimiento | `/app/abastecimiento` | 🔶 Solo landing (`AbastecimientoPageComponent`) |
-| Notificaciones | `/app/notificaciones` | 🔶 Solo landing (`NotificacionesPageComponent`) |
-
----
-
-## Resumen por módulo
-
-| Módulo | Rutas implementadas | Rutas pendientes | Estado general |
-|--------|-------------------|-----------------|----------------|
-| Auth | 2 | 0 | ✅ Completo |
-| Usuarios | 1 | 2 (roles, cuentas) | 🔶 Parcial |
-| Cocina | 7 | 0 | ✅ Completo |
-| Bar | 4 | 0 | ✅ Completo |
-| Restaurante | 9 | 0 | ✅ Completo |
-| Inventario | 35 | 0 | ✅ Completo |
-| Reportes | 0 | — | 🔶 Stub |
-| Abastecimiento | 0 | — | 🔶 Stub |
-| Notificaciones | 0 | — | 🔶 Stub |
-
-**Total rutas activas: 58 de ~63 planeadas**
+| Reportes | `/app/reportes` | 🔶 Solo landing — páginas internas pendientes |
+| Notificaciones | `/app/notificaciones` | 🔶 Solo landing — páginas internas pendientes |
 
 ---
 
@@ -247,7 +257,7 @@ Estos módulos están registrados en el router pero sin páginas internas aún.
 
 | Guard | Aplicado en | Roles permitidos |
 |-------|------------|-----------------|
-| `authGuard` | `/app` (desactivado temporalmente — ver `shell.routes.ts`) | Todos los autenticados |
+| `authGuard` | `/app` (desactivado — ver `shell.routes.ts`) | Todos los autenticados |
 | `roleGuard` | `/app/inventario` | `ADMINISTRADOR`, `CONTADORA` |
 | `roleGuard` | `/app/cocina` (desactivado temporalmente) | `CHEF`, `ADMIN_COCINA`, `AUXILIAR_COCINA` |
 | `roleGuard` | `/app/bar` (desactivado temporalmente) | `LIDER_BAR`, `ADMIN_BAR`, `BARTENDER` |
