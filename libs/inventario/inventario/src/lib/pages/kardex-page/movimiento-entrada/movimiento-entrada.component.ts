@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -9,27 +9,27 @@ import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule, LucideIconComponent, ButtonComponent],
   templateUrl: './movimiento-entrada.component.html',
-  styleUrls: ['./movimiento-entrada.component.scss']
+  styleUrl: './movimiento-entrada.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MovimientoEntradaComponent {
-  entradaForm: FormGroup;
+  private fb = inject(FormBuilder);
+  private router = inject(Router);
 
-  constructor(private fb: FormBuilder, private router: Router) {
-    this.entradaForm = this.fb.group({
-      producto: ['', Validators.required],
-      cantidad: [null, [Validators.required, Validators.min(1)]],
-      fecha: ['', Validators.required],
-      proveedor: ['', Validators.required],
-      factura: [''],
-      ubicacion: ['', Validators.required],
-      valorUnitario: [null, [Validators.required, Validators.min(0)]],
-      observaciones: ['']
-    });
-  }
+  entradaForm: FormGroup = this.fb.group({
+    producto: ['', Validators.required],
+    cantidad: [null, [Validators.required, Validators.min(1)]],
+    fecha: ['', Validators.required],
+    proveedor: ['', Validators.required],
+    factura: [''],
+    ubicacion: ['', Validators.required],
+    valorUnitario: [null, [Validators.required, Validators.min(0)]],
+    observaciones: ['']
+  });
 
-  onSubmit() {
+  onSubmit(): void {
     if (this.entradaForm.valid) {
-      console.log('Entrada guardada:', this.entradaForm.value);
+      // TODO: llamar a kardexFacade.registrarEntrada(this.entradaForm.getRawValue())
       this.closeModal();
     }
   }
