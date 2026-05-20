@@ -13,7 +13,7 @@ import { LucideIconComponent } from '@restaurant/shared/ui';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, LucideIconComponent],
   templateUrl: './paquete-req-detail.component.html',
-  styleUrls: ['./paquete-req-detail.component.scss'],
+  styleUrl: './paquete-req-detail.component.scss',
 })
 export class PaqueteReqDetailComponent {
   private router = inject(Router);
@@ -25,7 +25,8 @@ export class PaqueteReqDetailComponent {
   }
 
   incluirEnPaquete(): void {
-    console.log('Incluyendo requisición en paquete...');
+    // TODO(paquete-facade): llamar facade.incluirRequisicionEnPaquete(...)
+    console.warn('incluirEnPaquete: pendiente integración con PaqueteFacade');
     this.cerrarPanel();
   }
 }
