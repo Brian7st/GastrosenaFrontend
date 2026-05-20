@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
@@ -14,10 +14,14 @@ import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 export class PresupuestoExportarComponent {
   private router = inject(Router);
 
-  formatoSeleccionado: 'excel' | 'pdf' = 'excel';
+  formatoSeleccionado = signal<'excel' | 'pdf'>('excel');
 
   setFormato(formato: 'excel' | 'pdf'): void {
-    this.formatoSeleccionado = formato;
+    this.formatoSeleccionado.set(formato);
+  }
+
+  onExportar(): void {
+    // TODO: llamar a presupuestoFacade.exportar(this.formatoSeleccionado())
   }
 
   closeModal(): void {
