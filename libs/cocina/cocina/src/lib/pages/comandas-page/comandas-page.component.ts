@@ -77,8 +77,8 @@ export class ComandasPageComponent {
 
   comandasFiltradas = computed(() => {
     let filtrados = this.comandas().filter(c => {
-      const matchBusqueda = c.mesa.toLowerCase().includes(this.searchTerm().toLowerCase()) || 
-                            c.mesero.toLowerCase().includes(this.searchTerm().toLowerCase());
+      const matchBusqueda = c.mesa.toLowerCase().includes(this.searchTerm().toLowerCase()) ||
+        c.mesero.toLowerCase().includes(this.searchTerm().toLowerCase());
       const matchEstado = this.filtroEstado() === 'Todos los estados' || c.estado === this.filtroEstado();
       const matchPrioridad = this.filtroPrioridad() === 'Todas las prioridades' || c.prioridad === this.filtroPrioridad();
       return matchBusqueda && matchEstado && matchPrioridad;
@@ -102,7 +102,7 @@ export class ComandasPageComponent {
   listos = computed(() => this.comandasFiltradas().filter(c => c.estado === 'Listo'));
 
   cambiarEstado(comanda: Comanda, nuevoEstado: string) {
-    this.comandas.update(actuales => 
+    this.comandas.update(actuales =>
       actuales.map(c => c.id === comanda.id ? { ...c, estado: nuevoEstado } : c)
     );
   }
