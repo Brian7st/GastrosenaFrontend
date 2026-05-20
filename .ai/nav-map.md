@@ -1,51 +1,52 @@
 # GastroSENA — Mapa de Navegación
 
-> Última actualización: 2026-05-20 | Rama: `develop` | Auditoría: código real verificado componente por componente
+> Última actualización: 2026-05-20 | Rama: `develop` | Auditoría: RFs Esenciales cruzados con código real
 
 ## Leyenda
 
 | Ícono | Significado |
 |-------|-------------|
-| ✅ | Implementado con lógica real |
-| 🔶 | Stub — componente existe pero sin contenido |
-| ❌ | Pendiente — ruta o componente no creado aún |
+| ✅ | RF implementado con lógica real |
+| 🔶 | RF parcialmente implementado — estructura sin funcionalidad completa |
+| ❌ | RF sin implementar — stub o componente faltante |
 | 🔒 | Protegido por `roleGuard` |
 
 ---
 
 ## Progreso general
 
-> Metodología: auditoría código a código — se leyó el `.ts` y `.html` de cada componente de página.
-> Clasificación: **REAL** = facade inyectado + bindings reales | **PARCIAL** = estructura sin data | **STUB** = scaffold vacío de Nx
+> Metodología: auditoría RF por RF — cada Requisito Funcional Esencial de `docs/requisitos.md` fue cruzado con el `.ts` y `.html` del componente responsable.
+> Clasificación: **REAL** = RF cumplido (facade + bindings + lógica) | **PARCIAL** = estructura sin funcionalidad completa | **FALTA** = sin implementar
 
 ```mermaid
-pie title Avance real del proyecto (44 componentes auditados)
-    "Implementado (REAL)" : 82
-    "Stub / Pendiente" : 18
+pie title Avance por RFs Esenciales (92 auditados)
+    "REAL" : 48
+    "PARCIAL" : 23
+    "FALTA" : 21
 ```
 
 ### Por módulo
 
 ```mermaid
 xychart-beta
-    title "Implementación real por módulo (% componentes REAL)"
-    x-axis ["Auth", "Usuarios", "Cocina", "Bar", "Restaurante", "Inventario", "Reportes", "Notificaciones"]
+    title "% RFs Esenciales REAL por modulo"
+    x-axis ["Usuarios", "Cocina", "Bar", "Restaurante", "Inventario", "Reportes", "Notificaciones"]
     y-axis "% Real" 0 --> 100
-    bar [100, 33, 100, 50, 89, 100, 0, 0]
+    bar [75, 69, 61, 28, 60, 0, 0]
 ```
 
-| Módulo | RFs | REAL | PARCIAL | STUB | % Real | Stubs identificados |
-|--------|-----|------|---------|------|--------|---------------------|
-| Auth | RF1.2–1.4 | 2 | 0 | 0 | `██████████` **100%** | — |
-| Usuarios | RF2.x | 1 | 0 | 2 | `███░░░░░░░` **33%** | RolesPage, CuentasPage |
-| Cocina | RF-C 4.0–4.9 | 7 | 0 | 0 | `██████████` **100%** | — |
-| Bar | RF-C 4.10–4.19 | 2 | 0 | 2 | `█████░░░░░` **50%** | BarPage (landing), MenuPage |
-| Restaurante | RF3.x | 8 | 0 | 1 | `█████████░` **89%** | CajaMovimientosPage |
-| Inventario | RF-F, RF-P, RF-Q | 11 | 0 | 0 | `██████████` **100%** | — |
-| Reportes | RF-R | 0 | 0 | 1 | `░░░░░░░░░░` **0%** | ReportesPage |
-| Notificaciones | RF-N | 0 | 0 | 1 | `░░░░░░░░░░` **0%** | NotificacionesPage |
+| Módulo | RFs Esenciales | REAL | PARCIAL | FALTA | % Real |
+|--------|---------------|------|---------|-------|--------|
+| Auth/Usuarios | RF1.2, RF2.1–2.6.1 | 6 | 1 | 2 | `███████░░░` **75%** |
+| Cocina | RF-C 4.0–4.4.1 | 11 | 2 | 5 | `██████░░░░` **69%** |
+| Bar | RF-C 4.10–4.18 | 11 | 0 | 7 | `██████░░░░` **61%** |
+| Restaurante | RF3.1.x–RF3.5.x | 5 | 8 | 5 | `███░░░░░░░` **28%** |
+| Inventario | RF-5.1–5.11 | 21 | 14 | 0 | `██████░░░░` **60%** |
+| Reportes | RF6.1.x | 0 | 0 | 13 | `░░░░░░░░░░` **0%** |
+| Notificaciones | RF1.8.x | 0 | 0 | 3 | `░░░░░░░░░░` **0%** |
+| **TOTAL** | **92** | **48** | **23** | **21** | `█████░░░░░` **52%** |
 
-> **Avance real verificado: 81.8%** — 36 de 44 componentes con lógica real (facade, signals, computed, templates con bindings).
+> **Avance real verificado: 52%** — 48 de 92 RFs Esenciales completamente implementados. 23 RFs adicionales con implementación parcial.
 
 ---
 
@@ -58,7 +59,7 @@ flowchart TD
     ROOT --> SHOWCASE["/showcase — Design System"]
 
     AUTH --> LOGIN["/auth/login ✅"]
-    AUTH --> FORGOT["/auth/forgot-password ✅"]
+    AUTH --> FORGOT["/auth/forgot-password 🔶"]
 
     APP -->|redirect| INVENT_ROOT
     APP --> INVENT_ROOT["/app/inventario 🔒 ADMIN · CONTADORA"]
@@ -66,8 +67,8 @@ flowchart TD
     APP --> BAR["/app/bar"]
     APP --> REST["/app/restaurante"]
     APP --> USERS["/app/usuarios"]
-    APP --> REP["/app/reportes 🔶"]
-    APP --> NOTIF["/app/notificaciones 🔶"]
+    APP --> REP["/app/reportes ❌"]
+    APP --> NOTIF["/app/notificaciones ❌"]
 ```
 
 ---
@@ -76,11 +77,10 @@ flowchart TD
 
 ### `/auth` — Autenticación
 
-```mermaid
-flowchart LR
-    AUTH["/auth"] --> LOGIN["/auth/login ✅\nLoginPageComponent"]
-    AUTH --> FORGOT["/auth/forgot-password ✅\nForgotPasswordPageComponent"]
-```
+| RF | Descripción | Vista | Estado |
+|----|-------------|-------|--------|
+| RF1.2 | Iniciar sesión | `LoginPageComponent` | ✅ Form reactivo + authService.login() |
+| RF1.3 | Restablecer contraseña | `ForgotPasswordPageComponent` | 🔶 Form existe — TODO: conectar endpoint |
 
 ---
 
@@ -88,172 +88,152 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    U["/app/usuarios"] --> LISTA["/app/usuarios ✅\nListaPageComponent\n— tabla + KPIs + filtros\n— modal importar/exportar"]
+    U["/app/usuarios"] --> LISTA["/app/usuarios ✅\nListaPageComponent\n— CRUD + filtros + importar masivo"]
     U -.->|pendiente| ROLES["❌ /roles\nGestión de roles y permisos"]
     U -.->|pendiente| CUENTAS["❌ /cuentas\nAdministración de cuentas"]
 ```
 
-| Ruta | Componente | Estado |
-|------|-----------|--------|
-| `/app/usuarios` | `ListaPageComponent` | ✅ Lista con filtros, KPIs, importar/exportar |
-| `/app/usuarios/roles` | `RolesPageComponent` | ❌ Stub sin rutas registradas |
-| `/app/usuarios/cuentas` | `CuentasPageComponent` | ❌ Stub sin rutas registradas |
+| RF | Descripción | Estado | Evidencia |
+|----|-------------|--------|-----------|
+| RF2.1 | CRUD usuarios | ✅ | facade cargarUsuarios(), crearUsuario(), eliminarUsuario() |
+| RF2.2 | Registro individual | ✅ | onGuardarUsuario() + modal UsuarioFormComponent |
+| RF2.3/2.3.1 | Registro masivo | ✅ | ImportarUsuariosComponent + facade.importarMasivo() |
+| RF2.4 | Consulta y filtros | ✅ | computed usuariosFiltrados + SearchFilterComponent |
+| RF2.5 | Gestión de perfiles | ❌ | CuentasPageComponent — stub vacío |
+| RF2.6 | Gestión de roles | ❌ | RolesPageComponent — stub vacío |
+| RF2.6.1 | Gestión de permisos | ❌ | No implementado |
 
 ---
 
 ### `/app/cocina` — Cocina
 
-```mermaid
-flowchart LR
-    C["/app/cocina"] -->|redirect| INICIO
-    C --> INICIO["/inicio ✅\nInicioPageComponent"]
-    C --> COMAND["/comandas ✅\nComandasPageComponent"]
-    C --> RECETAS["/recetas ✅\nRecetasPageComponent"]
-    C --> ACTIV["/actividad ✅\nActividadPageComponent"]
-    C --> ACTIV_LIST["/actividades ✅\nActividadesListPageComponent"]
-    C --> EVAL_M["/evaluacion-masiva ✅\nEvaluacionMasivaPageComponent"]
-    C --> EVAL_I["/evaluacion-individual ✅\nEvaluacionIndividualPageComponent"]
-```
-
-| Ruta | Estado |
-|------|--------|
-| `/app/cocina/inicio` | ✅ |
-| `/app/cocina/comandas` | ✅ |
-| `/app/cocina/recetas` | ✅ |
-| `/app/cocina/actividad` | ✅ |
-| `/app/cocina/actividades` | ✅ |
-| `/app/cocina/evaluacion-masiva` | ✅ |
-| `/app/cocina/evaluacion-individual` | ✅ |
+| RF | Descripción | Vista | Estado |
+|----|-------------|-------|--------|
+| RF-C 4.0 | Visualización de pedidos | InicioPageComponent | ✅ estadisticas + pedidosPendientes signals |
+| RF-C 4.0.1 | Mostrar número de pedido | InicioPageComponent | ✅ idComanda en pedidosPendientes |
+| RF-C 4.0.2 | Mostrar hora de solicitud | InicioPageComponent | ✅ formatHora() |
+| RF-C 4.1 | Gestión del estado | ComandasPageComponent | ✅ cambiarEstado() |
+| RF-C 4.1.1 | Cambiar estado de orden | ComandasPageComponent | ✅ Espera → Preparando → Listo → Cancelado |
+| RF-C 4.1.2 | Mostrar estado actual | ComandasPageComponent | ✅ computed filtra por estado |
+| RF-C 4.2 | Gestión de recetas | RecetasPageComponent | ✅ RecetaService.listar() + CRUD completo |
+| RF-C 4.2.1 | Crear recetas | RecetasPageComponent | ✅ GestionRecetaComponent modal |
+| RF-C 4.2.2 | Consultar recetas | RecetasPageComponent | ✅ recetasFiltradas computed |
+| RF-C 4.2.3 | Actualizar recetas | RecetasPageComponent | ✅ recetaService.actualizarReceta() |
+| RF-C 4.2.4 | Eliminar recetas | RecetasPageComponent | ✅ recetaService.eliminarReceta() |
+| RF-C 4.3 | Estadísticas de tiempos | InicioPageComponent | 🔶 Datos simulados — sin cálculo real |
+| RF-C 4.4 | Alertas a sala | InicioPageComponent | 🔶 Modal incidencias — sin sistema real |
+| RF-C 4.3.1 | Registrar inicio preparación | — | ❌ No encontrado |
+| RF-C 4.3.2 | Registrar fin preparación | — | ❌ No encontrado |
+| RF-C 4.3.3 | Tiempo promedio | — | ❌ No implementado |
+| RF-C 4.4.1 | Notificar listo | — | ❌ Sin notificaciones automáticas |
 
 ---
 
 ### `/app/bar` — Bar
 
-```mermaid
-flowchart LR
-    B["/app/bar"] --> LANDING["/ 🔶\nBarPageComponent — EmptyState sin lógica"]
-    B --> COMAND["/comandas ✅\nComandasComponent"]
-    B --> RECETAS["/recetas ✅\nRecetasPageComponent"]
-    B --> MENU["/menu 🔶\nMenuPageComponent — EmptyState próximamente"]
-```
-
-| Ruta | Estado |
-|------|--------|
-| `/app/bar` | 🔶 EmptyState — sin lógica real |
-| `/app/bar/comandas` | ✅ |
-| `/app/bar/recetas` | ✅ |
-| `/app/bar/menu` | 🔶 EmptyState — mensaje "próximamente" |
+| RF | Descripción | Vista | Estado |
+|----|-------------|-------|--------|
+| RF-C 4.10 | Visualización pedidos bar | ComandasComponent | ✅ listaComandas + formatIdComanda() |
+| RF-C 4.10.1 | Mostrar número de pedido | ComandasComponent | ✅ formatIdComanda(id) → #B*** |
+| RF-C 4.10.2 | Mostrar hora solicitud | ComandasComponent | ✅ formatHora(), formatHoraCompleta() |
+| RF-C 4.11 | Gestión del estado | ComandasComponent | ✅ comenzarPreparacion(), marcarListo() |
+| RF-C 4.11.1 | Cambiar estado | ComandasComponent | ✅ ESPERA → PREPARANDO → TERMINADO |
+| RF-C 4.11.2 | Mostrar estado actual | ComandasComponent | ✅ getters comandasEspera/Preparando/Listo |
+| RF-C 4.12 | Gestión de recetas bar | RecetasPageComponent | ✅ RecetaService + CRUD completo |
+| RF-C 4.12.1 | Crear recetas bar | RecetasPageComponent | ✅ abrirNuevaReceta() + GestionRecetaComponent |
+| RF-C 4.12.2 | Consultar recetas bar | RecetasPageComponent | ✅ recetasFiltradas por nombre/categoría |
+| RF-C 4.12.3 | Actualizar recetas bar | RecetasPageComponent | ✅ recetaService.actualizarReceta() |
+| RF-C 4.12.4 | Eliminar recetas bar | RecetasPageComponent | ✅ confirm dialog + eliminarReceta() |
+| RF-C 4.13.1 | Registrar inicio (bar) | — | ❌ No encontrado |
+| RF-C 4.13.2 | Registrar fin (bar) | — | ❌ No encontrado |
+| RF-C 4.14 | Alertas a sala (bar) | — | ❌ No implementado |
+| RF-C 4.14.1 | Notificar listo (bar) | — | ❌ No implementado |
+| RF-C 4.18 | Modificaciones (bar) | — | ❌ No encontrado |
+| RF-C 4.19 | Gestión de menús (bar) | MenuPageComponent | ❌ EmptyState — stub |
 
 ---
 
 ### `/app/restaurante` — Restaurante
 
-```mermaid
-flowchart LR
-    R["/app/restaurante"] -->|redirect| MESAS
-    R --> MESAS["/mesas ✅\nMesasPageComponent"]
-    R --> PEDIDOS["/pedidos ✅\nPedidosPageComponent"]
-    R --> CAJA["/caja ✅\nCajaPageComponent"]
-    CAJA --> C_NUEVA["/caja/nueva ✅"]
-    CAJA --> C_BUSCAR["/caja/buscar ✅"]
-    CAJA --> C_PAGAR["/caja/pagar ✅"]
-    CAJA --> C_APERTURA["/caja/apertura ✅"]
-    CAJA --> C_CIERRE["/caja/cierre ✅"]
-    CAJA --> C_MOV["/caja/movimientos ✅"]
-```
-
-| Ruta | Estado |
-|------|--------|
-| `/app/restaurante/mesas` | ✅ |
-| `/app/restaurante/pedidos` | ✅ |
-| `/app/restaurante/caja` | ✅ Dashboard de caja |
-| `/app/restaurante/caja/nueva` | ✅ |
-| `/app/restaurante/caja/buscar` | ✅ |
-| `/app/restaurante/caja/pagar` | ✅ |
-| `/app/restaurante/caja/apertura` | ✅ |
-| `/app/restaurante/caja/cierre` | ✅ |
-| `/app/restaurante/caja/movimientos` | 🔶 Solo router — sin facade ni datos |
+| RF | Descripción | Vista | Estado |
+|----|-------------|-------|--------|
+| RF3.1.1 | Consultar mapa de mesas | MesasPageComponent | ✅ facade.mesas + computed activas/inactivas |
+| RF3.1.1.1 | Asignar mesas | MesasPageComponent | ✅ abrirMesa(id) → facade.abrirMesa() |
+| RF3.1.1.2 | Liberar mesas | MesasPageComponent | ✅ liberarMesa(id) → facade.liberarMesa() |
+| RF3.1.3 | Agregar mesa | MesasPageComponent | ✅ crearMesa() con número, asientos, zona |
+| RF3.1.4 | Eliminar mesa | MesasPageComponent | ✅ eliminarMesa(id) → facade.eliminarMesa() |
+| RF3.2.1 | Menú digital | PedidosPageComponent | 🔶 PedidosMenuGridComponent sin lógica real |
+| RF3.2.1.1 | Añadir a carrito | PedidosPageComponent | 🔶 Componentes presentes sin binding completo |
+| RF3.2.2 | Gestionar carrito | PedidosPageComponent | 🔶 PedidosCartComponent incompleto |
+| RF3.2.2.1 | Mostrar valores | PedidosPageComponent | 🔶 Sin cálculo de totales |
+| RF3.2.4 | Seguimiento de pedido | PedidosPageComponent | 🔶 Estructura sin status updates |
+| RF3.5.1 | Generar factura | CajaPageComponent | 🔶 irANuevaFactura() — modales no integrados |
+| RF3.5.3 | Registrar pago simulado | CajaPageComponent | 🔶 irARegistrarPago() — sin lógica |
+| RF3.2.2.2 | Modificar productos carrito | — | ❌ No implementado |
+| RF3.2.2.3 | Eliminar productos carrito | — | ❌ No implementado |
+| RF3.2.3 | Observaciones por producto | — | ❌ No encontrado |
+| RF3.5.3.1 | Pago en efectivo | — | ❌ No implementado |
+| RF3.5.3.2 | Pago con tarjeta | — | ❌ No implementado |
+| RF3.5.3.3 | Pago por consignación | — | ❌ No implementado |
 
 ---
 
 ### `/app/inventario` — Inventario 🔒
 
-```mermaid
-flowchart TD
-    INV["/app/inventario"] -->|redirect| BIENES
-
-    INV --> BIENES["/bienes ✅"]
-    BIENES --> B_EXP["/bienes/exportar ✅"]
-    BIENES --> B_ID["/bienes/:id ✅"]
-
-    INV --> SOL["/solicitudes-gil ✅"]
-    SOL --> SOL_NEW["/solicitudes-gil/nueva ✅"]
-    SOL --> SOL_ID["/solicitudes-gil/:id ✅"]
-    SOL_ID --> SOL_EDIT["/editar ✅"]
-    SOL_ID --> SOL_EXP["/exportar ✅"]
-
-    INV --> FACT["/facturas ✅"]
-    FACT --> FACT_IMP["/facturas/importar ✅"]
-    FACT --> FACT_GIL["/facturas/gil/:id ✅"]
-    FACT --> FACT_ID["/facturas/:id ✅"]
-    FACT_ID --> FACT_EDIT["/editar ✅"]
-
-    INV --> CONS["/consolidado ✅"]
-    CONS --> CONS_NEW["/consolidado/nuevo ✅"]
-    CONS --> CONS_ID["/consolidado/:id ✅"]
-
-    INV --> CONC["/conciliacion ✅"]
-    CONC --> CONC_TF["/toma-fisica ✅"]
-    CONC --> CONC_HIST["/historial ✅"]
-    CONC --> CONC_ID["/conciliacion/:id ✅"]
-
-    INV --> MOV["/movimientos ✅"]
-    MOV --> MOV_ENT["/entrada ✅"]
-    MOV --> MOV_GIL["/entrada-gil ✅"]
-    MOV --> MOV_SAL["/salida ✅"]
-    MOV --> MOV_EXP["/exportar ✅"]
-    INV --> MOV_ID["/movimientos/:id ✅"]
-
-    INV --> ALERT["/alertas ✅"]
-    ALERT --> ALERT_HIST["/historial ✅"]
-    ALERT --> ALERT_CFG["/configuracion ✅"]
-    ALERT --> ALERT_ID["/alertas/:id ✅"]
-    ALERT_ID --> ALERT_RES["/resolver ✅"]
-
-    INV --> PRES["/presupuesto ✅"]
-    PRES --> PRES_REG["/registrar ✅"]
-    PRES --> PRES_TRA["/traslado ✅"]
-    PRES --> PRES_EXP["/exportar ✅"]
-    PRES --> PRES_GIL["/cargar-gil ✅"]
-
-    INV --> ACTAS["/actas ✅"]
-    ACTAS --> ACTAS_NEW["/nueva ✅"]
-    ACTAS --> ACTAS_ID["/actas/:id ✅"]
-    ACTAS_ID --> ACTAS_FIR["/cargar-firma ✅"]
-
-    INV --> PAQ["/paquete-probatorio ✅"]
-    PAQ --> PAQ_NEW["/nuevo ✅"]
-    PAQ --> PAQ_ID["/paquete-probatorio/:id ✅"]
-    PAQ_ID --> PAQ_ADJ["/adjuntar ✅"]
-    PAQ_ID --> PAQ_REQ["/requisicion ✅"]
-
-    INV --> REQ["/requisiciones ✅"]
-    REQ --> REQ_DASH["/requisiciones dashboard ✅"]
-    REQ_DASH --> REQ_DET["/detalle/:id ✅"]
-    REQ_DASH --> REQ_DES["/despacho/:id ✅"]
-    REQ --> REQ_NEW["/nueva ✅"]
-    REQ --> REQ_FIR["/firmar/:id ✅"]
-    REQ --> REQ_RES["/resumen/:id ✅"]
-```
+| RF | Descripción | Vista | Estado |
+|----|-------------|-------|--------|
+| RF-5.1 | Inventario central | BienesListPageComponent | ✅ facade.bienes + loadAll() |
+| RF-5.1.1 | Registro de bienes | BienesListPageComponent | ✅ BienFormComponent + onSaveBien() |
+| RF-5.1.2 | Consulta de catálogo | BienesListPageComponent | ✅ onSearch() → setFiltros() |
+| RF-5.1.3 | Modificación de bienes | BienesListPageComponent | ✅ onEditar() → actualizarBien() |
+| RF-5.1.4 | Eliminación masiva | BienesListPageComponent | ✅ confirmarEliminacion() → eliminarBien() |
+| RF-5.1.5 | Detalle de bien | BienesListPageComponent | ✅ onVerDetalle() navega a detalle |
+| RF-5.2 | Control de facturación | FacturasListPageComponent | ✅ facade.facturas + CRUD |
+| RF-5.2.1 | Registro de factura | FacturasListPageComponent | ✅ FacturaFormComponent + onSaveFactura() |
+| RF-5.2.3 | Buscador de facturas | FacturasListPageComponent | ✅ onSearch() con filtro dinámico |
+| RF-5.2.4 | Detalle de factura | FacturasListPageComponent | ✅ onVerFactura() navega a detalle |
+| RF-5.2.5 | Edición de factura | FacturasListPageComponent | ✅ onEditarFactura() |
+| RF-5.2.6 | Anulación de factura | FacturasListPageComponent | ✅ onAnularFactura() + modal confirmación |
+| RF-5.3 | Gestión GIL | SolicitudesListComponent | ✅ facade.solicitudes + loadAll() |
+| RF-5.3.6 | Historial GIL | SolicitudesListComponent | ✅ lista filtrable por estado/fecha |
+| RF-5.4 | Consolidado de Ejecución | ConsolidadoListComponent | ✅ facade.consolidados + reversarConsolidado() |
+| RF-5.4.2 | Generación de tabla | ConsolidadoListComponent | ✅ DataTableComponent con datos facade |
+| RF-5.5 | Entradas y Salidas | MovimientosListComponent | ✅ facade.movimientos + loadAll() |
+| RF-5.6 | Alertas de Stock | AlertasListComponent | ✅ facade.alertas + computed kpiCriticas |
+| RF-5.7 | Presupuesto General | PresupuestoDashboardComponent | ✅ facade.resumen + programas + afectaciones |
+| RF-5.7.2 | Visibilidad financiera | PresupuestoDashboardComponent | ✅ Saldos: Disponible, Comprometido, Pagado |
+| RF-5.7.3 | Afectación presupuestal | PresupuestoDashboardComponent | ✅ facade.afectaciones (pago, traslado, etc) |
+| RF-5.8 | Conciliación de Inventario | ConciliacionDashboardComponent | ✅ facade.conciliaciones + loadAll() |
+| RF-5.10 | Actas de Legalización | ActasListComponent | ✅ facade.actas + filtrado por estado/ficha |
+| RF-5.10.10 | Estados de acta | ActasListComponent | ✅ borrador → pendiente → firmada → archivada |
+| RF-5.11 | Paquete Probatorio | PaqueteListComponent | ✅ facade.paquetes + KPIs |
+| RF-5.11.1 | Estructura del paquete | PaqueteListComponent | ✅ expediente, responsable, documentos |
+| RF-5.2.2 | Asociación Factura-GIL | FacturasListPageComponent | 🔶 Estructura sin validaciones CUFE |
+| RF-5.3.1 | Registro de solicitud GIL | SolicitudesListComponent | 🔶 Sin todos los campos dinámicos |
+| RF-5.3.2 | Emisión GIL | SolicitudesListComponent | 🔶 Estados parciales — sin flujo completo |
+| RF-5.4.1 | Selección de fuente GIL | ConsolidadoListComponent | 🔶 Lista pero sin selección UI |
+| RF-5.5.1 | Registro de entrada | MovimientosListComponent | 🔶 Componente entrada existe — stub |
+| RF-5.5.3 | Registro de salida | MovimientosListComponent | 🔶 Componente salida existe — stub |
+| RF-5.6.1 | Configurar umbrales | AlertasListComponent | 🔶 irAConfig() navega — sin UI implementada |
+| RF-5.6.2 | Notificación en tiempo real | AlertasListComponent | 🔶 KPIs visibles — sin websocket |
+| RF-5.7.1 | Asignación inicial presupuesto | PresupuestoDashboardComponent | 🔶 Solo visualización — sin UI para editar |
+| RF-5.8.1 | Toma física | ConciliacionDashboardComponent | 🔶 Componente toma-fisica existe — stub |
+| RF-5.8.4 | Detección de brechas | ConciliacionDashboardComponent | 🔶 Datos mock — sin cálculos reales |
+| RF-5.9 | Requisiciones Diarias | RequisicionesDashboardComponent | 🔶 facade.requisiciones — ciclo incompleto |
+| RF-5.9.1 | Apertura de requisición | RequisicionesDashboardComponent | 🔶 Componente create existe — stub |
+| RF-5.10.1 | Apertura de acta | ActasListComponent | 🔶 Componente create existe — stub |
+| RF-5.10.7 | Firmantes de ley | ActasListComponent | 🔶 Modelo incluye instructor — sin flujo de firmas |
+| RF-5.11.3 | Candado de completitud | PaqueteListComponent | 🔶 Modelo incluye documentos — sin validación |
+| RF-5.11.7 | Integridad de datos | PaqueteListComponent | 🔶 Referencias vinculadas — sin trazabilidad visual |
 
 ---
 
-### Módulos stub
+### Módulos pendientes
 
-| Módulo | Ruta | Estado |
-|--------|------|--------|
-| Reportes | `/app/reportes` | 🔶 Solo landing — páginas internas pendientes |
-| Notificaciones | `/app/notificaciones` | 🔶 Solo landing — páginas internas pendientes |
+| Módulo | Ruta | RFs Esenciales | Estado |
+|--------|------|---------------|--------|
+| Reportes | `/app/reportes` | RF6.1–RF6.1.12 (13 RFs) | ❌ Solo landing — sin ningún RF implementado |
+| Notificaciones | `/app/notificaciones` | RF1.8.1–1.8.3 (3 RFs) | ❌ Solo landing — sin ningún RF implementado |
 
 ---
 
