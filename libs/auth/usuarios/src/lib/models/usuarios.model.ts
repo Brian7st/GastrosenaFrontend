@@ -1,3 +1,14 @@
+import { Usuario } from '@restaurant/shared/models';
+
+export interface UsuarioDetalle extends Usuario {
+  apellidos:        string;
+  documento:        string;
+  telefono:         string;
+  ultimoAcceso:     string | null;
+  cuentaBloqueada:  boolean;
+  intentosFallidos: number;
+}
+
 export interface CrearUsuarioRequest {
   documento:  string;
   nombre:     string;
@@ -36,4 +47,10 @@ export interface ImportarUsuariosResponse {
   exitosos: number;
   fallidos: number;
   errores:  string[];
+}
+
+export interface ExportarConfig {
+  formato:          'excel' | 'csv';
+  incluirInactivos: boolean;
+  rol:              string;
 }

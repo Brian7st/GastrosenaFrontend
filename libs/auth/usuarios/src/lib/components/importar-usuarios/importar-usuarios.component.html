@@ -1,0 +1,75 @@
+<div class="modal-backdrop" (click)="cerrar.emit()" (keydown.escape)="cerrar.emit()" role="dialog" aria-modal="true" tabindex="-1">
+  <div class="modal" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="modal__header">
+      <div class="modal__header-icon modal__header-icon--import">
+        <lucide-icon name="upload" [size]="20"></lucide-icon>
+      </div>
+      <div>
+        <h2 class="modal__title">Importar Usuarios</h2>
+        <p class="modal__subtitle">Cargá un archivo Excel con los datos del equipo</p>
+      </div>
+      <button class="modal__close" type="button" (click)="cerrar.emit()" aria-label="Cerrar">
+        <lucide-icon name="x" [size]="18"></lucide-icon>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal__body">
+
+      <!-- Drop zone -->
+      <label
+        class="modal__dropzone"
+        [class.modal__dropzone--active]="isDragging()"
+        [class.modal__dropzone--ready]="archivo() !== null"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave()"
+        (drop)="onDrop($event)"
+      >
+        @if (archivo()) {
+          <lucide-icon name="file-check" [size]="36" class="modal__dropzone-icon modal__dropzone-icon--ready"></lucide-icon>
+          <p class="modal__dropzone-text">{{ archivo()!.name }}</p>
+          <p class="modal__dropzone-hint">Archivo listo · clic para cambiar</p>
+        } @else {
+          <lucide-icon name="file-up" [size]="36" class="modal__dropzone-icon"></lucide-icon>
+          <p class="modal__dropzone-text">Arrastrá tu archivo aquí</p>
+          <p class="modal__dropzone-hint">o hacé clic para seleccionar (.xlsx, .xls, .csv)</p>
+        }
+        <input
+          type="file"
+          accept=".xlsx,.xls,.csv"
+          class="modal__dropzone-input"
+          (change)="onFileChange($event)"
+        />
+      </label>
+
+      <!-- Yellow note -->
+      <div class="modal__note">
+        <lucide-icon name="triangle-alert" [size]="16" class="modal__note-icon"></lucide-icon>
+        <div>
+          <p class="modal__note-title">Formato esperado de columnas:</p>
+          <p class="modal__note-cols">Documento &middot; Nombre &middot; Apellidos &middot; Email &middot; Teléfono &middot; Rol</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="modal__footer">
+      <button class="modal__btn modal__btn--ghost" type="button" (click)="cerrar.emit()">
+        Cancelar
+      </button>
+      <button
+        class="modal__btn modal__btn--primary"
+        type="button"
+        [disabled]="archivo() === null"
+        (click)="onImportar()"
+      >
+        <lucide-icon name="upload" [size]="16"></lucide-icon>
+        Iniciar Importación
+      </button>
+    </div>
+
+  </div>
+</div>
