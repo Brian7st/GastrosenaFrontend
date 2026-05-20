@@ -4,13 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { ComandaCardComponent } from '../../components/comanda-card/comanda-card.component';
 import { ComandaService, Comanda } from '../../data-access/comanda.service';
 import {
-  LucideIconComponent,
   PageHeaderComponent,
   SearchFilterComponent,
   SelectFilterComponent,
   CardComponent,
-  ButtonComponent,
-  StatusBadgeComponent,
   SectionTitleComponent
 } from '@restaurant/shared/ui';
 
@@ -21,13 +18,10 @@ import {
     CommonModule, 
     FormsModule,
     ComandaCardComponent,
-    LucideIconComponent,
     PageHeaderComponent,
     SearchFilterComponent,
     SelectFilterComponent,
     CardComponent,
-    ButtonComponent,
-    StatusBadgeComponent,
     SectionTitleComponent
   ],
   templateUrl: './comandas-page.component.html',
