@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import { KardexFacade } from '../../../data-access/kardex.facade';
 
 @Component({
   selector: 'restaurant-movimiento-detail',
@@ -14,18 +15,23 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
 })
 export class MovimientoDetailComponent implements OnInit {
   private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private route  = inject(ActivatedRoute);
+  private facade = inject(KardexFacade);
 
-  ngOnInit() {
+  // ── Estado reactivo desde facade ─────────────────────────────────────────
+  movimiento = this.facade.movimientoSeleccionado;
+  loading    = this.facade.loading;
+
+  ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    if (!id) {
+    if (id) {
+      this.facade.cargarMovimiento(id);
+    } else {
       this.router.navigate(['/app/inventario/movimientos']);
-      return;
     }
-    // TODO: llamar a kardexFacade.cargarMovimiento(id)
   }
 
-  goBack() {
+  goBack(): void {
     this.router.navigate(['/app/inventario/movimientos']);
   }
 }

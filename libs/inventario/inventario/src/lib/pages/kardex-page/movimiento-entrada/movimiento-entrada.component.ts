@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
+import { KardexFacade } from '../../../data-access/kardex.facade';
+import { EntradaMovimientoData } from '../../../models/movimiento.model';
 
 @Component({
   selector: 'restaurant-movimiento-entrada',
@@ -13,28 +15,29 @@ import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MovimientoEntradaComponent {
-  private fb = inject(FormBuilder);
+  private fb     = inject(FormBuilder);
   private router = inject(Router);
+  private facade = inject(KardexFacade);
 
   entradaForm: FormGroup = this.fb.group({
-    producto: ['', Validators.required],
-    cantidad: [null, [Validators.required, Validators.min(1)]],
-    fecha: ['', Validators.required],
-    proveedor: ['', Validators.required],
-    factura: [''],
-    ubicacion: ['', Validators.required],
+    producto:      ['', Validators.required],
+    cantidad:      [null, [Validators.required, Validators.min(1)]],
+    fecha:         ['', Validators.required],
+    proveedor:     ['', Validators.required],
+    factura:       [''],
+    ubicacion:     ['', Validators.required],
     valorUnitario: [null, [Validators.required, Validators.min(0)]],
-    observaciones: ['']
+    observaciones: [''],
   });
 
   onSubmit(): void {
     if (this.entradaForm.valid) {
-      // TODO: llamar a kardexFacade.registrarEntrada(this.entradaForm.getRawValue())
+      this.facade.registrarEntrada(this.entradaForm.getRawValue() as EntradaMovimientoData);
       this.closeModal();
     }
   }
 
-  closeModal() {
+  closeModal(): void {
     this.router.navigate(['/app/inventario/movimientos']);
   }
 }

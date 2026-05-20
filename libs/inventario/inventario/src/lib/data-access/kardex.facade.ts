@@ -1,5 +1,5 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
-import { Movimiento } from '../models/movimiento.model';
+import { Movimiento, EntradaMovimientoData, SalidaMovimientoData } from '../models/movimiento.model';
 import { MovimientosService } from './services/movimientos.service';
 import { finalize, catchError, of } from 'rxjs';
 
@@ -37,7 +37,7 @@ export class KardexFacade {
       .subscribe(data => this._movimientoSeleccionado.set(data));
   }
 
-  registrarEntrada(data: any): void {
+  registrarEntrada(data: EntradaMovimientoData): void {
     this._loading.set(true);
     this.movimientosService.registrarEntrada(data)
       .pipe(
@@ -49,7 +49,7 @@ export class KardexFacade {
       });
   }
 
-  registrarSalida(data: any): void {
+  registrarSalida(data: SalidaMovimientoData): void {
     this._loading.set(true);
     this.movimientosService.registrarSalida(data)
       .pipe(

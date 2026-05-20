@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
-import { Movimiento } from '../../models/movimiento.model';
+import { Movimiento, EntradaMovimientoData, SalidaMovimientoData } from '../../models/movimiento.model';
 import { MOVIMIENTOS_MOCK } from '../../models/movimiento.mock';
 
 @Injectable({
@@ -17,11 +17,11 @@ export class MovimientosService {
     return of(mov).pipe(delay(300));
   }
 
-  registrarEntrada(data: any): Observable<any> {
+  registrarEntrada(data: EntradaMovimientoData): Observable<{ success: boolean; data: EntradaMovimientoData }> {
     return of({ success: true, data }).pipe(delay(500));
   }
 
-  registrarSalida(data: any): Observable<any> {
+  registrarSalida(data: SalidaMovimientoData): Observable<{ success: boolean; data: SalidaMovimientoData }> {
     return of({ success: true, data }).pipe(delay(500));
   }
 }
