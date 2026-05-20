@@ -31,7 +31,7 @@ import {
     ButtonComponent,
   ],
   templateUrl: './actas-list.component.html',
-  styleUrls: ['./actas-list.component.scss'],
+  styleUrl: './actas-list.component.scss',
 })
 export class ActasListComponent {
   private router = inject(Router);
