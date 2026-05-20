@@ -4,11 +4,11 @@ import { Router } from '@angular/router';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 
 @Component({
-  selector: 'inventario-presupuesto-cargar-gil',
+  selector: 'restaurant-presupuesto-cargar-gil',
   standalone: true,
   imports: [CommonModule, LucideIconComponent, ButtonComponent],
   templateUrl: './presupuesto-cargar-gil.component.html',
-  styleUrls: ['./presupuesto-cargar-gil.component.scss'],
+  styleUrl: './presupuesto-cargar-gil.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PresupuestoCargarGilComponent {

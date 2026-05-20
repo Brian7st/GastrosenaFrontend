@@ -2,7 +2,8 @@
   <!-- ═══════════════════════════════════════════════════════════════════════
        HEADER
        ═══════════════════════════════════════════════════════════════════════ -->
-  <div class="page-header-row">
+  @if (resumen()) {
+    <div class="page-header-row">
     <div>
       <h1 class="page-title">Presupuesto General de Gastos</h1>
       <p class="page-subtitle">
@@ -42,9 +43,10 @@
     <restaurant-kpi-card label="DISPONIBLE" [value]="formatCompact(resumen().totalDisponible)" icon="wallet"
       iconColor="blue" trend="Saldo sin comprometer" [trendUp]="null"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="TOTAL ZESE APLICADA" [value]="formatCompact(resumen().totalZese)" icon="percent"
+    <restaurant-kpi-card label="TOTAL ZESE APLICADA" [value]="formatCompact(resumen()!.totalZese)" icon="percent"
       iconColor="red" trend="Retención 0.625%" [trendUp]="null"></restaurant-kpi-card>
   </div>
+  }
 
   <!-- ═══════════════════════════════════════════════════════════════════════
        TABLA DE ESTRUCTURA PRESUPUESTAL (colapsable por programa)

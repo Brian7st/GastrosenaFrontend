@@ -4,11 +4,11 @@ import { Router } from '@angular/router';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 
 @Component({
-  selector: 'inventario-presupuesto-exportar',
+  selector: 'restaurant-presupuesto-exportar',
   standalone: true,
   imports: [CommonModule, LucideIconComponent, ButtonComponent],
   templateUrl: './presupuesto-exportar.component.html',
-  styleUrls: ['./presupuesto-exportar.component.scss'],
+  styleUrl: './presupuesto-exportar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PresupuestoExportarComponent {

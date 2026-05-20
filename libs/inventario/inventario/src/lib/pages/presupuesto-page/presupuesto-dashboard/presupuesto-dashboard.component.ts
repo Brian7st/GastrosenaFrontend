@@ -14,15 +14,12 @@ import {
   AfectacionPresupuestal,
   VencimientoProximo,
   EjecucionMensual,
-  MOCK_RESUMEN,
-  MOCK_PROGRAMAS,
-  MOCK_AFECTACIONES,
-  MOCK_VENCIMIENTOS,
-  MOCK_EJECUCION_MENSUAL,
 } from '../../../models/presupuesto.model';
+import { PresupuestoFacade } from '../../../data-access/presupuesto.facade';
+import { OnInit, inject } from '@angular/core';
 
 @Component({
-  selector: 'inventario-presupuesto-dashboard',
+  selector: 'restaurant-presupuesto-dashboard',
   standalone: true,
   imports: [
     CommonModule,
@@ -35,15 +32,17 @@ import {
     StatusBadgeComponent,
   ],
   templateUrl: './presupuesto-dashboard.component.html',
-  styleUrls: ['./presupuesto-dashboard.component.scss'],
+  styleUrl: './presupuesto-dashboard.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PresupuestoDashboardComponent {
+export class PresupuestoDashboardComponent implements OnInit {
+  public facade = inject(PresupuestoFacade);
+
   /** Datos de resumen presupuestal */
-  resumen = signal<PresupuestoResumen>(MOCK_RESUMEN);
+  resumen = this.facade.resumen;
 
   /** Programas con sus rubros (tabla colapsable) */
-  programas = signal<Programa[]>(MOCK_PROGRAMAS);
+  programas = this.facade.programas;
 
   /** Estado de expansión por programa id */
   expandidos = signal<Record<string, boolean>>({
@@ -53,13 +52,17 @@ export class PresupuestoDashboardComponent {
   });
 
   /** Historial de afectaciones */
-  afectaciones = signal<AfectacionPresupuestal[]>(MOCK_AFECTACIONES);
+  afectaciones = this.facade.afectaciones;
 
   /** Próximos vencimientos */
-  vencimientos = signal<VencimientoProximo[]>(MOCK_VENCIMIENTOS);
+  vencimientos = this.facade.vencimientos;
 
   /** Ejecución mensual para gráfico de barras */
-  ejecucionMensual = signal<EjecucionMensual[]>(MOCK_EJECUCION_MENSUAL);
+  ejecucionMensual = this.facade.ejecucionMensual;
+
+  ngOnInit(): void {
+    this.facade.loadAll();
+  }
 
   /** Toggle de grupo colapsable */
   togglePrograma(programaId: string): void {
