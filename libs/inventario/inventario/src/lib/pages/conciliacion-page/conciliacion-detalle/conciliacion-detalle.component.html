@@ -3,6 +3,7 @@
   <!-- ═══════════════════════════════════════════════════════════════════════
        HEADER
        ═══════════════════════════════════════════════════════════════════════ -->
+  @if (detalle()) {
   <div class="header-section">
     <div class="header-top">
       <div class="title-group">
@@ -20,65 +21,62 @@
     <div class="info-badges-row">
       <div class="info-badge">
         <lucide-icon name="hash" [size]="14"></lucide-icon>
-        <span>ID #{{ detalle.id }}</span>
+        <span>ID #{{ detalle()!.id }}</span>
       </div>
       <div class="info-badge">
         <lucide-icon name="calendar" [size]="14"></lucide-icon>
-        <span>{{ detalle.fecha }}</span>
+        <span>{{ detalle()!.fecha }}</span>
       </div>
       <div class="info-badge">
         <lucide-icon name="user" [size]="14"></lucide-icon>
-        <span>{{ detalle.responsable }} (Resp.)</span>
+        <span>{{ detalle()!.responsable }} (Resp.)</span>
       </div>
       <div class="info-badge">
         <lucide-icon name="box" [size]="14"></lucide-icon>
-        <span>{{ detalle.almacen }}</span>
+        <span>{{ detalle()!.almacen }}</span>
       </div>
     </div>
 
     <div class="status-badge">
-      <span>{{ detalle.estado }}</span>
+      <span>{{ detalle()!.estado }}</span>
     </div>
   </div>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
        KPI ROW (5 CARDS)
        ═══════════════════════════════════════════════════════════════════════ -->
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       KPI ROW (5 CARDS)
-       ═══════════════════════════════════════════════════════════════════════ -->
   <div class="kpi-grid">
     <restaurant-kpi-card
       label="Total ítems"
-      [value]="detalle.totalItems"
+      [value]="detalle()!.totalItems"
       iconName="list"
       iconVariant="neutral">
     </restaurant-kpi-card>
 
     <restaurant-kpi-card
       label="Ítems correctos"
-      [value]="detalle.itemsCorrectos"
+      [value]="detalle()!.itemsCorrectos"
       iconName="check-circle-2"
       iconVariant="success">
     </restaurant-kpi-card>
 
     <restaurant-kpi-card
       label="Diferencias"
-      [value]="detalle.diferencias"
+      [value]="detalle()!.diferencias"
       iconName="alert-triangle"
       iconVariant="alert">
     </restaurant-kpi-card>
 
     <restaurant-kpi-card
       label="Precisión"
-      [value]="detalle.precision + '%'"
+      [value]="detalle()!.precision + '%'"
       iconName="check-circle"
       iconVariant="info">
     </restaurant-kpi-card>
 
     <restaurant-kpi-card
       label="Valoración monetaria"
-      [value]="'-$' + (detalle.valoracionMonetaria * -1)"
+      [value]="'-$' + (detalle()!.valoracionMonetaria * -1)"
       iconName="trending-down"
       iconVariant="alert">
     </restaurant-kpi-card>
@@ -112,11 +110,10 @@
           </tr>
         </thead>
         <tbody>
-          @for (item of diferenciasList; track item.codigo) {
+          @for (item of diferenciasList(); track item.codigo) {
             <tr>
               <td>
                 <div class="bien-info">
-                  <!-- Using an icon to represent the image placeholder in prototype -->
                   <div class="bien-icon">
                     <lucide-icon name="package" [size]="20"></lucide-icon>
                   </div>
@@ -127,15 +124,15 @@
                 </div>
               </td>
               <td class="text-secondary">{{ item.categoria }}</td>
-              <td class="text-right text-secondary">{{ item.stockSis }}</td>
-              <td class="text-right font-bold">{{ item.fisico }}</td>
+              <td class="text-right text-secondary">{{ item.stockSistema }} {{ item.unidad }}</td>
+              <td class="text-right font-bold">{{ item.stockFisico }} {{ item.unidad }}</td>
               <td class="text-center">
-                <span class="dif-badge" [ngClass]="item.isPositive ? 'dif-badge--pos' : 'dif-badge--neg'">
-                  {{ item.dif }}
+                <span class="dif-badge" [ngClass]="item.diferencia >= 0 ? 'dif-badge--pos' : 'dif-badge--neg'">
+                  {{ item.diferencia > 0 ? '+' : '' }}{{ item.diferencia }} {{ item.unidad }}
                 </span>
               </td>
               <td class="text-right text-secondary">${{ item.valorUnit | number }}</td>
-              <td class="text-right font-bold" [ngClass]="item.isPositive ? 'text-success' : 'text-danger'">
+              <td class="text-right font-bold" [ngClass]="item.impacto >= 0 ? 'text-success' : 'text-danger'">
                 {{ item.impacto > 0 ? '+' : '' }}${{ (item.impacto < 0 ? (item.impacto * -1) : item.impacto) | number }}
               </td>
             </tr>
@@ -147,18 +144,22 @@
       <div class="table-aggregates">
         <div class="aggregate-group">
           <span class="aggregate-label">Σ PÉRDIDAS</span>
-          <span class="aggregate-value text-danger">-${{ (detalle.perdidas * -1) | number }}</span>
+          <span class="aggregate-value text-danger">-${{ (detalle()!.perdidas * -1) | number }}</span>
         </div>
         <div class="aggregate-group">
           <span class="aggregate-label">Σ SOBRANTES</span>
-          <span class="aggregate-value text-success">+${{ detalle.sobrantes | number }}</span>
+          <span class="aggregate-value text-success">+${{ detalle()!.sobrantes | number }}</span>
         </div>
         <div class="aggregate-neto">
           <span class="aggregate-label">NETO</span>
-          <span class="aggregate-value text-danger">-${{ (detalle.valoracionMonetaria * -1) | number }}</span>
+          <span class="aggregate-value text-danger">-${{ (detalle()!.valoracionMonetaria * -1) | number }}</span>
         </div>
       </div>
     </div>
   </div>
+
+  } @else {
+    <div class="loading-state">Cargando detalle...</div>
+  }
 
 </div>

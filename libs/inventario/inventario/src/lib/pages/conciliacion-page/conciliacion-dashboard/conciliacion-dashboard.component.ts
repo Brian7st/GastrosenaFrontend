@@ -1,9 +1,8 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { LucideIconComponent } from '@restaurant/shared/ui';
-import { ButtonComponent } from '@restaurant/shared/ui';
-import { KpiCardComponent } from '@restaurant/shared/ui';
+import { LucideIconComponent, ButtonComponent, KpiCardComponent } from '@restaurant/shared/ui';
+import { ConciliacionFacade } from '../../../data-access/conciliacion.facade';
 
 @Component({
   selector: 'restaurant-conciliacion-dashboard',
@@ -19,18 +18,25 @@ import { KpiCardComponent } from '@restaurant/shared/ui';
   styleUrl: './conciliacion-dashboard.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ConciliacionDashboardComponent {
-  // Mock data based on the prototype
-  tendencias = [
+export class ConciliacionDashboardComponent implements OnInit {
+  protected facade = inject(ConciliacionFacade);
+
+  // Signals expuestos desde la facade (solo lectura)
+  conciliaciones = this.facade.conciliaciones;
+  loading = this.facade.loading;
+  error = this.facade.error;
+
+  // ─── Datos de UI locales como signals ───
+  tendencias = signal([
     { mes: 'Ene', valor: 60, isCurrent: false },
     { mes: 'Feb', valor: 50, isCurrent: false },
     { mes: 'Mar', valor: 55, isCurrent: false },
     { mes: 'Abr', valor: 40, isCurrent: false },
     { mes: 'May', valor: 30, isCurrent: false },
     { mes: 'Jun', valor: 25, isCurrent: true },
-  ];
+  ]);
 
-  actividades = [
+  actividades = signal([
     {
       id: 1,
       ubicacion: 'Cocina Principal',
@@ -59,12 +65,12 @@ export class ConciliacionDashboardComponent {
       tiempo: 'Ayer, 16:30',
       estado: 'alert',
     },
-  ];
+  ]);
 
-  categorias = [
+  categorias = signal([
     {
       nombre: 'Abarrotes',
-      icono: 'box', // valid lucide icon
+      icono: 'box',
       estado: 'Última toma: Hace 2 días',
       tipo: 'normal',
     },
@@ -86,5 +92,9 @@ export class ConciliacionDashboardComponent {
       estado: 'Última toma: Ayer',
       tipo: 'normal',
     },
-  ];
+  ]);
+
+  ngOnInit(): void {
+    this.facade.loadAll();
+  }
 }
