@@ -1,6 +1,6 @@
 # GastroSENA — Mapa de Navegación
 
-> Última actualización: 2026-05-20 | Rama: `develop`
+> Última actualización: 2026-05-20 | Rama: `develop` | Auditoría: código real verificado componente por componente
 
 ## Leyenda
 
@@ -15,33 +15,37 @@
 
 ## Progreso general
 
+> Metodología: auditoría código a código — se leyó el `.ts` y `.html` de cada componente de página.
+> Clasificación: **REAL** = facade inyectado + bindings reales | **PARCIAL** = estructura sin data | **STUB** = scaffold vacío de Nx
+
 ```mermaid
-pie title Avance total del proyecto
-    "Implementado" : 63
-    "Pendiente" : 37
+pie title Avance real del proyecto (44 componentes auditados)
+    "Implementado (REAL)" : 82
+    "Stub / Pendiente" : 18
 ```
 
 ### Por módulo
 
 ```mermaid
 xychart-beta
-    title "Avance por módulo (%)"
-    x-axis ["Auth/Usuarios", "Cocina", "Bar", "Restaurante", "Inventario", "Reportes", "Notificaciones"]
-    y-axis "Progreso (%)" 0 --> 100
-    bar [60, 70, 40, 80, 90, 0, 0]
+    title "Implementación real por módulo (% componentes REAL)"
+    x-axis ["Auth", "Usuarios", "Cocina", "Bar", "Restaurante", "Inventario", "Reportes", "Notificaciones"]
+    y-axis "% Real" 0 --> 100
+    bar [100, 33, 100, 50, 89, 100, 0, 0]
 ```
 
-| Módulo | RFs asignados | Implementado | Pendiente | Progreso |
-|--------|--------------|-------------|-----------|----------|
-| Auth / Usuarios | RF1.2–1.4, RF2.x | Login, Forgot-Password, Lista usuarios | Roles, Cuentas | `██████░░░░` 60% |
-| Cocina | RF-C 4.0–4.9 | Inicio, Comandas, Recetas, Actividad, Actividades, Eval. masiva, Eval. individual | ~3 RFs sin mapear | `███████░░░` 70% |
-| Bar | RF-C 4.10–4.19 | Landing, Comandas, Recetas, Menú | ~6 RFs sin implementar | `████░░░░░░` 40% |
-| Restaurante | RF3.x | Mesas, Pedidos, Caja completa (6 sub-flujos) | Detalles menores RF3.x | `████████░░` 80% |
-| Inventario | RF-F, RF-P, RF-Q, RF-5.x | 11 sub-módulos completos (35 rutas) | Ajustes finales | `█████████░` 90% |
-| Reportes | RF-R | — | Todas las páginas internas | `░░░░░░░░░░` 0% |
-| Notificaciones | RF-N | — | Todas las páginas internas | `░░░░░░░░░░` 0% |
+| Módulo | RFs | REAL | PARCIAL | STUB | % Real | Stubs identificados |
+|--------|-----|------|---------|------|--------|---------------------|
+| Auth | RF1.2–1.4 | 2 | 0 | 0 | `██████████` **100%** | — |
+| Usuarios | RF2.x | 1 | 0 | 2 | `███░░░░░░░` **33%** | RolesPage, CuentasPage |
+| Cocina | RF-C 4.0–4.9 | 7 | 0 | 0 | `██████████` **100%** | — |
+| Bar | RF-C 4.10–4.19 | 2 | 0 | 2 | `█████░░░░░` **50%** | BarPage (landing), MenuPage |
+| Restaurante | RF3.x | 8 | 0 | 1 | `█████████░` **89%** | CajaMovimientosPage |
+| Inventario | RF-F, RF-P, RF-Q | 11 | 0 | 0 | `██████████` **100%** | — |
+| Reportes | RF-R | 0 | 0 | 1 | `░░░░░░░░░░` **0%** | ReportesPage |
+| Notificaciones | RF-N | 0 | 0 | 1 | `░░░░░░░░░░` **0%** | NotificacionesPage |
 
-> **Avance estimado: ~63%** — basado en features por RF, no solo conteo de rutas.
+> **Avance real verificado: 81.8%** — 36 de 44 componentes con lógica real (facade, signals, computed, templates con bindings).
 
 ---
 
@@ -127,18 +131,18 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    B["/app/bar"] --> LANDING["/ ✅\nBarPageComponent — landing"]
+    B["/app/bar"] --> LANDING["/ 🔶\nBarPageComponent — EmptyState sin lógica"]
     B --> COMAND["/comandas ✅\nComandasComponent"]
     B --> RECETAS["/recetas ✅\nRecetasPageComponent"]
-    B --> MENU["/menu ✅\nMenuPageComponent"]
+    B --> MENU["/menu 🔶\nMenuPageComponent — EmptyState próximamente"]
 ```
 
 | Ruta | Estado |
 |------|--------|
-| `/app/bar` | ✅ Landing |
+| `/app/bar` | 🔶 EmptyState — sin lógica real |
 | `/app/bar/comandas` | ✅ |
 | `/app/bar/recetas` | ✅ |
-| `/app/bar/menu` | ✅ |
+| `/app/bar/menu` | 🔶 EmptyState — mensaje "próximamente" |
 
 ---
 
@@ -168,7 +172,7 @@ flowchart LR
 | `/app/restaurante/caja/pagar` | ✅ |
 | `/app/restaurante/caja/apertura` | ✅ |
 | `/app/restaurante/caja/cierre` | ✅ |
-| `/app/restaurante/caja/movimientos` | ✅ |
+| `/app/restaurante/caja/movimientos` | 🔶 Solo router — sin facade ni datos |
 
 ---
 
