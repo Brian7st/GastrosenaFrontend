@@ -24,8 +24,9 @@ import { TOMA_FISICA_ITEMS_MOCK } from '../../../models/conciliacion.mock';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConciliacionTomaFisicaComponent {
-  fecha = '24 Oct 2023';
-  responsable = 'Chef Instructor';
+  // TODO: obtener desde conciliacionFacade o desde el usuario autenticado
+  fecha = signal('24 Oct 2023');
+  responsable = signal('Chef Instructor');
 
   items = signal<TomaFisicaItem[]>([...TOMA_FISICA_ITEMS_MOCK]);
 
@@ -83,9 +84,9 @@ export class ConciliacionTomaFisicaComponent {
   // UI Formatters
   formatCurrency(value: number | null): string {
     if (value === null) return '-';
-    const isNegative = value < 0;
-    const absValue = Math.abs(value);
-    const formatted = new Intl.NumberFormat('es-CO').format(absValue);
-    return isNegative ? `-$${formatted}` : `+$${formatted}`.replace('+$-', '-$').replace('+$0', '$0');
+    if (value === 0) return '$0';
+    const signo = value < 0 ? '-' : '+';
+    const formatted = new Intl.NumberFormat('es-CO').format(Math.abs(value));
+    return `${signo}$${formatted}`;
   }
 }

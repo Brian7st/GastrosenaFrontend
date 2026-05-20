@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { LucideIconComponent, ButtonComponent, KpiCardComponent } from '@restaurant/shared/ui';
@@ -26,17 +26,17 @@ export class ConciliacionDashboardComponent implements OnInit {
   loading = this.facade.loading;
   error = this.facade.error;
 
-  // ─── Datos de UI locales (no pertenecen a la capa de datos) ───
-  tendencias = [
+  // ─── Datos de UI locales como signals ───
+  tendencias = signal([
     { mes: 'Ene', valor: 60, isCurrent: false },
     { mes: 'Feb', valor: 50, isCurrent: false },
     { mes: 'Mar', valor: 55, isCurrent: false },
     { mes: 'Abr', valor: 40, isCurrent: false },
     { mes: 'May', valor: 30, isCurrent: false },
     { mes: 'Jun', valor: 25, isCurrent: true },
-  ];
+  ]);
 
-  actividades = [
+  actividades = signal([
     {
       id: 1,
       ubicacion: 'Cocina Principal',
@@ -65,9 +65,9 @@ export class ConciliacionDashboardComponent implements OnInit {
       tiempo: 'Ayer, 16:30',
       estado: 'alert',
     },
-  ];
+  ]);
 
-  categorias = [
+  categorias = signal([
     {
       nombre: 'Abarrotes',
       icono: 'box',
@@ -92,7 +92,7 @@ export class ConciliacionDashboardComponent implements OnInit {
       estado: 'Última toma: Ayer',
       tipo: 'normal',
     },
-  ];
+  ]);
 
   ngOnInit(): void {
     this.facade.loadAll();

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { LucideIconComponent, ButtonComponent, DataTableComponent, KpiCardComponent } from '@restaurant/shared/ui';
@@ -31,11 +31,11 @@ export class ConciliacionHistorialComponent implements OnInit {
   error = this.facade.error;
 
   // Datos de UI locales sin gestión de servidor
-  topDiferencias = [
+  topDiferencias = signal([
     { producto: 'Aceite Vegetal', dif: '-15 L', icon: 'droplet' },
     { producto: 'Azúcar Refinada', dif: '-8 Kg', icon: 'package' },
     { producto: 'Carne de Res', dif: '-5 Kg', icon: 'beef' },
-  ];
+  ]);
 
   ngOnInit(): void {
     this.facade.loadAll();
