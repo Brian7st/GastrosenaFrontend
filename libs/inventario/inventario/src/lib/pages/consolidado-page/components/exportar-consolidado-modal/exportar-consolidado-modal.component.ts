@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -13,13 +13,13 @@ export class ExportarConsolidadoModalComponent {
   @Output() close = new EventEmitter<void>();
   @Output() export = new EventEmitter<'excel' | 'pdf'>();
 
-  selectedFormat: 'excel' | 'pdf' = 'excel';
+  selectedFormat = signal<'excel' | 'pdf'>('excel');
 
   onClose(): void {
     this.close.emit();
   }
 
   onExport(): void {
-    this.export.emit(this.selectedFormat);
+    this.export.emit(this.selectedFormat());
   }
 }

@@ -33,7 +33,9 @@
   flex-shrink: 0;
   margin-top: 0.125rem;
 
-  &:hover { background: #e1e3e4; }
+  &:hover {
+    background: #e1e3e4;
+  }
 }
 
 .page-title {
@@ -129,7 +131,9 @@
   font-weight: 600;
   color: var(--color-text-primary, #1e293b);
 
-  &--primary { color: var(--color-pizarra-800, #1e293b); }
+  &--primary {
+    color: var(--color-pizarra-800, #1e293b);
+  }
 }
 
 // ─── Sección observaciones ────────────────────
@@ -140,7 +144,9 @@
   gap: 8px;
   margin-bottom: 10px;
 
-  .obs-icon { font-size: 1rem; }
+  .obs-icon {
+    font-size: 1rem;
+  }
 
   .obs-title {
     font-size: var(--text-sm, 0.9rem);
@@ -171,7 +177,9 @@
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
 
-  &::placeholder { color: var(--color-text-muted, #94a3b8); }
+  &::placeholder {
+    color: var(--color-text-muted, #94a3b8);
+  }
 
   &:focus {
     border-color: var(--color-primario);
@@ -203,8 +211,15 @@
 }
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .evaluar-option {
@@ -221,18 +236,29 @@
   transition: background 0.12s;
   text-align: left;
 
-  .option-icon { font-size: 0.95rem; font-weight: 700; }
+  .option-icon {
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
 
-  &:hover { background: var(--color-surface, #f8fafc); }
+  &:hover {
+    background: var(--color-surface, #f8fafc);
+  }
 
   &--aprobo {
     color: var(--color-success, #16a34a);
-    .option-icon { color: var(--color-success, #16a34a); }
+
+    .option-icon {
+      color: var(--color-success, #16a34a);
+    }
   }
 
   &--no-aprobo {
     color: var(--color-danger, #dc2626);
-    .option-icon { color: var(--color-danger, #dc2626); }
+
+    .option-icon {
+      color: var(--color-danger, #dc2626);
+    }
   }
 }
 
@@ -261,5 +287,7 @@
   transition: transform 0.2s;
   transform: rotate(180deg);
 
-  &.caret-up { transform: rotate(0deg); }
+  &.caret-up {
+    transform: rotate(0deg);
+  }
 }

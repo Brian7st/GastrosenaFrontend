@@ -2,9 +2,16 @@
 
   <!-- ===== CABECERA ===== -->
   <div class="page-header">
-    <button id="btn-volver-individual" class="back-btn" type="button" (click)="volver(); $event.stopPropagation()" aria-label="Volver">
+    <button
+      id="btn-volver-individual"
+      class="back-btn"
+      type="button"
+      (click)="volver(); $event.stopPropagation()"
+      aria-label="Volver"
+    >
       <lucide-icon name="arrow-left" [size]="20"></lucide-icon>
     </button>
+
     <h1 class="page-title">Evaluación Individual</h1>
   </div>
 
@@ -14,6 +21,7 @@
     <!-- Perfil -->
     <div class="aprendiz-perfil">
       <div class="avatar-lg">{{ aprendiz().inicial }}</div>
+
       <div class="aprendiz-info">
         <p class="aprendiz-nombre">{{ aprendiz().nombreCompleto }}</p>
         <p class="aprendiz-doc">{{ aprendiz().documento }}</p>
@@ -22,32 +30,44 @@
 
     <hr class="divider" />
 
-    <!-- Metadatos: 3 columnas -->
+    <!-- Metadatos -->
     <div class="meta-grid">
+
       <div class="meta-item">
         <span class="meta-label">Jornada</span>
-        <span class="meta-value meta-value--primary">{{ aprendiz().jornada }}</span>
+        <span class="meta-value meta-value--primary">
+          {{ aprendiz().jornada }}
+        </span>
       </div>
+
       <div class="meta-item">
         <span class="meta-label">Número de Ficha</span>
-        <span class="meta-value">{{ aprendiz().numeroFicha }}</span>
+        <span class="meta-value">
+          {{ aprendiz().numeroFicha }}
+        </span>
       </div>
+
       <div class="meta-item">
         <span class="meta-label">Actividad</span>
-        <span class="meta-value">{{ aprendiz().actividad ?? '—' }}</span>
+        <span class="meta-value">
+          {{ aprendiz().actividad ?? '—' }}
+        </span>
       </div>
+
     </div>
 
     <hr class="divider" />
 
     <!-- Observaciones -->
     <div class="obs-section">
+
       <div class="obs-header">
         <span class="obs-icon">📋</span>
         <span class="obs-title">Observaciones</span>
       </div>
 
       <div class="obs-body">
+
         <textarea
           id="textarea-observaciones"
           class="obs-textarea"
@@ -57,11 +77,20 @@
           (click)="$event.stopPropagation()"
         ></textarea>
 
-        <!-- Botón EVALUAR (desplegable hacia arriba) -->
-        <div class="evaluar-dropdown-wrapper" (click)="$event.stopPropagation()">
+        <!-- Botón EVALUAR -->
+        <div
+          class="evaluar-dropdown-wrapper"
+          (click)="$event.stopPropagation()"
+        >
 
           @if (menuEvaluarAbierto()) {
-            <div class="evaluar-menu" role="menu" aria-label="Opciones de evaluación">
+
+            <div
+              class="evaluar-menu"
+              role="menu"
+              aria-label="Opciones de evaluación"
+            >
+
               <button
                 id="btn-aprobo-individual"
                 class="evaluar-option evaluar-option--aprobo"
@@ -69,8 +98,10 @@
                 role="menuitem"
                 (click)="submitEvaluacionIndividual('aprobo')"
               >
-                <span class="option-icon">✓</span> Aprobó
+                <span class="option-icon">✓</span>
+                Aprobó
               </button>
+
               <button
                 id="btn-no-aprobo-individual"
                 class="evaluar-option evaluar-option--no-aprobo"
@@ -78,8 +109,10 @@
                 role="menuitem"
                 (click)="submitEvaluacionIndividual('no_aprobo')"
               >
-                <span class="option-icon">✗</span> No Aprobó
+                <span class="option-icon">✗</span>
+                No Aprobó
               </button>
+
             </div>
           }
 
@@ -92,13 +125,18 @@
             aria-haspopup="menu"
           >
             EVALUAR
-            <span class="evaluar-caret" [class.caret-up]="menuEvaluarAbierto()">▲</span>
+            <span
+              class="evaluar-caret"
+              [class.caret-up]="menuEvaluarAbierto()"
+            >
+              ▲
+            </span>
           </button>
 
         </div>
       </div>
     </div>
 
-  </div><!-- /aprendiz-card -->
+  </div>
 
 </div>

@@ -1,43 +1,38 @@
-import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
+import { ButtonComponent } from '@restaurant/shared/ui';
+import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import { BienSolicitud, BIENES_SOLICITUD_MOCK } from '../../../models/solicitudes-gil.mock';
 
 @Component({
-  selector: 'app-solicitudes-form',
+  selector: 'restaurant-solicitudes-form',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ButtonComponent, BackButtonComponent],
   templateUrl: './solicitudes-form.component.html',
-  styleUrls: ['./solicitudes-form.component.scss'],
+  styleUrl: './solicitudes-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SolicitudesFormComponent {
-  // Datos mock del formulario para renderizado (según prototipo)
+export class SolicitudesFormComponent implements OnInit {
+  private router = inject(Router);
+
   fechaSolicitud = signal('2024-05-20');
   
-  bienes = signal([
-    {
-      codigo: 'ALM-001',
-      descripcion: 'Harina de Trigo x 50kg',
-      um: 'Bto',
-      cantidad: 2,
-      valorUnitario: 150000,
-      subtotal: 300000
-    }
-  ]);
+  bienes = signal<BienSolicitud[]>([...BIENES_SOLICITUD_MOCK]);
 
-  constructor(private router: Router) {}
+  ngOnInit(): void { /* no route params needed here */ }
 
   onCancel(): void {
     this.router.navigate(['/app/inventario/solicitudes-gil']);
   }
 
   onSave(): void {
-    console.log('Guardando solicitud...');
+    // TODO: llamar a solicitudesFacade.crearSolicitud(dto) cuando exista la facade
     this.router.navigate(['/app/inventario/solicitudes-gil']);
   }
 
   onAddCuentadante(): void {
-    console.log('Agregar cuentadante');
+    // TODO: abrir selector de cuentadante
   }
 
   onAddBien(): void {

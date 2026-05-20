@@ -25,7 +25,7 @@ export class ReversarConsolidadoModalComponent {
   confirmKeyword = signal('');
   
   get isValid(): boolean {
-    return this.confirmKeyword().trim().toUpperCase() === 'ANULAR';
+    return this.confirmKeyword().trim().toUpperCase() === 'REVERSAR';
   }
 
   onClose(): void {

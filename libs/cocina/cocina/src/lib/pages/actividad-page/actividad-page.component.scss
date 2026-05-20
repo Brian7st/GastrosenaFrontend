@@ -26,8 +26,6 @@
   }
 }
 
-
-
 // ─── Layout principal ─────────────────────────
 .content-grid {
   display: flex;
@@ -63,7 +61,9 @@
   flex-direction: column;
   gap: 6px;
 
-  &.full-width { grid-column: 1 / -1; }
+  &.full-width {
+    grid-column: 1 / -1;
+  }
 }
 
 .form-label {
@@ -161,7 +161,10 @@
     background: color-mix(in srgb, var(--color-primario) 85%, black);
     transform: scale(1.03);
   }
-  &:active { transform: scale(0.98); }
+
+  &:active {
+    transform: scale(0.98);
+  }
 }
 
 .btn-outline {
@@ -180,7 +183,10 @@
     background: color-mix(in srgb, var(--color-primario) 8%, white);
     transform: scale(1.03);
   }
-  &:active { transform: scale(0.98); }
+
+  &:active {
+    transform: scale(0.98);
+  }
 }
 
 .form-hint {
@@ -235,7 +241,9 @@
     margin-bottom: 8px;
   }
 
-  .info-icon { color: var(--color-primary, #2563eb); }
+  .info-icon {
+    color: var(--color-primary, #2563eb);
+  }
 }
 
 // ─── Badges de historial ──────────────────────

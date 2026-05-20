@@ -1,8 +1,6 @@
 <!-- Breadcrumb + Back -->
 <div class="breadcrumb">
-  <button class="back-btn" (click)="onVolver()">
-    <span class="material-symbols-outlined">arrow_back</span>
-  </button>
+  <inventario-back-button (clicked)="onVolver()" />
   <nav class="breadcrumb-nav">
     <span class="breadcrumb-link" (click)="onVolver()">Inventario</span>
     <span class="material-symbols-outlined breadcrumb-sep">chevron_right</span>
@@ -48,7 +46,7 @@
       <div class="asset-badges">
         <div class="asset-badge-item">
           <span class="badge-label">ESTADO</span>
-          <span class="estado-pill" [ngClass]="b.estado === 'Activo' ? 'estado-pill--activo' : 'estado-pill--bajo'">
+          <span class="estado-pill" [ngClass]="getEstadoPillClass(b.estado)">
             <span class="estado-dot"></span>
             {{ b.estado }}
           </span>
@@ -129,7 +127,7 @@
             <td class="mov-fecha">{{ m.fecha | date:'dd/MM/yyyy' }}</td>
             <td>
               <span class="tipo-badge" [ngClass]="'tipo-badge--' + getTipoClass(m.tipo)">
-                {{ getTipoLabel(m.tipo) }}
+                {{ m.tipo }}
               </span>
             </td>
             <td class="mov-responsable">{{ m.responsable }}</td>

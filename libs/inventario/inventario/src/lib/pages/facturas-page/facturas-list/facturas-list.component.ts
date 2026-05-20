@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { ButtonComponent, DataTableComponent, KpiCardComponent } from '@restaurant/shared/ui';
+import { ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmModalComponent } from '@restaurant/shared/ui';
 import { FacturasFacade } from '../../../data-access/facturas.facade';
 import { Factura, EstadoFactura } from '../../../models/facturas.model';
 import { FacturaFormComponent } from '../../../ui/modals/factura-form/factura-form.component';
@@ -9,7 +9,7 @@ import { FacturaFormComponent } from '../../../ui/modals/factura-form/factura-fo
 @Component({
   selector: 'restaurant-facturas-list',
   standalone: true,
-  imports: [CommonModule, ButtonComponent, DataTableComponent, KpiCardComponent, FacturaFormComponent],
+  imports: [CommonModule, ButtonComponent, DataTableComponent, KpiCardComponent, FacturaFormComponent, KeywordConfirmModalComponent],
   templateUrl: './facturas-list.component.html',
   styleUrl: './facturas-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,7 +24,9 @@ export class FacturasListPageComponent implements OnInit {
   loading = this.facade.loading;
 
   // Modal controls
-  showFormModal = signal(false);
+  showFormModal    = signal(false);
+  showAnularModal  = signal(false);
+  facturaParaAnular = signal<Factura | null>(null);
   searchQuery = signal('');
 
   ngOnInit(): void {
@@ -58,7 +60,20 @@ export class FacturasListPageComponent implements OnInit {
   }
 
   onAnularFactura(factura: Factura): void {
-    console.log('Anular factura:', factura.id);
+    this.facturaParaAnular.set(factura);
+    this.showAnularModal.set(true);
+  }
+
+  onConfirmarAnular(): void {
+    const factura = this.facturaParaAnular();
+    if (factura) this.facade.anularFactura(factura.id);
+    this.showAnularModal.set(false);
+    this.facturaParaAnular.set(null);
+  }
+
+  onCancelarAnular(): void {
+    this.showAnularModal.set(false);
+    this.facturaParaAnular.set(null);
   }
 
   onImportar(): void {
@@ -66,7 +81,7 @@ export class FacturasListPageComponent implements OnInit {
   }
 
   onExportar(): void {
-    console.log('Exportando facturas...');
+    // TODO: ruta de exportación pendiente
   }
 
   getEstadoBadgeClass(estado: EstadoFactura): string {
@@ -89,9 +104,10 @@ export class FacturasListPageComponent implements OnInit {
   }
 
   formatCurrency(value: number, moneda = 'COP'): string {
+    const validCurrency = moneda === 'GTQ' ? 'GTQ' : (moneda === 'USD' ? 'USD' : 'COP');
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
-      currency: moneda === 'GTQ' ? 'GTQ' : 'USD',
+      currency: validCurrency,
       minimumFractionDigits: 2,
     }).format(value).replace('US$', '$');
   }

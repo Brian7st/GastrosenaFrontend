@@ -1,0 +1,53 @@
+<div class="pedidos-layout">
+  <!-- Área Principal (Izquierda) -->
+  <main class="pedidos-main">
+    <header class="pedidos-header">
+      <div class="header-left">
+        <button class="back-btn" (click)="volverAMesas()">
+          <lucide-icon name="arrow-left" [size]="20"></lucide-icon>
+        </button>
+        @if (mesaActual(); as mesa) {
+          <div class="mesa-info">
+            <h2>Mesa {{ mesa.numero }}</h2>
+            <span class="comensal">{{ mesa.comensal || 'Sin comensal asignado' }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="search-bar">
+        <lucide-icon name="search" [size]="18" class="search-icon"></lucide-icon>
+        <input type="text" placeholder="Buscar platillo..." [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" />
+      </div>
+      
+      <div class="user-profile">
+        <div class="user-info">
+          <span class="user-name">Cajero Principal</span>
+          <span class="date">{{ fechaActual | date:'mediumDate' }}</span>
+        </div>
+        <div class="avatar">
+          <lucide-icon name="user" [size]="20" color="var(--color-text-secondary)"></lucide-icon>
+        </div>
+      </div>
+    </header>
+
+    <section class="categories-section">
+      <lib-pedidos-categories
+        (categorySelected)="selectedCategory.set($event)"
+        (subcategorySelected)="selectedSubcategory.set($event)">
+      </lib-pedidos-categories>
+    </section>
+
+    <section class="menu-section">
+      <lib-pedidos-menu-grid 
+        [searchTerm]="searchTerm()"
+        [category]="selectedCategory()"
+        [subcategory]="selectedSubcategory()">
+      </lib-pedidos-menu-grid>
+    </section>
+  </main>
+
+  <!-- Área del Carrito (Derecha) -->
+  <aside class="pedidos-sidebar">
+    <lib-pedidos-cart></lib-pedidos-cart>
+  </aside>
+</div>

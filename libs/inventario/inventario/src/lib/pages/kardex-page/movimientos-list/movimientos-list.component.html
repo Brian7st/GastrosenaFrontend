@@ -2,23 +2,25 @@
   <!-- Header & Actions -->
   <div class="page-header-row">
     <div>
-      <nav class="breadcrumb-nav">
-        <span>INVENTARIO</span>
-        <lucide-icon name="chevron-right" [size]="10"></lucide-icon>
-        <span class="active">ENTRADAS Y SALIDAS</span>
-      </nav>
       <h1 class="page-title">Entradas y Salidas de Productos</h1>
       <p class="page-subtitle">Registro histórico y gestión de flujos de almacén en tiempo real.</p>
     </div>
     <div class="header-actions">
-      <restaurant-button variant="surface" routerLink="salida">
+      <restaurant-button variant="surface" routerLink="exportar">
         <div class="btn-icon-text">
-          <lucide-icon name="outbox" [size]="20"></lucide-icon>
+          <lucide-icon name="download" [size]="20"></lucide-icon>
+          Exportar
+        </div>
+      </restaurant-button>
+
+      <restaurant-button variant="primary" routerLink="salida">
+        <div class="btn-icon-text">
+          <lucide-icon name="minus-circle" [size]="20"></lucide-icon>
           Nueva Salida
         </div>
       </restaurant-button>
       
-      <restaurant-button variant="surface" routerLink="entrada-gil" class="btn-gil">
+      <restaurant-button variant="primary" routerLink="entrada-gil">
         <div class="btn-icon-text">
           <lucide-icon name="file-text" [size]="20"></lucide-icon>
           Entrada GIL-F-014
@@ -74,54 +76,48 @@
   </div>
 
   <!-- Main Data Table Container -->
-  <restaurant-data-table
-    tableTitle="Historial de Movimientos"
-    tableIcon="history"
-    searchPlaceholder="Buscar movimientos, productos o usuarios..."
-  >
-    <div dtHeader class="dt-header-controls">
-      <div class="title-group">
-        <h2>Historial de Movimientos</h2>
-        <p>Filtrando últimos 30 días</p>
+  <restaurant-data-table>
+    <div dtHeader class="dt-controls">
+      <div class="dt-controls__title">
+        <lucide-icon name="history" [size]="22" class="dt-controls__icon"></lucide-icon>
+        <h3 class="dt-controls__heading">Historial de Movimientos</h3>
       </div>
-      <div class="action-group">
-        <button class="control-btn">
-          <lucide-icon name="filter" [size]="18"></lucide-icon> Filtros
-        </button>
-        <button class="control-btn" routerLink="exportar">
-          <lucide-icon name="download" [size]="18"></lucide-icon> Exportar
-        </button>
+      <div class="dt-controls__actions">
+        <div class="dt-search">
+          <lucide-icon name="search" [size]="18" class="dt-search__icon"></lucide-icon>
+          <input type="text" class="dt-search__input" placeholder="Buscar movimientos, productos o usuarios...">
+        </div>
       </div>
     </div>
     
     <thead>
       <tr>
-        <th>Tipo</th>
-        <th>Producto</th>
-        <th>Código SENA</th>
+        <th style="text-align: center;">Tipo</th>
+        <th style="text-align: center;">Producto</th>
+        <th style="text-align: center;">Código SENA</th>
         <th style="text-align: center;">Cantidad</th>
-        <th>Fecha/Hora</th>
-        <th>Origen/Destino</th>
-        <th>Doc. origen</th>
-        <th style="text-align: right;">Valor</th>
+        <th style="text-align: center;">Fecha/Hora</th>
+        <th style="text-align: center;">Origen/Destino</th>
+        <th style="text-align: center;">Doc. origen</th>
+        <th style="text-align: center;">Valor</th>
         <th style="text-align: center;">Estado</th>
-        <th style="text-align: right;">Acciones</th>
+        <th style="text-align: center;">Acciones</th>
       </tr>
     </thead>
     <tbody>
-      @for (movimiento of movimientos; track movimiento.id) {
+      @for (movimiento of movimientos(); track movimiento.id) {
       <tr class="table-row">
-        <td>
+        <td style="text-align: center;">
           <span class="type-badge" [ngClass]="movimiento.tipo === 'ENTRADA' ? 'type-badge--entrada' : 'type-badge--salida'">
             <lucide-icon [name]="movimiento.tipo === 'ENTRADA' ? 'arrow-down' : 'arrow-up'" [size]="14"></lucide-icon>
             {{ movimiento.tipo === 'ENTRADA' ? 'Entrada' : 'Salida' }}
           </span>
         </td>
-        <td>
+        <td style="text-align: center;">
           <p class="prod-name">{{ movimiento.productoNombre }}</p>
           <p class="prod-sku">SKU: {{ movimiento.productoSku }}</p>
         </td>
-        <td>
+        <td style="text-align: center;">
           <span class="code-sena">{{ movimiento.codigoSena }}</span>
         </td>
         <td style="text-align: center;">
@@ -130,33 +126,26 @@
           </span>
           <span class="qty-unit">{{ movimiento.unidad }}</span>
         </td>
-        <td>
+        <td style="text-align: center;">
           <p class="date-text">{{ movimiento.fecha }}</p>
           <p class="time-text">{{ movimiento.hora }}</p>
         </td>
-        <td>
+        <td style="text-align: center;">
           <p class="origin-text">{{ movimiento.origenDestino }}</p>
         </td>
-        <td>
+        <td style="text-align: center;">
           <a href="javascript:void(0)" class="doc-link">
             <lucide-icon name="external-link" [size]="14"></lucide-icon> {{ movimiento.docOrigen }}
           </a>
         </td>
-        <td style="text-align: right;">
+        <td style="text-align: center;">
           <p class="money-val">{{ movimiento.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
         </td>
         <td style="text-align: center;">
-          <span class="status-badge"
-                [ngClass]="{
-                  'status-badge--completado': movimiento.estado === 'Completado',
-                  'status-badge--pendiente': movimiento.estado === 'Pendiente',
-                  'status-badge--cancelado': movimiento.estado === 'Cancelado'
-                }">
-            {{ movimiento.estado }}
-          </span>
+          <restaurant-status-badge [label]="movimiento.estado" [variant]="getVariant(movimiento.estado)"></restaurant-status-badge>
         </td>
-        <td style="text-align: right;">
-          <div class="actions-row">
+        <td style="text-align: center;">
+          <div class="actions-row" style="justify-content: center;">
             <button class="action-icon" [routerLink]="[movimiento.id]" title="Ver Detalle">
               <lucide-icon name="eye" [size]="18"></lucide-icon>
             </button>
@@ -165,6 +154,20 @@
       </tr>
       }
     </tbody>
+    <div dtFooter class="dt-footer">
+      <span class="table-pagination__info">Mostrando 4 de 12 registros de movimientos</span>
+      <div class="pagination-btns">
+        <button class="pagination-btn" disabled>
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        <button class="pagination-btn pagination-btn--active">1</button>
+        <button class="pagination-btn">2</button>
+        <button class="pagination-btn">3</button>
+        <button class="pagination-btn">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+      </div>
+    </div>
   </restaurant-data-table>
 </div>
 <router-outlet></router-outlet>

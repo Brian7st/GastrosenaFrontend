@@ -1,10 +1,5 @@
 import { Routes } from '@angular/router';
-import { BienesListPageComponent } from './ui/pages/bienes-list/bienes-list.component';
-import { BienDetailPageComponent } from './ui/pages/bien-detail/bien-detail.component';
-import { BienExportPageComponent } from './ui/pages/bien-export/bien-export.component';
-import { FacturasListPageComponent } from './pages/facturas-page/facturas-list/facturas-list.component';
-import { FacturaEditPageComponent } from './pages/facturas-page/factura-edit/factura-edit.component';
-import { GilSolicitudDetailPageComponent } from './pages/facturas-page/gil-solicitud-detail/gil-solicitud-detail.component';
+
 
 export const INVENTARIO_ROUTES: Routes = [
   // ── Gestión de Bienes ────────────────────────────────────────────────────
@@ -15,15 +10,15 @@ export const INVENTARIO_ROUTES: Routes = [
   },
   {
     path: 'bienes',
-    component: BienesListPageComponent,
+    loadComponent: () => import('./ui/pages/bienes-list/bienes-list.component').then(m => m.BienesListPageComponent),
   },
   {
     path: 'bienes/exportar',
-    component: BienExportPageComponent,
+    loadComponent: () => import('./ui/pages/bien-export/bien-export.component').then(m => m.BienExportPageComponent),
   },
   {
     path: 'bienes/:id',
-    component: BienDetailPageComponent,
+    loadComponent: () => import('./ui/pages/bien-detail/bien-detail.component').then(m => m.BienDetailPageComponent),
   },
 
   // ── GIL-F-014: Solicitudes de Abastecimiento ─────────────────────────────
@@ -72,12 +67,17 @@ export const INVENTARIO_ROUTES: Routes = [
   // Vista 1: Panel de Facturación (listado + KPIs)
   {
     path: 'facturas',
-    component: FacturasListPageComponent,
+    loadComponent: () => import('./pages/facturas-page/facturas-list/facturas-list.component').then(m => m.FacturasListPageComponent),
   },
   // Vista de Importar Factura
   {
     path: 'facturas/importar',
     loadComponent: () => import('./pages/facturas-page/factura-import/factura-import.component').then(m => m.FacturaImportPageComponent)
+  },
+  // Vista 5: Detalle Solicitud GIL F-014
+  {
+    path: 'facturas/gil/:id',
+    loadComponent: () => import('./pages/facturas-page/gil-solicitud-detail/gil-solicitud-detail.component').then(m => m.GilSolicitudDetailPageComponent),
   },
   // Vista 3: Detalle de Factura FEL (Bento Grid)
   {
@@ -87,12 +87,7 @@ export const INVENTARIO_ROUTES: Routes = [
   // Vista 4: Editar Factura FEL (Editable/Lectura antigua)
   {
     path: 'facturas/:id/editar',
-    component: FacturaEditPageComponent,
-  },
-  // Vista 5: Detalle Solicitud GIL F-014
-  {
-    path: 'facturas/gil/:id',
-    component: GilSolicitudDetailPageComponent,
+    loadComponent: () => import('./pages/facturas-page/factura-edit/factura-edit.component').then(m => m.FacturaEditPageComponent),
   },
 
   // ── Consolidado de Ejecución Presupuestal ────────────────────────────────
@@ -295,5 +290,100 @@ export const INVENTARIO_ROUTES: Routes = [
         ],
       },
     ]
+  },
+
+  // ── Paquete Probatorio ──────────────────────────────────────────────────
+  {
+    path: 'paquete-probatorio',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./pages/paquete-probatorio-page/paquete-list/paquete-list.component').then(
+            m => m.PaqueteListComponent
+          ),
+      },
+      {
+        path: 'nuevo',
+        loadComponent: () =>
+          import('./pages/paquete-probatorio-page/paquete-create/paquete-create.component').then(
+            m => m.PaqueteCreateComponent
+          ),
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./pages/paquete-probatorio-page/paquete-detail/paquete-detail.component').then(
+            m => m.PaqueteDetailComponent
+          ),
+        children: [
+          {
+            path: 'adjuntar',
+            loadComponent: () =>
+              import('./pages/paquete-probatorio-page/paquete-upload/paquete-upload.component').then(
+                m => m.PaqueteUploadComponent
+              ),
+          },
+          {
+            path: 'requisicion',
+            loadComponent: () =>
+              import('./pages/paquete-probatorio-page/paquete-req-detail/paquete-req-detail.component').then(
+                m => m.PaqueteReqDetailComponent
+              ),
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── Requisiciones (Formato 45-S) ────────────────────────────────────────
+  {
+    path: 'requisiciones',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./pages/requisiciones-page/requisiciones-dashboard/requisiciones-dashboard.component').then(
+            m => m.RequisicionesDashboardComponent
+          ),
+        children: [
+          {
+            path: 'detalle/:id',
+            loadComponent: () =>
+              import('./pages/requisiciones-page/requisiciones-detalle/requisiciones-detalle.component').then(
+                m => m.RequisicionesDetalleComponent
+              ),
+          },
+          {
+            path: 'despacho/:id',
+            loadComponent: () =>
+              import('./pages/requisiciones-page/requisiciones-despacho/requisiciones-despacho.component').then(
+                m => m.RequisicionesDespachoComponent
+              ),
+          },
+        ]
+      },
+      {
+        path: 'nueva',
+        loadComponent: () =>
+          import('./pages/requisiciones-page/requisiciones-create/requisiciones-create.component').then(
+            m => m.RequisicionesCreateComponent
+          ),
+      },
+      {
+        path: 'firmar/:id',
+        loadComponent: () =>
+          import('./pages/requisiciones-page/requisiciones-firmar/requisiciones-firmar.component').then(
+            m => m.RequisicionesFirmarComponent
+          ),
+      },
+      {
+        path: 'resumen/:id',
+        loadComponent: () =>
+          import('./pages/requisiciones-page/requisiciones-resumen/requisiciones-resumen.component').then(
+            m => m.RequisicionesResumenComponent
+          ),
+      }
+    ],
   },
 ];

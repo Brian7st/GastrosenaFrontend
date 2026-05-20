@@ -67,13 +67,13 @@
       <!-- Security Input (Confirm only) -->
       <div class="security-box" *ngIf="!isBlocked">
         <label class="security-box__label" for="security-confirm">
-          Escriba la palabra "ANULAR" para confirmar
+          Escriba la palabra "REVERSAR" para confirmar
         </label>
         <input 
           id="security-confirm" 
           type="text" 
           class="security-box__input" 
-          placeholder="ANULAR"
+          placeholder="REVERSAR"
           [ngModel]="confirmKeyword()"
           (ngModelChange)="confirmKeyword.set($event)"
         />

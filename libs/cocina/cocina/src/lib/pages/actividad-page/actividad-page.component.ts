@@ -14,25 +14,26 @@ import { CocinaFacade } from '../../data-access/cocina.facade';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ActividadPageComponent {
+
   private router = inject(Router);
   private facade = inject(CocinaFacade);
 
-  fecha          = signal<string>('');
+  fecha = signal<string>('');
   nombreActividad = signal<string>('');
-  jornada        = signal<string>('');
-  numeroFicha    = signal<string>('');
+  jornada = signal<string>('');
+  numeroFicha = signal<string>('');
   pasosActividad = signal<string>('');
-  trimestre      = signal<string>('trimestre1');
+  trimestre = signal<string>('trimestre1');
 
   readonly historialReciente = [
-    { nombre: 'Matemáticas', estado: 'Aprobado',  clase: 'badge-aprobado'  },
-    { nombre: 'Lógica',      estado: 'Pendiente', clase: 'badge-pendiente' },
-    { nombre: 'Inglés I',    estado: 'Aprobado',  clase: 'badge-aprobado'  },
+    { nombre: 'Matemáticas', estado: 'Aprobado', clase: 'badge-aprobado' },
+    { nombre: 'Lógica', estado: 'Pendiente', clase: 'badge-pendiente' },
+    { nombre: 'Inglés I', estado: 'Aprobado', clase: 'badge-aprobado' },
   ];
 
   readonly jornadas = [
-    { value: 'diurna',   label: 'Diurna' },
-    { value: 'mixta',    label: 'Mixta'  },
+    { value: 'diurna', label: 'Diurna' },
+    { value: 'mixta', label: 'Mixta' },
     { value: 'nocturna', label: 'Nocturna' },
   ];
 
@@ -44,8 +45,14 @@ export class ActividadPageComponent {
   ];
 
   crearActividad(): void {
-    const jornadaLabel = this.jornadas.find(j => j.value === this.jornada())?.label ?? this.jornada();
-    const trimestreLabel = this.trimestres.find(t => t.value === this.trimestre())?.label ?? this.trimestre();
+
+    const jornadaLabel =
+      this.jornadas.find(j => j.value === this.jornada())?.label ??
+      this.jornada();
+
+    const trimestreLabel =
+      this.trimestres.find(t => t.value === this.trimestre())?.label ??
+      this.trimestre();
 
     this.facade.crearActividad({
       nombre: this.nombreActividad() || 'Actividad sin nombre',

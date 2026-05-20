@@ -4,6 +4,7 @@ import {
   computed,
   signal,
   inject,
+  OnInit,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
@@ -15,9 +16,21 @@ import {
 } from '@restaurant/shared/ui';
 import {
   Alerta,
-  AlertaPrioridad,
-  MOCK_ALERTAS,
+  AlertaPrioridad
 } from '../../../models/alerta.model';
+import { AlertasFacade } from '../../../data-access/alertas.facade';
+
+export interface HistorialResolucion {
+  bien: string;
+  accion: string;
+  tiempo: string;
+}
+
+export interface MovimientoReciente {
+  tipo: 'entrada' | 'salida';
+  nombre: string;
+  cantidad: string;
+}
 
 @Component({
   selector: 'restaurant-alertas-list',
@@ -25,28 +38,33 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterModule, KpiCardComponent, ButtonComponent, StatusBadgeComponent, LucideIconComponent],
   templateUrl: './alertas-list.component.html',
-  styleUrls: ['./alertas-list.component.scss'],
+  styleUrl: './alertas-list.component.scss',
 })
-export class AlertasListComponent {
+export class AlertasListComponent implements OnInit {
   private router = inject(Router);
+  private facade = inject(AlertasFacade);
 
   // ── Estado reactivo ──────────────────────────────────────────────────────
-  allAlertas = signal<Alerta[]>(MOCK_ALERTAS);
+  allAlertas = this.facade.alertas;
   searchText     = signal<string>('');
   prioridadFilter = signal<string>('');
   estadoFilter    = signal<string>('');
 
   // Historial lateral (mock estático)
-  historial: { bien: string; accion: string; tiempo: string }[] = [
+  historial = signal<HistorialResolucion[]>([
     { bien: 'Sal Marina',   accion: 'Repuesto 50kg. Aprobado por Admin.', tiempo: 'Hoy, 09:30 AM' },
     { bien: 'Papa Pastusa', accion: 'Orden de compra generada (#OC-402).', tiempo: 'Ayer, 16:45 PM' },
-  ];
+  ]);
 
-  movimientos: { tipo: 'entrada' | 'salida'; nombre: string; cantidad: string }[] = [
+  movimientos = signal<MovimientoReciente[]>([
     { tipo: 'entrada', nombre: 'Tomate Chonto',   cantidad: '+100kg' },
     { tipo: 'salida',  nombre: 'Cebolla Cabezona', cantidad: '-25kg'  },
     { tipo: 'entrada', nombre: 'Arroz Blanco',     cantidad: '+500kg' },
-  ];
+  ]);
+
+  ngOnInit(): void {
+    this.facade.loadAll();
+  }
 
   // ── KPIs computados ──────────────────────────────────────────────────────
   kpiCriticas = computed(() =>

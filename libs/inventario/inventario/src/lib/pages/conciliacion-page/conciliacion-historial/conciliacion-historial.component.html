@@ -5,9 +5,7 @@
        ═══════════════════════════════════════════════════════════════════════ -->
   <div class="page-header-row">
     <div class="title-group">
-      <button class="back-btn" routerLink="../">
-        <lucide-icon name="arrow-left" [size]="24"></lucide-icon>
-      </button>
+      <inventario-back-button (clicked)="goBack()" />
       <div>
         <h1 class="page-title">Historial de Conciliaciones</h1>
         <p class="page-subtitle">Revisión y auditoría de inventario físico vs sistema</p>
@@ -54,7 +52,7 @@
     <restaurant-kpi-card
       label="PRECISIÓN PROMEDIO"
       value="94.2%"
-      iconName="target"
+      iconName="check-circle-2"
       iconVariant="info">
     </restaurant-kpi-card>
 
@@ -71,14 +69,13 @@
        ═══════════════════════════════════════════════════════════════════════ -->
   <div class="main-layout-grid">
     
-    <!-- LEFT CONTENT: TABLE -->
+    <!-- MAIN CONTENT: TABLE -->
     <div class="main-content">
       <restaurant-data-table 
         tableTitle="Registros Recientes" 
+        tableIcon="list"
         searchPlaceholder="Buscar ID, Ubicación...">
         
-        <!-- Dropdowns in the header area handled by data-table projection if it supports it, 
-             otherwise we can add custom filters here via CSS override -->
         <div dtHeader class="table-filters">
           <div class="filter-dropdown">
             <span>Todos</span>
@@ -102,7 +99,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (reg of registros; track reg.id) {
+          @for (reg of registros(); track reg.id) {
             <tr>
               <td class="font-bold text-primary">{{ reg.id }}</td>
               <td class="text-secondary whitespace-pre">{{ reg.fecha.replace(', ', '\n') }}</td>
@@ -137,65 +134,64 @@
       </restaurant-data-table>
     </div>
 
-    <!-- RIGHT SIDEBAR -->
-    <div class="sidebar-content">
+  </div>
+
+  <!-- PANELS BELOW THE TABLE -->
+  <div class="bottom-panels">
+    
+    <!-- Top 3 Diferencias -->
+    <div class="sidebar-card">
+      <h3 class="sidebar-title">Top 3 Diferencias</h3>
+      <div class="top-list">
+        @for (item of topDiferencias(); track item.producto) {
+          <div class="top-item">
+            <div class="top-icon">
+              <lucide-icon [name]="item.icon" [size]="18"></lucide-icon>
+            </div>
+            <span class="top-name">{{ item.producto }}</span>
+            <span class="top-dif">{{ item.dif }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Volumen vs Precision -->
+    <div class="sidebar-card">
+      <div class="sidebar-header-flex">
+        <h3 class="sidebar-title">Volumen vs Precisión</h3>
+        <lucide-icon name="more-vertical" [size]="18" class="text-disabled"></lucide-icon>
+      </div>
+      <p class="sidebar-subtitle">Análisis trimestral (Q3)</p>
       
-      <!-- Top 3 Diferencias -->
-      <div class="sidebar-card">
-        <h3 class="sidebar-title">Top 3 Diferencias</h3>
-        <div class="top-list">
-          @for (item of topDiferencias; track item.producto) {
-            <div class="top-item">
-              <div class="top-icon">
-                <lucide-icon [name]="item.icon" [size]="18"></lucide-icon>
-              </div>
-              <span class="top-name">{{ item.producto }}</span>
-              <span class="top-dif">{{ item.dif }}</span>
+      <div class="placeholder-chart">
+        <div class="vol-bars">
+          <div class="vol-col">
+            <div class="bar-pair">
+              <div class="bar vol" style="height: 40%"></div>
+              <div class="bar prec" style="height: 90%"></div>
             </div>
-          }
-        </div>
-      </div>
-
-      <!-- Volumen vs Precision -->
-      <div class="sidebar-card">
-        <div class="sidebar-header-flex">
-          <h3 class="sidebar-title">Volumen vs Precisión</h3>
-          <lucide-icon name="more-vertical" [size]="18" class="text-disabled"></lucide-icon>
-        </div>
-        <p class="sidebar-subtitle">Análisis trimestral (Q3)</p>
-        
-        <div class="placeholder-chart">
-          <!-- CSS Bar chart matching prototype -->
-          <div class="vol-bars">
-            <div class="vol-col">
-              <div class="bar-pair">
-                <div class="bar vol" style="height: 40%"></div>
-                <div class="bar prec" style="height: 90%"></div>
-              </div>
-              <span>Jul</span>
-            </div>
-            <div class="vol-col">
-              <div class="bar-pair">
-                <div class="bar vol" style="height: 60%"></div>
-                <div class="bar prec" style="height: 95%"></div>
-              </div>
-              <span>Ago</span>
-            </div>
-            <div class="vol-col">
-              <div class="bar-pair">
-                <div class="bar vol" style="height: 80%"></div>
-                <div class="bar prec" style="height: 85%"></div>
-              </div>
-              <span>Sep</span>
-            </div>
+            <span>Jul</span>
           </div>
-          <div class="chart-legend">
-            <div class="legend-item"><div class="dot vol-dot"></div><span>Volumen (Ítems)</span></div>
-            <div class="legend-item"><div class="dot prec-dot"></div><span>Precisión (%)</span></div>
+          <div class="vol-col">
+            <div class="bar-pair">
+              <div class="bar vol" style="height: 60%"></div>
+              <div class="bar prec" style="height: 95%"></div>
+            </div>
+            <span>Ago</span>
+          </div>
+          <div class="vol-col">
+            <div class="bar-pair">
+              <div class="bar vol" style="height: 80%"></div>
+              <div class="bar prec" style="height: 85%"></div>
+            </div>
+            <span>Sep</span>
           </div>
         </div>
+        <div class="chart-legend">
+          <div class="legend-item"><div class="dot vol-dot"></div><span>Volumen (Ítems)</span></div>
+          <div class="legend-item"><div class="dot prec-dot"></div><span>Precisión (%)</span></div>
+        </div>
       </div>
-
     </div>
 
   </div>

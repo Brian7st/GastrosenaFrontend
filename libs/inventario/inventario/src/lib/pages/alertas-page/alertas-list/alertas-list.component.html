@@ -3,11 +3,7 @@
   <!-- ── Header & Actions ─────────────────────────────────────────────────── -->
   <div class="page-header-row">
     <div>
-      <nav class="breadcrumb-nav">
-        <span>INVENTARIO</span>
-        <lucide-icon name="chevron-right" [size]="10"></lucide-icon>
-        <span class="active">ALERTAS DE STOCK</span>
-      </nav>
+
       <h1 class="page-title">Alertas de Stock Mínimo</h1>
       <p class="page-subtitle">Gestión proactiva de inventario crítico y riesgo financiero.</p>
     </div>
@@ -32,7 +28,7 @@
     <restaurant-kpi-card
       label="Críticas"
       [value]="kpiCriticas().toString()"
-      icon="alert-triangle"
+      icon="triangle-alert"
       iconColor="red"
     ></restaurant-kpi-card>
     <restaurant-kpi-card
@@ -44,7 +40,7 @@
     <restaurant-kpi-card
       label="Valor en Riesgo"
       [value]="kpiValorRiesgo()"
-      icon="dollar-sign"
+      icon="banknote"
       iconColor="orange"
     ></restaurant-kpi-card>
     <restaurant-kpi-card
@@ -174,7 +170,7 @@
           <span class="material-symbols-outlined lateral-card__chevron">expand_more</span>
         </div>
         <div class="lateral-card__body">
-          @for (item of historial; track item.bien) {
+          @for (item of historial(); track item.bien) {
             <div class="historial-item">
               <div class="historial-item__check">
                 <span class="material-symbols-outlined">check</span>
@@ -193,7 +189,7 @@
       <div class="lateral-card">
         <h3 class="lateral-card__title lateral-card__title--pad">Movimientos Recientes</h3>
         <div class="movimientos-list">
-          @for (mov of movimientos; track mov.nombre) {
+          @for (mov of movimientos(); track mov.nombre) {
             <div class="movimiento-item">
               <div class="movimiento-item__dot" [class]="'movimiento-item__dot--' + mov.tipo"></div>
               <span class="movimiento-item__nombre">

@@ -6,13 +6,15 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 
-import { CocinaFacade, ActividadMock } from '../../data-access/cocina.facade';
-
-// ─── Componente ───────────────────────────────────────────────────────────────
+import {
+  CocinaFacade,
+  ActividadMock,
+} from '../../data-access/cocina.facade';
 
 @Component({
   selector: 'restaurant-evaluacion-masiva-page',
@@ -23,66 +25,84 @@ import { CocinaFacade, ActividadMock } from '../../data-access/cocina.facade';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EvaluacionMasivaPageComponent implements OnInit {
+
+  // ── Inyecciones ─────────────────────────────
   private facade = inject(CocinaFacade);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-  // ── Actividad actual ────────────────────────────────────────────────────
+  // ── Actividad actual ─────────────────────────
   readonly actividadId = signal<number | null>(null);
+
   readonly actividad = computed<ActividadMock | null>(() => {
     const id = this.actividadId();
-    if (!id) return null;
-    return this.facade.actividades().find(a => a.id === id) ?? null;
+
+    if (!id) {
+      return null;
+    }
+
+    return (
+      this.facade.actividades().find(a => a.id === id) ?? null
+    );
   });
 
   readonly menuEstadoAbierto = signal<boolean>(false);
-  readonly estadosActividad: Array<'Activa' | 'Pendiente' | 'Finalizada'> = ['Activa', 'Pendiente', 'Finalizada'];
 
-  // ── Datos ────────────────────────────────────────────────────────────────
+  readonly estadosActividad: Array<
+    'Activa' | 'Pendiente' | 'Finalizada'
+  > = ['Activa', 'Pendiente', 'Finalizada'];
+
+  // ── Datos ────────────────────────────────────
   readonly aprendices = this.facade.aprendices;
 
-  /** Aprendices activos (no inactivos) */
-  readonly aprendicesActivos = computed(() => this.aprendices().filter(a => !a.inactivo));
+  readonly aprendicesActivos = computed(() =>
+    this.aprendices().filter(a => !a.inactivo)
+  );
 
-  /** Aprendices inactivos */
-  readonly aprendicesInactivos = computed(() => this.aprendices().filter(a => a.inactivo));
+  readonly aprendicesInactivos = computed(() =>
+    this.aprendices().filter(a => a.inactivo)
+  );
 
-  // ── Selección ────────────────────────────────────────────────────────────
+  // ── Selección ────────────────────────────────
   readonly modoSeleccionAbierto = signal<boolean>(false);
-  
-  /** Set reactivo con los IDs de aprendices seleccionados */
+
   readonly seleccionados = signal<Set<number>>(new Set());
 
-  /** Cantidad reactiva de seleccionados */
-  readonly cantidadSeleccionados = computed(() => this.seleccionados().size);
-
-  /** ¿Todos los visibles están seleccionados? */
-  readonly todosSeleccionados = computed(
-    () => {
-      const activos = this.aprendicesActivos();
-      return activos.length > 0 && activos.every(a => this.seleccionados().has(a.id));
-    }
+  readonly cantidadSeleccionados = computed(
+    () => this.seleccionados().size
   );
 
-  /** ¿Al menos uno está seleccionado pero no todos? (indeterminate) */
+  readonly todosSeleccionados = computed(() => {
+    const activos = this.aprendicesActivos();
+
+    return (
+      activos.length > 0 &&
+      activos.every(a => this.seleccionados().has(a.id))
+    );
+  });
+
   readonly algunoSeleccionado = computed(
     () =>
-      this.cantidadSeleccionados() > 0 && !this.todosSeleccionados()
+      this.cantidadSeleccionados() > 0 &&
+      !this.todosSeleccionados()
   );
 
-  // ── UI ───────────────────────────────────────────────────────────────────
+  // ── UI ───────────────────────────────────────
   readonly menuEvaluarAbierto = signal<boolean>(false);
 
-  // ── Init ────────────────────────────────────────────────────────────────
+  // ── Init ─────────────────────────────────────
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
+
       const id = Number(params['actividadId']);
-      if (id) this.actividadId.set(id);
+
+      if (id) {
+        this.actividadId.set(id);
+      }
     });
   }
 
-  // ── Estado de actividad ─────────────────────────────────────────────────
-
+  // ── Estado actividad ─────────────────────────
   toggleMenuEstado(): void {
     this.menuEstadoAbierto.update(v => !v);
   }
@@ -91,29 +111,46 @@ export class EvaluacionMasivaPageComponent implements OnInit {
     this.menuEstadoAbierto.set(false);
   }
 
-  cambiarEstadoActividad(estado: 'Activa' | 'Pendiente' | 'Finalizada'): void {
+  cambiarEstadoActividad(
+    estado: 'Activa' | 'Pendiente' | 'Finalizada'
+  ): void {
+
     const id = this.actividadId();
+
     if (id) {
       this.facade.actualizarEstadoActividad(id, estado);
     }
+
     this.menuEstadoAbierto.set(false);
   }
 
   getEstadoActividadClass(estado: string): string {
+
     switch (estado) {
-      case 'Activa':     return 'act-estado-activa';
-      case 'Finalizada': return 'act-estado-finalizada';
-      case 'Pendiente':  return 'act-estado-pendiente';
-      default:           return '';
+
+      case 'Activa':
+        return 'act-estado-activa';
+
+      case 'Pendiente':
+        return 'act-estado-pendiente';
+
+      case 'Finalizada':
+        return 'act-estado-finalizada';
+
+      default:
+        return '';
     }
   }
 
-  // ── Selección ────────────────────────────────────────────────────────────
-
+  // ── Selección ────────────────────────────────
   toggleModoSeleccion(): void {
+
     this.modoSeleccionAbierto.update(v => !v);
+
     if (!this.modoSeleccionAbierto()) {
+
       this.seleccionados.set(new Set());
+
       this.cerrarMenuEvaluar();
     }
   }
@@ -123,28 +160,43 @@ export class EvaluacionMasivaPageComponent implements OnInit {
   }
 
   toggleSelection(id: number): void {
-    if (!this.modoSeleccionAbierto()) return;
+
+    if (!this.modoSeleccionAbierto()) {
+      return;
+    }
+
     const actual = new Set(this.seleccionados());
+
     if (actual.has(id)) {
       actual.delete(id);
     } else {
       actual.add(id);
     }
+
     this.seleccionados.set(actual);
   }
 
   toggleSelectAll(): void {
-    if (!this.modoSeleccionAbierto()) return;
+
+    if (!this.modoSeleccionAbierto()) {
+      return;
+    }
+
     if (this.todosSeleccionados()) {
+
       this.seleccionados.set(new Set());
+
     } else {
-      const todos = new Set(this.aprendicesActivos().map(a => a.id));
+
+      const todos = new Set(
+        this.aprendicesActivos().map(a => a.id)
+      );
+
       this.seleccionados.set(todos);
     }
   }
 
-  // ── Menú EVALUAR ─────────────────────────────────────────────────────────
-
+  // ── Menú evaluar ─────────────────────────────
   toggleMenuEvaluar(): void {
     this.menuEvaluarAbierto.update(v => !v);
   }
@@ -153,32 +205,47 @@ export class EvaluacionMasivaPageComponent implements OnInit {
     this.menuEvaluarAbierto.set(false);
   }
 
-  // ── Submit masivo ────────────────────────────────────────────────────────
-
-  submitEvaluacionMasiva(resultado: 'aprobo' | 'no_aprobo'): void {
-    const ids = Array.from(this.seleccionados());
-    
-    const estadoStr = resultado === 'aprobo' ? 'Aprobó' : 'No Aprobó';
-    for (const id of ids) {
-      this.facade.actualizarEstado(id, estadoStr);
-    }
-
-    this.seleccionados.set(new Set());
-    this.menuEvaluarAbierto.set(false);
-    this.modoSeleccionAbierto.set(false);
-  }
-
-  volver(): void {
-    window.history.back();
-  }
-
   cerrarTodosMenus(): void {
     this.cerrarMenuEvaluar();
     this.cerrarMenuEstado();
   }
 
+  // ── Evaluación masiva ────────────────────────
+  submitEvaluacionMasiva(
+    resultado: 'aprobo' | 'no_aprobo'
+  ): void {
+
+    const ids = Array.from(this.seleccionados());
+
+    const estadoStr =
+      resultado === 'aprobo'
+        ? 'Aprobó'
+        : 'No Aprobó';
+
+    for (const id of ids) {
+      this.facade.actualizarEstado(id, estadoStr);
+    }
+
+    this.seleccionados.set(new Set());
+
+    this.menuEvaluarAbierto.set(false);
+
+    this.modoSeleccionAbierto.set(false);
+  }
+
+  // ── Navegación ───────────────────────────────
+  volver(): void {
+    window.history.back();
+  }
+
   goToIndividual(id: number): void {
-    this.router.navigate(['/app/cocina/evaluacion-individual'], { queryParams: { id } });
+
+    this.router.navigate(
+      ['/app/cocina/evaluacion-individual'],
+      {
+        queryParams: { id },
+      }
+    );
   }
 
   goToActividades(): void {

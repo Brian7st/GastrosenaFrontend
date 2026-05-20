@@ -1,20 +1,38 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { LucideIconComponent } from '@restaurant/shared/ui';
+import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
 
 @Component({
-  selector: 'gastro-requisiciones-detalle',
+  selector: 'restaurant-requisiciones-detalle',
   standalone: true,
   imports: [CommonModule, RouterModule, LucideIconComponent],
   templateUrl: './requisiciones-detalle.component.html',
-  styleUrls: ['./requisiciones-detalle.component.scss'],
+  styleUrl: './requisiciones-detalle.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RequisicionesDetalleComponent {
+export class RequisicionesDetalleComponent implements OnInit {
   private router = inject(Router);
+  private route  = inject(ActivatedRoute);
+  private facade = inject(RequisicionesFacade);
 
-  close() {
+  // ── Estado reactivo desde facade ─────────────────────────────────────────
+  requisicion = this.facade.requisicionSeleccionada;
+  loading     = this.facade.loading;
+  /** Expuesto para el template (usa reqId() en dos lugares) */
+  reqId       = computed(() => this.requisicion()?.id ?? '');
+
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.facade.cargarRequisicion(id);
+    } else {
+      this.router.navigate(['/app/inventario/requisiciones']);
+    }
+  }
+
+  close(): void {
     this.router.navigate(['/app/inventario/requisiciones']);
   }
 }

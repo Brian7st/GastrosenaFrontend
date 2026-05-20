@@ -1,6 +1,16 @@
 import { Component, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import {
+  LucideIconComponent,
+  PageHeaderComponent,
+  SearchFilterComponent,
+  SelectFilterComponent,
+  CardComponent,
+  ButtonComponent,
+  StatusBadgeComponent,
+  SectionTitleComponent
+} from '@restaurant/shared/ui';
 
 export interface Comanda {
   id: number;
@@ -16,7 +26,18 @@ export interface Comanda {
 @Component({
   selector: 'restaurant-comandas-page',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule, 
+    FormsModule,
+    LucideIconComponent,
+    PageHeaderComponent,
+    SearchFilterComponent,
+    SelectFilterComponent,
+    CardComponent,
+    ButtonComponent,
+    StatusBadgeComponent,
+    SectionTitleComponent
+  ],
   templateUrl: './comandas-page.component.html',
   styleUrl: './comandas-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,6 +48,26 @@ export class ComandasPageComponent {
   filtroPrioridad = signal('Todas las prioridades');
   filtroOrden = signal('Prioridad');
 
+  opcionesEstado = [
+    { label: 'Todos los estados', value: 'Todos los estados' },
+    { label: 'En Espera', value: 'En Espera' },
+    { label: 'Preparando', value: 'Preparando' },
+    { label: 'Listo', value: 'Listo' }
+  ];
+  
+  opcionesPrioridad = [
+    { label: 'Todas las prioridades', value: 'Todas las prioridades' },
+    { label: 'Urgente', value: 'Urgente' },
+    { label: 'Alta', value: 'Alta' },
+    { label: 'Normal', value: 'Normal' }
+  ];
+  
+  opcionesOrden = [
+    { label: 'Prioridad', value: 'Prioridad' },
+    { label: 'Hora de llegada', value: 'Hora de llegada' },
+    { label: 'Tiempo estimado', value: 'Tiempo estimado' }
+  ];
+
   comandas = signal<Comanda[]>([
     { id: 1, mesa: 'Mesa 5', mesero: 'María G.', platos: ['Pasta Carbonara'], estado: 'En Espera', prioridad: 'Alta', tiempo: 15, hora: '22:30' },
     { id: 2, mesa: 'Mesa 2', mesero: 'Juan P.', platos: ['Hamburguesa'], estado: 'Preparando', prioridad: 'Urgente', tiempo: 25, hora: '22:35' },
@@ -36,8 +77,8 @@ export class ComandasPageComponent {
 
   comandasFiltradas = computed(() => {
     let filtrados = this.comandas().filter(c => {
-      const matchBusqueda = c.mesa.toLowerCase().includes(this.searchTerm().toLowerCase()) || 
-                            c.mesero.toLowerCase().includes(this.searchTerm().toLowerCase());
+      const matchBusqueda = c.mesa.toLowerCase().includes(this.searchTerm().toLowerCase()) ||
+        c.mesero.toLowerCase().includes(this.searchTerm().toLowerCase());
       const matchEstado = this.filtroEstado() === 'Todos los estados' || c.estado === this.filtroEstado();
       const matchPrioridad = this.filtroPrioridad() === 'Todas las prioridades' || c.prioridad === this.filtroPrioridad();
       return matchBusqueda && matchEstado && matchPrioridad;
@@ -61,8 +102,14 @@ export class ComandasPageComponent {
   listos = computed(() => this.comandasFiltradas().filter(c => c.estado === 'Listo'));
 
   cambiarEstado(comanda: Comanda, nuevoEstado: string) {
-    this.comandas.update(actuales => 
+    this.comandas.update(actuales =>
       actuales.map(c => c.id === comanda.id ? { ...c, estado: nuevoEstado } : c)
     );
+  }
+
+  getBadgeVariant(prioridad: string): 'danger' | 'warning' | 'info' | 'success' {
+    if (prioridad === 'Urgente') return 'danger';
+    if (prioridad === 'Alta') return 'warning';
+    return 'info';
   }
 }

@@ -5,17 +5,16 @@
   
   <!-- Header de Acción -->
   <div class="page-header">
-    <div class="header-titles">
-      <h2 class="title">Editar Solicitud GIL-F-014</h2>
-      <p class="subtitle">Actualice la información de asignación de bienes de inventario.</p>
-    </div>
-    <div class="header-status" style="display: flex; align-items: center; gap: 1rem;">
-      <span class="badge badge--active">Activo</span>
-      <span class="header-id">ID: {{ solicitudId() }}</span>
-      <button (click)="onCancel()" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; font-weight: 500; color: #52525b; background: transparent; border: none; border-radius: 0.75rem; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#e4e4e7'" onmouseout="this.style.background='transparent'">
-        <span class="material-symbols-outlined text-lg">arrow_back</span>
-        Volver a Solicitudes
-      </button>
+    <inventario-back-button (clicked)="onCancel()" />
+    <div class="header-main">
+      <div class="header-titles">
+        <h2 class="title">Editar Solicitud GIL-F-014</h2>
+        <p class="subtitle">Actualice la información de asignación de bienes de inventario.</p>
+      </div>
+      <div class="header-status">
+        <span class="badge badge--active">Activo</span>
+        <span class="header-id">ID: {{ solicitudId() }}</span>
+      </div>
     </div>
   </div>
 
@@ -161,8 +160,8 @@
 
       <!-- Actions -->
       <div class="actions-footer" *ngIf="!isBlocked()">
-        <button class="btn btn--secondary" (click)="onCancel()">Cancelar</button>
-        <button class="btn btn--primary" (click)="onSave()">Guardar Cambios</button>
+        <restaurant-button variant="ghost" (click)="onCancel()">Cancelar</restaurant-button>
+        <restaurant-button variant="primary" (click)="onSave()">Guardar Cambios</restaurant-button>
       </div>
 
     </div>

@@ -57,28 +57,24 @@ export class EvaluacionIndividualPageComponent implements OnInit {
   // ── UI ───────────────────────────────────────────────────────────────────
   readonly menuEvaluarAbierto = signal<boolean>(false);
 
-  // ── Menú EVALUAR ─────────────────────────────────────────────────────────
-
-  toggleMenuEvaluar(): void {
-    this.menuEvaluarAbierto.update(v => !v);
-  }
-
-  cerrarMenuEvaluar(): void {
-    this.menuEvaluarAbierto.set(false);
-  }
-
+  // ── Dependencias ──────────────────────────────────────────────────────────
   private facade = inject(CocinaFacade);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-  ngOnInit() {
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
+  ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       const id = Number(params['id']);
+
       if (id) {
-        const aprendizEncontrado = this.facade.aprendices().find(a => a.id === id);
+        const aprendizEncontrado = this.facade
+          .aprendices()
+          .find(a => a.id === id);
+
         if (aprendizEncontrado) {
           this.aprendiz.set({
-            ...APRENDIZ_MOCK, // mantener base mock
+            ...APRENDIZ_MOCK,
             id: aprendizEncontrado.id,
             nombreCompleto: aprendizEncontrado.nombreCompleto,
             inicial: aprendizEncontrado.inicial,
@@ -90,11 +86,21 @@ export class EvaluacionIndividualPageComponent implements OnInit {
     });
   }
 
+  // ── Menú EVALUAR ─────────────────────────────────────────────────────────
+
+  toggleMenuEvaluar(): void {
+    this.menuEvaluarAbierto.update(v => !v);
+  }
+
+  cerrarMenuEvaluar(): void {
+    this.menuEvaluarAbierto.set(false);
+  }
+
   // ── Submit individual ────────────────────────────────────────────────────
 
   /**
    * Procesa la evaluación individual.
-   * @param resultado  'aprobo' | 'no_aprobo'
+   * @param resultado 'aprobo' | 'no_aprobo'
    */
   submitEvaluacionIndividual(resultado: 'aprobo' | 'no_aprobo'): void {
     const payload = {
@@ -102,10 +108,21 @@ export class EvaluacionIndividualPageComponent implements OnInit {
       observaciones: this.observaciones.trim(),
       resultado,
     };
-    console.log('[EvaluacionIndividual] Submit:', JSON.stringify(payload, null, 2));
 
-    const estadoStr = resultado === 'aprobo' ? 'Aprobó' : 'No Aprobó';
-    this.facade.actualizarEstado(this.aprendiz().id, estadoStr);
+    console.log(
+      '[EvaluacionIndividual] Submit:',
+      JSON.stringify(payload, null, 2)
+    );
+
+    const estadoStr =
+      resultado === 'aprobo'
+        ? 'Aprobó'
+        : 'No Aprobó';
+
+    this.facade.actualizarEstado(
+      this.aprendiz().id,
+      estadoStr
+    );
 
     // Limpiar formulario y cerrar menú
     this.observaciones = '';

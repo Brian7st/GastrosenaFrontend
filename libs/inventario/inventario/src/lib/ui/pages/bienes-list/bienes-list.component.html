@@ -20,6 +20,38 @@
   </div>
 </div>
 
+<!-- Summary Dashboard Stats -->
+<div class="kpi-grid" *ngIf="kpis() as k">
+
+  <restaurant-kpi-card
+    label="Valor Total Inventario"
+    [value]="k.valorTotal | currency:'COP':'symbol-narrow':'1.0-0'"
+    icon="landmark"
+    iconColor="green"
+    [trend]="'+' + k.tendenciaValor + '% vs mes anterior'"
+    [trendUp]="true"
+  />
+
+  <restaurant-kpi-card
+    label="Bienes en Alerta"
+    [value]="k.totalAlertas + ' Items'"
+    icon="warehouse"
+    iconColor="red"
+    trend="Crítico"
+    [trendUp]="false"
+  />
+
+  <restaurant-kpi-card
+    label="Movimientos Recientes"
+    [value]="k.movimientosHoy + ' Altas'"
+    icon="refresh-cw"
+    iconColor="blue"
+    trend="Hoy"
+    [trendUp]="null"
+  />
+
+</div>
+
 <!-- Dashboard Card Container (Tabla) -->
 <div class="card-container">
   <!-- Table Controls -->
@@ -31,7 +63,7 @@
     <div class="table-controls__actions">
       <div class="search-box">
         <span class="material-symbols-outlined search-icon">search</span>
-        <input type="text" placeholder="Buscar por código o nombre..." (input)="onSearch($any($event.target).value)" />
+        <input #searchInput type="text" placeholder="Buscar por código o nombre..." (input)="onSearch(searchInput.value)" />
       </div>
       <restaurant-button variant="filter">
         <span class="material-symbols-outlined">filter_list</span>
@@ -82,7 +114,7 @@
               <span class="valor-text">{{ bien.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
             </td>
             <td>
-              <span class="estado-badge" [ngClass]="bien.estado === 'Activo' ? 'estado-badge--activo' : 'estado-badge--bajo'">
+              <span class="estado-badge" [ngClass]="getEstadoBadgeClass(bien.estado)">
                 <span class="estado-dot"></span>
                 {{ bien.estado }}
               </span>
@@ -124,43 +156,6 @@
     <restaurant-loading-skeleton [rows]="5" [columns]="10"></restaurant-loading-skeleton>
   </ng-template>
 </div>
-
-<!-- Summary Dashboard Stats -->
-<div class="kpi-grid" *ngIf="kpis() as k">
-
-  <restaurant-kpi-card
-    label="Valor Total Inventario"
-    [value]="k.valorTotal | currency:'COP':'symbol-narrow':'1.0-0'"
-    icon="landmark"
-    iconColor="green"
-    [trend]="'+' + k.tendenciaValor + '% vs mes anterior'"
-    [trendUp]="true"
-  />
-
-  <restaurant-kpi-card
-    label="Bienes en Alerta"
-    [value]="k.totalAlertas + ' Items'"
-    icon="warehouse"
-    iconColor="red"
-    trend="Crítico"
-    [trendUp]="false"
-  />
-
-  <restaurant-kpi-card
-    label="Movimientos Recientes"
-    [value]="k.movimientosHoy + ' Altas'"
-    icon="refresh-cw"
-    iconColor="blue"
-    trend="Hoy"
-    [trendUp]="null"
-  />
-
-</div>
-
-<!-- FAB -->
-<button class="fab" (click)="onNuevoBien()">
-  <span class="material-symbols-outlined">add</span>
-</button>
 
 <!-- Modales -->
 <restaurant-bien-form

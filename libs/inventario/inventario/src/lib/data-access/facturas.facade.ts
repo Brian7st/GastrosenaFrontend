@@ -1,5 +1,5 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
-import { finalize } from 'rxjs';
+import { finalize, catchError, of } from 'rxjs';
 import { Factura, FacturaFiltros, FacturaKpis, SolicitudGIL } from '../models/facturas.model';
 import { FacturasService } from './services/facturas.service';
 
@@ -16,6 +16,7 @@ export class FacturasFacade {
   private _solicitudGIL = signal<SolicitudGIL | null>(null);
   private _loading = signal<boolean>(false);
   private _filtros = signal<FacturaFiltros>({});
+  private _error = signal<string | null>(null);
 
   // Public readonly
   public facturas = computed(() => this._facturas());
@@ -24,6 +25,7 @@ export class FacturasFacade {
   public solicitudGIL = computed(() => this._solicitudGIL());
   public loading = computed(() => this._loading());
   public filtros = computed(() => this._filtros());
+  public error = computed(() => this._error());
 
   /** Carga inicial del panel */
   loadAll(): void {
@@ -36,13 +38,26 @@ export class FacturasFacade {
     if (filtros) this._filtros.set(filtros);
     this._loading.set(true);
     this.svc.getFacturas(this._filtros())
-      .pipe(finalize(() => this._loading.set(false)))
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al cargar la lista de facturas');
+          return of([]);
+        }),
+        finalize(() => this._loading.set(false))
+      )
       .subscribe(data => this._facturas.set(data));
   }
 
   /** Carga KPIs del panel */
   cargarKpis(): void {
-    this.svc.getKpis().subscribe(data => this._kpis.set(data));
+    this.svc.getKpis()
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al cargar los indicadores');
+          return of(null);
+        })
+      )
+      .subscribe(data => this._kpis.set(data));
   }
 
   /** Aplica filtros y recarga */
@@ -55,7 +70,13 @@ export class FacturasFacade {
   cargarFactura(id: string | number): void {
     this._loading.set(true);
     this.svc.getFacturaById(id)
-      .pipe(finalize(() => this._loading.set(false)))
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al cargar la factura');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
       .subscribe(f => this._facturaSeleccionada.set(f ?? null));
   }
 
@@ -63,18 +84,34 @@ export class FacturasFacade {
   crearFactura(data: Partial<Factura>): void {
     this._loading.set(true);
     this.svc.createFactura(data)
-      .pipe(finalize(() => this._loading.set(false)))
-      .subscribe(() => this.loadAll());
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al crear la factura');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe((res) => {
+        if (res !== null) this.loadAll();
+      });
   }
 
   /** Actualiza una factura */
   actualizarFactura(id: string | number, data: Partial<Factura>): void {
     this._loading.set(true);
     this.svc.updateFactura(id, data)
-      .pipe(finalize(() => this._loading.set(false)))
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al actualizar la factura');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
       .subscribe(updated => {
-        this._facturaSeleccionada.set(updated);
-        this.cargarFacturas();
+        if (updated !== null) {
+          this._facturaSeleccionada.set(updated);
+          this.cargarFacturas();
+        }
       });
   }
 
@@ -82,13 +119,27 @@ export class FacturasFacade {
   anularFactura(id: string | number): void {
     this._loading.set(true);
     this.svc.anularFactura(id)
-      .pipe(finalize(() => this._loading.set(false)))
-      .subscribe(() => this.loadAll());
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al anular la factura');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe((res) => {
+        if (res !== null) this.loadAll();
+      });
   }
 
   /** Carga una solicitud GIL */
   cargarSolicitudGIL(id: string): void {
     this.svc.getSolicitudGIL(id)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al cargar la solicitud GIL');
+          return of(null);
+        })
+      )
       .subscribe(s => this._solicitudGIL.set(s ?? null));
   }
 }
