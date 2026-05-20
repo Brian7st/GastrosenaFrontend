@@ -84,9 +84,23 @@ export class ActasDetailComponent implements OnInit {
   }
 
   // ── Acciones ─────────────────────────────────────────────────────────────
-  cambiarEstado(nuevoEstado: ActaEstado): void {
-    const id = this.acta()?.id;
-    if (id) this.facade.cambiarEstado(id, nuevoEstado);
+  /** Avanza al siguiente estado del flujo. Acepta un estado explícito o lo calcula automáticamente. */
+  cambiarEstado(nuevoEstado?: ActaEstado): void {
+    const id    = this.acta()?.id;
+    const estado = nuevoEstado ?? this.siguienteEstado();
+    if (id && estado) this.facade.cambiarEstado(id, estado);
+  }
+
+  private siguienteEstado(): ActaEstado | null {
+    const actual = this.acta()?.estado;
+    if (!actual) return null;
+    const flujo: Partial<Record<ActaEstado, ActaEstado>> = {
+      borrador:  'pendiente',
+      pendiente: 'firmada',
+      firmada:   'revisada',
+      revisada:  'archivada',
+    };
+    return flujo[actual] ?? null;
   }
 
   // ── Navegación ───────────────────────────────────────────────────────────

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { LucideIconComponent } from '@restaurant/shared/ui';
@@ -20,6 +20,8 @@ export class RequisicionesDetalleComponent implements OnInit {
   // ── Estado reactivo desde facade ─────────────────────────────────────────
   requisicion = this.facade.requisicionSeleccionada;
   loading     = this.facade.loading;
+  /** Expuesto para el template (usa reqId() en dos lugares) */
+  reqId       = computed(() => this.requisicion()?.id ?? '');
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
