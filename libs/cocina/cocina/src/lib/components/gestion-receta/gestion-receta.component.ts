@@ -5,7 +5,8 @@ import { CategoriaService } from "../../data-access/categoria.service";
 import { RecetaService } from "../../data-access/receta.service";
 import { IngredienteService } from "../../data-access/ingrediente.service";
 import { Receta } from "../../models/receta.model";
-import { LucideIconComponent } from "@restaurant/shared/ui";
+import { LucideIconComponent, ButtonComponent, InputComponent } from "@restaurant/shared/ui";
+import { soloLetrasValidator } from "../../validators/solo-letras.validator";
 
 export function noDuplicatesValidator(fieldName: string): ValidatorFn {
   return (formArray: AbstractControl): ValidationErrors | null => {
@@ -21,7 +22,7 @@ export function noDuplicatesValidator(fieldName: string): ValidatorFn {
 @Component({
   selector: 'restaurant-gestion-receta',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, LucideIconComponent],
+  imports: [ReactiveFormsModule, CommonModule, LucideIconComponent, ButtonComponent, InputComponent],
   templateUrl: './gestion-receta.component.html',
   styleUrl: './gestion-receta.component.scss'
 })
@@ -38,9 +39,9 @@ export class GestionRecetaComponent implements OnInit {
 
   recipeForm = this.fb.group({
     idCategoria: ['', Validators.required],        
-    nombreReceta: ['', [Validators.required, Validators.minLength(5)]], 
-    tiempoPreparacion: [0, [Validators.required, Validators.min(1)]],   
-    precioUnitario: [0, [Validators.required, Validators.min(0)]],    
+    nombreReceta: ['', [Validators.required, Validators.minLength(5), soloLetrasValidator()]], 
+    tiempoPreparacion: [0, [Validators.required, Validators.min(1), Validators.max(720)]],   
+    precioUnitario: [0, [Validators.required, Validators.min(0), Validators.max(1000000)]],    
     temperatura: ['', Validators.required],
     urlImagen: [''],
     ingredientes: this.fb.array([], [Validators.required, noDuplicatesValidator('nombreIngrediente')]),
@@ -82,8 +83,8 @@ export class GestionRecetaComponent implements OnInit {
     if (receta.ingredientes) {
       receta.ingredientes.forEach((ing: any) => {
         const group = this.fb.group({
-          nombreIngrediente: [ing.nombreIngrediente || ing.nombre, [Validators.required, Validators.minLength(2)]],
-          cantidadRequerida: [ing.cantidadRequerida, [Validators.required, Validators.min(0.1)]],
+          nombreIngrediente: [ing.nombreIngrediente || ing.nombre, [Validators.required, Validators.minLength(2), soloLetrasValidator()]],
+          cantidadRequerida: [ing.cantidadRequerida, [Validators.required, Validators.min(0.1), Validators.max(10000)]],
           unidadMedida: [ing.unidadMedida, Validators.required]
         });
         this.ingredientesArr.push(group);
@@ -94,7 +95,7 @@ export class GestionRecetaComponent implements OnInit {
       receta.pasos.forEach((paso: any) => {
         const group = this.fb.group({
           orden: [paso.orden],
-          descripcionPaso: [paso.descripcionPaso, Validators.required],
+          descripcionPaso: [paso.descripcionPaso, [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
           notasAdicionales: [paso.notasAdicionales]
         });
         this.pasosArr.push(group);
@@ -114,8 +115,8 @@ export class GestionRecetaComponent implements OnInit {
     }
 
     const nuevoIngrediente = this.fb.group({
-      nombreIngrediente: ['', [Validators.required, Validators.minLength(2)]], 
-      cantidadRequerida: [1, [Validators.required, Validators.min(0.1)]],      
+      nombreIngrediente: ['', [Validators.required, Validators.minLength(2), soloLetrasValidator()]], 
+      cantidadRequerida: [1, [Validators.required, Validators.min(0.1), Validators.max(10000)]],      
       unidadMedida: ['GR', Validators.required]                             
     });
     this.ingredientesArr.push(nuevoIngrediente);
@@ -139,7 +140,7 @@ export class GestionRecetaComponent implements OnInit {
     const orden = this.pasosArr.length + 1;
     const group = this.fb.group({
       orden: [orden],
-      descripcionPaso: ['', Validators.required],
+      descripcionPaso: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
       notasAdicionales: ['']
     });
     this.pasosArr.push(group);
@@ -194,8 +195,46 @@ export class GestionRecetaComponent implements OnInit {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = () => {
-        this.recipeForm.patchValue({ urlImagen: reader.result as string });
+      reader.onload = (e: any) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 800;
+          const MAX_HEIGHT = 800;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height = Math.round(height * (MAX_WIDTH / width));
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width = Math.round(width * (MAX_HEIGHT / height));
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+
+          // Comprimir como JPEG al 70% de calidad para evitar exceder el límite del paquete de MySQL
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+
+          // Calcular el tamaño aproximado en base64
+          const sizeInBytes = dataUrl.length * (3 / 4);
+          const sizeInMB = sizeInBytes / (1024 * 1024);
+          if (sizeInMB > 1) {
+            alert('La imagen es demasiado pesada incluso después de comprimir. Por favor, elige una imagen con menor resolución o recórtala.');
+            return;
+          }
+
+          this.recipeForm.patchValue({ urlImagen: dataUrl });
+        };
+        img.src = e.target.result;
       };
       reader.readAsDataURL(file);
     }

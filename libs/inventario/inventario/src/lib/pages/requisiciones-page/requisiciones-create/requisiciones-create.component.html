@@ -24,10 +24,7 @@
        ═══════════════════════════════════════════════════════════════════════ -->
   <div class="create-header">
     <div style="display: flex; justify-content: flex-start; margin-bottom: var(--space-6);">
-      <button class="btn-outline" routerLink="/app/inventario/requisiciones" style="display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-4); border-radius: var(--radius-lg); border: 1px solid var(--color-contorno); background: transparent; color: var(--color-en-superficie); font-weight: 700; font-size: var(--font-size-sm); cursor: pointer;">
-        <lucide-icon name="arrow-left" [size]="18"></lucide-icon>
-        Volver a la Bandeja
-      </button>
+      <inventario-back-button (clicked)="goBack()"></inventario-back-button>
     </div>
 
     <h1 class="page-title">Nueva Requisición de Insumos</h1>

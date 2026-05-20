@@ -141,3 +141,8 @@ export const MOCK_FIRMANTES: FirmanteActa[] = [
   { nombre: 'Sebastián Betancourt', cargo: 'Instructor Cuentadante', firmado: false },
   { nombre: 'Camila Rodríguez M.', cargo: 'Vocero de Aprendices (Recepción y Conformidad)', firmado: false },
 ];
+
+export interface WizardStep {
+  number: number;
+  label: string;
+}

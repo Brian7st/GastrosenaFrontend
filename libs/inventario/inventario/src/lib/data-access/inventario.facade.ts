@@ -1,7 +1,7 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
-import { Bien, BienFiltros, BienKpis } from '../models/inventario.model';
+import { Bien, BienFiltros, BienKpis, BienFormDto } from '../models/inventario.model';
 import { BienesService } from './services/bienes.service';
-import { finalize } from 'rxjs';
+import { finalize, catchError, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -14,12 +14,16 @@ export class InventarioFacade {
   private _kpis = signal<BienKpis | null>(null);
   private _loading = signal<boolean>(false);
   private _filtros = signal<BienFiltros>({});
+  private _bienSeleccionado = signal<Bien | undefined>(undefined);
+  private _error = signal<string | null>(null);
 
   // Exposición pública (Solo lectura)
   public bienes = computed(() => this._bienes());
   public kpis = computed(() => this._kpis());
   public loading = computed(() => this._loading());
   public filtros = computed(() => this._filtros());
+  public bienSeleccionado = computed(() => this._bienSeleccionado());
+  public error = computed(() => this._error());
 
   /**
    * Carga inicial de datos.
@@ -37,8 +41,30 @@ export class InventarioFacade {
     
     this._loading.set(true);
     this.bienesService.getBienes(this._filtros())
-      .pipe(finalize(() => this._loading.set(false)))
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al cargar la lista de bienes');
+          return of([]);
+        }),
+        finalize(() => this._loading.set(false))
+      )
       .subscribe(data => this._bienes.set(data));
+  }
+
+  /**
+   * Carga un bien específico por su ID.
+   */
+  cargarBienPorId(id: string): void {
+    this._loading.set(true);
+    this.bienesService.getBienById(id)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al cargar el detalle del bien');
+          return of(undefined);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(data => this._bienSeleccionado.set(data));
   }
 
   /**
@@ -46,6 +72,12 @@ export class InventarioFacade {
    */
   cargarKpis(): void {
     this.bienesService.getKpis()
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al cargar los indicadores');
+          return of(null);
+        })
+      )
       .subscribe(data => this._kpis.set(data));
   }
 
@@ -63,10 +95,54 @@ export class InventarioFacade {
   eliminarBien(id: string | number): void {
     this._loading.set(true);
     this.bienesService.deleteBien(id)
-      .pipe(finalize(() => this._loading.set(false)))
-      .subscribe(() => {
-        this.cargarBienes();
-        this.cargarKpis();
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al eliminar el bien');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe((res) => {
+        if (res !== null) {
+          this.cargarBienes();
+          this.cargarKpis();
+        }
+      });
+  }
+
+  /**
+   * Crea un nuevo bien y refresca los datos.
+   */
+  crearBien(dto: BienFormDto): void {
+    this._loading.set(true);
+    this.bienesService.createBien(dto)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al crear el bien');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe((res) => {
+        if (res !== null) this.loadAll();
+      });
+  }
+
+  /**
+   * Actualiza un bien existente y refresca los datos.
+   */
+  actualizarBien(id: string | number, dto: BienFormDto): void {
+    this._loading.set(true);
+    this.bienesService.updateBien(id, dto)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al actualizar el bien');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe((res) => {
+        if (res !== null) this.loadAll();
       });
   }
 }

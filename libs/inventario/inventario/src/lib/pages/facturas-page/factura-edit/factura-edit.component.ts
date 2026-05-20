@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -38,23 +38,24 @@ export class FacturaEditPageComponent implements OnInit {
 
   hasConciliacion = computed(() => (this.factura()?.conciliacion?.length ?? 0) > 0);
 
+  constructor() {
+    effect(() => {
+      const f = this.factura();
+      if (f) {
+        this.nitCliente.set(f.nitEmisor);
+        this.razonSocial.set(f.razonSocial);
+        this.fechaEmision.set(f.fechaEmision);
+        this.moneda.set(f.moneda);
+        this.notasInternas.set(f.notasInternas ?? '');
+        this.localItems.set([...f.items]);
+      }
+    });
+  }
+
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.facade.cargarFactura(id);
-      // Populate local signals once loaded
-      const intervalId = setInterval(() => {
-        const f = this.factura();
-        if (f) {
-          clearInterval(intervalId);
-          this.nitCliente.set(f.nitEmisor);
-          this.razonSocial.set(f.razonSocial);
-          this.fechaEmision.set(f.fechaEmision);
-          this.moneda.set(f.moneda);
-          this.notasInternas.set(f.notasInternas ?? '');
-          this.localItems.set([...f.items]);
-        }
-      }, 100);
     }
   }
 

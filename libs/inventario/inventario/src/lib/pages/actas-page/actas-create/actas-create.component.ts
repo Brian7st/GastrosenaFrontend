@@ -11,11 +11,7 @@ import {
   StatusBadgeComponent,
   LucideIconComponent,
 } from '@restaurant/shared/ui';
-
-interface WizardStep {
-  number: number;
-  label: string;
-}
+import { WizardStep } from '../../../models/acta.model';
 
 @Component({
   selector: 'restaurant-actas-create',
@@ -27,7 +23,7 @@ interface WizardStep {
     LucideIconComponent,
   ],
   templateUrl: './actas-create.component.html',
-  styleUrls: ['./actas-create.component.scss'],
+  styleUrl: './actas-create.component.scss',
 })
 export class ActasCreateComponent {
   private router = inject(Router);
@@ -36,7 +32,7 @@ export class ActasCreateComponent {
   currentStep = signal(1);
   readonly totalSteps = 4;
 
-  steps: WizardStep[] = [
+  readonly steps: WizardStep[] = [
     { number: 1, label: 'Apertura' },
     { number: 2, label: 'Desarrollo' },
     { number: 3, label: 'Firmantes' },

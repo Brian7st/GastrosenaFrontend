@@ -60,7 +60,7 @@
                 <input 
                   type="checkbox" 
                   class="checkbox" 
-                  [checked]="allSelected" 
+                  [checked]="allSelected()" 
                   (change)="toggleAll($event)" />
               </th>
               <th class="th-center">Código GIL</th>
@@ -72,7 +72,7 @@
             </tr>
           </thead>
           <tbody class="text-black text-center">
-            @for (item of gils; track item.id) {
+            @for (item of gils(); track item.id) {
               <tr [class.tr--disabled]="item.estado !== 'Disponible'" (click)="toggleSelection(item)">
                 <td class="td-center">
                   <input 
@@ -122,27 +122,27 @@
       <div class="calc-panel">
         <div class="calc-panel__header">
           <h3 class="calc-panel__title">Resumen de Selección</h3>
-          <p class="calc-panel__subtitle">{{ selectedCount }} Formatos seleccionados</p>
+          <p class="calc-panel__subtitle">{{ selectedCount() }} Formatos seleccionados</p>
         </div>
         
         <div class="calc-panel__body">
           <div class="calc-row text-on-surface">
             <span>Subtotal Neto</span>
-            <span class="calc-row__value">{{ subtotalNeto | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+            <span class="calc-row__value">{{ subtotalNeto() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
           </div>
           <div class="calc-row text-on-surface">
             <span>IVA Acumulado</span>
-            <span class="calc-row__value">{{ ivaAcumulado | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+            <span class="calc-row__value">{{ ivaAcumulado() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
           </div>
           <div class="calc-row text-tertiary">
             <span>Retención ZESE (0.625%)</span>
-            <span class="calc-row__value">-{{ retencionZese | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+            <span class="calc-row__value">-{{ retencionZese() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
           </div>
         </div>
         
         <div class="calc-panel__footer">
           <p class="calc-panel__total-label">Total Consolidado</p>
-          <p class="calc-panel__total-value">{{ totalConsolidado | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
+          <p class="calc-panel__total-value">{{ totalConsolidado() | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
         </div>
         
         <div class="calc-panel__actions">

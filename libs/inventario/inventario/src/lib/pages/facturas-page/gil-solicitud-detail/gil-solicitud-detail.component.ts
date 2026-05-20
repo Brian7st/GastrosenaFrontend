@@ -23,7 +23,11 @@ export class GilSolicitudDetailPageComponent implements OnInit {
   readonly STEPS: EstadoGIL[] = ['Borrador', 'Pendiente', 'Validado', 'Aprobado', 'Procesado'];
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id') ?? 'GIL-F-014-2024-001';
+    const id = this.route.snapshot.paramMap.get('id');
+    if (!id) {
+      this.router.navigate(['/app/inventario/facturas']);
+      return;
+    }
     this.facade.cargarSolicitudGIL(id);
   }
 
@@ -32,15 +36,15 @@ export class GilSolicitudDetailPageComponent implements OnInit {
   }
 
   onEditar(): void {
-    console.log('Editando solicitud GIL...');
+    // TODO: navegar a la ruta de edición de la solicitud
   }
 
   onDescargarPDF(): void {
-    console.log('Descargando PDF...');
+    // TODO: llamar a un servicio de exportación para descargar el PDF
   }
 
   onEnviarAprobacion(): void {
-    console.log('Enviando a aprobación...');
+    // TODO: llamar a un método de la facade que cambie el estado
   }
 
   getStepState(step: EstadoGIL, currentStep: EstadoGIL): 'done' | 'active' | 'pending' {

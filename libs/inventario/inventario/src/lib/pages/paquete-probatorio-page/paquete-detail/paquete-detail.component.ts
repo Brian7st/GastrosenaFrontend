@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  signal,
   inject,
   OnInit,
 } from '@angular/core';
@@ -12,19 +11,13 @@ import {
   StatusBadgeComponent,
   LucideIconComponent,
 } from '@restaurant/shared/ui';
+import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import {
   PaqueteProbatorio,
   PaqueteEstado,
-  MOCK_PAQUETES,
+  TimelineEntry,
 } from '../../../models/paquete.model';
-
-interface TimelineEntry {
-  estado: string;
-  fecha: string;
-  activo: boolean;
-  tipo: 'success' | 'error' | 'neutral';
-  detalle?: string;
-}
+import { PaqueteFacade } from '../../../data-access/paquete.facade';
 
 @Component({
   selector: 'restaurant-paquete-detail',
@@ -36,15 +29,19 @@ interface TimelineEntry {
     RouterLink,
     StatusBadgeComponent,
     LucideIconComponent,
+    BackButtonComponent,
   ],
   templateUrl: './paquete-detail.component.html',
-  styleUrls: ['./paquete-detail.component.scss'],
+  styleUrl: './paquete-detail.component.scss',
 })
 export class PaqueteDetailComponent implements OnInit {
-  private route = inject(ActivatedRoute);
+  private route  = inject(ActivatedRoute);
   private router = inject(Router);
+  private facade = inject(PaqueteFacade);
 
-  paquete = signal<PaqueteProbatorio | null>(null);
+  // ── Estado reactivo desde facade ─────────────────────────────────────────
+  paquete = this.facade.paqueteSeleccionado;
+  loading = this.facade.loading;
 
   // ── Estado derivado ──────────────────────────────────────────────────────
   isCompleto = computed(() => {
@@ -101,7 +98,7 @@ export class PaqueteDetailComponent implements OnInit {
     }
 
     // Historical states
-    if (p.estado !== 'borrador') {
+    if (p.estado !== 'borrador' && p.estado !== 'en_revision') {
       entries.push({
         estado: 'En revisión',
         fecha: p.fecha,
@@ -146,8 +143,11 @@ export class PaqueteDetailComponent implements OnInit {
   // ── Lifecycle ──────────────────────────────────────────────────────────
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    const found = MOCK_PAQUETES.find(p => p.id === id);
-    this.paquete.set(found ?? null);
+    if (id) {
+      this.facade.cargarPaquete(id);
+    } else {
+      this.router.navigate(['/app/inventario/paquete-probatorio']);
+    }
   }
 
   // ── Navegación ─────────────────────────────────────────────────────────

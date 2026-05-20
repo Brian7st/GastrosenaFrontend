@@ -2,8 +2,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  signal,
   inject,
+  OnInit,
 } from '@angular/core';
 import { CommonModule, UpperCasePipe, CurrencyPipe } from '@angular/common';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
@@ -11,17 +11,9 @@ import {
   StatusBadgeComponent,
   LucideIconComponent,
 } from '@restaurant/shared/ui';
-import {
-  ActaLegalizacion,
-  ActaEstado,
-  InsumoActa,
-  CompromisoActa,
-  FirmanteActa,
-  MOCK_ACTAS,
-  MOCK_INSUMOS,
-  MOCK_COMPROMISOS,
-  MOCK_FIRMANTES,
-} from '../../../models/acta.model';
+import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import { ActaEstado } from '../../../models/acta.model';
+import { ActasFacade } from '../../../data-access/actas.facade';
 
 @Component({
   selector: 'restaurant-actas-detail',
@@ -34,47 +26,47 @@ import {
     CurrencyPipe,
     StatusBadgeComponent,
     LucideIconComponent,
+    BackButtonComponent,
   ],
   templateUrl: './actas-detail.component.html',
-  styleUrls: ['./actas-detail.component.scss'],
+  styleUrl: './actas-detail.component.scss',
 })
-export class ActasDetailComponent {
+export class ActasDetailComponent implements OnInit {
   private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private route  = inject(ActivatedRoute);
+  private facade = inject(ActasFacade);
 
-  // ── Estado reactivo ───────────────────────────────────────────────────────
-  acta = signal<ActaLegalizacion>(MOCK_ACTAS[0]);
-  insumos = signal<InsumoActa[]>(MOCK_INSUMOS);
-  compromisos = signal<CompromisoActa[]>(MOCK_COMPROMISOS);
-  firmantes = signal<FirmanteActa[]>(MOCK_FIRMANTES);
+  // ── Estado reactivo desde facade ─────────────────────────────────────────
+  acta        = this.facade.actaSeleccionada;
+  insumos     = this.facade.insumos;
+  compromisos = this.facade.compromisos;
+  firmantes   = this.facade.firmantes;
+  loading     = this.facade.loading;
 
   // ── Cálculos monetarios ──────────────────────────────────────────────────
   subtotal = computed(() =>
     this.insumos().reduce((sum, i) => sum + i.cantidad * i.costoUnitario, 0)
   );
 
-  iva = computed(() => this.subtotal() * 0.05);
-
+  iva   = computed(() => this.subtotal() * 0.19);
   total = computed(() => this.subtotal() + this.iva());
 
-  constructor() {
-    // Cargar acta según parámetro de ruta
+  ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      const found = MOCK_ACTAS.find(a => a.id === id);
-      if (found) {
-        this.acta.set(found);
-      }
+      this.facade.cargarActa(id);
+    } else {
+      this.router.navigate(['/app/inventario/actas']);
     }
   }
 
   // ── Helpers de UI ────────────────────────────────────────────────────────
   getEstadoLabel(estado: ActaEstado): string {
     const map: Record<ActaEstado, string> = {
-      borrador: 'Borrador',
+      borrador:  'Borrador',
       pendiente: 'Pendiente Aprobación',
-      firmada: 'Firmada',
-      revisada: 'Revisada',
+      firmada:   'Firmada',
+      revisada:  'Revisada',
       archivada: 'Archivada',
     };
     return map[estado];
@@ -82,22 +74,38 @@ export class ActasDetailComponent {
 
   getEstadoVariant(estado: ActaEstado): 'success' | 'warning' | 'danger' | 'info' {
     const map: Record<ActaEstado, 'success' | 'warning' | 'danger' | 'info'> = {
-      borrador: 'info',
+      borrador:  'info',
       pendiente: 'warning',
-      firmada: 'info',
-      revisada: 'success',
+      firmada:   'success',
+      revisada:  'success',
       archivada: 'info',
     };
     return map[estado];
   }
 
-  // ── Navegación ─────────────────────────────────────────────────────────
-  volver(): void {
-    this.router.navigate(['/app/inventario/actas']);
+  // ── Acciones ─────────────────────────────────────────────────────────────
+  /** Avanza al siguiente estado del flujo. Acepta un estado explícito o lo calcula automáticamente. */
+  cambiarEstado(nuevoEstado?: ActaEstado): void {
+    const id    = this.acta()?.id;
+    const estado = nuevoEstado ?? this.siguienteEstado();
+    if (id && estado) this.facade.cambiarEstado(id, estado);
   }
 
-  cambiarEstado(): void {
-    // Placeholder para lógica futura
+  private siguienteEstado(): ActaEstado | null {
+    const actual = this.acta()?.estado;
+    if (!actual) return null;
+    const flujo: Partial<Record<ActaEstado, ActaEstado>> = {
+      borrador:  'pendiente',
+      pendiente: 'firmada',
+      firmada:   'revisada',
+      revisada:  'archivada',
+    };
+    return flujo[actual] ?? null;
+  }
+
+  // ── Navegación ───────────────────────────────────────────────────────────
+  volver(): void {
+    this.router.navigate(['/app/inventario/actas']);
   }
 
   cargarFirma(): void {
