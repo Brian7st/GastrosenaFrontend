@@ -250,11 +250,11 @@ $verde-sena-hover: rgba($verde-sena-nuevo, 0.05);
     }
 
     &--activo {
-      color: color.adjust($verde-sena-nuevo, $lightness: -15%);
+      color: var(--color-pizarra-800);
       font-weight: 600;
 
       .barra-lateral__subpunto {
-        background-color: $verde-sena-nuevo;
+        background-color: var(--color-pizarra-800);
       }
     }
   }

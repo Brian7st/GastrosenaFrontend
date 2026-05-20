@@ -3,99 +3,200 @@ import {
   Component,
   computed,
   inject,
+  OnInit,
   signal,
 } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
+import { LucideIconComponent } from '@restaurant/shared/ui';
 
-// ─── Modelo ──────────────────────────────────────────────────────────────────
-
-export interface AprendizMock {
-  id: number;
-  nombreCompleto: string;
-  inicial: string;
-  ficha: string;
-  jornada: 'Diurna' | 'Nocturna' | 'Mixta';
-  estado: 'Pendiente' | 'Aprobó' | 'No Aprobó';
-}
-
-// ─── Datos mock ───────────────────────────────────────────────────────────────
-
-const APRENDICES_MOCK: AprendizMock[] = [
-  { id: 1, nombreCompleto: 'Camila Rodriguez Torres',  inicial: 'C', ficha: '2561234', jornada: 'Diurna',   estado: 'Pendiente' },
-  { id: 2, nombreCompleto: 'Andrés Felipe Mora',       inicial: 'A', ficha: '2561234', jornada: 'Diurna',   estado: 'Pendiente' },
-  { id: 3, nombreCompleto: 'Laura Valentina Gómez',   inicial: 'L', ficha: '2489012', jornada: 'Mixta',    estado: 'Pendiente' },
-  { id: 4, nombreCompleto: 'María Fernanda Castro',   inicial: 'M', ficha: '2561234', jornada: 'Diurna',   estado: 'Pendiente' },
-  { id: 5, nombreCompleto: 'Valeria Ospina Herrera',  inicial: 'V', ficha: '2632456', jornada: 'Mixta',    estado: 'Pendiente' },
-];
-
-// ─── Componente ───────────────────────────────────────────────────────────────
+import {
+  CocinaFacade,
+  ActividadMock,
+} from '../../data-access/cocina.facade';
 
 @Component({
   selector: 'restaurant-evaluacion-masiva-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideIconComponent],
   templateUrl: './evaluacion-masiva-page.component.html',
   styleUrl: './evaluacion-masiva-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EvaluacionMasivaPageComponent {
+export class EvaluacionMasivaPageComponent implements OnInit {
 
-  // ── Datos ────────────────────────────────────────────────────────────────
-  readonly aprendices = signal<AprendizMock[]>(APRENDICES_MOCK);
+  // ── Inyecciones ─────────────────────────────
+  private facade = inject(CocinaFacade);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
-  // ── Selección ────────────────────────────────────────────────────────────
-  /** Set reactivo con los IDs de aprendices seleccionados */
+  // ── Actividad actual ─────────────────────────
+  readonly actividadId = signal<number | null>(null);
+
+  readonly actividad = computed<ActividadMock | null>(() => {
+    const id = this.actividadId();
+
+    if (!id) {
+      return null;
+    }
+
+    return (
+      this.facade.actividades().find(a => a.id === id) ?? null
+    );
+  });
+
+  readonly menuEstadoAbierto = signal<boolean>(false);
+
+  readonly estadosActividad: Array<
+    'Activa' | 'Pendiente' | 'Finalizada'
+  > = ['Activa', 'Pendiente', 'Finalizada'];
+
+  // ── Datos ────────────────────────────────────
+  readonly aprendices = this.facade.aprendices;
+
+  readonly aprendicesActivos = computed(() =>
+    this.aprendices().filter(a => !a.inactivo)
+  );
+
+  readonly aprendicesInactivos = computed(() =>
+    this.aprendices().filter(a => a.inactivo)
+  );
+
+  // ── Selección ────────────────────────────────
+  readonly modoSeleccionAbierto = signal<boolean>(false);
+
   readonly seleccionados = signal<Set<number>>(new Set());
 
-  /** Cantidad reactiva de seleccionados */
-  readonly cantidadSeleccionados = computed(() => this.seleccionados().size);
-
-  /** ¿Todos los visibles están seleccionados? */
-  readonly todosSeleccionados = computed(
-    () =>
-      this.aprendices().length > 0 &&
-      this.aprendices().every(a => this.seleccionados().has(a.id))
+  readonly cantidadSeleccionados = computed(
+    () => this.seleccionados().size
   );
 
-  /** ¿Al menos uno está seleccionado pero no todos? (indeterminate) */
+  readonly todosSeleccionados = computed(() => {
+    const activos = this.aprendicesActivos();
+
+    return (
+      activos.length > 0 &&
+      activos.every(a => this.seleccionados().has(a.id))
+    );
+  });
+
   readonly algunoSeleccionado = computed(
     () =>
-      this.cantidadSeleccionados() > 0 && !this.todosSeleccionados()
+      this.cantidadSeleccionados() > 0 &&
+      !this.todosSeleccionados()
   );
 
-  // ── UI ───────────────────────────────────────────────────────────────────
+  // ── UI ───────────────────────────────────────
   readonly menuEvaluarAbierto = signal<boolean>(false);
 
-  // ── Métodos de selección ─────────────────────────────────────────────────
+  // ── Init ─────────────────────────────────────
+  ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+
+      const id = Number(params['actividadId']);
+
+      if (id) {
+        this.actividadId.set(id);
+      }
+    });
+  }
+
+  // ── Estado actividad ─────────────────────────
+  toggleMenuEstado(): void {
+    this.menuEstadoAbierto.update(v => !v);
+  }
+
+  cerrarMenuEstado(): void {
+    this.menuEstadoAbierto.set(false);
+  }
+
+  cambiarEstadoActividad(
+    estado: 'Activa' | 'Pendiente' | 'Finalizada'
+  ): void {
+
+    const id = this.actividadId();
+
+    if (id) {
+      this.facade.actualizarEstadoActividad(id, estado);
+    }
+
+    this.menuEstadoAbierto.set(false);
+  }
+
+  getEstadoActividadClass(estado: string): string {
+
+    switch (estado) {
+
+      case 'Activa':
+        return 'act-estado-activa';
+
+      case 'Pendiente':
+        return 'act-estado-pendiente';
+
+      case 'Finalizada':
+        return 'act-estado-finalizada';
+
+      default:
+        return '';
+    }
+  }
+
+  // ── Selección ────────────────────────────────
+  toggleModoSeleccion(): void {
+
+    this.modoSeleccionAbierto.update(v => !v);
+
+    if (!this.modoSeleccionAbierto()) {
+
+      this.seleccionados.set(new Set());
+
+      this.cerrarMenuEvaluar();
+    }
+  }
 
   isSelected(id: number): boolean {
     return this.seleccionados().has(id);
   }
 
   toggleSelection(id: number): void {
+
+    if (!this.modoSeleccionAbierto()) {
+      return;
+    }
+
     const actual = new Set(this.seleccionados());
+
     if (actual.has(id)) {
       actual.delete(id);
     } else {
       actual.add(id);
     }
+
     this.seleccionados.set(actual);
   }
 
   toggleSelectAll(): void {
+
+    if (!this.modoSeleccionAbierto()) {
+      return;
+    }
+
     if (this.todosSeleccionados()) {
-      // Desmarcar todos
+
       this.seleccionados.set(new Set());
+
     } else {
-      // Seleccionar todos los visibles
-      const todos = new Set(this.aprendices().map(a => a.id));
+
+      const todos = new Set(
+        this.aprendicesActivos().map(a => a.id)
+      );
+
       this.seleccionados.set(todos);
     }
   }
 
-  // ── Menú EVALUAR ─────────────────────────────────────────────────────────
-
+  // ── Menú evaluar ─────────────────────────────
   toggleMenuEvaluar(): void {
     this.menuEvaluarAbierto.update(v => !v);
   }
@@ -104,29 +205,50 @@ export class EvaluacionMasivaPageComponent {
     this.menuEvaluarAbierto.set(false);
   }
 
-  // ── Submit masivo ────────────────────────────────────────────────────────
-
-  /**
-   * Procesa la evaluación masiva.
-   * @param resultado  'aprobo' | 'no_aprobo'
-   */
-  submitEvaluacionMasiva(resultado: 'aprobo' | 'no_aprobo'): void {
-    const ids = Array.from(this.seleccionados());
-    console.log('[EvaluacionMasiva] Submit:', { ids, resultado });
-
-    // Limpiar selección y cerrar menú
-    this.seleccionados.set(new Set());
-    this.menuEvaluarAbierto.set(false);
+  cerrarTodosMenus(): void {
+    this.cerrarMenuEvaluar();
+    this.cerrarMenuEstado();
   }
 
+  // ── Evaluación masiva ────────────────────────
+  submitEvaluacionMasiva(
+    resultado: 'aprobo' | 'no_aprobo'
+  ): void {
+
+    const ids = Array.from(this.seleccionados());
+
+    const estadoStr =
+      resultado === 'aprobo'
+        ? 'Aprobó'
+        : 'No Aprobó';
+
+    for (const id of ids) {
+      this.facade.actualizarEstado(id, estadoStr);
+    }
+
+    this.seleccionados.set(new Set());
+
+    this.menuEvaluarAbierto.set(false);
+
+    this.modoSeleccionAbierto.set(false);
+  }
+
+  // ── Navegación ───────────────────────────────
   volver(): void {
-    // Navega hacia atrás en el historial del navegador
     window.history.back();
   }
 
-  private router = inject(Router);
-
   goToIndividual(id: number): void {
-    this.router.navigate(['/app/cocina/evaluacion-individual'], { queryParams: { id } });
+
+    this.router.navigate(
+      ['/app/cocina/evaluacion-individual'],
+      {
+        queryParams: { id },
+      }
+    );
+  }
+
+  goToActividades(): void {
+    this.router.navigate(['/app/cocina/actividades']);
   }
 }
