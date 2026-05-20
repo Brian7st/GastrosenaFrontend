@@ -18,26 +18,22 @@
   gap: var(--space-4, 1rem);
 }
 
-.btn-volver {
-  display: inline-flex;
+.back-btn {
+  display: flex;
   align-items: center;
-  gap: 4px;
-  background: none;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background: #e7e8e9;
   border: none;
-  color: var(--color-text-secondary, #64748b);
-  font-size: var(--text-sm, 0.875rem);
+  color: var(--color-text-primary, #1e293b);
   cursor: pointer;
-  padding: 4px 0;
-  white-space: nowrap;
-  transition: color 0.15s;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
 
-  &:hover { color: var(--color-primary, #1e3a5f); }
-
-  .volver-chevron {
-    font-size: 1.1rem;
-    font-weight: 600;
-    line-height: 1;
-  }
+  &:hover { background: #e1e3e4; }
 }
 
 .page-title {
@@ -57,7 +53,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4, 1.2rem);
-  max-width: 520px;
+  max-width: 680px;
 }
 
 // ─── Perfil del aprendiz ──────────────────────

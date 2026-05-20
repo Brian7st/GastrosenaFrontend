@@ -2,9 +2,14 @@ import {
   ChangeDetectionStrategy,
   Component,
   signal,
+  inject,
+  OnInit
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
+import { CocinaFacade } from '../../data-access/cocina.facade';
+import { LucideIconComponent } from '@restaurant/shared/ui';
 
 // ─── Modelo ──────────────────────────────────────────────────────────────────
 
@@ -35,12 +40,12 @@ const APRENDIZ_MOCK: AprendizIndividualMock = {
 @Component({
   selector: 'restaurant-evaluacion-individual-page',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LucideIconComponent],
   templateUrl: './evaluacion-individual-page.component.html',
   styleUrl: './evaluacion-individual-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EvaluacionIndividualPageComponent {
+export class EvaluacionIndividualPageComponent implements OnInit {
 
   // ── Datos ────────────────────────────────────────────────────────────────
   readonly aprendiz = signal<AprendizIndividualMock>(APRENDIZ_MOCK);
@@ -62,6 +67,29 @@ export class EvaluacionIndividualPageComponent {
     this.menuEvaluarAbierto.set(false);
   }
 
+  private facade = inject(CocinaFacade);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
+  ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      const id = Number(params['id']);
+      if (id) {
+        const aprendizEncontrado = this.facade.aprendices().find(a => a.id === id);
+        if (aprendizEncontrado) {
+          this.aprendiz.set({
+            ...APRENDIZ_MOCK, // mantener base mock
+            id: aprendizEncontrado.id,
+            nombreCompleto: aprendizEncontrado.nombreCompleto,
+            inicial: aprendizEncontrado.inicial,
+            numeroFicha: aprendizEncontrado.ficha,
+            jornada: aprendizEncontrado.jornada,
+          });
+        }
+      }
+    });
+  }
+
   // ── Submit individual ────────────────────────────────────────────────────
 
   /**
@@ -75,6 +103,9 @@ export class EvaluacionIndividualPageComponent {
       resultado,
     };
     console.log('[EvaluacionIndividual] Submit:', JSON.stringify(payload, null, 2));
+
+    const estadoStr = resultado === 'aprobo' ? 'Aprobó' : 'No Aprobó';
+    this.facade.actualizarEstado(this.aprendiz().id, estadoStr);
 
     // Limpiar formulario y cerrar menú
     this.observaciones = '';

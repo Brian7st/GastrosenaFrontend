@@ -2,8 +2,8 @@
 
   <!-- ===== CABECERA ===== -->
   <div class="page-header">
-    <button id="btn-volver-individual" class="btn-volver" type="button" (click)="volver(); $event.stopPropagation()">
-      <span class="volver-chevron">‹</span> Volver
+    <button id="btn-volver-individual" class="back-btn" type="button" (click)="volver(); $event.stopPropagation()" aria-label="Volver">
+      <lucide-icon name="arrow-left" [size]="20"></lucide-icon>
     </button>
     <h1 class="page-title">Evaluación Individual</h1>
   </div>

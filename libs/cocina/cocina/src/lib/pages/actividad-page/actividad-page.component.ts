@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LucideIconComponent } from '@restaurant/shared/ui';
+import { CocinaFacade } from '../../data-access/cocina.facade';
 
 @Component({
   selector: 'restaurant-actividad-page',
@@ -13,6 +14,9 @@ import { LucideIconComponent } from '@restaurant/shared/ui';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ActividadPageComponent {
+  private router = inject(Router);
+  private facade = inject(CocinaFacade);
+
   fecha          = signal<string>('');
   nombreActividad = signal<string>('');
   jornada        = signal<string>('');
@@ -39,9 +43,22 @@ export class ActividadPageComponent {
     { value: 'trimestre4', label: 'Trimestre 4' },
   ];
 
-  private router = inject(Router);
-
   crearActividad(): void {
+    const jornadaLabel = this.jornadas.find(j => j.value === this.jornada())?.label ?? this.jornada();
+    const trimestreLabel = this.trimestres.find(t => t.value === this.trimestre())?.label ?? this.trimestre();
+
+    this.facade.crearActividad({
+      nombre: this.nombreActividad() || 'Actividad sin nombre',
+      fecha: this.fecha() || new Date().toISOString().slice(0, 10),
+      jornada: jornadaLabel,
+      ficha: this.numeroFicha() || '0000000',
+      trimestre: trimestreLabel,
+    });
+
     this.router.navigate(['/app/cocina/evaluacion-masiva']);
+  }
+
+  verActividades(): void {
+    this.router.navigate(['/app/cocina/actividades']);
   }
 }

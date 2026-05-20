@@ -23,7 +23,7 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
             { label: 'Comandas',  ruta: '/app/cocina/comandas',  icono: 'clipboard-list'   },
             { label: 'Recetas',   ruta: '/app/cocina/recetas',   icono: 'book-open'        },
             { label: 'Menú',      ruta: '/app/cocina/menu',      icono: 'utensils'         },
-            { label: 'Actividad', ruta: '/app/cocina/actividad', icono: 'graduation-cap'   },
+            { label: 'Evaluar', ruta: '/app/cocina/actividad', icono: 'graduation-cap'   },
           ],
         },
         {
