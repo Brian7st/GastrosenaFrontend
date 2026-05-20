@@ -24,6 +24,6 @@ export class CajaMovimientosPageComponent {
   private router = inject(Router);
 
   volver() {
-    this.router.navigate(['/restaurante/caja']);
+    this.router.navigate(['/app/restaurante/caja']);
   }
 }
