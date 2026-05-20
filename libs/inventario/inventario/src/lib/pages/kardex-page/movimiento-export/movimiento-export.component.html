@@ -30,13 +30,13 @@
       <div class="form-section">
         <label class="section-label">Tipo de Movimiento</label>
         <div class="chip-group">
-          <button type="button" class="chip-btn" [class.active]="tipoSeleccionado === 'entradas'" (click)="setTipo('entradas')">
+          <button type="button" class="chip-btn" [class.active]="tipoSeleccionado() === 'entradas'" (click)="setTipo('entradas')">
             Entradas
           </button>
-          <button type="button" class="chip-btn" [class.active]="tipoSeleccionado === 'salidas'" (click)="setTipo('salidas')">
+          <button type="button" class="chip-btn" [class.active]="tipoSeleccionado() === 'salidas'" (click)="setTipo('salidas')">
             Salidas
           </button>
-          <button type="button" class="chip-btn" [class.active]="tipoSeleccionado === 'ambos'" (click)="setTipo('ambos')">
+          <button type="button" class="chip-btn" [class.active]="tipoSeleccionado() === 'ambos'" (click)="setTipo('ambos')">
             Ambos
           </button>
         </div>
@@ -48,34 +48,34 @@
         <div class="format-grid">
           
           <!-- Excel Card -->
-          <div class="format-card" [class.selected]="formatoSeleccionado === 'excel'" (click)="setFormato('excel')">
+          <div class="format-card" [class.selected]="formatoSeleccionado() === 'excel'" (click)="setFormato('excel')">
             <div class="format-icon excel-icon">
               <lucide-icon name="file-spreadsheet" [size]="24"></lucide-icon>
             </div>
             <span class="format-title">Excel (.xlsx)</span>
-            <div class="check-indicator" *ngIf="formatoSeleccionado === 'excel'">
+            <div class="check-indicator" *ngIf="formatoSeleccionado() === 'excel'">
               <lucide-icon name="check-circle" [size]="18"></lucide-icon>
             </div>
           </div>
 
           <!-- PDF Card -->
-          <div class="format-card" [class.selected]="formatoSeleccionado === 'pdf'" (click)="setFormato('pdf')">
+          <div class="format-card" [class.selected]="formatoSeleccionado() === 'pdf'" (click)="setFormato('pdf')">
             <div class="format-icon pdf-icon">
               <lucide-icon name="file-text" [size]="24"></lucide-icon>
             </div>
             <span class="format-title">PDF (.pdf)</span>
-            <div class="check-indicator" *ngIf="formatoSeleccionado === 'pdf'">
+            <div class="check-indicator" *ngIf="formatoSeleccionado() === 'pdf'">
               <lucide-icon name="check-circle" [size]="18"></lucide-icon>
             </div>
           </div>
 
           <!-- CSV Card -->
-          <div class="format-card" [class.selected]="formatoSeleccionado === 'csv'" (click)="setFormato('csv')">
+          <div class="format-card" [class.selected]="formatoSeleccionado() === 'csv'" (click)="setFormato('csv')">
             <div class="format-icon csv-icon">
               <lucide-icon name="file-type-csv" [size]="24"></lucide-icon>
             </div>
             <span class="format-title">CSV (.csv)</span>
-            <div class="check-indicator" *ngIf="formatoSeleccionado === 'csv'">
+            <div class="check-indicator" *ngIf="formatoSeleccionado() === 'csv'">
               <lucide-icon name="check-circle" [size]="18"></lucide-icon>
             </div>
           </div>
