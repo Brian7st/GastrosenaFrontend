@@ -58,7 +58,7 @@
 
       <!-- Filtro Estado -->
       <div class="select-box">
-        <select (change)="onFilterEstado($any($event.target).value)">
+        <select #estadoSelect (change)="onFilterEstado(estadoSelect.value)">
           <option *ngFor="let opt of estadoOptions" [value]="opt.value">{{ opt.label }}</option>
         </select>
         <span class="material-symbols-outlined dropdown-icon">expand_more</span>
@@ -66,7 +66,7 @@
 
       <!-- Filtro Fecha -->
       <div class="select-box">
-        <select (change)="onFilterFecha($any($event.target).value)">
+        <select #fechaSelect (change)="onFilterFecha(fechaSelect.value)">
           <option *ngFor="let opt of fechaOptions" [value]="opt.value">{{ opt.label }}</option>
         </select>
         <span class="material-symbols-outlined dropdown-icon">calendar_month</span>
@@ -221,72 +221,18 @@
 
 </div>
 
-<!-- ══════════════════════════════════════════════════════════════════════════
-     MODALES DE ELIMINACIÓN
-══════════════════════════════════════════════════════════════════════════ -->
-<div *ngIf="showDeleteModal()" class="modal-overlay">
-  <!-- Background Backdrop -->
-  <div class="modal-backdrop" (click)="closeDeleteModal()"></div>
-
-  <!-- Modal Container: BLOQUEADO -->
-  <div *ngIf="deleteBlocked()" class="modal-container">
-    <div class="modal-header-strip"></div>
-    <div class="modal-header-label">
-      GIL Aprobado — eliminación bloqueada
-    </div>
-    <div class="modal-body">
-      <div class="modal-icon-container">
-        <span class="material-symbols-outlined modal-icon">warning</span>
-      </div>
-      <div class="modal-text-center">
-        <h3 class="modal-title">No se puede eliminar</h3>
-        <p class="modal-desc">
-          Este GIL ya fue aprobado y se encuentra en un estado inmutable para auditoría.
-        </p>
-      </div>
-      <div class="modal-actions">
-        <button (click)="closeDeleteModal()" class="btn-modal btn-modal--primary">
-          Entendido
-        </button>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <span class="material-symbols-outlined icon-info">info</span>
-      <span class="footer-text">Identificador: {{ itemToDelete()?.codigo }}</span>
-    </div>
-  </div>
-
-  <!-- Modal Container: CONFIRMACIÓN -->
-  <div *ngIf="!deleteBlocked()" class="modal-container">
-    <div class="modal-header-strip"></div>
-    <div class="modal-body">
-      <div class="modal-icon-container">
-        <span class="material-symbols-outlined modal-icon">warning</span>
-      </div>
-      <div class="modal-text-center">
-        <h3 class="modal-title">¿Estás seguro de que deseas eliminar esta solicitud?</h3>
-        <p class="modal-desc">
-          Esta acción no se puede deshacer. Se eliminarán permanentemente todos los registros asociados al formato <span class="font-bold">{{ itemToDelete()?.codigo }}</span> del sistema.
-        </p>
-        <div class="modal-input-group">
-          <label for="confirm-delete">Por seguridad, escribe la palabra ELIMINAR para continuar</label>
-          <input #deleteInput id="confirm-delete" placeholder="ELIMINAR" type="text" class="modal-input" />
-        </div>
-      </div>
-      <div class="modal-actions-col">
-        <button (click)="confirmDelete()" [disabled]="deleteInput.value !== 'ELIMINAR'" class="btn-modal btn-modal--danger" [class.btn-modal--disabled]="deleteInput.value !== 'ELIMINAR'">
-          <span class="material-symbols-outlined">delete_forever</span>
-          Eliminar Solicitud
-        </button>
-        <button (click)="closeDeleteModal()" class="btn-modal btn-modal--secondary">
-          Cancelar
-        </button>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <span class="material-symbols-outlined icon-info">info</span>
-      <span class="footer-text">Identificador: {{ itemToDelete()?.codigo }}</span>
-    </div>
-  </div>
-</div>
-
+<!-- ── MODAL: Eliminar GIL ── -->
+<restaurant-keyword-confirm-modal
+  [open]="showDeleteModal()"
+  title="¿Eliminar esta solicitud GIL?"
+  description="Esta acción no se puede deshacer. Se eliminarán permanentemente todos los registros asociados a este GIL del sistema."
+  keyword="ELIMINAR"
+  keywordLabel="Escribe ELIMINAR para confirmar"
+  confirmLabel="Sí, eliminar GIL"
+  cancelLabel="Cancelar"
+  [identifierLabel]="'GIL'"
+  [identifierValue]="itemToDelete()?.codigo ?? ''"
+  accent="danger"
+  (confirm)="confirmDelete()"
+  (cancel)="closeDeleteModal()"
+/>

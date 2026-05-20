@@ -7,7 +7,7 @@
   font-weight: var(--font-weight-semibold);
 }
 
-.status-badge--success { background: var(--color-success-bg-subtle);    color: var(--color-success); }
-.status-badge--warning { background: var(--color-warning-badge-bg);      color: var(--color-warning-badge-text); }
-.status-badge--danger  { background: var(--color-danger-bg-subtle);      color: var(--color-danger); }
-.status-badge--info    { background: var(--color-info-bg-subtle);        color: var(--color-info); }
+.status-badge--success { background: var(--color-estado-activo-bg); color: var(--color-estado-activo); }
+.status-badge--warning { background: var(--color-estado-pendiente-bg); color: var(--color-estado-pendiente); }
+.status-badge--danger  { background: var(--color-estado-anulada-bg); color: var(--color-estado-anulada); }
+.status-badge--info    { background: var(--color-estado-registrada-bg); color: var(--color-estado-registrada); }

@@ -71,7 +71,13 @@
 /* ── MAIN GRID ─────────────────────────────────────────────────────────── */
 .main-layout-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+
+.bottom-panels {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--space-6);
   align-items: start;
 }

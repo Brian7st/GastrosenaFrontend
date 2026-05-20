@@ -81,7 +81,7 @@ export class FacturasListPageComponent implements OnInit {
   }
 
   onExportar(): void {
-    console.log('Exportando facturas...');
+    // TODO: ruta de exportación pendiente
   }
 
   getEstadoBadgeClass(estado: EstadoFactura): string {
@@ -104,9 +104,10 @@ export class FacturasListPageComponent implements OnInit {
   }
 
   formatCurrency(value: number, moneda = 'COP'): string {
+    const validCurrency = moneda === 'GTQ' ? 'GTQ' : (moneda === 'USD' ? 'USD' : 'COP');
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
-      currency: moneda === 'GTQ' ? 'GTQ' : 'USD',
+      currency: validCurrency,
       minimumFractionDigits: 2,
     }).format(value).replace('US$', '$');
   }

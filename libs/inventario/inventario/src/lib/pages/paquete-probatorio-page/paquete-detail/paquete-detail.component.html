@@ -17,10 +17,7 @@
   <!-- ── Header ────────────────────────────────────────────────────── -->
   <div class="paquete-detail__header">
     <div class="paquete-detail__header-left">
-      <button class="paquete-detail__back-btn" (click)="volver()">
-        <lucide-icon name="arrow-left" [size]="14"></lucide-icon>
-        Volver
-      </button>
+      <inventario-back-button (clicked)="volver()" />
       <div class="paquete-detail__header-title-row">
         <h1 class="paquete-detail__title">Detalle paquete: {{ p.expediente }}</h1>
         <restaurant-status-badge

@@ -6,17 +6,18 @@ import {
   inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
-import { DataTableComponent, LucideIconComponent } from '@restaurant/shared/ui';
+import { Router } from '@angular/router';
+import { LucideIconComponent, DataTableComponent, ButtonComponent } from '@restaurant/shared/ui';
+import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { RegistroHistorial, AlertaPrioridad, MOCK_HISTORIAL } from '../../../models/alerta.model';
 
 @Component({
   selector: 'restaurant-alertas-historial',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, DataTableComponent, LucideIconComponent],
+  imports: [CommonModule, LucideIconComponent, DataTableComponent, ButtonComponent, BackButtonComponent],
   templateUrl: './alertas-historial.component.html',
-  styleUrls: ['./alertas-historial.component.scss'],
+  styleUrl: './alertas-historial.component.scss',
 })
 export class AlertasHistorialComponent {
   private router = inject(Router);
@@ -86,6 +87,6 @@ export class AlertasHistorialComponent {
   }
 
   exportarCSV(): void {
-    console.log('Exportando historial CSV...');
+    // TODO: llamar a alertasService.exportarHistorialCSV()
   }
 }

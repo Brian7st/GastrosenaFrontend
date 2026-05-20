@@ -7,20 +7,22 @@ export class RestauranteFacade {
   // Estado privado con Signals
   private _mesas = signal<Mesa[]>([]);
   private _ordenesHistorial = signal<Pedido[]>([]);
+  private _pedidoActivo = signal<Pedido | null>(null);
 
   // Selectores públicos (Signals)
   readonly mesas = this._mesas.asReadonly();
   readonly ordenesHistorial = this._ordenesHistorial.asReadonly();
+  readonly pedidoActivo = this._pedidoActivo.asReadonly();
 
   // KPIs computados
   readonly stats = computed<RestauranteStats>(() => {
-    const mesas = this._mesas();
-    const totalMesas = mesas.length;
-    const mesasOcupadas = mesas.filter(m => m.estado !== 'libre').length;
+    const mesasActivas = this._mesas().filter(m => m.isActive !== false);
+    const totalMesas = mesasActivas.length;
+    const mesasOcupadas = mesasActivas.filter(m => m.estado !== 'libre').length;
     const porcentajeOcupacion = totalMesas > 0 ? Math.round((mesasOcupadas / totalMesas) * 100) : 0;
     
     // Contar pedidos que no estén ENTREGADOS o CANCELADOS en las mesas activas
-    const pedidosPendientes = mesas.filter(m => 
+    const pedidosPendientes = mesasActivas.filter(m => 
       m.ordenActual && 
       m.ordenActual.estado !== EstadoPedido.ENTREGADO && 
       m.ordenActual.estado !== EstadoPedido.CANCELADO
@@ -74,6 +76,7 @@ export class RestauranteFacade {
       isActive,
       estado: 'libre',
       comensal: '',
+      cantidadComensales: undefined,
       ordenActual: null,
       notas: ''
     };
@@ -82,7 +85,7 @@ export class RestauranteFacade {
     this.guardarDatos();
   }
 
-  abrirMesa(id: number, comensal: string) {
+  abrirMesa(id: number, comensal: string, cantidadComensales: number) {
     this._mesas.update(mesas => mesas.map(m => {
       if (m.id === id) {
         // Crear orden inicial simulada
@@ -98,7 +101,7 @@ export class RestauranteFacade {
           total: 0
         };
         this._ordenesHistorial.set([nuevaOrden, ...this._ordenesHistorial()]);
-        return { ...m, estado: 'ocupada', comensal, ordenActual: nuevaOrden };
+        return { ...m, estado: 'ocupada', comensal, cantidadComensales, ordenActual: nuevaOrden };
       }
       return m;
     }));
@@ -110,10 +113,15 @@ export class RestauranteFacade {
     this.guardarDatos();
   }
 
+  cambiarEstadoActivoMesa(id: number, isActive: boolean) {
+    this._mesas.update(mesas => mesas.map(m => m.id === id ? { ...m, isActive } : m));
+    this.guardarDatos();
+  }
+
   liberarMesa(id: number) {
     this._mesas.update(mesas => mesas.map(m => {
       if (m.id === id) {
-        return { ...m, estado: 'libre', comensal: '', ordenActual: null };
+        return { ...m, estado: 'libre', comensal: '', cantidadComensales: undefined, ordenActual: null };
       }
       return m;
     }));
@@ -127,6 +135,83 @@ export class RestauranteFacade {
 
   actualizarMesa(mesa: Mesa) {
     this._mesas.update(mesas => mesas.map(m => m.id === mesa.id ? mesa : m));
+    this.guardarDatos();
+  }
+
+  // --- Gestión de Pedido Activo (Toma de Pedido) ---
+
+  seleccionarMesaParaPedido(mesaId: number) {
+    const mesa = this._mesas().find(m => m.id === mesaId);
+    if (!mesa) return;
+
+    // Si ya tiene una orden activa, la cargamos. Si no, creamos un "Borrador" simulado.
+    if (mesa.ordenActual) {
+      this._pedidoActivo.set(mesa.ordenActual);
+    } else {
+      const borrador: Pedido = {
+        id: `B-${Date.now()}`,
+        numero: this._ordenesHistorial().length + 1,
+        mesaId: mesa.id.toString(),
+        meseroId: '1', // Simulado
+        estado: EstadoPedido.ESPERA, // En el futuro será BORRADOR según tu backend
+        destino: 'COCINA',
+        horaCreacion: new Date(),
+        items: [],
+        total: 0
+      };
+      this._pedidoActivo.set(borrador);
+    }
+  }
+
+  agregarProductoAlPedido(productoId: string, nombre: string, precioUnit: number, observacion: string = '') {
+    this._pedidoActivo.update(pedido => {
+      if (!pedido) return null;
+      
+      const newItem = { productoId, nombre, cantidad: 1, precioUnit, observacion };
+      const items = [...pedido.items, newItem];
+      const total = items.reduce((sum, item) => sum + (item.precioUnit * item.cantidad), 0);
+      
+      return { ...pedido, items, total };
+    });
+  }
+
+  actualizarCantidadProducto(index: number, delta: number) {
+    this._pedidoActivo.update(pedido => {
+      if (!pedido) return null;
+      
+      const items = [...pedido.items];
+      items[index].cantidad += delta;
+      
+      if (items[index].cantidad <= 0) {
+        items.splice(index, 1);
+      }
+      
+      const total = items.reduce((sum, item) => sum + (item.precioUnit * item.cantidad), 0);
+      return { ...pedido, items, total };
+    });
+  }
+
+  limpiarPedidoActivo() {
+    this._pedidoActivo.set(null);
+  }
+
+  confirmarPedidoActivo() {
+    const pedido = this._pedidoActivo();
+    if (!pedido) return;
+
+    // Aquí a futuro llamarás al API (PATCH /api/pedidos/{id}/confirmar)
+    // Por ahora, simulamos que pasa a PREPARACION y ocupamos la mesa
+    const pedidoConfirmado = { ...pedido, estado: EstadoPedido.PREPARACION };
+    
+    this._mesas.update(mesas => mesas.map(m => {
+      if (m.id.toString() === pedido.mesaId) {
+        return { ...m, estado: 'ocupada', ordenActual: pedidoConfirmado };
+      }
+      return m;
+    }));
+
+    this._ordenesHistorial.update(historial => [pedidoConfirmado, ...historial]);
+    this.limpiarPedidoActivo();
     this.guardarDatos();
   }
 }

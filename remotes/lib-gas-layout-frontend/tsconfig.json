@@ -18,6 +18,14 @@
     "target": "ES2022",
     "module": "ES2022",
     "useDefineForClassFields": false,
-    "lib": ["ES2022", "dom"]
+    "lib": ["ES2022", "dom"],
+    "paths": {
+      "@restaurant/shared/ui": ["../../libs/shared/ui/src/index.ts"],
+      "@restaurant/shared/models": ["../../libs/shared/models/src/index.ts"],
+      "@restaurant/shared/util": ["../../libs/shared/util/src/index.ts"],
+      "@restaurant/shared/auth": ["../../libs/shared/auth/src/index.ts"],
+      "@restaurant/shared/api": ["../../libs/shared/api/src/index.ts"],
+      "@restaurant/shared/state": ["../../libs/shared/state/src/index.ts"]
+    }
   }
 }

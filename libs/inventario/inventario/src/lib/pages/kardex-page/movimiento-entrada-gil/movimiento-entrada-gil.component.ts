@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
@@ -8,11 +8,11 @@ import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
   standalone: true,
   imports: [CommonModule, RouterModule, LucideIconComponent, ButtonComponent],
   templateUrl: './movimiento-entrada-gil.component.html',
-  styleUrls: ['./movimiento-entrada-gil.component.scss']
+  styleUrl: './movimiento-entrada-gil.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MovimientoEntradaGilComponent {
-  
-  constructor(private router: Router) {}
+  private router = inject(Router);
 
   closeModal() {
     this.router.navigate(['/app/inventario/movimientos']);

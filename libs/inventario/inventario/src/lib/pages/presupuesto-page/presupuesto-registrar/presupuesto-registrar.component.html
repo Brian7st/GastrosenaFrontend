@@ -34,7 +34,7 @@
         <div class="select-wrapper">
           <lucide-icon name="calendar" [size]="18" class="field-icon"></lucide-icon>
           <select formControlName="vigenciaFiscal" class="form-select">
-            @for (v of vigencias; track v) {
+            @for (v of VIGENCIAS; track v) {
               <option [value]="v">{{ v }}</option>
             }
           </select>

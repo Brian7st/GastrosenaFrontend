@@ -5,17 +5,17 @@ import {
   inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { LucideIconComponent } from '@restaurant/shared/ui';
+import { Router } from '@angular/router';
 import { UmbralConfig, MOCK_UMBRALES } from '../../../models/alerta.model';
+import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+
 @Component({
   selector: 'restaurant-alertas-config',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, FormsModule, LucideIconComponent],
+  imports: [CommonModule, BackButtonComponent],
   templateUrl: './alertas-config.component.html',
-  styleUrls: ['./alertas-config.component.scss'],
+  styleUrl: './alertas-config.component.scss',
 })
 export class AlertasConfigComponent {
   private router = inject(Router);
@@ -45,7 +45,7 @@ export class AlertasConfigComponent {
   }
 
   guardarConfig(): void {
-    console.log('Guardando configuración de umbrales:', this.umbrales());
+    // TODO: llamar a alertasFacade.guardarUmbrales(this.umbrales())
   }
 
   restablecerValores(): void {

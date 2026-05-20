@@ -12,6 +12,7 @@ import {
   StatusBadgeComponent,
   LucideIconComponent,
 } from '@restaurant/shared/ui';
+import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import {
   PaqueteProbatorio,
   PaqueteEstado,
@@ -36,6 +37,7 @@ interface TimelineEntry {
     RouterLink,
     StatusBadgeComponent,
     LucideIconComponent,
+    BackButtonComponent,
   ],
   templateUrl: './paquete-detail.component.html',
   styleUrls: ['./paquete-detail.component.scss'],

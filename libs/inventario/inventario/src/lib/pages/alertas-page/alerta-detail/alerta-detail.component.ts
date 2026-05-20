@@ -9,26 +9,37 @@ import {
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { StatusBadgeComponent, ButtonComponent, LucideIconComponent } from '@restaurant/shared/ui';
-import { MOCK_ALERTAS, Alerta } from '../../../models/alerta.model';
+import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import { Alerta } from '../../../models/alerta.model';
+import { AlertasFacade } from '../../../data-access/alertas.facade';
 
 @Component({
   selector: 'restaurant-alerta-detail',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, StatusBadgeComponent, ButtonComponent, LucideIconComponent],
+  imports: [CommonModule, RouterModule, StatusBadgeComponent, ButtonComponent, LucideIconComponent, BackButtonComponent],
   templateUrl: './alerta-detail.component.html',
-  styleUrls: ['./alerta-detail.component.scss'],
+  styleUrl: './alerta-detail.component.scss',
 })
 export class AlertaDetailComponent implements OnInit {
   private router  = inject(Router);
   private route   = inject(ActivatedRoute);
+  private facade  = inject(AlertasFacade);
 
-  alerta = signal<Alerta | undefined>(undefined);
+  alerta = this.facade.alertaSeleccionada;
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     const id = this.route.snapshot.paramMap.get('id');
-    const found = MOCK_ALERTAS.find(a => a.id === id);
-    this.alerta.set(found ?? MOCK_ALERTAS[0]);
+    if (id) {
+      const alerta = await this.facade.cargarAlerta(id);
+      if (!alerta) {
+        this.router.navigate(['/app/inventario/alertas']);
+        return;
+      }
+    } else {
+      this.router.navigate(['/app/inventario/alertas']);
+      return;
+    }
   }
 
   // ── Computed ──────────────────────────────────────────────────────────────
@@ -59,7 +70,6 @@ export class AlertaDetailComponent implements OnInit {
   }
 
   abrirResolver(): void {
-    const id = this.alerta()?.id;
     this.router.navigate(['resolver'], { relativeTo: this.route });
   }
 

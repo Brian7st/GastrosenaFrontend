@@ -33,6 +33,7 @@
     "@nx/angular": "^20.0.0",
     "@nx/eslint": "^20.0.0",
     "@nx/eslint-plugin": "^20.0.0",
+    "@types/jest": "^30.0.0",
     "@types/node": "^22.10.2",
     "@typescript-eslint/eslint-plugin": "^8.59.1",
     "@typescript-eslint/parser": "^8.59.1",
@@ -41,6 +42,7 @@
     "lint-staged": "^15.2.10",
     "nx": "^20.0.0",
     "prettier": "^3.4.2",
+    "ts-mockito": "^2.6.1",
     "typescript": "~5.9.3"
   },
   "overrides": {
