@@ -23,8 +23,7 @@ export class AlertasService {
     return of(alerta).pipe(delay(200));
   }
 
-  resolverAlerta(id: string, data: any): Observable<boolean> {
-    // Simulamos la resolución exitosa
+  resolverAlerta(id: string, data: Record<string, unknown>): Observable<boolean> {
     console.log(`[AlertasService] Resolviendo alerta ${id}`, data);
     return of(true).pipe(delay(500));
   }

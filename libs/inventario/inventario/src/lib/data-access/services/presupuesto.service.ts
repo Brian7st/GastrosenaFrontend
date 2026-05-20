@@ -6,6 +6,8 @@ import {
   AfectacionPresupuestal,
   VencimientoProximo,
   EjecucionMensual,
+  RegistrarPresupuestoData,
+  TrasladarRubroData,
   MOCK_RESUMEN,
   MOCK_PROGRAMAS,
   MOCK_AFECTACIONES,
@@ -35,11 +37,11 @@ export class PresupuestoService {
     return of(MOCK_EJECUCION_MENSUAL).pipe(delay(300));
   }
 
-  registrarPresupuesto(data: any): Observable<any> {
+  registrarPresupuesto(data: RegistrarPresupuestoData): Observable<{ success: boolean }> {
     return of({ success: true }).pipe(delay(500));
   }
 
-  trasladarRubro(data: any): Observable<any> {
+  trasladarRubro(data: TrasladarRubroData): Observable<{ success: boolean }> {
     return of({ success: true }).pipe(delay(500));
   }
 
