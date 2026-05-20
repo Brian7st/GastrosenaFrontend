@@ -2,11 +2,15 @@ import {
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
+  Input,
   Output,
   signal,
 } from '@angular/core';
 import { LucideIconComponent } from '@restaurant/shared/ui';
-import { ImportarUsuariosRequest } from '../../models/usuarios.model';
+import {
+  ImportarUsuariosRequest,
+  ImportarUsuariosResponse,
+} from '../../models/usuarios.model';
 
 @Component({
   selector: 'restaurant-importar-usuarios',
@@ -20,8 +24,12 @@ export class ImportarUsuariosComponent {
   @Output() cerrar   = new EventEmitter<void>();
   @Output() importar = new EventEmitter<ImportarUsuariosRequest>();
 
+  @Input() resultado: ImportarUsuariosResponse | null = null;
+  @Input() importando = false;
+
   readonly isDragging = signal(false);
   readonly archivo    = signal<File | null>(null);
+  readonly tipo       = signal<'INSTRUCTOR' | 'APRENDIZ'>('INSTRUCTOR');
 
   onDragOver(event: DragEvent): void {
     event.preventDefault();
@@ -44,9 +52,13 @@ export class ImportarUsuariosComponent {
     if (file) this.archivo.set(file);
   }
 
+  onTipoChange(event: Event): void {
+    this.tipo.set((event.target as HTMLSelectElement).value as 'INSTRUCTOR' | 'APRENDIZ');
+  }
+
   onImportar(): void {
     const file = this.archivo();
     if (!file) return;
-    this.importar.emit({ archivo: file, tipo: 'INSTRUCTOR' });
+    this.importar.emit({ archivo: file, tipo: this.tipo() });
   }
 }

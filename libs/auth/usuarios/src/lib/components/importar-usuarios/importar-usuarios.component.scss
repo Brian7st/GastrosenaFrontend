@@ -17,6 +17,8 @@
   max-width: 480px;
   display: flex;
   flex-direction: column;
+  max-height: 90vh;
+  overflow-y: auto;
 
   &__header {
     display: flex;
@@ -24,6 +26,10 @@
     gap: var(--space-3);
     padding: var(--space-5) var(--space-6);
     border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    background: var(--color-surface-primary);
+    z-index: 1;
   }
 
   &__header-icon {
@@ -83,6 +89,55 @@
     flex-direction: column;
     gap: var(--space-4);
   }
+
+  // ── Select field (Corrección 2) ───────────────────────────────────────────
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  &__label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+  }
+
+  &__select-wrapper {
+    position: relative;
+  }
+
+  &__select {
+    width: 100%;
+    appearance: none;
+    padding: var(--space-2) var(--space-8) var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+    background: var(--color-surface-primary);
+    cursor: pointer;
+    transition: border-color var(--duration-fast) var(--ease-standard);
+    font-family: var(--font-family-base);
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-primario);
+      box-shadow: var(--focus-ring);
+    }
+  }
+
+  &__select-icon {
+    position: absolute;
+    right: var(--space-3);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-secondary);
+    pointer-events: none;
+  }
+
+  // ── Drop zone ─────────────────────────────────────────────────────────────
 
   &__dropzone {
     position: relative;
@@ -148,6 +203,8 @@
     cursor: pointer;
   }
 
+  // ── Yellow note ───────────────────────────────────────────────────────────
+
   &__note {
     display: flex;
     align-items: flex-start;
@@ -177,6 +234,72 @@
     margin: 0;
   }
 
+  // ── Loading (Corrección 6) ────────────────────────────────────────────────
+
+  &__loading {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    padding: var(--space-3);
+    background: var(--color-superficie-contenedor-bajo);
+    border-radius: var(--radius-md);
+  }
+
+  &__loading-icon {
+    animation: spin 1s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  // ── Result summary (Corrección 6) ─────────────────────────────────────────
+
+  &__result {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-superficie-contenedor-bajo);
+  }
+
+  &__result-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+
+    &--success {
+      color: var(--color-success-text);
+    }
+
+    &--error {
+      color: var(--color-error-text);
+    }
+  }
+
+  &__result-errors {
+    margin: var(--space-1) 0 0 var(--space-6);
+    padding: 0;
+    list-style: disc;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  &__result-error-item {
+    font-size: var(--font-size-xs);
+    color: var(--color-error-text);
+  }
+
+  // ── Footer ────────────────────────────────────────────────────────────────
+
   &__footer {
     display: flex;
     justify-content: flex-end;
@@ -185,6 +308,8 @@
     border-top: 1px solid var(--color-border);
     background: var(--color-superficie-contenedor-bajo);
     border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+    position: sticky;
+    bottom: 0;
   }
 
   &__btn {

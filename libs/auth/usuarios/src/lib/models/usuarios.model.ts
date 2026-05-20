@@ -19,6 +19,11 @@ export interface CrearUsuarioRequest {
   idRol:      string;
 }
 
+/**
+ * DTO para actualizar datos de un usuario.
+ * NOTA: email y documento NO son modificables por seguridad.
+ * Para cambiar el email se requiere un flujo de verificación separado.
+ */
 export interface ActualizarUsuarioRequest {
   nombre:    string;
   apellidos: string;

@@ -3,6 +3,7 @@ import { PaginatedResponse } from '@restaurant/shared/models';
 import {
   ActualizarUsuarioRequest,
   CrearUsuarioRequest,
+  ExportarConfig,
   FiltrosUsuarios,
   ImportarUsuariosRequest,
   ImportarUsuariosResponse,
@@ -59,7 +60,7 @@ export const UsuariosActions = createActionGroup({
     'Importar Masivo Fallido':      props<{ error: string }>(),
 
     // ── Exportar ──────────────────────────────────────────────────────────────
-    'Exportar Usuarios':            emptyProps(),
+    'Exportar Usuarios':            props<{ config: ExportarConfig }>(),
     'Exportar Usuarios Exitoso':    emptyProps(),
     'Exportar Usuarios Fallido':    props<{ error: string }>(),
 

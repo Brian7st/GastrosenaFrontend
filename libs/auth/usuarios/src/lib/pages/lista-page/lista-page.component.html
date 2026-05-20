@@ -15,30 +15,38 @@
         <lucide-icon name="download" [size]="16"></lucide-icon>
         Exportar
       </button>
-      <button class="lista-page__btn lista-page__btn--primary" type="button">
+      <button class="lista-page__btn lista-page__btn--primary" type="button" (click)="onCrearUsuario()">
         <lucide-icon name="user-plus" [size]="16"></lucide-icon>
         Nuevo Usuario
       </button>
     </div>
   </div>
 
+  <!-- Toast exportar (Corrección 5) -->
+  @if (mensajeExport()) {
+    <restaurant-alert
+      [type]="mensajeExport()!.tipo"
+      [message]="mensajeExport()!.texto"
+    ></restaurant-alert>
+  }
+
   <!-- KPI Cards -->
   <div class="lista-page__kpis">
     <restaurant-kpi-card
       label="Total Usuarios"
-      [value]="totalElements().toString()"
+      [value]="totalMostrar().toString()"
       icon="users"
       iconColor="blue"
     ></restaurant-kpi-card>
     <restaurant-kpi-card
       label="Activos"
-      [value]="totalActivos().toString()"
+      [value]="activosMostrar().toString()"
       icon="user-check"
       iconColor="green"
     ></restaurant-kpi-card>
     <restaurant-kpi-card
       label="Inactivos"
-      [value]="totalInactivos().toString()"
+      [value]="inactivosMostrar().toString()"
       icon="user-x"
       iconColor="red"
     ></restaurant-kpi-card>
@@ -55,7 +63,7 @@
     <restaurant-select-filter
       label="Rol"
       [value]="rolFiltro()"
-      [options]="rolOpciones"
+      [options]="rolOpciones()"
       (valueChange)="rolFiltro.set($event)"
     ></restaurant-select-filter>
   </div>
@@ -79,12 +87,12 @@
             Cargando usuarios...
           </td>
         </tr>
-      } @else if (usuariosFiltrados().length === 0) {
+      } @else if (usuariosMostrar().length === 0) {
         <tr>
           <td colspan="5" class="lista-page__empty">Sin resultados</td>
         </tr>
       } @else {
-        @for (u of usuariosFiltrados(); track u.id) {
+        @for (u of usuariosMostrar(); track u.id) {
           <tr>
             <td>
               <div class="lista-page__user">
@@ -109,10 +117,13 @@
                 {{ u.activo ? 'Activo' : 'Inactivo' }}
               </span>
             </td>
-            <td class="lista-page__last-access">{{ formatUltimoAcceso(u.ultimoAcceso) }}</td>
+            <!-- Corrección 7 — DatePipe Angular -->
+            <td class="lista-page__last-access">
+              {{ (u.ultimoAcceso | date:'dd/MM/yyyy') || '—' }}
+            </td>
             <td>
               <div class="lista-page__actions">
-                <button class="lista-page__action-btn" type="button" aria-label="Editar">
+                <button class="lista-page__action-btn" type="button" (click)="onEditarUsuario(u)" aria-label="Editar">
                   <lucide-icon name="pencil" [size]="16"></lucide-icon>
                 </button>
                 <button
@@ -144,7 +155,17 @@
 
 @if (mostrarImportar()) {
   <restaurant-importar-usuarios
+    [resultado]="resultadoImport()"
+    [importando]="importando()"
     (cerrar)="mostrarImportar.set(false)"
     (importar)="onImportar($event)"
   ></restaurant-importar-usuarios>
+}
+
+@if (mostrarFormulario()) {
+  <restaurant-usuario-form
+    [usuario]="usuarioEditando()"
+    (cerrar)="onCerrarFormulario()"
+    (guardar)="onGuardarUsuario($event)"
+  ></restaurant-usuario-form>
 }
