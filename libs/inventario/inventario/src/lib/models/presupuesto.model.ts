@@ -71,6 +71,23 @@ export interface EjecucionMensual {
   esMesActual: boolean;
 }
 
+/** Payload para registrar un nuevo rubro presupuestal */
+export interface RegistrarPresupuestoData {
+  programaId: string;
+  vigenciaFiscal: number;
+  nombreRubro: string;
+  codigoPresupuestal: string;
+  bolsaInicial: number;
+}
+
+/** Payload para trasladar saldo entre rubros */
+export interface TrasladarRubroData {
+  rubroOrigenId: string;
+  rubroDestinoId: string;
+  valor: number;
+  motivo?: string;
+}
+
 // ============================================================
 // MOCKS
 // ============================================================

@@ -15,7 +15,7 @@ import { LucideIconComponent } from '@restaurant/shared/ui';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, LucideIconComponent],
   templateUrl: './paquete-upload.component.html',
-  styleUrls: ['./paquete-upload.component.scss'],
+  styleUrl: './paquete-upload.component.scss',
 })
 export class PaqueteUploadComponent {
   private router = inject(Router);
@@ -24,6 +24,7 @@ export class PaqueteUploadComponent {
   isDragging = signal<boolean>(false);
   selectedFile = signal<File | null>(null);
   uploading = signal<boolean>(false);
+  errorArchivo = signal<string | null>(null);
 
   // ── Drag & Drop Events ───────────────────────────────────────────────────
   @HostListener('dragover', ['$event'])
@@ -62,9 +63,11 @@ export class PaqueteUploadComponent {
   private handleFile(file: File): void {
     // Basic validation: only PDFs or images
     if (file.type === 'application/pdf' || file.type.startsWith('image/')) {
+      this.errorArchivo.set(null);
       this.selectedFile.set(file);
     } else {
-      alert('Solo se permiten archivos PDF o imágenes (JPG, PNG).');
+      this.errorArchivo.set('Solo se permiten archivos PDF o imágenes (JPG, PNG).');
+      return;
     }
   }
 
@@ -80,14 +83,10 @@ export class PaqueteUploadComponent {
 
   subirDocumento(): void {
     if (!this.selectedFile()) return;
-    
     this.uploading.set(true);
-    
-    // Simulate upload delay
-    setTimeout(() => {
-      this.uploading.set(false);
-      this.cerrarModal();
-      // En la vida real aquí emitiríamos un evento o actualizaríamos el store
-    }, 1500);
+    // TODO(paquete-facade): llamar facade.adjuntarDocumento(file)
+    console.warn('subirDocumento: pendiente integración con PaqueteFacade');
+    this.uploading.set(false);
+    this.cerrarModal();
   }
 }

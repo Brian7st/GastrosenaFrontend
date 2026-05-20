@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
+import { KardexFacade } from '../../../data-access/kardex.facade';
+import { SalidaMovimientoData } from '../../../models/movimiento.model';
 
 @Component({
   selector: 'restaurant-movimiento-salida',
@@ -13,31 +15,33 @@ import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MovimientoSalidaComponent {
-  private fb = inject(FormBuilder);
+  private fb     = inject(FormBuilder);
   private router = inject(Router);
+  private facade = inject(KardexFacade);
 
-  stockDisponible = signal<number>(0); // TODO: actualizar al seleccionar producto desde la facade.
+  /** Stock en tiempo real; se actualizará cuando el backend esté integrado */
+  stockDisponible = signal<number>(0);
 
   salidaForm: FormGroup = this.fb.group({
-    producto: ['', Validators.required],
-    cantidad: [null, [Validators.required, Validators.min(1)]],
-    fecha: ['', Validators.required],
-    areaDestino: ['', Validators.required],
-    instructor: [''],
-    ficha: ['', [Validators.pattern('^[0-9]{7}$')]],
-    categoria: ['', Validators.required],
-    proposito: ['', Validators.required],
-    observaciones: ['']
+    producto:      ['', Validators.required],
+    cantidad:      [null, [Validators.required, Validators.min(1)]],
+    fecha:         ['', Validators.required],
+    areaDestino:   ['', Validators.required],
+    instructor:    [''],
+    ficha:         ['', [Validators.pattern('^[0-9]{7}$')]],
+    categoria:     ['', Validators.required],
+    proposito:     ['', Validators.required],
+    observaciones: [''],
   });
 
   onSubmit(): void {
     if (this.salidaForm.valid) {
-      // TODO: llamar a kardexFacade.registrarSalida(this.salidaForm.getRawValue())
+      this.facade.registrarSalida(this.salidaForm.getRawValue() as SalidaMovimientoData);
       this.closeModal();
     }
   }
 
-  closeModal() {
+  closeModal(): void {
     this.router.navigate(['/app/inventario/movimientos']);
   }
 }

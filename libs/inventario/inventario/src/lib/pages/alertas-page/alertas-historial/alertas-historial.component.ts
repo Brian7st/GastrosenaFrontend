@@ -1,15 +1,17 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  signal,
   computed,
+  signal,
   inject,
+  OnInit,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { LucideIconComponent, DataTableComponent, ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
-import { RegistroHistorial, AlertaPrioridad, MOCK_HISTORIAL } from '../../../models/alerta.model';
+import { AlertaPrioridad } from '../../../models/alerta.model';
+import { AlertasFacade } from '../../../data-access/alertas.facade';
 
 @Component({
   selector: 'restaurant-alertas-historial',
@@ -19,11 +21,12 @@ import { RegistroHistorial, AlertaPrioridad, MOCK_HISTORIAL } from '../../../mod
   templateUrl: './alertas-historial.component.html',
   styleUrl: './alertas-historial.component.scss',
 })
-export class AlertasHistorialComponent {
+export class AlertasHistorialComponent implements OnInit {
   private router = inject(Router);
+  private facade = inject(AlertasFacade);
 
-  registros = signal<RegistroHistorial[]>(MOCK_HISTORIAL);
-  filtroBien = signal<string>('');
+  registros         = this.facade.historial;
+  filtroBien        = signal<string>('');
   filtroResponsable = signal<string>('');
 
   total = computed(() => this.registros().length);
@@ -37,6 +40,10 @@ export class AlertasHistorialComponent {
       return matchBien && matchResp;
     });
   });
+
+  ngOnInit(): void {
+    this.facade.cargarHistorial();
+  }
 
   // ── Helpers de UI ────────────────────────────────────────────────────────
   getPrioridadLabel(p: AlertaPrioridad): string {
@@ -87,6 +94,7 @@ export class AlertasHistorialComponent {
   }
 
   exportarCSV(): void {
-    // TODO: llamar a alertasService.exportarHistorialCSV()
+    // TODO(alertas-facade): llamar facade.exportarHistorialCSV()
+    console.warn('exportarCSV: pendiente integración con AlertasFacade');
   }
 }

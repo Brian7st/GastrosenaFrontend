@@ -6,7 +6,9 @@ import {
   Programa,
   AfectacionPresupuestal,
   VencimientoProximo,
-  EjecucionMensual
+  EjecucionMensual,
+  RegistrarPresupuestoData,
+  TrasladarRubroData,
 } from '../models/presupuesto.model';
 
 @Injectable({ providedIn: 'root' })
@@ -68,7 +70,7 @@ export class PresupuestoFacade {
     });
   }
 
-  registrarPresupuesto(data: any): void {
+  registrarPresupuesto(data: RegistrarPresupuestoData): void {
     this._loading.set(true);
     this.presupuestoService.registrarPresupuesto(data)
       .pipe(
@@ -83,7 +85,7 @@ export class PresupuestoFacade {
       });
   }
 
-  trasladarRubro(data: any): void {
+  trasladarRubro(data: TrasladarRubroData): void {
     this._loading.set(true);
     this.presupuestoService.trasladarRubro(data)
       .pipe(

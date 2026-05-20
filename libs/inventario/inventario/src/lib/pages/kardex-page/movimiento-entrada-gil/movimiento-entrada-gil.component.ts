@@ -14,7 +14,7 @@ import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 export class MovimientoEntradaGilComponent {
   private router = inject(Router);
 
-  closeModal() {
+  closeModal(): void {
     this.router.navigate(['/app/inventario/movimientos']);
   }
 }

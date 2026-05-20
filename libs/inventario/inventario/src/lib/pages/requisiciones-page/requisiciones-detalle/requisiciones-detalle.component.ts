@@ -1,49 +1,38 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { LucideIconComponent } from '@restaurant/shared/ui';
+import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
 
 @Component({
-  selector: 'gastro-requisiciones-detalle',
+  selector: 'restaurant-requisiciones-detalle',
   standalone: true,
   imports: [CommonModule, RouterModule, LucideIconComponent],
   templateUrl: './requisiciones-detalle.component.html',
-  styleUrls: ['./requisiciones-detalle.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Default,
+  styleUrl: './requisiciones-detalle.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RequisicionesDetalleComponent {
+export class RequisicionesDetalleComponent implements OnInit {
   private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private route  = inject(ActivatedRoute);
+  private facade = inject(RequisicionesFacade);
 
-  reqId = '0892';
-  statusName = 'Despachada';
-  statusClass = 'sheet-panel__status-badge--info';
+  // ── Estado reactivo desde facade ─────────────────────────────────────────
+  requisicion = this.facade.requisicionSeleccionada;
+  loading     = this.facade.loading;
+  /** Expuesto para el template (usa reqId() en dos lugares) */
+  reqId       = computed(() => this.requisicion()?.id ?? '');
 
-  constructor() {
-    this.route.paramMap.subscribe(params => {
-      const id = params.get('id');
-      if (id) {
-        this.reqId = id;
-        
-        // Mock status based on known IDs from dashboard
-        if (['0895', '0896', '0897'].includes(id)) {
-          this.statusName = 'Borrador';
-          this.statusClass = 'sheet-panel__status-badge--borrador';
-        } else if (['0892', '0893'].includes(id)) {
-          this.statusName = 'Enviada';
-          this.statusClass = 'sheet-panel__status-badge--enviada';
-        } else if (id === '0890') {
-          this.statusName = 'En Despacho';
-          this.statusClass = 'sheet-panel__status-badge--info';
-        } else if (['0888', '0885'].includes(id)) {
-          this.statusName = 'Firmada';
-          this.statusClass = 'sheet-panel__status-badge--success';
-        }
-      }
-    });
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.facade.cargarRequisicion(id);
+    } else {
+      this.router.navigate(['/app/inventario/requisiciones']);
+    }
   }
 
-  close() {
+  close(): void {
     this.router.navigate(['/app/inventario/requisiciones']);
   }
 }

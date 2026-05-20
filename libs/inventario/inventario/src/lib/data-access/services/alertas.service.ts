@@ -1,6 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
-import { Alerta, MOCK_ALERTAS } from '../../models/alerta.model';
+import {
+  Alerta,
+  RegistroHistorial,
+  UmbralConfig,
+  MOCK_ALERTAS,
+  MOCK_HISTORIAL,
+  MOCK_UMBRALES,
+} from '../../models/alerta.model';
 
 @Injectable({
   providedIn: 'root'
@@ -16,15 +23,21 @@ export class AlertasService {
     return of(alerta).pipe(delay(200));
   }
 
-  resolverAlerta(id: string, data: any): Observable<boolean> {
-    // Simulamos la resolución exitosa
+  resolverAlerta(id: string, data: Record<string, unknown>): Observable<boolean> {
     console.log(`[AlertasService] Resolviendo alerta ${id}`, data);
     return of(true).pipe(delay(500));
   }
 
-  updateUmbrales(umbrales: any): Observable<boolean> {
-    // Simulamos guardado de umbrales
+  updateUmbrales(umbrales: UmbralConfig[]): Observable<boolean> {
     console.log('[AlertasService] Umbrales actualizados', umbrales);
     return of(true).pipe(delay(400));
+  }
+
+  getHistorial(): Observable<RegistroHistorial[]> {
+    return of([...MOCK_HISTORIAL]).pipe(delay(300));
+  }
+
+  getUmbrales(): Observable<UmbralConfig[]> {
+    return of([...MOCK_UMBRALES]).pipe(delay(300));
   }
 }

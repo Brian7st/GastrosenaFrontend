@@ -4,17 +4,17 @@ import { Router } from '@angular/router';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 
 @Component({
-  selector: 'gastro-requisiciones-firmar',
+  selector: 'restaurant-requisiciones-firmar',
   standalone: true,
   imports: [CommonModule, LucideIconComponent],
   templateUrl: './requisiciones-firmar.component.html',
-  styleUrls: ['./requisiciones-firmar.component.scss'],
+  styleUrl: './requisiciones-firmar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RequisicionesFirmarComponent {
   private router = inject(Router);
 
-  close() {
+  close(): void {
     this.router.navigate(['/app/inventario/requisiciones']);
   }
 }

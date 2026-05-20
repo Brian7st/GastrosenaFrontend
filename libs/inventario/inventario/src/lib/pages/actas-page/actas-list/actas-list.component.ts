@@ -4,6 +4,7 @@ import {
   computed,
   signal,
   inject,
+  OnInit,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -13,11 +14,8 @@ import {
   LucideIconComponent,
   ButtonComponent,
 } from '@restaurant/shared/ui';
-import {
-  ActaLegalizacion,
-  ActaEstado,
-  MOCK_ACTAS,
-} from '../../../models/acta.model';
+import { ActaEstado } from '../../../models/acta.model';
+import { ActasFacade } from '../../../data-access/actas.facade';
 
 @Component({
   selector: 'restaurant-actas-list',
@@ -31,27 +29,33 @@ import {
     ButtonComponent,
   ],
   templateUrl: './actas-list.component.html',
-  styleUrls: ['./actas-list.component.scss'],
+  styleUrl: './actas-list.component.scss',
 })
-export class ActasListComponent {
+export class ActasListComponent implements OnInit {
   private router = inject(Router);
+  private facade = inject(ActasFacade);
 
   // ── Estado reactivo ──────────────────────────────────────────────────────
-  allActas = signal<ActaLegalizacion[]>(MOCK_ACTAS);
-  searchText = signal<string>('');
+  allActas    = this.facade.actas;
+  loading     = this.facade.loading;
+  searchText  = signal<string>('');
   estadoFilter = signal<string>('');
-  fichaFilter = signal<string>('');
+  fichaFilter  = signal<string>('');
+
+  ngOnInit(): void {
+    this.facade.loadAll();
+  }
 
   // ── Actas filtradas ──────────────────────────────────────────────────────
   filteredActas = computed(() => {
-    const text = this.searchText().toLowerCase();
+    const text   = this.searchText().toLowerCase();
     const estado = this.estadoFilter();
-    const ficha = this.fichaFilter().toLowerCase();
+    const ficha  = this.fichaFilter().toLowerCase();
 
     return this.allActas().filter(a => {
-      const matchText = !text || a.instructor.toLowerCase().includes(text);
+      const matchText   = !text   || a.instructor.toLowerCase().includes(text);
       const matchEstado = !estado || a.estado === estado;
-      const matchFicha = !ficha || a.ficha.toLowerCase().includes(ficha);
+      const matchFicha  = !ficha  || a.ficha.toLowerCase().includes(ficha);
       return matchText && matchEstado && matchFicha;
     });
   });
@@ -59,10 +63,10 @@ export class ActasListComponent {
   // ── Helpers de UI ────────────────────────────────────────────────────────
   getEstadoLabel(estado: ActaEstado): string {
     const map: Record<ActaEstado, string> = {
-      borrador: 'Borrador',
+      borrador:  'Borrador',
       pendiente: 'Pendiente Firmas',
-      firmada: 'Firmada',
-      revisada: 'Revisada',
+      firmada:   'Firmada',
+      revisada:  'Revisada',
       archivada: 'Archivada',
     };
     return map[estado];
@@ -70,16 +74,16 @@ export class ActasListComponent {
 
   getEstadoVariant(estado: ActaEstado): 'success' | 'warning' | 'danger' | 'info' {
     const map: Record<ActaEstado, 'success' | 'warning' | 'danger' | 'info'> = {
-      borrador: 'info',
+      borrador:  'info',
       pendiente: 'warning',
-      firmada: 'success',
-      revisada: 'success',
+      firmada:   'success',
+      revisada:  'success',
       archivada: 'info',
     };
     return map[estado];
   }
 
-  // ── Eventos de filtro ──────────────────────────────────────────────────
+  // ── Eventos de filtro ────────────────────────────────────────────────────
   onSearch(event: Event): void {
     this.searchText.set((event.target as HTMLInputElement).value);
   }
@@ -98,7 +102,7 @@ export class ActasListComponent {
     this.fichaFilter.set('');
   }
 
-  // ── Navegación ─────────────────────────────────────────────────────────
+  // ── Navegación ───────────────────────────────────────────────────────────
   crearActa(): void {
     this.router.navigate(['/app/inventario/actas/nueva']);
   }

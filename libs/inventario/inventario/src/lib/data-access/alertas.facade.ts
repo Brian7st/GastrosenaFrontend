@@ -1,6 +1,6 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
 import { AlertasService } from './services/alertas.service';
-import { Alerta } from '../models/alerta.model';
+import { Alerta, RegistroHistorial, UmbralConfig } from '../models/alerta.model';
 import { finalize, catchError, of, firstValueFrom } from 'rxjs';
 
 @Injectable({
@@ -12,14 +12,16 @@ export class AlertasFacade {
   // Estados internos (Signals)
   private _alertas = signal<Alerta[]>([]);
   private _alertaSeleccionada = signal<Alerta | undefined>(undefined);
-  private _umbrales = signal<any>(null); // Placeholder para umbrales
+  private _historial = signal<RegistroHistorial[]>([]);
+  private _umbrales  = signal<UmbralConfig[]>([]);
   private _loading = signal<boolean>(false);
   private _error = signal<string | null>(null);
 
   // Exposición pública (Solo lectura)
   public alertas = computed(() => this._alertas());
   public alertaSeleccionada = computed(() => this._alertaSeleccionada());
-  public umbrales = computed(() => this._umbrales());
+  public historial = computed(() => this._historial());
+  public umbrales  = computed(() => this._umbrales());
   public loading = computed(() => this._loading());
   public error = computed(() => this._error());
 
@@ -56,34 +58,38 @@ export class AlertasFacade {
     }
   }
 
-  /**
-   * Resuelve una alerta.
-   */
-  resolverAlerta(id: string, data: any): void {
+  /** Carga el historial de resoluciones de alertas. */
+  cargarHistorial(): void {
     this._loading.set(true);
-    this.alertasService.resolverAlerta(id, data)
+    this.alertasService.getHistorial()
       .pipe(
         catchError(() => {
-          this._error.set('Error al resolver la alerta');
-          return of(false);
+          this._error.set('Error al cargar el historial de alertas');
+          return of([]);
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe((res) => {
-        if (res) {
-          // Refrescar datos después de resolver
-          this.loadAll();
-          if (this._alertaSeleccionada()?.id === id) {
-             this.cargarAlerta(id);
-          }
-        }
-      });
+      .subscribe(data => this._historial.set(data));
+  }
+
+  /** Carga la configuración de umbrales. */
+  cargarUmbrales(): void {
+    this._loading.set(true);
+    this.alertasService.getUmbrales()
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al cargar los umbrales');
+          return of([]);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(data => this._umbrales.set(data));
   }
 
   /**
    * Guarda los umbrales de configuración.
    */
-  guardarUmbrales(nuevosUmbrales: any): void {
+  guardarUmbrales(nuevosUmbrales: UmbralConfig[]): void {
     this._loading.set(true);
     this.alertasService.updateUmbrales(nuevosUmbrales)
       .pipe(
@@ -96,6 +102,27 @@ export class AlertasFacade {
       .subscribe((res) => {
         if (res) {
           this._umbrales.set(nuevosUmbrales);
+        }
+      });
+  }
+
+  /** Resuelve una alerta con datos tipados. */
+  resolverAlerta(id: string, data: Record<string, unknown>): void {
+    this._loading.set(true);
+    this.alertasService.resolverAlerta(id, data)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al resolver la alerta');
+          return of(false);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe((res) => {
+        if (res) {
+          this.loadAll();
+          if (this._alertaSeleccionada()?.id === id) {
+            this.cargarAlerta(id);
+          }
         }
       });
   }
