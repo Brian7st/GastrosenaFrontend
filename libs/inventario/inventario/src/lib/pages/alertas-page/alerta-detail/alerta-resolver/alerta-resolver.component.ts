@@ -8,7 +8,8 @@ import {
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-import { MOCK_ALERTAS, Alerta, AccionResolver } from '../../../../models/alerta.model';
+import { Alerta, AccionResolver } from '../../../../models/alerta.model';
+import { AlertasFacade } from '../../../../data-access/alertas.facade';
 
 @Component({
   selector: 'restaurant-alerta-resolver',
@@ -16,14 +17,15 @@ import { MOCK_ALERTAS, Alerta, AccionResolver } from '../../../../models/alerta.
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './alerta-resolver.component.html',
-  styleUrls: ['./alerta-resolver.component.scss'],
+  styleUrl: './alerta-resolver.component.scss',
 })
 export class AlertaResolverComponent implements OnInit {
   private router  = inject(Router);
   private route   = inject(ActivatedRoute);
   private fb      = inject(FormBuilder);
+  private facade  = inject(AlertasFacade);
 
-  alerta = signal<Alerta | undefined>(undefined);
+  alerta = this.facade.alertaSeleccionada;
   accionSeleccionada = signal<AccionResolver | ''>('');
 
   resolverForm: FormGroup = this.fb.group({
@@ -36,8 +38,9 @@ export class AlertaResolverComponent implements OnInit {
   ngOnInit(): void {
     // El id está en el padre (alertas/:id/resolver)
     const id = this.route.parent?.snapshot.paramMap.get('id');
-    const found = MOCK_ALERTAS.find(a => a.id === id);
-    this.alerta.set(found ?? MOCK_ALERTAS[0]);
+    if (id && this.facade.alertaSeleccionada()?.id !== id) {
+       this.facade.cargarAlerta(id);
+    }
   }
 
   get prioridadLabel(): string {
@@ -54,7 +57,10 @@ export class AlertaResolverComponent implements OnInit {
 
   onConfirmar(): void {
     if (this.resolverForm.valid) {
-      console.log('Resolución confirmada:', this.resolverForm.getRawValue());
+      const id = this.alerta()?.id;
+      if (id) {
+         this.facade.resolverAlerta(id, this.resolverForm.getRawValue());
+      }
       this.cerrar();
     }
   }

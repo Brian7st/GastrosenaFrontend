@@ -15,7 +15,7 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, BackButtonComponent],
   templateUrl: './alertas-config.component.html',
-  styleUrls: ['./alertas-config.component.scss'],
+  styleUrl: './alertas-config.component.scss',
 })
 export class AlertasConfigComponent {
   private router = inject(Router);

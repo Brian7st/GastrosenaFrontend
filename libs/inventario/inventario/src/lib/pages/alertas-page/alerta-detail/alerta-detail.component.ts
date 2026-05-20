@@ -10,7 +10,8 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { StatusBadgeComponent, ButtonComponent, LucideIconComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
-import { MOCK_ALERTAS, Alerta } from '../../../models/alerta.model';
+import { Alerta } from '../../../models/alerta.model';
+import { AlertasFacade } from '../../../data-access/alertas.facade';
 
 @Component({
   selector: 'restaurant-alerta-detail',
@@ -18,18 +19,20 @@ import { MOCK_ALERTAS, Alerta } from '../../../models/alerta.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterModule, StatusBadgeComponent, ButtonComponent, LucideIconComponent, BackButtonComponent],
   templateUrl: './alerta-detail.component.html',
-  styleUrls: ['./alerta-detail.component.scss'],
+  styleUrl: './alerta-detail.component.scss',
 })
 export class AlertaDetailComponent implements OnInit {
   private router  = inject(Router);
   private route   = inject(ActivatedRoute);
+  private facade  = inject(AlertasFacade);
 
-  alerta = signal<Alerta | undefined>(undefined);
+  alerta = this.facade.alertaSeleccionada;
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    const found = MOCK_ALERTAS.find(a => a.id === id);
-    this.alerta.set(found ?? MOCK_ALERTAS[0]);
+    if (id) {
+      this.facade.cargarAlerta(id);
+    }
   }
 
   // ── Computed ──────────────────────────────────────────────────────────────
