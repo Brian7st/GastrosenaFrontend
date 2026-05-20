@@ -8,7 +8,7 @@ import {
 } from '@restaurant/shared/ui';
 
 @Component({
-  selector: 'gastro-requisiciones-dashboard',
+  selector: 'restaurant-requisiciones-dashboard',
   standalone: true,
   imports: [
     CommonModule,
@@ -18,7 +18,7 @@ import {
     ButtonComponent,
   ],
   templateUrl: './requisiciones-dashboard.component.html',
-  styleUrls: ['./requisiciones-dashboard.component.scss'],
+  styleUrl: './requisiciones-dashboard.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RequisicionesDashboardComponent {}
