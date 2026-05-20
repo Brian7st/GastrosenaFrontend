@@ -1,11 +1,17 @@
 <div class="comanda-container">
 
+  @if (errorToast()) {
+  <div class="toast-error shadow">
+    <i class="bi bi-exclamation-triangle-fill"></i> {{ errorToast() }}
+  </div>
+  }
+
   <!-- Filtros -->
   <div class="filters-container">
     <div class="search-wrapper">
       <i class="bi bi-search"></i>
       <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)"
-             placeholder="Buscar por mesa, mesero o plato..." class="search-bar">
+        placeholder="Buscar por mesa, mesero o plato..." class="search-bar">
     </div>
 
     <select [ngModel]="filtroEstado()" (ngModelChange)="filtroEstado.set($event)" class="filter-select">
@@ -30,31 +36,17 @@
   </div>
 
   <div class="comandas-grid">
-    
+
     <div class="column col-espera">
       <div class="col-header">
         <span><i class="bi bi-clock-history"></i> En Espera</span>
         <span class="counter">{{ enEspera().length }}</span>
       </div>
-      @for (c of enEspera(); track c.id) {
-        <div class="comanda-card shadow-sm">
-          <div class="card-header">
-            <span class="mesa">{{ c.mesa }}</span>
-            <span class="prioridad" [class]="c.prioridad.toLowerCase()">{{ c.prioridad }}</span>
-          </div>
-          <div class="card-body">
-            <p class="mesero"><b>Mesero:</b> {{ c.mesero }}</p>
-            <ul class="platos-list">
-              @for (plato of c.platos; track plato) {
-                <li>{{ plato }}</li>
-              }
-            </ul>
-          </div>
-          <div class="card-footer">
-            <span class="tiempo"><i class="bi bi-stopwatch"></i> {{ c.tiempo }} min</span>
-            <button class="btn-preparar" (click)="cambiarEstado(c, 'Preparando')">Preparar</button>
-          </div>
-        </div>
+      @for (c of enEspera(); track c.idComanda) {
+      <restaurant-comanda-card class="comanda-card-wrapper shadow-sm" [comanda]="c"
+        (onIniciarPlato)="onIniciarPlato($event, c.idComanda)"
+        (onFinalizarPlato)="onFinalizarPlato($event, c.idComanda)">
+      </restaurant-comanda-card>
       }
     </div>
 
@@ -63,25 +55,11 @@
         <span><i class="bi bi-play-circle-fill"></i> Preparando</span>
         <span class="counter">{{ preparando().length }}</span>
       </div>
-      @for (c of preparando(); track c.id) {
-        <div class="comanda-card shadow-sm">
-          <div class="card-header">
-            <span class="mesa">{{ c.mesa }}</span>
-            <span class="prioridad" [class]="c.prioridad.toLowerCase()">{{ c.prioridad }}</span>
-          </div>
-          <div class="card-body">
-            <p class="mesero"><b>Mesero:</b> {{ c.mesero }}</p>
-            <ul class="platos-list">
-              @for (plato of c.platos; track plato) {
-                <li>{{ plato }}</li>
-              }
-            </ul>
-          </div>
-          <div class="card-footer">
-            <span class="tiempo"><i class="bi bi-stopwatch"></i> {{ c.tiempo }} min</span>
-            <button class="btn-listo" (click)="cambiarEstado(c, 'Listo')">Listo</button>
-          </div>
-        </div>
+      @for (c of preparando(); track c.idComanda) {
+      <restaurant-comanda-card class="comanda-card-wrapper shadow-sm" [comanda]="c"
+        (onIniciarPlato)="onIniciarPlato($event, c.idComanda)"
+        (onFinalizarPlato)="onFinalizarPlato($event, c.idComanda)">
+      </restaurant-comanda-card>
       }
     </div>
 
@@ -90,25 +68,11 @@
         <span><i class="bi bi-check-circle-fill"></i> Listo</span>
         <span class="counter">{{ listos().length }}</span>
       </div>
-      @for (c of listos(); track c.id) {
-        <div class="comanda-card card-completed shadow-sm">
-          <div class="card-header">
-            <span class="mesa">{{ c.mesa }}</span>
-            <span class="prioridad done">Completado</span>
-          </div>
-          <div class="card-body">
-            <p class="mesero"><b>Mesero:</b> {{ c.mesero }}</p>
-            <ul class="platos-list">
-              @for (plato of c.platos; track plato) {
-                <li class="text-muted text-decoration-line-through">{{ plato }}</li>
-              }
-            </ul>
-          </div>
-          <div class="card-footer">
-            <span class="finalizado">Esperando entrega</span>
-            <i class="bi bi-check2-all text-success fs-4"></i>
-          </div>
-        </div>
+      @for (c of listos(); track c.idComanda) {
+      <restaurant-comanda-card class="comanda-card-wrapper shadow-sm card-completed" [comanda]="c"
+        (onIniciarPlato)="onIniciarPlato($event, c.idComanda)"
+        (onFinalizarPlato)="onFinalizarPlato($event, c.idComanda)">
+      </restaurant-comanda-card>
       }
     </div>
 
