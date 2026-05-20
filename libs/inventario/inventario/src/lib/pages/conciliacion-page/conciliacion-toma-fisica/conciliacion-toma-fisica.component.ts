@@ -1,11 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LucideIconComponent, ButtonComponent, KpiCardComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { TomaFisicaItem } from '../../../models/conciliacion.model';
-import { TOMA_FISICA_ITEMS_MOCK } from '../../../models/conciliacion.mock';
+import { ConciliacionFacade } from '../../../data-access/conciliacion.facade';
 
 @Component({
   selector: 'restaurant-conciliacion-toma-fisica',
@@ -23,18 +23,30 @@ import { TOMA_FISICA_ITEMS_MOCK } from '../../../models/conciliacion.mock';
   styleUrl: './conciliacion-toma-fisica.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ConciliacionTomaFisicaComponent {
-  // TODO: obtener desde conciliacionFacade o desde el usuario autenticado
-  fecha = signal('24 Oct 2023');
+export class ConciliacionTomaFisicaComponent implements OnInit {
+  private location = inject(Location);
+  private facade   = inject(ConciliacionFacade);
+
+  fecha       = signal('24 Oct 2023');
   responsable = signal('Chef Instructor');
 
-  items = signal<TomaFisicaItem[]>([...TOMA_FISICA_ITEMS_MOCK]);
+  /** Señal local mutable: el usuario edita los conteos durante la sesión */
+  items = signal<TomaFisicaItem[]>([]);
+
+  ngOnInit(): void {
+    this.facade.cargarTomaFisicaItems();
+    // Seed local signal con los ítems del facade al cargar
+    effect(() => {
+      const loaded = this.facade.tomaFisicaItems();
+      if (loaded.length > 0 && this.items().length === 0) {
+        this.items.set([...loaded]);
+      }
+    }, { allowSignalWrites: true });
+  }
 
   // Computed stats
   itemsTotales = computed(() => this.items().length);
   pendientesCount = computed(() => this.items().filter(i => i.conteoFisico === null).length);
-
-  private location = inject(Location);
 
   goBack(): void {
     this.location.back();

@@ -4,6 +4,8 @@ import { ConciliacionService } from './services/conciliacion.service';
 import {
   ConciliacionRegistro,
   ConciliacionDetalle,
+  DiferenciaItem,
+  TomaFisicaItem,
 } from '../models/conciliacion.model';
 
 @Injectable({
@@ -13,16 +15,20 @@ export class ConciliacionFacade {
   private conciliacionService = inject(ConciliacionService);
 
   // ─────────────── Estado interno (privado) ───────────────
-  private _conciliaciones = signal<ConciliacionRegistro[]>([]);
-  private _conciliacionSeleccionada = signal<ConciliacionDetalle | undefined>(undefined);
-  private _loading = signal<boolean>(false);
-  private _error = signal<string | null>(null);
+  private _conciliaciones            = signal<ConciliacionRegistro[]>([]);
+  private _conciliacionSeleccionada  = signal<ConciliacionDetalle | undefined>(undefined);
+  private _diferenciasList           = signal<DiferenciaItem[]>([]);
+  private _tomaFisicaItems           = signal<TomaFisicaItem[]>([]);
+  private _loading                   = signal<boolean>(false);
+  private _error                     = signal<string | null>(null);
 
   // ─────────────── Exposición pública (solo lectura) ───────────────
-  public conciliaciones = computed(() => this._conciliaciones());
+  public conciliaciones           = computed(() => this._conciliaciones());
   public conciliacionSeleccionada = computed(() => this._conciliacionSeleccionada());
-  public loading = computed(() => this._loading());
-  public error = computed(() => this._error());
+  public diferenciasList          = computed(() => this._diferenciasList());
+  public tomaFisicaItems          = computed(() => this._tomaFisicaItems());
+  public loading                  = computed(() => this._loading());
+  public error                    = computed(() => this._error());
 
   // ─────────────── KPIs derivados ───────────────
   public totalConciliaciones = computed(() => this._conciliaciones().length);
@@ -54,7 +60,7 @@ export class ConciliacionFacade {
   }
 
   /**
-   * Carga el detalle de una conciliación específica.
+   * Carga el detalle de una conciliación específica y sus diferencias.
    */
   cargarConciliacion(id: string): void {
     this._loading.set(true);
@@ -69,6 +75,26 @@ export class ConciliacionFacade {
         finalize(() => this._loading.set(false))
       )
       .subscribe((data) => this._conciliacionSeleccionada.set(data));
+
+    this.conciliacionService
+      .getDiferenciasByConciliacion(id)
+      .pipe(catchError(() => of([])))
+      .subscribe((data) => this._diferenciasList.set(data));
+  }
+
+  /** Carga los ítems de la sesión de toma física activa. */
+  cargarTomaFisicaItems(): void {
+    this._loading.set(true);
+    this.conciliacionService
+      .getTomaFisicaItems()
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al cargar los ítems de toma física');
+          return of([]);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe((data) => this._tomaFisicaItems.set(data));
   }
 
   /**
