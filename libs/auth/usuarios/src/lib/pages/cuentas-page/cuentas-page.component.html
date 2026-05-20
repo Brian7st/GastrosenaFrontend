@@ -1,1 +1,20 @@
-<p>cuentas-page.component works!</p>
+<div class="cuentas-page">
+
+  <!-- Header -->
+  <div class="cuentas-page__header">
+    <h1 class="cuentas-page__title">Gestión de Cuentas</h1>
+    <p class="cuentas-page__subtitle">Bloqueo, desbloqueo e historial de accesos por usuario</p>
+  </div>
+
+  <!-- Empty state -->
+  <div class="cuentas-page__empty">
+    <div class="cuentas-page__empty-icon">
+      <lucide-icon name="shield-check" [size]="48"></lucide-icon>
+    </div>
+    <restaurant-empty-state
+      title="Funcionalidad pendiente"
+      message="Esta funcionalidad estará disponible cuando se conecte el backend. Permite bloquear/desbloquear cuentas y ver historial de accesos."
+    ></restaurant-empty-state>
+  </div>
+
+</div>
