@@ -14,6 +14,11 @@ import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 export class PresupuestoCargarGilComponent {
   private router = inject(Router);
 
+  onCargar(): void {
+    // TODO: llamar a presupuestoFacade.cargarDesdeGIL(gilId)
+    this.closePanel();
+  }
+
   closePanel(): void {
     this.router.navigate(['/app/inventario/presupuesto']);
   }

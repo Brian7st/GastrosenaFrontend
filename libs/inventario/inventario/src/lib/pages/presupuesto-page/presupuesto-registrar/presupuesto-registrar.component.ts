@@ -24,7 +24,8 @@ export class PresupuestoRegistrarComponent {
     bolsaInicial: [null as number | null, [Validators.required, Validators.min(1)]],
   });
 
-  programas = [
+  // TODO: cargar programas desde presupuestoFacade.programas()
+  readonly programas = [
     { id: 'PRG-001', nombre: 'Formación Profesional Integral' },
     { id: 'PRG-002', nombre: 'Gestión Administrativa Regional' },
     { id: 'PRG-003', nombre: 'Mantenimiento de Infraestructura' },
@@ -32,11 +33,11 @@ export class PresupuestoRegistrarComponent {
     { id: 'PRG-005', nombre: 'Investigación y Desarrollo (SENNOVA)' },
   ];
 
-  vigencias = [2024, 2025, 2026];
+  readonly VIGENCIAS = [2024, 2025, 2026];
 
   onSubmit(): void {
     if (this.registroForm.valid) {
-      console.log('Guardando presupuesto:', this.registroForm.value);
+      // TODO: llamar a presupuestoFacade.registrarPresupuesto(this.registroForm.getRawValue())
       this.closeModal();
     }
   }

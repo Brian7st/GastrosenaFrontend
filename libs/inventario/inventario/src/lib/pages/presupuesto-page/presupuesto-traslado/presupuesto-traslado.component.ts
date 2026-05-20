@@ -14,6 +14,11 @@ import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 export class PresupuestoTrasladoComponent {
   private router = inject(Router);
 
+  onSubmit(): void {
+    // TODO: llamar a presupuestoFacade.trasladarRubro(data)
+    this.closeModal();
+  }
+
   closeModal(): void {
     this.router.navigate(['/app/inventario/presupuesto']);
   }
