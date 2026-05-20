@@ -41,4 +41,16 @@ export class SolicitudesService {
     // Simulated delete
     return of(true).pipe(delay(800));
   }
+
+  updateSolicitud(id: string | number, payload: Partial<SolicitudGil>): Observable<SolicitudGil> {
+    const solicitud = SOLICITUDES_GIL_MOCK.find(s => s.codigo === id || s.id.toString() === id.toString());
+    if (!solicitud) throw new Error('Not found');
+    const updated = { ...solicitud, ...payload };
+    return of(updated).pipe(delay(600));
+  }
+
+  generarGils(ids: (string | number)[]): Observable<boolean> {
+    // Simulated action
+    return of(true).pipe(delay(800));
+  }
 }

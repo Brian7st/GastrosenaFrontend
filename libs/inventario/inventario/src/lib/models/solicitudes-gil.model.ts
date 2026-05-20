@@ -13,6 +13,16 @@ export interface SolicitudGil {
   totalBienes?: number;    // Cantidad de ítems
   montoTotal?: number;     // Valor total en COP
   avatarColor?: string;    // Color del avatar para el listado
+  bienes?: BienSolicitud[]; // Lista de bienes
+}
+
+export interface BienSolicitud {
+  codigo: string;
+  descripcion: string;
+  um: string;
+  cantidad: number;
+  valorUnitario: number;
+  subtotal: number;
 }
 
 export interface SolicitudesGilFiltros {

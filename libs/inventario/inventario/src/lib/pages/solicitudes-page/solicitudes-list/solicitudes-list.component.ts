@@ -84,6 +84,12 @@ export class SolicitudesListComponent implements OnInit {
   onExportPdf(id: string | number): void {
     this.router.navigate(['/app/inventario/solicitudes-gil', id, 'exportar']);
   }
+  onView(id: string | number): void {
+    this.router.navigate(['/app/inventario/solicitudes-gil', id]);
+  }
+  onEdit(id: string | number): void {
+    this.router.navigate(['/app/inventario/solicitudes-gil', id, 'editar']);
+  }
 
   // ── Modal State ──────────────────────────────────────────────────────────
   showDeleteModal = signal<boolean>(false);

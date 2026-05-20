@@ -91,4 +91,38 @@ export class SolicitudesFacade {
         }
       });
   }
+
+  generarGils(ids: (string | number)[]): void {
+    this._loading.set(true);
+    this.solicitudesService.generarGils(ids)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al generar los GIL');
+          return of(false);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe((success) => {
+        if (success) {
+          this.cargarSolicitudes();
+        }
+      });
+  }
+
+  actualizarSolicitud(id: string | number, payload: Partial<SolicitudGil>): void {
+    this._loading.set(true);
+    this.solicitudesService.updateSolicitud(id, payload)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al actualizar la solicitud');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(updated => {
+        if (updated) {
+          this._solicitudSeleccionada.set(updated);
+        }
+      });
+  }
 }
