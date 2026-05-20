@@ -20,7 +20,7 @@
           <lucide-icon name="building-2" [size]="18" class="field-icon"></lucide-icon>
           <select formControlName="programaId" class="form-select">
             <option value="" disabled>Seleccione un programa administrativo</option>
-            @for (p of programas; track p.id) {
+            @for (p of programas(); track p.id) {
               <option [value]="p.id">{{ p.nombre }}</option>
             }
           </select>

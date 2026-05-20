@@ -1,8 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
+import { PresupuestoFacade } from '../../../data-access/presupuesto.facade';
+import { RegistrarPresupuestoData } from '../../../models/presupuesto.model';
 
 @Component({
   selector: 'restaurant-presupuesto-registrar',
@@ -12,32 +14,31 @@ import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
   styleUrl: './presupuesto-registrar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PresupuestoRegistrarComponent {
+export class PresupuestoRegistrarComponent implements OnInit {
   private router = inject(Router);
-  private fb = inject(FormBuilder);
+  private fb     = inject(FormBuilder);
+  private facade = inject(PresupuestoFacade);
 
   registroForm = this.fb.group({
-    programaId: ['', Validators.required],
-    vigenciaFiscal: [2025, Validators.required],
-    nombreRubro: ['', Validators.required],
-    codigoPresupuestal: ['', Validators.required],
-    bolsaInicial: [null as number | null, [Validators.required, Validators.min(1)]],
+    programaId:          ['', Validators.required],
+    vigenciaFiscal:      [2025, Validators.required],
+    nombreRubro:         ['', Validators.required],
+    codigoPresupuestal:  ['', Validators.required],
+    bolsaInicial:        [null as number | null, [Validators.required, Validators.min(1)]],
   });
 
-  // TODO: cargar programas desde presupuestoFacade.programas()
-  readonly programas = [
-    { id: 'PRG-001', nombre: 'Formación Profesional Integral' },
-    { id: 'PRG-002', nombre: 'Gestión Administrativa Regional' },
-    { id: 'PRG-003', nombre: 'Mantenimiento de Infraestructura' },
-    { id: 'PRG-004', nombre: 'Bienestar al Aprendiz' },
-    { id: 'PRG-005', nombre: 'Investigación y Desarrollo (SENNOVA)' },
-  ];
+  // Programas cargados desde la facade
+  programas = this.facade.programas;
 
   readonly VIGENCIAS = [2024, 2025, 2026];
 
+  ngOnInit(): void {
+    this.facade.loadAll();
+  }
+
   onSubmit(): void {
     if (this.registroForm.valid) {
-      // TODO: llamar a presupuestoFacade.registrarPresupuesto(this.registroForm.getRawValue())
+      this.facade.registrarPresupuesto(this.registroForm.getRawValue() as RegistrarPresupuestoData);
       this.closeModal();
     }
   }
