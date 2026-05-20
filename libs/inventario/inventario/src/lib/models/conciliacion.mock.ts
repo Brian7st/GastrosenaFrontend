@@ -1,7 +1,7 @@
 import {
   ConciliacionRegistro,
   ConciliacionDetalle,
-  ConciliacionDiferencia,
+  DiferenciaItem,
   TomaFisicaItem,
   TopDiferencia,
 } from './conciliacion.model';
@@ -57,39 +57,39 @@ export const CONCILIACION_DETALLE_MOCK: ConciliacionDetalle = {
 };
 
 // ─────────────── Lista de diferencias del detalle ───────────────
-export const DIFERENCIAS_MOCK: ConciliacionDiferencia[] = [
+export const DIFERENCIAS_MOCK: DiferenciaItem[] = [
   {
     producto: 'Arroz Blanco Premium',
     codigo: 'COD-AB-001',
     categoria: 'Granos y Cereales',
-    stockSis: '250 kg',
-    fisico: '245 kg',
-    dif: '-5 kg',
+    stockSistema: 250,
+    stockFisico: 245,
+    diferencia: -5,
+    unidad: 'kg',
     valorUnit: 4000,
     impacto: -20000,
-    isPositive: false,
   },
   {
     producto: 'Aceite de Oliva Extra Virgen',
     codigo: 'COD-AO-012',
     categoria: 'Aceites y Grasas',
-    stockSis: '40 L',
-    fisico: '35 L',
-    dif: '-5 L',
+    stockSistema: 40,
+    stockFisico: 35,
+    diferencia: -5,
+    unidad: 'L',
     valorUnit: 60000,
     impacto: -300000,
-    isPositive: false,
   },
   {
     producto: 'Sal Marina Fina',
     codigo: 'COD-SM-004',
     categoria: 'Especias y Condimentos',
-    stockSis: '100 kg',
-    fisico: '108 kg',
-    dif: '+8 kg',
+    stockSistema: 100,
+    stockFisico: 108,
+    diferencia: 8,
+    unidad: 'kg',
     valorUnit: 2500,
     impacto: 20000,
-    isPositive: true,
   },
 ];
 

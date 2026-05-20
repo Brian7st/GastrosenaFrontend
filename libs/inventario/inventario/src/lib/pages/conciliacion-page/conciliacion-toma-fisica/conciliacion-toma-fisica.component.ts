@@ -36,7 +36,7 @@ export class ConciliacionTomaFisicaComponent {
 
   private location = inject(Location);
 
-  goBack() {
+  goBack(): void {
     this.location.back();
   }
 
@@ -75,7 +75,7 @@ export class ConciliacionTomaFisicaComponent {
   }
 
   // Update handler for reactivity
-  updateConteoFisico(id: string, value: number | null) {
+  updateConteoFisico(id: string, value: number | null): void {
     this.items.update(items => 
       items.map(item => item.id === id ? { ...item, conteoFisico: value } : item)
     );

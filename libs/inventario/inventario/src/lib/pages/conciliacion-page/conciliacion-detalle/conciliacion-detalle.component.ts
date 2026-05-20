@@ -5,7 +5,7 @@ import { LucideIconComponent, ButtonComponent, KpiCardComponent } from '@restaur
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import {
   ConciliacionDetalle,
-  ConciliacionDiferencia,
+  DiferenciaItem,
 } from '../../../models/conciliacion.model';
 import {
   CONCILIACION_DETALLE_MOCK,
@@ -34,7 +34,7 @@ export class ConciliacionDetalleComponent implements OnInit {
 
   // Estado reactivo
   detalle = signal<ConciliacionDetalle | undefined>(CONCILIACION_DETALLE_MOCK);
-  diferenciasList = signal<ConciliacionDiferencia[]>(DIFERENCIAS_MOCK);
+  diferenciasList = signal<DiferenciaItem[]>(DIFERENCIAS_MOCK);
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -49,7 +49,7 @@ export class ConciliacionDetalleComponent implements OnInit {
     // Por ahora, usamos el mock centralizado
   }
 
-  goBack() {
+  goBack(): void {
     this.location.back();
   }
 }

@@ -41,7 +41,7 @@ export class ConciliacionHistorialComponent implements OnInit {
     this.facade.loadAll();
   }
 
-  goBack() {
+  goBack(): void {
     this.location.back();
   }
 }

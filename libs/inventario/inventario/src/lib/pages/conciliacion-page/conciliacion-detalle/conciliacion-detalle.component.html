@@ -124,15 +124,15 @@
                 </div>
               </td>
               <td class="text-secondary">{{ item.categoria }}</td>
-              <td class="text-right text-secondary">{{ item.stockSis }}</td>
-              <td class="text-right font-bold">{{ item.fisico }}</td>
+              <td class="text-right text-secondary">{{ item.stockSistema }} {{ item.unidad }}</td>
+              <td class="text-right font-bold">{{ item.stockFisico }} {{ item.unidad }}</td>
               <td class="text-center">
-                <span class="dif-badge" [ngClass]="item.isPositive ? 'dif-badge--pos' : 'dif-badge--neg'">
-                  {{ item.dif }}
+                <span class="dif-badge" [ngClass]="item.diferencia >= 0 ? 'dif-badge--pos' : 'dif-badge--neg'">
+                  {{ item.diferencia > 0 ? '+' : '' }}{{ item.diferencia }} {{ item.unidad }}
                 </span>
               </td>
               <td class="text-right text-secondary">${{ item.valorUnit | number }}</td>
-              <td class="text-right font-bold" [ngClass]="item.isPositive ? 'text-success' : 'text-danger'">
+              <td class="text-right font-bold" [ngClass]="item.impacto >= 0 ? 'text-success' : 'text-danger'">
                 {{ item.impacto > 0 ? '+' : '' }}${{ (item.impacto < 0 ? (item.impacto * -1) : item.impacto) | number }}
               </td>
             </tr>

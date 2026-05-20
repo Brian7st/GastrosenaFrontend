@@ -40,6 +40,22 @@ export interface ConciliacionDiferencia {
   isPositive: boolean;
 }
 
+/**
+ * DiferenciaItem: versión tipada con valores numéricos.
+ * Sustituye a ConciliacionDiferencia eliminando los strings combinados.
+ */
+export interface DiferenciaItem {
+  producto: string;
+  codigo: string;
+  categoria: string;
+  stockSistema: number;
+  stockFisico: number;
+  diferencia: number;
+  unidad: string;
+  valorUnit: number;
+  impacto: number;
+}
+
 export interface TomaFisicaItem {
   id: string;
   codigoSena: string;
