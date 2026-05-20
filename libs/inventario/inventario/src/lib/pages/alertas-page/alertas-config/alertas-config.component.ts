@@ -45,7 +45,7 @@ export class AlertasConfigComponent {
   }
 
   guardarConfig(): void {
-    console.log('Guardando configuración de umbrales:', this.umbrales());
+    // TODO: llamar a alertasFacade.guardarUmbrales(this.umbrales())
   }
 
   restablecerValores(): void {

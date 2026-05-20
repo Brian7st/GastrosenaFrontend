@@ -35,11 +35,18 @@ export class AlertaResolverComponent implements OnInit {
     responsable: [{ value: 'Administrador Centro de Formación', disabled: true }],
   });
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     // El id está en el padre (alertas/:id/resolver)
     const id = this.route.parent?.snapshot.paramMap.get('id');
     if (id && this.facade.alertaSeleccionada()?.id !== id) {
-       this.facade.cargarAlerta(id);
+       const alerta = await this.facade.cargarAlerta(id);
+       if (!alerta) {
+         this.router.navigate(['/app/inventario/alertas']);
+         return;
+       }
+    } else if (!id) {
+       this.router.navigate(['/app/inventario/alertas']);
+       return;
     }
   }
 

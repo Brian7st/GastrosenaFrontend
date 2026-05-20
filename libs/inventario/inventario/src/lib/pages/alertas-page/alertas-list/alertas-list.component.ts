@@ -20,6 +20,18 @@ import {
 } from '../../../models/alerta.model';
 import { AlertasFacade } from '../../../data-access/alertas.facade';
 
+export interface HistorialResolucion {
+  bien: string;
+  accion: string;
+  tiempo: string;
+}
+
+export interface MovimientoReciente {
+  tipo: 'entrada' | 'salida';
+  nombre: string;
+  cantidad: string;
+}
+
 @Component({
   selector: 'restaurant-alertas-list',
   standalone: true,
@@ -39,16 +51,16 @@ export class AlertasListComponent implements OnInit {
   estadoFilter    = signal<string>('');
 
   // Historial lateral (mock estático)
-  historial: { bien: string; accion: string; tiempo: string }[] = [
+  historial = signal<HistorialResolucion[]>([
     { bien: 'Sal Marina',   accion: 'Repuesto 50kg. Aprobado por Admin.', tiempo: 'Hoy, 09:30 AM' },
     { bien: 'Papa Pastusa', accion: 'Orden de compra generada (#OC-402).', tiempo: 'Ayer, 16:45 PM' },
-  ];
+  ]);
 
-  movimientos: { tipo: 'entrada' | 'salida'; nombre: string; cantidad: string }[] = [
+  movimientos = signal<MovimientoReciente[]>([
     { tipo: 'entrada', nombre: 'Tomate Chonto',   cantidad: '+100kg' },
     { tipo: 'salida',  nombre: 'Cebolla Cabezona', cantidad: '-25kg'  },
     { tipo: 'entrada', nombre: 'Arroz Blanco',     cantidad: '+500kg' },
-  ];
+  ]);
 
   ngOnInit(): void {
     this.facade.loadAll();

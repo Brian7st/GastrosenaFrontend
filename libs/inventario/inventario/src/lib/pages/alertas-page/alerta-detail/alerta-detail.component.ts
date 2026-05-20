@@ -28,10 +28,17 @@ export class AlertaDetailComponent implements OnInit {
 
   alerta = this.facade.alertaSeleccionada;
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      this.facade.cargarAlerta(id);
+      const alerta = await this.facade.cargarAlerta(id);
+      if (!alerta) {
+        this.router.navigate(['/app/inventario/alertas']);
+        return;
+      }
+    } else {
+      this.router.navigate(['/app/inventario/alertas']);
+      return;
     }
   }
 

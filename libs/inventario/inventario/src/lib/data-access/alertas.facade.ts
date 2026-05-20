@@ -1,7 +1,7 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
 import { AlertasService } from './services/alertas.service';
 import { Alerta } from '../models/alerta.model';
-import { finalize, catchError, of } from 'rxjs';
+import { finalize, catchError, of, firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -42,17 +42,18 @@ export class AlertasFacade {
   /**
    * Carga una alerta específica por su ID.
    */
-  cargarAlerta(id: string): void {
+  async cargarAlerta(id: string): Promise<Alerta | undefined> {
     this._loading.set(true);
-    this.alertasService.getAlertaById(id)
-      .pipe(
-        catchError(() => {
-          this._error.set('Error al cargar el detalle de la alerta');
-          return of(undefined);
-        }),
-        finalize(() => this._loading.set(false))
-      )
-      .subscribe(data => this._alertaSeleccionada.set(data));
+    try {
+      const data = await firstValueFrom(this.alertasService.getAlertaById(id));
+      this._alertaSeleccionada.set(data);
+      return data;
+    } catch {
+      this._error.set('Error al cargar el detalle de la alerta');
+      return undefined;
+    } finally {
+      this._loading.set(false);
+    }
   }
 
   /**
