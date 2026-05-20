@@ -4,6 +4,7 @@ import {
   computed,
   signal,
   inject,
+  OnInit,
 } from '@angular/core';
 import { CommonModule, UpperCasePipe, CurrencyPipe } from '@angular/common';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
@@ -38,14 +39,14 @@ import {
     BackButtonComponent,
   ],
   templateUrl: './actas-detail.component.html',
-  styleUrls: ['./actas-detail.component.scss'],
+  styleUrl: './actas-detail.component.scss',
 })
-export class ActasDetailComponent {
+export class ActasDetailComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
   // ── Estado reactivo ───────────────────────────────────────────────────────
-  acta = signal<ActaLegalizacion>(MOCK_ACTAS[0]);
+  acta = signal<ActaLegalizacion | null>(null);
   insumos = signal<InsumoActa[]>(MOCK_INSUMOS);
   compromisos = signal<CompromisoActa[]>(MOCK_COMPROMISOS);
   firmantes = signal<FirmanteActa[]>(MOCK_FIRMANTES);
@@ -55,18 +56,17 @@ export class ActasDetailComponent {
     this.insumos().reduce((sum, i) => sum + i.cantidad * i.costoUnitario, 0)
   );
 
-  iva = computed(() => this.subtotal() * 0.05);
+  iva = computed(() => this.subtotal() * 0.19);
 
   total = computed(() => this.subtotal() + this.iva());
 
-  constructor() {
-    // Cargar acta según parámetro de ruta
+  ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      const found = MOCK_ACTAS.find(a => a.id === id);
-      if (found) {
-        this.acta.set(found);
-      }
+    const found = MOCK_ACTAS.find(a => a.id === id);
+    if (found) {
+      this.acta.set(found);
+    } else {
+      this.router.navigate(['/app/inventario/actas']);
     }
   }
 
@@ -86,7 +86,7 @@ export class ActasDetailComponent {
     const map: Record<ActaEstado, 'success' | 'warning' | 'danger' | 'info'> = {
       borrador: 'info',
       pendiente: 'warning',
-      firmada: 'info',
+      firmada: 'success',
       revisada: 'success',
       archivada: 'info',
     };
@@ -99,7 +99,8 @@ export class ActasDetailComponent {
   }
 
   cambiarEstado(): void {
-    // Placeholder para lógica futura
+    // TODO(actas-facade): llamar facade.cambiarEstadoActa(...)
+    console.warn('cambiarEstado: pendiente integración con ActasFacade');
   }
 
   cargarFirma(): void {
