@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   signal,
+  computed,
   inject,
   OnInit,
 } from '@angular/core';
@@ -47,15 +48,15 @@ export class AlertaResolverComponent implements OnInit {
     } else if (!id) {
        this.router.navigate(['/app/inventario/alertas']);
        return;
-    }
+     }
   }
 
-  get prioridadLabel(): string {
+  prioridadLabel = computed(() => {
     const map: Record<string, string> = {
       critica: 'Crítica', alta: 'Alta', media: 'Media', baja: 'Baja',
     };
     return map[this.alerta()?.prioridad ?? 'critica'] ?? 'Crítica';
-  }
+  });
 
   selectAccion(accion: AccionResolver): void {
     this.accionSeleccionada.set(accion);
