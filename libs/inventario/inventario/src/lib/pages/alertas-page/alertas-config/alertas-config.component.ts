@@ -1,12 +1,13 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  signal,
   inject,
+  OnInit,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { UmbralConfig, MOCK_UMBRALES } from '../../../models/alerta.model';
+import { UmbralConfig } from '../../../models/alerta.model';
+import { AlertasFacade } from '../../../data-access/alertas.facade';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 
 @Component({
@@ -17,39 +18,45 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
   templateUrl: './alertas-config.component.html',
   styleUrl: './alertas-config.component.scss',
 })
-export class AlertasConfigComponent {
+export class AlertasConfigComponent implements OnInit {
   private router = inject(Router);
+  private facade = inject(AlertasFacade);
 
-  umbrales = signal<UmbralConfig[]>(MOCK_UMBRALES);
+  umbrales = this.facade.umbrales;
+
+  ngOnInit(): void {
+    this.facade.cargarUmbrales();
+  }
 
   toggleEmail(id: string): void {
-    this.umbrales.update(list =>
-      list.map(u =>
-        u.id === id ? { ...u, emailActivo: !u.emailActivo } : u
-      )
+    const updated = this.umbrales().map(u =>
+      u.id === id ? { ...u, emailActivo: !u.emailActivo } : u
     );
+    this.facade.guardarUmbrales(updated);
   }
 
   updateStockMinimo(id: string, event: Event): void {
     const value = Number((event.target as HTMLInputElement).value);
-    this.umbrales.update(list =>
-      list.map(u => u.id === id ? { ...u, stockMinimo: value } : u)
+    const updated = this.umbrales().map(u =>
+      u.id === id ? { ...u, stockMinimo: value } : u
     );
+    this.facade.guardarUmbrales(updated);
   }
 
   updateCorreos(id: string, event: Event): void {
     const value = (event.target as HTMLInputElement).value;
-    this.umbrales.update(list =>
-      list.map(u => u.id === id ? { ...u, correos: value } : u)
+    const updated = this.umbrales().map(u =>
+      u.id === id ? { ...u, correos: value } : u
     );
+    this.facade.guardarUmbrales(updated);
   }
 
   guardarConfig(): void {
-    // TODO: llamar a alertasFacade.guardarUmbrales(this.umbrales())
+    this.facade.guardarUmbrales(this.umbrales());
   }
 
   restablecerValores(): void {
-    this.umbrales.set(MOCK_UMBRALES.map(u => ({ ...u })));
+    this.facade.cargarUmbrales();
   }
 
   volver(): void {
