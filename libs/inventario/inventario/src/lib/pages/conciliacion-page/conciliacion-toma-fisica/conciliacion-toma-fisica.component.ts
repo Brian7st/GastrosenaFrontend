@@ -4,16 +4,8 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LucideIconComponent, ButtonComponent, KpiCardComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
-
-interface TomaFisicaItem {
-  id: string;
-  codigoSena: string;
-  categoria: string;
-  producto: string;
-  stockSistema: number;
-  conteoFisico: number | null;
-  valorUnitario: number;
-}
+import { TomaFisicaItem } from '../../../models/conciliacion.model';
+import { TOMA_FISICA_ITEMS_MOCK } from '../../../models/conciliacion.mock';
 
 @Component({
   selector: 'restaurant-conciliacion-toma-fisica',
@@ -35,44 +27,7 @@ export class ConciliacionTomaFisicaComponent {
   fecha = '24 Oct 2023';
   responsable = 'Chef Instructor';
 
-  items = signal<TomaFisicaItem[]>([
-    {
-      id: '1',
-      codigoSena: 'HRN-001',
-      categoria: 'Abarrotes',
-      producto: 'Harina de Trigo (Kg)',
-      stockSistema: 150,
-      conteoFisico: 150,
-      valorUnitario: 3500,
-    },
-    {
-      id: '2',
-      codigoSena: 'LCH-042',
-      categoria: 'Lácteos',
-      producto: 'Leche Entera (L)',
-      stockSistema: 85,
-      conteoFisico: 80,
-      valorUnitario: 4200,
-    },
-    {
-      id: '3',
-      codigoSena: 'CRN-112',
-      categoria: 'Cárnicos',
-      producto: 'Solomillo de Res (Kg)',
-      stockSistema: 12,
-      conteoFisico: 14,
-      valorUnitario: 45000,
-    },
-    {
-      id: '4',
-      codigoSena: 'ESP-008',
-      categoria: 'Especias',
-      producto: 'Pimienta Negra (g)',
-      stockSistema: 500,
-      conteoFisico: null,
-      valorUnitario: 150,
-    },
-  ]);
+  items = signal<TomaFisicaItem[]>([...TOMA_FISICA_ITEMS_MOCK]);
 
   // Computed stats
   itemsTotales = computed(() => this.items().length);

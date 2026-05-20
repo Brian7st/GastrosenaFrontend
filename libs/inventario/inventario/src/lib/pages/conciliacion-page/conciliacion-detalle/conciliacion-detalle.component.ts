@@ -1,8 +1,16 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { LucideIconComponent, ButtonComponent, KpiCardComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import {
+  ConciliacionDetalle,
+  ConciliacionDiferencia,
+} from '../../../models/conciliacion.model';
+import {
+  CONCILIACION_DETALLE_MOCK,
+  DIFERENCIAS_MOCK,
+} from '../../../models/conciliacion.mock';
 
 @Component({
   selector: 'restaurant-conciliacion-detalle',
@@ -19,60 +27,27 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
   styleUrl: './conciliacion-detalle.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ConciliacionDetalleComponent {
-  
-  detalle = {
-    id: 'CONC-2024-012',
-    fecha: '24 Oct 2024',
-    responsable: 'Carlos Ruiz',
-    almacen: 'Almacén Seco',
-    estado: 'Completada',
-    totalItems: 120,
-    itemsCorrectos: 112,
-    diferencias: 8,
-    precision: 93.3,
-    valoracionMonetaria: -340000,
-    perdidas: -320000,
-    sobrantes: 20000,
-  };
-
-  diferenciasList = [
-    {
-      producto: 'Arroz Blanco Premium',
-      codigo: 'COD-AB-001',
-      categoria: 'Granos y Cereales',
-      stockSis: '250 kg',
-      fisico: '245 kg',
-      dif: '-5 kg',
-      valorUnit: 4000,
-      impacto: -20000,
-      isPositive: false,
-    },
-    {
-      producto: 'Aceite de Oliva Extra Virgen',
-      codigo: 'COD-AO-012',
-      categoria: 'Aceites y Grasas',
-      stockSis: '40 L',
-      fisico: '35 L',
-      dif: '-5 L',
-      valorUnit: 60000,
-      impacto: -300000,
-      isPositive: false,
-    },
-    {
-      producto: 'Sal Marina Fina',
-      codigo: 'COD-SM-004',
-      categoria: 'Especias y Condimentos',
-      stockSis: '100 kg',
-      fisico: '108 kg',
-      dif: '+8 kg',
-      valorUnit: 2500,
-      impacto: 20000,
-      isPositive: true,
-    },
-  ];
-
+export class ConciliacionDetalleComponent implements OnInit {
   private location = inject(Location);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
+  // Estado reactivo
+  detalle = signal<ConciliacionDetalle | undefined>(CONCILIACION_DETALLE_MOCK);
+  diferenciasList = signal<ConciliacionDiferencia[]>(DIFERENCIAS_MOCK);
+
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+
+    if (!id) {
+      // Si no hay ID en la ruta, regresa al historial
+      this.router.navigate(['../historial'], { relativeTo: this.route });
+      return;
+    }
+
+    // TODO: llamar a conciliacionFacade.cargarConciliacion(id)
+    // Por ahora, usamos el mock centralizado
+  }
 
   goBack() {
     this.location.back();

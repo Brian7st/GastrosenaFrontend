@@ -1,10 +1,10 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
 import { finalize, catchError, of } from 'rxjs';
+import { ConciliacionService } from './services/conciliacion.service';
 import {
-  ConciliacionService,
   ConciliacionRegistro,
   ConciliacionDetalle,
-} from './services/conciliacion.service';
+} from '../models/conciliacion.model';
 
 @Injectable({
   providedIn: 'root',
