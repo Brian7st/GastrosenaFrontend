@@ -104,46 +104,38 @@
   }
 }
 
-.comanda-card {
+.comanda-card-wrapper {
+  display: block;
   background: white;
   border-radius: var(--radius-lg, 12px);
   padding: var(--space-3, 15px);
   margin-bottom: var(--space-3, 15px);
+  border: 1px solid var(--color-border, #e2e8f0);
 
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: var(--space-2, 10px);
-    .mesa { font-weight: var(--font-weight-semibold); }
-    .prioridad {
-      font-size: var(--font-size-sm);
-      padding: var(--space-1) 8px;
-      border-radius: var(--radius-sm, 5px);
-      &.urgente { background: var(--color-error-text); color: white; }
-      &.alta { background: var(--color-warning, #f59e0b); color: white; }
-      &.normal { background: var(--color-info, #3b82f6); color: white; }
-      &.done { background: var(--color-primario); color: white; }
-    }
+  &.card-completed {
+    opacity: 0.8;
   }
+}
 
-  .card-body {
-    .mesero { font-size: var(--font-size-sm); color: var(--color-text-secondary); margin-bottom: var(--space-1, 5px); }
-    .platos-list {
-      list-style: none; padding: 0; margin: 0 0 var(--space-2, 10px) 0;
-      li { font-size: var(--font-size-md); padding: var(--space-1) 0; border-bottom: 1px dashed var(--color-border); }
-      li:last-child { border-bottom: none; }
-    }
-  }
 
-  .card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    .tiempo { font-size: var(--font-size-sm); color: var(--color-text-secondary); }
-    button {
-      border: none; padding: var(--space-1) 15px; border-radius: var(--radius-sm, 5px); cursor: pointer; font-weight: var(--font-weight-semibold);
-      &.btn-preparar { background: var(--color-info-light, #dbeafe); color: var(--color-info-dark, #1e40af); }
-      &.btn-listo { background: var(--color-success-bg); color: var(--color-success-text); }
-    }
-  }
+.toast-error {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #DC3545;
+  color: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  z-index: 9999;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }

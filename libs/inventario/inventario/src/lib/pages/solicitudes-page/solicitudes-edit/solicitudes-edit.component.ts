@@ -1,9 +1,10 @@
-import { Component, ChangeDetectionStrategy, signal, inject, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
-import { BienSolicitud, BIENES_SOLICITUD_MOCK } from '../../../models/solicitudes-gil.mock';
+import { BienSolicitud } from '../../../models/solicitudes-gil.mock';
+import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 
 @Component({
   selector: 'restaurant-solicitudes-edit',
@@ -14,20 +15,25 @@ import { BienSolicitud, BIENES_SOLICITUD_MOCK } from '../../../models/solicitude
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SolicitudesEditComponent implements OnInit {
-  
-  solicitudId = signal<string>('GIL-2023-0892');
-  isBlocked = signal<boolean>(false);
-  
-  bienes = signal<BienSolicitud[]>([...BIENES_SOLICITUD_MOCK]);
-
   private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private route  = inject(ActivatedRoute);
+  private facade = inject(SolicitudesFacade);
+
+  // ── Estado reactivo desde facade ─────────────────────────────────────────
+  solicitud   = this.facade.solicitudSeleccionada;
+  loading     = this.facade.loading;
+  solicitudId = computed(() => this.solicitud()?.codigo ?? '');
+  isBlocked   = computed(() => {
+    const estado = this.solicitud()?.estado;
+    return estado !== undefined && estado !== 'Borrador';
+  });
+
+  bienes = signal<BienSolicitud[]>([]);
 
   ngOnInit(): void {
     const paramId = this.route.snapshot.paramMap.get('id');
     if (paramId) {
-      // TODO: llamar a solicitudesFacade.cargarSolicitudById(paramId) y derivar isBlocked del estado recibido
-      this.solicitudId.set(paramId);
+      this.facade.cargarSolicitudById(paramId);
     }
   }
 
@@ -37,7 +43,10 @@ export class SolicitudesEditComponent implements OnInit {
   }
 
   onSave(): void {
-    // TODO: llamar a solicitudesFacade.actualizarSolicitud(id, dto) cuando exista la facade
+    const codigo = this.solicitud()?.codigo;
+    if (codigo) {
+      this.facade.actualizarSolicitud(codigo, {});
+    }
     const rawId = this.route.snapshot.paramMap.get('id') || '001';
     this.router.navigate(['/app/inventario/solicitudes-gil', rawId]);
   }
