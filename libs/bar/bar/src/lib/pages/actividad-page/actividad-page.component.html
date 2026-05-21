@@ -1,0 +1,146 @@
+<div class="modulo-container">
+
+  <!-- ===== CABECERA ===== -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">Actividad Bar y Barismo</h1>
+      <p class="page-subtitle">
+        Registro y evaluación de actividades académicas para aprendices.
+      </p>
+    </div>
+  </div>
+
+  <!-- ===== CUERPO PRINCIPAL ===== -->
+  <div class="content-grid">
+
+    <!-- ---- Formulario ---- -->
+    <div class="form-card">
+
+      <!-- Fecha -->
+      <div class="form-group full-width">
+        <label class="form-label" for="act-fecha">Fecha</label>
+        <input
+          id="act-fecha"
+          type="date"
+          class="form-input"
+          placeholder="dd/mm/aaaa"
+          (change)="fecha.set($any($event.target).value)"
+        />
+      </div>
+
+      <!-- Nombre de actividad + Jornada -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="act-nombre">
+            Nombre de actividad <span class="required">*</span>
+          </label>
+          <input
+            id="act-nombre"
+            type="text"
+            class="form-input"
+            placeholder="Ej: Técnicas de Barismo"
+            (input)="nombreActividad.set($any($event.target).value)"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="act-jornada">Jornada</label>
+          <div class="select-wrapper">
+            <select id="act-jornada" class="form-select" (change)="jornada.set($any($event.target).value)">
+              <option value="" disabled selected>Seleccione una jornada</option>
+              @for (j of jornadas; track j.value) {
+                <option [value]="j.value">{{ j.label }}</option>
+              }
+            </select>
+            <lucide-icon name="chevron-down" size="16" class="select-icon"></lucide-icon>
+          </div>
+        </div>
+      </div>
+
+      <!-- Número de ficha -->
+      <div class="form-group full-width">
+        <label class="form-label" for="act-ficha">Número de ficha</label>
+        <input
+          id="act-ficha"
+          type="text"
+          class="form-input"
+          placeholder="Ej: 2561234"
+          (input)="numeroFicha.set($any($event.target).value)"
+        />
+      </div>
+
+      <!-- Pasos de la actividad -->
+      <div class="form-group full-width">
+        <label class="form-label" for="act-pasos">Pasos de la actividad</label>
+        <textarea
+          id="act-pasos"
+          class="form-textarea"
+          rows="5"
+          placeholder="Describa detalladamente los pasos realizados en la actividad..."
+          (input)="pasosActividad.set($any($event.target).value)"
+        ></textarea>
+      </div>
+
+      <!-- Trimestre -->
+      <div class="form-group">
+        <label class="form-label" for="act-trimestre">Trimestre</label>
+        <div class="select-wrapper">
+          <select id="act-trimestre" class="form-select" (change)="trimestre.set($any($event.target).value)">
+            @for (t of trimestres; track t.value) {
+              <option [value]="t.value">{{ t.label }}</option>
+            }
+          </select>
+          <lucide-icon name="chevron-down" size="16" class="select-icon"></lucide-icon>
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="form-actions">
+        <div class="form-actions-row">
+          <button id="btn-ver-actividades" class="btn-outline" type="button" (click)="verActividades()">
+            VER ACTIVIDADES
+          </button>
+          <button id="btn-crear-actividad" class="btn-primary" type="button" (click)="crearActividad()">
+            CREAR ACTIVIDAD
+          </button>
+        </div>
+
+        <p class="form-hint">
+          Asegúrese de que todos los campos obligatorios (*) estén completos antes de evaluar.
+        </p>
+      </div>
+
+    </div><!-- /form-card -->
+
+    <!-- ---- Paneles inferiores ---- -->
+    <div class="bottom-panels">
+
+      <!-- Guía de evaluación -->
+      <div class="panel-card panel-guide">
+        <div class="panel-header">
+          <lucide-icon name="info" size="18" class="panel-icon info-icon"></lucide-icon>
+          <h3>Guía de Evaluación</h3>
+        </div>
+        <p class="panel-text">
+          Las actividades se evalúan basándose en las competencias técnicas definidas en el
+          <a href="#" class="link-registro">programa oficial</a>.
+        </p>
+      </div>
+
+      <!-- Historial reciente -->
+      <div class="panel-card panel-historial">
+        <h3>Historial Reciente</h3>
+        <div class="badges-list">
+          @for (item of historialReciente; track item.nombre) {
+            <span class="activity-badge" [ngClass]="item.clase">
+              {{ item.nombre }} · {{ item.estado }}
+            </span>
+          }
+        </div>
+      </div>
+
+    </div><!-- /bottom-panels -->
+
+  </div><!-- /content-grid -->
+
+</div>

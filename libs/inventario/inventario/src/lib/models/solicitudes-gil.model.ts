@@ -21,3 +21,20 @@ export interface SolicitudesGilFiltros {
   estado?: EstadoGil;
   fechaRango?: string;
 }
+
+export interface CrearSolicitudData {
+  fecha: string;
+  centroCostos?: string;
+  area?: string;
+  cuentadante?: string;
+  destino?: string;
+  ficha?: string;
+}
+
+export interface ActualizarSolicitudData {
+  centroCostos?: string;
+  area?: string;
+  cuentadante?: string;
+  destino?: string;
+  ficha?: string;
+}

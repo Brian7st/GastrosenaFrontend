@@ -33,7 +33,7 @@
       label="Facturas Hoy"
       [value]="stats.facturasHoy.toString()"
       icon="file-text"
-      iconColor="purple"
+      iconColor="red"
     ></restaurant-kpi-card>
 
     <restaurant-kpi-card
@@ -108,12 +108,12 @@
       <!-- Action Card: Apertura -->
       <div class="action-card opening-card">
         <div class="action-header">
-          <lucide-icon name="unlock" [size]="24" class="icon-orange"></lucide-icon>
+          <lucide-icon name="log-in" [size]="24" class="icon-orange"></lucide-icon>
           <h3 class="text-orange">Apertura de Caja</h3>
         </div>
         <p class="action-desc">Definir fondo base e iniciar turno</p>
         <restaurant-button variant="primary" class="full-width" (click)="irAApertura()">
-          <lucide-icon name="unlock" [size]="18"></lucide-icon>
+          <lucide-icon name="log-in" [size]="18"></lucide-icon>
           <span>Abrir Caja</span>
         </restaurant-button>
       </div>
@@ -121,12 +121,12 @@
       <!-- Action Card: Movimientos -->
       <div class="action-card movements-card">
         <div class="action-header">
-          <lucide-icon name="arrow-right-left" [size]="24" class="icon-gray"></lucide-icon>
+          <lucide-icon name="arrow-left-right" [size]="24" class="icon-gray"></lucide-icon>
           <h3 class="text-gray">Movimientos</h3>
         </div>
         <p class="action-desc">Ingresos y egresos de caja menor</p>
         <restaurant-button variant="primary" class="full-width" (click)="irAMovimientos()" [disabled]="!facade.isCajaAbierta()">
-          <lucide-icon name="arrow-right-left" [size]="18"></lucide-icon>
+          <lucide-icon name="arrow-left-right" [size]="18"></lucide-icon>
           <span>Registrar Movimiento</span>
         </restaurant-button>
       </div>
@@ -134,12 +134,12 @@
       <!-- Action Card: Cierre -->
       <div class="action-card closing-card">
         <div class="action-header">
-          <lucide-icon name="lock" [size]="24" class="icon-red"></lucide-icon>
+          <lucide-icon name="log-out" [size]="24" class="icon-red"></lucide-icon>
           <h3 class="text-red">Cierre de Caja</h3>
         </div>
         <p class="action-desc">Arqueo ciego y reporte Z del turno</p>
         <restaurant-button variant="primary" class="full-width" (click)="irACierre()" [disabled]="!facade.isCajaAbierta()">
-          <lucide-icon name="lock" [size]="18"></lucide-icon>
+          <lucide-icon name="log-out" [size]="18"></lucide-icon>
           <span>Cerrar Caja</span>
         </restaurant-button>
       </div>

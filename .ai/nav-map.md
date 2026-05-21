@@ -21,8 +21,8 @@
 ```mermaid
 pie title Avance por RFs Esenciales (92 auditados)
     "REAL" : 48
-    "PARCIAL" : 23
-    "FALTA" : 21
+    "PARCIAL" : 28
+    "FALTA" : 16
 ```
 
 ### Por módulo
@@ -39,14 +39,14 @@ xychart-beta
 |--------|---------------|------|---------|-------|--------|
 | Auth/Usuarios | RF1.2, RF2.1–2.6.1 | 6 | 1 | 2 | `███████░░░` **75%** |
 | Cocina | RF-C 4.0–4.4.1 | 11 | 2 | 5 | `██████░░░░` **69%** |
-| Bar | RF-C 4.10–4.18 | 11 | 0 | 7 | `██████░░░░` **61%** |
-| Restaurante | RF3.1.x–RF3.5.x | 5 | 8 | 5 | `███░░░░░░░` **28%** |
+| Bar | RF-C 4.10–4.19 | 11 | 2 | 5 | `██████░░░░` **61%** |
+| Restaurante | RF3.1.x–RF3.5.x | 5 | 11 | 2 | `███░░░░░░░` **28%** |
 | Inventario | RF-5.1–5.11 | 21 | 14 | 0 | `██████░░░░` **60%** |
 | Reportes | RF6.1.x | 0 | 0 | 13 | `░░░░░░░░░░` **0%** |
 | Notificaciones | RF1.8.x | 0 | 0 | 3 | `░░░░░░░░░░` **0%** |
-| **TOTAL** | **92** | **48** | **23** | **21** | `█████░░░░░` **52%** |
+| **TOTAL** | **92** | **48** | **28** | **16** | `█████░░░░░` **52%** |
 
-> **Avance real verificado: 52%** — 48 de 92 RFs Esenciales completamente implementados. 23 RFs adicionales con implementación parcial.
+> **Avance real verificado: 52%** — 48 de 92 RFs Esenciales completamente implementados. 28 RFs adicionales con implementación parcial.
 
 ---
 
@@ -131,6 +131,16 @@ flowchart LR
 
 ### `/app/bar` — Bar
 
+> `BarPageComponent` es un layout shell con `<router-outlet>`. Todas las vistas son hijos de `/app/bar`.
+
+```mermaid
+flowchart LR
+    BAR["/app/bar\nBarPageComponent\nlayout shell"] --> INICIO["/app/bar/inicio 🔶\nInicioPageComponent\n— dashboard con datos mock"]
+    BAR --> COMANDAS["/app/bar/comandas ✅\nComandasPageComponent"]
+    BAR --> RECETAS["/app/bar/recetas ✅\nRecetasPageComponent"]
+    BAR --> MENU["/app/bar/menu 🔶\nMenuPageComponent\n— EmptyState stub"]
+```
+
 | RF | Descripción | Vista | Estado |
 |----|-------------|-------|--------|
 | RF-C 4.10 | Visualización pedidos bar | ComandasComponent | ✅ listaComandas + formatIdComanda() |
@@ -146,9 +156,9 @@ flowchart LR
 | RF-C 4.12.4 | Eliminar recetas bar | RecetasPageComponent | ✅ confirm dialog + eliminarReceta() |
 | RF-C 4.13.1 | Registrar inicio (bar) | — | ❌ No encontrado |
 | RF-C 4.13.2 | Registrar fin (bar) | — | ❌ No encontrado |
-| RF-C 4.14 | Alertas a sala (bar) | — | ❌ No implementado |
-| RF-C 4.14.1 | Notificar listo (bar) | — | ❌ No implementado |
-| RF-C 4.18 | Modificaciones (bar) | — | ❌ No encontrado |
+| RF-C 4.14 | Alertas a sala (bar) | InicioPageComponent | 🔶 Modal incidencias — IncidenciaService inyectado, datos mock |
+| RF-C 4.14.1 | Notificar listo (bar) | — | ❌ Sin notificaciones automáticas |
+| RF-C 4.18 | Modificaciones (bar) | InicioPageComponent | 🔶 Modal tipo MODIFICACION — mockData vacío |
 | RF-C 4.19 | Gestión de menús (bar) | MenuPageComponent | ❌ EmptyState — stub |
 
 ---
@@ -168,13 +178,13 @@ flowchart LR
 | RF3.2.2.1 | Mostrar valores | PedidosPageComponent | 🔶 Sin cálculo de totales |
 | RF3.2.4 | Seguimiento de pedido | PedidosPageComponent | 🔶 Estructura sin status updates |
 | RF3.5.1 | Generar factura | CajaPageComponent | 🔶 irANuevaFactura() — modales no integrados |
-| RF3.5.3 | Registrar pago simulado | CajaPageComponent | 🔶 irARegistrarPago() — sin lógica |
+| RF3.5.3 | Registrar pago | CajaPagarPageComponent | 🔶 confirmarPago() + modal éxito — sin backend |
+| RF3.5.3.1 | Pago en efectivo | CajaPagarPageComponent | 🔶 seleccionarMetodo('Efectivo') — UI completa |
+| RF3.5.3.2 | Pago con tarjeta | CajaPagarPageComponent | 🔶 seleccionarMetodo('Tarjeta') — UI completa |
+| RF3.5.3.3 | Pago por consignación | CajaPagarPageComponent | 🔶 seleccionarMetodo('Transferencia') — UI completa |
 | RF3.2.2.2 | Modificar productos carrito | — | ❌ No implementado |
 | RF3.2.2.3 | Eliminar productos carrito | — | ❌ No implementado |
 | RF3.2.3 | Observaciones por producto | — | ❌ No encontrado |
-| RF3.5.3.1 | Pago en efectivo | — | ❌ No implementado |
-| RF3.5.3.2 | Pago con tarjeta | — | ❌ No implementado |
-| RF3.5.3.3 | Pago por consignación | — | ❌ No implementado |
 
 ---
 
