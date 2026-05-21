@@ -40,4 +40,8 @@ export class AlertasService {
   getUmbrales(): Observable<UmbralConfig[]> {
     return of([...MOCK_UMBRALES]).pipe(delay(300));
   }
+
+  exportarHistorialCSV(): Observable<Blob> {
+    return of(new Blob()).pipe(delay(500));
+  }
 }

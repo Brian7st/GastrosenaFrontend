@@ -53,7 +53,6 @@ export class BienesListPageComponent implements OnInit {
   }
 
   onProcessImport(data: BienImportRow[]): void {
-    console.log('Procesando importación de', data.length, 'registros');
     this.showImportModal.set(false);
     this.facade.loadAll();
   }
