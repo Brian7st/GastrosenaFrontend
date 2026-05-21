@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
+import { PresupuestoFacade } from '../../../data-access/presupuesto.facade';
 
 @Component({
   selector: 'restaurant-presupuesto-cargar-gil',
@@ -13,9 +14,12 @@ import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 })
 export class PresupuestoCargarGilComponent {
   private router = inject(Router);
+  private facade = inject(PresupuestoFacade);
+
+  loading = this.facade.loading;
 
   onCargar(): void {
-    // TODO: llamar a presupuestoFacade.cargarDesdeGIL(gilId)
+    // Pendiente: selección de solicitudes GIL (lista en construcción — Fase 4)
     this.closePanel();
   }
 
