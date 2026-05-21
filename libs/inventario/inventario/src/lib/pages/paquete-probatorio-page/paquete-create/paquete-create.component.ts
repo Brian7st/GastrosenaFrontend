@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import { PaqueteFacade } from '../../../data-access/paquete.facade';
 
 @Component({
   selector: 'restaurant-paquete-create',
@@ -20,7 +21,8 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
 })
 export class PaqueteCreateComponent {
   private router = inject(Router);
-  private fb = inject(FormBuilder);
+  private fb     = inject(FormBuilder);
+  private facade = inject(PaqueteFacade);
 
   // ── Formulario ──────────────────────────────────────────────────────────
   createForm = this.fb.nonNullable.group({
@@ -60,8 +62,7 @@ export class PaqueteCreateComponent {
 
   guardarPaquete(): void {
     if (this.createForm.valid) {
-      // TODO(paquete-facade): llamar facade.crearPaquete(this.createForm.getRawValue())
-      console.warn('guardarPaquete: pendiente integración con PaqueteFacade');
+      this.facade.crearPaquete(this.createForm.getRawValue());
       this.volver();
     }
   }

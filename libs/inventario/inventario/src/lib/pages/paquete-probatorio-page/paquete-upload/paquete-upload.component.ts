@@ -8,6 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LucideIconComponent } from '@restaurant/shared/ui';
+import { PaqueteFacade } from '../../../data-access/paquete.facade';
 
 @Component({
   selector: 'restaurant-paquete-upload',
@@ -19,11 +20,12 @@ import { LucideIconComponent } from '@restaurant/shared/ui';
 })
 export class PaqueteUploadComponent {
   private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private route  = inject(ActivatedRoute);
+  private facade = inject(PaqueteFacade);
 
-  isDragging = signal<boolean>(false);
+  isDragging   = signal<boolean>(false);
   selectedFile = signal<File | null>(null);
-  uploading = signal<boolean>(false);
+  uploading    = this.facade.loading;
   errorArchivo = signal<string | null>(null);
 
   // ── Drag & Drop Events ───────────────────────────────────────────────────
@@ -82,11 +84,10 @@ export class PaqueteUploadComponent {
   }
 
   subirDocumento(): void {
-    if (!this.selectedFile()) return;
-    this.uploading.set(true);
-    // TODO(paquete-facade): llamar facade.adjuntarDocumento(file)
-    console.warn('subirDocumento: pendiente integración con PaqueteFacade');
-    this.uploading.set(false);
+    const file = this.selectedFile();
+    if (!file) return;
+    const paqueteId = this.route.parent?.snapshot.paramMap.get('id') ?? '';
+    this.facade.adjuntarDocumento(paqueteId, file);
     this.cerrarModal();
   }
 }

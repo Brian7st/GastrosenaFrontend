@@ -94,7 +94,6 @@ export class AlertasHistorialComponent implements OnInit {
   }
 
   exportarCSV(): void {
-    // TODO(alertas-facade): llamar facade.exportarHistorialCSV()
-    console.warn('exportarCSV: pendiente integración con AlertasFacade');
+    this.facade.exportarHistorialCSV();
   }
 }

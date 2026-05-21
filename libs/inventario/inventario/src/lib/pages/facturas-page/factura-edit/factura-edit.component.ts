@@ -64,7 +64,7 @@ export class FacturaEditPageComponent implements OnInit {
   }
 
   onExportar(): void {
-    console.log('Exportando factura...');
+    // Exportación pendiente de integración HTTP
   }
 
   onAgregarItem(): void {

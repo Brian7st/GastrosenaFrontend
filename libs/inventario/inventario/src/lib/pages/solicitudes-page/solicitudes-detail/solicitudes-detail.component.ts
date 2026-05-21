@@ -1,7 +1,8 @@
-import { Component, ChangeDetectionStrategy, signal, inject, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 
 @Component({
   selector: 'restaurant-solicitudes-detail',
@@ -12,21 +13,24 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SolicitudesDetailComponent implements OnInit {
-  
-  // ─── Mocks basados en prototipo ─────────────────────────
-  solicitudId = signal<string>('GIL-F-014-2024-001');
-  estadoActual = signal<'Borrador' | 'Pendiente' | 'Validado' | 'Aprobado' | 'Procesado'>('Borrador');
-  fechaCreacion = signal('24 Oct 2024');
-  totalEstimado = signal(1240000);
-
   private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private route  = inject(ActivatedRoute);
+  private facade = inject(SolicitudesFacade);
+
+  // ── Estado reactivo desde facade ─────────────────────────────────────────
+  solicitud     = this.facade.solicitudSeleccionada;
+  loading       = this.facade.loading;
+  solicitudId   = computed(() => this.solicitud()?.codigo ?? '');
+  estadoActual  = computed(() => this.solicitud()?.estado ?? 'Borrador');
+  fechaCreacion = computed(() => this.solicitud()?.fecha ?? '');
+  totalEstimado = computed(() => this.solicitud()?.montoTotal ?? 0);
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
-      // TODO: llamar a solicitudesFacade.cargarSolicitudById(idParam) cuando exista la facade
-      this.solicitudId.set(idParam);
+      this.facade.cargarSolicitudById(idParam);
+    } else {
+      this.router.navigate(['/app/inventario/solicitudes-gil']);
     }
   }
 
@@ -46,7 +50,7 @@ export class SolicitudesDetailComponent implements OnInit {
 
   isPast(estado: string): boolean {
     const currentIndex = this.estados.indexOf(this.estadoActual());
-    const targetIndex = this.estados.indexOf(estado);
+    const targetIndex  = this.estados.indexOf(estado);
     return targetIndex < currentIndex;
   }
 
@@ -60,15 +64,16 @@ export class SolicitudesDetailComponent implements OnInit {
   }
 
   onEditar(): void {
-    const rawId = this.solicitudId().split('-').pop(); // Mock extract '001'
-    this.router.navigate(['/app/inventario/solicitudes-gil', rawId, 'editar']);
+    const id = this.solicitud()?.id;
+    if (id) this.router.navigate(['/app/inventario/solicitudes-gil', id, 'editar']);
   }
 
   onDownloadPdf(): void {
-    // TODO: llamar a servicio de exportación PDF
+    // Exportación PDF pendiente de integración HTTP
   }
 
   onEnviarAprobacion(): void {
-    // TODO: llamar a solicitudesFacade.cambiarEstado(id, 'Pendiente')
+    const codigo = this.solicitud()?.codigo;
+    if (codigo) this.facade.cambiarEstado(codigo, 'Pendiente');
   }
 }
