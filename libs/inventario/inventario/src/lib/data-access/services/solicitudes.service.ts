@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
-import { SolicitudGil, SolicitudesGilFiltros } from '../../models/solicitudes-gil.model';
+import { SolicitudGil, SolicitudesGilFiltros, EstadoGil, CrearSolicitudData, ActualizarSolicitudData } from '../../models/solicitudes-gil.model';
 import { SOLICITUDES_GIL_MOCK } from '../../models/solicitudes-gil.mock';
 
 @Injectable({
@@ -40,5 +40,17 @@ export class SolicitudesService {
   deleteSolicitud(codigo: string): Observable<boolean> {
     // Simulated delete
     return of(true).pipe(delay(800));
+  }
+
+  crearSolicitud(_data: CrearSolicitudData): Observable<{ success: boolean }> {
+    return of({ success: true }).pipe(delay(600));
+  }
+
+  actualizarSolicitud(_id: string, _data: ActualizarSolicitudData): Observable<{ success: boolean }> {
+    return of({ success: true }).pipe(delay(600));
+  }
+
+  cambiarEstado(_id: string, _estado: EstadoGil): Observable<boolean> {
+    return of(true).pipe(delay(400));
   }
 }
