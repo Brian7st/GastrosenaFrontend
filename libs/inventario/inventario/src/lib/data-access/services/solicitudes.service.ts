@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
-import { SolicitudGil, SolicitudesGilFiltros } from '../../models/solicitudes-gil.model';
+import { SolicitudGil, SolicitudesGilFiltros, EstadoGil, CrearSolicitudData, ActualizarSolicitudData } from '../../models/solicitudes-gil.model';
 import { SOLICITUDES_GIL_MOCK } from '../../models/solicitudes-gil.mock';
 
 @Injectable({
@@ -42,15 +42,15 @@ export class SolicitudesService {
     return of(true).pipe(delay(800));
   }
 
-  updateSolicitud(id: string | number, payload: Partial<SolicitudGil>): Observable<SolicitudGil> {
-    const solicitud = SOLICITUDES_GIL_MOCK.find(s => s.codigo === id || s.id.toString() === id.toString());
-    if (!solicitud) throw new Error('Not found');
-    const updated = { ...solicitud, ...payload };
-    return of(updated).pipe(delay(600));
+  crearSolicitud(_data: CrearSolicitudData): Observable<{ success: boolean }> {
+    return of({ success: true }).pipe(delay(600));
   }
 
-  generarGils(ids: (string | number)[]): Observable<boolean> {
-    // Simulated action
-    return of(true).pipe(delay(800));
+  actualizarSolicitud(_id: string, _data: ActualizarSolicitudData): Observable<{ success: boolean }> {
+    return of({ success: true }).pipe(delay(600));
+  }
+
+  cambiarEstado(_id: string, _estado: EstadoGil): Observable<boolean> {
+    return of(true).pipe(delay(400));
   }
 }

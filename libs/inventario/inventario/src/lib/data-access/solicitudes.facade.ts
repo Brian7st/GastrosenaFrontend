@@ -1,5 +1,5 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
-import { SolicitudGil, SolicitudesGilFiltros } from '../models/solicitudes-gil.model';
+import { SolicitudGil, SolicitudesGilFiltros, EstadoGil, CrearSolicitudData, ActualizarSolicitudData } from '../models/solicitudes-gil.model';
 import { SolicitudesService } from './services/solicitudes.service';
 import { finalize, catchError, of } from 'rxjs';
 
@@ -70,6 +70,60 @@ export class SolicitudesFacade {
   setFiltros(filtros: SolicitudesGilFiltros): void {
     this._filtros.set({ ...this._filtros(), ...filtros });
     this.cargarSolicitudes();
+  }
+
+  /**
+   * Crea una nueva solicitud y recarga el listado.
+   */
+  crearSolicitud(data: CrearSolicitudData): void {
+    this._loading.set(true);
+    this.solicitudesService.crearSolicitud(data)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al crear la solicitud');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(result => {
+        if (result) this.cargarSolicitudes();
+      });
+  }
+
+  /**
+   * Actualiza una solicitud existente y recarga el detalle.
+   */
+  actualizarSolicitud(id: string, data: ActualizarSolicitudData): void {
+    this._loading.set(true);
+    this.solicitudesService.actualizarSolicitud(id, data)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al actualizar la solicitud');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(result => {
+        if (result) this.cargarSolicitudById(id);
+      });
+  }
+
+  /**
+   * Cambia el estado de una solicitud.
+   */
+  cambiarEstado(id: string, estado: EstadoGil): void {
+    this._loading.set(true);
+    this.solicitudesService.cambiarEstado(id, estado)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al cambiar el estado de la solicitud');
+          return of(false);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(success => {
+        if (success) this.cargarSolicitudById(id);
+      });
   }
 
   /**

@@ -73,14 +73,8 @@ export class SolicitudesListComponent implements OnInit {
   }
 
   onSearch(term: string): void        { this.facade.setFiltros({ busqueda: term }); }
-  onFilterEstado(v: string): void      {
-    // TODO: llamar a solicitudesFacade.setFiltros(...) cuando exista la facade
-    this.facade.setFiltros({ estado: v ? (v as EstadoGil) : undefined });
-  }
-  onFilterFecha(v: string): void       {
-    // TODO: llamar a solicitudesFacade.setFiltros(...) cuando exista la facade
-    this.facade.setFiltros({ fechaRango: v });
-  }
+  onFilterEstado(v: string): void { this.facade.setFiltros({ estado: v ? (v as EstadoGil) : undefined }); }
+  onFilterFecha(v: string): void  { this.facade.setFiltros({ fechaRango: v }); }
   onExportPdf(id: string | number): void {
     this.router.navigate(['/app/inventario/solicitudes-gil', id, 'exportar']);
   }

@@ -1,6 +1,13 @@
 import { Routes } from '@angular/router';
 import { MesasPageComponent } from './pages/mesas-page/mesas-page.component';
 import { PedidosPageComponent } from './pages/pedidos-page/pedidos-page.component';
+import { CajaPageComponent } from './pages/caja-page/caja-page.component';
+import { CajaNuevaPageComponent } from './pages/caja-nueva-page/caja-nueva-page.component';
+import { CajaBuscarPageComponent } from './pages/caja-buscar-page/caja-buscar-page.component';
+import { CajaPagarPageComponent } from './pages/caja-pagar-page/caja-pagar-page.component';
+import { CajaAperturaPageComponent } from './pages/caja-apertura-page/caja-apertura-page.component';
+import { CajaCierrePageComponent } from './pages/caja-cierre-page/caja-cierre-page.component';
+import { CajaMovimientosPageComponent } from './pages/caja-movimientos-page/caja-movimientos-page.component';
 
 export const RESTAURANTE_ROUTES: Routes = [
   {
@@ -15,6 +22,34 @@ export const RESTAURANTE_ROUTES: Routes = [
   {
     path: 'pedidos',
     component: PedidosPageComponent,
+  },
+  {
+    path: 'caja',
+    component: CajaPageComponent,
+  },
+  {
+    path: 'caja/nueva',
+    component: CajaNuevaPageComponent,
+  },
+  {
+    path: 'caja/buscar',
+    component: CajaBuscarPageComponent,
+  },
+  {
+    path: 'caja/pagar',
+    component: CajaPagarPageComponent,
+  },
+  {
+    path: 'caja/apertura',
+    component: CajaAperturaPageComponent,
+  },
+  {
+    path: 'caja/cierre',
+    component: CajaCierrePageComponent,
+  },
+  {
+    path: 'caja/movimientos',
+    component: CajaMovimientosPageComponent,
   },
 ];
 

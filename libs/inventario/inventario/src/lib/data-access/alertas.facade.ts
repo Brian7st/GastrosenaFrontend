@@ -106,6 +106,20 @@ export class AlertasFacade {
       });
   }
 
+  /** Exporta el historial de alertas en formato CSV. */
+  exportarHistorialCSV(): void {
+    this._loading.set(true);
+    this.alertasService.exportarHistorialCSV()
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al exportar el historial');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe();
+  }
+
   /** Resuelve una alerta con datos tipados. */
   resolverAlerta(id: string, data: Record<string, unknown>): void {
     this._loading.set(true);

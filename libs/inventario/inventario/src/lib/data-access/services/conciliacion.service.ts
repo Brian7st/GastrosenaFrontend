@@ -3,10 +3,14 @@ import { Observable, of, delay } from 'rxjs';
 import {
   ConciliacionRegistro,
   ConciliacionDetalle,
+  DiferenciaItem,
+  TomaFisicaItem,
 } from '../../models/conciliacion.model';
 import {
   CONCILIACIONES_MOCK,
   CONCILIACION_DETALLE_MOCK,
+  DIFERENCIAS_MOCK,
+  TOMA_FISICA_ITEMS_MOCK,
 } from '../../models/conciliacion.mock';
 
 @Injectable({
@@ -28,6 +32,16 @@ export class ConciliacionService {
     const detalle =
       id === CONCILIACION_DETALLE_MOCK.id ? CONCILIACION_DETALLE_MOCK : undefined;
     return of(detalle).pipe(delay(300));
+  }
+
+  /** Obtiene las diferencias de una conciliación por su ID. */
+  getDiferenciasByConciliacion(_id: string): Observable<DiferenciaItem[]> {
+    return of([...DIFERENCIAS_MOCK]).pipe(delay(300));
+  }
+
+  /** Obtiene los ítems de una sesión de toma física. */
+  getTomaFisicaItems(): Observable<TomaFisicaItem[]> {
+    return of([...TOMA_FISICA_ITEMS_MOCK]).pipe(delay(400));
   }
 
   /**

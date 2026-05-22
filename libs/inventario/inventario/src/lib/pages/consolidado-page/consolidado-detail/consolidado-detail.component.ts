@@ -5,6 +5,7 @@ import { ButtonComponent, DataTableComponent, KpiCardComponent } from '@restaura
 import { ExportarConsolidadoModalComponent } from '../components/exportar-consolidado-modal/exportar-consolidado-modal.component';
 import { ReversarConsolidadoModalComponent } from '../components/reversar-consolidado-modal/reversar-consolidado-modal.component';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import { ConsolidadoFacade } from '../../../data-access/consolidado.facade';
 
 @Component({
   selector: 'restaurant-consolidado-detail',
@@ -15,17 +16,22 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConsolidadoDetailComponent implements OnInit {
-  private router = inject(Router);
+  private router   = inject(Router);
   private location = inject(Location);
-  private route = inject(ActivatedRoute);
+  private route    = inject(ActivatedRoute);
+  private facade   = inject(ConsolidadoFacade);
 
-  ngOnInit() {
+  // ── Estado reactivo desde facade ─────────────────────────────────────────
+  consolidado = this.facade.consolidadoSeleccionado;
+  loading     = this.facade.loading;
+
+  ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) {
       this.router.navigate(['/app/inventario/consolidado']);
       return;
     }
-    // TODO: llamar a consolidadoFacade.cargarConsolidado(id)
+    this.facade.cargarConsolidado(id);
   }
 
   showExportModal = signal(false);
@@ -69,13 +75,13 @@ export class ConsolidadoDetailComponent implements OnInit {
     this.showExportModal.set(false);
   }
 
-  onExport(format: 'excel' | 'pdf'): void {
-    // TODO: llamar a consolidadoFacade.exportar(format)
+  onExport(_format: 'excel' | 'pdf'): void {
+    // Exportación real pendiente de integración HTTP
     this.showExportModal.set(false);
   }
 
   openReversarModal(): void {
-    this.isReversarBlocked.set(false); // Mock
+    this.isReversarBlocked.set(false);
     this.showReversarModal.set(true);
   }
 
@@ -84,7 +90,8 @@ export class ConsolidadoDetailComponent implements OnInit {
   }
 
   confirmReversar(): void {
-    // TODO: llamar a consolidadoFacade.reversarConsolidado(this.route.snapshot.paramMap.get('id')!)
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) this.facade.reversarConsolidado(id);
     this.closeReversarModal();
   }
 }

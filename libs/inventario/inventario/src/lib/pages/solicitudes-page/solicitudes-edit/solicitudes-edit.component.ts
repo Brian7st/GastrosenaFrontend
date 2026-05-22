@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal, computed, inject, OnInit, effect } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { ButtonComponent } from '@restaurant/shared/ui';
@@ -15,36 +15,20 @@ import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SolicitudesEditComponent implements OnInit {
-  
   private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private route  = inject(ActivatedRoute);
   private facade = inject(SolicitudesFacade);
 
-  solicitudSeleccionada = this.facade.solicitudSeleccionada;
-  isSaving = this.facade.loading;
-
-  solicitudId = computed(() => {
-    const sol = this.solicitudSeleccionada();
-    return sol ? sol.codigo : 'Cargando...';
+  // ── Estado reactivo desde facade ─────────────────────────────────────────
+  solicitud   = this.facade.solicitudSeleccionada;
+  loading     = this.facade.loading;
+  solicitudId = computed(() => this.solicitud()?.codigo ?? '');
+  isBlocked   = computed(() => {
+    const estado = this.solicitud()?.estado;
+    return estado !== undefined && estado !== 'Borrador';
   });
 
-  isBlocked = computed(() => {
-    const sol = this.solicitudSeleccionada();
-    if (!sol) return false;
-    return sol.estado !== 'Borrador' && sol.estado !== 'Pendiente';
-  });
-  
   bienes = signal<BienSolicitud[]>([]);
-
-  constructor() {
-    // Sincronizar bienes locales cuando se carga la solicitud
-    effect(() => {
-      const sol = this.solicitudSeleccionada();
-      if (sol && sol.bienes) {
-        this.bienes.set([...sol.bienes]);
-      }
-    }, { allowSignalWrites: true });
-  }
 
   ngOnInit(): void {
     const paramId = this.route.snapshot.paramMap.get('id');
@@ -59,18 +43,12 @@ export class SolicitudesEditComponent implements OnInit {
   }
 
   onSave(): void {
-    const sol = this.solicitudSeleccionada();
-    if (!sol) return;
-
-    this.facade.actualizarSolicitud(sol.id, { 
-      bienes: this.bienes(),
-      totalBienes: this.bienes().length
-    });
-
-    // Navegar después de simular guardado
-    setTimeout(() => {
-      this.router.navigate(['/app/inventario/solicitudes-gil', sol.id]);
-    }, 600);
+    const codigo = this.solicitud()?.codigo;
+    if (codigo) {
+      this.facade.actualizarSolicitud(codigo, {});
+    }
+    const rawId = this.route.snapshot.paramMap.get('id') || '001';
+    this.router.navigate(['/app/inventario/solicitudes-gil', rawId]);
   }
 
   onAddBien(): void {

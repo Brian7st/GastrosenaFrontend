@@ -2,59 +2,61 @@ import { Injectable } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { BaseHttpService } from '@restaurant/shared/api';
-import { Usuario, PaginatedResponse } from '@restaurant/shared/models';
+import { PaginatedResponse } from '@restaurant/shared/models';
 import {
   ActualizarUsuarioRequest,
   CrearUsuarioRequest,
+  ExportarConfig,
   FiltrosUsuarios,
   ImportarUsuariosRequest,
   ImportarUsuariosResponse,
   RolOpcion,
+  UsuarioDetalle,
 } from '../models/usuarios.model';
 
 @Injectable({ providedIn: 'root' })
 export class UsuariosService extends BaseHttpService {
   private readonly resource = 'usuarios';
 
-  getUsuarios(filtros?: Partial<FiltrosUsuarios>): Observable<PaginatedResponse<Usuario>> {
+  getUsuarios(filtros?: Partial<FiltrosUsuarios>): Observable<PaginatedResponse<UsuarioDetalle>> {
     let params = new HttpParams();
-    if (filtros?.busqueda) params = params.set('busqueda', filtros.busqueda);
-    if (filtros?.rol)      params = params.set('rol', filtros.rol);
+    if (filtros?.busqueda)  params = params.set('busqueda', filtros.busqueda);
+    if (filtros?.rol)       params = params.set('rol', filtros.rol);
     if (filtros?.pagina  !== undefined) params = params.set('pagina',  String(filtros.pagina));
     if (filtros?.tamano  !== undefined) params = params.set('tamano',  String(filtros.tamano));
-    return this.http.get<PaginatedResponse<Usuario>>(this.buildUrl(this.resource), { params });
+    return this.http.get<PaginatedResponse<UsuarioDetalle>>(this.buildUrl(this.resource), { params });
   }
 
-  getUsuarioPorId(id: string): Observable<Usuario> {
-    return this.http.get<Usuario>(this.buildUrl(`${this.resource}/${id}`));
+  getUsuarioPorId(id: string): Observable<UsuarioDetalle> {
+    return this.http.get<UsuarioDetalle>(this.buildUrl(`${this.resource}/${id}`));
   }
 
   getRoles(): Observable<RolOpcion[]> {
     return this.http.get<RolOpcion[]>(this.buildUrl('roles'));
   }
 
-  crearUsuario(data: CrearUsuarioRequest): Observable<Usuario> {
-    return this.http.post<Usuario>(this.buildUrl(this.resource), data);
+  crearUsuario(data: CrearUsuarioRequest): Observable<UsuarioDetalle> {
+    return this.http.post<UsuarioDetalle>(this.buildUrl(this.resource), data);
   }
 
-  actualizarUsuario(id: string, data: ActualizarUsuarioRequest): Observable<Usuario> {
-    return this.http.put<Usuario>(this.buildUrl(`${this.resource}/${id}`), data);
+  actualizarUsuario(id: string, data: ActualizarUsuarioRequest): Observable<UsuarioDetalle> {
+    return this.http.put<UsuarioDetalle>(this.buildUrl(`${this.resource}/${id}`), data);
   }
 
   eliminarUsuario(id: string): Observable<void> {
     return this.http.delete<void>(this.buildUrl(`${this.resource}/${id}`));
   }
 
-  activarUsuario(id: string): Observable<Usuario> {
-    return this.http.patch<Usuario>(this.buildUrl(`${this.resource}/${id}/activar`), {});
+  activarUsuario(id: string): Observable<UsuarioDetalle> {
+    return this.http.patch<UsuarioDetalle>(this.buildUrl(`${this.resource}/${id}/activar`), {});
   }
 
-  desactivarUsuario(id: string): Observable<Usuario> {
-    return this.http.patch<Usuario>(this.buildUrl(`${this.resource}/${id}/desactivar`), {});
+  desactivarUsuario(id: string): Observable<UsuarioDetalle> {
+    return this.http.patch<UsuarioDetalle>(this.buildUrl(`${this.resource}/${id}/desactivar`), {});
   }
 
-  desbloquearCuenta(id: string): Observable<Usuario> {
-    return this.http.patch<Usuario>(this.buildUrl(`${this.resource}/${id}/desbloquear`), {});
+  desbloquearCuenta(id: string): Observable<UsuarioDetalle> {
+    return this.http.patch<UsuarioDetalle>(this.buildUrl(`${this.resource}/${id}/desbloquear`), {});
   }
 
   importarMasivo(request: ImportarUsuariosRequest): Observable<ImportarUsuariosResponse> {
@@ -67,9 +69,14 @@ export class UsuariosService extends BaseHttpService {
     );
   }
 
-  exportarUsuarios(): Observable<Blob> {
-    return this.http.get(this.buildUrl(`${this.resource}/exportar`), {
-      responseType: 'blob',
-    });
+  exportarUsuarios(config: ExportarConfig): Observable<Blob> {
+    const params = new HttpParams()
+      .set('formato',          config.formato)
+      .set('incluirInactivos', String(config.incluirInactivos))
+      .set('rol',              config.rol);
+    return this.http.get(
+      this.buildUrl(`${this.resource}/exportar`),
+      { params, responseType: 'blob' },
+    );
   }
 }

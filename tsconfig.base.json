@@ -2,6 +2,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "rootDir": ".",
     "sourceMap": true,
     "declaration": false,
@@ -14,23 +15,23 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "paths": {
-      "@restaurant/shell": ["libs/shell/shell/src/index.ts"],
-      "@restaurant/home": ["libs/shell/home/src/index.ts"],
-      "@restaurant/auth": ["libs/auth/auth/src/index.ts"],
-      "@restaurant/usuarios": ["libs/auth/usuarios/src/index.ts"],
-      "@restaurant/cocina": ["libs/cocina/cocina/src/index.ts"],
-      "@restaurant/bar": ["libs/bar/bar/src/index.ts"],
-      "@restaurant/restaurante": ["libs/restaurante/restaurante/src/index.ts"],
-      "@restaurant/inventario": ["libs/inventario/inventario/src/index.ts"],
       "@restaurant/abastecimiento": ["libs/abastecimiento/abastecimiento/src/index.ts"],
-      "@restaurant/reportes": ["libs/reportes/reportes/src/index.ts"],
+      "@restaurant/auth": ["libs/auth/auth/src/index.ts"],
+      "@restaurant/bar": ["libs/bar/bar/src/index.ts"],
+      "@restaurant/cocina": ["libs/cocina/cocina/src/index.ts"],
+      "@restaurant/home": ["libs/shell/home/src/index.ts"],
+      "@restaurant/inventario": ["libs/inventario/inventario/src/index.ts"],
       "@restaurant/notificaciones": ["libs/notificaciones/notificaciones/src/index.ts"],
-      "@restaurant/shared/auth": ["libs/shared/auth/src/index.ts"],
+      "@restaurant/reportes": ["libs/reportes/reportes/src/index.ts"],
+      "@restaurant/restaurante": ["libs/restaurante/restaurante/src/index.ts"],
       "@restaurant/shared/api": ["libs/shared/api/src/index.ts"],
+      "@restaurant/shared/auth": ["libs/shared/auth/src/index.ts"],
+      "@restaurant/shared/models": ["libs/shared/models/src/index.ts"],
       "@restaurant/shared/state": ["libs/shared/state/src/index.ts"],
       "@restaurant/shared/ui": ["libs/shared/ui/src/index.ts"],
-      "@restaurant/shared/models": ["libs/shared/models/src/index.ts"],
-      "@restaurant/shared/util": ["libs/shared/util/src/index.ts"]
+      "@restaurant/shared/util": ["libs/shared/util/src/index.ts"],
+      "@restaurant/shell": ["libs/shell/shell/src/index.ts"],
+      "@restaurant/usuarios": ["libs/auth/usuarios/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
