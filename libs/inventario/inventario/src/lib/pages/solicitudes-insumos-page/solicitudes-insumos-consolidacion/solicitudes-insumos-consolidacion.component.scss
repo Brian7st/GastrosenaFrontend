@@ -10,7 +10,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--color-text-secondary, #636E72);
+  color: var(--color-text-secondary);
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
@@ -22,7 +22,7 @@
   }
 
   &:hover {
-    color: var(--color-text-primary, #191c1d);
+    color: var(--color-en-superficie);
   }
 }
 
@@ -37,7 +37,7 @@
   font-family: 'Manrope', sans-serif;
   font-size: 2.25rem;
   font-weight: 800;
-  color: var(--color-text-primary, #191c1d);
+  color: var(--color-en-superficie);
   letter-spacing: -0.02em;
   margin: 0;
   line-height: 1.2;
@@ -48,7 +48,7 @@
 }
 
 .page-subtitle {
-  color: var(--color-text-secondary, #636E72);
+  color: var(--color-text-secondary);
   font-size: 0.9375rem;
   margin: 0;
   max-width: 800px;
@@ -65,7 +65,7 @@
 .origen-label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--color-text-secondary, #636E72);
+  color: var(--color-text-secondary);
 }
 
 .origen-tags {
@@ -85,8 +85,8 @@
 
 /* Tarjeta Principal */
 .consolidacion-card {
-  background-color: var(--color-surface-container-lowest, #ffffff);
-  border: 1px solid var(--color-outline-variant, #e2e8f0);
+  background-color: var(--color-superficie-contenedor-mas-bajo);
+  border: 1px solid var(--color-superficie-contenedor-alto);
   border-radius: var(--radius-xl, 1rem);
   overflow: hidden;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
@@ -100,7 +100,7 @@
   align-items: flex-start;
   gap: 1rem;
   justify-content: space-between;
-  border-bottom: 1px solid var(--color-outline-variant, #e2e8f0);
+  border-bottom: 1px solid var(--color-superficie-contenedor-alto);
 
   @media (min-width: 768px) {
     flex-direction: row;
@@ -114,7 +114,7 @@
   font-size: 1.25rem;
   font-weight: 700;
   margin: 0;
-  color: var(--color-text-primary, #191c1d);
+  color: var(--color-en-superficie);
 }
 
 .items-badge {
@@ -142,13 +142,13 @@
     padding: 1rem 1.5rem;
     font-size: 0.8125rem;
     font-weight: 700;
-    color: var(--color-text-secondary, #636E72);
-    border-bottom: 1px solid var(--color-outline-variant, #e2e8f0);
+    color: var(--color-text-secondary);
+    border-bottom: 1px solid var(--color-superficie-contenedor-alto);
   }
 
   td {
     padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid var(--color-outline-variant, #e2e8f0);
+    border-bottom: 1px solid var(--color-superficie-contenedor-alto);
     vertical-align: top;
   }
 
@@ -188,7 +188,7 @@
 .item-name {
   font-size: 0.9375rem;
   font-weight: 600;
-  color: var(--color-text-primary, #191c1d);
+  color: var(--color-en-superficie);
 }
 
 .item-status-badge {
@@ -210,7 +210,7 @@
 
 .col-unidad {
   font-size: 0.875rem;
-  color: var(--color-text-secondary, #636E72);
+  color: var(--color-text-secondary);
   padding-top: 1.5rem !important;
 }
 
@@ -240,7 +240,7 @@
 
 .desglose-qty {
   font-size: 0.875rem;
-  color: var(--color-text-secondary, #636E72);
+  color: var(--color-text-secondary);
 }
 
 .col-total {
@@ -250,7 +250,7 @@
 .total-value {
   font-size: 1.25rem;
   font-weight: 800;
-  color: var(--color-primario, #39a900);
+  color: var(--color-primario);
 }
 
 .text-right {
@@ -266,7 +266,7 @@
   justify-content: space-between;
   margin-top: 1rem;
   padding-top: 1.5rem;
-  border-top: 1px solid var(--color-outline-variant, #e2e8f0);
+  border-top: 1px solid var(--color-superficie-contenedor-alto);
 
   @media (min-width: 768px) {
     flex-direction: row;

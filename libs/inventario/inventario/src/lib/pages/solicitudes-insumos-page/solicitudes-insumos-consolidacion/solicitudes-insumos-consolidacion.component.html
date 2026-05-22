@@ -45,10 +45,10 @@
             </div>
             <div class="item-info">
               <span class="item-name">{{ item.nombre }}</span>
-              <span class="item-status-badge">
-                <span class="material-symbols-outlined status-icon">merge</span>
-                Consolidado ×{{ item.origenes.length }}
-              </span>
+              <restaurant-status-badge
+                [label]="'Consolidado ×' + item.origenes.length"
+                variant="success">
+              </restaurant-status-badge>
             </div>
           </td>
           
