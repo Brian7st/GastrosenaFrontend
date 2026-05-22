@@ -12,7 +12,7 @@
       </div>
     </div>
     <div class="header-actions">
-      <restaurant-button variant="ghost">
+      <restaurant-button variant="ghost" (click)="onExportar()">
         <div class="btn-icon-text">
           <lucide-icon name="download" [size]="18"></lucide-icon>
           Exportar Reporte
@@ -197,3 +197,12 @@
   </div>
 
 </div>
+
+<!-- ── MODAL: Exportar Historial ── -->
+<inventario-exportar
+  *ngIf="showExportarModal()"
+  titulo="Exportar Historial de Conciliaciones"
+  subtitulo="Seleccione el formato de salida para el reporte de auditoría"
+  (exportar)="onConfirmarExportar($event)"
+  (cerrar)="onCerrarExportar()"
+/>
