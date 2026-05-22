@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, OnInit, signal, computed, e
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { KeywordConfirmModalComponent } from '@restaurant/shared/ui';
 import { FacturasFacade } from '../../../data-access/facturas.facade';
 import { Factura, FacturaItem, ConciliacionItem, MonedaFEL } from '../../../models/facturas.model';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
@@ -9,7 +10,7 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
 @Component({
   selector: 'restaurant-factura-edit',
   standalone: true,
-  imports: [CommonModule, FormsModule, BackButtonComponent],
+  imports: [CommonModule, FormsModule, BackButtonComponent, KeywordConfirmModalComponent],
   templateUrl: './factura-edit.component.html',
   styleUrl: './factura-edit.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,6 +31,9 @@ export class FacturaEditPageComponent implements OnInit {
   moneda        = signal<MonedaFEL>('COP');
   notasInternas = signal('');
   localItems    = signal<FacturaItem[]>([]);
+
+  // Modal de confirmación de anulación
+  showAnularModal = signal(false);
 
   isBlocked = computed(() => {
     const f = this.factura();
@@ -89,8 +93,18 @@ export class FacturaEditPageComponent implements OnInit {
   }
 
   onAnular(): void {
+    this.showAnularModal.set(true);
+  }
+
+  onConfirmarAnular(): void {
     const id = this.factura()?.id;
     if (id) this.facade.anularFactura(id);
+    this.showAnularModal.set(false);
+    this.onVolver();
+  }
+
+  onCancelarAnular(): void {
+    this.showAnularModal.set(false);
   }
 
   onGuardar(): void {

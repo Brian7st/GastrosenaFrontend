@@ -5,11 +5,12 @@ import { ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmMo
 import { FacturasFacade } from '../../../data-access/facturas.facade';
 import { Factura, EstadoFactura } from '../../../models/facturas.model';
 import { FacturaFormComponent } from '../../../ui/modals/factura-form/factura-form.component';
+import { ExportarComponent } from '../../../components/exportar/exportar.component';
 
 @Component({
   selector: 'restaurant-facturas-list',
   standalone: true,
-  imports: [CommonModule, ButtonComponent, DataTableComponent, KpiCardComponent, FacturaFormComponent, KeywordConfirmModalComponent],
+  imports: [CommonModule, ButtonComponent, DataTableComponent, KpiCardComponent, FacturaFormComponent, KeywordConfirmModalComponent, ExportarComponent],
   templateUrl: './facturas-list.component.html',
   styleUrl: './facturas-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,10 +25,11 @@ export class FacturasListPageComponent implements OnInit {
   loading = this.facade.loading;
 
   // Modal controls
-  showFormModal    = signal(false);
-  showAnularModal  = signal(false);
-  facturaParaAnular = signal<Factura | null>(null);
-  searchQuery = signal('');
+  showFormModal      = signal(false);
+  showAnularModal    = signal(false);
+  showExportarModal  = signal(false);
+  facturaParaAnular  = signal<Factura | null>(null);
+  searchQuery        = signal('');
 
   ngOnInit(): void {
     this.facade.loadAll();
@@ -81,7 +83,17 @@ export class FacturasListPageComponent implements OnInit {
   }
 
   onExportar(): void {
-    // TODO: ruta de exportación pendiente
+    this.showExportarModal.set(true);
+  }
+
+  onConfirmarExportar(formato: string): void {
+    // TODO: integrar con servicio de descarga cuando backend confirme contrato
+    console.info('[FEL] Exportar en formato:', formato);
+    this.showExportarModal.set(false);
+  }
+
+  onCerrarExportar(): void {
+    this.showExportarModal.set(false);
   }
 
   getEstadoBadgeClass(estado: EstadoFactura): string {

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import {
@@ -52,8 +52,37 @@ export class PresupuestoDashboardComponent implements OnInit {
     'PRG-003': false,
   });
 
-  /** Historial de afectaciones */
+  /** Historial de afectaciones — fuente completa */
   afectaciones = this.facade.afectaciones;
+
+  // ── Paginación ─────────────────────────────────────────────────────────────
+  readonly ITEMS_POR_PAGINA = 5;
+  paginaActual = signal(1);
+
+  totalPaginas = computed(() =>
+    Math.max(1, Math.ceil(this.afectaciones().length / this.ITEMS_POR_PAGINA))
+  );
+
+  afectacionesPaginadas = computed(() => {
+    const inicio = (this.paginaActual() - 1) * this.ITEMS_POR_PAGINA;
+    return this.afectaciones().slice(inicio, inicio + this.ITEMS_POR_PAGINA);
+  });
+
+  paginas = computed(() =>
+    Array.from({ length: this.totalPaginas() }, (_, i) => i + 1)
+  );
+
+  irAPagina(n: number): void {
+    if (n >= 1 && n <= this.totalPaginas()) {
+      this.paginaActual.set(n);
+    }
+  }
+
+  anterior(): void { this.irAPagina(this.paginaActual() - 1); }
+  siguiente(): void { this.irAPagina(this.paginaActual() + 1); }
+
+  /** Template helper: evita pipe externo */
+  minOf(a: number, b: number): number { return Math.min(a, b); }
 
   /** Próximos vencimientos */
   vencimientos = this.facade.vencimientos;
