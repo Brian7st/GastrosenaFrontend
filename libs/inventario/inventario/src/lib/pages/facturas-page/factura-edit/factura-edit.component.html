@@ -274,6 +274,22 @@
   </div>
 </div>
 
+<!-- ── MODAL: Confirmar Anulación ── -->
+<restaurant-keyword-confirm-modal
+  [open]="showAnularModal()"
+  title="Anular edición de FEL"
+  description="Esta acción marcará el documento como Anulado. No podrá ser revertida."
+  keyword="ANULAR"
+  keywordLabel="Escribe ANULAR para confirmar"
+  confirmLabel="Sí, anular documento"
+  cancelLabel="Cancelar"
+  [identifierLabel]="'Documento'"
+  [identifierValue]="factura()?.numeroFEL ?? ''"
+  accent="warning"
+  (confirm)="onConfirmarAnular()"
+  (cancel)="onCancelarAnular()"
+/>
+
 <!-- Loading -->
 <ng-template #loadingTpl>
   <div class="loading-state">
