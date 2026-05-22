@@ -137,6 +137,15 @@ export class SolicitudesInsumosListComponent {
   onFilterFecha(v: string): void  { console.log('Fecha:', v);        }
   onClearFilters(): void          { console.log('Limpiar filtros');  }
 
+  getSolicitudVariant(estado: string): 'warning' | 'success' | 'neutral' {
+    const map: Record<string, 'warning' | 'success' | 'neutral'> = {
+      'ENVIADA':  'warning',
+      'APROBADA': 'success',
+      'CERRADA':  'neutral',
+    };
+    return map[estado] ?? 'neutral';
+  }
+
   onView(id: string | number): void {
     this.router.navigate(['/app/inventario/solicitudes-insumos-page', id, 'consolidacion']);
   }

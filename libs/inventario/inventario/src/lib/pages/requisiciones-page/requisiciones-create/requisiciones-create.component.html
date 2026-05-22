@@ -77,9 +77,9 @@
                 <p class="product-card__unit">Botella x 500ml</p>
                 <div class="product-card__qty-row">
                   <div class="product-card__qty-controls">
-                    <button class="qty-btn qty-btn--minus">-</button>
-                    <input class="qty-input" type="number" value="5"/>
-                    <button class="qty-btn qty-btn--plus">+</button>
+                    <button class="qty-btn qty-btn--minus" (click)="decrementar('aceite')">-</button>
+                    <input class="qty-input" type="number" [value]="cantidades()['aceite']" readonly/>
+                    <button class="qty-btn qty-btn--plus" (click)="incrementar('aceite')">+</button>
                   </div>
                   <span class="product-card__qty-label">Cant. a pedir</span>
                 </div>
@@ -102,9 +102,9 @@
                 <p class="product-card__unit">Bulto x 1kg</p>
                 <div class="product-card__qty-row">
                   <div class="product-card__qty-controls">
-                    <button class="qty-btn qty-btn--minus">-</button>
-                    <input class="qty-input" type="number" value="12"/>
-                    <button class="qty-btn qty-btn--plus">+</button>
+                    <button class="qty-btn qty-btn--minus" (click)="decrementar('arroz')">-</button>
+                    <input class="qty-input" type="number" [value]="cantidades()['arroz']" readonly/>
+                    <button class="qty-btn qty-btn--plus" (click)="incrementar('arroz')">+</button>
                   </div>
                   <span class="product-card__qty-label">Cant. a pedir</span>
                 </div>
@@ -123,9 +123,9 @@
                 <p class="product-card__unit">Bolsa x 500g</p>
                 <div class="product-card__qty-row">
                   <div class="product-card__qty-controls">
-                    <button class="qty-btn qty-btn--minus">-</button>
-                    <input class="qty-input" type="number" value="3"/>
-                    <button class="qty-btn qty-btn--plus">+</button>
+                    <button class="qty-btn qty-btn--minus" (click)="decrementar('sal')">-</button>
+                    <input class="qty-input" type="number" [value]="cantidades()['sal']" readonly/>
+                    <button class="qty-btn qty-btn--plus" (click)="incrementar('sal')">+</button>
                   </div>
                   <span class="product-card__qty-label">Cant. a pedir</span>
                 </div>
@@ -204,9 +204,9 @@
       <lucide-icon name="info" [size]="14"></lucide-icon>
       Acción Requerida: Validar Cantidad de Aceite
     </div>
-    <button class="summary-bar__cta" routerLink="../requisiciones/resumen/nueva">
-      <span>Revisar Pedido</span>
+    <restaurant-button variant="primary" routerLink="../requisiciones/resumen/nueva">
+      Revisar Pedido
       <lucide-icon name="shopping-cart" [size]="20"></lucide-icon>
-    </button>
+    </restaurant-button>
   </div>
 </div>

@@ -112,7 +112,12 @@
               {{ getProveedorIniciales(factura.proveedor) }}
             </div>
             <div>
-              <p class="proveedor-cell__name">{{ factura.proveedor }}</p>
+              <p class="proveedor-cell__name">
+                <span class="material-symbols-outlined doc-type-icon" [title]="factura.tipoDocumento">
+                  {{ getDocumentoIcono(factura.tipoDocumento) }}
+                </span>
+                {{ factura.proveedor }}
+              </p>
               <p class="proveedor-cell__id">{{ factura.nitEmisor }}</p>
             </div>
           </div>
@@ -134,7 +139,7 @@
               <span class="material-symbols-outlined">visibility</span>
             </button>
             <button class="action-icon action-icon--danger" (click)="$event.stopPropagation(); onAnularFactura(factura)" title="Anular">
-              <span class="material-symbols-outlined">delete</span>
+              <span class="material-symbols-outlined">block</span>
             </button>
           </div>
         </td>
@@ -175,6 +180,15 @@
   (close)="onCloseForm()"
   (save)="onSaveFactura($event)"
 ></restaurant-factura-form>
+
+<!-- ── MODAL: Exportar Facturas ── -->
+<inventario-exportar
+  *ngIf="showExportarModal()"
+  titulo="Exportar Panel de Facturación"
+  subtitulo="Seleccione el formato de salida para el reporte de facturas electrónicas"
+  (exportar)="onConfirmarExportar($event)"
+  (cerrar)="onCerrarExportar()"
+/>
 
 <!-- ── MODAL: Anular Factura ── -->
 <restaurant-keyword-confirm-modal

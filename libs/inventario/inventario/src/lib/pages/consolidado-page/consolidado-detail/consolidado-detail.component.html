@@ -21,48 +21,35 @@
 
   <!-- Dashboard Stats Summary (Bento Grid) -->
   <div class="kpi-grid">
-    <restaurant-kpi-card variant="states">
-      <div class="bento-card kpi-content">
-        <p class="kpi-content__label">Total Consolidado</p>
-        <div>
-          <span class="kpi-content__value">$142,500,000</span>
-          <p class="kpi-content__trend kpi-content__trend--up">
-            <span class="material-symbols-outlined">trending_up</span>
-            +12.5% vs Mes Anterior
-          </p>
-        </div>
-      </div>
-    </restaurant-kpi-card>
+    <restaurant-kpi-card
+      label="Total Consolidado"
+      value="$142,500,000"
+      icon="landmark"
+      iconColor="green"
+      trend="+12.5% vs Mes Anterior"
+      [trendUp]="true"
+    />
 
-    <restaurant-kpi-card variant="states">
-      <div class="bento-card kpi-content">
-        <p class="kpi-content__label">Vouchers Incluidos</p>
-        <div>
-          <span class="kpi-content__value">28 Formatos</span>
-          <p class="kpi-content__subtitle">GIL-F014 v.2023</p>
-        </div>
-      </div>
-    </restaurant-kpi-card>
+    <restaurant-kpi-card
+      label="Vouchers Incluidos"
+      value="28 Formatos"
+      icon="file-text"
+      iconColor="blue"
+    />
 
-    <restaurant-kpi-card variant="states">
-      <div class="bento-card kpi-content">
-        <p class="kpi-content__label">Fecha de Cierre</p>
-        <div>
-          <span class="kpi-content__value">24 Oct, 2023</span>
-          <p class="kpi-content__subtitle">16:45 PM</p>
-        </div>
-      </div>
-    </restaurant-kpi-card>
+    <restaurant-kpi-card
+      label="Fecha de Cierre"
+      value="24 Oct, 2023"
+      icon="calendar"
+      iconColor="slate"
+    />
 
-    <restaurant-kpi-card variant="states">
-      <div class="bento-card kpi-content">
-        <p class="kpi-content__label">Centro de Operación</p>
-        <div>
-          <span class="kpi-content__value">Bogotá D.C.</span>
-          <p class="kpi-content__subtitle">Sede Administrativa</p>
-        </div>
-      </div>
-    </restaurant-kpi-card>
+    <restaurant-kpi-card
+      label="Centro de Operación"
+      value="Bogotá D.C."
+      icon="map-pin"
+      iconColor="blue"
+    />
   </div>
 
   <!-- Section 1: Subtotales Discriminados -->

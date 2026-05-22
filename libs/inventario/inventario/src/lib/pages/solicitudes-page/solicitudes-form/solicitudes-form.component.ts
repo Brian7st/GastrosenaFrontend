@@ -21,8 +21,10 @@ export class SolicitudesFormComponent {
   // ── Estado reactivo desde facade ─────────────────────────────────────────
   loading = this.facade.loading;
 
-  fechaSolicitud = signal('2024-05-20');
-  bienes         = signal<BienSolicitud[]>([]);
+  fechaSolicitud    = signal('2024-05-20');
+  bienes            = signal<BienSolicitud[]>([]);
+  mostrarNuevaCuenta = signal(false);
+  nuevaCuenta       = signal('');
 
   onCancel(): void {
     this.router.navigate(['/app/inventario/solicitudes-gil']);
@@ -34,7 +36,15 @@ export class SolicitudesFormComponent {
   }
 
   onAddCuentadante(): void {
-    // Selector de cuentadante pendiente de integración
+    this.mostrarNuevaCuenta.update(v => !v);
+    if (!this.mostrarNuevaCuenta()) {
+      this.nuevaCuenta.set('');
+    }
+  }
+
+  onConfirmarCuentadante(): void {
+    this.mostrarNuevaCuenta.set(false);
+    this.nuevaCuenta.set('');
   }
 
   onAddBien(): void {

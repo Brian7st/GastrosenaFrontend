@@ -214,7 +214,7 @@
       </tr>
     </thead>
     <tbody>
-      @for (a of afectaciones(); track a.id) {
+      @for (a of afectacionesPaginadas(); track a.id) {
       <tr class="table-row">
         <td class="text-center">
           <span class="fecha-text">{{ a.fecha }}</span>
@@ -247,11 +247,36 @@
     </tbody>
     
     <div dtFooter class="pagination-footer">
-      <span class="results-count">Mostrando 1–{{ afectaciones().length }} de {{ afectaciones().length }} resultados</span>
+      <span class="results-count">
+        Mostrando {{ (paginaActual() - 1) * ITEMS_POR_PAGINA + 1 }}–{{ minOf(paginaActual() * ITEMS_POR_PAGINA, afectaciones().length) }}
+        de {{ afectaciones().length }} resultados
+      </span>
       <div class="page-numbers">
-        <button class="page-btn page-btn--active">1</button>
-        <button class="page-btn">2</button>
-        <button class="page-btn">3</button>
+        <button
+          class="page-btn page-btn--nav"
+          [disabled]="paginaActual() === 1"
+          (click)="anterior()"
+          aria-label="Página anterior"
+        >
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+
+        @for (p of paginas(); track p) {
+          <button
+            class="page-btn"
+            [class.page-btn--active]="paginaActual() === p"
+            (click)="irAPagina(p)"
+          >{{ p }}</button>
+        }
+
+        <button
+          class="page-btn page-btn--nav"
+          [disabled]="paginaActual() === totalPaginas()"
+          (click)="siguiente()"
+          aria-label="Página siguiente"
+        >
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
       </div>
     </div>
   </restaurant-data-table>

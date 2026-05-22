@@ -46,10 +46,10 @@
       <div class="asset-badges">
         <div class="asset-badge-item">
           <span class="badge-label">ESTADO</span>
-          <span class="estado-pill" [ngClass]="getEstadoPillClass(b.estado)">
-            <span class="estado-dot"></span>
-            {{ b.estado }}
-          </span>
+          <restaurant-status-badge
+            [label]="b.estado"
+            [variant]="getEstadoVariant(b.estado)">
+          </restaurant-status-badge>
         </div>
         <div class="asset-badge-item">
           <span class="badge-label">CATEGORÍA</span>
@@ -126,9 +126,10 @@
           <tr *ngFor="let m of movimientos()">
             <td class="mov-fecha">{{ m.fecha | date:'dd/MM/yyyy' }}</td>
             <td>
-              <span class="tipo-badge" [ngClass]="'tipo-badge--' + getTipoClass(m.tipo)">
-                {{ m.tipo }}
-              </span>
+              <restaurant-status-badge
+                [label]="m.tipo"
+                [variant]="getTipoVariant(m.tipo)">
+              </restaurant-status-badge>
             </td>
             <td class="mov-responsable">{{ m.responsable }}</td>
             <td class="mov-ubicacion">{{ m.ubicacion }}</td>
@@ -151,7 +152,12 @@
         <span class="material-symbols-outlined filled text-primary">receipt_long</span>
         <h3>Facturas de Abastecimiento</h3>
       </div>
-      <button class="link-btn">Ver todas</button>
+      <button
+        class="link-btn"
+        *ngIf="b.facturas && b.facturas.length > FACTURAS_PREVIEW_COUNT"
+        (click)="toggleFacturas()">
+        {{ mostrarTodasFacturas() ? 'Ver menos' : 'Ver todas (' + b.facturas.length + ')' }}
+      </button>
     </div>
 
     <ng-container *ngIf="b.facturas && b.facturas.length > 0; else noFacturas">
@@ -168,14 +174,17 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let f of b.facturas">
+            <tr *ngFor="let f of (mostrarTodasFacturas() ? b.facturas : (b.facturas | slice:0:FACTURAS_PREVIEW_COUNT))">
               <td class="code-mono">{{ f.fel }}</td>
               <td class="code-mono text-muted">{{ f.cufe }}</td>
               <td>{{ f.proveedor }}</td>
               <td>{{ f.fecha | date:'dd/MM/yyyy' }}</td>
               <td class="mov-valor">{{ f.monto | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
               <td>
-                <span class="factura-estado" [ngClass]="getEstadoFacturaClass(f.estado)">{{ f.estado }}</span>
+                <restaurant-status-badge
+                  [label]="f.estado"
+                  [variant]="getFacturaEstadoVariant(f.estado)">
+                </restaurant-status-badge>
               </td>
             </tr>
           </tbody>
