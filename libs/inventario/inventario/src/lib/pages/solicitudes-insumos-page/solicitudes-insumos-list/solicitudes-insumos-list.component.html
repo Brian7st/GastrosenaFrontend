@@ -101,7 +101,7 @@
       <th>Fecha</th>
       <th>Ítems</th>
       <th>Estado</th>
-      <th class="text-right">Acciones</th>
+      <th style="text-align: center;">Acciones</th>
     </tr>
   </thead>
 
@@ -154,7 +154,7 @@
           </button>
           
           <!-- Botón Aprobar similar al badge de aprobado pero clicable -->
-          <button *ngIf="s.estado === 'ENVIADA'" class="btn-aprobar" (click)="onApprove(s.id)">
+          <button [style.visibility]="s.estado === 'ENVIADA' ? 'visible' : 'hidden'" class="btn-aprobar" (click)="onApprove(s.id)">
             <span class="material-symbols-outlined" style="font-size: 16px;">check</span>
             Aprobar
           </button>
@@ -173,3 +173,11 @@
   </div>
 
 </restaurant-data-table>
+
+<!-- Modal de aprobación -->
+<restaurant-aprobar-solicitud-modal
+  [isOpen]="solicitudSeleccionada() !== null"
+  [solicitud]="solicitudSeleccionada()"
+  (cancel)="onCloseModal()"
+  (confirm)="onConfirmApprove($event)">
+</restaurant-aprobar-solicitud-modal>

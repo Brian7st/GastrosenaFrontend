@@ -163,20 +163,5 @@ export class SolicitudesFacade {
       });
   }
 
-  actualizarSolicitud(id: string | number, payload: Partial<SolicitudGil>): void {
-    this._loading.set(true);
-    this.solicitudesService.updateSolicitud(id, payload)
-      .pipe(
-        catchError(() => {
-          this._error.set('Error al actualizar la solicitud');
-          return of(null);
-        }),
-        finalize(() => this._loading.set(false))
-      )
-      .subscribe(updated => {
-        if (updated) {
-          this._solicitudSeleccionada.set(updated);
-        }
-      });
-  }
+
 }

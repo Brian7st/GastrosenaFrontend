@@ -33,13 +33,6 @@ export const INVENTARIO_ROUTES: Routes = [
           ),
       },
       {
-        path: 'generar',
-        loadComponent: () =>
-          import('./pages/solicitudes-page/solicitudes-generar/solicitudes-generar.component').then(
-            m => m.SolicitudesGenerarComponent
-          ),
-      },
-      {
         path: 'nueva',
         loadComponent: () =>
           import('./pages/solicitudes-page/solicitudes-form/solicitudes-form.component').then(
@@ -71,6 +64,10 @@ export const INVENTARIO_ROUTES: Routes = [
   },
 
   // ── Solicitudes de Insumos (Bandeja de Aprobación) ───────────────────────
+  {
+    path: 'solicitudes-insumos-page',
+    loadComponent: () => import('./pages/solicitudes-insumos-page/solicitudes-insumos-list/solicitudes-insumos-list.component').then(m => m.SolicitudesInsumosListComponent)
+  },
   {
     path: 'solicitudes-insumos-page/:id/consolidacion',
     loadComponent: () => import('./pages/solicitudes-insumos-page/solicitudes-insumos-consolidacion/solicitudes-insumos-consolidacion.component').then(m => m.SolicitudesInsumosConsolidacionComponent)

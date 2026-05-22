@@ -10,6 +10,7 @@ import {
   SelectFilterComponent,
   StatusBadgeComponent
 } from '@restaurant/shared/ui';
+import { AprobarSolicitudModalComponent } from '../../../components/aprobar-solicitud-modal/aprobar-solicitud-modal.component';
 
 interface SolicitudInsumo {
   id: number;
@@ -19,6 +20,7 @@ interface SolicitudInsumo {
   fecha: string;
   itemsCount: number;
   estado: 'ENVIADA' | 'APROBADA' | 'CERRADA';
+  items?: { nombre: string; cantidad: string; icon: string }[];
 }
 
 @Component({
@@ -33,7 +35,8 @@ interface SolicitudInsumo {
     PageHeaderComponent,
     SearchFilterComponent,
     SelectFilterComponent,
-    StatusBadgeComponent
+    StatusBadgeComponent,
+    AprobarSolicitudModalComponent
   ],
   templateUrl: './solicitudes-insumos-list.component.html',
   styleUrls: ['./solicitudes-insumos-list.component.scss'],
@@ -51,7 +54,12 @@ export class SolicitudesInsumosListComponent {
       ficha: '2560892',
       fecha: '12 Oct',
       itemsCount: 3,
-      estado: 'ENVIADA'
+      estado: 'ENVIADA',
+      items: [
+        { nombre: 'Harina de trigo', cantidad: '10 kg', icon: 'inventory_2' },
+        { nombre: 'Aceite vegetal', cantidad: '5 L', icon: 'local_drink' },
+        { nombre: 'Leche entera', cantidad: '12 L', icon: 'water_drop' }
+      ]
     },
     {
       id: 2,
@@ -130,6 +138,8 @@ export class SolicitudesInsumosListComponent {
     }
   }
 
+  solicitudSeleccionada = signal<SolicitudInsumo | null>(null);
+
   onSearch(term: string): void    { console.log('Buscar:', term);    }
   onFilterEstado(v: string): void { console.log('Estado:', v);       }
   onFilterFecha(v: string): void  { console.log('Fecha:', v);        }
@@ -139,5 +149,24 @@ export class SolicitudesInsumosListComponent {
     this.router.navigate(['/app/inventario/solicitudes-insumos-page', id, 'consolidacion']);
   }
   
-  onApprove(id: string | number): void { console.log('Aprobar:', id); }
+  onApprove(id: number): void {
+    const sol = this.solicitudes().find(s => s.id === id);
+    if (sol) {
+      this.solicitudSeleccionada.set(sol);
+    }
+  }
+
+  onCloseModal(): void {
+    this.solicitudSeleccionada.set(null);
+  }
+
+  onConfirmApprove(id: number): void {
+    this.solicitudes.update(list => list.map(s => {
+      if (s.id === id) {
+        return { ...s, estado: 'APROBADA' };
+      }
+      return s;
+    }));
+    this.onCloseModal();
+  }
 }

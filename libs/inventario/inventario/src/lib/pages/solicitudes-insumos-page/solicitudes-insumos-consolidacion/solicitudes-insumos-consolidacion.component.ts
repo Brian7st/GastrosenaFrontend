@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { PageHeaderComponent, ButtonComponent } from '@restaurant/shared/ui';
+import { ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 
 interface ConsolidacionItem {
@@ -19,7 +19,7 @@ interface ConsolidacionItem {
 @Component({
   selector: 'restaurant-solicitudes-insumos-consolidacion',
   standalone: true,
-  imports: [CommonModule, RouterModule, PageHeaderComponent, ButtonComponent, BackButtonComponent],
+  imports: [CommonModule, RouterModule, ButtonComponent, BackButtonComponent],
   templateUrl: './solicitudes-insumos-consolidacion.component.html',
   styleUrls: ['./solicitudes-insumos-consolidacion.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
