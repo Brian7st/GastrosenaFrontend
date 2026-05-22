@@ -28,19 +28,19 @@
     </div>
     <div class="paquete-detail__header-actions">
       @if (isCompleto()) {
-        <button class="paquete-detail__btn-secondary">
+        <restaurant-button variant="surface" (click)="exportarPaquete()">
           <lucide-icon name="download" [size]="16"></lucide-icon>
           Exportar Paquete
-        </button>
-        <button class="paquete-detail__btn-primary">
+        </restaurant-button>
+        <restaurant-button variant="primary" (click)="archivarExpediente()">
           <lucide-icon name="archive" [size]="16"></lucide-icon>
           Archivar Expediente
-        </button>
+        </restaurant-button>
       } @else {
-        <button class="paquete-detail__btn-disabled" disabled>
+        <restaurant-button variant="surface" [disabled]="true">
           <lucide-icon name="archive" [size]="16"></lucide-icon>
           Archivar Expediente
-        </button>
+        </restaurant-button>
         <p class="paquete-detail__btn-hint">
           <lucide-icon name="alert-triangle" [size]="12"></lucide-icon>
           Todos los 3 documentos son requeridos
@@ -113,12 +113,12 @@
                       <lucide-icon name="arrow-right" [size]="14"></lucide-icon>
                     </a>
                   } @else {
-                    <a class="paquete-detail__doc-link" href="#">
+                    <a class="paquete-detail__doc-link" (click)="verDocumento(doc.tipo)" role="button" style="cursor:pointer;">
                       Ver documento
                       <lucide-icon name="arrow-right" [size]="14"></lucide-icon>
                     </a>
                   }
-                  <button class="paquete-detail__doc-change">
+                  <button class="paquete-detail__doc-change" (click)="cambiarDocumento(doc.tipo)">
                     <lucide-icon name="refresh-cw" [size]="12"></lucide-icon>
                     Cambiar
                   </button>

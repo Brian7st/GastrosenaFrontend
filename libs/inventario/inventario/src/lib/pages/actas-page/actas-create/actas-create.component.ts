@@ -13,6 +13,12 @@ import {
 } from '@restaurant/shared/ui';
 import { WizardStep } from '../../../models/acta.model';
 
+interface Firmante {
+  nombre: string;
+  rol: string;
+  estado: 'pendiente' | 'firmado';
+}
+
 @Component({
   selector: 'restaurant-actas-create',
   standalone: true,
@@ -43,6 +49,19 @@ export class ActasCreateComponent {
     const progress = ((this.currentStep() - 1) / (this.totalSteps - 1)) * 100;
     return `${progress}%`;
   });
+
+  // ── Firmantes ──────────────────────────────────────────────────────────
+  firmantes = signal<Firmante[]>([
+    { nombre: 'Sebastián Betancourt', rol: 'Instructor Cuentadante', estado: 'pendiente' },
+    { nombre: 'Camila Rodríguez M.', rol: 'Vocero de Aprendices', estado: 'pendiente' },
+  ]);
+
+  addFirmante(): void {
+    this.firmantes.update(list => [
+      ...list,
+      { nombre: 'Nuevo Firmante', rol: 'Sin asignar', estado: 'pendiente' },
+    ]);
+  }
 
   // ── Navegación del wizard ──────────────────────────────────────────────
   nextStep(): void {

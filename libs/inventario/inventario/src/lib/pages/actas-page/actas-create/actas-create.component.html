@@ -140,28 +140,23 @@
           Asistentes y Firmantes
         </h3>
         <div class="acta-create__firmantes-list">
-          <div class="acta-create__firmante-row">
-            <div class="acta-create__firmante-avatar">
-              <lucide-icon name="user" [size]="16"></lucide-icon>
+          @for (firmante of firmantes(); track firmante.nombre + $index) {
+            <div class="acta-create__firmante-row">
+              <div class="acta-create__firmante-avatar">
+                <lucide-icon name="user" [size]="16"></lucide-icon>
+              </div>
+              <div class="acta-create__firmante-info">
+                <span class="acta-create__firmante-name">{{ firmante.nombre }}</span>
+                <span class="acta-create__firmante-role">{{ firmante.rol }}</span>
+              </div>
+              <restaurant-status-badge
+                [label]="firmante.estado === 'firmado' ? 'Firmado' : 'Pendiente'"
+                [variant]="firmante.estado === 'firmado' ? 'success' : 'warning'">
+              </restaurant-status-badge>
             </div>
-            <div class="acta-create__firmante-info">
-              <span class="acta-create__firmante-name">Sebastián Betancourt</span>
-              <span class="acta-create__firmante-role">Instructor Cuentadante</span>
-            </div>
-            <restaurant-status-badge label="Pendiente" variant="warning"></restaurant-status-badge>
-          </div>
-          <div class="acta-create__firmante-row">
-            <div class="acta-create__firmante-avatar">
-              <lucide-icon name="user" [size]="16"></lucide-icon>
-            </div>
-            <div class="acta-create__firmante-info">
-              <span class="acta-create__firmante-name">Camila Rodríguez M.</span>
-              <span class="acta-create__firmante-role">Vocero de Aprendices</span>
-            </div>
-            <restaurant-status-badge label="Pendiente" variant="warning"></restaurant-status-badge>
-          </div>
+          }
         </div>
-        <button class="acta-create__add-firmante">
+        <button class="acta-create__add-firmante" (click)="addFirmante()">
           <lucide-icon name="plus" [size]="16"></lucide-icon>
           Agregar Firmante
         </button>

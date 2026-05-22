@@ -10,6 +10,7 @@ import { ActivatedRoute, Router, RouterOutlet, RouterLink } from '@angular/route
 import {
   StatusBadgeComponent,
   LucideIconComponent,
+  ButtonComponent,
 } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import {
@@ -29,6 +30,7 @@ import { PaqueteFacade } from '../../../data-access/paquete.facade';
     RouterLink,
     StatusBadgeComponent,
     LucideIconComponent,
+    ButtonComponent,
     BackButtonComponent,
   ],
   templateUrl: './paquete-detail.component.html',
@@ -159,6 +161,36 @@ export class PaqueteDetailComponent implements OnInit {
     const p = this.paquete();
     if (p) {
       this.router.navigate(['/app/inventario/paquete-probatorio', p.id, 'adjuntar']);
+    }
+  }
+
+  exportarPaquete(): void {
+    const p = this.paquete();
+    if (p) {
+      console.log('Exportar paquete:', p.expediente);
+    }
+  }
+
+  archivarExpediente(): void {
+    const p = this.paquete();
+    if (p) {
+      console.log('Archivar expediente:', p.expediente);
+    }
+  }
+
+  verDocumento(tipo: string): void {
+    const p = this.paquete();
+    if (p) {
+      this.router.navigate(['/app/inventario/paquete-probatorio', p.id, tipo]);
+    }
+  }
+
+  cambiarDocumento(tipo: string): void {
+    const p = this.paquete();
+    if (p) {
+      this.router.navigate(['/app/inventario/paquete-probatorio', p.id, 'adjuntar'], {
+        queryParams: { tipo },
+      });
     }
   }
 }
