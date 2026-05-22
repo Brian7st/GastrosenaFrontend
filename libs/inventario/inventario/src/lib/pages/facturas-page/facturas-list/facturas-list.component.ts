@@ -103,6 +103,17 @@ export class FacturasListPageComponent implements OnInit {
       .toUpperCase();
   }
 
+  getDocumentoIcono(tipoDocumento: string): string {
+    const map: Record<string, string> = {
+      'Factura Electrónica': 'receipt_long',
+      'Factura':             'receipt_long',
+      'Nota Crédito':        'note_alt',
+      'Nota Débito':         'note_add',
+      'Orden de Compra':     'shopping_cart',
+    };
+    return map[tipoDocumento] ?? 'description';
+  }
+
   formatCurrency(value: number, moneda = 'COP'): string {
     const validCurrency = moneda === 'GTQ' ? 'GTQ' : (moneda === 'USD' ? 'USD' : 'COP');
     return new Intl.NumberFormat('es-CO', {
