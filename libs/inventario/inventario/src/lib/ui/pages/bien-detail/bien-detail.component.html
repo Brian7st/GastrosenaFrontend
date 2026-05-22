@@ -46,10 +46,10 @@
       <div class="asset-badges">
         <div class="asset-badge-item">
           <span class="badge-label">ESTADO</span>
-          <span class="estado-pill" [ngClass]="getEstadoPillClass(b.estado)">
-            <span class="estado-dot"></span>
-            {{ b.estado }}
-          </span>
+          <restaurant-status-badge
+            [label]="b.estado"
+            [variant]="getEstadoVariant(b.estado)">
+          </restaurant-status-badge>
         </div>
         <div class="asset-badge-item">
           <span class="badge-label">CATEGORÍA</span>
@@ -126,9 +126,10 @@
           <tr *ngFor="let m of movimientos()">
             <td class="mov-fecha">{{ m.fecha | date:'dd/MM/yyyy' }}</td>
             <td>
-              <span class="tipo-badge" [ngClass]="'tipo-badge--' + getTipoClass(m.tipo)">
-                {{ m.tipo }}
-              </span>
+              <restaurant-status-badge
+                [label]="m.tipo"
+                [variant]="getTipoVariant(m.tipo)">
+              </restaurant-status-badge>
             </td>
             <td class="mov-responsable">{{ m.responsable }}</td>
             <td class="mov-ubicacion">{{ m.ubicacion }}</td>
@@ -180,7 +181,10 @@
               <td>{{ f.fecha | date:'dd/MM/yyyy' }}</td>
               <td class="mov-valor">{{ f.monto | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
               <td>
-                <span class="factura-estado" [ngClass]="getEstadoFacturaClass(f.estado)">{{ f.estado }}</span>
+                <restaurant-status-badge
+                  [label]="f.estado"
+                  [variant]="getFacturaEstadoVariant(f.estado)">
+                </restaurant-status-badge>
               </td>
             </tr>
           </tbody>

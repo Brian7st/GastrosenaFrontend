@@ -58,39 +58,10 @@
 <!-- ══════════════════════════════════════════════════════════════════════════
      Tabla con filtros
 ══════════════════════════════════════════════════════════════════════════ -->
-<restaurant-data-table tableTitle="Solicitudes de Insumos" tableIcon="clipboard-list">
-
-  <!-- Barra de filtros -->
-  <div dtHeader class="table-controls">
-    <div class="filters-left">
-
-      <!-- Filtro Estado -->
-      <div class="select-box">
-        <select (change)="onFilterEstado($any($event.target).value)">
-          <option *ngFor="let opt of estadoOptions" [value]="opt.value">{{ opt.label }}</option>
-        </select>
-        <span class="material-symbols-outlined dropdown-icon">expand_more</span>
-      </div>
-
-      <!-- Filtro Fecha -->
-      <div class="select-box">
-        <select (change)="onFilterFecha($any($event.target).value)">
-          <option *ngFor="let opt of fechaOptions" [value]="opt.value">{{ opt.label }}</option>
-        </select>
-        <span class="material-symbols-outlined dropdown-icon">calendar_month</span>
-      </div>
-
-      <!-- Buscar por instructor -->
-      <div class="search-box">
-        <span class="material-symbols-outlined search-icon">search</span>
-        <input type="text"
-               placeholder="Buscar por Instructor..."
-               (input)="onSearch($any($event.target).value)" />
-      </div>
-    </div>
-
-    <p class="results-count">Mostrando 1–3 de 60 solicitudes</p>
-  </div>
+<restaurant-data-table
+  tableTitle="Solicitudes de Insumos"
+  tableIcon="clipboard-list"
+  searchPlaceholder="Buscar por instructor o código...">
 
   <!-- Cabecera de tabla -->
   <thead>
@@ -135,15 +106,10 @@
 
       <!-- Estado badge -->
       <td>
-        <span class="estado-badge"
-              [ngClass]="{
-                'estado-badge--pendiente': s.estado === 'ENVIADA',
-                'estado-badge--aprobado':  s.estado === 'APROBADA',
-                'estado-badge--procesado': s.estado === 'CERRADA'
-              }">
-          <span *ngIf="s.estado === 'CERRADA'" class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle; margin-right: 2px;">lock</span>
-          {{ s.estado }}
-        </span>
+        <restaurant-status-badge
+          [label]="s.estado"
+          [variant]="getSolicitudVariant(s.estado)">
+        </restaurant-status-badge>
       </td>
 
       <!-- Acciones -->
