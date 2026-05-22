@@ -1,4 +1,18 @@
-import { SolicitudGil } from './solicitudes-gil.model';
+import { SolicitudGil, BienSolicitud } from './solicitudes-gil.model';
+export { BienSolicitud };
+
+// ── Bienes por solicitud (ítems de formulario) ───────────────────────────────
+
+export const BIENES_SOLICITUD_MOCK: BienSolicitud[] = [
+  {
+    codigo: 'ALM-001',
+    descripcion: 'Harina de Trigo x 50kg',
+    um: 'Bto',
+    cantidad: 2,
+    valorUnitario: 150000,
+    subtotal: 300000,
+  },
+];
 
 // ── Alias requerido por los componentes ──────────────────────────────────────
 export const SOLICITUDES_MOCK: SolicitudGil[] = [
@@ -15,6 +29,7 @@ export const SOLICITUDES_MOCK: SolicitudGil[] = [
     totalBienes: 8,
     montoTotal: 1240000,
     avatarColor: 'blue',
+    bienes: [...BIENES_SOLICITUD_MOCK]
   },
   {
     id: 2,
@@ -29,6 +44,7 @@ export const SOLICITUDES_MOCK: SolicitudGil[] = [
     totalBienes: 5,
     montoTotal: 450500,
     avatarColor: 'purple',
+    bienes: [...BIENES_SOLICITUD_MOCK]
   },
   {
     id: 3,
@@ -43,6 +59,7 @@ export const SOLICITUDES_MOCK: SolicitudGil[] = [
     totalBienes: 12,
     montoTotal: 2890000,
     avatarColor: 'amber',
+    bienes: [...BIENES_SOLICITUD_MOCK]
   },
   {
     id: 4,
@@ -57,6 +74,7 @@ export const SOLICITUDES_MOCK: SolicitudGil[] = [
     totalBienes: 20,
     montoTotal: 3150000,
     avatarColor: 'green',
+    bienes: [...BIENES_SOLICITUD_MOCK]
   },
   {
     id: 5,
@@ -71,29 +89,11 @@ export const SOLICITUDES_MOCK: SolicitudGil[] = [
     totalBienes: 6,
     montoTotal: 890000,
     avatarColor: 'slate',
+    bienes: [...BIENES_SOLICITUD_MOCK]
   },
 ];
 
 /** @deprecated Use SOLICITUDES_MOCK — kept for backward-compat with SolicitudesService */
 export const SOLICITUDES_GIL_MOCK = SOLICITUDES_MOCK;
 
-// ── Bienes por solicitud (ítems de formulario) ───────────────────────────────
-export interface BienSolicitud {
-  codigo: string;
-  descripcion: string;
-  um: string;
-  cantidad: number;
-  valorUnitario: number;
-  subtotal: number;
-}
 
-export const BIENES_SOLICITUD_MOCK: BienSolicitud[] = [
-  {
-    codigo: 'ALM-001',
-    descripcion: 'Harina de Trigo x 50kg',
-    um: 'Bto',
-    cantidad: 2,
-    valorUnitario: 150000,
-    subtotal: 300000,
-  },
-];
