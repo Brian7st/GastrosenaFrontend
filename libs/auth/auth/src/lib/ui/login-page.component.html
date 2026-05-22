@@ -14,22 +14,45 @@
       </a>
 
       <div class="auth-panel__content">
-        <blockquote class="auth-panel__quote">
-          "La gastronomía es el arte que utiliza la comida como medio de expresión."
-        </blockquote>
-        <p class="auth-panel__sub">Sistema de Gestión · GastroSENA</p>
-        <ul class="auth-panel__features">
-          @for (feature of panelFeatures; track feature) {
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                   stroke-width="2.5" stroke-linecap="round">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-              {{ feature }}
-            </li>
-          }
-        </ul>
-      </div>
+  <div class="auth-panel__illustration">
+    <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Círculos decorativos -->
+      <circle cx="100" cy="100" r="85" stroke="rgba(255,255,255,0.06)" stroke-width="2"/>
+      <circle cx="100" cy="100" r="65" stroke="rgba(255,255,255,0.04)" stroke-width="2"/>
+      <!-- Plato -->
+      <circle cx="100" cy="105" r="45" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+      <circle cx="100" cy="105" r="35" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+      <!-- Tenedor -->
+      <line x1="78" y1="70" x2="78" y2="95" stroke="rgba(255,255,255,0.6)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="74" y1="70" x2="74" y2="82" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round"/>
+      <line x1="78" y1="70" x2="78" y2="82" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round"/>
+      <line x1="82" y1="70" x2="82" y2="82" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round"/>
+      <line x1="78" y1="95" x2="78" y2="140" stroke="rgba(255,255,255,0.6)" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- Cuchillo -->
+      <line x1="122" y1="70" x2="122" y2="140" stroke="rgba(255,255,255,0.6)" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M122 70 Q128 80 122 95" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round"/>
+      <!-- Punto verde decorativo -->
+      <circle cx="148" cy="58" r="14" fill="#22c55e"/>
+      <path d="M142 58 L146 62 L154 54" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+   <blockquote class="auth-panel__quote">
+    "La gastronomía es el arte que utiliza la comida como medio de expresión."
+   </blockquote>
+   <p class="auth-panel__sub">Sistema de Gestión · GastroSENA</p>
+   <ul class="auth-panel__features">
+     @for (feature of panelFeatures; track feature) {
+        <li>
+         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          {{ feature }}
+        </li>
+      }
+      </ul>
+   </div>
 
       <div class="auth-panel__footer">
         <span>Programa ADSO · SENA Colombia</span>

@@ -1,0 +1,85 @@
+<div class="actividades-container">
+
+  <!-- ===== CABECERA ===== -->
+  <div class="page-header">
+    <button id="btn-volver-actividades" class="back-btn" type="button" (click)="volver()" aria-label="Volver">
+      <lucide-icon name="arrow-left" [size]="20"></lucide-icon>
+    </button>
+    <div class="header-info">
+      <h1 class="page-title">Actividades Bar y Barismo</h1>
+      <p class="page-subtitle">
+        {{ actividadesFiltradas().length }} actividades registradas
+      </p>
+    </div>
+  </div>
+
+  <!-- ===== BUSCADOR ===== -->
+  <div class="search-bar">
+    <restaurant-search-filter
+      label="Buscar por ficha"
+      placeholder="Escribí para filtrar..."
+      [value]="filtroFicha()"
+      (valueChange)="onFiltroChange($event)"
+    ></restaurant-search-filter>
+  </div>
+
+  <!-- ===== LISTADO ===== -->
+  <div class="actividades-grid">
+    @for (act of actividadesFiltradas(); track act.id) {
+      <div class="actividad-card" (click)="irAEvaluacion(act.id)">
+        <div class="card-top">
+          <div class="card-icon-wrapper">
+            <lucide-icon name="file-text" size="22" class="card-icon"></lucide-icon>
+          </div>
+          <span class="card-estado" [ngClass]="getEstadoClass(act.estado)">
+            {{ act.estado }}
+          </span>
+        </div>
+
+        <h3 class="card-nombre">{{ act.nombre }}</h3>
+
+        <div class="card-meta">
+          <div class="meta-item">
+            <span class="meta-label">Fecha</span>
+            <span class="meta-value">{{ act.fecha }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Jornada</span>
+            <span class="meta-value">{{ act.jornada }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Ficha</span>
+            <span class="meta-value">{{ act.ficha }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Trimestre</span>
+            <span class="meta-value">{{ act.trimestre }}</span>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <span class="card-action">Evaluar aprendices →</span>
+          <button class="btn-delete-card" type="button" (click)="eliminarActividad(act.id, $event)" title="Eliminar actividad">
+            <lucide-icon name="trash-2" size="18"></lucide-icon>
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Empty state -->
+  @if (actividadesFiltradas().length === 0) {
+    <div class="empty-state">
+      <lucide-icon name="file-text" size="48" class="empty-icon-lucide"></lucide-icon>
+      @if (filtroFicha()) {
+        <p class="empty-text">No se encontraron actividades con ficha "{{ filtroFicha() }}"</p>
+      } @else {
+        <p class="empty-text">No hay actividades registradas aún.</p>
+        <button class="btn-primary" type="button" (click)="volver()">
+          CREAR ACTIVIDAD
+        </button>
+      }
+    </div>
+  }
+
+</div>
