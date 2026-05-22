@@ -181,6 +181,15 @@
   (save)="onSaveFactura($event)"
 ></restaurant-factura-form>
 
+<!-- ── MODAL: Exportar Facturas ── -->
+<inventario-exportar
+  *ngIf="showExportarModal()"
+  titulo="Exportar Panel de Facturación"
+  subtitulo="Seleccione el formato de salida para el reporte de facturas electrónicas"
+  (exportar)="onConfirmarExportar($event)"
+  (cerrar)="onCerrarExportar()"
+/>
+
 <!-- ── MODAL: Anular Factura ── -->
 <restaurant-keyword-confirm-modal
   [open]="showAnularModal()"
