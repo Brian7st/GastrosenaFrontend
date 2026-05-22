@@ -25,6 +25,13 @@ export class BienDetailPageComponent implements OnInit {
   loading = this.facade.loading;
   movimientos = signal<MovimientoBien[]>([]);
   showEditModal = signal(false);
+  mostrarTodasFacturas = signal(false);
+
+  readonly FACTURAS_PREVIEW_COUNT = 3;
+
+  toggleFacturas(): void {
+    this.mostrarTodasFacturas.update(v => !v);
+  }
 
   espec = computed(() => {
     const b = this.bien();

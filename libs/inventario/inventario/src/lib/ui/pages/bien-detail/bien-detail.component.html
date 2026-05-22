@@ -151,7 +151,12 @@
         <span class="material-symbols-outlined filled text-primary">receipt_long</span>
         <h3>Facturas de Abastecimiento</h3>
       </div>
-      <button class="link-btn">Ver todas</button>
+      <button
+        class="link-btn"
+        *ngIf="b.facturas && b.facturas.length > FACTURAS_PREVIEW_COUNT"
+        (click)="toggleFacturas()">
+        {{ mostrarTodasFacturas() ? 'Ver menos' : 'Ver todas (' + b.facturas.length + ')' }}
+      </button>
     </div>
 
     <ng-container *ngIf="b.facturas && b.facturas.length > 0; else noFacturas">
@@ -168,7 +173,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let f of b.facturas">
+            <tr *ngFor="let f of (mostrarTodasFacturas() ? b.facturas : (b.facturas | slice:0:FACTURAS_PREVIEW_COUNT))">
               <td class="code-mono">{{ f.fel }}</td>
               <td class="code-mono text-muted">{{ f.cufe }}</td>
               <td>{{ f.proveedor }}</td>
