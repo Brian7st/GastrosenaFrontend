@@ -53,4 +53,8 @@ export class SolicitudesService {
   cambiarEstado(_id: string, _estado: EstadoGil): Observable<boolean> {
     return of(true).pipe(delay(400));
   }
+
+  generarGils(ids: (string | number)[]): Observable<boolean> {
+    return of(true).pipe(delay(500));
+  }
 }
