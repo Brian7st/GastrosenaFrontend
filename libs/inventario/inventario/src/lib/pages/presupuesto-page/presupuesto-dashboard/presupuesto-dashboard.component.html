@@ -11,7 +11,7 @@
       </p>
     </div>
     <div class="header-actions">
-      <restaurant-button variant="surface" routerLink="exportar">
+      <restaurant-button variant="surface" (click)="openExportModal()">
         <div class="btn-icon-text">
           <lucide-icon name="download" [size]="20"></lucide-icon>
           Exportar PDF
@@ -282,5 +282,14 @@
   </restaurant-data-table>
 </div>
 
-<!-- Router outlet para modales (registrar, traslado, exportar, cargar-gil) -->
+<!-- Modal de exportación -->
+<inventario-exportar
+  *ngIf="showExportModal()"
+  titulo="Exportar Presupuesto"
+  subtitulo="Seleccione el formato de salida para el presupuesto general"
+  (exportar)="onExport($event)"
+  (cerrar)="closeExportModal()">
+</inventario-exportar>
+
+<!-- Router outlet para modales (registrar, traslado, cargar-gil) -->
 <router-outlet></router-outlet>
