@@ -7,10 +7,10 @@
         <inventario-back-button (clicked)="volver()"></inventario-back-button>
         <div>
           <h1 class="page-title">
-            Detalle de Alerta: {{ a.nombreBien }}
+            Detalle de Alerta: {{ a.nombreBien ?? a.descripcion }}
           </h1>
           <p class="detail-meta">
-            Código: {{ a.codigoSena }} &bull; Categoría: {{ a.categoria }} &bull; Ubicación: {{ a.ubicacion }}
+            Código: {{ a.codigoSena ?? '—' }} &bull; Tipo: {{ a.tipo }}
           </p>
         </div>
       </div>
@@ -66,15 +66,15 @@
             <div>
               <p class="stock-label">STOCK ACTUAL</p>
               <p class="stock-value" [class]="'stock-value--' + a.prioridad.toLowerCase()">
-                {{ a.stockActual }}
-                <span class="stock-unit">{{ a.unidad }}</span>
+                {{ a.stockActual ?? 0 }}
+                <span class="stock-unit">{{ a.unidad ?? '' }}</span>
               </p>
             </div>
             <div>
               <p class="stock-label">UMBRAL MÍNIMO</p>
               <p class="stock-value stock-value--neutral">
-                {{ a.stockMinimo }}
-                <span class="stock-unit">{{ a.unidad }}</span>
+                {{ a.stockMinimo ?? 0 }}
+                <span class="stock-unit">{{ a.unidad ?? '' }}</span>
               </p>
             </div>
           </div>
@@ -83,7 +83,6 @@
           <div class="progress-section">
             <div class="progress-header">
               <span>Capacidad: {{ porcentajeStock().toFixed(0) }}%</span>
-              <span>Objetivo: {{ a.stockObjetivo }}{{ a.unidad }}</span>
             </div>
             <div class="progress-track">
               <div
@@ -92,66 +91,22 @@
                 [style.width.%]="porcentajeStock()"
               ></div>
             </div>
-            <p class="progress-note">
-              <span class="material-symbols-outlined progress-note__icon">info</span>
-              Proyección de agotamiento: {{ a.diasRestantes === 0 ? 'Hace 2 días' : 'En ' + a.diasRestantes + ' días' }}
-            </p>
           </div>
         </section>
 
-        <!-- Gráfico de Tendencia ──────────────────────────────────────── -->
+        <!-- Descripción de la alerta -->
         <section class="chart-card">
-          <h2 class="chart-card__title">Tendencia de Stock (30 Días)</h2>
-          <div class="chart-wrapper">
-            <!-- Línea de umbral -->
-            <div class="chart-threshold">
-              <span class="chart-threshold__label">Mínimo ({{ a.stockMinimo }}{{ a.unidad }})</span>
-            </div>
-            <!-- Barras -->
-            <div class="chart-bars">
-              @for (punto of a.tendencia; track punto.fecha) {
-                <div
-                  class="chart-bar"
-                  [class]="punto.nivel <= 30 ? 'chart-bar--danger' : 'chart-bar--safe'"
-                  [style.height.%]="punto.nivel"
-                  [title]="punto.nivel + a.unidad + ' — ' + punto.fecha"
-                ></div>
-              }
-            </div>
-            <div class="chart-labels">
-              <span>Hace 30 días</span>
-              <span>Hoy</span>
-            </div>
-          </div>
+          <h2 class="chart-card__title">Descripción</h2>
+          <p class="descripcion-text">{{ a.descripcion }}</p>
+          @if (a.fechaResolucion) {
+            <p class="resolucion-fecha">
+              <span class="material-symbols-outlined">check_circle</span>
+              Resuelta: {{ a.fechaResolucion }}
+            </p>
+          }
         </section>
 
       </div>
-
-      <!-- ── Columna derecha: Timeline ──────────────────────────────────── -->
-      <aside class="col-timeline">
-        <section class="timeline-card">
-          <h2 class="timeline-card__title">Historial de Incidencias</h2>
-          <div class="timeline">
-            @for (item of a.historialIncidencias; track item.fecha) {
-              <div class="timeline-item">
-                <div
-                  class="timeline-item__dot"
-                  [class]="'timeline-item__dot--' + item.tipo"
-                ></div>
-                <div class="timeline-item__content">
-                  <p class="timeline-item__fecha">{{ item.fecha }}</p>
-                  <p class="timeline-item__titulo">
-                    @if (item.tipo === 'agotado') { Stock Agotado }
-                    @else if (item.tipo === 'alerta_umbral') { Alerta de Umbral }
-                    @else { Incidencia Resuelta }
-                  </p>
-                  <p class="timeline-item__desc">{{ item.descripcion }}</p>
-                </div>
-              </div>
-            }
-          </div>
-        </section>
-      </aside>
 
     </div>
   </div>

@@ -73,18 +73,6 @@ export class AlertasListComponent implements OnInit {
   kpiActivas = computed(() =>
     this.allAlertas().filter(a => a.estado === 'ACTIVA').length
   );
-  kpiValorRiesgo = computed(() => {
-    const total = this.allAlertas().reduce((sum, a) => sum + a.valorEnRiesgo, 0);
-    return total >= 1_000_000
-      ? `$${(total / 1_000_000).toFixed(1)}M`
-      : `$${(total / 1_000).toFixed(0)}k`;
-  });
-  kpiPromedioDias = computed(() => {
-    const activas = this.allAlertas().filter(a => a.estado === 'ACTIVA' || a.estado === 'CRITICA');
-    if (!activas.length) return '0 días';
-    const avg = activas.reduce((s, a) => s + a.diasRestantes, 0) / activas.length;
-    return `${avg.toFixed(1)} días`;
-  });
 
   // ── Alertas filtradas ────────────────────────────────────────────────────
   filteredAlertas = computed(() => {
@@ -93,7 +81,7 @@ export class AlertasListComponent implements OnInit {
     const estado = this.estadoFilter();
 
     return this.allAlertas().filter(a => {
-      const matchText   = !text  || a.nombreBien.toLowerCase().includes(text) || a.codigoSena.toLowerCase().includes(text);
+      const matchText   = !text  || (a.nombreBien?.toLowerCase().includes(text) ?? false) || (a.codigoSena?.toLowerCase().includes(text) ?? false);
       const matchPrio   = !prio  || a.prioridad === prio;
       const matchEstado = !estado || a.estado === estado;
       return matchText && matchPrio && matchEstado;

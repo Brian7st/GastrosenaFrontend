@@ -48,12 +48,13 @@ export class PaqueteDetailComponent implements OnInit {
   // ── Estado derivado ──────────────────────────────────────────────────────
   isCompleto = computed(() => {
     const p = this.paquete();
-    return p ? p.documentos.every(d => d.vinculado) : false;
+    return p ? (!!p.actaId && !!p.requisicionId && p.registroAsistenciaAdjunto) : false;
   });
 
   docsCompletados = computed(() => {
     const p = this.paquete();
-    return p ? p.documentos.filter(d => d.vinculado).length : 0;
+    if (!p) return 0;
+    return (p.actaId ? 1 : 0) + (p.requisicionId ? 1 : 0) + (p.registroAsistenciaAdjunto ? 1 : 0);
   });
 
   timeline = computed<TimelineEntry[]>(() => {

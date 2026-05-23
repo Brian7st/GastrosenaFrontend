@@ -61,7 +61,7 @@
     <thead>
       <tr>
         <th class="th-center">ID Consolidado</th>
-        <th class="th-center">Periodo/Mes</th>
+        <th class="th-center">Fecha Generación</th>
         <th class="th-center">Total Consolidado</th>
         <th class="th-center">Estado Contable</th>
         <th class="th-center">Acciones</th>
@@ -75,15 +75,15 @@
           </td>
           <td>
             <div class="td-flex-col">
-              <span class="td-medium">{{ item.mes }}</span>
-              <span class="td-muted">{{ item.tipo }}</span>
+              <span class="td-medium">{{ item.fechaGeneracion }}</span>
+              <span class="td-muted">{{ item.lineas.length }} línea(s)</span>
             </div>
           </td>
           <td>
-            <span class="td-bold">{{ item.total }}</span>
+            <span class="td-bold">{{ item.totales.totalGeneral | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
           </td>
           <td>
-            <restaurant-status-badge [label]="item.estado" [variant]="item.variant"></restaurant-status-badge>
+            <restaurant-status-badge [label]="item.estado" [variant]="getVariantFromEstado(item.estado)"></restaurant-status-badge>
           </td>
           <td class="text-center">
             <div class="action-buttons justify-center">
@@ -158,9 +158,9 @@
   <restaurant-reversar-consolidado-modal
     *ngIf="showReversarModal() && selectedReversarItem()"
     [consolidadoId]="selectedReversarItem()!.id"
-    [periodo]="selectedReversarItem()!.mes"
-    [total]="selectedReversarItem()!.total"
-    [comprobantes]="12" 
+    [periodo]="selectedReversarItem()!.fechaGeneracion"
+    [total]="(selectedReversarItem()!.totales.totalGeneral | currency:'COP':'symbol-narrow':'1.0-0') ?? ''"
+    [comprobantes]="selectedReversarItem()!.lineas.length"
     [isBlocked]="isReversarBlocked()"
     (close)="closeReversarModal()"
     (confirm)="confirmReversar()">

@@ -17,27 +17,11 @@ export interface ConciliacionDetalle {
   id: string;
   fecha: string;
   responsable: string;
-  almacen: string;
   estado: string;
-  totalItems: number;
-  itemsCorrectos: number;
+  totalItemsContados: number;
   diferencias: number;
   precision: number;
-  valoracionMonetaria: number;
-  perdidas: number;
-  sobrantes: number;
-}
-
-export interface ConciliacionDiferencia {
-  producto: string;
-  codigo: string;
-  categoria: string;
-  stockSis: string;
-  fisico: string;
-  dif: string;
-  valorUnit: number;
-  impacto: number;
-  isPositive: boolean;
+  valorTotalDiferencias: number;
 }
 
 /**
@@ -68,6 +52,6 @@ export interface TomaFisicaItem {
 
 export interface TopDiferencia {
   producto: string;
-  dif: string;
+  diferencia: string;
   icon: string;
 }

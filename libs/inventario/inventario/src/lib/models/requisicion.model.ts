@@ -18,14 +18,17 @@ export interface RequisicionItem {
 }
 
 export interface Requisicion {
-  id:         string;
-  codigo:     string;
-  programa:   string;
-  ficha:      string;
-  instructor: string;
-  fecha:      string;
-  estado:     RequisicionEstado;
-  items:      RequisicionItem[];
+  id:               string;
+  numero:           string;
+  programa:         string;
+  fichaId:          string;
+  instructorId:     string;
+  instructorNombre: string;
+  diaSemana:        string;
+  horaSesion:       string;
+  fecha:            string;
+  estado:           RequisicionEstado;
+  items:            RequisicionItem[];
 }
 
 // ── Mock Data ────────────────────────────────────────────────────────────────
@@ -33,10 +36,13 @@ export interface Requisicion {
 export const MOCK_REQUISICIONES: Requisicion[] = [
   {
     id: '1',
-    codigo: '0895',
+    numero: '0895',
     programa: 'Gastronomía',
-    ficha: '2574832',
-    instructor: 'Chef Sebastián',
+    fichaId: '2574832',
+    instructorId: 'usr-sebastián',
+    instructorNombre: 'Chef Sebastián',
+    diaSemana: 'Lunes',
+    horaSesion: '08:00 - 12:00',
     fecha: '10/04/2026',
     estado: 'BORRADOR',
     items: [
@@ -46,10 +52,13 @@ export const MOCK_REQUISICIONES: Requisicion[] = [
   },
   {
     id: '2',
-    codigo: '0892',
+    numero: '0892',
     programa: 'Panadería',
-    ficha: '2574833',
-    instructor: 'Chef Valentina',
+    fichaId: '2574833',
+    instructorId: 'usr-valentina',
+    instructorNombre: 'Chef Valentina',
+    diaSemana: 'Miércoles',
+    horaSesion: '14:00 - 18:00',
     fecha: '08/04/2026',
     estado: 'ENVIADA',
     items: [
@@ -58,10 +67,13 @@ export const MOCK_REQUISICIONES: Requisicion[] = [
   },
   {
     id: '3',
-    codigo: '0890',
+    numero: '0890',
     programa: 'Pastelería',
-    ficha: '2574834',
-    instructor: 'Chef Mario',
+    fichaId: '2574834',
+    instructorId: 'usr-mario',
+    instructorNombre: 'Chef Mario',
+    diaSemana: 'Jueves',
+    horaSesion: '07:00 - 11:00',
     fecha: '05/04/2026',
     estado: 'DESPACHADA',
     items: [
@@ -70,10 +82,13 @@ export const MOCK_REQUISICIONES: Requisicion[] = [
   },
   {
     id: '4',
-    codigo: '0888',
+    numero: '0888',
     programa: 'Sommelier',
-    ficha: '2574835',
-    instructor: 'Chef Alejandro',
+    fichaId: '2574835',
+    instructorId: 'usr-alejandro',
+    instructorNombre: 'Chef Alejandro',
+    diaSemana: 'Viernes',
+    horaSesion: '10:00 - 14:00',
     fecha: '01/04/2026',
     estado: 'FIRMADA',
     items: [

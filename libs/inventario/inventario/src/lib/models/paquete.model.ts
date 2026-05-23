@@ -1,29 +1,23 @@
-// ── Paquete Probatorio — Modelo y Mock ──────────────────────────────────────
+// ── Paquete Probatorio — Modelo y Mock (F-10) ──────────────────────────────
 
 export type PaqueteEstado =
   | 'INCOMPLETO'
   | 'COMPLETO'
   | 'ARCHIVADO';
 
-export interface DocumentoBase {
-  tipo: 'acta' | 'requisicion' | 'asistencia';
-  vinculado: boolean;
-  referencia?: string; // e.g. "Acta Nº 120", "Req. Nº 554"
-}
-
 export interface PaqueteProbatorio {
   id: string;
-  expediente: string;        // PKT-2026-015
-  titulo: string;            // "Insumos Cárnicos Semestre 1"
-  ficha: string;             // "2574832"
-  programa: string;          // "Gastronomía"
+  expediente: string;                  // PKT-2026-015
+  titulo: string;                      // "Insumos Cárnicos Semestre 1"
+  fichaId: string;                     // era: ficha
   estado: PaqueteEstado;
-  gilVinculado: string;      // "GIL-88392-A"
-  cufe?: string;
-  documentos: DocumentoBase[];
-  responsable: string;
-  responsableIniciales?: string;
-  fecha: string;             // "15/04/2026"
+  gilId: string;                       // era: gilVinculado
+  cufeFuenteId?: string;               // era: cufe
+  actaId?: string;                     // era: documentos[tipo='acta'].referencia
+  requisicionId?: string;              // era: documentos[tipo='requisicion'].referencia
+  registroAsistenciaAdjunto: boolean;  // era: documentos[tipo='asistencia'].vinculado
+  instructorId: string;                // era: responsable
+  fecha: string;                       // "15/04/2026"
 }
 
 // ── Mock Data ──────────────────────────────────────────────────────────────
@@ -33,104 +27,81 @@ export const MOCK_PAQUETES: PaqueteProbatorio[] = [
     id: '1',
     expediente: 'PKT-2026-015',
     titulo: 'Insumos Cárnicos Semestre 1',
-    ficha: '2574832',
-    programa: 'Gastronomía',
+    fichaId: '2574832',
     estado: 'COMPLETO',
-    gilVinculado: 'GIL-88392-A',
-    cufe: 'a8f9c2e4b1d7f6a5',
-    documentos: [
-      { tipo: 'acta', vinculado: true, referencia: 'Acta Nº 120' },
-      { tipo: 'requisicion', vinculado: true, referencia: 'Req. Nº 554' },
-      { tipo: 'asistencia', vinculado: true },
-    ],
-    responsable: 'Chef Sebastián',
+    gilId: 'GIL-88392-A',
+    cufeFuenteId: 'a8f9c2e4b1d7f6a5',
+    actaId: 'ACT-120',
+    requisicionId: 'REQ-554',
+    registroAsistenciaAdjunto: true,
+    instructorId: 'Chef Sebastián',
     fecha: '15/04/2026',
   },
   {
     id: '2',
     expediente: 'PKT-2026-016',
     titulo: 'Materia Prima Lácteos',
-    ficha: '2574833',
-    programa: 'Panadería',
+    fichaId: '2574833',
     estado: 'INCOMPLETO',
-    gilVinculado: 'GIL-88393-B',
-    cufe: 'b7e3d1f0c2a8e4b9',
-    documentos: [
-      { tipo: 'acta', vinculado: true, referencia: 'Acta Nº 121' },
-      { tipo: 'requisicion', vinculado: true, referencia: 'Req. Nº 555' },
-      { tipo: 'asistencia', vinculado: false },
-    ],
-    responsable: 'Laura Cortés',
-    responsableIniciales: 'LC',
+    gilId: 'GIL-88393-B',
+    cufeFuenteId: 'b7e3d1f0c2a8e4b9',
+    actaId: 'ACT-121',
+    requisicionId: 'REQ-555',
+    registroAsistenciaAdjunto: false,
+    instructorId: 'Laura Cortés',
     fecha: '18/04/2026',
   },
   {
     id: '3',
     expediente: 'PKT-2026-017',
     titulo: 'Dotación Vinos y Espirituosos',
-    ficha: '2574834',
-    programa: 'Sommelier',
+    fichaId: '2574834',
     estado: 'INCOMPLETO',
-    gilVinculado: '--',
-    documentos: [
-      { tipo: 'acta', vinculado: false },
-      { tipo: 'requisicion', vinculado: false },
-      { tipo: 'asistencia', vinculado: false },
-    ],
-    responsable: 'Chef Mario',
+    gilId: '--',
+    registroAsistenciaAdjunto: false,
+    instructorId: 'Chef Mario',
     fecha: '20/04/2026',
   },
   {
     id: '4',
     expediente: 'PKT-2026-018',
     titulo: 'Verduras de Estación',
-    ficha: '2574835',
-    programa: 'Gastronomía',
+    fichaId: '2574835',
     estado: 'INCOMPLETO',
-    gilVinculado: 'GIL-88395-C',
-    cufe: 'c4d6e8f1a3b5c7d9',
-    documentos: [
-      { tipo: 'acta', vinculado: true, referencia: 'Acta Nº 123' },
-      { tipo: 'requisicion', vinculado: true, referencia: 'Req. Nº 557' },
-      { tipo: 'asistencia', vinculado: true },
-    ],
-    responsable: 'Andrés Muñoz',
-    responsableIniciales: 'AM',
+    gilId: 'GIL-88395-C',
+    cufeFuenteId: 'c4d6e8f1a3b5c7d9',
+    actaId: 'ACT-123',
+    requisicionId: 'REQ-557',
+    registroAsistenciaAdjunto: true,
+    instructorId: 'Andrés Muñoz',
     fecha: '22/04/2026',
   },
   {
     id: '5',
     expediente: 'PKT-2026-019',
     titulo: 'Utensilios de Pastelería',
-    ficha: '2574836',
-    programa: 'Pastelería',
+    fichaId: '2574836',
     estado: 'COMPLETO',
-    gilVinculado: 'GIL-88396-D',
-    cufe: 'd5e7f9a2b4c6d8e0',
-    documentos: [
-      { tipo: 'acta', vinculado: true, referencia: 'Acta Nº 124' },
-      { tipo: 'requisicion', vinculado: true, referencia: 'Req. Nº 558' },
-      { tipo: 'asistencia', vinculado: true },
-    ],
-    responsable: 'Rosa Vargas',
-    responsableIniciales: 'RV',
+    gilId: 'GIL-88396-D',
+    cufeFuenteId: 'd5e7f9a2b4c6d8e0',
+    actaId: 'ACT-124',
+    requisicionId: 'REQ-558',
+    registroAsistenciaAdjunto: true,
+    instructorId: 'Rosa Vargas',
     fecha: '25/04/2026',
   },
   {
     id: '6',
     expediente: 'PKT-2026-020',
     titulo: 'Conservas y Enlatados',
-    ficha: '2574837',
-    programa: 'Gastronomía',
+    fichaId: '2574837',
     estado: 'ARCHIVADO',
-    gilVinculado: 'GIL-88397-E',
-    cufe: 'e6f8a0b1c3d5e7f9',
-    documentos: [
-      { tipo: 'acta', vinculado: true, referencia: 'Acta Nº 125' },
-      { tipo: 'requisicion', vinculado: true, referencia: 'Req. Nº 559' },
-      { tipo: 'asistencia', vinculado: true },
-    ],
-    responsable: 'Chef Sebastián',
+    gilId: 'GIL-88397-E',
+    cufeFuenteId: 'e6f8a0b1c3d5e7f9',
+    actaId: 'ACT-125',
+    requisicionId: 'REQ-559',
+    registroAsistenciaAdjunto: true,
+    instructorId: 'Chef Sebastián',
     fecha: '28/04/2026',
   },
 ];

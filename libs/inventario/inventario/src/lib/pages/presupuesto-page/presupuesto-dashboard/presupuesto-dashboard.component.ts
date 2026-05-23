@@ -9,7 +9,6 @@ import {
   StatusBadgeComponent,
 } from '@restaurant/shared/ui';
 import {
-  Programa,
   PresupuestoResumen,
   VencimientoProximo,
   EjecucionMensual,
@@ -47,10 +46,10 @@ export class PresupuestoDashboardComponent implements OnInit {
   /** Datos de resumen presupuestal */
   resumen = this.facade.resumen;
 
-  /** Programas con sus rubros (tabla colapsable) */
-  programas = this.facade.programas;
+  /** Grupos de rubros agrupados por ficha (tabla colapsable) */
+  grupos = this.facade.grupos;
 
-  /** Estado de expansión por programa id */
+  /** Estado de expansión por fichaId */
   expandidos = signal<Record<string, boolean>>({
     'PRG-001': true,
     'PRG-002': false,
@@ -100,16 +99,16 @@ export class PresupuestoDashboardComponent implements OnInit {
   }
 
   /** Toggle de grupo colapsable */
-  togglePrograma(programaId: string): void {
+  toggleGrupo(fichaId: string): void {
     this.expandidos.update(prev => ({
       ...prev,
-      [programaId]: !prev[programaId],
+      [fichaId]: !prev[fichaId],
     }));
   }
 
-  /** Helper: verificar si programa está expandido */
-  isExpanded(programaId: string): boolean {
-    return this.expandidos()[programaId] ?? false;
+  /** Helper: verificar si grupo está expandido */
+  isExpanded(fichaId: string): boolean {
+    return this.expandidos()[fichaId] ?? false;
   }
 
   /** Helper: clase CSS del badge de ejecución */

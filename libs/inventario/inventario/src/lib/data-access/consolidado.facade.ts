@@ -73,7 +73,7 @@ export class ConsolidadoFacade {
       .subscribe(ok => {
         if (ok) {
           this._consolidados.update(list =>
-            list.map(c => c.id === id ? { ...c, estado: 'Reversado', variant: 'danger' as const } : c)
+            list.map(c => c.id === id ? { ...c, estado: 'REVERSADO' as const } : c)
           );
         }
       });
