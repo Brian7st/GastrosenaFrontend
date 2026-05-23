@@ -67,7 +67,7 @@
       <div class="form-field">
         <label>Tipo de Documento</label>
         <div class="select-wrapper">
-          <select id="field-tipo-doc" [(ngModel)]="tipoDoc" [disabled]="isBlocked()">
+          <select id="field-tipo-doc" [ngModel]="tipoDoc()" (ngModelChange)="tipoDoc.set($event)" [disabled]="isBlocked()">
             <option>Factura Electrónica</option>
             <option>Nota Crédito</option>
             <option>Nota Débito</option>

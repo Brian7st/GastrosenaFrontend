@@ -87,7 +87,6 @@
       </div>
     </div>
 
-    <p class="results-count">Mostrando 1–{{ solicitudes().length }} de {{ totalSolicitudes() }} resultados</p>
   </div>
 
   <!-- Cabecera de tabla -->
@@ -175,6 +174,7 @@
 
   <!-- Paginación -->
   <div dtFooter class="pagination-footer">
+    <p class="results-count">Mostrando 1–{{ solicitudes().length }} de {{ totalSolicitudes() }} resultados</p>
     <div class="page-numbers">
       <button class="page-btn page-btn--active">1</button>
       <button class="page-btn">2</button>

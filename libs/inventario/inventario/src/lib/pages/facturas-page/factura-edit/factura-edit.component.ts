@@ -48,6 +48,7 @@ export class FacturaEditPageComponent implements OnInit {
       if (f) {
         this.nitCliente.set(f.nitEmisor);
         this.razonSocial.set(f.razonSocial);
+        this.tipoDoc.set(f.tipoDocumento);
         this.fechaEmision.set(f.fechaEmision);
         this.moneda.set(f.moneda);
         this.notasInternas.set(f.notasInternas ?? '');
