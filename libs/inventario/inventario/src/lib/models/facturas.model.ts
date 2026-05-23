@@ -1,7 +1,7 @@
 /**
  * Estados posibles de una Factura Electrónica (FEL).
  */
-export type EstadoFactura = 'Registrada' | 'Verificada' | 'Pagada' | 'Anulada';
+export type EstadoFactura = 'REGISTRADA' | 'VERIFICADA' | 'PAGADA' | 'ANULADA';
 
 /**
  * Monedas soportadas.
@@ -117,7 +117,7 @@ export interface FacturaFormDto {
 /**
  * Estado de la solicitud GIL F-014.
  */
-export type EstadoGIL = 'Borrador' | 'Pendiente' | 'Validado' | 'Aprobado' | 'Procesado';
+export type EstadoGIL = 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'CERRADO';
 
 /**
  * Solicitud GIL F-014 completa con trazabilidad.

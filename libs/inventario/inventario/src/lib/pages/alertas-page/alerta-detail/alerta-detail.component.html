@@ -37,21 +37,21 @@
       <div class="col-main">
 
         <!-- Tarjeta de Estado ─────────────────────────────────────────── -->
-        <section class="estado-card" [class]="'estado-card--' + a.prioridad">
-          <div class="estado-card__top-bar" [class]="'estado-card__top-bar--' + a.prioridad"></div>
+        <section class="estado-card" [class]="'estado-card--' + a.prioridad.toLowerCase()">
+          <div class="estado-card__top-bar" [class]="'estado-card__top-bar--' + a.prioridad.toLowerCase()"></div>
 
           <div class="estado-card__header">
-            <div class="estado-card__icon-wrap" [class]="'estado-card__icon-wrap--' + a.prioridad">
+            <div class="estado-card__icon-wrap" [class]="'estado-card__icon-wrap--' + a.prioridad.toLowerCase()">
               <span class="material-symbols-outlined estado-card__icon">oil_barrel</span>
             </div>
             <div>
               <h2 class="estado-card__titulo">
-                @if (a.prioridad === 'critica') { Estado Crítico }
-                @else if (a.prioridad === 'alta') { Stock Bajo }
+                @if (a.estado === 'CRITICA') { Estado Crítico }
+                @else if (a.prioridad === 'ALTA') { Stock Bajo }
                 @else { Bajo Umbral }
               </h2>
               <p class="estado-card__subtitulo">
-                @if (a.prioridad === 'critica') { Requiere atención inmediata }
+                @if (a.estado === 'CRITICA') { Requiere atención inmediata }
                 @else { Monitorear y gestionar
               }</p>
             </div>
@@ -65,7 +65,7 @@
           <div class="stock-grid">
             <div>
               <p class="stock-label">STOCK ACTUAL</p>
-              <p class="stock-value" [class]="'stock-value--' + a.prioridad">
+              <p class="stock-value" [class]="'stock-value--' + a.prioridad.toLowerCase()">
                 {{ a.stockActual }}
                 <span class="stock-unit">{{ a.unidad }}</span>
               </p>
@@ -88,7 +88,7 @@
             <div class="progress-track">
               <div
                 class="progress-fill"
-                [class]="'progress-fill--' + a.prioridad"
+                [class]="'progress-fill--' + a.prioridad.toLowerCase()"
                 [style.width.%]="porcentajeStock()"
               ></div>
             </div>

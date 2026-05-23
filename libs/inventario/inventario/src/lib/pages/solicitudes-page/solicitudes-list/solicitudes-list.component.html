@@ -131,11 +131,10 @@
       <td>
         <span class="estado-badge"
               [ngClass]="{
-                'estado-badge--borrador':  s.estado === 'Borrador',
-                'estado-badge--pendiente': s.estado === 'Pendiente',
-                'estado-badge--validado':  s.estado === 'Validado',
-                'estado-badge--aprobado':  s.estado === 'Aprobado',
-                'estado-badge--procesado': s.estado === 'Procesado'
+                'estado-badge--borrador':  s.estado === 'BORRADOR',
+                'estado-badge--pendiente': s.estado === 'EMITIDO',
+                'estado-badge--validado':  s.estado === 'ENVIADO_PROVEEDOR',
+                'estado-badge--procesado': s.estado === 'CERRADO'
               }">
           {{ s.estado }}
         </span>

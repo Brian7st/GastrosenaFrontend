@@ -70,15 +70,15 @@
         </div>
         <select class="filter-bar__select" (change)="onPrioridadChange($event)">
           <option value="">Prioridad</option>
-          <option value="critica">Crítica</option>
-          <option value="alta">Alta</option>
-          <option value="media">Media</option>
-          <option value="baja">Baja</option>
+          <option value="ALTA">Alta</option>
+          <option value="MEDIA">Media</option>
+          <option value="BAJA">Baja</option>
         </select>
         <select class="filter-bar__select" (change)="onEstadoChange($event)">
           <option value="">Estado</option>
-          <option value="activa">Activa</option>
-          <option value="resuelta">Resuelta</option>
+          <option value="ACTIVA">Activa</option>
+          <option value="CRITICA">Crítica</option>
+          <option value="RESUELTA">Resuelta</option>
         </select>
       </div>
 
@@ -94,8 +94,8 @@
             <!-- Ícono de prioridad -->
             <div class="alerta-card__icon" [class]="'alerta-card__icon--' + alerta.prioridad">
               <span class="material-symbols-outlined">
-                @if (alerta.prioridad === 'critica') { warning }
-                @else if (alerta.prioridad === 'alta') { error_outline }
+                @if (alerta.estado === 'CRITICA') { warning }
+                @else if (alerta.prioridad === 'ALTA') { error_outline }
                 @else { info }
               </span>
             </div>

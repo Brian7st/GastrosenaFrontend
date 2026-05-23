@@ -3,7 +3,7 @@
  * RF-5.10 — Legalización de materiales de formación por sesión.
  */
 
-export type ActaEstado = 'borrador' | 'pendiente' | 'firmada' | 'revisada' | 'archivada';
+export type ActaEstado = 'BORRADOR' | 'PENDIENTE_FIRMAS' | 'FIRMADA' | 'REVISADA' | 'ARCHIVADA';
 
 export interface ActaLegalizacion {
   id: string;
@@ -51,7 +51,7 @@ export const MOCK_ACTAS: ActaLegalizacion[] = [
     ficha: '24501A',
     instructor: 'Chef Sebastián',
     requisicion: '45-S',
-    estado: 'borrador',
+    estado: 'BORRADOR',
     ciudad: 'Armenia',
     lugar: 'Escuela de Gastronomía',
     agendaSesion: 'Legalizar la entrega y consumo de materiales correspondientes al taller de cocina programado.',
@@ -67,7 +67,7 @@ export const MOCK_ACTAS: ActaLegalizacion[] = [
     ficha: '24502B',
     instructor: 'Chef Valentina',
     requisicion: '46-P',
-    estado: 'pendiente',
+    estado: 'PENDIENTE_FIRMAS',
     ciudad: 'Armenia',
     lugar: 'Escuela de Gastronomía',
     agendaSesion: 'Legalizar entrega de materiales para clase de panadería artesanal.',
@@ -83,7 +83,7 @@ export const MOCK_ACTAS: ActaLegalizacion[] = [
     ficha: '24503C',
     instructor: 'Chef Sebastián',
     requisicion: '48-S',
-    estado: 'firmada',
+    estado: 'FIRMADA',
     ciudad: 'Armenia',
     lugar: 'Escuela de Gastronomía',
     agendaSesion: 'Legalizar materiales utilizados en sesión de salsas madre.',
@@ -99,7 +99,7 @@ export const MOCK_ACTAS: ActaLegalizacion[] = [
     ficha: '24504D',
     instructor: 'Chef Alejandro',
     requisicion: '50-I',
-    estado: 'revisada',
+    estado: 'REVISADA',
     ciudad: 'Armenia',
     lugar: 'Escuela de Gastronomía',
     agendaSesion: 'Legalizar materiales consumidos en clase de cocina internacional.',
@@ -115,7 +115,7 @@ export const MOCK_ACTAS: ActaLegalizacion[] = [
     ficha: '24505E',
     instructor: 'Chef Valentina',
     requisicion: '52-R',
-    estado: 'archivada',
+    estado: 'ARCHIVADA',
     ciudad: 'Armenia',
     lugar: 'Escuela de Gastronomía',
     agendaSesion: 'Legalizar insumos utilizados en taller de repostería fina.',

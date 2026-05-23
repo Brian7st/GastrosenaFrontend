@@ -25,7 +25,7 @@ export class SolicitudesEditComponent implements OnInit {
   solicitudId = computed(() => this.solicitud()?.codigo ?? '');
   isBlocked   = computed(() => {
     const estado = this.solicitud()?.estado;
-    return estado !== undefined && estado !== 'Borrador';
+    return estado !== undefined && estado !== 'BORRADOR';
   });
 
   bienes = signal<BienSolicitud[]>([]);

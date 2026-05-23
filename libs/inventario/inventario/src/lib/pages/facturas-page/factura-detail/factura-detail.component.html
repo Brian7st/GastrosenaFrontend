@@ -13,7 +13,7 @@
       </nav>
       <div class="page-header__title-row">
         <h1 class="page-header__title">Factura Electrónica {{ f.numeroFEL }}</h1>
-        <span class="badge" [ngClass]="'badge--' + (f.estado === 'Verificada' ? 'verificada' : (f.estado === 'Anulada' ? 'error' : 'primary-soft'))">{{ f.estado | uppercase }}</span>
+        <span class="badge" [ngClass]="'badge--' + (f.estado === 'VERIFICADA' ? 'verificada' : (f.estado === 'ANULADA' ? 'error' : 'primary-soft'))">{{ f.estado }}</span>
       </div>
     </div>
 

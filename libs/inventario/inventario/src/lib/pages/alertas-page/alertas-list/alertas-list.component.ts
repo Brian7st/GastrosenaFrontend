@@ -68,10 +68,10 @@ export class AlertasListComponent implements OnInit {
 
   // ── KPIs computados ──────────────────────────────────────────────────────
   kpiCriticas = computed(() =>
-    this.allAlertas().filter(a => a.prioridad === 'critica').length
+    this.allAlertas().filter(a => a.estado === 'CRITICA').length
   );
   kpiActivas = computed(() =>
-    this.allAlertas().filter(a => a.estado === 'activa').length
+    this.allAlertas().filter(a => a.estado === 'ACTIVA').length
   );
   kpiValorRiesgo = computed(() => {
     const total = this.allAlertas().reduce((sum, a) => sum + a.valorEnRiesgo, 0);
@@ -80,7 +80,7 @@ export class AlertasListComponent implements OnInit {
       : `$${(total / 1_000).toFixed(0)}k`;
   });
   kpiPromedioDias = computed(() => {
-    const activas = this.allAlertas().filter(a => a.estado === 'activa');
+    const activas = this.allAlertas().filter(a => a.estado === 'ACTIVA' || a.estado === 'CRITICA');
     if (!activas.length) return '0 días';
     const avg = activas.reduce((s, a) => s + a.diasRestantes, 0) / activas.length;
     return `${avg.toFixed(1)} días`;
@@ -103,20 +103,18 @@ export class AlertasListComponent implements OnInit {
   // ── Helpers de UI ────────────────────────────────────────────────────────
   getPrioridadLabel(p: AlertaPrioridad): string {
     const map: Record<AlertaPrioridad, string> = {
-      critica: 'Crítica',
-      alta:    'Alta',
-      media:   'Media',
-      baja:    'Baja',
+      ALTA:  'Alta',
+      MEDIA: 'Media',
+      BAJA:  'Baja',
     };
     return map[p];
   }
 
   getPrioridadVariant(p: AlertaPrioridad): 'danger' | 'warning' | 'info' | 'success' {
     const map: Record<AlertaPrioridad, 'danger' | 'warning' | 'info' | 'success'> = {
-      critica: 'danger',
-      alta:    'warning',
-      media:   'info',
-      baja:    'success',
+      ALTA:  'warning',
+      MEDIA: 'info',
+      BAJA:  'success',
     };
     return map[p];
   }

@@ -63,22 +63,22 @@ export class ActasListComponent implements OnInit {
   // ── Helpers de UI ────────────────────────────────────────────────────────
   getEstadoLabel(estado: ActaEstado): string {
     const map: Record<ActaEstado, string> = {
-      borrador:  'Borrador',
-      pendiente: 'Pendiente Firmas',
-      firmada:   'Firmada',
-      revisada:  'Revisada',
-      archivada: 'Archivada',
+      BORRADOR:         'Borrador',
+      PENDIENTE_FIRMAS: 'Pendiente Firmas',
+      FIRMADA:          'Firmada',
+      REVISADA:         'Revisada',
+      ARCHIVADA:        'Archivada',
     };
     return map[estado];
   }
 
   getEstadoVariant(estado: ActaEstado): 'success' | 'warning' | 'danger' | 'info' {
     const map: Record<ActaEstado, 'success' | 'warning' | 'danger' | 'info'> = {
-      borrador:  'info',
-      pendiente: 'warning',
-      firmada:   'success',
-      revisada:  'success',
-      archivada: 'info',
+      BORRADOR:         'info',
+      PENDIENTE_FIRMAS: 'warning',
+      FIRMADA:          'success',
+      REVISADA:         'success',
+      ARCHIVADA:        'info',
     };
     return map[estado];
   }

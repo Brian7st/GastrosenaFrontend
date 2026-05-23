@@ -51,7 +51,7 @@ export class FacturasService {
     const nueva = {
       ...data,
       id: Math.floor(Math.random() * 10000),
-      estado: 'Registrada',
+      estado: 'REGISTRADA',
       subtotal: 0,
       ivaTotal: 0,
       total: 0,

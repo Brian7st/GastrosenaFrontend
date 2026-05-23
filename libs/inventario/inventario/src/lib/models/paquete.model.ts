@@ -1,11 +1,9 @@
 // ── Paquete Probatorio — Modelo y Mock ──────────────────────────────────────
 
 export type PaqueteEstado =
-  | 'borrador'
-  | 'en_revision'
-  | 'completo'
-  | 'archivado'
-  | 'incompleto';
+  | 'INCOMPLETO'
+  | 'COMPLETO'
+  | 'ARCHIVADO';
 
 export interface DocumentoBase {
   tipo: 'acta' | 'requisicion' | 'asistencia';
@@ -37,7 +35,7 @@ export const MOCK_PAQUETES: PaqueteProbatorio[] = [
     titulo: 'Insumos Cárnicos Semestre 1',
     ficha: '2574832',
     programa: 'Gastronomía',
-    estado: 'completo',
+    estado: 'COMPLETO',
     gilVinculado: 'GIL-88392-A',
     cufe: 'a8f9c2e4b1d7f6a5',
     documentos: [
@@ -54,7 +52,7 @@ export const MOCK_PAQUETES: PaqueteProbatorio[] = [
     titulo: 'Materia Prima Lácteos',
     ficha: '2574833',
     programa: 'Panadería',
-    estado: 'incompleto',
+    estado: 'INCOMPLETO',
     gilVinculado: 'GIL-88393-B',
     cufe: 'b7e3d1f0c2a8e4b9',
     documentos: [
@@ -72,7 +70,7 @@ export const MOCK_PAQUETES: PaqueteProbatorio[] = [
     titulo: 'Dotación Vinos y Espirituosos',
     ficha: '2574834',
     programa: 'Sommelier',
-    estado: 'borrador',
+    estado: 'INCOMPLETO',
     gilVinculado: '--',
     documentos: [
       { tipo: 'acta', vinculado: false },
@@ -88,7 +86,7 @@ export const MOCK_PAQUETES: PaqueteProbatorio[] = [
     titulo: 'Verduras de Estación',
     ficha: '2574835',
     programa: 'Gastronomía',
-    estado: 'en_revision',
+    estado: 'INCOMPLETO',
     gilVinculado: 'GIL-88395-C',
     cufe: 'c4d6e8f1a3b5c7d9',
     documentos: [
@@ -106,7 +104,7 @@ export const MOCK_PAQUETES: PaqueteProbatorio[] = [
     titulo: 'Utensilios de Pastelería',
     ficha: '2574836',
     programa: 'Pastelería',
-    estado: 'completo',
+    estado: 'COMPLETO',
     gilVinculado: 'GIL-88396-D',
     cufe: 'd5e7f9a2b4c6d8e0',
     documentos: [
@@ -124,7 +122,7 @@ export const MOCK_PAQUETES: PaqueteProbatorio[] = [
     titulo: 'Conservas y Enlatados',
     ficha: '2574837',
     programa: 'Gastronomía',
-    estado: 'archivado',
+    estado: 'ARCHIVADO',
     gilVinculado: 'GIL-88397-E',
     cufe: 'e6f8a0b1c3d5e7f9',
     documentos: [

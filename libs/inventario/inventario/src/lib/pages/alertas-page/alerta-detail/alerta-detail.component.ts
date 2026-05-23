@@ -52,16 +52,16 @@ export class AlertaDetailComponent implements OnInit {
   prioridadLabel = computed(() => {
     const p = this.alerta()?.prioridad;
     const map: Record<string, string> = {
-      critica: 'Crítica', alta: 'Alta', media: 'Media', baja: 'Baja',
+      ALTA: 'Alta', MEDIA: 'Media', BAJA: 'Baja',
     };
-    return p ? map[p] : '';
+    return p ? (map[p] ?? p) : '';
   });
 
   prioridadVariant = computed((): 'danger' | 'warning' | 'info' | 'success' => {
     const map: Record<string, 'danger' | 'warning' | 'info' | 'success'> = {
-      critica: 'danger', alta: 'warning', media: 'info', baja: 'success',
+      ALTA: 'warning', MEDIA: 'info', BAJA: 'success',
     };
-    return map[this.alerta()?.prioridad ?? 'media'] ?? 'info';
+    return map[this.alerta()?.prioridad ?? 'MEDIA'] ?? 'info';
   });
 
   // ── Navegación ────────────────────────────────────────────────────────────

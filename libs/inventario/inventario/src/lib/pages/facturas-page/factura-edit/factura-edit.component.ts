@@ -37,7 +37,7 @@ export class FacturaEditPageComponent implements OnInit {
 
   isBlocked = computed(() => {
     const f = this.factura();
-    return f?.estado === 'Verificada' || f?.estado === 'Pagada' || f?.estado === 'Anulada';
+    return f?.estado === 'VERIFICADA' || f?.estado === 'PAGADA' || f?.estado === 'ANULADA';
   });
 
   hasConciliacion = computed(() => (this.factura()?.conciliacion?.length ?? 0) > 0);
