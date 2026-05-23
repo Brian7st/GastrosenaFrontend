@@ -3,6 +3,7 @@ import { CommonModule, Location } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { LucideIconComponent, ButtonComponent, DataTableComponent, KpiCardComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import { ExportarComponent } from '../../../components/exportar/exportar.component';
 import { ConciliacionFacade } from '../../../data-access/conciliacion.facade';
 
 @Component({
@@ -16,6 +17,7 @@ import { ConciliacionFacade } from '../../../data-access/conciliacion.facade';
     DataTableComponent,
     KpiCardComponent,
     BackButtonComponent,
+    ExportarComponent,
   ],
   templateUrl: './conciliacion-historial.component.html',
   styleUrl: './conciliacion-historial.component.scss',
@@ -37,11 +39,27 @@ export class ConciliacionHistorialComponent implements OnInit {
     { producto: 'Carne de Res', dif: '-5 Kg', icon: 'beef' },
   ]);
 
+  showExportarModal = signal(false);
+
   ngOnInit(): void {
     this.facade.loadAll();
   }
 
   goBack(): void {
     this.location.back();
+  }
+
+  onExportar(): void {
+    this.showExportarModal.set(true);
+  }
+
+  onConfirmarExportar(formato: string): void {
+    // TODO: integrar con servicio de descarga cuando backend confirme contrato
+    console.info('[CON-TF] Exportar historial en formato:', formato);
+    this.showExportarModal.set(false);
+  }
+
+  onCerrarExportar(): void {
+    this.showExportarModal.set(false);
   }
 }

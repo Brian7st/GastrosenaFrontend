@@ -3,7 +3,8 @@ import { catchError, finalize, of } from 'rxjs';
 import { PresupuestoService } from './services/presupuesto.service';
 import {
   PresupuestoResumen,
-  Programa,
+  Rubro,
+  GrupoPresupuestal,
   AfectacionPresupuestal,
   VencimientoProximo,
   EjecucionMensual,
@@ -16,22 +17,58 @@ export class PresupuestoFacade {
   private presupuestoService = inject(PresupuestoService);
 
   // Estados internos (Signals)
-  private _resumen = signal<PresupuestoResumen | null>(null);
-  private _programas = signal<Programa[]>([]);
-  private _afectaciones = signal<AfectacionPresupuestal[]>([]);
-  private _vencimientos = signal<VencimientoProximo[]>([]);
+  private _resumen          = signal<PresupuestoResumen | null>(null);
+  private _rubros           = signal<Rubro[]>([]);
+  private _afectaciones     = signal<AfectacionPresupuestal[]>([]);
+  private _vencimientos     = signal<VencimientoProximo[]>([]);
   private _ejecucionMensual = signal<EjecucionMensual[]>([]);
-  private _loading = signal<boolean>(false);
-  private _error = signal<string | null>(null);
+  private _loading          = signal<boolean>(false);
+  private _error            = signal<string | null>(null);
 
-  // Exposición pública (Solo lectura)
-  public resumen = computed(() => this._resumen());
-  public programas = computed(() => this._programas());
-  public afectaciones = computed(() => this._afectaciones());
-  public vencimientos = computed(() => this._vencimientos());
+  // Exposición pública (solo lectura)
+  public resumen          = computed(() => this._resumen());
+  public rubros           = computed(() => this._rubros());
+  public afectaciones     = computed(() => this._afectaciones());
+  public vencimientos     = computed(() => this._vencimientos());
   public ejecucionMensual = computed(() => this._ejecucionMensual());
-  public loading = computed(() => this._loading());
-  public error = computed(() => this._error());
+  public loading          = computed(() => this._loading());
+  public error            = computed(() => this._error());
+
+  /** Vista agrupada de rubros por ficha — derivada en cliente */
+  public grupos = computed<GrupoPresupuestal[]>(() => {
+    const map = new Map<string, GrupoPresupuestal>();
+
+    for (const r of this._rubros()) {
+      if (!map.has(r.fichaId)) {
+        map.set(r.fichaId, {
+          fichaId:               r.fichaId,
+          programaFormacion:     r.programaFormacion,
+          rubros:                [],
+          totalMontoAsignado:    0,
+          totalSaldoDisponible:  0,
+          totalMontoComprometido: 0,
+          totalMontoPagado:      0,
+          totalZese:             0,
+          porcentajeEjecucion:   0,
+        });
+      }
+      const g = map.get(r.fichaId)!;
+      g.rubros.push(r);
+      g.totalMontoAsignado    += r.montoAsignado;
+      g.totalSaldoDisponible  += r.saldoDisponible;
+      g.totalMontoComprometido += r.montoComprometido;
+      g.totalMontoPagado      += r.montoPagado;
+      g.totalZese             += r.retencionZese;
+    }
+
+    for (const g of map.values()) {
+      g.porcentajeEjecucion = g.totalMontoAsignado > 0
+        ? parseFloat(((g.totalMontoComprometido / g.totalMontoAsignado) * 100).toFixed(1))
+        : 0;
+    }
+
+    return Array.from(map.values());
+  });
 
   /**
    * Carga inicial de datos para el dashboard.
@@ -52,8 +89,8 @@ export class PresupuestoFacade {
       this._resumen.set(data);
       checkLoading();
     });
-    this.presupuestoService.getProgramas().subscribe(data => {
-      this._programas.set(data);
+    this.presupuestoService.getRubros().subscribe(data => {
+      this._rubros.set(data);
       checkLoading();
     });
     this.presupuestoService.getAfectaciones().subscribe(data => {

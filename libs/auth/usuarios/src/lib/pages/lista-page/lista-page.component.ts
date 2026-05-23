@@ -20,8 +20,11 @@ import {
 import { ExportarUsuariosComponent } from '../../components/exportar-usuarios/exportar-usuarios.component';
 import { ImportarUsuariosComponent } from '../../components/importar-usuarios/importar-usuarios.component';
 import { UsuarioFormComponent } from '../../components/usuario-form/usuario-form.component';
+import { UsuarioAvatarComponent } from '../../components/usuario-avatar/usuario-avatar.component';
+import { UsuarioRolBadgeComponent } from '../../components/usuario-rol-badge/usuario-rol-badge.component';
 import { UsuariosFacade } from '../../data-access/usuarios.facade';
 import {
+  ActualizarUsuarioRequest,
   CrearUsuarioRequest,
   ExportarConfig,
   ImportarUsuariosRequest,
@@ -52,20 +55,6 @@ const MOCK_USUARIOS: UsuarioDetalle[] = [
     cuentaBloqueada: false, intentosFallidos: 0 },
 ];
 
-const ROL_CLASS_MAP: Record<Rol, string> = {
-  [Rol.ADMINISTRADOR]:   'admin',
-  [Rol.CONTADORA]:       'contadora',
-  [Rol.INSTRUCTOR]:      'instructor',
-  [Rol.CHEF]:            'chef',
-  [Rol.LIDER_BAR]:       'lider-bar',
-  [Rol.MESERO]:          'mesero',
-  [Rol.BARTENDER]:       'bartender',
-  [Rol.AUXILIAR_COCINA]: 'aux-cocina',
-  [Rol.CAJERO]:          'cajero',
-  [Rol.ADMIN_COCINA]:    'admin-cocina',
-  [Rol.ADMIN_BAR]:       'admin-bar',
-};
-
 @Component({
   selector: 'restaurant-lista-page',
   standalone: true,
@@ -81,6 +70,8 @@ const ROL_CLASS_MAP: Record<Rol, string> = {
     ExportarUsuariosComponent,
     ImportarUsuariosComponent,
     UsuarioFormComponent,
+    UsuarioAvatarComponent,
+    UsuarioRolBadgeComponent,
   ],
   templateUrl: './lista-page.component.html',
   styleUrl:    './lista-page.component.scss',
@@ -157,14 +148,6 @@ export class ListaPageComponent implements OnInit {
     this.facade.cargarRoles();
   }
 
-  getIniciales(u: UsuarioDetalle): string {
-    return (u.nombre.charAt(0) + u.apellidos.charAt(0)).toUpperCase();
-  }
-
-  getRolClass(rol: Rol): string {
-    return ROL_CLASS_MAP[rol] ?? 'default';
-  }
-
   onCrearUsuario(): void {
     this.usuarioEditando.set(null);
     this.mostrarFormulario.set(true);
@@ -202,7 +185,17 @@ export class ListaPageComponent implements OnInit {
         this.mockUsuarios.update(list => [...list, nuevo]);
       }
     } else {
-      this.facade.crearUsuario(data);
+      if (editando) {
+        const payload: ActualizarUsuarioRequest = {
+          nombre:    data.nombre,
+          apellidos: data.apellidos,
+          telefono:  data.telefono,
+          idRol:     data.idRol,
+        };
+        this.facade.actualizarUsuario(editando.id, payload);
+      } else {
+        this.facade.crearUsuario(data);
+      }
     }
     this.onCerrarFormulario();
   }

@@ -7,12 +7,12 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '@restaurant/shared/auth';
-import { AlertComponent } from '@restaurant/shared/ui';
+import { AlertComponent, InputComponent, ButtonComponent } from '@restaurant/shared/ui';
 
 @Component({
   selector: 'restaurant-login-page',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, AlertComponent],
+  imports: [ReactiveFormsModule, RouterLink, AlertComponent, InputComponent, ButtonComponent],
   templateUrl: './login-page.component.html',
   styleUrl: './login-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,12 +22,11 @@ export class LoginPageComponent {
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
 
-  readonly showPass = signal(false);
-  readonly loading = signal(false);
+  readonly loading  = signal(false);
   readonly errorMsg = signal('');
 
   readonly form = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
+    email:      ['', [Validators.required, Validators.email]],
     contrasena: ['', [Validators.required, Validators.minLength(6)]],
   });
 

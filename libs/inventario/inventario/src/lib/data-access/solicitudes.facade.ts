@@ -145,4 +145,23 @@ export class SolicitudesFacade {
         }
       });
   }
+
+  generarGils(ids: (string | number)[]): void {
+    this._loading.set(true);
+    this.solicitudesService.generarGils(ids)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al generar los GIL');
+          return of(false);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe((success) => {
+        if (success) {
+          this.cargarSolicitudes();
+        }
+      });
+  }
+
+
 }

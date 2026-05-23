@@ -20,11 +20,8 @@
     <restaurant-kpi-card label="TOTAL" [value]="kpiTotal().toString()" icon="folders"
       iconColor="blue" trend="Total de paquetes" [trendUp]="null"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="BORRADORES" [value]="kpiBorrador().toString()" icon="file-edit"
-      iconColor="orange" trend="Borradores" [trendUp]="null"></restaurant-kpi-card>
-
-    <restaurant-kpi-card label="EN REVISIÓN" [value]="kpiEnRevision().toString()" icon="clock"
-      iconColor="yellow" trend="En revisión" [trendUp]="null"></restaurant-kpi-card>
+    <restaurant-kpi-card label="INCOMPLETOS" [value]="kpiIncompleto().toString()" icon="file-edit"
+      iconColor="orange" trend="Incompletos" [trendUp]="null"></restaurant-kpi-card>
 
     <restaurant-kpi-card label="COMPLETOS" [value]="kpiCompleto().toString()" icon="check-circle"
       iconColor="green" trend="Aprobados" [trendUp]="true"></restaurant-kpi-card>
@@ -45,21 +42,9 @@
         <div class="dt-filter">
           <select class="dt-filter__select" (change)="onEstadoChange($event)">
             <option value="">Todos los estados</option>
-            <option value="borrador">Borrador</option>
-            <option value="en_revision">En revisión</option>
-            <option value="completo">Completo</option>
-            <option value="archivado">Archivado</option>
-            <option value="incompleto">Incompleto</option>
-          </select>
-        </div>
-
-        <div class="dt-filter">
-          <select class="dt-filter__select" (change)="onProgramaChange($event)">
-            <option value="">Todos los programas</option>
-            <option value="gastronomía">Gastronomía</option>
-            <option value="panadería">Panadería</option>
-            <option value="pastelería">Pastelería</option>
-            <option value="sommelier">Sommelier</option>
+            <option value="INCOMPLETO">Incompleto</option>
+            <option value="COMPLETO">Completo</option>
+            <option value="ARCHIVADO">Archivado</option>
           </select>
         </div>
 
@@ -103,7 +88,7 @@
           <!-- Detalle / Ficha -->
           <td>
             <p class="paquete-table__titulo">{{ paquete.titulo }}</p>
-            <p class="paquete-table__ficha">Ficha {{ paquete.ficha }} · {{ paquete.programa }}</p>
+            <p class="paquete-table__ficha">Ficha {{ paquete.fichaId }}</p>
           </td>
 
           <!-- Estado -->
@@ -116,22 +101,36 @@
 
           <!-- GIL Vinculado -->
           <td>
-            <span class="paquete-table__gil">{{ paquete.gilVinculado }}</span>
+            <span class="paquete-table__gil">{{ paquete.gilId }}</span>
           </td>
 
           <!-- Documentos Base (Checklist) -->
           <td>
             <div class="paquete-table__docs">
-              @for (doc of paquete.documentos; track doc.tipo) {
-                <div class="paquete-table__doc-item" [class.paquete-table__doc-item--missing]="!doc.vinculado">
-                  @if (doc.vinculado) {
-                    <lucide-icon name="check-circle-2" [size]="14" class="paquete-table__doc-icon--ok"></lucide-icon>
-                  } @else {
-                    <lucide-icon name="circle" [size]="14" class="paquete-table__doc-icon--pending"></lucide-icon>
-                  }
-                  <span>{{ doc.tipo === 'acta' ? 'Acta' : doc.tipo === 'requisicion' ? 'Requisición' : 'Asistencia' }}</span>
-                </div>
-              }
+              <div class="paquete-table__doc-item" [class.paquete-table__doc-item--missing]="!paquete.actaId">
+                @if (paquete.actaId) {
+                  <lucide-icon name="check-circle-2" [size]="14" class="paquete-table__doc-icon--ok"></lucide-icon>
+                } @else {
+                  <lucide-icon name="circle" [size]="14" class="paquete-table__doc-icon--pending"></lucide-icon>
+                }
+                <span>Acta</span>
+              </div>
+              <div class="paquete-table__doc-item" [class.paquete-table__doc-item--missing]="!paquete.requisicionId">
+                @if (paquete.requisicionId) {
+                  <lucide-icon name="check-circle-2" [size]="14" class="paquete-table__doc-icon--ok"></lucide-icon>
+                } @else {
+                  <lucide-icon name="circle" [size]="14" class="paquete-table__doc-icon--pending"></lucide-icon>
+                }
+                <span>Requisición</span>
+              </div>
+              <div class="paquete-table__doc-item" [class.paquete-table__doc-item--missing]="!paquete.registroAsistenciaAdjunto">
+                @if (paquete.registroAsistenciaAdjunto) {
+                  <lucide-icon name="check-circle-2" [size]="14" class="paquete-table__doc-icon--ok"></lucide-icon>
+                } @else {
+                  <lucide-icon name="circle" [size]="14" class="paquete-table__doc-icon--pending"></lucide-icon>
+                }
+                <span>Asistencia</span>
+              </div>
             </div>
           </td>
 
@@ -141,7 +140,7 @@
               <div class="paquete-table__responsable-avatar">
                 {{ getIniciales(paquete) }}
               </div>
-              <span class="paquete-table__responsable-name">{{ paquete.responsable }}</span>
+              <span class="paquete-table__responsable-name">{{ paquete.instructorId }}</span>
             </div>
           </td>
 
@@ -151,7 +150,7 @@
           <!-- Acciones -->
           <td class="text-center">
             <div class="actions-row" style="justify-content: center;">
-              @if (paquete.estado === 'incompleto') {
+              @if (paquete.estado === 'INCOMPLETO') {
                 <button
                   class="action-icon action-icon--primary"
                   title="Completar Paquete"

@@ -1,0 +1,84 @@
+<!-- Back Button -->
+<div class="action-header-wrap" style="margin-bottom: -1rem;">
+  <inventario-back-button (clicked)="goBack()" />
+</div>
+
+<!-- Header -->
+<div class="page-header">
+  <h1 class="page-title">Vista previa — Consolidación de ítems</h1>
+  <p class="page-subtitle">Revise los ítems consolidados de múltiples solicitudes antes de generar el documento GIL (Guía de Ingreso y/o Salida).</p>
+</div>
+
+<!-- Origen de datos -->
+<div class="origen-datos">
+  <span class="origen-label">Origen de datos:</span>
+  <div class="origen-tags">
+    <span class="origen-tag" *ngFor="let orig of origenes()">{{ orig }}</span>
+  </div>
+</div>
+
+<!-- Contenedor Principal (Tarjeta) -->
+<div class="consolidacion-card">
+  <!-- Cabecera -->
+  <div class="card-header">
+    <h2 class="card-title">Ítems Consolidados</h2>
+    <span class="items-badge">{{ itemsConsolidados().length }} Ítems Únicos</span>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-container">
+    <table class="consolidacion-table">
+      <thead>
+        <tr>
+          <th>Ítem</th>
+          <th>Unidad</th>
+          <th>Desglose por Solicitud</th>
+          <th class="text-right">Total Consolidado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of itemsConsolidados()">
+          <!-- Columna Ítem -->
+          <td class="col-item">
+            <div class="item-icon">
+              <span class="material-symbols-outlined">{{ item.icono }}</span>
+            </div>
+            <div class="item-info">
+              <span class="item-name">{{ item.nombre }}</span>
+              <restaurant-status-badge
+                [label]="'Consolidado ×' + item.origenes.length"
+                variant="success">
+              </restaurant-status-badge>
+            </div>
+          </td>
+          
+          <!-- Columna Unidad -->
+          <td class="col-unidad">{{ item.unidad }}</td>
+
+          <!-- Columna Desglose -->
+          <td class="col-desglose">
+            <div class="desglose-list">
+              <div class="desglose-row" *ngFor="let orig of item.origenes">
+                <span class="desglose-tag">{{ orig.solicitud }}</span>
+                <span class="desglose-qty">{{ orig.cantidad }} {{ item.unidad }}</span>
+              </div>
+            </div>
+          </td>
+
+          <!-- Columna Total -->
+          <td class="col-total text-right">
+            <span class="total-value">{{ item.total }}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="page-footer" style="justify-content: flex-end;">
+  <restaurant-button variant="primary" (click)="onConfirm()">
+    Confirmar y Generar GIL
+    <span class="material-symbols-outlined" style="margin-left: 8px;">arrow_forward</span>
+  </restaurant-button>
+</div>

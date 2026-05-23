@@ -67,9 +67,18 @@ export class ConsolidadoListComponent implements OnInit {
     const item = this.consolidados().find(c => c.id === id);
     if (item) {
       this.selectedReversarItem.set(item);
-      this.isReversarBlocked.set(item.variant === 'success');
+      this.isReversarBlocked.set(item.estado === 'CONTABILIZADO');
       this.showReversarModal.set(true);
     }
+  }
+
+  getVariantFromEstado(estado: string): 'info' | 'success' | 'danger' | 'warning' {
+    const map: Record<string, 'info' | 'success' | 'danger' | 'warning'> = {
+      GENERADO:      'info',
+      CONTABILIZADO: 'success',
+      REVERSADO:     'danger',
+    };
+    return map[estado] ?? 'warning';
   }
 
   closeReversarModal(): void {

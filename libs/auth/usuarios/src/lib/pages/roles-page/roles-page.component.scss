@@ -1,0 +1,190 @@
+.roles-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+
+  // ── Header ────────────────────────────────────────────────────────────────
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+  }
+
+  &__header-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  &__title {
+    font-family: var(--font-family-headline);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-heading);
+    margin: 0;
+  }
+
+  &__subtitle {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+
+  &__header-stats {
+    display: flex;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+  }
+
+  &__stat {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    background: var(--color-superficie-contenedor-bajo);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    padding: var(--space-1) var(--space-3);
+  }
+
+  // ── Grid ──────────────────────────────────────────────────────────────────
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-5);
+
+    @media (max-width: 1024px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 640px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // ── Card ──────────────────────────────────────────────────────────────────
+
+  &__card {
+    --card-accent: var(--color-brand-primary-strong);
+
+    background: var(--color-surface-primary);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-top: 3px solid var(--card-accent);
+    transition: box-shadow var(--duration-fast) var(--ease-standard),
+                transform   var(--duration-fast) var(--ease-standard);
+
+    &:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    // ── Per-role accent colors ─────────────────────────────────────────────
+
+    &--admin      { --card-accent: var(--color-rol-administrador); }
+    &--contadora  { --card-accent: var(--color-rol-contadora); }
+    &--instructor { --card-accent: var(--color-rol-instructor); }
+    &--chef       { --card-accent: var(--color-rol-chef); }
+    &--lider-bar  { --card-accent: var(--color-rol-lider-bar); }
+    &--mesero     { --card-accent: var(--color-rol-mesero); }
+    &--bartender  { --card-accent: var(--color-rol-bartender); }
+    &--auxiliar   { --card-accent: var(--color-rol-auxiliar); }
+    &--cajero     { --card-accent: var(--color-rol-cajero); }
+  }
+
+  &__card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-4) var(--space-3);
+  }
+
+  &__card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--card-accent) 12%, transparent);
+    color: var(--card-accent);
+    flex-shrink: 0;
+  }
+
+  &__card-meta {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__card-title {
+    font-family: var(--font-family-headline);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-heading);
+    margin: 0 0 var(--space-1);
+    word-break: break-word;
+  }
+
+  &__card-desc {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  // ── Permisos list ─────────────────────────────────────────────────────────
+
+  &__permisos {
+    list-style: none;
+    margin: 0;
+    padding: var(--space-1) var(--space-4) var(--space-3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    flex: 1;
+  }
+
+  &__permiso {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-primary);
+  }
+
+  &__permiso-icon {
+    color: var(--card-accent);
+    flex-shrink: 0;
+  }
+
+  // ── Card footer ───────────────────────────────────────────────────────────
+
+  &__card-footer {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    border-top: 1px solid var(--color-border);
+    background: var(--color-superficie-contenedor-bajo);
+  }
+
+  &__footer-icon {
+    color: var(--color-text-secondary);
+    flex-shrink: 0;
+  }
+
+  &__footer-label {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+  }
+}

@@ -22,10 +22,11 @@ export class SolicitudesEditComponent implements OnInit {
   // ── Estado reactivo desde facade ─────────────────────────────────────────
   solicitud   = this.facade.solicitudSeleccionada;
   loading     = this.facade.loading;
-  solicitudId = computed(() => this.solicitud()?.codigo ?? '');
+  solicitudId = computed(() => this.solicitud()?.numeroGil ?? '');
+
   isBlocked   = computed(() => {
     const estado = this.solicitud()?.estado;
-    return estado !== undefined && estado !== 'Borrador';
+    return estado !== undefined && estado !== 'BORRADOR';
   });
 
   bienes = signal<BienSolicitud[]>([]);
@@ -43,7 +44,7 @@ export class SolicitudesEditComponent implements OnInit {
   }
 
   onSave(): void {
-    const codigo = this.solicitud()?.codigo;
+    const codigo = this.solicitud()?.numeroGil;
     if (codigo) {
       this.facade.actualizarSolicitud(codigo, {});
     }

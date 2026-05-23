@@ -7,7 +7,7 @@
       <p class="page-header__subtitle">Supervisión y control de documentos electrónicos en tiempo real.</p>
     </div>
     <div class="page-header__actions">
-      <restaurant-button variant="surface" (click)="onImportar()">
+      <restaurant-button variant="ghost" (click)="onImportar()">
         <span class="material-symbols-outlined">upload</span>
         Importar
       </restaurant-button>
@@ -109,11 +109,16 @@
         <td>
           <div class="proveedor-cell">
             <div class="proveedor-avatar">
-              {{ getProveedorIniciales(factura.proveedor) }}
+              {{ getProveedorIniciales(factura.proveedorNombre) }}
             </div>
             <div>
-              <p class="proveedor-cell__name">{{ factura.proveedor }}</p>
-              <p class="proveedor-cell__id">{{ factura.nitEmisor }}</p>
+              <p class="proveedor-cell__name">
+                <span class="material-symbols-outlined doc-type-icon" [title]="factura.tipoDocumento">
+                  {{ getDocumentoIcono(factura.tipoDocumento) }}
+                </span>
+                {{ factura.proveedorNombre }}
+              </p>
+              <p class="proveedor-cell__id">{{ factura.proveedorNit }}</p>
             </div>
           </div>
         </td>
@@ -134,7 +139,7 @@
               <span class="material-symbols-outlined">visibility</span>
             </button>
             <button class="action-icon action-icon--danger" (click)="$event.stopPropagation(); onAnularFactura(factura)" title="Anular">
-              <span class="material-symbols-outlined">delete</span>
+              <span class="material-symbols-outlined">block</span>
             </button>
           </div>
         </td>
@@ -176,6 +181,15 @@
   (save)="onSaveFactura($event)"
 ></restaurant-factura-form>
 
+<!-- ── MODAL: Exportar Facturas ── -->
+<inventario-exportar
+  *ngIf="showExportarModal()"
+  titulo="Exportar Panel de Facturación"
+  subtitulo="Seleccione el formato de salida para el reporte de facturas electrónicas"
+  (exportar)="onConfirmarExportar($event)"
+  (cerrar)="onCerrarExportar()"
+/>
+
 <!-- ── MODAL: Anular Factura ── -->
 <restaurant-keyword-confirm-modal
   [open]="showAnularModal()"
@@ -186,7 +200,7 @@
   confirmLabel="Sí, anular factura"
   cancelLabel="Cancelar"
   [identifierLabel]="'Factura'"
-  [identifierValue]="facturaParaAnular()?.proveedor ?? ''"
+  [identifierValue]="facturaParaAnular()?.proveedorNombre ?? ''"
   accent="danger"
   (confirm)="onConfirmarAnular()"
   (cancel)="onCancelarAnular()"

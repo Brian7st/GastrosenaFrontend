@@ -27,11 +27,11 @@
         <div class="dt-filter">
           <select class="dt-filter__select" (change)="onEstadoChange($event)">
             <option value="">Todos los Estados</option>
-            <option value="borrador">Borrador</option>
-            <option value="pendiente">Pendiente Firmas</option>
-            <option value="firmada">Firmada</option>
-            <option value="revisada">Revisada</option>
-            <option value="archivada">Archivada</option>
+            <option value="BORRADOR">Borrador</option>
+            <option value="PENDIENTE_FIRMAS">Pendiente Firmas</option>
+            <option value="FIRMADA">Firmada</option>
+            <option value="REVISADA">Revisada</option>
+            <option value="ARCHIVADA">Archivada</option>
           </select>
         </div>
         <!-- Filtro por Ficha -->
@@ -71,22 +71,22 @@
       @for (acta of filteredActas(); track acta.id) {
         <tr class="table-row" (click)="irADetalle(acta.id)">
           <td style="text-align: center;">
-            <span class="actas-table__consecutivo">{{ acta.consecutivo }}</span>
+            <span class="actas-table__consecutivo">{{ acta.numeroActa }}</span>
           </td>
-          <td style="text-align: center;" class="actas-table__fecha">{{ acta.fechaTaller }}</td>
+          <td style="text-align: center;" class="actas-table__fecha">{{ acta.fecha }}</td>
           <td style="text-align: center;">
             <p class="actas-table__programa">{{ acta.programa }}</p>
-            <p class="actas-table__ficha">Ficha {{ acta.ficha }}</p>
+            <p class="actas-table__ficha">Ficha {{ acta.fichaId }}</p>
           </td>
           <td style="text-align: center;">
             <div class="actas-table__instructor" style="justify-content: center;">
               <div class="actas-table__instructor-avatar">
                 <lucide-icon name="user" [size]="14"></lucide-icon>
               </div>
-              {{ acta.instructor }}
+              {{ acta.instructorId }}
             </div>
           </td>
-          <td style="text-align: center;" class="actas-table__requisicion">{{ acta.requisicion }}</td>
+          <td style="text-align: center;" class="actas-table__requisicion">{{ acta.requisicionId }}</td>
           <td style="text-align: center;">
             <restaurant-status-badge
               [label]="getEstadoLabel(acta.estado)"

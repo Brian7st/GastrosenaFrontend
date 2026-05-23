@@ -131,6 +131,9 @@
   gap: 0.75rem;
 
   &__name {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
     font-weight: 700;
     font-size: 0.875rem;
     color: #111827;
@@ -142,6 +145,13 @@
     color: #6b7280;
     margin: 0;
   }
+}
+
+.doc-type-icon {
+  font-size: 14px !important;
+  color: var(--color-primario);
+  flex-shrink: 0;
+  line-height: 1;
 }
 
 .proveedor-avatar {
