@@ -263,3 +263,46 @@
     }
   }
 }
+
+.recetas-filters {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-end;
+  margin-bottom: var(--space-6);
+  width: 100%;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.filter-search {
+  flex: 2;
+  min-width: 250px;
+}
+
+.filter-category {
+  flex: 1;
+  min-width: 200px;
+  max-width: 300px;
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+  }
+}
+
+restaurant-search-filter {
+  display: block;
+  width: 100%;
+
+  ::ng-deep .search-filter__input {
+    width: 100% !important;
+  }
+}
+
+restaurant-select-filter {
+  display: block;
+  width: 100%;
+}
+
