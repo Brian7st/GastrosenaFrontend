@@ -1,21 +1,16 @@
 /**
- * Estados posibles de una Factura Electrónica (FEL).
+ * Estados posibles de una Factura Electrónica.
  */
 export type EstadoFactura = 'REGISTRADA' | 'VERIFICADA' | 'PAGADA' | 'ANULADA';
 
 /**
- * Monedas soportadas.
+ * Línea de detalle dentro de una factura.
  */
-export type MonedaFEL = 'COP' | 'GTQ' | 'USD';
-
-/**
- * Ítem de detalle dentro de una factura.
- */
-export interface FacturaItem {
+export interface FacturaLinea {
   descripcion: string;
   cantidad: number;
   precioUnitario: number;
-  iva: number; // porcentaje, ej: 19
+  iva: number;
   total: number;
 }
 
@@ -39,37 +34,36 @@ export interface PreFactura {
   id: string;
   proveedor: string;
   subtotal: number;
-  items: FacturaItem[];
+  items: FacturaLinea[];
 }
 
 /**
- * Representa una Factura Electrónica (FEL).
+ * Representa una Factura Electrónica.
  */
 export interface Factura {
   id: string | number;
-  numeroFEL: string;
+  numeroFactura: string;
   cufe: string;
-  nitEmisor: string;
+  proveedorNit: string;
   nitReceptor: string;
-  proveedor: string;
+  proveedorNombre: string;
   razonSocial: string;
   tipoDocumento: string;
   fechaEmision: string;
   fechaVencimiento?: string;
-  moneda: MonedaFEL;
+  fechaRecepcion?: string;
   estado: EstadoFactura;
-  items: FacturaItem[];
+  lineas: FacturaLinea[];
   conciliacion?: ConciliacionItem[];
   subtotal: number;
-  ivaTotal: number;
+  totalIva: number;
   total: number;
   ordenCompra?: string;
-  gilVinculado?: string; // ID del formulario GIL-F-014 vinculado
-  instructorCuentadante?: string;
-  codigoCufe?: string; // 64 caracteres
-  retencionZESE?: number; // porcentaje
-  notasInternas?: string;
-  archivosAdjuntos?: string[]; // nombres de archivos XML/PDF
+  gilVinculado?: string;
+  instructorId?: string;
+  valorRetencionZese?: number;
+  motivoAnulacion?: string;
+  proveedorBeneficiarioZese?: string;
 }
 
 /**
@@ -98,20 +92,20 @@ export interface FacturaFiltros {
 }
 
 /**
- * DTO para crear o editar una factura.
+ * DTO para crear o editar una factura (POST/PUT /facturas).
  */
 export interface FacturaFormDto {
-  numeroFEL: string;
+  numeroFactura: string;
   fechaEmision: string;
   fechaVencimiento?: string;
-  nitEmisor: string;
+  fechaRecepcion?: string;
+  proveedorNit: string;
   nitReceptor: string;
   gilVinculado?: string;
-  instructorCuentadante?: string;
-  codigoCufe?: string;
-  retencionZESE?: number;
+  instructorId?: string;
+  valorRetencionZese?: number;
   ordenCompra?: string;
-  archivosAdjuntos?: File[];
+  motivoAnulacion?: string;
 }
 
 /**

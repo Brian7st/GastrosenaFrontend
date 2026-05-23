@@ -21,7 +21,7 @@
           <h1>Editar Factura FEL</h1>
         </div>
         <p class="page-header__sub">
-          Modificando Documento: <strong class="page-header__doc-id">{{ f.numeroFEL }}</strong>
+          Modificando Documento: <strong class="page-header__doc-id">{{ f.numeroFactura }}</strong>
         </p>
       </div>
     </div>
@@ -63,7 +63,7 @@
       </div>
     </div>
 
-    <div class="form-grid form-grid--3">
+    <div class="form-grid form-grid--2">
       <div class="form-field">
         <label>Tipo de Documento</label>
         <div class="select-wrapper">
@@ -84,17 +84,6 @@
           (ngModelChange)="fechaEmision.set($event)"
           [disabled]="isBlocked()"
         />
-      </div>
-      <div class="form-field">
-        <label>Moneda</label>
-        <div class="select-wrapper">
-          <select id="field-moneda" [(ngModel)]="moneda" [disabled]="isBlocked()">
-            <option value="COP">COP - Pesos Colombianos</option>
-            <option value="GTQ">GTQ - Quetzales</option>
-            <option value="USD">USD - Dólares</option>
-          </select>
-          <span class="material-symbols-outlined">expand_more</span>
-        </div>
       </div>
     </div>
 
@@ -150,7 +139,7 @@
                 [ngModel]="item.precioUnitario"
                 (ngModelChange)="onItemChange(i, 'precioUnitario', +$event)"
               />
-              <ng-template #showPrecio>{{ formatMoney(item.precioUnitario, f.moneda) }}</ng-template>
+              <ng-template #showPrecio>{{ formatMoney(item.precioUnitario) }}</ng-template>
             </td>
             <td class="td--iva">
               <div class="iva-select" *ngIf="!isBlocked(); else showIva">
@@ -166,7 +155,7 @@
               </div>
               <ng-template #showIva>{{ item.iva }}%</ng-template>
             </td>
-            <td class="td--currency td--bold">{{ formatMoney(item.total, f.moneda) }}</td>
+            <td class="td--currency td--bold">{{ formatMoney(item.total) }}</td>
             <td *ngIf="!isBlocked()">
               <button class="icon-btn icon-btn--danger" (click)="onEliminarItem(i)">
                 <span class="material-symbols-outlined">delete</span>
@@ -211,10 +200,10 @@
               <td class="td--num" [ngClass]="getDiffClass(c.diferenciaCantidad)">
                 {{ c.diferenciaCantidad === 0 ? '0' : c.diferenciaCantidad }}
               </td>
-              <td class="td--currency">{{ formatMoney(c.precioGil, f.moneda) }}</td>
-              <td class="td--currency">{{ formatMoney(c.precioFactura, f.moneda) }}</td>
+              <td class="td--currency">{{ formatMoney(c.precioGil) }}</td>
+              <td class="td--currency">{{ formatMoney(c.precioFactura) }}</td>
               <td class="td--currency" [ngClass]="getDiffClass(c.diferenciaPrecio)">
-                {{ c.diferenciaPrecio > 0 ? '+' : '' }}{{ formatMoney(c.diferenciaPrecio, f.moneda) }}
+                {{ c.diferenciaPrecio > 0 ? '+' : '' }}{{ formatMoney(c.diferenciaPrecio) }}
               </td>
             </tr>
           </tbody>
@@ -222,32 +211,20 @@
       </div>
     </div>
 
-    <!-- ── NOTAS + TOTALES ── -->
+    <!-- ── TOTALES ── -->
     <div class="bottom-section">
-      <div class="notas-section">
-        <label class="notas-section__label">Notas Internas</label>
-        <textarea
-          id="field-notas"
-          rows="4"
-          [ngModel]="notasInternas()"
-          (ngModelChange)="notasInternas.set($event)"
-          [disabled]="isBlocked()"
-          placeholder="Añade observaciones internas..."
-        ></textarea>
-      </div>
-
       <div class="totals-card">
         <div class="totals-row">
           <span>Subtotal:</span>
-          <span>{{ formatMoney(f.subtotal, f.moneda) }}</span>
+          <span>{{ formatMoney(f.subtotal) }}</span>
         </div>
         <div class="totals-row">
-          <span>IVA ({{ f.ivaTotal > 0 ? '12' : '0' }}%):</span>
-          <span>{{ formatMoney(f.ivaTotal, f.moneda) }}</span>
+          <span>IVA ({{ f.totalIva > 0 ? '12' : '0' }}%):</span>
+          <span>{{ formatMoney(f.totalIva) }}</span>
         </div>
         <div class="totals-row totals-row--total">
           <span>TOTAL FEL:</span>
-          <span class="totals-total-value">{{ formatMoney(f.total, f.moneda) }}</span>
+          <span class="totals-total-value">{{ formatMoney(f.total) }}</span>
         </div>
       </div>
     </div>
@@ -284,7 +261,7 @@
   confirmLabel="Sí, anular documento"
   cancelLabel="Cancelar"
   [identifierLabel]="'Documento'"
-  [identifierValue]="factura()?.numeroFEL ?? ''"
+  [identifierValue]="factura()?.numeroFactura ?? ''"
   accent="warning"
   (confirm)="onConfirmarAnular()"
   (cancel)="onCancelarAnular()"

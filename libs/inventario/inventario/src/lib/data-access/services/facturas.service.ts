@@ -17,8 +17,8 @@ export class FacturasService {
     if (filtros?.busqueda) {
       const q = filtros.busqueda.toLowerCase();
       result = result.filter(f =>
-        f.proveedor.toLowerCase().includes(q) ||
-        f.numeroFEL.toLowerCase().includes(q) ||
+        f.proveedorNombre.toLowerCase().includes(q) ||
+        f.numeroFactura.toLowerCase().includes(q) ||
         (f.ordenCompra ?? '').toLowerCase().includes(q)
       );
     }
@@ -53,9 +53,9 @@ export class FacturasService {
       id: Math.floor(Math.random() * 10000),
       estado: 'REGISTRADA',
       subtotal: 0,
-      ivaTotal: 0,
+      totalIva: 0,
       total: 0,
-      items: [],
+      lineas: [],
     } as Factura;
     return of(nueva).pipe(delay(800));
   }
