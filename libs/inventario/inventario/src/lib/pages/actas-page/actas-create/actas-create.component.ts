@@ -11,6 +11,7 @@ import {
   StatusBadgeComponent,
   LucideIconComponent,
 } from '@restaurant/shared/ui';
+import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { WizardStep } from '../../../models/acta.model';
 
 interface Firmante {
@@ -27,6 +28,7 @@ interface Firmante {
     CommonModule,
     StatusBadgeComponent,
     LucideIconComponent,
+    BackButtonComponent,
   ],
   templateUrl: './actas-create.component.html',
   styleUrl: './actas-create.component.scss',
@@ -74,6 +76,10 @@ export class ActasCreateComponent {
     if (this.currentStep() > 1) {
       this.currentStep.update(s => s - 1);
     }
+  }
+
+  goBack(): void {
+    this.router.navigate(['/app/inventario/actas']);
   }
 
   generarActa(): void {
