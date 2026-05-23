@@ -4,6 +4,7 @@ import {
 } from '@angular/core';
 import { Rol } from '@restaurant/shared/models';
 import { LucideIconComponent } from '@restaurant/shared/ui';
+import { getRolClass } from '../../util/rol-class.util';
 
 interface RolInfo {
   readonly rol:           Rol;
@@ -12,20 +13,6 @@ interface RolInfo {
   readonly permisos:      readonly string[];
   readonly totalUsuarios: number;
 }
-
-const ROL_CSS_CLASS: Record<Rol, string> = {
-  [Rol.ADMINISTRADOR]:   'admin',
-  [Rol.CONTADORA]:       'contadora',
-  [Rol.INSTRUCTOR]:      'instructor',
-  [Rol.CHEF]:            'chef',
-  [Rol.LIDER_BAR]:       'lider-bar',
-  [Rol.MESERO]:          'mesero',
-  [Rol.BARTENDER]:       'bartender',
-  [Rol.AUXILIAR_COCINA]: 'auxiliar',
-  [Rol.CAJERO]:          'cajero',
-  [Rol.ADMIN_COCINA]:    'admin-cocina',
-  [Rol.ADMIN_BAR]:       'admin-bar',
-};
 
 const MOCK_ROLES: readonly RolInfo[] = [
   {
@@ -107,7 +94,5 @@ export class RolesPageComponent {
   readonly totalUsuarios = MOCK_ROLES.reduce((sum, r) => sum + r.totalUsuarios, 0);
   readonly totalRoles    = MOCK_ROLES.length;
 
-  getRolClass(rol: Rol): string {
-    return ROL_CSS_CLASS[rol] ?? 'default';
-  }
+  readonly getRolClass = getRolClass;
 }

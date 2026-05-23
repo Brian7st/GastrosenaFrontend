@@ -22,7 +22,6 @@
     </div>
   </div>
 
-  <!-- Toast exportar (Corrección 5) -->
   @if (mensajeExport()) {
     <restaurant-alert
       [type]="mensajeExport()!.tipo"
@@ -96,7 +95,10 @@
           <tr>
             <td>
               <div class="lista-page__user">
-                <div class="lista-page__avatar">{{ getIniciales(u) }}</div>
+                <restaurant-usuario-avatar
+                  [nombre]="u.nombre"
+                  [apellidos]="u.apellidos"
+                ></restaurant-usuario-avatar>
                 <div>
                   <p class="lista-page__user-name">{{ u.nombre }} {{ u.apellidos }}</p>
                   <p class="lista-page__user-email">{{ u.email }}</p>
@@ -104,9 +106,7 @@
               </div>
             </td>
             <td>
-              <span class="lista-page__badge lista-page__badge--{{ getRolClass(u.rol) }}">
-                {{ u.rol }}
-              </span>
+              <restaurant-usuario-rol-badge [rol]="u.rol"></restaurant-usuario-rol-badge>
             </td>
             <td>
               <span
@@ -117,7 +117,6 @@
                 {{ u.activo ? 'Activo' : 'Inactivo' }}
               </span>
             </td>
-            <!-- Corrección 7 — DatePipe Angular -->
             <td class="lista-page__last-access">
               {{ (u.ultimoAcceso | date:'dd/MM/yyyy') || '—' }}
             </td>
