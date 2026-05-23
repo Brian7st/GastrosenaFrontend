@@ -57,6 +57,15 @@ export class SolicitudesListComponent implements OnInit {
       .toUpperCase();
   }
 
+  getAvatarColor(id: string | number): string {
+    const colors = ['blue', 'purple', 'amber', 'green', 'slate'];
+    return colors[Number(id) % colors.length];
+  }
+
+  getMontoTotal(s: SolicitudGil): number {
+    return s.bienes?.reduce((acc, b) => acc + b.subtotal, 0) ?? 0;
+  }
+
   formatCOP(value: number): string {
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
@@ -107,7 +116,7 @@ export class SolicitudesListComponent implements OnInit {
   }
 
   confirmDelete(): void {
-    const id = this.itemToDelete()?.codigo;
+    const id = this.itemToDelete()?.numeroGil;
     if (id) {
       this.facade.eliminarSolicitud(id);
     }

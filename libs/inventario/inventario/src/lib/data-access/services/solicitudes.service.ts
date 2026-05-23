@@ -14,9 +14,9 @@ export class SolicitudesService {
     if (filtros) {
       if (filtros.busqueda) {
         const query = filtros.busqueda.toLowerCase();
-        result = result.filter(s => 
-          s.codigo.toLowerCase().includes(query) || 
-          s.cuentadante.toLowerCase().includes(query) ||
+        result = result.filter(s =>
+          s.numeroGil.toLowerCase().includes(query) ||
+          s.cuentadantes.some(c => c.nombre.toLowerCase().includes(query)) ||
           s.destino.toLowerCase().includes(query)
         );
       }
@@ -25,7 +25,7 @@ export class SolicitudesService {
       }
       if (filtros.instructor) {
         const instr = filtros.instructor.toLowerCase();
-        result = result.filter(s => s.cuentadante.toLowerCase().includes(instr));
+        result = result.filter(s => s.cuentadantes.some(c => c.nombre.toLowerCase().includes(instr)));
       }
     }
 
@@ -33,7 +33,7 @@ export class SolicitudesService {
   }
 
   getSolicitudById(id: string | number): Observable<SolicitudGil | undefined> {
-    const solicitud = SOLICITUDES_GIL_MOCK.find(s => s.codigo === id || s.id.toString() === id.toString());
+    const solicitud = SOLICITUDES_GIL_MOCK.find(s => s.numeroGil === id || s.id.toString() === id.toString());
     return of(solicitud).pipe(delay(300));
   }
 

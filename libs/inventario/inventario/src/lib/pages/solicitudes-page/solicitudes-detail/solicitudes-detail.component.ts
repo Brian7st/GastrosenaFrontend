@@ -20,10 +20,10 @@ export class SolicitudesDetailComponent implements OnInit {
   // ── Estado reactivo desde facade ─────────────────────────────────────────
   solicitud     = this.facade.solicitudSeleccionada;
   loading       = this.facade.loading;
-  solicitudId   = computed(() => this.solicitud()?.codigo ?? '');
+  solicitudId   = computed(() => this.solicitud()?.numeroGil ?? '');
   estadoActual  = computed(() => this.solicitud()?.estado ?? 'BORRADOR');
   fechaCreacion = computed(() => this.solicitud()?.fecha ?? '');
-  totalEstimado = computed(() => this.solicitud()?.montoTotal ?? 0);
+  totalEstimado = computed(() => this.solicitud()?.bienes?.reduce((acc, b) => acc + b.subtotal, 0) ?? 0);
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
@@ -72,7 +72,7 @@ export class SolicitudesDetailComponent implements OnInit {
   }
 
   onEnviarAprobacion(): void {
-    const codigo = this.solicitud()?.codigo;
+    const codigo = this.solicitud()?.numeroGil;
     if (codigo) this.facade.cambiarEstado(codigo, 'EMITIDO');
   }
 }
