@@ -40,9 +40,8 @@ export class PaqueteListComponent implements OnInit {
   // ── Estado reactivo desde facade ─────────────────────────────────────────
   allPaquetes    = this.facade.paquetes;
   loading        = this.facade.loading;
-  searchText     = signal<string>('');
-  estadoFilter   = signal<string>('');
-  programaFilter = signal<string>('');
+  searchText   = signal<string>('');
+  estadoFilter = signal<string>('');
 
   ngOnInit(): void {
     this.facade.loadAll();
@@ -50,19 +49,17 @@ export class PaqueteListComponent implements OnInit {
 
   // ── Paquetes filtrados ───────────────────────────────────────────────────
   filteredPaquetes = computed(() => {
-    const text     = this.searchText().toLowerCase();
-    const estado   = this.estadoFilter();
-    const programa = this.programaFilter().toLowerCase();
+    const text   = this.searchText().toLowerCase();
+    const estado = this.estadoFilter();
 
     return this.allPaquetes().filter(p => {
       const matchText =
         !text ||
         p.expediente.toLowerCase().includes(text) ||
-        p.responsable.toLowerCase().includes(text) ||
-        p.ficha.toLowerCase().includes(text);
-      const matchEstado   = !estado   || p.estado === estado;
-      const matchPrograma = !programa || p.programa.toLowerCase().includes(programa);
-      return matchText && matchEstado && matchPrograma;
+        p.instructorId.toLowerCase().includes(text) ||
+        p.fichaId.toLowerCase().includes(text);
+      const matchEstado = !estado || p.estado === estado;
+      return matchText && matchEstado;
     });
   });
 
@@ -92,12 +89,11 @@ export class PaqueteListComponent implements OnInit {
   }
 
   getDocsCompletados(p: PaqueteProbatorio): number {
-    return p.documentos.filter(d => d.vinculado).length;
+    return (p.actaId ? 1 : 0) + (p.requisicionId ? 1 : 0) + (p.registroAsistenciaAdjunto ? 1 : 0);
   }
 
   getIniciales(p: PaqueteProbatorio): string {
-    if (p.responsableIniciales) return p.responsableIniciales;
-    return p.responsable
+    return p.instructorId
       .split(' ')
       .map(w => w[0])
       .join('')
@@ -114,14 +110,9 @@ export class PaqueteListComponent implements OnInit {
     this.estadoFilter.set((event.target as HTMLSelectElement).value);
   }
 
-  onProgramaChange(event: Event): void {
-    this.programaFilter.set((event.target as HTMLSelectElement).value);
-  }
-
   limpiarFiltros(): void {
     this.searchText.set('');
     this.estadoFilter.set('');
-    this.programaFilter.set('');
   }
 
   // ── Navegación ───────────────────────────────────────────────────────────

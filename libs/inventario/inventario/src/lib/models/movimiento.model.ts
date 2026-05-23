@@ -1,18 +1,14 @@
+// ── Movimiento de Almacén — Modelo (F-11) ──────────────────────────────────
+
 export interface Movimiento {
   id: string;
-  tipo: 'ENTRADA' | 'SALIDA';
+  tipo: 'ENTRADA' | 'SALIDA' | 'RESERVA' | 'LIBERACION' | 'AJUSTE';
   productoNombre: string;
-  productoSku: string;
   codigoSena: string;
   cantidad: number;
-  unidad: string;
-  fecha: string;
-  hora: string;
-  origenDestino: string;
-  docOrigen: string;
-  docUrl?: string;
+  unidadMedida: string;    // era: unidad
+  fechaMovimiento: string; // ISO datetime — e.g. "2023-10-15T09:45:00Z"
   responsableNombre: string;
-  responsableAvatar: string;
   valor: number;
   estado: 'Completado' | 'Pendiente' | 'Cancelado';
 }

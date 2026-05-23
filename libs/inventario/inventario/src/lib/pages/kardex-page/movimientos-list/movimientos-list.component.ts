@@ -34,10 +34,21 @@ export class MovimientosListComponent implements OnInit {
 
   getVariant(estado: string): 'success' | 'warning' | 'danger' | 'info' {
     switch (estado) {
-      case 'Completado': return 'success';
-      case 'Pendiente':  return 'warning';
-      case 'Cancelado':  return 'danger';
-      default:           return 'info';
+      case 'Completado':  return 'success';
+      case 'Pendiente':   return 'warning';
+      case 'Cancelado':   return 'danger';
+      default:            return 'info';
     }
+  }
+
+  getTipoLabel(tipo: string): string {
+    const map: Record<string, string> = {
+      ENTRADA:    'Entrada',
+      SALIDA:     'Salida',
+      RESERVA:    'Reserva',
+      LIBERACION: 'Liberación',
+      AJUSTE:     'Ajuste',
+    };
+    return map[tipo] ?? tipo;
   }
 }

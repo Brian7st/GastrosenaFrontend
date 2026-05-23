@@ -26,12 +26,11 @@ export class PaqueteCreateComponent {
 
   // ── Formulario ──────────────────────────────────────────────────────────
   createForm = this.fb.nonNullable.group({
-    expediente: [this.generarIdExpediente(), Validators.required],
-    titulo: ['', Validators.required],
-    programa: ['', Validators.required],
-    ficha: ['', Validators.required],
-    gilVinculado: [''],
-    responsable: ['', Validators.required],
+    expediente:   [this.generarIdExpediente(), Validators.required],
+    titulo:       ['', Validators.required],
+    fichaId:      ['', Validators.required],
+    gilId:        [''],
+    instructorId: ['', Validators.required],
   });
 
   // ── Estado del Stepper ──────────────────────────────────────────────────
