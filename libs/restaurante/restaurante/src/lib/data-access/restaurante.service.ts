@@ -1,14 +1,19 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { Mesa, EstadoMesa, MesaCreateRequest, MesaUpdateRequest, PedidoResumenResponse, EstadoPedidoBackend, PedidoCreateRequest } from '../models/restaurante.model';
+import { Observable } from 'rxjs';
+import {
+  Mesa, EstadoMesa, MesaCreateRequest, MesaUpdateRequest,
+  EstadoPedido,
+  PedidoCreateRequest, PedidoResponse, PedidoResumenResponse,
+  DetallePedidoResponse
+} from '../models/restaurante.model';
 
 @Injectable({ providedIn: 'root' })
 export class RestauranteService {
   private http = inject(HttpClient);
-  /** URL del microservicio de restaurante (dev: localhost:8080) */
-  private readonly mesasUrl    = 'http://localhost:8080/api/mesas';
-  private readonly apiUrl      = '/api/pedidos';
+  /** URL base del microservicio de restaurante (dev: localhost:8080) */
+  private readonly mesasUrl   = 'http://localhost:8080/api/mesas';
+  private readonly pedidosUrl = 'http://localhost:8080/api/pedidos';
 
   /**
    * GET /api/mesas  →  Lista todas las mesas activas del backend.
@@ -61,29 +66,82 @@ export class RestauranteService {
     return this.http.patch<Mesa>(`${this.mesasUrl}/${id}/${accion}`, null);
   }
 
+  // ── Pedidos — lectura ───────────────────────────────────────────────────────
+
   /**
-   * Obtiene la lista de pedidos en un estado específico
+   * GET /api/pedidos/{id}
+   * Devuelve el pedido completo con sus detalles (PedidoResponse).
    */
-  getPedidosPorEstado(estado: EstadoPedidoBackend): Observable<PedidoResumenResponse[]> {
-    return this.http.get<PedidoResumenResponse[]>(`${this.apiUrl}/estado/${estado}`);
+  obtenerPedidoPorId(id: string): Observable<PedidoResponse> {
+    return this.http.get<PedidoResponse>(`${this.pedidosUrl}/${id}`);
   }
 
   /**
-   * Crea un nuevo pedido (ej: Facturación manual / directo)
+   * GET /api/pedidos
+   * Lista todos los pedidos (rol INSTRUCTOR / ADMIN).
+   * Devuelve PedidoResumenResponse[] — sin detalles de ítems.
    */
-  crearPedido(request: PedidoCreateRequest): Observable<any> {
-    return this.http.post<any>(this.apiUrl, request);
+  listarTodosPedidos(): Observable<PedidoResumenResponse[]> {
+    return this.http.get<PedidoResumenResponse[]>(this.pedidosUrl);
   }
 
   /**
-   * Registra el pago de un pedido (cambia estado a FACTURADO)
-   * Nota: Asume la existencia de un endpoint /facturar o /pagar
+   * GET /api/pedidos/mis-pedidos
+   * Lista solo los pedidos del mesero autenticado (X-Mock-User-Id).
    */
-  registrarPago(pedidoId: string, metodoPago: string): Observable<any> {
-    // Si tu backend real tiene este endpoint, lo usas.
-    // Ej: return this.http.patch<any>(`${this.apiUrl}/${pedidoId}/facturar`, { metodoPago });
-    
-    // Por ahora, para continuar con la UI, simulamos la respuesta HTTP si el endpoint aún no existe:
-    return of({ success: true, pedidoId, metodoPago });
+  misPedidos(): Observable<PedidoResumenResponse[]> {
+    return this.http.get<PedidoResumenResponse[]>(`${this.pedidosUrl}/mis-pedidos`);
+  }
+
+  /**
+   * GET /api/pedidos/estado/{estado}
+   * Filtra pedidos por EstadoPedido.
+   */
+  pedidosPorEstado(estado: EstadoPedido): Observable<PedidoResumenResponse[]> {
+    return this.http.get<PedidoResumenResponse[]>(`${this.pedidosUrl}/estado/${estado}`);
+  }
+
+  /**
+   * GET /api/pedidos/mesa/{mesaId}
+   * Devuelve todos los pedidos asociados a una mesa (UUID).
+   */
+  pedidosPorMesa(mesaId: string): Observable<PedidoResumenResponse[]> {
+    return this.http.get<PedidoResumenResponse[]>(`${this.pedidosUrl}/mesa/${mesaId}`);
+  }
+
+  // ── Pedidos — escritura ──────────────────────────────────────────────────────
+
+  /**
+   * POST /api/pedidos
+   * Crea un pedido en estado BORRADOR. Devuelve PedidoResponse con UUID asignado.
+   * mesaId es @NotNull y detalles @NotEmpty en el backend.
+   */
+  crearPedido(request: PedidoCreateRequest): Observable<PedidoResponse> {
+    return this.http.post<PedidoResponse>(this.pedidosUrl, request);
+  }
+
+  /**
+   * PATCH /api/pedidos/{id}/confirmar
+   * Transición: BORRADOR → ENVIADO_COCINA.
+   * Dispara eventos RabbitMQ hacia el microservicio de Cocina.
+   */
+  confirmarPedido(id: string): Observable<PedidoResponse> {
+    return this.http.patch<PedidoResponse>(`${this.pedidosUrl}/${id}/confirmar`, null);
+  }
+
+  /**
+   * PATCH /api/pedidos/{id}/entregar
+   * Transición: LISTO_PARA_SERVIR → ENTREGADO.
+   */
+  entregarPedido(id: string): Observable<PedidoResponse> {
+    return this.http.patch<PedidoResponse>(`${this.pedidosUrl}/${id}/entregar`, null);
+  }
+
+  /**
+   * PATCH /api/pedidos/{id}/cancelar
+   * Cancela el pedido independientemente del estado actual.
+   */
+  cancelarPedido(id: string): Observable<PedidoResponse> {
+    return this.http.patch<PedidoResponse>(`${this.pedidosUrl}/${id}/cancelar`, null);
   }
 }

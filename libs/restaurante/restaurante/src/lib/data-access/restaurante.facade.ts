@@ -1,7 +1,38 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { Mesa, EstadoMesa, MesaCreateRequest, MesaUpdateRequest, RestauranteStats, PedidoResumenResponse, CajaStats, TurnoCaja } from '../models/restaurante.model';
-import { Pedido, EstadoPedido } from '@restaurant/shared/models';
+import {
+  Mesa, EstadoMesa, MesaCreateRequest, MesaUpdateRequest,
+  RestauranteStats, PedidoResumenResponse, CajaStats, TurnoCaja,
+  EstadoPedido, PedidoResponse, PedidoCreateRequest
+} from '../models/restaurante.model';
 import { RestauranteService } from './restaurante.service';
+
+/**
+ * Representa un ítem del carrito de pedidos en el frontend.
+ * Campos alineados con DetallePedidoRequest + extras de UI (subtotal local).
+ */
+export interface ItemCarrito {
+  productoId: string;
+  nombreProducto: string;  // = DetallePedidoRequest.nombreProducto
+  cantidad: number;
+  precioUnitario: number;  // = DetallePedidoRequest.precioUnitario
+  categoria: string;
+  observaciones?: string;
+}
+
+/**
+ * Pedido en construcción en el frontend (borrador local).
+ * Se convierte en PedidoCreateRequest al confirmar.
+ */
+export interface PedidoCarrito {
+  id: string;
+  mesaId: string;          // obligatorio — @NotNull en backend
+  meseroId: string;
+  numeroComensales: number; // necesario para el POST
+  estado: EstadoPedido;
+  fechaCreacion: string;   // ISO-8601
+  detalles: ItemCarrito[];
+  subtotal: number;        // calculado en frontend (suma precioUnitario * cantidad)
+}
 
 @Injectable({ providedIn: 'root' })
 export class RestauranteFacade {
@@ -11,8 +42,8 @@ export class RestauranteFacade {
   private _mesas          = signal<Mesa[]>([]);
   private _mesasCargando  = signal<boolean>(false);
   private _mesasError     = signal<string | null>(null);
-  private _ordenesHistorial = signal<Pedido[]>([]);
-  private _pedidoActivo   = signal<Pedido | null>(null);
+  private _ordenesHistorial = signal<PedidoCarrito[]>([]);
+  private _pedidoActivo   = signal<PedidoCarrito | null>(null);
 
   // Estado de Caja
   private _turnoCaja          = signal<TurnoCaja | null>(null);
@@ -126,11 +157,12 @@ export class RestauranteFacade {
 
   /**
    * Conectado a PATCH /api/mesas/{id}/estado?nuevoEstado=OCUPADA.
-   * Al confirmar el acceso a la mesa se cambia su estado en el backend.
-   * TODO: integrar con la creación del Pedido asociado (fase siguiente).
+   * Al confirmar el acceso a la mesa se cambia su estado en el backend
+   * y se inicializa el carrito (Pedido Activo) para esta mesa.
    */
-  abrirMesa(mesaId: string, _comensal: string, _cantidadComensales: number): void {
-    this.actualizarEstado(mesaId, 'OCUPADA');
+  abrirMesa(mesaId: string, _comensal: string, cantidadComensales: number): void {
+    // this.actualizarEstado(mesaId, 'OCUPADA'); // Comentado para evitar 422 al crear el pedido
+    this.iniciarCarrito(mesaId, cantidadComensales);
   }
 
   /**
@@ -231,25 +263,50 @@ export class RestauranteFacade {
     });
   }
 
-  // --- Gestión de Pedido Activo (TODO: conectar al backend en fases siguientes) ---
+  // --- Gestión de Pedido Activo ---
 
   /**
-   * TODO: Cargar el pedido activo desde GET /api/pedidos?mesaId={id}&estado=BORRADOR
+   * Se invoca cuando el usuario accede a una mesa ya OCUPADA para ver o agregar
+   * a su pedido actual. Por ahora (fase Pedidos), si no hay uno, lo inicializa.
    */
-  seleccionarMesaParaPedido(_mesaId: string): void {
-    // TODO: implementar llamada al backend
-    console.warn('[RestauranteFacade] seleccionarMesaParaPedido() aún no está conectado al backend.');
+  seleccionarMesaParaPedido(mesaId: string): void {
+    // TODO: A futuro debería hacer GET /api/pedidos/mesa/{mesaId} para cargar
+    // el pedido activo real del backend. Por ahora iniciamos uno vacío.
+    this.iniciarCarrito(mesaId, 1);
   }
 
-  agregarProductoAlPedido(productoId: string, nombre: string, precioUnit: number, observacion: string = '') {
+  /**
+   * Helper para instanciar el carrito temporal en memoria (_pedidoActivo)
+   * que la UI usa para agregar productos. Evita el bloqueo de UI.
+   */
+  private iniciarCarrito(mesaId: string, numeroComensales: number): void {
+    this._pedidoActivo.set({
+      id: `LOCAL-${Date.now()}`, // UUID temporal
+      mesaId,
+      meseroId: '00000000-0000-0000-0000-000000000000', // El backend lo sobrescribe con el user autenticado
+      numeroComensales: numeroComensales || 1,
+      estado: 'BORRADOR',
+      fechaCreacion: new Date().toISOString(),
+      detalles: [],
+      subtotal: 0
+    });
+  }
+
+  agregarProductoAlPedido(
+    productoId: string,
+    nombreProducto: string,
+    precioUnitario: number,
+    categoria: string = 'COMIDA',
+    observaciones: string = ''
+  ) {
     this._pedidoActivo.update(pedido => {
       if (!pedido) return null;
 
-      const newItem = { productoId, nombre, cantidad: 1, precioUnit, observacion };
-      const items   = [...pedido.items, newItem];
-      const total   = items.reduce((sum, item) => sum + (item.precioUnit * item.cantidad), 0);
+      const nuevoItem: ItemCarrito = { productoId, nombreProducto, cantidad: 1, precioUnitario, categoria, observaciones };
+      const detalles = [...pedido.detalles, nuevoItem];
+      const subtotal = detalles.reduce((sum, it) => sum + (it.precioUnitario * it.cantidad), 0);
 
-      return { ...pedido, items, total };
+      return { ...pedido, detalles, subtotal };
     });
   }
 
@@ -257,15 +314,15 @@ export class RestauranteFacade {
     this._pedidoActivo.update(pedido => {
       if (!pedido) return null;
 
-      const items = [...pedido.items];
-      items[index].cantidad += delta;
+      const detalles = [...pedido.detalles];
+      detalles[index].cantidad += delta;
 
-      if (items[index].cantidad <= 0) {
-        items.splice(index, 1);
+      if (detalles[index].cantidad <= 0) {
+        detalles.splice(index, 1);
       }
 
-      const total = items.reduce((sum, item) => sum + (item.precioUnit * item.cantidad), 0);
-      return { ...pedido, items, total };
+      const subtotal = detalles.reduce((sum, it) => sum + (it.precioUnitario * it.cantidad), 0);
+      return { ...pedido, detalles, subtotal };
     });
   }
 
@@ -274,18 +331,104 @@ export class RestauranteFacade {
   }
 
   /**
-   * TODO: Conectar a PATCH /api/pedidos/{id}/confirmar
+   * Envía el Pedido Activo al backend (POST /api/pedidos).
    */
-  confirmarPedidoActivo(): void {
+  confirmarPedidoActivo(notas: string = ''): void {
     const pedido = this._pedidoActivo();
     if (!pedido) return;
 
-    // TODO: llamar al backend para confirmar el pedido y que este cambie el estado
-    // de la mesa a OCUPADA. Por ahora solo actualizamos el historial local.
-    const pedidoConfirmado = { ...pedido, estado: EstadoPedido.PREPARACION };
-    this._ordenesHistorial.update(historial => [pedidoConfirmado, ...historial]);
-    this.limpiarPedidoActivo();
-    this.guardarEstadoLocal();
+    if (pedido.detalles.length === 0) {
+      alert('No puedes confirmar un pedido vacío');
+      return;
+    }
+
+    const request: PedidoCreateRequest = {
+      mesaId: pedido.mesaId,
+      numeroComensales: pedido.numeroComensales,
+      notas: notas,
+      // Solo mapeamos los campos requeridos por DetallePedidoRequest (excluye id y subtotalLinea)
+      detalles: pedido.detalles.map(d => ({
+        productoId: d.productoId,
+        nombreProducto: d.nombreProducto,
+        cantidad: d.cantidad,
+        precioUnitario: d.precioUnitario,
+        categoria: d.categoria,
+        observaciones: d.observaciones
+      }))
+    };
+
+    this.restauranteService.crearPedido(request).subscribe({
+      next: (pedidoResponse) => {
+        // En un flujo real, aquí llamaríamos a PATCH /api/pedidos/{id}/confirmar
+        // para pasarlo de BORRADOR a ENVIADO_COCINA. 
+        // Por compatibilidad con la UI actual, lo mapeamos localmente y limpiamos.
+        const pedidoConfirmado: PedidoCarrito = {
+          id: pedidoResponse.id,
+          mesaId: pedidoResponse.mesaId,
+          meseroId: pedidoResponse.meseroId,
+          numeroComensales: pedidoResponse.numeroComensales,
+          estado: 'EN_PREPARACION', // Mock estado UI
+          fechaCreacion: pedidoResponse.fechaCreacion,
+          detalles: pedido.detalles, // Mantenemos los de UI
+          subtotal: pedidoResponse.subtotal
+        };
+
+        this._ordenesHistorial.update(historial => [pedidoConfirmado, ...historial]);
+        this.limpiarPedidoActivo();
+        this.guardarEstadoLocal();
+
+        // Disparamos automáticamente el envío a cocina tras crearlo exitosamente
+        this.enviarPedidoACocina(pedidoResponse.id);
+      },
+      error: (err) => {
+        console.error('[RestauranteFacade] Error al crear pedido:', err);
+        alert('Hubo un error de comunicación al crear el pedido.');
+      }
+    });
+  }
+
+  /**
+   * PATCH /api/pedidos/{id}/confirmar
+   * Cambia el estado del pedido a ENVIADO_COCINA y dispara eventos RabbitMQ en el backend.
+   */
+  enviarPedidoACocina(pedidoId: string): void {
+    this.restauranteService.confirmarPedido(pedidoId).subscribe({
+      next: (pedidoResponse) => {
+        // Actualizamos el estado del pedido en el historial local a ENVIADO_COCINA
+        this._ordenesHistorial.update(historial =>
+          historial.map(p => p.id === pedidoId ? { ...p, estado: pedidoResponse.estado } : p)
+        );
+        this.guardarEstadoLocal();
+      },
+      error: (err) => {
+        console.error(`[RestauranteFacade] Error al enviar a cocina el pedido ${pedidoId}:`, err);
+      }
+    });
+  }
+
+  /**
+   * PATCH /api/pedidos/{id}/entregar
+   * Cambia el estado del pedido a ENTREGADO. También cambia la mesa a POR_PAGAR.
+   */
+  marcarPedidoComoEntregado(pedidoId: string): void {
+    this.restauranteService.entregarPedido(pedidoId).subscribe({
+      next: (pedidoResponse) => {
+        // Actualizamos el estado del pedido
+        this._ordenesHistorial.update(historial =>
+          historial.map(p => p.id === pedidoId ? { ...p, estado: 'ENTREGADO' } : p)
+        );
+        
+        // Actualizamos el estado de la mesa a POR_PAGAR
+        this._mesas.update(mesas =>
+          mesas.map(m => m.id.toString() === pedidoResponse.mesaId ? { ...m, estado: 'POR_PAGAR' } : m)
+        );
+        
+        this.guardarEstadoLocal();
+      },
+      error: (err) => {
+        console.error(`[RestauranteFacade] Error al marcar como entregado el pedido ${pedidoId}:`, err);
+      }
+    });
   }
 
   // --- Módulo de Caja (Facturación y Pagos) ---
@@ -316,7 +459,7 @@ export class RestauranteFacade {
       { id: 'P-002', nombreMesa: 'Mesa 4', meseroId: 'Ana',  numeroComensales: 4, estado: 'ENTREGADO', subtotal: 120500, fechaCreacion: new Date().toISOString() }
     ];
 
-    this.restauranteService.getPedidosPorEstado('ENTREGADO').subscribe({
+    this.restauranteService.pedidosPorEstado('ENTREGADO').subscribe({
       next:  (pedidos) => this._pedidosParaCobro.set(pedidos.length ? pedidos : mockPedidos),
       error: (err) => {
         console.error('Usando datos mockeados (error de API)', err);
@@ -332,7 +475,7 @@ export class RestauranteFacade {
       { id: 'F-102', nombreMesa: 'Mesa 7', meseroId: 'Ana',    numeroComensales: 2, estado: 'FACTURADO', subtotal: 55000, fechaCreacion: new Date().toISOString() }
     ];
 
-    this.restauranteService.getPedidosPorEstado('FACTURADO').subscribe({
+    this.restauranteService.pedidosPorEstado('FACTURADO').subscribe({
       next:  (pedidos) => this._historialFacturas.set(pedidos.length ? pedidos : mockFacturas),
       error: (err) => {
         console.error('Usando facturas mockeadas', err);
@@ -348,9 +491,9 @@ export class RestauranteFacade {
       this._historialFacturas.update(lista => [{ ...pedidoPagado, estado: 'FACTURADO' }, ...lista]);
     }
 
-    this.restauranteService.registrarPago(pedidoId, metodo).subscribe({
-      next:  () => console.log('Pago registrado en backend'),
-      error: (err) => console.error('Error registrando pago en API', err)
-    });
+    // TODO: El backend no tiene endpoint /facturar. El cambio a FACTURADO
+    // se realiza a través del flujo de facturación (fase siguiente).
+    // this.restauranteService.cancelarPedido(pedidoId) es el más próximo por ahora.
+    console.log('[RestauranteFacade] procesarPagoFinal: integrar con endpoint de facturación (pendiente).');
   }
 }

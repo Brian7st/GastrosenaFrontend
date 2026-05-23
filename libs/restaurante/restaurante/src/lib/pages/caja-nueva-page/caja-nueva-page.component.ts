@@ -84,6 +84,9 @@ export class CajaNuevaPageComponent {
     const notas = `Factura Manual. Cliente: ${this.nombreCliente() || 'Consumidor Final'} - Doc: ${this.documento()}`;
 
     const request: PedidoCreateRequest = {
+      // TODO: En facturación real, el usuario debe seleccionar una mesa.
+      // 'MANUAL' es un UUID centinela temporal para no bloquear el flujo de caja.
+      mesaId: '00000000-0000-0000-0000-000000000000',
       numeroComensales: 1, // Por defecto al no haber mesa física
       notas: notas,
       detalles: this.listaProductos()
