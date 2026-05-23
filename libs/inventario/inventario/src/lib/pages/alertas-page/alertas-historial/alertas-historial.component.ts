@@ -49,20 +49,18 @@ export class AlertasHistorialComponent implements OnInit {
   // ── Helpers de UI ────────────────────────────────────────────────────────
   getPrioridadLabel(p: AlertaPrioridad): string {
     const map: Record<AlertaPrioridad, string> = {
-      critica: 'Crítica (Mermas)',
-      alta:    'Alta (Bajo Stock)',
-      media:   'Media (Revisión)',
-      baja:    'Baja',
+      ALTA:  'Alta (Bajo Stock)',
+      MEDIA: 'Media (Revisión)',
+      BAJA:  'Baja',
     };
     return map[p];
   }
 
   getPrioridadClass(p: AlertaPrioridad): string {
     const map: Record<AlertaPrioridad, string> = {
-      critica: 'badge--critico',
-      alta:    'badge--alto',
-      media:   'badge--medio',
-      baja:    'badge--bajo',
+      ALTA:  'badge--alto',
+      MEDIA: 'badge--medio',
+      BAJA:  'badge--bajo',
     };
     return map[p];
   }

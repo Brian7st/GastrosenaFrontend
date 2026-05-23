@@ -68,30 +68,25 @@ export class PaqueteListComponent implements OnInit {
 
   // ── KPIs computados ──────────────────────────────────────────────────────
   kpiTotal     = computed(() => this.allPaquetes().length);
-  kpiBorrador  = computed(() => this.allPaquetes().filter(p => p.estado === 'borrador').length);
-  kpiEnRevision = computed(() => this.allPaquetes().filter(p => p.estado === 'en_revision').length);
-  kpiCompleto  = computed(() => this.allPaquetes().filter(p => p.estado === 'completo').length);
-  kpiArchivado = computed(() => this.allPaquetes().filter(p => p.estado === 'archivado').length);
+  kpiIncompleto = computed(() => this.allPaquetes().filter(p => p.estado === 'INCOMPLETO').length);
+  kpiCompleto   = computed(() => this.allPaquetes().filter(p => p.estado === 'COMPLETO').length);
+  kpiArchivado  = computed(() => this.allPaquetes().filter(p => p.estado === 'ARCHIVADO').length);
 
   // ── Helpers de UI ────────────────────────────────────────────────────────
   getEstadoLabel(estado: PaqueteEstado): string {
     const map: Record<PaqueteEstado, string> = {
-      borrador:    'Borrador',
-      en_revision: 'En revisión',
-      completo:    'Completo',
-      archivado:   'Archivado',
-      incompleto:  'Incompleto',
+      INCOMPLETO: 'Incompleto',
+      COMPLETO:   'Completo',
+      ARCHIVADO:  'Archivado',
     };
     return map[estado];
   }
 
   getEstadoVariant(estado: PaqueteEstado): 'success' | 'warning' | 'danger' | 'info' {
     const map: Record<PaqueteEstado, 'success' | 'warning' | 'danger' | 'info'> = {
-      borrador:    'info',
-      en_revision: 'warning',
-      completo:    'success',
-      archivado:   'info',
-      incompleto:  'danger',
+      INCOMPLETO: 'danger',
+      COMPLETO:   'success',
+      ARCHIVADO:  'info',
     };
     return map[estado];
   }

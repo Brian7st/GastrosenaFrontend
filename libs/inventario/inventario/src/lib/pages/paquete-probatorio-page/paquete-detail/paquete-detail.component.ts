@@ -62,9 +62,9 @@ export class PaqueteDetailComponent implements OnInit {
 
     const entries: TimelineEntry[] = [];
 
-    if (p.estado === 'incompleto') {
+    if (p.estado === 'INCOMPLETO') {
       entries.push({
-        estado: 'Falta Asistencia',
+        estado: 'Falta documentación',
         fecha: 'Pendiente de acción',
         activo: true,
         tipo: 'error',
@@ -72,7 +72,7 @@ export class PaqueteDetailComponent implements OnInit {
       });
     }
 
-    if (p.estado === 'completo') {
+    if (p.estado === 'COMPLETO') {
       entries.push({
         estado: 'Completo',
         fecha: p.fecha,
@@ -81,16 +81,7 @@ export class PaqueteDetailComponent implements OnInit {
       });
     }
 
-    if (p.estado === 'en_revision') {
-      entries.push({
-        estado: 'En revisión',
-        fecha: p.fecha,
-        activo: true,
-        tipo: 'neutral',
-      });
-    }
-
-    if (p.estado === 'archivado') {
+    if (p.estado === 'ARCHIVADO') {
       entries.push({
         estado: 'Archivado',
         fecha: p.fecha,
@@ -99,22 +90,15 @@ export class PaqueteDetailComponent implements OnInit {
       });
     }
 
-    // Historical states
-    if (p.estado !== 'borrador' && p.estado !== 'en_revision') {
+    // Historical: show previous state if not INCOMPLETO
+    if (p.estado !== 'INCOMPLETO') {
       entries.push({
-        estado: 'En revisión',
+        estado: 'Incompleto',
         fecha: p.fecha,
         activo: false,
         tipo: 'neutral',
       });
     }
-
-    entries.push({
-      estado: 'Borrador',
-      fecha: p.fecha,
-      activo: p.estado === 'borrador',
-      tipo: 'neutral',
-    });
 
     return entries;
   });
@@ -122,22 +106,18 @@ export class PaqueteDetailComponent implements OnInit {
   // ── Helpers de UI ────────────────────────────────────────────────────────
   getEstadoLabel(estado: PaqueteEstado): string {
     const map: Record<PaqueteEstado, string> = {
-      borrador: 'Borrador',
-      en_revision: 'En revisión',
-      completo: 'Completo',
-      archivado: 'Archivado',
-      incompleto: 'Incompleto',
+      INCOMPLETO: 'Incompleto',
+      COMPLETO:   'Completo',
+      ARCHIVADO:  'Archivado',
     };
     return map[estado];
   }
 
   getEstadoVariant(estado: PaqueteEstado): 'success' | 'warning' | 'danger' | 'info' {
     const map: Record<PaqueteEstado, 'success' | 'warning' | 'danger' | 'info'> = {
-      borrador: 'info',
-      en_revision: 'warning',
-      completo: 'success',
-      archivado: 'info',
-      incompleto: 'danger',
+      INCOMPLETO: 'danger',
+      COMPLETO:   'success',
+      ARCHIVADO:  'info',
     };
     return map[estado];
   }

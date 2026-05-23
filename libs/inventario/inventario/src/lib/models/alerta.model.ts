@@ -3,8 +3,8 @@
 // RF-5.1, RF-5.6
 // ============================================================
 
-export type AlertaPrioridad = 'critica' | 'alta' | 'media' | 'baja';
-export type AlertaEstado    = 'activa' | 'resuelta' | 'revisada';
+export type AlertaPrioridad = 'ALTA' | 'MEDIA' | 'BAJA';
+export type AlertaEstado    = 'ACTIVA' | 'CRITICA' | 'RESUELTA';
 export type AccionResolver  = 'gil' | 'entrada_manual' | 'revisada';
 
 export interface TendenciaPoint {
@@ -72,8 +72,8 @@ export const MOCK_ALERTAS: Alerta[] = [
     nombreBien:    'Aceite de Oliva Extra Virgen',
     categoria:     'Insumos Básicos',
     ubicacion:     'Almacén Principal, Sector A',
-    prioridad:     'critica',
-    estado:        'activa',
+    prioridad:     'ALTA',
+    estado:        'CRITICA',
     stockActual:   0,
     stockMinimo:   50,
     stockObjetivo: 100,
@@ -105,8 +105,8 @@ export const MOCK_ALERTAS: Alerta[] = [
     nombreBien:    'Harina de Trigo Premium',
     categoria:     'Abarrotes',
     ubicacion:     'Almacén Central, Sector B',
-    prioridad:     'alta',
-    estado:        'activa',
+    prioridad:     'ALTA',
+    estado:        'ACTIVA',
     stockActual:   12,
     stockMinimo:   100,
     stockObjetivo: 200,
@@ -136,8 +136,8 @@ export const MOCK_ALERTAS: Alerta[] = [
     nombreBien:    'Pechuga de Pollo',
     categoria:     'Cárnicos',
     ubicacion:     'Cuarto Frío, Sector C',
-    prioridad:     'media',
-    estado:        'activa',
+    prioridad:     'MEDIA',
+    estado:        'ACTIVA',
     stockActual:   45,
     stockMinimo:   50,
     stockObjetivo: 100,
@@ -163,11 +163,11 @@ export const MOCK_ALERTAS: Alerta[] = [
 ];
 
 export const MOCK_HISTORIAL: RegistroHistorial[] = [
-  { id: 'HIST-001', bien: 'Harina de Trigo',  lote: 'HT-2023-45A',  prioridad: 'alta',    accion: 'Entrada Registrada',    responsable: 'Ana Torres',  referencia: 'REC-8942', fecha: '24 Oct 2023', hora: '14:30 hrs' },
-  { id: 'HIST-002', bien: 'Carne de Res',      lote: 'CR-2023-12B',  prioridad: 'media',   accion: 'Revisada - Conforme',   responsable: 'Luis Gómez',  referencia: 'REV-0125', fecha: '24 Oct 2023', hora: '09:15 hrs' },
-  { id: 'HIST-003', bien: 'Aceite de Oliva',   lote: 'AO-2023-99X',  prioridad: 'critica', accion: 'GIL Generado',          responsable: 'Elena Ruiz',  referencia: 'GIL-4458', fecha: '23 Oct 2023', hora: '16:45 hrs' },
-  { id: 'HIST-004', bien: 'Sal Marina',         lote: 'SM-2023-01A',  prioridad: 'baja',    accion: 'Entrada Registrada',    responsable: 'Ana Torres',  referencia: 'REC-8901', fecha: '22 Oct 2023', hora: '11:00 hrs' },
-  { id: 'HIST-005', bien: 'Papa Pastusa',       lote: 'PP-2023-77B',  prioridad: 'alta',    accion: 'GIL Generado',          responsable: 'Luis Gómez',  referencia: 'GIL-4410', fecha: '21 Oct 2023', hora: '15:30 hrs' },
+  { id: 'HIST-001', bien: 'Harina de Trigo',  lote: 'HT-2023-45A',  prioridad: 'ALTA',   accion: 'Entrada Registrada',    responsable: 'Ana Torres',  referencia: 'REC-8942', fecha: '24 Oct 2023', hora: '14:30 hrs' },
+  { id: 'HIST-002', bien: 'Carne de Res',      lote: 'CR-2023-12B',  prioridad: 'MEDIA',  accion: 'Revisada - Conforme',   responsable: 'Luis Gómez',  referencia: 'REV-0125', fecha: '24 Oct 2023', hora: '09:15 hrs' },
+  { id: 'HIST-003', bien: 'Aceite de Oliva',   lote: 'AO-2023-99X',  prioridad: 'ALTA',   accion: 'GIL Generado',          responsable: 'Elena Ruiz',  referencia: 'GIL-4458', fecha: '23 Oct 2023', hora: '16:45 hrs' },
+  { id: 'HIST-004', bien: 'Sal Marina',         lote: 'SM-2023-01A',  prioridad: 'BAJA',   accion: 'Entrada Registrada',    responsable: 'Ana Torres',  referencia: 'REC-8901', fecha: '22 Oct 2023', hora: '11:00 hrs' },
+  { id: 'HIST-005', bien: 'Papa Pastusa',       lote: 'PP-2023-77B',  prioridad: 'ALTA',   accion: 'GIL Generado',          responsable: 'Luis Gómez',  referencia: 'GIL-4410', fecha: '21 Oct 2023', hora: '15:30 hrs' },
 ];
 
 export const MOCK_UMBRALES: UmbralConfig[] = [

@@ -20,11 +20,8 @@
     <restaurant-kpi-card label="TOTAL" [value]="kpiTotal().toString()" icon="folders"
       iconColor="blue" trend="Total de paquetes" [trendUp]="null"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="BORRADORES" [value]="kpiBorrador().toString()" icon="file-edit"
-      iconColor="orange" trend="Borradores" [trendUp]="null"></restaurant-kpi-card>
-
-    <restaurant-kpi-card label="EN REVISIÓN" [value]="kpiEnRevision().toString()" icon="clock"
-      iconColor="yellow" trend="En revisión" [trendUp]="null"></restaurant-kpi-card>
+    <restaurant-kpi-card label="INCOMPLETOS" [value]="kpiIncompleto().toString()" icon="file-edit"
+      iconColor="orange" trend="Incompletos" [trendUp]="null"></restaurant-kpi-card>
 
     <restaurant-kpi-card label="COMPLETOS" [value]="kpiCompleto().toString()" icon="check-circle"
       iconColor="green" trend="Aprobados" [trendUp]="true"></restaurant-kpi-card>
@@ -45,11 +42,9 @@
         <div class="dt-filter">
           <select class="dt-filter__select" (change)="onEstadoChange($event)">
             <option value="">Todos los estados</option>
-            <option value="borrador">Borrador</option>
-            <option value="en_revision">En revisión</option>
-            <option value="completo">Completo</option>
-            <option value="archivado">Archivado</option>
-            <option value="incompleto">Incompleto</option>
+            <option value="INCOMPLETO">Incompleto</option>
+            <option value="COMPLETO">Completo</option>
+            <option value="ARCHIVADO">Archivado</option>
           </select>
         </div>
 
@@ -151,7 +146,7 @@
           <!-- Acciones -->
           <td class="text-center">
             <div class="actions-row" style="justify-content: center;">
-              @if (paquete.estado === 'incompleto') {
+              @if (paquete.estado === 'INCOMPLETO') {
                 <button
                   class="action-icon action-icon--primary"
                   title="Completar Paquete"

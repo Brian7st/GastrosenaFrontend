@@ -54,9 +54,9 @@ export class AlertaResolverComponent implements OnInit {
 
   prioridadLabel = computed(() => {
     const map: Record<string, string> = {
-      critica: 'Crítica', alta: 'Alta', media: 'Media', baja: 'Baja',
+      ALTA: 'Alta', MEDIA: 'Media', BAJA: 'Baja',
     };
-    return map[this.alerta()?.prioridad ?? 'critica'] ?? 'Crítica';
+    return map[this.alerta()?.prioridad ?? 'ALTA'] ?? 'Alta';
   });
 
   selectAccion(accion: AccionResolver): void {

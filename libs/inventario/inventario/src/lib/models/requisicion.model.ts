@@ -4,17 +4,17 @@
  */
 
 export type RequisicionEstado =
-  | 'borrador'
-  | 'enviada'
-  | 'en_despacho'
-  | 'firmada';
+  | 'BORRADOR'
+  | 'ENVIADA'
+  | 'DESPACHADA'
+  | 'FIRMADA'
+  | 'LEGALIZADA';
 
 export interface RequisicionItem {
-  codigo:        string;
-  descripcion:   string;
-  cantidad:      number;
-  unidad:        string;
-  valorUnitario: number;
+  codigo:      string;
+  descripcion: string;
+  cantidad:    number;
+  unidad:      string;
 }
 
 export interface Requisicion {
@@ -26,7 +26,6 @@ export interface Requisicion {
   fecha:      string;
   estado:     RequisicionEstado;
   items:      RequisicionItem[];
-  totalCOP:   number;
 }
 
 // ── Mock Data ────────────────────────────────────────────────────────────────
@@ -39,12 +38,11 @@ export const MOCK_REQUISICIONES: Requisicion[] = [
     ficha: '2574832',
     instructor: 'Chef Sebastián',
     fecha: '10/04/2026',
-    estado: 'borrador',
+    estado: 'BORRADOR',
     items: [
-      { codigo: 'INS-001', descripcion: 'Harina de Trigo', cantidad: 5, unidad: 'kg', valorUnitario: 3200 },
-      { codigo: 'INS-002', descripcion: 'Aceite de Oliva', cantidad: 2, unidad: 'L', valorUnitario: 32500 },
+      { codigo: 'INS-001', descripcion: 'Harina de Trigo', cantidad: 5, unidad: 'kg' },
+      { codigo: 'INS-002', descripcion: 'Aceite de Oliva', cantidad: 2, unidad: 'L' },
     ],
-    totalCOP: 81000,
   },
   {
     id: '2',
@@ -53,11 +51,10 @@ export const MOCK_REQUISICIONES: Requisicion[] = [
     ficha: '2574833',
     instructor: 'Chef Valentina',
     fecha: '08/04/2026',
-    estado: 'enviada',
+    estado: 'ENVIADA',
     items: [
-      { codigo: 'INS-003', descripcion: 'Mantequilla sin sal', cantidad: 3, unidad: 'kg', valorUnitario: 18200 },
+      { codigo: 'INS-003', descripcion: 'Mantequilla sin sal', cantidad: 3, unidad: 'kg' },
     ],
-    totalCOP: 54600,
   },
   {
     id: '3',
@@ -66,11 +63,10 @@ export const MOCK_REQUISICIONES: Requisicion[] = [
     ficha: '2574834',
     instructor: 'Chef Mario',
     fecha: '05/04/2026',
-    estado: 'en_despacho',
+    estado: 'DESPACHADA',
     items: [
-      { codigo: 'INS-004', descripcion: 'Azúcar Glass', cantidad: 4, unidad: 'kg', valorUnitario: 4500 },
+      { codigo: 'INS-004', descripcion: 'Azúcar Glass', cantidad: 4, unidad: 'kg' },
     ],
-    totalCOP: 18000,
   },
   {
     id: '4',
@@ -79,10 +75,9 @@ export const MOCK_REQUISICIONES: Requisicion[] = [
     ficha: '2574835',
     instructor: 'Chef Alejandro',
     fecha: '01/04/2026',
-    estado: 'firmada',
+    estado: 'FIRMADA',
     items: [
-      { codigo: 'INS-005', descripcion: 'Vino Tinto Selección', cantidad: 2, unidad: 'botella', valorUnitario: 45000 },
+      { codigo: 'INS-005', descripcion: 'Vino Tinto Selección', cantidad: 2, unidad: 'botella' },
     ],
-    totalCOP: 90000,
   },
 ];

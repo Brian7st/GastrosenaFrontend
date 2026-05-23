@@ -35,9 +35,9 @@ export class SolicitudesGenerarComponent implements OnInit {
   solicitudes = computed<SolicitudRow[]>(() => {
     return this.solicitudesReales().map(s => ({
       id: String(s.id),
-      codigoFicha: `${s.codigo}\n${s.ficha}`,
-      solicitante: s.cuentadante,
-      totalBienes: s.totalBienes || 0,
+      codigoFicha: `${s.numeroGil}\n${s.fichaId}`,
+      solicitante: s.cuentadantes[0]?.nombre ?? '',
+      totalBienes: s.bienes?.length ?? 0,
       estado: s.estado // 'Aprobado', 'Borrador', etc.
     }));
   });
@@ -69,7 +69,7 @@ export class SolicitudesGenerarComponent implements OnInit {
     const ids = this.selectedIds();
     for (const s of this.solicitudes()) {
       if (ids.has(s.id)) {
-        total += s.totalBienes;
+        total += s.totalBienes ?? 0;
       }
     }
     return total;

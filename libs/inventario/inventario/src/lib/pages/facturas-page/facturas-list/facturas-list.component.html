@@ -109,16 +109,16 @@
         <td>
           <div class="proveedor-cell">
             <div class="proveedor-avatar">
-              {{ getProveedorIniciales(factura.proveedor) }}
+              {{ getProveedorIniciales(factura.proveedorNombre) }}
             </div>
             <div>
               <p class="proveedor-cell__name">
                 <span class="material-symbols-outlined doc-type-icon" [title]="factura.tipoDocumento">
                   {{ getDocumentoIcono(factura.tipoDocumento) }}
                 </span>
-                {{ factura.proveedor }}
+                {{ factura.proveedorNombre }}
               </p>
-              <p class="proveedor-cell__id">{{ factura.nitEmisor }}</p>
+              <p class="proveedor-cell__id">{{ factura.proveedorNit }}</p>
             </div>
           </div>
         </td>
@@ -200,7 +200,7 @@
   confirmLabel="Sí, anular factura"
   cancelLabel="Cancelar"
   [identifierLabel]="'Factura'"
-  [identifierValue]="facturaParaAnular()?.proveedor ?? ''"
+  [identifierValue]="facturaParaAnular()?.proveedorNombre ?? ''"
   accent="danger"
   (confirm)="onConfirmarAnular()"
   (cancel)="onCancelarAnular()"
