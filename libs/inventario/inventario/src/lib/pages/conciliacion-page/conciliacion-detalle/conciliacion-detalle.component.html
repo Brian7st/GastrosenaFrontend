@@ -25,10 +25,6 @@
         <lucide-icon name="user" [size]="14"></lucide-icon>
         <span>{{ detalle()!.responsable }} (Resp.)</span>
       </div>
-      <div class="info-badge">
-        <lucide-icon name="box" [size]="14"></lucide-icon>
-        <span>{{ detalle()!.almacen }}</span>
-      </div>
     </div>
 
     <div class="status-badge">
@@ -41,17 +37,10 @@
        ═══════════════════════════════════════════════════════════════════════ -->
   <div class="kpi-grid">
     <restaurant-kpi-card
-      label="Total ítems"
-      [value]="detalle()!.totalItems"
+      label="Total ítems contados"
+      [value]="detalle()!.totalItemsContados"
       iconName="list"
       iconVariant="neutral">
-    </restaurant-kpi-card>
-
-    <restaurant-kpi-card
-      label="Ítems correctos"
-      [value]="detalle()!.itemsCorrectos"
-      iconName="check-circle-2"
-      iconVariant="success">
     </restaurant-kpi-card>
 
     <restaurant-kpi-card
@@ -70,7 +59,7 @@
 
     <restaurant-kpi-card
       label="Valoración monetaria"
-      [value]="'-$' + (detalle()!.valoracionMonetaria * -1)"
+      [value]="'-$' + (detalle()!.valorTotalDiferencias * -1)"
       iconName="trending-down"
       iconVariant="alert">
     </restaurant-kpi-card>
@@ -136,17 +125,9 @@
 
       <!-- TABLE FOOTER AGGREGATES -->
       <div class="table-aggregates">
-        <div class="aggregate-group">
-          <span class="aggregate-label">Σ PÉRDIDAS</span>
-          <span class="aggregate-value text-danger">-${{ (detalle()!.perdidas * -1) | number }}</span>
-        </div>
-        <div class="aggregate-group">
-          <span class="aggregate-label">Σ SOBRANTES</span>
-          <span class="aggregate-value text-success">+${{ detalle()!.sobrantes | number }}</span>
-        </div>
         <div class="aggregate-neto">
-          <span class="aggregate-label">NETO</span>
-          <span class="aggregate-value text-danger">-${{ (detalle()!.valoracionMonetaria * -1) | number }}</span>
+          <span class="aggregate-label">VALOR TOTAL DIFERENCIAS</span>
+          <span class="aggregate-value text-danger">-${{ (detalle()!.valorTotalDiferencias * -1) | number }}</span>
         </div>
       </div>
     </div>
