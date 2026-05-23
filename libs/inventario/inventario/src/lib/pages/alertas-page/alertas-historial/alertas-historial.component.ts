@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { LucideIconComponent, DataTableComponent, ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import { ExportarComponent } from '../../../components/exportar/exportar.component';
 import { AlertaPrioridad } from '../../../models/alerta.model';
 import { AlertasFacade } from '../../../data-access/alertas.facade';
 
@@ -17,7 +18,7 @@ import { AlertasFacade } from '../../../data-access/alertas.facade';
   selector: 'restaurant-alertas-historial',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, LucideIconComponent, DataTableComponent, ButtonComponent, BackButtonComponent],
+  imports: [CommonModule, LucideIconComponent, DataTableComponent, ButtonComponent, BackButtonComponent, ExportarComponent],
   templateUrl: './alertas-historial.component.html',
   styleUrl: './alertas-historial.component.scss',
 })
@@ -93,7 +94,19 @@ export class AlertasHistorialComponent implements OnInit {
     this.filtroResponsable.set((event.target as HTMLSelectElement).value);
   }
 
-  exportarCSV(): void {
+  // ── Modal de exportación ─────────────────────────────────────────────────
+  showExportModal = signal(false);
+
+  openExportModal(): void {
+    this.showExportModal.set(true);
+  }
+
+  closeExportModal(): void {
+    this.showExportModal.set(false);
+  }
+
+  onExport(formato: string): void {
     this.facade.exportarHistorialCSV();
+    this.closeExportModal();
   }
 }

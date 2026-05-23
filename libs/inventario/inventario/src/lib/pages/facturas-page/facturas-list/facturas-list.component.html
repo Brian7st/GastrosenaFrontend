@@ -7,7 +7,7 @@
       <p class="page-header__subtitle">Supervisión y control de documentos electrónicos en tiempo real.</p>
     </div>
     <div class="page-header__actions">
-      <restaurant-button variant="surface" (click)="onImportar()">
+      <restaurant-button variant="ghost" (click)="onImportar()">
         <span class="material-symbols-outlined">upload</span>
         Importar
       </restaurant-button>
@@ -156,7 +156,6 @@
 
     <!-- Pagination slot -->
     <div dtFooter class="table-pagination" *ngIf="!loading() && facturas().length > 0">
-      <span class="table-pagination__info">Mostrando {{ facturas().length }} de {{ kpis()?.totalFacturas | number }} facturas</span>
       <div class="pagination-btns">
         <button class="pagination-btn" disabled>
           <span class="material-symbols-outlined">chevron_left</span>
@@ -168,6 +167,7 @@
           <span class="material-symbols-outlined">chevron_right</span>
         </button>
       </div>
+      <span class="table-pagination__info">Mostrando {{ facturas().length }} de {{ kpis()?.totalFacturas | number }} facturas</span>
     </div>
 
   </restaurant-data-table>
