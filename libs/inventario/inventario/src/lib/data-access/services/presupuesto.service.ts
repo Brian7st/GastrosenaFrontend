@@ -2,14 +2,14 @@ import { Injectable } from '@angular/core';
 import { Observable, delay, of } from 'rxjs';
 import {
   PresupuestoResumen,
-  Programa,
+  Rubro,
   AfectacionPresupuestal,
   VencimientoProximo,
   EjecucionMensual,
   RegistrarPresupuestoData,
   TrasladarRubroData,
   MOCK_RESUMEN,
-  MOCK_PROGRAMAS,
+  MOCK_RUBROS,
   MOCK_AFECTACIONES,
   MOCK_VENCIMIENTOS,
   MOCK_EJECUCION_MENSUAL
@@ -21,8 +21,8 @@ export class PresupuestoService {
     return of(MOCK_RESUMEN).pipe(delay(300));
   }
 
-  getProgramas(): Observable<Programa[]> {
-    return of(MOCK_PROGRAMAS).pipe(delay(300));
+  getRubros(): Observable<Rubro[]> {
+    return of(MOCK_RUBROS).pipe(delay(300));
   }
 
   getAfectaciones(): Observable<AfectacionPresupuestal[]> {

@@ -37,18 +37,6 @@
       icon="bell"
       iconColor="green"
     ></restaurant-kpi-card>
-    <restaurant-kpi-card
-      label="Valor en Riesgo"
-      [value]="kpiValorRiesgo()"
-      icon="banknote"
-      iconColor="orange"
-    ></restaurant-kpi-card>
-    <restaurant-kpi-card
-      label="Promedio sin Reposición"
-      [value]="kpiPromedioDias()"
-      icon="clock"
-      iconColor="blue"
-    ></restaurant-kpi-card>
   </div>
 
   <!-- ── Main Content Split ──────────────────────────────────────────────── -->
@@ -104,14 +92,8 @@
             <div class="alerta-card__body">
               <div class="alerta-card__header">
                 <div class="alerta-card__meta">
-                  <h3 class="alerta-card__nombre">{{ alerta.nombreBien }}</h3>
-                  @if (alerta.notificacionEnviada) {
-                    <div class="notif-badge">
-                      <span class="material-symbols-outlined notif-badge__icon">mail</span>
-                      Notificación enviada
-                    </div>
-                  }
-                  <p class="alerta-card__codigo">{{ alerta.codigoSena }}</p>
+                  <h3 class="alerta-card__nombre">{{ alerta.nombreBien ?? alerta.descripcion }}</h3>
+                  <p class="alerta-card__codigo">{{ alerta.codigoSena ?? '—' }}</p>
                 </div>
                 <restaurant-status-badge
                   [label]="getPrioridadLabel(alerta.prioridad)"
@@ -123,18 +105,8 @@
                 <div class="alerta-stat">
                   <p class="alerta-stat__label">Stock Actual</p>
                   <p class="alerta-stat__value" [class]="'alerta-stat__value--' + alerta.prioridad">
-                    {{ alerta.stockActual }} / {{ alerta.stockMinimo }}{{ alerta.unidad }}
+                    {{ alerta.stockActual ?? 0 }} / {{ alerta.stockMinimo ?? 0 }}{{ alerta.unidad ?? '' }}
                   </p>
-                </div>
-                <div class="alerta-stat">
-                  <p class="alerta-stat__label">Días Restantes</p>
-                  <p class="alerta-stat__value" [class]="'alerta-stat__value--' + alerta.prioridad">
-                    {{ alerta.diasRestantes }} días
-                  </p>
-                </div>
-                <div class="alerta-stat">
-                  <p class="alerta-stat__label">Valor en Riesgo</p>
-                  <p class="alerta-stat__value">{{ formatValor(alerta.valorEnRiesgo) }}</p>
                 </div>
               </div>
             </div>

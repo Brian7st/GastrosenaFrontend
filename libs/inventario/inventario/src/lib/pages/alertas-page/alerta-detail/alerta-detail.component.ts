@@ -45,8 +45,8 @@ export class AlertaDetailComponent implements OnInit {
   // ── Computed ──────────────────────────────────────────────────────────────
   porcentajeStock = computed(() => {
     const a = this.alerta();
-    if (!a || a.stockObjetivo === 0) return 0;
-    return Math.min(100, (a.stockActual / a.stockObjetivo) * 100);
+    if (!a || !a.stockActual || !a.stockMinimo || a.stockMinimo === 0) return 0;
+    return Math.min(100, (a.stockActual / a.stockMinimo) * 100);
   });
 
   prioridadLabel = computed(() => {
