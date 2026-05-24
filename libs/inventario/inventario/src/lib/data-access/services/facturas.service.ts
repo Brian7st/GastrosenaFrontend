@@ -1,86 +1,117 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable, of, delay } from 'rxjs';
-import { Factura, FacturaFiltros, FacturaKpis, SolicitudGIL } from '../../models/facturas.model';
-import { FACTURAS_MOCK, FACTURAS_KPIS_MOCK, SOLICITUD_GIL_MOCK } from '../../models/facturas.mock';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { Factura, FacturaFiltros, FacturaKpis, SolicitudGIL, EstadoGIL } from '../../models/facturas.model';
+import { FacturaResponse, FacturaResumenResponse, GilResponse } from '../api/sourcing.api';
+import { facturaFromApi } from '../mappers/sourcing.mapper';
 
-@Injectable({
-  providedIn: 'root'
-})
+const API = '/api/v1';
+
+@Injectable({ providedIn: 'root' })
 export class FacturasService {
+  private http = inject(HttpClient);
 
-  /**
-   * Obtiene el listado de facturas con filtros opcionales.
-   */
   getFacturas(filtros?: FacturaFiltros): Observable<Factura[]> {
-    let result = [...FACTURAS_MOCK];
+    let params = new HttpParams();
+    if (filtros?.busqueda)   params = params.set('q', filtros.busqueda);
+    if (filtros?.estado)     params = params.set('estado', filtros.estado);
+    if (filtros?.proveedor)  params = params.set('proveedor', filtros.proveedor);
+    if (filtros?.fechaDesde) params = params.set('fechaDesde', filtros.fechaDesde);
+    if (filtros?.fechaHasta) params = params.set('fechaHasta', filtros.fechaHasta);
 
-    if (filtros?.busqueda) {
-      const q = filtros.busqueda.toLowerCase();
-      result = result.filter(f =>
-        f.proveedorNombre.toLowerCase().includes(q) ||
-        f.numeroFactura.toLowerCase().includes(q) ||
-        (f.ordenCompra ?? '').toLowerCase().includes(q)
+    return this.http
+      .get<FacturaResponse[]>(`${API}/sourcing/facturas`, { params })
+      .pipe(
+        map(list => list.map(facturaFromApi)),
+        catchError(err => throwError(() => err))
       );
-    }
-    if (filtros?.estado) {
-      result = result.filter(f => f.estado === filtros.estado);
-    }
-
-    return of(result).pipe(delay(500));
   }
 
-  /**
-   * Obtiene los KPIs del panel de facturación.
-   */
   getKpis(): Observable<FacturaKpis> {
-    return of(FACTURAS_KPIS_MOCK).pipe(delay(300));
+    return this.http
+      .get<FacturaResumenResponse>(`${API}/sourcing/facturas/resumen`)
+      .pipe(
+        map(r => ({
+          totalFacturas:          r.totalFacturas,
+          tendenciaTotalFacturas: r.tendenciaTotalFacturas,
+          montoMensual:           r.montoMensual,
+          tendenciaMonto:         r.tendenciaMonto,
+          registradas:            r.registradas,
+          verificadas:            r.verificadas,
+          pagadas:                r.pagadas,
+          anuladas:               r.anuladas,
+        })),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  /**
-   * Obtiene una factura por ID.
-   */
   getFacturaById(id: string | number): Observable<Factura | undefined> {
-    const factura = FACTURAS_MOCK.find(f => f.id.toString() === id.toString());
-    return of(factura).pipe(delay(300));
+    return this.http
+      .get<FacturaResponse>(`${API}/sourcing/facturas/${id}`)
+      .pipe(
+        map(facturaFromApi),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  /**
-   * Crea una nueva factura FEL.
-   */
+  /** La facade pasa Partial<Factura> — el service lo envía al backend tal cual.
+   *  FE-04/FE-06 ajustarán el DTO de request cuando el contrato esté confirmado. */
   createFactura(data: Partial<Factura>): Observable<Factura> {
-    const nueva = {
-      ...data,
-      id: Math.floor(Math.random() * 10000),
-      estado: 'REGISTRADA',
-      subtotal: 0,
-      totalIva: 0,
-      total: 0,
-      lineas: [],
-    } as Factura;
-    return of(nueva).pipe(delay(800));
+    return this.http
+      .post<FacturaResponse>(`${API}/sourcing/facturas`, data)
+      .pipe(
+        map(facturaFromApi),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  /**
-   * Actualiza una factura existente.
-   */
   updateFactura(id: string | number, data: Partial<Factura>): Observable<Factura> {
-    const original = FACTURAS_MOCK.find(f => f.id.toString() === id.toString());
-    const actualizada = { ...original, ...data } as Factura;
-    return of(actualizada).pipe(delay(800));
+    return this.http
+      .patch<FacturaResponse>(`${API}/sourcing/facturas/${id}`, data)
+      .pipe(
+        map(facturaFromApi),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  /**
-   * Anula una factura.
-   */
   anularFactura(id: string | number): Observable<void> {
-    return of(undefined).pipe(delay(800));
+    return this.http
+      .patch<void>(`${API}/sourcing/facturas/${id}/anular`, {})
+      .pipe(catchError(err => throwError(() => err)));
   }
 
-  /**
-   * Obtiene una solicitud GIL por ID.
-   */
+  /** Mapea GilResponse al tipo SolicitudGIL que usa la FacturasFacade.
+   *  SolicitudGIL (facturas.model) y SolicitudGil (solicitudes-gil.model) son dos
+   *  tipos distintos — unificarlos es trabajo de un refactor posterior. */
   getSolicitudGIL(id: string): Observable<SolicitudGIL | undefined> {
-    if (id === SOLICITUD_GIL_MOCK.id) return of(SOLICITUD_GIL_MOCK).pipe(delay(300));
-    return of(undefined).pipe(delay(300));
+    return this.http
+      .get<GilResponse>(`${API}/procurement/giles/${id}`)
+      .pipe(
+        map(g => this.gilResponseToSolicitudGIL(g)),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  private gilResponseToSolicitudGIL(g: GilResponse): SolicitudGIL {
+    return {
+      id: g.id,
+      nombreVocero:            g.voceroNombre ?? '',
+      horarios:                '',   // sin campo equivalente aún
+      resultadoAprendizaje:    g.resultadoAprendizaje ?? '',
+      estadoSolicitud:         g.estado as EstadoGIL,
+      fechaCreacion:           g.fecha,
+      totalEstimado:           0,    // calculado en backend
+      responsable:             g.emitidoPor ?? '',
+      regional:                '',
+      centroFormacion:         g.centroFormacionId,
+      areaPrograma:            g.area,
+      cuentadanteResponsable:  g.cuentadantes?.[0]?.nombre ?? '',
+      destinoBien:             g.destino,
+      preFacturas:             [],
+      observaciones:           g.observaciones ?? '',
+      hashTransaccion:         '',
+      idTransaccion:           '',
+    };
   }
 }

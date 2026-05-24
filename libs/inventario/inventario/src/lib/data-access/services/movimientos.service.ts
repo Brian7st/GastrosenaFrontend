@@ -1,27 +1,44 @@
-import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { inject, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { Movimiento, EntradaMovimientoData, SalidaMovimientoData } from '../../models/movimiento.model';
-import { MOVIMIENTOS_MOCK } from '../../models/movimiento.mock';
+import { MovimientoResponse } from '../api/inventory.api';
+import { movimientoFromApi, entradaToRequest, salidaToRequest } from '../mappers/inventory.mapper';
 
-@Injectable({
-  providedIn: 'root'
-})
+const API = '/api/v1';
+
+@Injectable({ providedIn: 'root' })
 export class MovimientosService {
+  private http = inject(HttpClient);
+
   getMovimientos(): Observable<Movimiento[]> {
-    return of(MOVIMIENTOS_MOCK).pipe(delay(500));
+    return this.http
+      .get<MovimientoResponse[]>(`${API}/inventory/movimientos`)
+      .pipe(
+        map(list => list.map(movimientoFromApi)),
+        catchError(err => throwError(() => err))
+      );
   }
 
   getMovimientoById(id: string): Observable<Movimiento | undefined> {
-    const mov = MOVIMIENTOS_MOCK.find(m => m.id === id);
-    return of(mov).pipe(delay(300));
+    return this.http
+      .get<MovimientoResponse>(`${API}/inventory/movimientos/${id}`)
+      .pipe(
+        map(movimientoFromApi),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  registrarEntrada(data: EntradaMovimientoData): Observable<{ success: boolean; data: EntradaMovimientoData }> {
-    return of({ success: true, data }).pipe(delay(500));
+  registrarEntrada(data: EntradaMovimientoData): Observable<{ success: boolean }> {
+    return this.http
+      .post<{ success: boolean }>(`${API}/inventory/movimientos/entrada`, entradaToRequest(data))
+      .pipe(catchError(err => throwError(() => err)));
   }
 
-  registrarSalida(data: SalidaMovimientoData): Observable<{ success: boolean; data: SalidaMovimientoData }> {
-    return of({ success: true, data }).pipe(delay(500));
+  registrarSalida(data: SalidaMovimientoData): Observable<{ success: boolean }> {
+    return this.http
+      .post<{ success: boolean }>(`${API}/inventory/movimientos/salida`, salidaToRequest(data))
+      .pipe(catchError(err => throwError(() => err)));
   }
 }

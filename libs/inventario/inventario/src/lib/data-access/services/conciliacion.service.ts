@@ -1,60 +1,67 @@
-import { Injectable } from '@angular/core';
-import { Observable, of, delay } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import {
   ConciliacionRegistro,
   ConciliacionDetalle,
   DiferenciaItem,
   TomaFisicaItem,
 } from '../../models/conciliacion.model';
+import { ConciliacionListItemResponse, ConciliacionDetailResponse, DiferenciaResponse } from '../api/reconciliation.api';
 import {
-  CONCILIACIONES_MOCK,
-  CONCILIACION_DETALLE_MOCK,
-  DIFERENCIAS_MOCK,
-  TOMA_FISICA_ITEMS_MOCK,
-} from '../../models/conciliacion.mock';
+  conciliacionListItemFromApi,
+  conciliacionDetailFromApi,
+  diferenciaFromApi,
+} from '../mappers/reconciliation.mapper';
 
-@Injectable({
-  providedIn: 'root',
-})
+const API = '/api/v1';
+
+@Injectable({ providedIn: 'root' })
 export class ConciliacionService {
-  /**
-   * Obtiene el listado de todas las conciliaciones.
-   */
+  private http = inject(HttpClient);
+
   getConciliaciones(): Observable<ConciliacionRegistro[]> {
-    return of([...CONCILIACIONES_MOCK]).pipe(delay(400));
+    return this.http
+      .get<ConciliacionListItemResponse[]>(`${API}/reconciliation/conciliaciones`)
+      .pipe(
+        map(list => list.map(conciliacionListItemFromApi)),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  /**
-   * Obtiene el detalle de una conciliación por su ID.
-   */
   getConciliacionById(id: string): Observable<ConciliacionDetalle | undefined> {
-    // En implementación real: return this.http.get<ConciliacionDetalle>(`/api/conciliaciones/${id}`)
-    const detalle =
-      id === CONCILIACION_DETALLE_MOCK.id ? CONCILIACION_DETALLE_MOCK : undefined;
-    return of(detalle).pipe(delay(300));
+    return this.http
+      .get<ConciliacionDetailResponse>(`${API}/reconciliation/conciliaciones/${id}`)
+      .pipe(
+        map(conciliacionDetailFromApi),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  /** Obtiene las diferencias de una conciliación por su ID. */
-  getDiferenciasByConciliacion(_id: string): Observable<DiferenciaItem[]> {
-    return of([...DIFERENCIAS_MOCK]).pipe(delay(300));
+  getDiferenciasByConciliacion(id: string): Observable<DiferenciaItem[]> {
+    return this.http
+      .get<DiferenciaResponse[]>(`${API}/reconciliation/conciliaciones/${id}/diferencias`)
+      .pipe(
+        map(list => list.map(diferenciaFromApi)),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  /** Obtiene los ítems de una sesión de toma física. */
-  getTomaFisicaItems(): Observable<TomaFisicaItem[]> {
-    return of([...TOMA_FISICA_ITEMS_MOCK]).pipe(delay(400));
-  }
-
-  /**
-   * Inicia una nueva toma física (crea la sesión en el servidor).
-   */
   iniciarTomaFisica(): Observable<{ sesionId: string }> {
-    return of({ sesionId: `TF-${Date.now()}` }).pipe(delay(500));
+    return this.http
+      .post<{ sesionId: string }>(`${API}/reconciliation/conciliaciones`, {})
+      .pipe(catchError(err => throwError(() => err)));
   }
 
-  /**
-   * Cierra y finaliza una conciliación existente.
-   */
   cerrarConciliacion(id: string): Observable<void> {
-    return of(undefined).pipe(delay(800));
+    return this.http
+      .patch<void>(`${API}/reconciliation/conciliaciones/${id}/cerrar`, {})
+      .pipe(catchError(err => throwError(() => err)));
+  }
+
+  /** TODO: endpoint de ítems de toma física pendiente de confirmación con backend */
+  getTomaFisicaItems(): Observable<TomaFisicaItem[]> {
+    return throwError(() => new Error('getTomaFisicaItems: endpoint no disponible — pendiente con backend'));
   }
 }

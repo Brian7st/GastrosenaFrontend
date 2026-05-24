@@ -1,86 +1,82 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable, of, delay } from 'rxjs';
-import { Bien, BienFiltros, BienKpis, BienFormDto } from '../../models/inventario.model';
-import { BIENES_MOCK, BIENES_KPIS_MOCK } from '../../models/inventario.mock';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { Bien, BienFiltros, BienKpis, BienFormDto, EstadoBien } from '../../models/inventario.model';
+import { PagedResponse, ProductoResponse } from '../api/catalog.api';
+import { bienFormToRequest } from '../mappers/catalog.mapper';
 
-@Injectable({
-  providedIn: 'root'
-})
+const API = '/api/v1';
+
+@Injectable({ providedIn: 'root' })
 export class BienesService {
-  // En una implementación real, aquí inyectaríamos HttpClient
-  // private http = inject(HttpClient);
-  // private apiUrl = 'api/bienes';
+  private http = inject(HttpClient);
 
-  /**
-   * Obtiene la lista de bienes filtrada.
-   */
   getBienes(filtros?: BienFiltros): Observable<Bien[]> {
-    let result = [...BIENES_MOCK];
+    let params = new HttpParams();
+    if (filtros?.busqueda)  params = params.set('q', filtros.busqueda);
+    if (filtros?.categoria) params = params.set('categoria', filtros.categoria);
+    if (filtros?.estado)    params = params.set('estado', filtros.estado);
 
-    if (filtros) {
-      if (filtros.busqueda) {
-        const query = filtros.busqueda.toLowerCase();
-        result = result.filter(b => 
-          b.nombre.toLowerCase().includes(query) || 
-          b.codigoSena.toLowerCase().includes(query) ||
-          b.codigoProveedor.toLowerCase().includes(query)
-        );
-      }
-      if (filtros.categoria) {
-        result = result.filter(b => b.categoria === filtros.categoria);
-      }
-      if (filtros.estado) {
-        result = result.filter(b => b.estado === filtros.estado);
-      }
-    }
-
-    return of(result).pipe(delay(500)); // Simulamos latencia
+    return this.http
+      .get<PagedResponse<ProductoResponse>>(`${API}/catalog/productos`, { params })
+      .pipe(
+        map(res => res.content.map(p => this.toUiModel(p))),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  /**
-   * Obtiene los indicadores clave (KPIs) del inventario.
-   */
+  /** TODO: endpoint dedicado pendiente en backend — RF por confirmar */
   getKpis(): Observable<BienKpis> {
-    return of(BIENES_KPIS_MOCK).pipe(delay(300));
+    return of({ valorTotal: 0, totalAlertas: 0, movimientosHoy: 0 });
   }
 
-  /**
-   * Obtiene un bien por su ID.
-   */
   getBienById(id: string | number): Observable<Bien | undefined> {
-    const bien = BIENES_MOCK.find(b => b.id.toString() === id.toString());
-    return of(bien).pipe(delay(300));
+    return this.http
+      .get<ProductoResponse>(`${API}/catalog/productos/${id}`)
+      .pipe(
+        map(p => this.toUiModel(p)),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  /**
-   * Crea un nuevo bien.
-   */
-  createBien(bien: Partial<Bien>): Observable<Bien> {
-    const nuevoBien = {
-      ...bien,
-      id: Math.floor(Math.random() * 1000), // ID temporal
-      estado: 'Activo',
-      tieneHistorial: false
-    } as Bien;
-    
-    // Aquí iría el POST al API
-    return of(nuevoBien).pipe(delay(800));
+  createBien(form: BienFormDto): Observable<Bien> {
+    return this.http
+      .post<ProductoResponse>(`${API}/catalog/productos`, bienFormToRequest(form))
+      .pipe(
+        map(p => this.toUiModel(p)),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  /**
-   * Actualiza un bien existente.
-   */
-  updateBien(id: string | number, data: Partial<Bien>): Observable<Bien> {
-    const bienOriginal = BIENES_MOCK.find(b => b.id.toString() === id.toString());
-    const actualizado = { ...bienOriginal, ...data } as Bien;
-    return of(actualizado).pipe(delay(800));
+  updateBien(id: string | number, form: BienFormDto): Observable<Bien> {
+    return this.http
+      .patch<ProductoResponse>(`${API}/catalog/productos/${id}`, bienFormToRequest(form))
+      .pipe(
+        map(p => this.toUiModel(p)),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  /**
-   * Elimina un bien.
-   */
   deleteBien(id: string | number): Observable<void> {
-    // Aquí iría el DELETE al API
-    return of(undefined).pipe(delay(800));
+    return this.http
+      .delete<void>(`${API}/catalog/productos/${id}`)
+      .pipe(catchError(err => throwError(() => err)));
+  }
+
+  /** Adapta ProductoResponse a Bien con defaults para campos de UI.
+   *  FE-04 completará valor y estado con /inventory/existencias. */
+  private toUiModel(dto: ProductoResponse): Bien {
+    return {
+      id: dto.id,
+      nombre: dto.nombre,
+      codigoSena: dto.codigoSena,
+      codigoProveedor: dto.codigoProveedor ?? '',
+      descripcion: dto.descripcion ?? '',
+      categoria: dto.categoria,
+      unidadMedida: dto.unidadMedida,
+      valor: 0,
+      estado: (dto.activo ? 'Activo' : 'Inactivo') as EstadoBien,
+    } as Bien;
   }
 }
