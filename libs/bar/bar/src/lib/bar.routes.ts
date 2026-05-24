@@ -38,6 +38,10 @@ export const BAR_ROUTES: Routes = [
       {
         path: 'actividades',
         loadComponent: () => import('./pages/actividades-list-page/actividades-list-page.component').then((m) => m.ActividadesListPageComponent)
+      },
+      {
+        path: 'estadisticas',
+        loadComponent: () => import('./pages/estadisticas-page/estadisticas-page.component').then((m) => m.EstadisticasPageComponent)
       }
     ]
   }

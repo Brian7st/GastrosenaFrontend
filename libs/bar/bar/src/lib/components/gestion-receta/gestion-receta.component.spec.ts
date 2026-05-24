@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ReactiveFormsModule, FormArray } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { signal, WritableSignal } from '@angular/core';
 import { of, throwError } from 'rxjs';
 import { mock, instance, when, verify, anything, anyString } from 'ts-mockito';
@@ -7,7 +7,7 @@ import { GestionRecetaComponent } from './gestion-receta.component';
 import { RecetaService } from '../../data-access/receta.service';
 import { CategoriaService } from '../../data-access/categoria.service';
 import { IngredienteService } from '../../data-access/ingrediente.service';
-import { Receta } from '../../models/receta.model';
+import { Receta, Ingrediente } from '../../models/receta.model';
 
 describe('GestionRecetaComponent', () => {
   let component: GestionRecetaComponent;
@@ -17,8 +17,8 @@ describe('GestionRecetaComponent', () => {
   let mockIngredienteService: IngredienteService;
 
   // Creamos señales reales para usarlas como valores de retorno en los mocks
-  let categoriasSignal: WritableSignal<any[]>;
-  let ingredientesSignal: WritableSignal<any[]>;
+  let categoriasSignal: WritableSignal<{ idCategoria: string, nombreCategoria: string }[]>;
+  let ingredientesSignal: WritableSignal<Ingrediente[]>;
 
   // Datos mock de prueba
   const mockReceta: Receta = {
@@ -54,9 +54,8 @@ describe('GestionRecetaComponent', () => {
       { idIngrediente: '2', nombreIngrediente: 'Limón' }
     ]);
 
-    // Configurar comportamientos en los mocks con ts-mockito
-    when(mockCategoriaService.categorias).thenReturn(categoriasSignal);
-    when(mockIngredienteService.ingredientes).thenReturn(ingredientesSignal as any);
+    when(mockCategoriaService.categorias).thenReturn(categoriasSignal.asReadonly());
+    when(mockIngredienteService.ingredientes).thenReturn(ingredientesSignal.asReadonly());
 
     when(mockCategoriaService.listar()).thenReturn();
     when(mockIngredienteService.listarIngredientes()).thenReturn();
@@ -167,8 +166,8 @@ describe('GestionRecetaComponent', () => {
     beforeEach(() => {
       fixture.detectChanges();
       
-      // Espiar la emisión del evento close
-      jest.spyOn(component.close, 'emit');
+      // Espiar la emisión del evento closeManage
+      jest.spyOn(component.closeManage, 'emit');
       // Mockear window.alert para evitar que salte popup real en los tests
       jest.spyOn(window, 'alert').mockImplementation(() => {});
     });
@@ -195,7 +194,7 @@ describe('GestionRecetaComponent', () => {
 
       // Verificar que se llamó al servicio de guardar de ts-mockito
       verify(mockRecetaService.guardarRecetaCompleta(anything())).once();
-      expect(component.close.emit).toHaveBeenCalledWith(true);
+      expect(component.closeManage.emit).toHaveBeenCalledWith(true);
     });
 
     it('debería llamar a actualizarRecetaCompleta si se está editando una receta existente', () => {
@@ -208,7 +207,7 @@ describe('GestionRecetaComponent', () => {
 
       // Verificar que se llamó al servicio de actualizar
       verify(mockRecetaService.actualizarRecetaCompleta('RB-100', anything())).once();
-      expect(component.close.emit).toHaveBeenCalledWith(true);
+      expect(component.closeManage.emit).toHaveBeenCalledWith(true);
     });
 
     it('debería manejar errores del backend al guardar', () => {
@@ -232,15 +231,15 @@ describe('GestionRecetaComponent', () => {
 
       verify(mockRecetaService.guardarRecetaCompleta(anything())).once();
       expect(component.isSaving).toBe(false);
-      expect(component.close.emit).not.toHaveBeenCalled();
+      expect(component.closeManage.emit).not.toHaveBeenCalled();
     });
   });
 
   describe('Acciones de Cancelar', () => {
     it('debería emitir close con false al llamar a cancelar()', () => {
-      jest.spyOn(component.close, 'emit');
+      jest.spyOn(component.closeManage, 'emit');
       component.cancelar();
-      expect(component.close.emit).toHaveBeenCalledWith(false);
+      expect(component.closeManage.emit).toHaveBeenCalledWith(false);
     });
   });
 });

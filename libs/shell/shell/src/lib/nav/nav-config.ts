@@ -54,6 +54,11 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
               icono: 'clipboard-list',
             },
             {
+              label: 'Estadísticas',
+              ruta: '/app/bar/estadisticas',
+              icono: 'bar-chart-2',
+            },
+            {
               label: 'Recetas',
               ruta: '/app/bar/recetas',
               icono: 'book-open',
