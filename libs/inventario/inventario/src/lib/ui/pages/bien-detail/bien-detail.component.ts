@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Bien, MovimientoBien } from '../../../models/inventario.model';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
+import { StatusBadgeComponent } from '@restaurant/shared/ui';
 import { BienFormComponent } from '../../modals/bien-form/bien-form.component';
 import { BienFormDto, EstadoBien } from '../../../models/inventario.model';
 import { MOVIMIENTOS_MOCK } from '../../../models/inventario.mock';
@@ -11,7 +12,7 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
 @Component({
   selector: 'restaurant-bien-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, BienFormComponent, BackButtonComponent],
+  imports: [CommonModule, RouterModule, BienFormComponent, BackButtonComponent, StatusBadgeComponent],
   templateUrl: './bien-detail.component.html',
   styleUrl: './bien-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,6 +26,13 @@ export class BienDetailPageComponent implements OnInit {
   loading = this.facade.loading;
   movimientos = signal<MovimientoBien[]>([]);
   showEditModal = signal(false);
+  mostrarTodasFacturas = signal(false);
+
+  readonly FACTURAS_PREVIEW_COUNT = 3;
+
+  toggleFacturas(): void {
+    this.mostrarTodasFacturas.update(v => !v);
+  }
 
   espec = computed(() => {
     const b = this.bien();
@@ -93,5 +101,34 @@ export class BienDetailPageComponent implements OnInit {
       'Inactivo': 'estado-pill--inactivo'
     };
     return map[estado] || '';
+  }
+
+  // ── StatusBadge helpers ─────────────────────────────────────────────────────
+  getEstadoVariant(estado: EstadoBien): 'success' | 'warning' | 'danger' | 'neutral' {
+    const map: Record<EstadoBien, 'success' | 'warning' | 'danger' | 'neutral'> = {
+      'Activo':    'success',
+      'Bajo Stock': 'warning',
+      'Agotado':   'danger',
+      'Inactivo':  'neutral',
+    };
+    return map[estado] ?? 'neutral';
+  }
+
+  getTipoVariant(tipo: string): 'success' | 'danger' | 'warning' | 'neutral' {
+    const map: Record<string, 'success' | 'danger' | 'warning' | 'neutral'> = {
+      'ENTRADA':  'success',
+      'SALIDA':   'danger',
+      'TRASLADO': 'warning',
+    };
+    return map[tipo] ?? 'neutral';
+  }
+
+  getFacturaEstadoVariant(estado: string): 'success' | 'warning' | 'neutral' {
+    const map: Record<string, 'success' | 'warning' | 'neutral'> = {
+      'PAGADA':    'success',
+      'CAUSADA':   'warning',
+      'PENDIENTE': 'neutral',
+    };
+    return map[estado] ?? 'neutral';
   }
 }

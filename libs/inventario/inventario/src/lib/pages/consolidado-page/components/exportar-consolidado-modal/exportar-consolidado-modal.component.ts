@@ -1,25 +1,44 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angular/core';
+import { ExportarComponent, FormatoExportacion } from '../../../../components/exportar/exportar.component';
+
+const FORMATOS_CONSOLIDADO: FormatoExportacion[] = [
+  {
+    id: 'excel',
+    label: 'Detallado Excel',
+    descripcion:
+      'Ideal para análisis profundo, tablas dinámicas y conciliación de partidas presupuestales.',
+    icono: 'table_chart',
+    iconoClase: 'icono--primary',
+    etiqueta: 'Incluye retenciones ZESE',
+  },
+  {
+    id: 'pdf',
+    label: 'Resumen PDF Contable',
+    descripcion:
+      'Documento formal listo para firma digital y presentación de informes mensuales ante contabilidad.',
+    icono: 'picture_as_pdf',
+    iconoClase: 'icono--danger',
+  },
+];
 
 @Component({
   selector: 'restaurant-exportar-consolidado-modal',
   standalone: true,
-  imports: [CommonModule],
-  templateUrl: './exportar-consolidado-modal.component.html',
-  styleUrl: './exportar-consolidado-modal.component.scss',
+  imports: [ExportarComponent],
+  template: `
+    <inventario-exportar
+      titulo="Exportar Reporte para Contabilidad"
+      subtitulo="Seleccione el formato de salida deseado para este consolidado"
+      [formatos]="formatos"
+      (exportar)="export.emit($event)"
+      (cerrar)="close.emit()"
+    />
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExportarConsolidadoModalComponent {
-  @Output() close = new EventEmitter<void>();
-  @Output() export = new EventEmitter<'excel' | 'pdf'>();
+  @Output() close   = new EventEmitter<void>();
+  @Output() export  = new EventEmitter<string>();
 
-  selectedFormat = signal<'excel' | 'pdf'>('excel');
-
-  onClose(): void {
-    this.close.emit();
-  }
-
-  onExport(): void {
-    this.export.emit(this.selectedFormat());
-  }
+  readonly formatos = FORMATOS_CONSOLIDADO;
 }

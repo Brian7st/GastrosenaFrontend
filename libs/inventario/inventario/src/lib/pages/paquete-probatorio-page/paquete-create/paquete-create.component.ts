@@ -7,7 +7,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { LucideIconComponent } from '@restaurant/shared/ui';
+import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { PaqueteFacade } from '../../../data-access/paquete.facade';
 
@@ -15,7 +15,7 @@ import { PaqueteFacade } from '../../../data-access/paquete.facade';
   selector: 'restaurant-paquete-create',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule, LucideIconComponent, BackButtonComponent],
+  imports: [CommonModule, ReactiveFormsModule, LucideIconComponent, ButtonComponent, BackButtonComponent],
   templateUrl: './paquete-create.component.html',
   styleUrl: './paquete-create.component.scss',
 })
@@ -26,16 +26,22 @@ export class PaqueteCreateComponent {
 
   // ── Formulario ──────────────────────────────────────────────────────────
   createForm = this.fb.nonNullable.group({
-    expediente: ['', Validators.required], // Auto-generado idealmente
-    titulo: ['', Validators.required],
-    programa: ['', Validators.required],
-    ficha: ['', Validators.required],
-    gilVinculado: [''],
-    responsable: ['', Validators.required],
+    expediente:   [this.generarIdExpediente(), Validators.required],
+    titulo:       ['', Validators.required],
+    fichaId:      ['', Validators.required],
+    gilId:        [''],
+    instructorId: ['', Validators.required],
   });
 
   // ── Estado del Stepper ──────────────────────────────────────────────────
   currentStep = signal<number>(1);
+
+  // ── Helpers ─────────────────────────────────────────────────────────────
+  private generarIdExpediente(): string {
+    const año = new Date().getFullYear();
+    const seq = String(Math.floor(Math.random() * 9000) + 1000);
+    return `EXP-${año}-${seq}`;
+  }
 
   // ── Navegación ─────────────────────────────────────────────────────────
   volver(): void {

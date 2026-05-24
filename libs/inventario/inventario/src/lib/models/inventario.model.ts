@@ -115,7 +115,41 @@ export interface BienImportRow {
 }
 
 /**
- * DTO para el formulario de creación/edición de bienes.
+ * Producto del catálogo (GET/POST /catalog/productos).
+ * Solo contiene metadatos descriptivos; sin stock ni precio.
+ */
+export interface ProductoCatalogo {
+  id: string | number;
+  codigoSena: string;
+  codigoProveedor?: string;
+  nombre: string;
+  descripcion?: string;
+  categoria: string;
+  unidadMedida: string;
+}
+
+/**
+ * Existencia de un producto en un centro de costo (GET /inventario/existencias).
+ * El campo stockActual del backend se llama stockDisponible.
+ */
+export interface ExistenciaProducto {
+  productoId: string | number;
+  codigoSena: string;
+  nombre: string;
+  categoria: string;
+  unidadMedida: string;
+  stockDisponible: number;
+  stockMinimo?: number;
+}
+
+/**
+ * Vista combinada para el listado/detalle de bienes en la UI.
+ */
+export type BienVista = ProductoCatalogo & Partial<Omit<ExistenciaProducto, 'productoId'>>;
+
+/**
+ * DTO para crear un producto en el catálogo (POST /catalog/productos).
+ * El backend NO acepta stockMinimo ni datos de precio en este endpoint.
  */
 export interface BienFormDto {
   nombre: string;
@@ -124,13 +158,4 @@ export interface BienFormDto {
   descripcion?: string;
   categoria: string;
   unidadMedida: string;
-  stockActual?: number;
-  stockMinimo: number;
-  kilos?: number;
-  factorConversion?: number;
-  proveedor?: string;
-  valorNeto: number;
-  iva: number;
-  valor: number;
-  estado?: EstadoBien;
 }

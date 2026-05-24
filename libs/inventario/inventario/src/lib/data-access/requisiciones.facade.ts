@@ -21,16 +21,16 @@ export class RequisicionesFacade {
 
   // KPIs computados por estado
   public kpiBorradores = computed(() =>
-    this._requisiciones().filter(r => r.estado === 'borrador').length
+    this._requisiciones().filter(r => r.estado === 'BORRADOR').length
   );
   public kpiEnviadas = computed(() =>
-    this._requisiciones().filter(r => r.estado === 'enviada').length
+    this._requisiciones().filter(r => r.estado === 'ENVIADA').length
   );
   public kpiEnDespacho = computed(() =>
-    this._requisiciones().filter(r => r.estado === 'en_despacho').length
+    this._requisiciones().filter(r => r.estado === 'DESPACHADA').length
   );
   public kpiFirmadas = computed(() =>
-    this._requisiciones().filter(r => r.estado === 'firmada').length
+    this._requisiciones().filter(r => r.estado === 'FIRMADA').length
   );
 
   /** Carga el listado completo de requisiciones. */

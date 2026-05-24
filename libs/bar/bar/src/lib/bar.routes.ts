@@ -23,7 +23,10 @@ export const BAR_ROUTES: Routes = [
         path: 'menu',
         loadComponent: () => import('./pages/menu-page/menu-page.component').then((m) => m.MenuPageComponent)
       },
-
+      {
+        path: 'estadisticas',
+        loadComponent: () => import('./pages/estadisticas-page/estadisticas-page.component').then((m) => m.EstadisticasPageComponent)
+      }
     ]
   }
 ];

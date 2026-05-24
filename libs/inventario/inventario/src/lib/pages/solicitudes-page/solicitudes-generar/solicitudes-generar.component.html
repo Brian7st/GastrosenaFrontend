@@ -1,0 +1,157 @@
+<!-- ══════════════════════════════════════════════════════════════════════════
+     Generar GIL - Layout
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="generar-page-container">
+  
+  <!-- Breadcrumbs / Header -->
+  <div class="page-header">
+    <inventario-back-button (clicked)="goBack()" />
+    <div class="header-titles">
+      <h2 class="title">Generar GIL — Seleccionar solicitudes aprobadas</h2>
+      <p class="subtitle">Seleccione las solicitudes aprobadas para consolidar en la Guía de Ingreso Local (GIL).</p>
+    </div>
+  </div>
+
+  <div class="generar-grid">
+    
+    <!-- ══════════════════════════════════════════════════════════════════════════
+         Columna Principal (Tabla)
+    ══════════════════════════════════════════════════════════════════════════ -->
+    <div class="main-col">
+      <div class="table-card">
+        
+        <!-- Toolbar -->
+        <div class="toolbar">
+          <div class="search-box">
+            <span class="material-symbols-outlined search-icon">search</span>
+            <input 
+              type="text" 
+              placeholder="Buscar por código o solicitante..." 
+              [value]="searchTerm()"
+              (input)="searchTerm.set($any($event.target).value)"
+            />
+          </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-container">
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th class="w-checkbox"></th>
+                <th>Código / Ficha</th>
+                <th>Solicitante</th>
+                <th>Resumen</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of filteredSolicitudes()" [class.row-disabled]="!isAprobada(row.estado)">
+                <td class="td-checkbox">
+                  <label class="custom-checkbox" *ngIf="isAprobada(row.estado)">
+                    <input 
+                      type="checkbox" 
+                      [checked]="isSelected(row.id)"
+                      (change)="toggleSelection(row.id)"
+                    />
+                    <span class="checkmark">
+                      <span class="material-symbols-outlined icon">check</span>
+                    </span>
+                  </label>
+                </td>
+                <td class="font-medium text-dark line-clamp">
+                  {{ row.codigoFicha }}
+                </td>
+                <td class="text-dark">{{ row.solicitante }}</td>
+                <td class="text-muted">{{ row.totalBienes }} ítems seleccionados</td>
+                <td>
+                  <span class="estado-badge estado-badge--{{ row.estado | lowercase }}">
+                    {{ row.estado }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════════
+         Columna Sidebar (Resumen)
+    ══════════════════════════════════════════════════════════════════════════ -->
+    <div class="sidebar-col">
+      <div class="summary-card">
+        <div class="summary-header">
+          <span class="material-symbols-outlined icon-doc">description</span>
+          <h3>Resumen de Consolidación</h3>
+        </div>
+        
+        <div class="summary-body">
+          <div class="summary-item">
+            <span>Solicitudes seleccionadas</span>
+            <span class="value text-dark">{{ solicitudesSeleccionadas() }}</span>
+          </div>
+          <div class="summary-item">
+            <span>Ítems totales a consolidar</span>
+            <span class="value text-primario">{{ itemsTotalesConsolidar() }}</span>
+          </div>
+
+          <div class="info-box">
+            <span class="material-symbols-outlined info-icon">info</span>
+            <p>Solo las solicitudes en estado APROBADA pueden incluirse en la Guía de Ingreso Local.</p>
+          </div>
+        </div>
+        
+        <div class="summary-footer">
+          <restaurant-button 
+            variant="primary" 
+            class="w-full"
+            [disabled]="solicitudesSeleccionadas() === 0"
+            (click)="onGenerar()">
+            Vista previa de consolidación
+            <span class="material-symbols-outlined right-icon">arrow_forward</span>
+          </restaurant-button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     MODAL DE CONFIRMACIÓN
+══════════════════════════════════════════════════════════════════════════ -->
+<div *ngIf="showModal()" class="modal-overlay">
+  <!-- Background Backdrop -->
+  <div class="modal-backdrop" (click)="cerrarModal()"></div>
+
+  <!-- Modal Container -->
+  <div class="modal-container">
+    <div class="modal-header-strip modal-header-strip--primary"></div>
+    <div class="modal-body">
+      <div class="modal-icon-container modal-icon-container--primary">
+        <span class="material-symbols-outlined modal-icon">library_add_check</span>
+      </div>
+      
+      <div class="modal-text-center">
+        <h3 class="modal-title">Confirmar Consolidación</h3>
+        <p class="modal-desc">
+          ¿Estás seguro de generar la Guía de Ingreso Local (GIL) con 
+          <span class="font-bold">{{ solicitudesSeleccionadas() }}</span> 
+          solicitudes seleccionadas y un total de 
+          <span class="font-bold">{{ itemsTotalesConsolidar() }}</span> ítems?
+        </p>
+      </div>
+
+      <div class="modal-actions-col">
+        <restaurant-button variant="primary" (click)="confirmarGeneracion()">
+          Confirmar y Generar GIL
+        </restaurant-button>
+        <restaurant-button variant="surface" (click)="cerrarModal()">
+          Cancelar
+        </restaurant-button>
+      </div>
+    </div>
+  </div>
+</div>
