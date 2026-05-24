@@ -2,15 +2,17 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { Alerta } from '../../models/alerta.model';
-import { AlertaResponse, ResolverAlertaRequest } from '../api/alerts.api';
-import { alertaFromApi } from '../mappers/alerts.mapper';
+import { Alerta, UmbralConfig } from '../../models/alerta.model';
+import { AlertaResponse, UmbralStockResponse, ActualizarUmbralRequest } from '../api/alerts.api';
+import { alertaFromApi, umbralFromApi } from '../mappers/alerts.mapper';
 
 const API = '/api/v1';
 
 @Injectable({ providedIn: 'root' })
 export class AlertasService {
   private http = inject(HttpClient);
+
+  // ── Alertas ──────────────────────────────────────────────────────────────────
 
   getAlertas(): Observable<Alerta[]> {
     return this.http
@@ -39,24 +41,34 @@ export class AlertasService {
       );
   }
 
-  // ── FE-05: los métodos de umbrales e historial no tienen endpoint en backend aún ──
+  // ── Umbrales ─────────────────────────────────────────────────────────────────
 
-  /** TODO FE-05 — endpoint pendiente de confirmación con backend */
-  getUmbrales(): Observable<never> {
-    return throwError(() => new Error('getUmbrales: endpoint no disponible — pendiente FE-05'));
+  /** GET /alerts/alertas/umbrales — lista todos los productos con existencia registrada */
+  getUmbrales(): Observable<UmbralConfig[]> {
+    return this.http
+      .get<UmbralStockResponse[]>(`${API}/alerts/alertas/umbrales`)
+      .pipe(
+        map(list => list.map(umbralFromApi)),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  /** TODO FE-05 — endpoint pendiente de confirmación con backend */
-  updateUmbrales(_umbrales: unknown): Observable<never> {
-    return throwError(() => new Error('updateUmbrales: endpoint no disponible — pendiente FE-05'));
+  /** PUT /alerts/alertas/umbrales/{productoId} — actualiza el mínimo de un producto */
+  updateUmbral(productoId: string, nuevoMinimo: number): Observable<UmbralStockResponse> {
+    const body: ActualizarUmbralRequest = { nuevoMinimo };
+    return this.http
+      .put<UmbralStockResponse>(`${API}/alerts/alertas/umbrales/${productoId}`, body)
+      .pipe(catchError(err => throwError(() => err)));
   }
 
-  /** TODO FE-05 — endpoint pendiente de confirmación con backend */
+  // ── Historial (Reporting) ─────────────────────────────────────────────────────
+
+  /** TODO FE-05 — wired en reporting: GET /reporting/alertas/resumen */
   getHistorial(): Observable<never> {
-    return throwError(() => new Error('getHistorial: endpoint no disponible — pendiente FE-05'));
+    return throwError(() => new Error('getHistorial: usar /reporting/alertas/resumen — pendiente FE-05'));
   }
 
-  /** TODO FE-05 — endpoint pendiente de confirmación con backend */
+  /** TODO FE-05 — sin endpoint de exportación CSV */
   exportarHistorialCSV(): Observable<never> {
     return throwError(() => new Error('exportarHistorialCSV: endpoint no disponible — pendiente FE-05'));
   }

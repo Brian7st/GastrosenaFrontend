@@ -89,4 +89,14 @@ export class BienesService {
       .delete<void>(`${API}/catalog/productos/${id}`)
       .pipe(catchError(err => throwError(() => err)));
   }
+
+  /** PATCH /catalog/productos/{id}/desactivar — soft delete: marca activo=false */
+  desactivarBien(id: string | number): Observable<Bien> {
+    return this.http
+      .patch<ProductoResponse>(`${API}/catalog/productos/${id}/desactivar`, {})
+      .pipe(
+        map(bienFromCatalogo),
+        catchError(err => throwError(() => err))
+      );
+  }
 }

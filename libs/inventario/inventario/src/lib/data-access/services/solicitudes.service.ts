@@ -9,7 +9,7 @@ import {
   CrearSolicitudData,
   ActualizarSolicitudData,
 } from '../../models/solicitudes-gil.model';
-import { GilResponse } from '../api/sourcing.api';
+import { GilResponse, EnviarProveedorRequest } from '../api/sourcing.api';
 import { gilFromApi } from '../mappers/sourcing.mapper';
 
 const API = '/api/v1';
@@ -62,16 +62,26 @@ export class SolicitudesService {
 
   cambiarEstado(id: string, estado: EstadoGil): Observable<boolean> {
     const accionMap: Record<EstadoGil, string> = {
-      BORRADOR:         '',
-      EMITIDO:          'emitir',
-      ENVIADO_PROVEEDOR: 'enviar-proveedor',
-      CERRADO:          'cerrar',
+      BORRADOR:          '',
+      EMITIDO:           'emitir',
+      ENVIADO_PROVEEDOR: '', // usa enviarAProveedor() — requiere PUT con body
+      CERRADO:           'cerrar',
     };
     const accion = accionMap[estado];
-    if (!accion) return throwError(() => new Error(`Estado ${estado} sin endpoint de transición`));
+    if (!accion) return throwError(() => new Error(`Estado ${estado} sin endpoint de transición PATCH`));
 
     return this.http
       .patch<void>(`${API}/procurement/giles/${id}/${accion}`, {})
+      .pipe(
+        map(() => true),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** PUT /procurement/giles/{id}/enviar-proveedor — requiere body con proveedorDestinatarioId y fechaEnvio */
+  enviarAProveedor(id: string, data: EnviarProveedorRequest): Observable<boolean> {
+    return this.http
+      .put<GilResponse>(`${API}/procurement/giles/${id}/enviar-proveedor`, data)
       .pipe(
         map(() => true),
         catchError(err => throwError(() => err))

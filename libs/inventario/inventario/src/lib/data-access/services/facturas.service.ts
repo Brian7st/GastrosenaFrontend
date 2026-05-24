@@ -81,6 +81,39 @@ export class FacturasService {
       .pipe(catchError(err => throwError(() => err)));
   }
 
+  /** PATCH /sourcing/facturas/{id}/verificar — dispara entrada automática de stock */
+  verificarFactura(id: string | number): Observable<Factura> {
+    return this.http
+      .patch<FacturaResponse>(`${API}/sourcing/facturas/${id}/verificar`, {})
+      .pipe(
+        map(facturaFromApi),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** PATCH /sourcing/facturas/{id}/pagar — solo válido desde estado VERIFICADA */
+  marcarPagada(id: string | number): Observable<Factura> {
+    return this.http
+      .patch<FacturaResponse>(`${API}/sourcing/facturas/${id}/pagar`, {})
+      .pipe(
+        map(facturaFromApi),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** PATCH /sourcing/facturas/{id}/info-bancaria — solo en estados REGISTRADA o VERIFICADA */
+  actualizarInfoBancaria(
+    id: string | number,
+    data: { banco: string; tipoCuenta: string; numeroCuenta: string },
+  ): Observable<Factura> {
+    return this.http
+      .patch<FacturaResponse>(`${API}/sourcing/facturas/${id}/info-bancaria`, data)
+      .pipe(
+        map(facturaFromApi),
+        catchError(err => throwError(() => err))
+      );
+  }
+
   /** Mapea GilResponse al tipo SolicitudGIL que usa la FacturasFacade.
    *  SolicitudGIL (facturas.model) y SolicitudGil (solicitudes-gil.model) son dos
    *  tipos distintos — unificarlos es trabajo de un refactor posterior. */

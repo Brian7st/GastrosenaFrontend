@@ -118,3 +118,9 @@ export type ActualizarGilRequest = Partial<CrearGilRequest>;
 export interface VincularInstructorRequest {
   instructorId: string;
 }
+
+/** PUT /procurement/giles/{id}/enviar-proveedor */
+export interface EnviarProveedorRequest {
+  proveedorDestinatarioId: string;
+  fechaEnvio: string;
+}

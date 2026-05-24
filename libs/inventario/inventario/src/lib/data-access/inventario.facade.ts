@@ -129,6 +129,23 @@ export class InventarioFacade {
   }
 
   /**
+   * Desactiva un bien (soft delete → activo: false).
+   * Usa PATCH /catalog/productos/{id}/desactivar.
+   */
+  desactivarBien(id: string | number): void {
+    this._loading.set(true);
+    this.bienesService.desactivarBien(id)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al desactivar el bien');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => { if (res !== null) this.cargarBienes(); });
+  }
+
+  /**
    * Actualiza un bien existente y refresca los datos.
    */
   actualizarBien(id: string | number, dto: BienFormDto): void {

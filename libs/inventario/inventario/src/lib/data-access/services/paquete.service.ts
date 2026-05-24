@@ -73,4 +73,14 @@ export class PaqueteService {
   incluirRequisicion(paqueteId: string, reqId: string): Observable<boolean> {
     return this.vincularTrazabilidad(paqueteId, { requisicionId: reqId });
   }
+
+  /** PATCH /legalization/paquetes/{id}/archivar */
+  archivarPaquete(id: string): Observable<boolean> {
+    return this.http
+      .patch<void>(`${API}/legalization/paquetes/${id}/archivar`, {})
+      .pipe(
+        map(() => true),
+        catchError(err => throwError(() => err))
+      );
+  }
 }
