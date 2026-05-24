@@ -9,8 +9,21 @@ import {
   CrearSolicitudData,
   ActualizarSolicitudData,
 } from '../../models/solicitudes-gil.model';
+import {
+  SolicitudSesion,
+  CrearSolicitudSesionData,
+  AprobarSesionData,
+  RechazarSesionData,
+} from '../../models/solicitud-sesion.model';
 import { GilResponse, EnviarProveedorRequest } from '../api/sourcing.api';
+import {
+  SolicitudSesionResponse,
+  CrearSolicitudSesionRequest,
+  AprobarSolicitudSesionRequest,
+  RechazarSolicitudSesionRequest,
+} from '../api/training.api';
 import { gilFromApi } from '../mappers/sourcing.mapper';
+import { solicitudSesionFromApi } from '../mappers/training.mapper';
 
 const API = '/api/v1';
 
@@ -94,5 +107,71 @@ export class SolicitudesService {
 
   generarGils(_ids: (string | number)[]): Observable<boolean> {
     return throwError(() => new Error('generarGils: endpoint no disponible — revisar con backend'));
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Training — /api/v1/training/solicitudes
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /** POST /training/solicitudes — crea una solicitud de sesión — 201 Created */
+  crearSolicitudSesion(data: CrearSolicitudSesionData): Observable<SolicitudSesion> {
+    const body: CrearSolicitudSesionRequest = {
+      fichaId:              data.fichaId,
+      programaId:           data.programaId,
+      instructorId:         data.instructorId,
+      resultadoAprendizaje: data.resultadoAprendizaje,
+      actividades:          data.actividades,
+      voceroId:             data.voceroId,
+      items: data.items.map(i => ({
+        productoId:    i.productoId,
+        cantidad:      i.cantidad,
+        unidadMedida:  i.unidadMedida,
+        justificacion: i.justificacion,
+      })),
+    };
+    return this.http
+      .post<SolicitudSesionResponse>(`${API}/training/solicitudes`, body)
+      .pipe(
+        map(solicitudSesionFromApi),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** PATCH /training/solicitudes/{id}/aprobar */
+  aprobarSolicitudSesion(id: string, data: AprobarSesionData): Observable<SolicitudSesion> {
+    const body: AprobarSolicitudSesionRequest = {
+      aprobadorId:   data.aprobadorId,
+      observaciones: data.observaciones,
+    };
+    return this.http
+      .patch<SolicitudSesionResponse>(`${API}/training/solicitudes/${id}/aprobar`, body)
+      .pipe(
+        map(solicitudSesionFromApi),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** PATCH /training/solicitudes/{id}/rechazar */
+  rechazarSolicitudSesion(id: string, data: RechazarSesionData): Observable<SolicitudSesion> {
+    const body: RechazarSolicitudSesionRequest = {
+      aprobadorId: data.aprobadorId,
+      motivo:      data.motivo,
+    };
+    return this.http
+      .patch<SolicitudSesionResponse>(`${API}/training/solicitudes/${id}/rechazar`, body)
+      .pipe(
+        map(solicitudSesionFromApi),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** PATCH /training/solicitudes/{id}/comprometer — sin body — 204 No Content */
+  comprometerSolicitudSesion(id: string): Observable<SolicitudSesion> {
+    return this.http
+      .patch<SolicitudSesionResponse>(`${API}/training/solicitudes/${id}/comprometer`, {})
+      .pipe(
+        map(solicitudSesionFromApi),
+        catchError(err => throwError(() => err))
+      );
   }
 }
