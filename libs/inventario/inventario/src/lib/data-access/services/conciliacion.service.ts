@@ -8,7 +8,14 @@ import {
   DiferenciaItem,
   TomaFisicaItem,
 } from '../../models/conciliacion.model';
-import { ConciliacionListItemResponse, ConciliacionDetailResponse, DiferenciaResponse } from '../api/reconciliation.api';
+import {
+  ConciliacionListItemResponse,
+  ConciliacionDetailResponse,
+  DiferenciaResponse,
+  RegistrarConteoRequest,
+  ResolverDiferenciaRequest,
+} from '../api/reconciliation.api';
+import { ConteoItemData } from '../../models/conciliacion.model';
 import {
   conciliacionListItemFromApi,
   conciliacionDetailFromApi,
@@ -57,6 +64,36 @@ export class ConciliacionService {
   cerrarConciliacion(id: string): Observable<void> {
     return this.http
       .patch<void>(`${API}/reconciliation/conciliaciones/${id}/cerrar`, {})
+      .pipe(catchError(err => throwError(() => err)));
+  }
+
+  /** POST /reconciliation/conciliaciones/{id}/conteo
+   *  Registra el conteo físico de todos los ítems de la sesión.
+   *  Respuesta: 204 No Content */
+  registrarConteo(id: string, items: ConteoItemData[]): Observable<void> {
+    const body: RegistrarConteoRequest = {
+      items: items.map(i => ({
+        codigoSena:      i.codigoSena,
+        descripcion:     i.descripcion,
+        cantidadSistema: i.cantidadSistema,
+        cantidadFisica:  i.cantidadFisica,
+        valorUnitario:   i.valorUnitario,
+      })),
+    };
+    return this.http
+      .post<void>(`${API}/reconciliation/conciliaciones/${id}/conteo`, body)
+      .pipe(catchError(err => throwError(() => err)));
+  }
+
+  /** PATCH /reconciliation/conciliaciones/{id}/diferencias/{diferenciaId}/resolver
+   *  Respuesta: 204 No Content */
+  resolverDiferencia(id: string, diferenciaId: string, justificacion: string): Observable<void> {
+    const body: ResolverDiferenciaRequest = { justificacion };
+    return this.http
+      .patch<void>(
+        `${API}/reconciliation/conciliaciones/${id}/diferencias/${diferenciaId}/resolver`,
+        body,
+      )
       .pipe(catchError(err => throwError(() => err)));
   }
 
