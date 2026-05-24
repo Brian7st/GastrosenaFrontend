@@ -5,7 +5,9 @@ import {
   Mesa, EstadoMesa, MesaCreateRequest, MesaUpdateRequest,
   EstadoPedido,
   PedidoCreateRequest, PedidoResponse, PedidoResumenResponse,
-  DetallePedidoResponse
+  DetallePedidoResponse,
+  SesionCajaResponse, FacturaResponse,
+  AbrirSesionRequest, CerrarSesionRequest, FacturarPedidoRequest
 } from '../models/restaurante.model';
 
 @Injectable({ providedIn: 'root' })
@@ -14,6 +16,7 @@ export class RestauranteService {
   /** URL base del microservicio de restaurante (dev: localhost:8080) */
   private readonly mesasUrl   = 'http://localhost:8080/api/mesas';
   private readonly pedidosUrl = 'http://localhost:8080/api/pedidos';
+  private readonly cajaUrl    = 'http://localhost:8080/api/caja';
 
   /**
    * GET /api/mesas  →  Lista todas las mesas activas del backend.
@@ -143,5 +146,47 @@ export class RestauranteService {
    */
   cancelarPedido(id: string): Observable<PedidoResponse> {
     return this.http.patch<PedidoResponse>(`${this.pedidosUrl}/${id}/cancelar`, null);
+  }
+
+  // ── Caja y Facturación ───────────────────────────────────────────────────────
+
+  // -- Sesión --
+
+  abrirSesion(request: AbrirSesionRequest): Observable<SesionCajaResponse> {
+    return this.http.post<SesionCajaResponse>(`${this.cajaUrl}/sesion/abrir`, request);
+  }
+
+  cerrarSesion(id: string, request: CerrarSesionRequest): Observable<SesionCajaResponse> {
+    return this.http.patch<SesionCajaResponse>(`${this.cajaUrl}/sesion/${id}/cerrar`, request);
+  }
+
+  obtenerSesionActiva(): Observable<SesionCajaResponse> {
+    return this.http.get<SesionCajaResponse>(`${this.cajaUrl}/sesion/activa`);
+  }
+
+  obtenerSesionPorId(id: string): Observable<SesionCajaResponse> {
+    return this.http.get<SesionCajaResponse>(`${this.cajaUrl}/sesion/${id}`);
+  }
+
+  // -- Facturación --
+
+  facturarPedido(request: FacturarPedidoRequest): Observable<FacturaResponse> {
+    return this.http.post<FacturaResponse>(`${this.cajaUrl}/facturar`, request);
+  }
+
+  anularFactura(id: string): Observable<FacturaResponse> {
+    return this.http.patch<FacturaResponse>(`${this.cajaUrl}/facturas/${id}/anular`, null);
+  }
+
+  obtenerFacturaPorId(id: string): Observable<FacturaResponse> {
+    return this.http.get<FacturaResponse>(`${this.cajaUrl}/facturas/${id}`);
+  }
+
+  obtenerFacturaPorNumero(numero: string): Observable<FacturaResponse> {
+    return this.http.get<FacturaResponse>(`${this.cajaUrl}/facturas/numero/${numero}`);
+  }
+
+  obtenerFacturasDeSesion(sesionId: string): Observable<FacturaResponse[]> {
+    return this.http.get<FacturaResponse[]>(`${this.cajaUrl}/sesion/${sesionId}/facturas`);
   }
 }

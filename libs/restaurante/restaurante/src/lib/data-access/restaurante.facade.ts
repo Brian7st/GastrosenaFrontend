@@ -1,10 +1,13 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import {
   Mesa, EstadoMesa, MesaCreateRequest, MesaUpdateRequest,
-  RestauranteStats, PedidoResumenResponse, CajaStats, TurnoCaja,
-  EstadoPedido, PedidoResponse, PedidoCreateRequest
+  RestauranteStats, PedidoResumenResponse, CajaStats,
+  EstadoPedido, PedidoResponse, PedidoCreateRequest,
+  SesionCajaResponse, AbrirSesionRequest, CerrarSesionRequest,
+  FacturarPedidoRequest, MetodoPago
 } from '../models/restaurante.model';
 import { RestauranteService } from './restaurante.service';
+import { catchError, of } from 'rxjs';
 
 /**
  * Representa un ítem del carrito de pedidos en el frontend.
@@ -46,7 +49,7 @@ export class RestauranteFacade {
   private _pedidoActivo   = signal<PedidoCarrito | null>(null);
 
   // Estado de Caja
-  private _turnoCaja          = signal<TurnoCaja | null>(null);
+  private _turnoCaja          = signal<SesionCajaResponse | null>(null);
   private _pedidosParaCobro   = signal<PedidoResumenResponse[]>([]);
   private _historialFacturas  = signal<PedidoResumenResponse[]>([]);
 
@@ -126,9 +129,16 @@ export class RestauranteFacade {
     if (ordenesGuardadas) {
       this._ordenesHistorial.set(JSON.parse(ordenesGuardadas));
     }
-    if (turnoGuardado) {
-      this._turnoCaja.set(JSON.parse(turnoGuardado));
-    }
+
+    this.restauranteService.obtenerSesionActiva().pipe(
+      catchError((err) => {
+        // 404 = no hay sesión activa, es normal
+        if (err.status !== 404) {
+          console.error('[RestauranteFacade] Error al cargar sesión activa:', err);
+        }
+        return of(null);
+      })
+    ).subscribe((sesion) => this._turnoCaja.set(sesion));
   }
 
   private guardarEstadoLocal(): void {
@@ -433,67 +443,86 @@ export class RestauranteFacade {
 
   // --- Módulo de Caja (Facturación y Pagos) ---
 
-  abrirCaja(baseInicial: number, responsable: string) {
-    const nuevoTurno: TurnoCaja = {
-      id: `T-${Date.now()}`,
-      estado: 'ABIERTA',
-      baseInicial,
-      responsable,
-      fechaApertura: new Date()
-    };
-    this._turnoCaja.set(nuevoTurno);
-    this.guardarEstadoLocal();
+  abrirCaja(baseEfectivo: number) {
+    const request: AbrirSesionRequest = { baseEfectivo };
+    this.restauranteService.abrirSesion(request).subscribe({
+      next: (sesion) => {
+        this._turnoCaja.set(sesion);
+      },
+      error: (err) => console.error('[RestauranteFacade] Error al abrir caja:', err)
+    });
   }
 
-  cerrarCaja() {
-    this._turnoCaja.update(turno => {
-      if (!turno) return null;
-      return { ...turno, estado: 'CERRADA', fechaCierre: new Date() };
+  cerrarCaja(efectivoReal: number) {
+    const session = this._turnoCaja();
+    if (!session) return;
+    
+    const request: CerrarSesionRequest = { efectivoReal };
+    this.restauranteService.cerrarSesion(session.id, request).subscribe({
+      next: (sesionCerrada) => {
+        this._turnoCaja.set(sesionCerrada);
+      },
+      error: (err) => console.error('[RestauranteFacade] Error al cerrar caja:', err)
     });
-    this.guardarEstadoLocal();
   }
 
   cargarPedidosParaCobro() {
-    const mockPedidos: PedidoResumenResponse[] = [
-      { id: 'P-001', nombreMesa: 'Mesa 1', meseroId: 'Juan', numeroComensales: 2, estado: 'ENTREGADO', subtotal: 45000,  fechaCreacion: new Date().toISOString() },
-      { id: 'P-002', nombreMesa: 'Mesa 4', meseroId: 'Ana',  numeroComensales: 4, estado: 'ENTREGADO', subtotal: 120500, fechaCreacion: new Date().toISOString() }
-    ];
-
     this.restauranteService.pedidosPorEstado('ENTREGADO').subscribe({
-      next:  (pedidos) => this._pedidosParaCobro.set(pedidos.length ? pedidos : mockPedidos),
+      next:  (pedidos) => this._pedidosParaCobro.set(pedidos),
       error: (err) => {
-        console.error('Usando datos mockeados (error de API)', err);
-        this._pedidosParaCobro.set(mockPedidos);
+        console.error('[RestauranteFacade] Error al cargar pedidos para cobro:', err);
+        this._pedidosParaCobro.set([]);
       }
     });
   }
 
   cargarHistorialFacturas() {
-    const mockFacturas: PedidoResumenResponse[] = [
-      { id: 'F-100', nombreMesa: 'Mesa 2', meseroId: 'Juan',   numeroComensales: 1, estado: 'FACTURADO', subtotal: 25000, fechaCreacion: new Date().toISOString() },
-      { id: 'F-101', nombreMesa: 'Mesa 5', meseroId: 'Carlos', numeroComensales: 3, estado: 'FACTURADO', subtotal: 85000, fechaCreacion: new Date().toISOString() },
-      { id: 'F-102', nombreMesa: 'Mesa 7', meseroId: 'Ana',    numeroComensales: 2, estado: 'FACTURADO', subtotal: 55000, fechaCreacion: new Date().toISOString() }
-    ];
-
     this.restauranteService.pedidosPorEstado('FACTURADO').subscribe({
-      next:  (pedidos) => this._historialFacturas.set(pedidos.length ? pedidos : mockFacturas),
+      next:  (pedidos) => this._historialFacturas.set(pedidos),
       error: (err) => {
-        console.error('Usando facturas mockeadas', err);
-        this._historialFacturas.set(mockFacturas);
+        console.error('[RestauranteFacade] Error al cargar historial de facturas:', err);
+        this._historialFacturas.set([]);
       }
     });
   }
 
-  procesarPagoFinal(pedidoId: string, metodo: string) {
-    const pedidoPagado = this._pedidosParaCobro().find(p => p.id === pedidoId);
-    if (pedidoPagado) {
-      this._pedidosParaCobro.update(lista  => lista.filter(p => p.id !== pedidoId));
-      this._historialFacturas.update(lista => [{ ...pedidoPagado, estado: 'FACTURADO' }, ...lista]);
-    }
+  /**
+   * POST /api/caja/facturar
+   * Envía el pago al backend. Al recibir éxito, recarga las mesas y los pedidos para cobro.
+   */
+  facturarPedido(pedidoId: string, metodoPago: MetodoPago, propina: number = 0): void {
+    const request: FacturarPedidoRequest = { pedidoId, metodoPago, propina };
+    this.restauranteService.facturarPedido(request).subscribe({
+      next: (factura) => {
+        // Quitamos el pedido de la lista local de "por cobrar"
+        this._pedidosParaCobro.update(lista => lista.filter(p => p.id !== pedidoId));
+        // Añadimos al historial con estado FACTURADO
+        const pedidoOriginal = this._pedidosParaCobro().find(p => p.id === pedidoId);
+        if (pedidoOriginal) {
+          this._historialFacturas.update(lista => [{ ...pedidoOriginal, estado: 'FACTURADO' }, ...lista]);
+        }
+        // Recargamos mesas para que la mesa facturada vuelva a LIBRE
+        this.cargarMesas();
+      },
+      error: (err) => {
+        console.error(`[RestauranteFacade] Error al facturar pedido ${pedidoId}:`, err);
+      }
+    });
+  }
 
-    // TODO: El backend no tiene endpoint /facturar. El cambio a FACTURADO
-    // se realiza a través del flujo de facturación (fase siguiente).
-    // this.restauranteService.cancelarPedido(pedidoId) es el más próximo por ahora.
-    console.log('[RestauranteFacade] procesarPagoFinal: integrar con endpoint de facturación (pendiente).');
+  /**
+   * @deprecated — Usa facturarPedido(pedidoId, metodoPago, propina) en su lugar.
+   * Mantenido temporalmente para no romper llamadas existentes de la UI.
+   */
+  procesarPagoFinal(pedidoId: string, metodo: string) {
+    // Mapeamos el string de la UI al tipo MetodoPago del backend
+    const metodoMap: Record<string, MetodoPago> = {
+      'Efectivo': 'EFECTIVO',
+      'Tarjeta': 'TARJETA',
+      'Transferencia': 'TRANSFERENCIA',
+      'Cortesía': 'CORTESIA'
+    };
+    const metodoPago: MetodoPago = metodoMap[metodo] || 'EFECTIVO';
+    this.facturarPedido(pedidoId, metodoPago, 0);
   }
 }
