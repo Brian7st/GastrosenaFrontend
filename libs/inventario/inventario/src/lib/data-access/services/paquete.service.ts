@@ -33,8 +33,9 @@ export class PaqueteService {
   /** La facade pasa Partial<PaqueteProbatorio> — el service construye el request tipado. */
   crearPaquete(data: Partial<PaqueteProbatorio>): Observable<PaqueteProbatorio> {
     const request: CrearPaqueteRequest = {
-      fichaId:      data.fichaId ?? '',
-      gilId:        data.gilId ?? '',
+      actaId:       data.actaId       ?? '',
+      requisicionId: data.requisicionId ?? '',
+      fichaId:      data.fichaId      ?? '',
       instructorId: data.instructorId ?? '',
       titulo:       data.titulo,
     };

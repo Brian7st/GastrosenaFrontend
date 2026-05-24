@@ -3,7 +3,15 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of, throwError, forkJoin } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Bien, BienFiltros, BienKpis, BienFormDto } from '../../models/inventario.model';
-import { PagedResponse, ProductoResponse } from '../api/catalog.api';
+import {
+  PagedResponse,
+  ProductoResponse,
+  EliminarProductosMasivaRequest,
+  EliminacionMasivaResponse,
+  ImportarProductosRequest,
+  SolicitarExportacionRequest,
+  ExportacionProductosResponse,
+} from '../api/catalog.api';
 import { ExistenciaResponse } from '../api/inventory.api';
 import {
   bienFromCatalogo,
@@ -98,5 +106,31 @@ export class BienesService {
         map(bienFromCatalogo),
         catchError(err => throwError(() => err))
       );
+  }
+
+  // ── Operaciones masivas ──────────────────────────────────────────────────────
+
+  /** POST /catalog/productos/eliminacion-masiva */
+  eliminarBienesMasivo(ids: string[], confirmacion: string): Observable<EliminacionMasivaResponse> {
+    const body: EliminarProductosMasivaRequest = { ids, confirmacion };
+    return this.http
+      .post<EliminacionMasivaResponse>(`${API}/catalog/productos/eliminacion-masiva`, body)
+      .pipe(catchError(err => throwError(() => err)));
+  }
+
+  /** POST /catalog/productos/importar */
+  importarBienes(productos: BienFormDto[]): Observable<{ success: boolean }> {
+    const body: ImportarProductosRequest = { productos: productos.map(bienFormToRequest) };
+    return this.http
+      .post<{ success: boolean }>(`${API}/catalog/productos/importar`, body)
+      .pipe(catchError(err => throwError(() => err)));
+  }
+
+  /** POST /catalog/productos/exportaciones (202 Accepted — async) */
+  solicitarExportacion(formato: 'CSV' | 'EXCEL'): Observable<ExportacionProductosResponse> {
+    const body: SolicitarExportacionRequest = { formato };
+    return this.http
+      .post<ExportacionProductosResponse>(`${API}/catalog/productos/exportaciones`, body)
+      .pipe(catchError(err => throwError(() => err)));
   }
 }

@@ -27,3 +27,30 @@ export interface CrearProductoRequest {
 }
 
 export type ActualizarProductoRequest = Partial<CrearProductoRequest>;
+
+/** POST /catalog/productos/eliminacion-masiva */
+export interface EliminarProductosMasivaRequest {
+  ids: string[];
+  confirmacion: string;
+}
+
+export interface EliminacionMasivaResponse {
+  idsEliminados: string[];
+}
+
+/** POST /catalog/productos/importar */
+export interface ImportarProductosRequest {
+  productos: CrearProductoRequest[];
+}
+
+/** POST /catalog/productos/exportaciones (202 Accepted — async) */
+export interface SolicitarExportacionRequest {
+  formato: 'CSV' | 'EXCEL';
+}
+
+export interface ExportacionProductosResponse {
+  exportId: string;
+  estado: string;
+  formato: 'CSV' | 'EXCEL';
+  totalProductos: number;
+}

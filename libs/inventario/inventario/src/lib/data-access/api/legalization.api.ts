@@ -44,8 +44,9 @@ export interface PaqueteResponse {
 }
 
 export interface CrearPaqueteRequest {
+  actaId: string;
+  requisicionId: string;
   fichaId: string;
-  gilId: string;
   instructorId: string;
   titulo?: string;
 }

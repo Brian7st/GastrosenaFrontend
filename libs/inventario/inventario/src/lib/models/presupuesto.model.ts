@@ -73,6 +73,27 @@ export interface EjecucionMensual {
   esMesActual: boolean;
 }
 
+/** Detalle de un presupuesto (GET /budget/presupuestos/{id}) */
+export interface PresupuestoDetalle {
+  id: string;
+  fichaId: string;
+  programaFormacion: string;
+  vigencia: number;
+  fechaAprobacion: string;
+  rubros: Rubro[];
+}
+
+/** Resumen global de presupuestos (GET /budget/presupuestos/resumen) */
+export interface ResumenPresupuestosGlobal {
+  totalPresupuestos: number;
+  vigencia?: number;
+  totalAsignado: number;
+  totalComprometido: number;
+  totalPagado: number;
+  saldoGlobal: number;
+  porcentajeEjecucion: number;
+}
+
 /** Payload para registrar un nuevo rubro presupuestal */
 export interface RegistrarPresupuestoData {
   programaId: string;

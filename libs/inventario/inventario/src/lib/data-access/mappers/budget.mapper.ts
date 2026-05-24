@@ -1,6 +1,12 @@
-import { Rubro, Compromiso } from '../../models/presupuesto.model';
+import { Rubro, Compromiso, PresupuestoDetalle, ResumenPresupuestosGlobal } from '../../models/presupuesto.model';
 import { Consolidado } from '../../models/consolidado.model';
-import { PresupuestoResponse, ConsolidadoResponse, CompromisoResponse } from '../api/budget.api';
+import {
+  PresupuestoResponse,
+  ConsolidadoResponse,
+  CompromisoResponse,
+  PresupuestoDetalleResponse,
+  ResumenPresupuestosResponse,
+} from '../api/budget.api';
 
 export function rubroFromApi(dto: PresupuestoResponse): Rubro {
   return {
@@ -29,6 +35,41 @@ export function compromisoFromApi(dto: CompromisoResponse): Compromiso {
     montoRetencionZese: dto.montoRetencionZese,
     fecha:              dto.fecha,
     estado:             dto.estado,
+  };
+}
+
+export function presupuestoDetalleFromApi(dto: PresupuestoDetalleResponse): PresupuestoDetalle {
+  return {
+    id:                dto.id,
+    fichaId:           dto.fichaId,
+    programaFormacion: dto.programaFormacion,
+    vigencia:          dto.vigencia,
+    fechaAprobacion:   dto.fechaAprobacion,
+    rubros: dto.rubros.map(r => ({
+      id:                 r.id,
+      codigo:             r.codigo,
+      descripcion:        r.descripcion,
+      fichaId:            dto.fichaId,
+      programaFormacion:  dto.programaFormacion,
+      montoAsignado:      r.montoAsignado,
+      saldoDisponible:    r.saldoDisponible,
+      montoComprometido:  r.montoComprometido,
+      montoPagado:        r.montoPagado,
+      retencionZese:      r.retencionZese,
+      porcentajeEjecucion: r.porcentajeEjecucion,
+    })),
+  };
+}
+
+export function resumenPresupuestosFromApi(dto: ResumenPresupuestosResponse): ResumenPresupuestosGlobal {
+  return {
+    totalPresupuestos: dto.totalPresupuestos,
+    vigencia:          dto.vigencia,
+    totalAsignado:     dto.totalAsignado,
+    totalComprometido: dto.totalComprometido,
+    totalPagado:       dto.totalPagado,
+    saldoGlobal:       dto.saldoGlobal,
+    porcentajeEjecucion: dto.porcentajeEjecucion,
   };
 }
 

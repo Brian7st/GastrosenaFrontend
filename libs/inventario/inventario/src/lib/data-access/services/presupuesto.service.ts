@@ -4,6 +4,8 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import {
   PresupuestoResumen,
+  PresupuestoDetalle,
+  ResumenPresupuestosGlobal,
   Rubro,
   AfectacionPresupuestal,
   VencimientoProximo,
@@ -14,8 +16,15 @@ import {
   ComprometerData,
   PagoData,
 } from '../../models/presupuesto.model';
-import { PresupuestoResponse, CompromisoResponse, ComprometerRequest, PagoRequest } from '../api/budget.api';
-import { rubroFromApi, compromisoFromApi } from '../mappers/budget.mapper';
+import {
+  PresupuestoResponse,
+  PresupuestoDetalleResponse,
+  ResumenPresupuestosResponse,
+  CompromisoResponse,
+  ComprometerRequest,
+  PagoRequest,
+} from '../api/budget.api';
+import { rubroFromApi, compromisoFromApi, presupuestoDetalleFromApi, resumenPresupuestosFromApi } from '../mappers/budget.mapper';
 
 const API = '/api/v1';
 
@@ -32,23 +41,26 @@ export class PresupuestoService {
       );
   }
 
-  /** Resumen derivado de los rubros — FE-06 alineará con el contrato oficial */
-  getResumen(): Observable<PresupuestoResumen> {
-    return this.getRubros().pipe(
-      map(rubros => ({
-        vigenciaFiscal: new Date().getFullYear(),
-        corte: new Date().toLocaleDateString('es-CO'),
-        totalApropiacion:   rubros.reduce((s, r) => s + r.montoAsignado, 0),
-        totalComprometido:  rubros.reduce((s, r) => s + r.montoComprometido, 0),
-        totalPagado:        rubros.reduce((s, r) => s + r.montoPagado, 0),
-        totalDisponible:    rubros.reduce((s, r) => s + r.saldoDisponible, 0),
-        totalZese:          rubros.reduce((s, r) => s + r.retencionZese, 0),
-        porcentajeEjecucion: rubros.length
-          ? rubros.reduce((s, r) => s + r.porcentajeEjecucion, 0) / rubros.length
-          : 0,
-        variacionAnual: 0, // TODO FE-06: sin endpoint disponible aún
-      }))
-    );
+  /** GET /budget/presupuestos/resumen?vigencia? */
+  getResumen(vigencia?: number): Observable<ResumenPresupuestosGlobal> {
+    let params = new HttpParams();
+    if (vigencia) params = params.set('vigencia', String(vigencia));
+    return this.http
+      .get<ResumenPresupuestosResponse>(`${API}/budget/presupuestos/resumen`, { params })
+      .pipe(
+        map(resumenPresupuestosFromApi),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** GET /budget/presupuestos/{id} */
+  getPresupuestoById(id: string): Observable<PresupuestoDetalle> {
+    return this.http
+      .get<PresupuestoDetalleResponse>(`${API}/budget/presupuestos/${id}`)
+      .pipe(
+        map(presupuestoDetalleFromApi),
+        catchError(err => throwError(() => err))
+      );
   }
 
   registrarPresupuesto(data: RegistrarPresupuestoData): Observable<{ success: boolean }> {

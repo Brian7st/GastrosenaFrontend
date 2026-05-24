@@ -82,3 +82,37 @@ export interface ConsolidadoResponse {
 export interface GenerarConsolidadoRequest {
   gilIds: string[];
 }
+
+/** GET /budget/presupuestos/{id} — rubro dentro del detalle */
+export interface RubroResponse {
+  id: string;
+  codigo: string;
+  descripcion: string;
+  montoAsignado: number;
+  saldoDisponible: number;
+  montoComprometido: number;
+  montoPagado: number;
+  retencionZese: number;
+  porcentajeEjecucion: number;
+}
+
+/** GET /budget/presupuestos/{id} — detalle completo de un presupuesto */
+export interface PresupuestoDetalleResponse {
+  id: string;
+  fichaId: string;
+  programaFormacion: string;
+  vigencia: number;
+  fechaAprobacion: string;
+  rubros: RubroResponse[];
+}
+
+/** GET /budget/presupuestos/resumen?vigencia? */
+export interface ResumenPresupuestosResponse {
+  totalPresupuestos: number;
+  vigencia?: number;
+  totalAsignado: number;
+  totalComprometido: number;
+  totalPagado: number;
+  saldoGlobal: number;
+  porcentajeEjecucion: number;
+}
