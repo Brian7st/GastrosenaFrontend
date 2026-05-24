@@ -1,18 +1,39 @@
-export type EstadoGil = 'Borrador' | 'Pendiente' | 'Validado' | 'Aprobado' | 'Procesado';
+export type EstadoGil = 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'CERRADO';
+
+export interface CuentadanteGil {
+  id: string | number;
+  nombre: string;
+  documento?: string;
+}
 
 export interface SolicitudGil {
   id: string | number;
-  codigo: string;          // Consecutivo GIL-F-014-YYYY-NNN
-  fecha: string;           // Fecha de emisión o creación
-  centroCostos: string;
+  numeroGil: string;           // Consecutivo GIL-F-014-YYYY-NNN
+  fecha: string;               // Fecha de emisión o creación
+  centroFormacionId: string;
   area: string;
-  cuentadante: string;     // Instructor/responsable principal
+  cuentadantes: CuentadanteGil[];
   destino: string;
-  ficha: string;           // Código tipo ADSO-2670687
+  fichaId: string;             // Código tipo ADSO-2670687
   estado: EstadoGil;
-  totalBienes?: number;    // Cantidad de ítems
-  montoTotal?: number;     // Valor total en COP
-  avatarColor?: string;    // Color del avatar para el listado
+  programaId?: string;
+  emitidoPor?: string;
+  resultadoAprendizaje?: string;
+  actividades?: string;
+  voceroNombre?: string;
+  voceroDocumento?: string;
+  solicitudesOrigenIds?: string[];
+  observaciones?: string;
+  bienes?: BienSolicitud[];
+}
+
+export interface BienSolicitud {
+  codigo: string;
+  descripcion: string;
+  um: string;
+  cantidad: number;
+  valorUnitario: number;
+  subtotal: number;
 }
 
 export interface SolicitudesGilFiltros {
@@ -24,17 +45,17 @@ export interface SolicitudesGilFiltros {
 
 export interface CrearSolicitudData {
   fecha: string;
-  centroCostos?: string;
+  centroFormacionId?: string;
   area?: string;
-  cuentadante?: string;
+  cuentadantes?: CuentadanteGil[];
   destino?: string;
-  ficha?: string;
+  fichaId?: string;
 }
 
 export interface ActualizarSolicitudData {
-  centroCostos?: string;
+  centroFormacionId?: string;
   area?: string;
-  cuentadante?: string;
+  cuentadantes?: CuentadanteGil[];
   destino?: string;
-  ficha?: string;
+  fichaId?: string;
 }

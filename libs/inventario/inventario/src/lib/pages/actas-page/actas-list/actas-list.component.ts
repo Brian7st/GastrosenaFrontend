@@ -53,9 +53,9 @@ export class ActasListComponent implements OnInit {
     const ficha  = this.fichaFilter().toLowerCase();
 
     return this.allActas().filter(a => {
-      const matchText   = !text   || a.instructor.toLowerCase().includes(text);
+      const matchText   = !text   || a.instructorId.toLowerCase().includes(text);
       const matchEstado = !estado || a.estado === estado;
-      const matchFicha  = !ficha  || a.ficha.toLowerCase().includes(ficha);
+      const matchFicha  = !ficha  || a.fichaId.toLowerCase().includes(ficha);
       return matchText && matchEstado && matchFicha;
     });
   });
@@ -63,22 +63,22 @@ export class ActasListComponent implements OnInit {
   // ── Helpers de UI ────────────────────────────────────────────────────────
   getEstadoLabel(estado: ActaEstado): string {
     const map: Record<ActaEstado, string> = {
-      borrador:  'Borrador',
-      pendiente: 'Pendiente Firmas',
-      firmada:   'Firmada',
-      revisada:  'Revisada',
-      archivada: 'Archivada',
+      BORRADOR:         'Borrador',
+      PENDIENTE_FIRMAS: 'Pendiente Firmas',
+      FIRMADA:          'Firmada',
+      REVISADA:         'Revisada',
+      ARCHIVADA:        'Archivada',
     };
     return map[estado];
   }
 
   getEstadoVariant(estado: ActaEstado): 'success' | 'warning' | 'danger' | 'info' {
     const map: Record<ActaEstado, 'success' | 'warning' | 'danger' | 'info'> = {
-      borrador:  'info',
-      pendiente: 'warning',
-      firmada:   'success',
-      revisada:  'success',
-      archivada: 'info',
+      BORRADOR:         'info',
+      PENDIENTE_FIRMAS: 'warning',
+      FIRMADA:          'success',
+      REVISADA:         'success',
+      ARCHIVADA:        'info',
     };
     return map[estado];
   }

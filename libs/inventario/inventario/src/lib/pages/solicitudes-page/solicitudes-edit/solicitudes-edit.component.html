@@ -160,8 +160,10 @@
 
       <!-- Actions -->
       <div class="actions-footer" *ngIf="!isBlocked()">
-        <restaurant-button variant="ghost" (click)="onCancel()">Cancelar</restaurant-button>
-        <restaurant-button variant="primary" (click)="onSave()">Guardar Cambios</restaurant-button>
+        <restaurant-button variant="ghost" (click)="onCancel()" [disabled]="isSaving()">Cancelar</restaurant-button>
+        <restaurant-button variant="primary" (click)="onSave()" [disabled]="isSaving()">
+          {{ isSaving() ? 'Guardando...' : 'Guardar Cambios' }}
+        </restaurant-button>
       </div>
 
     </div>

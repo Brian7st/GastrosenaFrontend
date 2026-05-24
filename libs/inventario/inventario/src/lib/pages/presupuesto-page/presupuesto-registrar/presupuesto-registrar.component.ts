@@ -27,8 +27,8 @@ export class PresupuestoRegistrarComponent implements OnInit {
     bolsaInicial:        [null as number | null, [Validators.required, Validators.min(1)]],
   });
 
-  // Programas cargados desde la facade
-  programas = this.facade.programas;
+  // Grupos de rubros agrupados por ficha (para el selector de programa)
+  grupos = this.facade.grupos;
 
   readonly VIGENCIAS = [2024, 2025, 2026];
 

@@ -89,8 +89,6 @@
     flex-wrap: wrap;
   }
 
-  // Table cells
-
   &__loading,
   &__empty {
     text-align: center;
@@ -108,21 +106,6 @@
     display: flex;
     align-items: center;
     gap: var(--space-3);
-  }
-
-  &__avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: var(--color-primario);
-    color: var(--color-en-primario);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-semibold);
-    flex-shrink: 0;
-    letter-spacing: 0.5px;
   }
 
   &__user-name {
@@ -147,7 +130,6 @@
     font-weight: var(--font-weight-medium);
     white-space: nowrap;
 
-    // Status
     &--activo {
       background: var(--color-success-bg);
       color: var(--color-success-text);
@@ -156,39 +138,6 @@
     &--inactivo {
       background: var(--color-error-bg);
       color: var(--color-error-text);
-    }
-
-    // Roles
-    &--admin {
-      background: var(--color-info-bg);
-      color: var(--color-info-text);
-    }
-
-    &--contadora,
-    &--instructor {
-      background: var(--color-brand-primary-soft);
-      color: var(--color-brand-primary-strong);
-    }
-
-    &--chef,
-    &--lider-bar,
-    &--admin-cocina,
-    &--admin-bar {
-      background: var(--color-warning-bg);
-      color: var(--color-warning-text);
-    }
-
-    &--cajero {
-      background: var(--color-error-bg);
-      color: var(--color-error-text);
-    }
-
-    &--mesero,
-    &--bartender,
-    &--aux-cocina,
-    &--default {
-      background: var(--color-superficie-contenedor);
-      color: var(--color-text-secondary);
     }
   }
 

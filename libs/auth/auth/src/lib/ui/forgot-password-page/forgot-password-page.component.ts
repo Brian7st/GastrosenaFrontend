@@ -4,23 +4,26 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { AlertComponent } from '@restaurant/shared/ui';
+import { AuthService } from '@restaurant/shared/auth';
+import { AlertComponent, InputComponent, ButtonComponent } from '@restaurant/shared/ui';
 
 @Component({
   selector: 'restaurant-forgot-password-page',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, AlertComponent],
+  imports: [ReactiveFormsModule, RouterLink, AlertComponent, InputComponent, ButtonComponent],
   templateUrl: './forgot-password-page.component.html',
   styleUrl: './forgot-password-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ForgotPasswordPageComponent {
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
 
-  readonly loading  = signal(false);
-  readonly errorMsg = signal('');
+  readonly loading    = signal(false);
+  readonly errorMsg   = signal('');
   readonly successMsg = signal('');
 
   readonly form = this.fb.group({
@@ -38,11 +41,12 @@ export class ForgotPasswordPageComponent {
     this.errorMsg.set('');
     this.successMsg.set('');
     try {
-      // TODO: conectar con el endpoint de recuperación
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      this.successMsg.set('Te enviamos las instrucciones a tu correo electrónico.');
+      const { email } = this.form.getRawValue();
+      await this.authService.recuperarContrasena(email!);
+      this.successMsg.set('Si el correo existe, recibirás las instrucciones en tu bandeja.');
+      setTimeout(() => this.router.navigateByUrl('/auth/login'), 3000);
     } catch {
-      this.errorMsg.set('No encontramos una cuenta con ese correo. Verificá e intentá de nuevo.');
+      this.errorMsg.set('Ocurrió un error. Intentá de nuevo más tarde.');
     } finally {
       this.loading.set(false);
     }

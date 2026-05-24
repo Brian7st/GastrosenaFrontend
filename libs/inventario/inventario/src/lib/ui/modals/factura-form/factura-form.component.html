@@ -56,8 +56,8 @@
                 class="field-input"
                 type="text"
                 placeholder="Ej. FEL-12345"
-                [(ngModel)]="numeroFEL"
-                name="numeroFEL"
+                [(ngModel)]="numeroFactura"
+                name="numeroFactura"
               />
             </div>
             <div class="field-group">
@@ -87,8 +87,8 @@
                 class="field-input"
                 type="text"
                 placeholder="Ej. 900.123.456-7"
-                [(ngModel)]="nitEmisor"
-                name="nitEmisor"
+                [(ngModel)]="proveedorNit"
+                name="proveedorNit"
               />
             </div>
             <div class="field-group col-span-2">
@@ -164,28 +164,10 @@
                   class="field-input field-input--readonly"
                   id="field-instructor"
                   type="text"
-                  [value]="instructorCuentadante()"
+                  [value]="instructorId()"
                   readonly
                 />
                 <span class="material-symbols-outlined input-icon">person</span>
-              </div>
-            </div>
-
-            <div class="field-group col-span-2">
-              <label class="field-label" for="field-cufe">Código CUFE (64 caracteres)</label>
-              <div class="cufe-wrapper">
-                <input
-                  id="field-cufe"
-                  class="field-input cufe-input"
-                  type="text"
-                  placeholder="7084931a27e3...b7a8d0f1"
-                  [ngModel]="codigoCufe()"
-                  (ngModelChange)="codigoCufe.set($event)"
-                  name="codigoCufe"
-                  maxlength="64"
-                />
-                <span class="cufe-tag">AUTO-DETECT</span>
-                <span class="cufe-count">{{ codigoCufe().length }} / 64</span>
               </div>
             </div>
 
@@ -196,9 +178,9 @@
                   id="field-retencion"
                   class="field-input field-input--readonly text-primary font-bold"
                   type="text"
-                  [value]="retencionZESE() + '%'"
+                  [value]="valorRetencionZese() + '%'"
                   readonly
-                  name="retencionZESE"
+                  name="valorRetencionZese"
                 />
                 <span class="material-symbols-outlined input-icon text-primary">verified</span>
               </div>

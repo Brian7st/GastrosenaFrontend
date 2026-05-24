@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { CategoriaService } from '../../data-access/categoria.service';
 import { RecetaService } from '../../data-access/receta.service';
 import { IngredienteService } from '../../data-access/ingrediente.service';
-import { Receta } from '../../models/receta.model';
+import { Receta, Ingrediente, Paso } from '../../models/receta.model';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 
 export function noDuplicatesValidator(fieldName: string): ValidatorFn {
@@ -27,7 +27,7 @@ export function noDuplicatesValidator(fieldName: string): ValidatorFn {
 })
 export class GestionRecetaComponent implements OnInit {
   @Input() receta: Receta | null = null;
-  @Output() close = new EventEmitter<boolean>(); // true if saved, false if cancelled
+  @Output() closeManage = new EventEmitter<boolean>(); // true if saved, false if cancelled
 
   private fb = inject(FormBuilder);
   public catService = inject(CategoriaService);
@@ -80,9 +80,9 @@ export class GestionRecetaComponent implements OnInit {
     });
 
     if (receta.ingredientes) {
-      receta.ingredientes.forEach((ing: any) => {
+      receta.ingredientes.forEach((ing: Ingrediente) => {
         const group = this.fb.group({
-          nombreIngrediente: [ing.nombreIngrediente || ing.nombre, [Validators.required, Validators.minLength(2)]],
+          nombreIngrediente: [ing.nombreIngrediente || (ing as unknown as Record<string, unknown>)['nombre'] as string, [Validators.required, Validators.minLength(2)]],
           cantidadRequerida: [ing.cantidadRequerida, [Validators.required, Validators.min(0.1)]],
           unidadMedida: [ing.unidadMedida, Validators.required]
         });
@@ -91,7 +91,7 @@ export class GestionRecetaComponent implements OnInit {
     }
 
     if (receta.pasos) {
-      receta.pasos.forEach((paso: any) => {
+      receta.pasos.forEach((paso: Paso) => {
         const group = this.fb.group({
           orden: [paso.orden],
           descripcionPaso: [paso.descripcionPaso, Validators.required],
@@ -153,22 +153,25 @@ export class GestionRecetaComponent implements OnInit {
   }
 
   cancelar() {
-    this.close.emit(false);
+    this.closeManage.emit(false);
   }
 
   guardar() {
     if (this.recipeForm.valid) {
       this.isSaving = true;
       
-      const formValue = this.recipeForm.value as any;
+      const formValue = this.recipeForm.value as unknown as Partial<Receta>;
       
       // Adapt notesAdicionales mapping
       if (formValue.pasos) {
-        formValue.pasos = formValue.pasos.map((p: any) => ({
-          orden: p.orden,
-          descripcionPaso: p.descripcionPaso,
-          notasAdicionales: p.notesAdicionales || p.notasAdicionales || ''
-        }));
+        formValue.pasos = formValue.pasos.map((p: unknown) => {
+          const step = p as Record<string, unknown>;
+          return {
+            orden: Number(step['orden']),
+            descripcionPaso: String(step['descripcionPaso']),
+            notasAdicionales: String(step['notesAdicionales'] || step['notasAdicionales'] || '')
+          };
+        });
       }
       
       const observable = this.receta?.idReceta 
@@ -178,7 +181,7 @@ export class GestionRecetaComponent implements OnInit {
       observable.subscribe({
         next: () => {
           alert(this.receta ? '¡Receta actualizada con éxito!' : '¡Receta guardada con éxito!');
-          this.close.emit(true);
+          this.closeManage.emit(true);
         },
         error: (err) => {
           console.error('Error al guardar:', err);

@@ -8,12 +8,12 @@
         <ol>
           <li><a routerLink="/app/inventario/facturas">Facturas</a></li>
           <li class="separator"><span class="material-symbols-outlined">chevron_right</span></li>
-          <li class="current">{{ f.numeroFEL }}</li>
+          <li class="current">{{ f.numeroFactura }}</li>
         </ol>
       </nav>
       <div class="page-header__title-row">
-        <h1 class="page-header__title">Factura Electrónica {{ f.numeroFEL }}</h1>
-        <span class="badge" [ngClass]="'badge--' + (f.estado === 'Verificada' ? 'verificada' : (f.estado === 'Anulada' ? 'error' : 'primary-soft'))">{{ f.estado | uppercase }}</span>
+        <h1 class="page-header__title">Factura Electrónica {{ f.numeroFactura }}</h1>
+        <span class="badge" [ngClass]="'badge--' + (f.estado === 'VERIFICADA' ? 'verificada' : (f.estado === 'ANULADA' ? 'error' : 'primary-soft'))">{{ f.estado }}</span>
       </div>
     </div>
 
@@ -37,8 +37,8 @@
           <!-- Emisor -->
           <div class="party-info">
             <span class="party-info__label">Emisor</span>
-            <h3 class="party-info__name">{{ f.razonSocial || f.proveedor }}</h3>
-            <p class="party-info__doc">NIT {{ f.nitEmisor }}</p>
+            <h3 class="party-info__name">{{ f.razonSocial || f.proveedorNombre }}</h3>
+            <p class="party-info__doc">NIT {{ f.proveedorNit }}</p>
             <p class="party-info__location">
               <span class="material-symbols-outlined">location_on</span> Armenia
             </p>
@@ -95,7 +95,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let item of f.items; let i = index">
+            <tr *ngFor="let item of f.lineas; let i = index">
               <td class="text-center font-medium text-secondary">{{ i + 1 }}</td>
               <td class="font-medium">{{ item.descripcion }}</td>
               <td class="text-secondary">UND</td>
@@ -104,7 +104,7 @@
               <td class="text-right text-secondary">{{ item.iva }}%</td>
               <td class="text-right font-semibold">{{ item.total | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
             </tr>
-            <tr *ngIf="!f.items || f.items.length === 0">
+            <tr *ngIf="!f.lineas || f.lineas.length === 0">
               <td colspan="7" class="text-center text-secondary py-4">No hay artículos registrados.</td>
             </tr>
           </tbody>
@@ -165,7 +165,7 @@
             </div>
 
             <div class="linked-details" *ngIf="f.gilVinculado">
-              <p><span class="material-symbols-outlined">person</span> {{ f.instructorCuentadante || 'Responsable' }}</p>
+              <p><span class="material-symbols-outlined">person</span> {{ f.instructorId || 'Responsable' }}</p>
               <p class="font-bold"><span class="material-symbols-outlined">payments</span> {{ f.total | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
             </div>
 
@@ -235,7 +235,7 @@
 
             <div class="summary-row">
               <span class="summary-row__label font-semibold">Total IVA</span>
-              <span class="summary-row__value font-bold">{{ f.ivaTotal | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+              <span class="summary-row__value font-bold">{{ f.totalIva | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
             </div>
           </div>
 
@@ -245,9 +245,9 @@
               <span class="summary-row__label">Retención ZESE</span>
               <span class="material-symbols-outlined text-[14px] text-outline">info</span>
             </div>
-            <span class="summary-row__value font-medium">{{ f.retencionZESE || 0 }}%</span>
+            <span class="summary-row__value font-medium">{{ f.valorRetencionZese || 0 }}%</span>
 
-            <div class="tooltip">Aplica tarifa {{ f.retencionZESE || 0 }}% por régimen especial ZESE registrado.</div>
+            <div class="tooltip">Aplica tarifa {{ f.valorRetencionZese || 0 }}% por régimen especial ZESE registrado.</div>
           </div>
         </div>
 
@@ -256,7 +256,7 @@
           <span class="summary__footer-label">Total a Pagar</span>
           <div class="text-right">
             <span class="summary__footer-total">{{ f.total | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-            <p class="summary__footer-currency">{{ f.moneda }} • Pesos Colombianos</p>
+            <p class="summary__footer-currency">COP • Pesos Colombianos</p>
           </div>
         </div>
       </section>

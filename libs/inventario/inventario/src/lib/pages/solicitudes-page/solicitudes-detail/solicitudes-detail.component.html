@@ -10,18 +10,18 @@
 
     <div class="header-actions">
       <inventario-back-button (clicked)="onVolver()" />
-      <button class="btn-action" (click)="onEditar()" [disabled]="estadoActual() !== 'Borrador'">
+      <button class="btn-action" (click)="onEditar()" [disabled]="estadoActual() !== 'BORRADOR'">
         <span class="material-symbols-outlined">edit</span> Editar
       </button>
       <button class="btn-action" (click)="onDownloadPdf()">
         <span class="material-symbols-outlined">picture_as_pdf</span> Descargar PDF
       </button>
-      
+
       <div class="action-group">
-        <button class="btn-primary" (click)="onEnviarAprobacion()" [disabled]="estadoActual() !== 'Borrador'">
+        <button class="btn-primary" (click)="onEnviarAprobacion()" [disabled]="estadoActual() !== 'BORRADOR'">
           Enviar a Aprobación
         </button>
-        <div class="tooltip" *ngIf="estadoActual() !== 'Borrador'">
+        <div class="tooltip" *ngIf="estadoActual() !== 'BORRADOR'">
           La solicitud ya fue enviada o no puede ser aprobada.
         </div>
       </div>

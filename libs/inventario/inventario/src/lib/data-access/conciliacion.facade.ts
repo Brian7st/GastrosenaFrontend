@@ -6,6 +6,7 @@ import {
   ConciliacionDetalle,
   DiferenciaItem,
   TomaFisicaItem,
+  ConteoItemData,
 } from '../models/conciliacion.model';
 
 @Injectable({
@@ -115,6 +116,46 @@ export class ConciliacionFacade {
       .subscribe(() => {
         // Refresca la lista tras iniciar la toma
         this.loadAll();
+      });
+  }
+
+  /**
+   * Registra el conteo físico de los ítems y recarga el detalle de la conciliación.
+   */
+  registrarConteo(id: string, items: ConteoItemData[]): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this.conciliacionService
+      .registrarConteo(id, items)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al registrar el conteo físico');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => {
+        if (res !== null) this.cargarConciliacion(id);
+      });
+  }
+
+  /**
+   * Resuelve una diferencia de inventario con su justificación y recarga el detalle.
+   */
+  resolverDiferencia(id: string, diferenciaId: string, justificacion: string): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this.conciliacionService
+      .resolverDiferencia(id, diferenciaId, justificacion)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al resolver la diferencia');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => {
+        if (res !== null) this.cargarConciliacion(id);
       });
   }
 

@@ -612,6 +612,19 @@
           color: var(--color-en-primario);
         }
       }
+
+      &--nav {
+        .material-symbols-outlined {
+          font-size: 18px;
+          line-height: 1;
+        }
+
+        &:disabled {
+          opacity: 0.35;
+          cursor: not-allowed;
+          pointer-events: none;
+        }
+      }
     }
   }
 }

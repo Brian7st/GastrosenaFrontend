@@ -68,23 +68,11 @@ export class AlertasListComponent implements OnInit {
 
   // ── KPIs computados ──────────────────────────────────────────────────────
   kpiCriticas = computed(() =>
-    this.allAlertas().filter(a => a.prioridad === 'critica').length
+    this.allAlertas().filter(a => a.estado === 'CRITICA').length
   );
   kpiActivas = computed(() =>
-    this.allAlertas().filter(a => a.estado === 'activa').length
+    this.allAlertas().filter(a => a.estado === 'ACTIVA').length
   );
-  kpiValorRiesgo = computed(() => {
-    const total = this.allAlertas().reduce((sum, a) => sum + a.valorEnRiesgo, 0);
-    return total >= 1_000_000
-      ? `$${(total / 1_000_000).toFixed(1)}M`
-      : `$${(total / 1_000).toFixed(0)}k`;
-  });
-  kpiPromedioDias = computed(() => {
-    const activas = this.allAlertas().filter(a => a.estado === 'activa');
-    if (!activas.length) return '0 días';
-    const avg = activas.reduce((s, a) => s + a.diasRestantes, 0) / activas.length;
-    return `${avg.toFixed(1)} días`;
-  });
 
   // ── Alertas filtradas ────────────────────────────────────────────────────
   filteredAlertas = computed(() => {
@@ -93,7 +81,7 @@ export class AlertasListComponent implements OnInit {
     const estado = this.estadoFilter();
 
     return this.allAlertas().filter(a => {
-      const matchText   = !text  || a.nombreBien.toLowerCase().includes(text) || a.codigoSena.toLowerCase().includes(text);
+      const matchText   = !text  || (a.nombreBien?.toLowerCase().includes(text) ?? false) || (a.codigoSena?.toLowerCase().includes(text) ?? false);
       const matchPrio   = !prio  || a.prioridad === prio;
       const matchEstado = !estado || a.estado === estado;
       return matchText && matchPrio && matchEstado;
@@ -103,20 +91,18 @@ export class AlertasListComponent implements OnInit {
   // ── Helpers de UI ────────────────────────────────────────────────────────
   getPrioridadLabel(p: AlertaPrioridad): string {
     const map: Record<AlertaPrioridad, string> = {
-      critica: 'Crítica',
-      alta:    'Alta',
-      media:   'Media',
-      baja:    'Baja',
+      ALTA:  'Alta',
+      MEDIA: 'Media',
+      BAJA:  'Baja',
     };
     return map[p];
   }
 
   getPrioridadVariant(p: AlertaPrioridad): 'danger' | 'warning' | 'info' | 'success' {
     const map: Record<AlertaPrioridad, 'danger' | 'warning' | 'info' | 'success'> = {
-      critica: 'danger',
-      alta:    'warning',
-      media:   'info',
-      baja:    'success',
+      ALTA:  'warning',
+      MEDIA: 'info',
+      BAJA:  'success',
     };
     return map[p];
   }

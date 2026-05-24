@@ -1,0 +1,67 @@
+<div class="exportar-overlay" (click)="onCerrar()">
+  <div class="exportar-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+
+    <!-- ── Header ──────────────────────────────────────────────────────────── -->
+    <div class="exportar-header">
+      <div class="exportar-header__title-row">
+        <div class="exportar-icon-box">
+          <span class="material-symbols-outlined">ios_share</span>
+        </div>
+        <h2 class="exportar-header__title">{{ titulo() }}</h2>
+      </div>
+      <p class="exportar-header__subtitle">{{ subtitulo() }}</p>
+    </div>
+
+    <!-- ── Opciones de formato ─────────────────────────────────────────────── -->
+    <div class="exportar-body">
+      <div class="exportar-formatos" [class.exportar-formatos--single]="formatos().length === 1">
+
+        <button
+          *ngFor="let fmt of formatos()"
+          class="formato-card"
+          [class.formato-card--activo]="formatoSeleccionado() === fmt.id"
+          (click)="onSeleccionar(fmt.id)"
+          type="button"
+        >
+          <!-- Check de selección -->
+          <span
+            class="formato-card__check material-symbols-outlined"
+            *ngIf="formatoSeleccionado() === fmt.id"
+          >check_circle</span>
+
+          <!-- Ícono del formato -->
+          <div class="formato-card__icon-wrap">
+            <span
+              class="material-symbols-outlined formato-card__icon"
+              [ngClass]="fmt.iconoClase ?? 'icono--primary'"
+            >{{ fmt.icono }}</span>
+          </div>
+
+          <h3 class="formato-card__titulo">{{ fmt.label }}</h3>
+          <p class="formato-card__desc">{{ fmt.descripcion }}</p>
+
+          <!-- Etiqueta badge opcional -->
+          <div class="formato-card__etiqueta" *ngIf="fmt.etiqueta">
+            <span class="material-symbols-outlined">check_circle</span>
+            {{ fmt.etiqueta }}
+          </div>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- ── Footer ──────────────────────────────────────────────────────────── -->
+    <div class="exportar-footer">
+      <button class="exportar-btn exportar-btn--cancelar" type="button" (click)="onCerrar()">
+        Cerrar
+      </button>
+      <button class="exportar-btn exportar-btn--primary" type="button" (click)="onExportar()">
+        <span class="material-symbols-outlined">download</span>
+        Iniciar Descarga
+      </button>
+    </div>
+
+    <!-- Acento de marca -->
+    <div class="exportar-acento"></div>
+  </div>
+</div>

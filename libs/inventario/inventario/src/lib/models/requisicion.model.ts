@@ -4,29 +4,31 @@
  */
 
 export type RequisicionEstado =
-  | 'borrador'
-  | 'enviada'
-  | 'en_despacho'
-  | 'firmada';
+  | 'BORRADOR'
+  | 'ENVIADA'
+  | 'DESPACHADA'
+  | 'FIRMADA'
+  | 'LEGALIZADA';
 
 export interface RequisicionItem {
-  codigo:        string;
-  descripcion:   string;
-  cantidad:      number;
-  unidad:        string;
-  valorUnitario: number;
+  codigo:      string;
+  descripcion: string;
+  cantidad:    number;
+  unidad:      string;
 }
 
 export interface Requisicion {
-  id:         string;
-  codigo:     string;
-  programa:   string;
-  ficha:      string;
-  instructor: string;
-  fecha:      string;
-  estado:     RequisicionEstado;
-  items:      RequisicionItem[];
-  totalCOP:   number;
+  id:               string;
+  numero:           string;
+  programa:         string;
+  fichaId:          string;
+  instructorId:     string;
+  instructorNombre: string;
+  diaSemana:        string;
+  horaSesion:       string;
+  fecha:            string;
+  estado:           RequisicionEstado;
+  items:            RequisicionItem[];
 }
 
 // ── Mock Data ────────────────────────────────────────────────────────────────
@@ -34,55 +36,63 @@ export interface Requisicion {
 export const MOCK_REQUISICIONES: Requisicion[] = [
   {
     id: '1',
-    codigo: '0895',
+    numero: '0895',
     programa: 'Gastronomía',
-    ficha: '2574832',
-    instructor: 'Chef Sebastián',
+    fichaId: '2574832',
+    instructorId: 'usr-sebastián',
+    instructorNombre: 'Chef Sebastián',
+    diaSemana: 'Lunes',
+    horaSesion: '08:00 - 12:00',
     fecha: '10/04/2026',
-    estado: 'borrador',
+    estado: 'BORRADOR',
     items: [
-      { codigo: 'INS-001', descripcion: 'Harina de Trigo', cantidad: 5, unidad: 'kg', valorUnitario: 3200 },
-      { codigo: 'INS-002', descripcion: 'Aceite de Oliva', cantidad: 2, unidad: 'L', valorUnitario: 32500 },
+      { codigo: 'INS-001', descripcion: 'Harina de Trigo', cantidad: 5, unidad: 'kg' },
+      { codigo: 'INS-002', descripcion: 'Aceite de Oliva', cantidad: 2, unidad: 'L' },
     ],
-    totalCOP: 81000,
   },
   {
     id: '2',
-    codigo: '0892',
+    numero: '0892',
     programa: 'Panadería',
-    ficha: '2574833',
-    instructor: 'Chef Valentina',
+    fichaId: '2574833',
+    instructorId: 'usr-valentina',
+    instructorNombre: 'Chef Valentina',
+    diaSemana: 'Miércoles',
+    horaSesion: '14:00 - 18:00',
     fecha: '08/04/2026',
-    estado: 'enviada',
+    estado: 'ENVIADA',
     items: [
-      { codigo: 'INS-003', descripcion: 'Mantequilla sin sal', cantidad: 3, unidad: 'kg', valorUnitario: 18200 },
+      { codigo: 'INS-003', descripcion: 'Mantequilla sin sal', cantidad: 3, unidad: 'kg' },
     ],
-    totalCOP: 54600,
   },
   {
     id: '3',
-    codigo: '0890',
+    numero: '0890',
     programa: 'Pastelería',
-    ficha: '2574834',
-    instructor: 'Chef Mario',
+    fichaId: '2574834',
+    instructorId: 'usr-mario',
+    instructorNombre: 'Chef Mario',
+    diaSemana: 'Jueves',
+    horaSesion: '07:00 - 11:00',
     fecha: '05/04/2026',
-    estado: 'en_despacho',
+    estado: 'DESPACHADA',
     items: [
-      { codigo: 'INS-004', descripcion: 'Azúcar Glass', cantidad: 4, unidad: 'kg', valorUnitario: 4500 },
+      { codigo: 'INS-004', descripcion: 'Azúcar Glass', cantidad: 4, unidad: 'kg' },
     ],
-    totalCOP: 18000,
   },
   {
     id: '4',
-    codigo: '0888',
+    numero: '0888',
     programa: 'Sommelier',
-    ficha: '2574835',
-    instructor: 'Chef Alejandro',
+    fichaId: '2574835',
+    instructorId: 'usr-alejandro',
+    instructorNombre: 'Chef Alejandro',
+    diaSemana: 'Viernes',
+    horaSesion: '10:00 - 14:00',
     fecha: '01/04/2026',
-    estado: 'firmada',
+    estado: 'FIRMADA',
     items: [
-      { codigo: 'INS-005', descripcion: 'Vino Tinto Selección', cantidad: 2, unidad: 'botella', valorUnitario: 45000 },
+      { codigo: 'INS-005', descripcion: 'Vino Tinto Selección', cantidad: 2, unidad: 'botella' },
     ],
-    totalCOP: 90000,
   },
 ];
