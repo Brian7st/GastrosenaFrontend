@@ -1,4 +1,5 @@
-import { Movimiento, ExistenciaProducto, EntradaMovimientoData, SalidaMovimientoData } from '../../models/movimiento.model';
+import { Movimiento, EntradaMovimientoData, SalidaMovimientoData } from '../../models/movimiento.model';
+import { ExistenciaProducto } from '../../models/inventario.model';
 import { MovimientoResponse, ExistenciaResponse, EntradaRequest, SalidaRequest } from '../api/inventory.api';
 
 export function movimientoFromApi(dto: MovimientoResponse): Movimiento {

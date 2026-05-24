@@ -30,9 +30,16 @@ export class PaqueteService {
       );
   }
 
-  crearPaquete(data: CrearPaqueteRequest): Observable<PaqueteProbatorio> {
+  /** La facade pasa Partial<PaqueteProbatorio> — el service construye el request tipado. */
+  crearPaquete(data: Partial<PaqueteProbatorio>): Observable<PaqueteProbatorio> {
+    const request: CrearPaqueteRequest = {
+      fichaId:      data.fichaId ?? '',
+      gilId:        data.gilId ?? '',
+      instructorId: data.instructorId ?? '',
+      titulo:       data.titulo,
+    };
     return this.http
-      .post<PaqueteResponse>(`${API}/legalization/paquetes`, data)
+      .post<PaqueteResponse>(`${API}/legalization/paquetes`, request)
       .pipe(
         map(paqueteFromApi),
         catchError(err => throwError(() => err))

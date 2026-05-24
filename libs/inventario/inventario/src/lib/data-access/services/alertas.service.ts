@@ -30,7 +30,7 @@ export class AlertasService {
       );
   }
 
-  resolverAlerta(id: string, body: ResolverAlertaRequest): Observable<boolean> {
+  resolverAlerta(id: string, body: Record<string, unknown>): Observable<boolean> {
     return this.http
       .patch<void>(`${API}/alerts/alertas/${id}/resolver`, body)
       .pipe(

@@ -2,10 +2,9 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { Factura, FacturaFiltros, FacturaKpis, FacturaFormDto } from '../../models/facturas.model';
-import { SolicitudGil } from '../../models/solicitudes-gil.model';
+import { Factura, FacturaFiltros, FacturaKpis, SolicitudGIL, EstadoGIL } from '../../models/facturas.model';
 import { FacturaResponse, FacturaResumenResponse, GilResponse } from '../api/sourcing.api';
-import { facturaFromApi, facturaFormToRequest, gilFromApi } from '../mappers/sourcing.mapper';
+import { facturaFromApi } from '../mappers/sourcing.mapper';
 
 const API = '/api/v1';
 
@@ -15,11 +14,11 @@ export class FacturasService {
 
   getFacturas(filtros?: FacturaFiltros): Observable<Factura[]> {
     let params = new HttpParams();
-    if (filtros?.busqueda)    params = params.set('q', filtros.busqueda);
-    if (filtros?.estado)      params = params.set('estado', filtros.estado);
-    if (filtros?.proveedor)   params = params.set('proveedor', filtros.proveedor);
-    if (filtros?.fechaDesde)  params = params.set('fechaDesde', filtros.fechaDesde);
-    if (filtros?.fechaHasta)  params = params.set('fechaHasta', filtros.fechaHasta);
+    if (filtros?.busqueda)   params = params.set('q', filtros.busqueda);
+    if (filtros?.estado)     params = params.set('estado', filtros.estado);
+    if (filtros?.proveedor)  params = params.set('proveedor', filtros.proveedor);
+    if (filtros?.fechaDesde) params = params.set('fechaDesde', filtros.fechaDesde);
+    if (filtros?.fechaHasta) params = params.set('fechaHasta', filtros.fechaHasta);
 
     return this.http
       .get<FacturaResponse[]>(`${API}/sourcing/facturas`, { params })
@@ -56,18 +55,20 @@ export class FacturasService {
       );
   }
 
-  createFactura(form: FacturaFormDto): Observable<Factura> {
+  /** La facade pasa Partial<Factura> — el service lo envía al backend tal cual.
+   *  FE-04/FE-06 ajustarán el DTO de request cuando el contrato esté confirmado. */
+  createFactura(data: Partial<Factura>): Observable<Factura> {
     return this.http
-      .post<FacturaResponse>(`${API}/sourcing/facturas`, facturaFormToRequest(form))
+      .post<FacturaResponse>(`${API}/sourcing/facturas`, data)
       .pipe(
         map(facturaFromApi),
         catchError(err => throwError(() => err))
       );
   }
 
-  updateFactura(id: string | number, form: FacturaFormDto): Observable<Factura> {
+  updateFactura(id: string | number, data: Partial<Factura>): Observable<Factura> {
     return this.http
-      .patch<FacturaResponse>(`${API}/sourcing/facturas/${id}`, facturaFormToRequest(form))
+      .patch<FacturaResponse>(`${API}/sourcing/facturas/${id}`, data)
       .pipe(
         map(facturaFromApi),
         catchError(err => throwError(() => err))
@@ -80,12 +81,37 @@ export class FacturasService {
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  getSolicitudGIL(id: string): Observable<SolicitudGil | undefined> {
+  /** Mapea GilResponse al tipo SolicitudGIL que usa la FacturasFacade.
+   *  SolicitudGIL (facturas.model) y SolicitudGil (solicitudes-gil.model) son dos
+   *  tipos distintos — unificarlos es trabajo de un refactor posterior. */
+  getSolicitudGIL(id: string): Observable<SolicitudGIL | undefined> {
     return this.http
       .get<GilResponse>(`${API}/procurement/giles/${id}`)
       .pipe(
-        map(gilFromApi),
+        map(g => this.gilResponseToSolicitudGIL(g)),
         catchError(err => throwError(() => err))
       );
+  }
+
+  private gilResponseToSolicitudGIL(g: GilResponse): SolicitudGIL {
+    return {
+      id: g.id,
+      nombreVocero:            g.voceroNombre ?? '',
+      horarios:                '',   // sin campo equivalente aún
+      resultadoAprendizaje:    g.resultadoAprendizaje ?? '',
+      estadoSolicitud:         g.estado as EstadoGIL,
+      fechaCreacion:           g.fecha,
+      totalEstimado:           0,    // calculado en backend
+      responsable:             g.emitidoPor ?? '',
+      regional:                '',
+      centroFormacion:         g.centroFormacionId,
+      areaPrograma:            g.area,
+      cuentadanteResponsable:  g.cuentadantes?.[0]?.nombre ?? '',
+      destinoBien:             g.destino,
+      preFacturas:             [],
+      observaciones:           g.observaciones ?? '',
+      hashTransaccion:         '',
+      idTransaccion:           '',
+    };
   }
 }
