@@ -1,6 +1,7 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
 import { SolicitudGil, SolicitudesGilFiltros, EstadoGil, CrearSolicitudData, ActualizarSolicitudData } from '../models/solicitudes-gil.model';
 import { SolicitudesService } from './services/solicitudes.service';
+import { EnviarProveedorRequest } from './api/sourcing.api';
 import { finalize, catchError, of } from 'rxjs';
 
 @Injectable({
@@ -144,6 +145,20 @@ export class SolicitudesFacade {
           this.cargarSolicitudes();
         }
       });
+  }
+
+  /** PUT /procurement/giles/{id}/enviar-proveedor con proveedorDestinatarioId y fechaEnvio */
+  enviarAProveedor(id: string, data: EnviarProveedorRequest): void {
+    this._loading.set(true);
+    this.solicitudesService.enviarAProveedor(id, data)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al enviar el GIL al proveedor');
+          return of(false);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(ok => { if (ok) this.cargarSolicitudById(id); });
   }
 
   generarGils(ids: (string | number)[]): void {

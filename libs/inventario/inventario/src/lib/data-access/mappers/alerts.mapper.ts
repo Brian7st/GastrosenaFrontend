@@ -1,5 +1,5 @@
-import { Alerta } from '../../models/alerta.model';
-import { AlertaResponse, ResolverAlertaRequest } from '../api/alerts.api';
+import { Alerta, UmbralConfig } from '../../models/alerta.model';
+import { AlertaResponse, ResolverAlertaRequest, UmbralStockResponse } from '../api/alerts.api';
 
 export function alertaFromApi(dto: AlertaResponse): Alerta {
   return {
@@ -30,4 +30,20 @@ export function resolverAlertaToRequest(
   observaciones?: string
 ): ResolverAlertaRequest {
   return { accionResolucion: accion, resueltoPorId: usuarioId, observaciones };
+}
+
+/** GET /alerts/alertas/umbrales → UmbralConfig
+ *  Los campos de UI (bien, categoria, icono, emailActivo, correos) no existen
+ *  en el response del backend; se rellenan con defaults hasta que se enriquezcan. */
+export function umbralFromApi(dto: UmbralStockResponse): UmbralConfig {
+  return {
+    id:           dto.productoId,
+    bien:         dto.productoId, // TODO: enriquecer con nombre desde /catalog/productos/{id}
+    categoria:    '',
+    icono:        'inventory',
+    stockMinimo:  dto.stockMinimo,
+    emailActivo:  false,
+    correos:      '',
+    enAlerta:     dto.bajoMinimo,
+  };
 }

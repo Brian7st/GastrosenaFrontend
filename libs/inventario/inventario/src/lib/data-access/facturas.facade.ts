@@ -131,6 +131,55 @@ export class FacturasFacade {
       });
   }
 
+  /** Verifica la factura (dispara entrada automática de stock) */
+  verificarFactura(id: string | number): void {
+    this._loading.set(true);
+    this.svc.verificarFactura(id)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al verificar la factura');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => {
+        if (res) { this._facturaSeleccionada.set(res); this.cargarFacturas(); }
+      });
+  }
+
+  /** Marca la factura como pagada (solo desde estado VERIFICADA) */
+  marcarPagada(id: string | number): void {
+    this._loading.set(true);
+    this.svc.marcarPagada(id)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al marcar la factura como pagada');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => {
+        if (res) { this._facturaSeleccionada.set(res); this.cargarFacturas(); }
+      });
+  }
+
+  /** Actualiza los datos bancarios del proveedor (solo en REGISTRADA o VERIFICADA) */
+  actualizarInfoBancaria(
+    id: string | number,
+    data: { banco: string; tipoCuenta: string; numeroCuenta: string },
+  ): void {
+    this._loading.set(true);
+    this.svc.actualizarInfoBancaria(id, data)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al actualizar la información bancaria');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => { if (res) this._facturaSeleccionada.set(res); });
+  }
+
   /** Carga una solicitud GIL */
   cargarSolicitudGIL(id: string): void {
     this.svc.getSolicitudGIL(id)

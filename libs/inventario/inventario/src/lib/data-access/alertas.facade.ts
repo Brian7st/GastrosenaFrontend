@@ -1,7 +1,7 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
 import { AlertasService } from './services/alertas.service';
 import { Alerta, RegistroHistorial, UmbralConfig } from '../models/alerta.model';
-import { finalize, catchError, of, firstValueFrom } from 'rxjs';
+import { finalize, catchError, of, firstValueFrom, forkJoin } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -88,21 +88,24 @@ export class AlertasFacade {
 
   /**
    * Guarda los umbrales de configuración.
+   * Llama PUT /alerts/alertas/umbrales/{productoId} por cada umbral modificado.
    */
   guardarUmbrales(nuevosUmbrales: UmbralConfig[]): void {
+    if (!nuevosUmbrales.length) return;
     this._loading.set(true);
-    this.alertasService.updateUmbrales(nuevosUmbrales)
+    const requests$ = nuevosUmbrales.map(u =>
+      this.alertasService.updateUmbral(u.id, u.stockMinimo)
+    );
+    forkJoin(requests$)
       .pipe(
         catchError(() => {
           this._error.set('Error al guardar umbrales');
-          return of(false);
+          return of([]);
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe((res) => {
-        if (res) {
-          this._umbrales.set(nuevosUmbrales);
-        }
+      .subscribe(res => {
+        if (res.length) this._umbrales.set(nuevosUmbrales);
       });
   }
 

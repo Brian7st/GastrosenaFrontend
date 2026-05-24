@@ -24,3 +24,17 @@ export interface ResolverAlertaRequest {
   resueltoPorId: string;
   observaciones?: string;
 }
+
+/** GET /alerts/alertas/umbrales — existencia con flags de stock */
+export interface UmbralStockResponse {
+  productoId: string;
+  stockFisico: number;
+  stockDisponible: number;
+  stockMinimo: number;
+  bajoMinimo: boolean;
+}
+
+/** PUT /alerts/alertas/umbrales/{productoId} */
+export interface ActualizarUmbralRequest {
+  nuevoMinimo: number;
+}
