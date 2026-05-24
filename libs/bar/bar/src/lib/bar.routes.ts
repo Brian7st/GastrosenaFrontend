@@ -24,14 +24,6 @@ export const BAR_ROUTES: Routes = [
         loadComponent: () => import('./pages/menu-page/menu-page.component').then((m) => m.MenuPageComponent)
       },
 
-      {
-        path: 'actividad',
-        loadComponent: () => import('./pages/actividad-page/actividad-page.component').then((m) => m.ActividadPageComponent)
-      },
-      {
-        path: 'actividades',
-        loadComponent: () => import('./pages/actividades-list-page/actividades-list-page.component').then((m) => m.ActividadesListPageComponent)
-      }
     ]
   }
 ];
