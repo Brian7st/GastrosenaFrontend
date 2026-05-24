@@ -20,25 +20,38 @@ export interface RegistrarPresupuestoRequest {
   bolsaInicial: number;
 }
 
+/** GET /budget/compromisos — item de la lista */
 export interface CompromisoResponse {
   id: string;
-  gilId: string;
   presupuestoId: string;
+  rubroId: string;
+  gilId?: string;
+  concepto: string;
   monto: number;
-  estado: 'ACTIVO' | 'ANULADO' | 'PAGADO';
+  montoRetencionZese: number;
   fecha: string;
+  estado: 'VIGENTE' | 'ANULADO';
 }
 
+/** POST /budget/compromisos */
 export interface ComprometerRequest {
-  gilId: string;
   presupuestoId: string;
+  rubroId: string;
+  gilId?: string;
+  facturaId?: string;
+  fichaId: string;
+  programaId: string;
+  concepto: string;
   monto: number;
+  aplicarZESE: boolean;
+  fecha: string;
 }
 
+/** POST /budget/compromisos/{id}/pagos */
 export interface PagoRequest {
+  cufeFuenteId: string;
   monto: number;
   fecha: string;
-  referencia: string;
 }
 
 export interface LineaConsolidadoResponse {

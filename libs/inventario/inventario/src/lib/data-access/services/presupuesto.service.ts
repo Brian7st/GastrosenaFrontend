@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import {
@@ -10,9 +10,12 @@ import {
   EjecucionMensual,
   RegistrarPresupuestoData,
   TrasladarRubroData,
+  Compromiso,
+  ComprometerData,
+  PagoData,
 } from '../../models/presupuesto.model';
-import { PresupuestoResponse } from '../api/budget.api';
-import { rubroFromApi } from '../mappers/budget.mapper';
+import { PresupuestoResponse, CompromisoResponse, ComprometerRequest, PagoRequest } from '../api/budget.api';
+import { rubroFromApi, compromisoFromApi } from '../mappers/budget.mapper';
 
 const API = '/api/v1';
 
@@ -55,6 +58,60 @@ export class PresupuestoService {
         map(() => ({ success: true })),
         catchError(err => throwError(() => err))
       );
+  }
+
+  // ── Compromisos ──────────────────────────────────────────────────────────────
+
+  /** GET /budget/compromisos — lista filtrada por presupuesto y/o estado */
+  getCompromisos(presupuestoId?: string, estado?: 'VIGENTE' | 'ANULADO'): Observable<Compromiso[]> {
+    let params = new HttpParams();
+    if (presupuestoId) params = params.set('presupuestoId', presupuestoId);
+    if (estado)        params = params.set('estado', estado);
+
+    return this.http
+      .get<CompromisoResponse[]>(`${API}/budget/compromisos`, { params })
+      .pipe(
+        map(list => list.map(compromisoFromApi)),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** POST /budget/compromisos — aplica retención ZESE si aplicarZESE=true */
+  comprometer(data: ComprometerData): Observable<{ id: string }> {
+    const body: ComprometerRequest = {
+      presupuestoId: data.presupuestoId,
+      rubroId:       data.rubroId,
+      gilId:         data.gilId,
+      facturaId:     data.facturaId,
+      fichaId:       data.fichaId,
+      programaId:    data.programaId,
+      concepto:      data.concepto,
+      monto:         data.monto,
+      aplicarZESE:   data.aplicarZESE,
+      fecha:         data.fecha,
+    };
+    return this.http
+      .post<{ id: string }>(`${API}/budget/compromisos`, body)
+      .pipe(catchError(err => throwError(() => err)));
+  }
+
+  /** PATCH /budget/compromisos/{id}/anular — 422 si ya anulado */
+  anularCompromiso(id: string): Observable<void> {
+    return this.http
+      .patch<void>(`${API}/budget/compromisos/${id}/anular`, {})
+      .pipe(catchError(err => throwError(() => err)));
+  }
+
+  /** POST /budget/compromisos/{id}/pagos */
+  registrarPago(compromisoId: string, data: PagoData): Observable<{ id: string }> {
+    const body: PagoRequest = {
+      cufeFuenteId: data.cufeFuenteId,
+      monto:        data.monto,
+      fecha:        data.fecha,
+    };
+    return this.http
+      .post<{ id: string }>(`${API}/budget/compromisos/${compromisoId}/pagos`, body)
+      .pipe(catchError(err => throwError(() => err)));
   }
 
   // ── FE-06: los métodos siguientes requieren alineación con backend ──

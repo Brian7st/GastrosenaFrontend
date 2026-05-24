@@ -10,6 +10,9 @@ import {
   EjecucionMensual,
   RegistrarPresupuestoData,
   TrasladarRubroData,
+  Compromiso,
+  ComprometerData,
+  PagoData,
 } from '../models/presupuesto.model';
 
 @Injectable({ providedIn: 'root' })
@@ -19,6 +22,7 @@ export class PresupuestoFacade {
   // Estados internos (Signals)
   private _resumen          = signal<PresupuestoResumen | null>(null);
   private _rubros           = signal<Rubro[]>([]);
+  private _compromisos      = signal<Compromiso[]>([]);
   private _afectaciones     = signal<AfectacionPresupuestal[]>([]);
   private _vencimientos     = signal<VencimientoProximo[]>([]);
   private _ejecucionMensual = signal<EjecucionMensual[]>([]);
@@ -28,6 +32,7 @@ export class PresupuestoFacade {
   // Exposición pública (solo lectura)
   public resumen          = computed(() => this._resumen());
   public rubros           = computed(() => this._rubros());
+  public compromisos      = computed(() => this._compromisos());
   public afectaciones     = computed(() => this._afectaciones());
   public vencimientos     = computed(() => this._vencimientos());
   public ejecucionMensual = computed(() => this._ejecucionMensual());
@@ -106,6 +111,72 @@ export class PresupuestoFacade {
       checkLoading();
     });
   }
+
+  // ── Compromisos ────────────────────────────────────────────────────────────
+
+  /** Carga compromisos con filtros opcionales de presupuesto y estado */
+  cargarCompromisos(presupuestoId?: string, estado?: 'VIGENTE' | 'ANULADO'): void {
+    this._loading.set(true);
+    this.presupuestoService.getCompromisos(presupuestoId, estado)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al cargar los compromisos');
+          return of([]);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(data => this._compromisos.set(data));
+  }
+
+  /** Crea un compromiso presupuestal y recarga la lista */
+  comprometer(data: ComprometerData): void {
+    this._loading.set(true);
+    this.presupuestoService.comprometer(data)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al comprometer el presupuesto');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => {
+        if (res) this.cargarCompromisos(data.presupuestoId);
+      });
+  }
+
+  /** Anula un compromiso y recarga la lista */
+  anularCompromiso(id: string, presupuestoId?: string): void {
+    this._loading.set(true);
+    this.presupuestoService.anularCompromiso(id)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al anular el compromiso');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => {
+        if (res !== null) this.cargarCompromisos(presupuestoId);
+      });
+  }
+
+  /** Registra un pago contra un compromiso y recarga la lista */
+  registrarPago(compromisoId: string, data: PagoData, presupuestoId?: string): void {
+    this._loading.set(true);
+    this.presupuestoService.registrarPago(compromisoId, data)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al registrar el pago');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => {
+        if (res) this.cargarCompromisos(presupuestoId);
+      });
+  }
+
+  // ── Presupuestos ────────────────────────────────────────────────────────────
 
   registrarPresupuesto(data: RegistrarPresupuestoData): void {
     this._loading.set(true);
