@@ -1,27 +1,54 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
-import { Movimiento, EntradaMovimientoData, SalidaMovimientoData } from '../models/movimiento.model';
+import { catchError, finalize, of } from 'rxjs';
+import {
+  Movimiento,
+  EntradaMovimientoData,
+  SalidaMovimientoData,
+  ReservaMovimientoData,
+  LiberacionMovimientoData,
+  AjusteMovimientoData,
+} from '../models/movimiento.model';
+import { ExistenciaProducto } from '../models/inventario.model';
 import { MovimientosService } from './services/movimientos.service';
-import { finalize, catchError, of } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class KardexFacade {
   private movimientosService = inject(MovimientosService);
 
-  private _movimientos = signal<Movimiento[]>([]);
+  // ── Estado ───────────────────────────────────────────────────────────────────
+  private _movimientos       = signal<Movimiento[]>([]);
   private _movimientoSeleccionado = signal<Movimiento | undefined>(undefined);
-  private _loading = signal<boolean>(false);
+  private _existencia        = signal<ExistenciaProducto | null>(null);
+  private _bajoMinimo        = signal<ExistenciaProducto[]>([]);
+  private _loading           = signal<boolean>(false);
+  private _error             = signal<string | null>(null);
 
-  public movimientos = computed(() => this._movimientos());
+  // ── Lectura pública ──────────────────────────────────────────────────────────
+  public movimientos          = computed(() => this._movimientos());
   public movimientoSeleccionado = computed(() => this._movimientoSeleccionado());
-  public loading = computed(() => this._loading());
+  public existencia           = computed(() => this._existencia());
+  public bajoMinimo           = computed(() => this._bajoMinimo());
+  public loading              = computed(() => this._loading());
+  public error                = computed(() => this._error());
 
+  // ── Kardex ───────────────────────────────────────────────────────────────────
+
+  /** El backend no expone un listado general de movimientos.
+   *  Llama cargarKardex(productoId) una vez se seleccione un producto. */
   loadAll(): void {
+    this._movimientos.set([]);
+    this._error.set(null);
+  }
+
+  cargarKardex(productoId: string): void {
     this._loading.set(true);
-    this.movimientosService.getMovimientos()
+    this._error.set(null);
+    this.movimientosService.getKardex(productoId)
       .pipe(
-        catchError(() => of([])),
+        catchError(() => {
+          this._error.set('Error al cargar el kardex');
+          return of([]);
+        }),
         finalize(() => this._loading.set(false))
       )
       .subscribe(data => this._movimientos.set(data));
@@ -37,27 +64,100 @@ export class KardexFacade {
       .subscribe(data => this._movimientoSeleccionado.set(data));
   }
 
+  // ── Existencias ──────────────────────────────────────────────────────────────
+
+  cargarExistencia(productoId: string): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this.movimientosService.getExistencia(productoId)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al cargar existencias');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(data => this._existencia.set(data));
+  }
+
+  cargarBajoMinimo(): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this.movimientosService.getExistenciasBajoMinimo()
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al cargar productos bajo mínimo');
+          return of([]);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(data => this._bajoMinimo.set(data));
+  }
+
+  // ── Registros ────────────────────────────────────────────────────────────────
+
   registrarEntrada(data: EntradaMovimientoData): void {
     this._loading.set(true);
     this.movimientosService.registrarEntrada(data)
       .pipe(
-        catchError(() => of(null)),
+        catchError(() => {
+          this._error.set('Error al registrar entrada');
+          return of(null);
+        }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe((res) => {
-        if (res) this.loadAll();
-      });
+      .subscribe(res => { if (res) this.cargarKardex(data.producto); });
   }
 
   registrarSalida(data: SalidaMovimientoData): void {
     this._loading.set(true);
     this.movimientosService.registrarSalida(data)
       .pipe(
-        catchError(() => of(null)),
+        catchError(() => {
+          this._error.set('Error al registrar salida');
+          return of(null);
+        }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe((res) => {
-        if (res) this.loadAll();
-      });
+      .subscribe(res => { if (res) this.cargarKardex(data.producto); });
+  }
+
+  registrarReserva(data: ReservaMovimientoData): void {
+    this._loading.set(true);
+    this.movimientosService.registrarReserva(data)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al registrar reserva');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => { if (res) this.cargarKardex(data.producto); });
+  }
+
+  registrarLiberacion(data: LiberacionMovimientoData): void {
+    this._loading.set(true);
+    this.movimientosService.registrarLiberacion(data)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al registrar liberación');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => { if (res) this.cargarKardex(data.producto); });
+  }
+
+  registrarAjuste(data: AjusteMovimientoData): void {
+    this._loading.set(true);
+    this.movimientosService.registrarAjuste(data)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al registrar ajuste');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => { if (res) this.cargarKardex(data.producto); });
   }
 }

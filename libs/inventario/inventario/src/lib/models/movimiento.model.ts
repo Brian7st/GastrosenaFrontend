@@ -37,3 +37,27 @@ export interface SalidaMovimientoData {
   proposito: string;
   observaciones?: string;
 }
+
+/** Payload para reservar stock de un producto */
+export interface ReservaMovimientoData {
+  producto: string;
+  cantidad: number;
+  fichaId: string;
+  instructorId: string;
+  observaciones?: string;
+}
+
+/** Payload para liberar una reserva existente */
+export interface LiberacionMovimientoData {
+  producto: string;
+  cantidad: number;
+  motivo: string;
+}
+
+/** Payload para ajustar el inventario físico de un producto */
+export interface AjusteMovimientoData {
+  producto: string;
+  cantidadNueva: number;
+  motivo: string;
+  responsableId: string;
+}
