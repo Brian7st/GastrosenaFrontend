@@ -1,6 +1,21 @@
-import { Movimiento, EntradaMovimientoData, SalidaMovimientoData } from '../../models/movimiento.model';
+import {
+  Movimiento,
+  EntradaMovimientoData,
+  SalidaMovimientoData,
+  ReservaMovimientoData,
+  LiberacionMovimientoData,
+  AjusteMovimientoData,
+} from '../../models/movimiento.model';
 import { ExistenciaProducto } from '../../models/inventario.model';
-import { MovimientoResponse, ExistenciaResponse, EntradaRequest, SalidaRequest } from '../api/inventory.api';
+import {
+  MovimientoResponse,
+  ExistenciaResponse,
+  EntradaRequest,
+  SalidaRequest,
+  ReservaRequest,
+  LiberacionRequest,
+  AjusteRequest,
+} from '../api/inventory.api';
 
 export function movimientoFromApi(dto: MovimientoResponse): Movimiento {
   return {
@@ -53,5 +68,32 @@ export function salidaToRequest(data: SalidaMovimientoData): SalidaRequest {
     categoria: data.categoria,
     proposito: data.proposito,
     observaciones: data.observaciones,
+  };
+}
+
+export function reservaToRequest(data: ReservaMovimientoData): ReservaRequest {
+  return {
+    productoId: data.producto,
+    cantidad: data.cantidad,
+    fichaId: data.fichaId,
+    instructorId: data.instructorId,
+    observaciones: data.observaciones,
+  };
+}
+
+export function liberacionToRequest(data: LiberacionMovimientoData): LiberacionRequest {
+  return {
+    productoId: data.producto,
+    cantidad: data.cantidad,
+    motivo: data.motivo,
+  };
+}
+
+export function ajusteToRequest(data: AjusteMovimientoData): AjusteRequest {
+  return {
+    productoId: data.producto,
+    cantidadNueva: data.cantidadNueva,
+    motivo: data.motivo,
+    responsableId: data.responsableId,
   };
 }
