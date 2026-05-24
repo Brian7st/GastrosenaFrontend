@@ -90,6 +90,42 @@ export interface TrasladarRubroData {
   motivo?: string;
 }
 
+// ── Compromisos presupuestales ────────────────────────────────────────────────
+
+/** Compromiso presupuestal (GET /budget/compromisos) */
+export interface Compromiso {
+  id: string;
+  presupuestoId: string;
+  rubroId: string;
+  gilId?: string;
+  concepto: string;
+  monto: number;
+  montoRetencionZese: number;
+  fecha: string;
+  estado: 'VIGENTE' | 'ANULADO';
+}
+
+/** Payload UI para comprometer presupuesto (POST /budget/compromisos) */
+export interface ComprometerData {
+  presupuestoId: string;
+  rubroId: string;
+  gilId?: string;
+  facturaId?: string;
+  fichaId: string;
+  programaId: string;
+  concepto: string;
+  monto: number;
+  aplicarZESE: boolean;
+  fecha: string;
+}
+
+/** Payload UI para registrar pago (POST /budget/compromisos/{id}/pagos) */
+export interface PagoData {
+  cufeFuenteId: string;
+  monto: number;
+  fecha: string;
+}
+
 // ============================================================
 // MOCKS
 // ============================================================
