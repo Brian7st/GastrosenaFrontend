@@ -9,6 +9,7 @@ import {
   AjusteMovimientoData,
 } from '../models/movimiento.model';
 import { ExistenciaProducto } from '../models/inventario.model';
+import { KardexValorizadoItem } from '../models/reporting.model';
 import { MovimientosService } from './services/movimientos.service';
 
 @Injectable({ providedIn: 'root' })
@@ -16,20 +17,22 @@ export class KardexFacade {
   private movimientosService = inject(MovimientosService);
 
   // ── Estado ───────────────────────────────────────────────────────────────────
-  private _movimientos       = signal<Movimiento[]>([]);
-  private _movimientoSeleccionado = signal<Movimiento | undefined>(undefined);
-  private _existencia        = signal<ExistenciaProducto | null>(null);
-  private _bajoMinimo        = signal<ExistenciaProducto[]>([]);
-  private _loading           = signal<boolean>(false);
-  private _error             = signal<string | null>(null);
+  private _movimientos              = signal<Movimiento[]>([]);
+  private _movimientoSeleccionado   = signal<Movimiento | undefined>(undefined);
+  private _existencia               = signal<ExistenciaProducto | null>(null);
+  private _bajoMinimo               = signal<ExistenciaProducto[]>([]);
+  private _kardexValorizado         = signal<KardexValorizadoItem[]>([]);
+  private _loading                  = signal<boolean>(false);
+  private _error                    = signal<string | null>(null);
 
   // ── Lectura pública ──────────────────────────────────────────────────────────
-  public movimientos          = computed(() => this._movimientos());
-  public movimientoSeleccionado = computed(() => this._movimientoSeleccionado());
-  public existencia           = computed(() => this._existencia());
-  public bajoMinimo           = computed(() => this._bajoMinimo());
-  public loading              = computed(() => this._loading());
-  public error                = computed(() => this._error());
+  public movimientos              = computed(() => this._movimientos());
+  public movimientoSeleccionado   = computed(() => this._movimientoSeleccionado());
+  public existencia               = computed(() => this._existencia());
+  public bajoMinimo               = computed(() => this._bajoMinimo());
+  public kardexValorizado         = computed(() => this._kardexValorizado());
+  public loading                  = computed(() => this._loading());
+  public error                    = computed(() => this._error());
 
   // ── Kardex ───────────────────────────────────────────────────────────────────
 
@@ -62,6 +65,25 @@ export class KardexFacade {
         finalize(() => this._loading.set(false))
       )
       .subscribe(data => this._movimientoSeleccionado.set(data));
+  }
+
+  /** GET /reporting/kardex?productoId?&desde?&hasta? */
+  cargarKardexValorizado(params?: {
+    productoId?: string;
+    desde?:      string;
+    hasta?:      string;
+  }): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this.movimientosService.getKardexValorizado(params)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al cargar el kardex valorizado');
+          return of([]);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(data => this._kardexValorizado.set(data));
   }
 
   // ── Existencias ──────────────────────────────────────────────────────────────
