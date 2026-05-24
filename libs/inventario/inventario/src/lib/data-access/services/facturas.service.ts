@@ -2,9 +2,17 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { Factura, FacturaFiltros, FacturaKpis, SolicitudGIL, EstadoGIL } from '../../models/facturas.model';
-import { FacturaResponse, FacturaResumenResponse, GilResponse } from '../api/sourcing.api';
-import { facturaFromApi } from '../mappers/sourcing.mapper';
+import { Factura, FacturaFiltros, FacturaKpis, SolicitudGIL, EstadoGIL, ConciliacionGil } from '../../models/facturas.model';
+import {
+  FacturaResponse,
+  FacturaResumenResponse,
+  GilResponse,
+  ConciliacionGilResponse,
+  ConciliarRequest,
+  ResolverDiferenciaGilRequest,
+  VincularInstructorRequest,
+} from '../api/sourcing.api';
+import { facturaFromApi, conciliacionGilFromApi } from '../mappers/sourcing.mapper';
 
 const API = '/api/v1';
 
@@ -112,6 +120,60 @@ export class FacturasService {
         map(facturaFromApi),
         catchError(err => throwError(() => err))
       );
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Sourcing — Conciliación Factura-GIL /api/v1/sourcing/conciliaciones-gil
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /** POST /sourcing/conciliaciones-gil — vincula una factura con su GIL — 201 Created */
+  conciliarFacturaGil(facturaId: string, gilId: string): Observable<ConciliacionGil> {
+    const body: ConciliarRequest = { facturaId, gilId };
+    return this.http
+      .post<ConciliacionGilResponse>(`${API}/sourcing/conciliaciones-gil`, body)
+      .pipe(
+        map(conciliacionGilFromApi),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** GET /sourcing/conciliaciones-gil?facturaId=X  ó  ?gilId=Y */
+  getConciliacionGil(params: { facturaId?: string; gilId?: string }): Observable<ConciliacionGil> {
+    let httpParams = new HttpParams();
+    if (params.facturaId) httpParams = httpParams.set('facturaId', params.facturaId);
+    if (params.gilId)     httpParams = httpParams.set('gilId',     params.gilId);
+    return this.http
+      .get<ConciliacionGilResponse>(`${API}/sourcing/conciliaciones-gil`, { params: httpParams })
+      .pipe(
+        map(conciliacionGilFromApi),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** PATCH /sourcing/conciliaciones-gil/{id}/diferencias/{gilItemId}/resolver */
+  resolverDiferenciaGil(id: string, gilItemId: string, observacion: string): Observable<ConciliacionGil> {
+    const body: ResolverDiferenciaGilRequest = { observacion };
+    return this.http
+      .patch<ConciliacionGilResponse>(
+        `${API}/sourcing/conciliaciones-gil/${id}/diferencias/${gilItemId}/resolver`,
+        body,
+      )
+      .pipe(
+        map(conciliacionGilFromApi),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Sourcing — Vinculación Instructor /api/v1/sourcing/instructor-vinculos
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /** PUT /sourcing/instructor-vinculos/{ordenCompra} — 204 No Content */
+  vincularInstructorOrden(ordenCompra: string, instructorId: string): Observable<void> {
+    const body: VincularInstructorRequest = { instructorId };
+    return this.http
+      .put<void>(`${API}/sourcing/instructor-vinculos/${ordenCompra}`, body)
+      .pipe(catchError(err => throwError(() => err)));
   }
 
   /** Mapea GilResponse al tipo SolicitudGIL que usa la FacturasFacade.

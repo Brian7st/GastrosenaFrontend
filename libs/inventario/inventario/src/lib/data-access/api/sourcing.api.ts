@@ -124,3 +124,37 @@ export interface EnviarProveedorRequest {
   proveedorDestinatarioId: string;
   fechaEnvio: string;
 }
+
+// ─── Sourcing — Conciliación Factura-GIL (/api/v1/sourcing/conciliaciones-gil) ─
+
+export interface GilDiferenciaItemResponse {
+  gilItemId:            string;
+  descripcion:          string;
+  cantidadGil:          number;
+  cantidadFactura:      number;
+  precioUnitarioGil:    number;
+  precioUnitarioFactura: number;
+  diferencia:           number;
+  observacion?:         string;
+  resuelta:             boolean;
+}
+
+/** Respuesta de POST, GET y PATCH /sourcing/conciliaciones-gil */
+export interface ConciliacionGilResponse {
+  id:          string;
+  facturaId:   string;
+  gilId:       string;
+  estado:      string;
+  diferencias: GilDiferenciaItemResponse[];
+}
+
+/** POST /sourcing/conciliaciones-gil */
+export interface ConciliarRequest {
+  facturaId: string;
+  gilId:     string;
+}
+
+/** PATCH /sourcing/conciliaciones-gil/{id}/diferencias/{gilItemId}/resolver */
+export interface ResolverDiferenciaGilRequest {
+  observacion: string;
+}

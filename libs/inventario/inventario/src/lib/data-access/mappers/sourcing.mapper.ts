@@ -1,6 +1,6 @@
-import { Factura, FacturaFormDto } from '../../models/facturas.model';
+import { Factura, FacturaFormDto, ConciliacionGil } from '../../models/facturas.model';
 import { SolicitudGil, BienSolicitud, CuentadanteGil } from '../../models/solicitudes-gil.model';
-import { FacturaResponse, GilResponse, RegistrarFacturaRequest } from '../api/sourcing.api';
+import { FacturaResponse, GilResponse, RegistrarFacturaRequest, ConciliacionGilResponse } from '../api/sourcing.api';
 
 export function facturaFromApi(dto: FacturaResponse): Factura {
   return {
@@ -42,6 +42,26 @@ export function facturaFormToRequest(form: FacturaFormDto): RegistrarFacturaRequ
     gilVinculado: form.gilVinculado,
     instructorId: form.instructorId,
     valorRetencionZese: form.valorRetencionZese,
+  };
+}
+
+export function conciliacionGilFromApi(dto: ConciliacionGilResponse): ConciliacionGil {
+  return {
+    id:        dto.id,
+    facturaId: dto.facturaId,
+    gilId:     dto.gilId,
+    estado:    dto.estado,
+    diferencias: dto.diferencias.map(d => ({
+      gilItemId:             d.gilItemId,
+      descripcion:           d.descripcion,
+      cantidadGil:           d.cantidadGil,
+      cantidadFactura:       d.cantidadFactura,
+      precioUnitarioGil:     d.precioUnitarioGil,
+      precioUnitarioFactura: d.precioUnitarioFactura,
+      diferencia:            d.diferencia,
+      observacion:           d.observacion,
+      resuelta:              d.resuelta,
+    })),
   };
 }
 
