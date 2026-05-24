@@ -59,14 +59,14 @@
   @if (mostrarDetalle() && recetaSeleccionada()) {
     <bar-detalle-receta 
       [receta]="recetaSeleccionada()!" 
-      (close)="cerrarModales()" 
+      (closeDetail)="cerrarModales()" 
     ></bar-detalle-receta>
   }
 
   @if (mostrarGestion()) {
     <bar-gestion-receta 
       [receta]="recetaSeleccionada()" 
-      (close)="cerrarModales($event)" 
+      (closeManage)="cerrarModales($event)" 
     ></bar-gestion-receta>
   }
 
