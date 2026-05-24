@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import {
@@ -12,6 +12,8 @@ import {
 } from '../../models/movimiento.model';
 import { ExistenciaProducto } from '../../models/inventario.model';
 import { MovimientoResponse, ExistenciaResponse } from '../api/inventory.api';
+import { KardexValorizadoItemResponse } from '../api/reporting.api';
+import { KardexValorizadoItem } from '../../models/reporting.model';
 import {
   movimientoFromApi,
   existenciaFromApi,
@@ -21,6 +23,7 @@ import {
   liberacionToRequest,
   ajusteToRequest,
 } from '../mappers/inventory.mapper';
+import { kardexValorizadoFromApi } from '../mappers/reporting.mapper';
 
 const API = '/api/v1';
 
@@ -103,5 +106,23 @@ export class MovimientosService {
     return this.http
       .post<{ success: boolean }>(`${API}/inventory/movimientos/ajuste`, ajusteToRequest(data))
       .pipe(catchError(err => throwError(() => err)));
+  }
+
+  /** GET /reporting/kardex?productoId?&desde?&hasta? (ISO_DATE_TIME) */
+  getKardexValorizado(params?: {
+    productoId?: string;
+    desde?:      string;
+    hasta?:      string;
+  }): Observable<KardexValorizadoItem[]> {
+    let httpParams = new HttpParams();
+    if (params?.productoId) httpParams = httpParams.set('productoId', params.productoId);
+    if (params?.desde)      httpParams = httpParams.set('desde',      params.desde);
+    if (params?.hasta)      httpParams = httpParams.set('hasta',      params.hasta);
+    return this.http
+      .get<KardexValorizadoItemResponse[]>(`${API}/reporting/kardex`, { params: httpParams })
+      .pipe(
+        map(list => list.map(kardexValorizadoFromApi)),
+        catchError(err => throwError(() => err))
+      );
   }
 }

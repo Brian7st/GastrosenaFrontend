@@ -1,10 +1,13 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Alerta, UmbralConfig } from '../../models/alerta.model';
+import { ResumenAlertas } from '../../models/reporting.model';
 import { AlertaResponse, UmbralStockResponse, ActualizarUmbralRequest } from '../api/alerts.api';
+import { ResumenAlertasResponse } from '../api/reporting.api';
 import { alertaFromApi, umbralFromApi } from '../mappers/alerts.mapper';
+import { resumenAlertasFromApi } from '../mappers/reporting.mapper';
 
 const API = '/api/v1';
 
@@ -61,15 +64,22 @@ export class AlertasService {
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  // ── Historial (Reporting) ─────────────────────────────────────────────────────
+  // ── Resumen Alertas (Reporting) ───────────────────────────────────────────────
 
-  /** TODO FE-05 — wired en reporting: GET /reporting/alertas/resumen */
-  getHistorial(): Observable<never> {
-    return throwError(() => new Error('getHistorial: usar /reporting/alertas/resumen — pendiente FE-05'));
+  /** GET /reporting/alertas/resumen?destinatarioId? */
+  getResumenAlertas(destinatarioId?: string): Observable<ResumenAlertas> {
+    let params = new HttpParams();
+    if (destinatarioId) params = params.set('destinatarioId', destinatarioId);
+    return this.http
+      .get<ResumenAlertasResponse>(`${API}/reporting/alertas/resumen`, { params })
+      .pipe(
+        map(resumenAlertasFromApi),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  /** TODO FE-05 — sin endpoint de exportación CSV */
+  /** TODO FE-05 — sin endpoint de exportación CSV confirmado con backend */
   exportarHistorialCSV(): Observable<never> {
-    return throwError(() => new Error('exportarHistorialCSV: endpoint no disponible — pendiente FE-05'));
+    return throwError(() => new Error('exportarHistorialCSV: endpoint no disponible — pendiente confirmación backend'));
   }
 }
