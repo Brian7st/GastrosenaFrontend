@@ -1,60 +1,88 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable, of, delay } from 'rxjs';
-import { SolicitudGil, SolicitudesGilFiltros, EstadoGil, CrearSolicitudData, ActualizarSolicitudData } from '../../models/solicitudes-gil.model';
-import { SOLICITUDES_GIL_MOCK } from '../../models/solicitudes-gil.mock';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import {
+  SolicitudGil,
+  SolicitudesGilFiltros,
+  EstadoGil,
+  CrearSolicitudData,
+  ActualizarSolicitudData,
+} from '../../models/solicitudes-gil.model';
+import { GilResponse } from '../api/sourcing.api';
+import { gilFromApi } from '../mappers/sourcing.mapper';
 
-@Injectable({
-  providedIn: 'root'
-})
+const API = '/api/v1';
+
+@Injectable({ providedIn: 'root' })
 export class SolicitudesService {
+  private http = inject(HttpClient);
 
   getSolicitudes(filtros?: SolicitudesGilFiltros): Observable<SolicitudGil[]> {
-    let result = [...SOLICITUDES_GIL_MOCK];
+    let params = new HttpParams();
+    if (filtros?.busqueda)   params = params.set('q', filtros.busqueda);
+    if (filtros?.estado)     params = params.set('estado', filtros.estado);
+    if (filtros?.instructor) params = params.set('instructor', filtros.instructor);
+    if (filtros?.fechaRango) params = params.set('fechaRango', filtros.fechaRango);
 
-    if (filtros) {
-      if (filtros.busqueda) {
-        const query = filtros.busqueda.toLowerCase();
-        result = result.filter(s =>
-          s.numeroGil.toLowerCase().includes(query) ||
-          s.cuentadantes.some(c => c.nombre.toLowerCase().includes(query)) ||
-          s.destino.toLowerCase().includes(query)
-        );
-      }
-      if (filtros.estado) {
-        result = result.filter(s => s.estado === filtros.estado);
-      }
-      if (filtros.instructor) {
-        const instr = filtros.instructor.toLowerCase();
-        result = result.filter(s => s.cuentadantes.some(c => c.nombre.toLowerCase().includes(instr)));
-      }
-    }
-
-    return of(result).pipe(delay(500));
+    return this.http
+      .get<GilResponse[]>(`${API}/procurement/giles`, { params })
+      .pipe(
+        map(list => list.map(gilFromApi)),
+        catchError(err => throwError(() => err))
+      );
   }
 
   getSolicitudById(id: string | number): Observable<SolicitudGil | undefined> {
-    const solicitud = SOLICITUDES_GIL_MOCK.find(s => s.numeroGil === id || s.id.toString() === id.toString());
-    return of(solicitud).pipe(delay(300));
+    return this.http
+      .get<GilResponse>(`${API}/procurement/giles/${id}`)
+      .pipe(
+        map(gilFromApi),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  deleteSolicitud(codigo: string): Observable<boolean> {
-    // Simulated delete
-    return of(true).pipe(delay(800));
+  crearSolicitud(data: CrearSolicitudData): Observable<{ success: boolean }> {
+    return this.http
+      .post<GilResponse>(`${API}/procurement/giles`, data)
+      .pipe(
+        map(() => ({ success: true })),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  crearSolicitud(_data: CrearSolicitudData): Observable<{ success: boolean }> {
-    return of({ success: true }).pipe(delay(600));
+  actualizarSolicitud(id: string, data: ActualizarSolicitudData): Observable<{ success: boolean }> {
+    return this.http
+      .patch<GilResponse>(`${API}/procurement/giles/${id}`, data)
+      .pipe(
+        map(() => ({ success: true })),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  actualizarSolicitud(_id: string, _data: ActualizarSolicitudData): Observable<{ success: boolean }> {
-    return of({ success: true }).pipe(delay(600));
+  cambiarEstado(id: string, estado: EstadoGil): Observable<boolean> {
+    const accionMap: Record<EstadoGil, string> = {
+      BORRADOR:         '',
+      EMITIDO:          'emitir',
+      ENVIADO_PROVEEDOR: 'enviar-proveedor',
+      CERRADO:          'cerrar',
+    };
+    const accion = accionMap[estado];
+    if (!accion) return throwError(() => new Error(`Estado ${estado} sin endpoint de transición`));
+
+    return this.http
+      .patch<void>(`${API}/procurement/giles/${id}/${accion}`, {})
+      .pipe(
+        map(() => true),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  cambiarEstado(_id: string, _estado: EstadoGil): Observable<boolean> {
-    return of(true).pipe(delay(400));
+  deleteSolicitud(_codigo: string): Observable<boolean> {
+    return throwError(() => new Error('deleteSolicitud: endpoint DELETE no disponible en backend'));
   }
 
-  generarGils(ids: (string | number)[]): Observable<boolean> {
-    return of(true).pipe(delay(500));
+  generarGils(_ids: (string | number)[]): Observable<boolean> {
+    return throwError(() => new Error('generarGils: endpoint no disponible — revisar con backend'));
   }
 }

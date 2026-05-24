@@ -1,30 +1,69 @@
-import { Injectable } from '@angular/core';
-import { Observable, of, delay } from 'rxjs';
-import { PaqueteProbatorio, MOCK_PAQUETES } from '../../models/paquete.model';
+import { inject, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { PaqueteProbatorio } from '../../models/paquete.model';
+import { PaqueteResponse, CrearPaqueteRequest, TrazabilidadRequest } from '../api/legalization.api';
+import { paqueteFromApi } from '../mappers/legalization.mapper';
+
+const API = '/api/v1';
 
 @Injectable({ providedIn: 'root' })
 export class PaqueteService {
+  private http = inject(HttpClient);
 
   getPaquetes(): Observable<PaqueteProbatorio[]> {
-    return of([...MOCK_PAQUETES]).pipe(delay(300));
+    return this.http
+      .get<PaqueteResponse[]>(`${API}/legalization/paquetes`)
+      .pipe(
+        map(list => list.map(paqueteFromApi)),
+        catchError(err => throwError(() => err))
+      );
   }
 
   getPaqueteById(id: string): Observable<PaqueteProbatorio | undefined> {
-    return of(MOCK_PAQUETES.find(p => p.id === id)).pipe(delay(200));
+    return this.http
+      .get<PaqueteResponse>(`${API}/legalization/paquetes/${id}`)
+      .pipe(
+        map(paqueteFromApi),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  crearPaquete(data: Partial<PaqueteProbatorio>): Observable<PaqueteProbatorio> {
-    const nuevo = { ...data, id: String(Date.now()) } as PaqueteProbatorio;
-    return of(nuevo).pipe(delay(800));
+  crearPaquete(data: CrearPaqueteRequest): Observable<PaqueteProbatorio> {
+    return this.http
+      .post<PaqueteResponse>(`${API}/legalization/paquetes`, data)
+      .pipe(
+        map(paqueteFromApi),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  adjuntarDocumento(paqueteId: string, file: File): Observable<boolean> {
-    console.log(`[PaqueteService] Adjuntando ${file.name} a paquete ${paqueteId}`);
-    return of(true).pipe(delay(600));
+  adjuntarAsistencia(paqueteId: string): Observable<boolean> {
+    return this.http
+      .patch<void>(`${API}/legalization/paquetes/${paqueteId}/adjuntar-asistencia`, {})
+      .pipe(
+        map(() => true),
+        catchError(err => throwError(() => err))
+      );
   }
 
+  vincularTrazabilidad(paqueteId: string, datos: TrazabilidadRequest): Observable<boolean> {
+    return this.http
+      .patch<void>(`${API}/legalization/paquetes/${paqueteId}/trazabilidad`, datos)
+      .pipe(
+        map(() => true),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** Firma anterior: adjuntarDocumento(paqueteId, file) → ahora adjuntarAsistencia */
+  adjuntarDocumento(paqueteId: string, _file: File): Observable<boolean> {
+    return this.adjuntarAsistencia(paqueteId);
+  }
+
+  /** TODO: vincular requisición — usar vincularTrazabilidad con requisicionId */
   incluirRequisicion(paqueteId: string, reqId: string): Observable<boolean> {
-    console.log(`[PaqueteService] Incluyendo req ${reqId} en paquete ${paqueteId}`);
-    return of(true).pipe(delay(400));
+    return this.vincularTrazabilidad(paqueteId, { requisicionId: reqId });
   }
 }

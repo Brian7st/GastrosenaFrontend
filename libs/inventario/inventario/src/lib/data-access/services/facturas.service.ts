@@ -1,86 +1,91 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable, of, delay } from 'rxjs';
-import { Factura, FacturaFiltros, FacturaKpis, SolicitudGIL } from '../../models/facturas.model';
-import { FACTURAS_MOCK, FACTURAS_KPIS_MOCK, SOLICITUD_GIL_MOCK } from '../../models/facturas.mock';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { Factura, FacturaFiltros, FacturaKpis, FacturaFormDto } from '../../models/facturas.model';
+import { SolicitudGil } from '../../models/solicitudes-gil.model';
+import { FacturaResponse, FacturaResumenResponse, GilResponse } from '../api/sourcing.api';
+import { facturaFromApi, facturaFormToRequest, gilFromApi } from '../mappers/sourcing.mapper';
 
-@Injectable({
-  providedIn: 'root'
-})
+const API = '/api/v1';
+
+@Injectable({ providedIn: 'root' })
 export class FacturasService {
+  private http = inject(HttpClient);
 
-  /**
-   * Obtiene el listado de facturas con filtros opcionales.
-   */
   getFacturas(filtros?: FacturaFiltros): Observable<Factura[]> {
-    let result = [...FACTURAS_MOCK];
+    let params = new HttpParams();
+    if (filtros?.busqueda)    params = params.set('q', filtros.busqueda);
+    if (filtros?.estado)      params = params.set('estado', filtros.estado);
+    if (filtros?.proveedor)   params = params.set('proveedor', filtros.proveedor);
+    if (filtros?.fechaDesde)  params = params.set('fechaDesde', filtros.fechaDesde);
+    if (filtros?.fechaHasta)  params = params.set('fechaHasta', filtros.fechaHasta);
 
-    if (filtros?.busqueda) {
-      const q = filtros.busqueda.toLowerCase();
-      result = result.filter(f =>
-        f.proveedorNombre.toLowerCase().includes(q) ||
-        f.numeroFactura.toLowerCase().includes(q) ||
-        (f.ordenCompra ?? '').toLowerCase().includes(q)
+    return this.http
+      .get<FacturaResponse[]>(`${API}/sourcing/facturas`, { params })
+      .pipe(
+        map(list => list.map(facturaFromApi)),
+        catchError(err => throwError(() => err))
       );
-    }
-    if (filtros?.estado) {
-      result = result.filter(f => f.estado === filtros.estado);
-    }
-
-    return of(result).pipe(delay(500));
   }
 
-  /**
-   * Obtiene los KPIs del panel de facturación.
-   */
   getKpis(): Observable<FacturaKpis> {
-    return of(FACTURAS_KPIS_MOCK).pipe(delay(300));
+    return this.http
+      .get<FacturaResumenResponse>(`${API}/sourcing/facturas/resumen`)
+      .pipe(
+        map(r => ({
+          totalFacturas:          r.totalFacturas,
+          tendenciaTotalFacturas: r.tendenciaTotalFacturas,
+          montoMensual:           r.montoMensual,
+          tendenciaMonto:         r.tendenciaMonto,
+          registradas:            r.registradas,
+          verificadas:            r.verificadas,
+          pagadas:                r.pagadas,
+          anuladas:               r.anuladas,
+        })),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  /**
-   * Obtiene una factura por ID.
-   */
   getFacturaById(id: string | number): Observable<Factura | undefined> {
-    const factura = FACTURAS_MOCK.find(f => f.id.toString() === id.toString());
-    return of(factura).pipe(delay(300));
+    return this.http
+      .get<FacturaResponse>(`${API}/sourcing/facturas/${id}`)
+      .pipe(
+        map(facturaFromApi),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  /**
-   * Crea una nueva factura FEL.
-   */
-  createFactura(data: Partial<Factura>): Observable<Factura> {
-    const nueva = {
-      ...data,
-      id: Math.floor(Math.random() * 10000),
-      estado: 'REGISTRADA',
-      subtotal: 0,
-      totalIva: 0,
-      total: 0,
-      lineas: [],
-    } as Factura;
-    return of(nueva).pipe(delay(800));
+  createFactura(form: FacturaFormDto): Observable<Factura> {
+    return this.http
+      .post<FacturaResponse>(`${API}/sourcing/facturas`, facturaFormToRequest(form))
+      .pipe(
+        map(facturaFromApi),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  /**
-   * Actualiza una factura existente.
-   */
-  updateFactura(id: string | number, data: Partial<Factura>): Observable<Factura> {
-    const original = FACTURAS_MOCK.find(f => f.id.toString() === id.toString());
-    const actualizada = { ...original, ...data } as Factura;
-    return of(actualizada).pipe(delay(800));
+  updateFactura(id: string | number, form: FacturaFormDto): Observable<Factura> {
+    return this.http
+      .patch<FacturaResponse>(`${API}/sourcing/facturas/${id}`, facturaFormToRequest(form))
+      .pipe(
+        map(facturaFromApi),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  /**
-   * Anula una factura.
-   */
   anularFactura(id: string | number): Observable<void> {
-    return of(undefined).pipe(delay(800));
+    return this.http
+      .patch<void>(`${API}/sourcing/facturas/${id}/anular`, {})
+      .pipe(catchError(err => throwError(() => err)));
   }
 
-  /**
-   * Obtiene una solicitud GIL por ID.
-   */
-  getSolicitudGIL(id: string): Observable<SolicitudGIL | undefined> {
-    if (id === SOLICITUD_GIL_MOCK.id) return of(SOLICITUD_GIL_MOCK).pipe(delay(300));
-    return of(undefined).pipe(delay(300));
+  getSolicitudGIL(id: string): Observable<SolicitudGil | undefined> {
+    return this.http
+      .get<GilResponse>(`${API}/procurement/giles/${id}`)
+      .pipe(
+        map(gilFromApi),
+        catchError(err => throwError(() => err))
+      );
   }
 }
