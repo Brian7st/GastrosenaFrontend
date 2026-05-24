@@ -1,10 +1,15 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, of, throwError, forkJoin } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { Bien, BienFiltros, BienKpis, BienFormDto, EstadoBien } from '../../models/inventario.model';
+import { Bien, BienFiltros, BienKpis, BienFormDto } from '../../models/inventario.model';
 import { PagedResponse, ProductoResponse } from '../api/catalog.api';
-import { bienFormToRequest } from '../mappers/catalog.mapper';
+import { ExistenciaResponse } from '../api/inventory.api';
+import {
+  bienFromCatalogo,
+  bienFromCatalogoYExistencia,
+  bienFormToRequest,
+} from '../mappers/catalog.mapper';
 
 const API = '/api/v1';
 
@@ -12,6 +17,10 @@ const API = '/api/v1';
 export class BienesService {
   private http = inject(HttpClient);
 
+  // ── Listado ──────────────────────────────────────────────────────────────────
+
+  /** GET /catalog/productos — lista paginada.
+   *  Estado derivado de `activo`; valor = 0 (sin endpoint de precio). */
   getBienes(filtros?: BienFiltros): Observable<Bien[]> {
     let params = new HttpParams();
     if (filtros?.busqueda)  params = params.set('q', filtros.busqueda);
@@ -21,30 +30,47 @@ export class BienesService {
     return this.http
       .get<PagedResponse<ProductoResponse>>(`${API}/catalog/productos`, { params })
       .pipe(
-        map(res => res.content.map(p => this.toUiModel(p))),
+        map(res => res.content.map(bienFromCatalogo)),
         catchError(err => throwError(() => err))
       );
   }
 
-  /** TODO: endpoint dedicado pendiente en backend — RF por confirmar */
+  // ── Detalle enriquecido ──────────────────────────────────────────────────────
+
+  /** GET /catalog/productos/{id} + GET /inventory/existencias/{id}
+   *  Compone el Bien con estado de stock real (Agotado / Bajo Stock / Activo). */
+  getBienById(id: string | number): Observable<Bien | undefined> {
+    const catalogo$ = this.http
+      .get<ProductoResponse>(`${API}/catalog/productos/${id}`)
+      .pipe(catchError(() => of(undefined)));
+
+    const existencia$ = this.http
+      .get<ExistenciaResponse>(`${API}/inventory/existencias/${id}`)
+      .pipe(catchError(() => of(null)));
+
+    return forkJoin([catalogo$, existencia$]).pipe(
+      map(([cat, ex]) => {
+        if (!cat) return undefined;
+        return bienFromCatalogoYExistencia(cat, ex ?? null);
+      }),
+      catchError(err => throwError(() => err))
+    );
+  }
+
+  // ── KPIs ─────────────────────────────────────────────────────────────────────
+
+  /** TODO: endpoint dedicado pendiente en backend. */
   getKpis(): Observable<BienKpis> {
     return of({ valorTotal: 0, totalAlertas: 0, movimientosHoy: 0 });
   }
 
-  getBienById(id: string | number): Observable<Bien | undefined> {
-    return this.http
-      .get<ProductoResponse>(`${API}/catalog/productos/${id}`)
-      .pipe(
-        map(p => this.toUiModel(p)),
-        catchError(err => throwError(() => err))
-      );
-  }
+  // ── CRUD ─────────────────────────────────────────────────────────────────────
 
   createBien(form: BienFormDto): Observable<Bien> {
     return this.http
       .post<ProductoResponse>(`${API}/catalog/productos`, bienFormToRequest(form))
       .pipe(
-        map(p => this.toUiModel(p)),
+        map(bienFromCatalogo),
         catchError(err => throwError(() => err))
       );
   }
@@ -53,7 +79,7 @@ export class BienesService {
     return this.http
       .patch<ProductoResponse>(`${API}/catalog/productos/${id}`, bienFormToRequest(form))
       .pipe(
-        map(p => this.toUiModel(p)),
+        map(bienFromCatalogo),
         catchError(err => throwError(() => err))
       );
   }
@@ -62,21 +88,5 @@ export class BienesService {
     return this.http
       .delete<void>(`${API}/catalog/productos/${id}`)
       .pipe(catchError(err => throwError(() => err)));
-  }
-
-  /** Adapta ProductoResponse a Bien con defaults para campos de UI.
-   *  FE-04 completará valor y estado con /inventory/existencias. */
-  private toUiModel(dto: ProductoResponse): Bien {
-    return {
-      id: dto.id,
-      nombre: dto.nombre,
-      codigoSena: dto.codigoSena,
-      codigoProveedor: dto.codigoProveedor ?? '',
-      descripcion: dto.descripcion ?? '',
-      categoria: dto.categoria,
-      unidadMedida: dto.unidadMedida,
-      valor: 0,
-      estado: (dto.activo ? 'Activo' : 'Inactivo') as EstadoBien,
-    } as Bien;
   }
 }
