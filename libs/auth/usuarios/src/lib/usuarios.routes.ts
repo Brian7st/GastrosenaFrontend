@@ -21,4 +21,25 @@ export const USUARIOS_ROUTES: Routes = [
     redirectTo: '',
     pathMatch: 'full',
   },
+  {
+    path: 'cuentas',
+    loadComponent: () =>
+      import('./pages/cuentas-page/cuentas-page.component').then(
+        m => m.CuentasPageComponent,
+      ),
+  },
+  {
+    path: 'historial',
+    loadComponent: () =>
+      import('./pages/historial-page/historial-page.component').then(
+        m => m.HistorialPageComponent,
+      ),
+  },
+  {
+    path: 'roles',
+    loadComponent: () =>
+      import('./pages/roles-page/roles-page.component').then(
+        m => m.RolesPageComponent,
+      ),
+  },
 ];
