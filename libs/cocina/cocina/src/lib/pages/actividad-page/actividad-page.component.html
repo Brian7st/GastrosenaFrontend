@@ -24,6 +24,8 @@
           type="date"
           class="form-input"
           placeholder="dd/mm/aaaa"
+          min="2020-01-01"
+          max="2050-12-31"
           (change)="fecha.set($any($event.target).value)"
         />
       </div>
@@ -100,7 +102,7 @@
           <button id="btn-ver-actividades" class="btn-outline" type="button" (click)="verActividades()">
             VER ACTIVIDADES
           </button>
-          <button id="btn-crear-actividad" class="btn-primary" type="button" (click)="crearActividad()">
+          <button id="btn-crear-actividad" class="btn-primary" type="button" [disabled]="!isFormValid()" (click)="crearActividad()">
             CREAR ACTIVIDAD
           </button>
         </div>

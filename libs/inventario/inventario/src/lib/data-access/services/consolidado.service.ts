@@ -9,7 +9,7 @@ import { EjecucionPresupuestalItemResponse } from '../api/reporting.api';
 import { consolidadoFromApi } from '../mappers/budget.mapper';
 import { ejecucionPresupuestalFromApi } from '../mappers/reporting.mapper';
 
-const API = '/api/v1';
+const API = 'http://localhost:8080/api/v1';
 
 @Injectable({ providedIn: 'root' })
 export class ConsolidadoService {

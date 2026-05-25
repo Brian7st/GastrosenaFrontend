@@ -6,7 +6,7 @@ import { PaqueteProbatorio } from '../../models/paquete.model';
 import { PaqueteResponse, CrearPaqueteRequest, TrazabilidadRequest } from '../api/legalization.api';
 import { paqueteFromApi } from '../mappers/legalization.mapper';
 
-const API = '/api/v1';
+const API = 'http://localhost:8080/api/v1';
 
 @Injectable({ providedIn: 'root' })
 export class PaqueteService {

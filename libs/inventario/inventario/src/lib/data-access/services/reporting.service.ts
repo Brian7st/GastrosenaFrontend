@@ -6,7 +6,7 @@ import { ConsumoItem, TrazabilidadDocumental } from '../../models/reporting.mode
 import { ConsumoItemResponse, TrazabilidadDocumentalItemResponse } from '../api/reporting.api';
 import { consumoFromApi, trazabilidadFromApi } from '../mappers/reporting.mapper';
 
-const API = '/api/v1';
+const API = 'http://localhost:8080/api/v1';
 
 @Injectable({ providedIn: 'root' })
 export class ReportingService {

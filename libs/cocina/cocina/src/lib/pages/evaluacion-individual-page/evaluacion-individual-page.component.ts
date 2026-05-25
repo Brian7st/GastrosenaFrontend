@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CocinaFacade } from '../../data-access/cocina.facade';
+import { EvaluacionRequestDTO } from '../../data-access/evaluacion.service';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 
 // ─── Modelo ──────────────────────────────────────────────────────────────────
@@ -23,7 +24,7 @@ export interface AprendizIndividualMock {
   actividad: string | null;
 }
 
-// ─── Datos mock ───────────────────────────────────────────────────────────────
+// ─── Datos mock (fallback cuando no hay datos del backend) ───────────────────
 
 const APRENDIZ_MOCK: AprendizIndividualMock = {
   id: 1,
@@ -50,6 +51,9 @@ export class EvaluacionIndividualPageComponent implements OnInit {
   // ── Datos ────────────────────────────────────────────────────────────────
   readonly aprendiz = signal<AprendizIndividualMock>(APRENDIZ_MOCK);
 
+  /** ID de la actividad en la que se evalúa (viene por queryParam 'actividadId') */
+  actividadId: number | null = null;
+
   // ── Estado del formulario ─────────────────────────────────────────────────
   /** Texto del textarea de observaciones (bidireccional con ngModel) */
   observaciones = '';
@@ -66,6 +70,12 @@ export class EvaluacionIndividualPageComponent implements OnInit {
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       const id = Number(params['id']);
+      const actId = Number(params['actividadId']);
+
+      // Guardar el ID de la actividad para poder persistir la evaluación
+      if (actId) {
+        this.actividadId = actId;
+      }
 
       if (id) {
         const aprendizEncontrado = this.facade
@@ -103,7 +113,7 @@ export class EvaluacionIndividualPageComponent implements OnInit {
    * @param resultado 'aprobo' | 'no_aprobo'
    */
   submitEvaluacionIndividual(resultado: 'aprobo' | 'no_aprobo'): void {
-    const payload = {
+    const payload: EvaluacionRequestDTO = {
       aprendizId: this.aprendiz().id,
       observaciones: this.observaciones.trim(),
       resultado,
@@ -114,15 +124,14 @@ export class EvaluacionIndividualPageComponent implements OnInit {
       JSON.stringify(payload, null, 2)
     );
 
-    const estadoStr =
-      resultado === 'aprobo'
-        ? 'Aprobó'
-        : 'No Aprobó';
-
-    this.facade.actualizarEstado(
-      this.aprendiz().id,
-      estadoStr
-    );
+    // Persistir en backend si tenemos el actividadId (flujo normal desde masiva-page)
+    if (this.actividadId) {
+      this.facade.evaluarAprendices(this.actividadId, [payload]);
+    } else {
+      // Fallback: actualización local optimista si no hay contexto de actividad
+      const estadoStr = resultado === 'aprobo' ? 'Aprobó' : 'No Aprobó';
+      this.facade.actualizarEstado(this.aprendiz().id, estadoStr);
+    }
 
     // Limpiar formulario y cerrar menú
     this.observaciones = '';

@@ -19,7 +19,7 @@ import {
   bienFormToRequest,
 } from '../mappers/catalog.mapper';
 
-const API = '/api/v1';
+const API = 'http://localhost:8080/api/v1';
 
 @Injectable({ providedIn: 'root' })
 export class BienesService {

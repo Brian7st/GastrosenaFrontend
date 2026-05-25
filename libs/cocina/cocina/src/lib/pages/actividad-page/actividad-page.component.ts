@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -42,9 +42,28 @@ export class ActividadPageComponent {
     { value: 'trimestre2', label: 'Trimestre 2' },
     { value: 'trimestre3', label: 'Trimestre 3' },
     { value: 'trimestre4', label: 'Trimestre 4' },
+    { value: 'trimestre5', label: 'Trimestre 5' },
+    { value: 'trimestre6', label: 'Trimestre 6' },
+    { value: 'trimestre7', label: 'Trimestre 7' },
   ];
 
+  isFormValid = computed(() => {
+    const f = this.fecha();
+    const n = this.nombreActividad().trim();
+    const j = this.jornada();
+    const nf = this.numeroFicha().trim();
+    const t = this.trimestre();
+
+    if (!f || !n || !j || !nf || !t) return false;
+
+    const year = parseInt(f.split('-')[0], 10);
+    if (isNaN(year) || year < 2020 || year > 2050) return false;
+
+    return true;
+  });
+
   crearActividad(): void {
+    if (!this.isFormValid()) return;
 
     const jornadaLabel =
       this.jornadas.find(j => j.value === this.jornada())?.label ??

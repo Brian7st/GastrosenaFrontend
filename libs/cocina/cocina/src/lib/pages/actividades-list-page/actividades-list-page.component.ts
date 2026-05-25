@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  OnInit,
   computed,
   inject,
   signal,
@@ -19,11 +20,13 @@ import { CocinaFacade } from '../../data-access/cocina.facade';
   styleUrl: './actividades-list-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ActividadesListPageComponent {
+export class ActividadesListPageComponent implements OnInit {
   private facade = inject(CocinaFacade);
   private router = inject(Router);
 
   readonly actividades = this.facade.actividades;
+  readonly cargando = this.facade.cargandoActividades;
+  readonly error = this.facade.errorActividades;
 
   /** Filtro por número de ficha */
   readonly filtroFicha = signal<string>('');
@@ -34,6 +37,11 @@ export class ActividadesListPageComponent {
     if (!filtro) return this.actividades();
     return this.actividades().filter(a => a.ficha.includes(filtro));
   });
+
+  ngOnInit(): void {
+    // Cargar actividades desde el backend al entrar a la página
+    this.facade.cargarActividades();
+  }
 
   onFiltroChange(valor: string): void {
     this.filtroFicha.set(valor);

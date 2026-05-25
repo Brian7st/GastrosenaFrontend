@@ -9,7 +9,7 @@ import { ResumenAlertasResponse } from '../api/reporting.api';
 import { alertaFromApi, umbralFromApi } from '../mappers/alerts.mapper';
 import { resumenAlertasFromApi } from '../mappers/reporting.mapper';
 
-const API = '/api/v1';
+const API = 'http://localhost:8080/api/v1';
 
 @Injectable({ providedIn: 'root' })
 export class AlertasService {

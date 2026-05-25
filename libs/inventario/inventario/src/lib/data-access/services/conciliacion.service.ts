@@ -22,7 +22,7 @@ import {
   diferenciaFromApi,
 } from '../mappers/reconciliation.mapper';
 
-const API = '/api/v1';
+const API = 'http://localhost:8080/api/v1';
 
 @Injectable({ providedIn: 'root' })
 export class ConciliacionService {

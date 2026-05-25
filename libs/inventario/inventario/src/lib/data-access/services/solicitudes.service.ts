@@ -25,7 +25,7 @@ import {
 import { gilFromApi } from '../mappers/sourcing.mapper';
 import { solicitudSesionFromApi } from '../mappers/training.mapper';
 
-const API = '/api/v1';
+const API = 'http://localhost:8080/api/v1';
 
 @Injectable({ providedIn: 'root' })
 export class SolicitudesService {

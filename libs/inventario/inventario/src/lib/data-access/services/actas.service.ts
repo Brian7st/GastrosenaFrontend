@@ -11,7 +11,7 @@ import {
 import { ActaResponse } from '../api/legalization.api';
 import { actaFromApi } from '../mappers/legalization.mapper';
 
-const API = '/api/v1';
+const API = 'http://localhost:8080/api/v1';
 
 const ACCION_ESTADO: Record<string, string> = {
   PENDIENTE_FIRMAS: 'enviar-a-firmas',

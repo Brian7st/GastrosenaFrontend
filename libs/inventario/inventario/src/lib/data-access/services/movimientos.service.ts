@@ -25,7 +25,7 @@ import {
 } from '../mappers/inventory.mapper';
 import { kardexValorizadoFromApi } from '../mappers/reporting.mapper';
 
-const API = '/api/v1';
+const API = 'http://localhost:8080/api/v1';
 
 @Injectable({ providedIn: 'root' })
 export class MovimientosService {

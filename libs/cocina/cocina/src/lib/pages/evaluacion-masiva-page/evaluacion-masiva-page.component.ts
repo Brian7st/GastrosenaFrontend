@@ -98,6 +98,12 @@ export class EvaluacionMasivaPageComponent implements OnInit {
 
       if (id) {
         this.actividadId.set(id);
+        // Cargar aprendices con su estado de evaluación para esta actividad
+        this.facade.cargarEstadosEvaluacion(id);
+        // Cargar actividades si no están cargadas (para mostrar info de la actividad)
+        if (this.facade.actividades().length === 0) {
+          this.facade.cargarActividades();
+        }
       }
     });
   }
@@ -216,20 +222,26 @@ export class EvaluacionMasivaPageComponent implements OnInit {
   ): void {
 
     const ids = Array.from(this.seleccionados());
+    const actividadId = this.actividadId();
 
-    const estadoStr =
-      resultado === 'aprobo'
-        ? 'Aprobó'
-        : 'No Aprobó';
-
-    for (const id of ids) {
-      this.facade.actualizarEstado(id, estadoStr);
+    if (actividadId && ids.length > 0) {
+      // Enviar todas las evaluaciones al backend en una sola petición
+      const requests = ids.map(aprendizId => ({
+        aprendizId,
+        resultado,
+        observaciones: '',
+      }));
+      this.facade.evaluarAprendices(actividadId, requests);
+    } else {
+      // Fallback: actualización local si no hay actividadId
+      const estadoStr = resultado === 'aprobo' ? 'Aprobó' : 'No Aprobó';
+      for (const id of ids) {
+        this.facade.actualizarEstado(id, estadoStr);
+      }
     }
 
     this.seleccionados.set(new Set());
-
     this.menuEvaluarAbierto.set(false);
-
     this.modoSeleccionAbierto.set(false);
   }
 
@@ -239,11 +251,10 @@ export class EvaluacionMasivaPageComponent implements OnInit {
   }
 
   goToIndividual(id: number): void {
-
     this.router.navigate(
       ['/app/cocina/evaluacion-individual'],
       {
-        queryParams: { id },
+        queryParams: { id, actividadId: this.actividadId() },
       }
     );
   }

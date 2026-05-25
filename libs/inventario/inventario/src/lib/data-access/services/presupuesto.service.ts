@@ -26,7 +26,7 @@ import {
 } from '../api/budget.api';
 import { rubroFromApi, compromisoFromApi, presupuestoDetalleFromApi, resumenPresupuestosFromApi } from '../mappers/budget.mapper';
 
-const API = '/api/v1';
+const API = 'http://localhost:8080/api/v1';
 
 @Injectable({ providedIn: 'root' })
 export class PresupuestoService {

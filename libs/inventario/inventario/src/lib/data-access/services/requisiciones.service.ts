@@ -6,7 +6,7 @@ import { Requisicion } from '../../models/requisicion.model';
 import { RequisicionResponse } from '../api/legalization.api';
 import { requisicionFromApi } from '../mappers/legalization.mapper';
 
-const API = '/api/v1';
+const API = 'http://localhost:8080/api/v1';
 
 @Injectable({ providedIn: 'root' })
 export class RequisicionesService {
