@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
 
 import { Router, RouterModule } from '@angular/router';
 import {
@@ -34,6 +34,12 @@ export class RequisicionesDashboardComponent implements OnInit {
   kpiEnviadas   = this.facade.kpiEnviadas;
   kpiEnDespacho = this.facade.kpiEnDespacho;
   kpiFirmadas   = this.facade.kpiFirmadas;
+
+  // ── Grupos para el tablero kanban ─────────────────────────────────────────
+  borradores = computed(() => this.requisiciones().filter(r => r.estado === 'BORRADOR'));
+  enviadas   = computed(() => this.requisiciones().filter(r => r.estado === 'ENVIADA'));
+  enDespacho = computed(() => this.requisiciones().filter(r => r.estado === 'DESPACHADA'));
+  firmadas   = computed(() => this.requisiciones().filter(r => r.estado === 'FIRMADA'));
 
   ngOnInit(): void {
     this.facade.loadAll();
