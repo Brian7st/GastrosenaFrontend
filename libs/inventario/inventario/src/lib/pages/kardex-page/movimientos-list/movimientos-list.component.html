@@ -39,40 +39,36 @@
   <!-- KPIs Bento Grid -->
   <div class="kpi-grid">
     <restaurant-kpi-card
-      label="ENTRADAS HOY"
-      value="142"
+      label="ENTRADAS"
+      [value]="kpiEntradas()"
       icon="log-in"
-      iconColor="green"
-      trend="+12%"
-      [trendUp]="true"
-    ></restaurant-kpi-card>
+      iconColor="green">
+    </restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="SALIDAS HOY"
-      value="86"
+      label="SALIDAS"
+      [value]="kpiSalidas()"
       icon="log-out"
-      iconColor="orange"
-      trend="-4%"
-      [trendUp]="false"
-    ></restaurant-kpi-card>
+      iconColor="orange">
+    </restaurant-kpi-card>
 
     <restaurant-kpi-card
       label="VALOR ENTRADAS"
-      value="$4.2M"
+      [value]="kpiValorEntradas() | currency:'COP':'symbol-narrow':'1.0-0'"
       icon="banknote"
       iconColor="blue"
-      trend="Semana Actual"
-      [trendUp]="null"
-    ></restaurant-kpi-card>
+      trend="Total cargado"
+      [trendUp]="null">
+    </restaurant-kpi-card>
 
     <restaurant-kpi-card
       label="PENDIENTES"
-      value="09"
+      [value]="kpiPendientes()"
       icon="alert-circle"
       iconColor="red"
       trend="Requieren verificación"
-      [trendUp]="null"
-    ></restaurant-kpi-card>
+      [trendUp]="null">
+    </restaurant-kpi-card>
   </div>
 
   <!-- Main Data Table Container -->
@@ -144,7 +140,7 @@
       }
     </tbody>
     <div dtFooter class="dt-footer">
-      <span class="table-pagination__info">Mostrando 4 de 12 registros de movimientos</span>
+      <span class="table-pagination__info">Mostrando {{ movimientos().length }} movimiento(s)</span>
       <div class="pagination-btns">
         <button class="pagination-btn" disabled>
           <span class="material-symbols-outlined">chevron_left</span>

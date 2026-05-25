@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { KpiCardComponent, DataTableComponent, LucideIconComponent, ButtonComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
@@ -27,6 +27,14 @@ export class MovimientosListComponent implements OnInit {
   // ── Estado reactivo desde facade ─────────────────────────────────────────
   movimientos = this.facade.movimientos;
   loading     = this.facade.loading;
+
+  // ── KPIs derivados del listado cargado ───────────────────────────────────
+  kpiEntradas      = computed(() => this.movimientos().filter(m => m.tipo === 'ENTRADA').length);
+  kpiSalidas       = computed(() => this.movimientos().filter(m => m.tipo === 'SALIDA').length);
+  kpiValorEntradas = computed(() =>
+    this.movimientos().filter(m => m.tipo === 'ENTRADA').reduce((acc, m) => acc + m.valor, 0)
+  );
+  kpiPendientes    = computed(() => this.movimientos().filter(m => m.estado === 'Pendiente').length);
 
   ngOnInit(): void {
     this.facade.loadAll();
