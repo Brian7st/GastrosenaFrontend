@@ -14,6 +14,8 @@ export const {
   selectImportando,
   selectResultadoImport,
   selectMensajeExport,
+  selectHistorial,
+  selectLoadingHistorial,
 } = usuariosFeature;
 
 export const selectTotalActivos = createSelector(

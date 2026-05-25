@@ -8,6 +8,7 @@ import {
   CrearUsuarioRequest,
   ExportarConfig,
   FiltrosUsuarios,
+  HistorialItem,
   ImportarUsuariosRequest,
   ImportarUsuariosResponse,
   RolOpcion,
@@ -67,6 +68,10 @@ export class UsuariosService extends BaseHttpService {
       this.buildUrl(`${this.resource}/importar`),
       formData,
     );
+  }
+
+  getHistorial(): Observable<HistorialItem[]> {
+    return this.http.get<HistorialItem[]>(this.buildUrl(`${this.resource}/historial`));
   }
 
   exportarUsuarios(config: ExportarConfig): Observable<Blob> {

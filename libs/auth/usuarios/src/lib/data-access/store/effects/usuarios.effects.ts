@@ -179,6 +179,22 @@ export const exportarUsuarios$ = createEffect(
   { functional: true },
 );
 
+export const cargarHistorial$ = createEffect(
+  (actions$ = inject(Actions), svc = inject(UsuariosService)) =>
+    actions$.pipe(
+      ofType(UsuariosActions.cargarHistorial),
+      switchMap(() =>
+        svc.getHistorial().pipe(
+          map(historial => UsuariosActions.cargarHistorialExitoso({ historial })),
+          catchError((err: unknown) =>
+            of(UsuariosActions.cargarHistorialFallido({ error: extractErrorMessage(err) })),
+          ),
+        ),
+      ),
+    ),
+  { functional: true },
+);
+
 // Corrección 4 — recargar lista tras crear/eliminar
 export const recargarTrasCrear$ = createEffect(
   (actions$ = inject(Actions)) =>

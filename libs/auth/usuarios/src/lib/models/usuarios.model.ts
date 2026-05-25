@@ -59,3 +59,13 @@ export interface ExportarConfig {
   incluirInactivos: boolean;
   rol:              string;
 }
+
+export interface HistorialItem {
+  id:            string;
+  usuarioNombre: string;
+  usuarioEmail:  string;
+  accion:        'LOGIN' | 'LOGOUT' | 'CREAR' | 'EDITAR' | 'ELIMINAR' | 'BLOQUEO';
+  fecha:         string;
+  ip:            string;
+  detalles:      string;
+}
