@@ -35,4 +35,11 @@ export const USUARIOS_ROUTES: Routes = [
         m => m.HistorialPageComponent,
       ),
   },
+  {
+    path: 'roles',
+    loadComponent: () =>
+      import('./pages/roles-page/roles-page.component').then(
+        m => m.RolesPageComponent,
+      ),
+  },
 ];

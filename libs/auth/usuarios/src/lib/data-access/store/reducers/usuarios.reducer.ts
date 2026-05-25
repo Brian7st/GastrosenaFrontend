@@ -1,5 +1,5 @@
 import { createFeature, createReducer, on } from '@ngrx/store';
-import { HistorialItem, ImportarUsuariosResponse, RolOpcion, UsuarioDetalle } from '../../../models/usuarios.model';
+import { HistorialItem, ImportarUsuariosResponse, RolDetalle, RolOpcion, UsuarioDetalle } from '../../../models/usuarios.model';
 import { UsuariosActions } from '../actions/usuarios.actions';
 
 export interface MensajeExport {
@@ -22,6 +22,8 @@ export interface UsuariosState {
   mensajeExport:       MensajeExport | null;
   historial:           HistorialItem[];
   loadingHistorial:    boolean;
+  rolesDetalle:        RolDetalle[];
+  loadingRolesDetalle: boolean;
 }
 
 const initialState: UsuariosState = {
@@ -39,6 +41,8 @@ const initialState: UsuariosState = {
   mensajeExport:       null,
   historial:           [],
   loadingHistorial:    false,
+  rolesDetalle:        [],
+  loadingRolesDetalle: false,
 };
 
 export const usuariosFeature = createFeature({
@@ -171,6 +175,17 @@ export const usuariosFeature = createFeature({
       loadingAccion: false,
       error,
       mensajeExport: { texto: error, tipo: 'error' as const },
+    })),
+
+    // ── Roles detalle ─────────────────────────────────────────────────────────
+    on(UsuariosActions.cargarRolesDetalle, state => ({
+      ...state, loadingRolesDetalle: true,
+    })),
+    on(UsuariosActions.cargarRolesDetalleExitoso, (state, { roles }) => ({
+      ...state, loadingRolesDetalle: false, rolesDetalle: roles,
+    })),
+    on(UsuariosActions.cargarRolesDetalleFallido, (state, { error }) => ({
+      ...state, loadingRolesDetalle: false, error,
     })),
 
     // ── Historial ─────────────────────────────────────────────────────────────

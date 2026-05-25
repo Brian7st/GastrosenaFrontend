@@ -11,6 +11,7 @@ import {
   HistorialItem,
   ImportarUsuariosRequest,
   ImportarUsuariosResponse,
+  RolDetalle,
   RolOpcion,
   UsuarioDetalle,
 } from '../models/usuarios.model';
@@ -34,6 +35,10 @@ export class UsuariosService extends BaseHttpService {
 
   getRoles(): Observable<RolOpcion[]> {
     return this.http.get<RolOpcion[]>(this.buildUrl('roles'));
+  }
+
+  getRolesDetalle(): Observable<RolDetalle[]> {
+    return this.http.get<RolDetalle[]>(this.buildUrl('roles'));
   }
 
   crearUsuario(data: CrearUsuarioRequest): Observable<UsuarioDetalle> {

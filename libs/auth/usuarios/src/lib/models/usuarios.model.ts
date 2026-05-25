@@ -60,6 +60,21 @@ export interface ExportarConfig {
   rol:              string;
 }
 
+export interface PermisoItem {
+  id:          string;
+  nombre:      string;
+  descripcion: string;
+  activo:      boolean;
+}
+
+export interface RolDetalle {
+  id:            string;
+  nombre:        string;
+  descripcion:   string;
+  permisos:      PermisoItem[];
+  totalUsuarios: number;
+}
+
 export interface HistorialItem {
   id:            string;
   usuarioNombre: string;

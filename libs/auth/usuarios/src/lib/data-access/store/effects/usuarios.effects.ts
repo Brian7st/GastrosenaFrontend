@@ -179,6 +179,22 @@ export const exportarUsuarios$ = createEffect(
   { functional: true },
 );
 
+export const cargarRolesDetalle$ = createEffect(
+  (actions$ = inject(Actions), svc = inject(UsuariosService)) =>
+    actions$.pipe(
+      ofType(UsuariosActions.cargarRolesDetalle),
+      switchMap(() =>
+        svc.getRolesDetalle().pipe(
+          map(roles => UsuariosActions.cargarRolesDetalleExitoso({ roles })),
+          catchError((err: unknown) =>
+            of(UsuariosActions.cargarRolesDetalleFallido({ error: extractErrorMessage(err) })),
+          ),
+        ),
+      ),
+    ),
+  { functional: true },
+);
+
 export const cargarHistorial$ = createEffect(
   (actions$ = inject(Actions), svc = inject(UsuariosService)) =>
     actions$.pipe(

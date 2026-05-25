@@ -19,9 +19,11 @@ import {
   selectLoading,
   selectLoadingAccion,
   selectLoadingHistorial,
+  selectLoadingRolesDetalle,
   selectMensajeExport,
   selectResultadoImport,
   selectRoles,
+  selectRolesDetalle,
   selectTotalActivos,
   selectTotalElements,
   selectTotalInactivos,
@@ -51,6 +53,8 @@ export class UsuariosFacade {
   readonly hayError$            = this.store.select(selectHayError);
   readonly historial$           = this.store.select(selectHistorial);
   readonly loadingHistorial$    = this.store.select(selectLoadingHistorial);
+  readonly rolesDetalle$        = this.store.select(selectRolesDetalle);
+  readonly loadingRolesDetalle$ = this.store.select(selectLoadingRolesDetalle);
 
   // ── Comandos ──────────────────────────────────────────────────────────────
   cargarUsuarios(filtros?: Partial<FiltrosUsuarios>): void {
@@ -103,5 +107,9 @@ export class UsuariosFacade {
 
   cargarHistorial(): void {
     this.store.dispatch(UsuariosActions.cargarHistorial());
+  }
+
+  cargarRolesDetalle(): void {
+    this.store.dispatch(UsuariosActions.cargarRolesDetalle());
   }
 }
