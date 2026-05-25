@@ -83,9 +83,10 @@ export class FacturasService {
       );
   }
 
-  anularFactura(id: string | number): Observable<void> {
+  /** PATCH /sourcing/facturas/{id}/anular — motivo es @NotBlank en backend */
+  anularFactura(id: string | number, motivo: string): Observable<void> {
     return this.http
-      .patch<void>(`${API}/sourcing/facturas/${id}/anular`, {})
+      .patch<void>(`${API}/sourcing/facturas/${id}/anular`, { motivo })
       .pipe(catchError(err => throwError(() => err)));
   }
 

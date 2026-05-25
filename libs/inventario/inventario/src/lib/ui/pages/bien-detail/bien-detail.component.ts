@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Bien, MovimientoBien } from '../../../models/inventario.model';
+import { MovimientoBien } from '../../../models/inventario.model';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { StatusBadgeComponent } from '@restaurant/shared/ui';
 import { BienFormComponent } from '../../modals/bien-form/bien-form.component';

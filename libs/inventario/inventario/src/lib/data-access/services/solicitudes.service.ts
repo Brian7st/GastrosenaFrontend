@@ -101,10 +101,12 @@ export class SolicitudesService {
       );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   deleteSolicitud(_codigo: string): Observable<boolean> {
     return throwError(() => new Error('deleteSolicitud: endpoint DELETE no disponible en backend'));
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   generarGils(_ids: (string | number)[]): Observable<boolean> {
     return throwError(() => new Error('generarGils: endpoint no disponible — revisar con backend'));
   }

@@ -13,7 +13,9 @@
 <div class="origen-datos">
   <span class="origen-label">Origen de datos:</span>
   <div class="origen-tags">
-    <span class="origen-tag" *ngFor="let orig of origenes()">{{ orig }}</span>
+    @for (orig of origenes(); track orig) {
+<span class="origen-tag">{{ orig }}</span>
+}
   </div>
 </div>
 
@@ -37,7 +39,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let item of itemsConsolidados()">
+        @for (item of itemsConsolidados(); track item) {
+<tr>
           <!-- Columna Ítem -->
           <td class="col-item">
             <div class="item-icon">
@@ -58,10 +61,12 @@
           <!-- Columna Desglose -->
           <td class="col-desglose">
             <div class="desglose-list">
-              <div class="desglose-row" *ngFor="let orig of item.origenes">
+              @for (orig of item.origenes; track orig) {
+<div class="desglose-row">
                 <span class="desglose-tag">{{ orig.solicitud }}</span>
                 <span class="desglose-qty">{{ orig.cantidad }} {{ item.unidad }}</span>
               </div>
+}
             </div>
           </td>
 
@@ -70,6 +75,7 @@
             <span class="total-value">{{ item.total }}</span>
           </td>
         </tr>
+}
       </tbody>
     </table>
   </div>

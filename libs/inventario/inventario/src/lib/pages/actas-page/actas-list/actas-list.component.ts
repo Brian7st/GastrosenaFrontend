@@ -6,7 +6,7 @@ import {
   inject,
   OnInit,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import {
   DataTableComponent,
@@ -22,12 +22,11 @@ import { ActasFacade } from '../../../data-access/actas.facade';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     DataTableComponent,
     StatusBadgeComponent,
     LucideIconComponent,
-    ButtonComponent,
-  ],
+    ButtonComponent
+],
   templateUrl: './actas-list.component.html',
   styleUrl: './actas-list.component.scss',
 })

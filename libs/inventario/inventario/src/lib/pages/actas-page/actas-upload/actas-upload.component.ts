@@ -4,7 +4,7 @@ import {
   signal,
   inject,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, ActivatedRoute } from '@angular/router';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 
@@ -12,7 +12,7 @@ import { LucideIconComponent } from '@restaurant/shared/ui';
   selector: 'restaurant-actas-upload',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, LucideIconComponent],
+  imports: [LucideIconComponent],
   templateUrl: './actas-upload.component.html',
   styleUrl: './actas-upload.component.scss',
 })

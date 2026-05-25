@@ -175,7 +175,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let bien of bienes(); let i = index">
+          @for (bien of bienes(); track bien; let i = $index) {
+<tr>
             <td class="font-medium">{{ bien.codigo }}</td>
             <td class="text-secondary">{{ bien.descripcion }}</td>
             <td class="text-secondary">{{ bien.um }}</td>
@@ -188,6 +189,7 @@
               </button>
             </td>
           </tr>
+}
         </tbody>
       </table>
     </div>

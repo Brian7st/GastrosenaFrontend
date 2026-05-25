@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, RouterModule } from '@angular/router';
 import {
   LucideIconComponent,
@@ -12,12 +12,11 @@ import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
   selector: 'restaurant-requisiciones-dashboard',
   standalone: true,
   imports: [
-    CommonModule,
     RouterModule,
     LucideIconComponent,
     KpiCardComponent,
-    ButtonComponent,
-  ],
+    ButtonComponent
+],
   templateUrl: './requisiciones-dashboard.component.html',
   styleUrl: './requisiciones-dashboard.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

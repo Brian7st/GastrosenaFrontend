@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
+import { Location } from '@angular/common';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { ButtonComponent, DataTableComponent, KpiCardComponent } from '@restaurant/shared/ui';
 import { ExportarConsolidadoModalComponent } from '../components/exportar-consolidado-modal/exportar-consolidado-modal.component';
@@ -10,7 +10,7 @@ import { ConsolidadoFacade } from '../../../data-access/consolidado.facade';
 @Component({
   selector: 'restaurant-consolidado-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent, ExportarConsolidadoModalComponent, ReversarConsolidadoModalComponent, BackButtonComponent],
+  imports: [RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent, ExportarConsolidadoModalComponent, ReversarConsolidadoModalComponent, BackButtonComponent],
   templateUrl: './consolidado-detail.component.html',
   styleUrl: './consolidado-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -75,6 +75,7 @@ export class ConsolidadoDetailComponent implements OnInit {
     this.showExportModal.set(false);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onExport(_format: 'excel' | 'pdf'): void {
     // Exportación real pendiente de integración HTTP
     this.showExportModal.set(false);

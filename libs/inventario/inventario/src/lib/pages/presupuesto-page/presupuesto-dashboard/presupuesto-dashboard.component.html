@@ -283,13 +283,15 @@
 </div>
 
 <!-- Modal de exportación -->
+@if (showExportModal()) {
 <inventario-exportar
-  *ngIf="showExportModal()"
+ 
   titulo="Exportar Presupuesto"
   subtitulo="Seleccione el formato de salida para el presupuesto general"
   (exportar)="onExport($event)"
   (cerrar)="closeExportModal()">
 </inventario-exportar>
+}
 
 <!-- Router outlet para modales (registrar, traslado, cargar-gil) -->
 <router-outlet></router-outlet>

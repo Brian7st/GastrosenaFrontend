@@ -5,7 +5,7 @@ import {
   inject,
   OnInit,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute, Router, RouterOutlet, RouterLink } from '@angular/router';
 import {
   StatusBadgeComponent,
@@ -14,7 +14,6 @@ import {
 } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import {
-  PaqueteProbatorio,
   PaqueteEstado,
   TimelineEntry,
 } from '../../../models/paquete.model';
@@ -25,14 +24,13 @@ import { PaqueteFacade } from '../../../data-access/paquete.facade';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     RouterOutlet,
     RouterLink,
     StatusBadgeComponent,
     LucideIconComponent,
     ButtonComponent,
-    BackButtonComponent,
-  ],
+    BackButtonComponent
+],
   templateUrl: './paquete-detail.component.html',
   styleUrl: './paquete-detail.component.scss',
 })

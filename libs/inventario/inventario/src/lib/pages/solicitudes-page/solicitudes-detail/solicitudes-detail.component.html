@@ -21,9 +21,11 @@
         <button class="btn-primary" (click)="onEnviarAprobacion()" [disabled]="estadoActual() !== 'BORRADOR'">
           Enviar a Aprobación
         </button>
-        <div class="tooltip" *ngIf="estadoActual() !== 'BORRADOR'">
+        @if (estadoActual() !== 'BORRADOR') {
+<div class="tooltip">
           La solicitud ya fue enviada o no puede ser aprobada.
         </div>
+}
       </div>
     </div>
   </div>
@@ -36,7 +38,8 @@
     <div class="timeline-line-active" [style.width]="(estados.indexOf(estadoActual()) * 25) + '%'"></div>
 
     <div class="timeline-nodes">
-      <div class="node" *ngFor="let est of estados">
+      @for (est of estados; track est) {
+<div class="node">
         <div class="node-icon" 
              [ngClass]="{
                'node-icon--active': isActive(est) || isPast(est),
@@ -49,6 +52,7 @@
           {{ est }}
         </span>
       </div>
+}
     </div>
   </div>
 

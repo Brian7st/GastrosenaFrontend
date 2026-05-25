@@ -66,6 +66,7 @@ export class PaqueteService {
   }
 
   /** Firma anterior: adjuntarDocumento(paqueteId, file) → ahora adjuntarAsistencia */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   adjuntarDocumento(paqueteId: string, _file: File): Observable<boolean> {
     return this.adjuntarAsistencia(paqueteId);
   }

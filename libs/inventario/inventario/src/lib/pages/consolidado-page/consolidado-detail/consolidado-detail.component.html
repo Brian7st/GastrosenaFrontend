@@ -223,14 +223,17 @@
         </div>
       </div>
     </restaurant-data-table>
-  <restaurant-exportar-consolidado-modal
-    *ngIf="showExportModal()"
+  @if (showExportModal()) {
+<restaurant-exportar-consolidado-modal
+   
     (close)="closeExportModal()"
     (export)="onExport($event)">
   </restaurant-exportar-consolidado-modal>
+}
 
-  <restaurant-reversar-consolidado-modal
-    *ngIf="showReversarModal()"
+  @if (showReversarModal()) {
+<restaurant-reversar-consolidado-modal
+   
     [consolidadoId]="'#CON-2023-0842'"
     [periodo]="'Octubre 2024'"
     [total]="'$ 1.452.300.000'"
@@ -239,4 +242,5 @@
     (close)="closeReversarModal()"
     (confirm)="confirmReversar()">
   </restaurant-reversar-consolidado-modal>
+}
 </div>

@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { StatusBadgeComponent } from '@restaurant/shared/ui';
 import { EstadoBien } from '../../../models/inventario.model';
 
 @Component({
   selector: 'restaurant-bien-status-badge',
   standalone: true,
-  imports: [CommonModule, StatusBadgeComponent],
+  imports: [StatusBadgeComponent],
   template: `
     <restaurant-status-badge 
       [label]="estado" 

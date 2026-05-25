@@ -78,7 +78,8 @@
 
   <!-- Filas de datos -->
   <tbody>
-    <tr *ngFor="let s of solicitudes()">
+    @for (s of solicitudes(); track s) {
+<tr>
       
       <!-- ID Solicitud -->
       <td>
@@ -127,6 +128,7 @@
         </div>
       </td>
     </tr>
+}
   </tbody>
 
   <!-- Paginación -->

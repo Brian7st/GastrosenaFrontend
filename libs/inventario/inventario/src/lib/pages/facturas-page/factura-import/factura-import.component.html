@@ -9,39 +9,49 @@
   </header>
 
   <!-- Alerts — se muestran según el estado del procesamiento -->
-  <div class="alerts-container" *ngIf="importStatus() !== 'idle'">
+  @if (importStatus() !== 'idle') {
+<div class="alerts-container">
 
     <!-- Procesando -->
-    <div class="alert alert--info" *ngIf="importStatus() === 'loading'">
+    @if (importStatus() === 'loading') {
+<div class="alert alert--info">
       <span class="material-symbols-outlined alert__spin">progress_activity</span>
       <span class="alert__text font-medium">Procesando archivo {{ fileName() }}…</span>
     </div>
+}
 
     <!-- Error de validación -->
-    <div class="alert alert--error" *ngIf="importStatus() === 'error'">
+    @if (importStatus() === 'error') {
+<div class="alert alert--error">
       <span class="material-symbols-outlined">error</span>
       <div class="alert__content">
         <h4 class="alert__title">Error de Validación</h4>
         <p class="alert__text">El archivo supera el límite de 10 MB o no es un XML/PDF válido. Verifique el documento original.</p>
       </div>
     </div>
+}
 
     <!-- Advertencia (PDF sin OC vinculada) -->
-    <div class="alert alert--warning" *ngIf="importStatus() === 'warning'">
+    @if (importStatus() === 'warning') {
+<div class="alert alert--warning">
       <span class="material-symbols-outlined">warning</span>
       <div class="alert__content">
         <h4 class="alert__title">Advertencia de Orden de Compra</h4>
         <p class="alert__text">No se ha asociado una Guía de Ingreso (GIL) u Orden de Compra válida para este proveedor. Por favor seleccione una en el formulario.</p>
       </div>
     </div>
+}
 
     <!-- Éxito -->
-    <div class="alert alert--success" *ngIf="importStatus() === 'success' || importStatus() === 'warning'">
+    @if (importStatus() === 'success' || importStatus() === 'warning') {
+<div class="alert alert--success">
       <span class="material-symbols-outlined">check_circle</span>
       <span class="alert__text font-medium">Datos extraídos correctamente de {{ fileName() }} · 8 ítems detectados</span>
     </div>
+}
 
   </div>
+}
 
   <!-- 2. Main Layout (Asymmetric) -->
   <div class="import-grid">
@@ -100,7 +110,8 @@
   </div>
 
   <!-- 3. Review Data Section — visible solo cuando el archivo fue procesado correctamente -->
-  <div class="review-section" *ngIf="fileLoaded()">
+  @if (fileLoaded()) {
+<div class="review-section">
     <h2 class="review-section__title">Revisión de Datos</h2>
     
     <!-- Document Data Card -->
@@ -259,6 +270,7 @@
       </div>
     </div>
   </div>
+}
 </div>
 
 <!-- Sticky Footer -->

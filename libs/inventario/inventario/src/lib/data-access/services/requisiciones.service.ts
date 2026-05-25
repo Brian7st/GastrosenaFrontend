@@ -39,22 +39,27 @@ export class RequisicionesService {
       );
   }
 
-  cambiarEstado(id: string, estado: Requisicion['estado']): Observable<boolean> {
-    const accionMap: Partial<Record<Requisicion['estado'], string>> = {
-      DESPACHADA: 'despachar',
-      FIRMADA:    'firmar',
-    };
-    const accion = accionMap[estado];
-    if (!accion) return throwError(() => new Error(`Estado ${estado} sin endpoint de transición`));
-
+  /** PATCH /legalization/requisiciones/{id}/despachar — economoId es @NotBlank en backend */
+  despacharRequisicion(id: string, economoId: string): Observable<boolean> {
     return this.http
-      .patch<void>(`${API}/legalization/requisiciones/${id}/${accion}`, {})
+      .patch<void>(`${API}/legalization/requisiciones/${id}/despachar`, { economoId })
       .pipe(
         map(() => true),
         catchError(err => throwError(() => err))
       );
   }
 
+  /** PATCH /legalization/requisiciones/{id}/firmar — voceroId es @NotBlank en backend */
+  firmarRequisicion(id: string, voceroId: string): Observable<boolean> {
+    return this.http
+      .patch<void>(`${API}/legalization/requisiciones/${id}/firmar`, { voceroId })
+      .pipe(
+        map(() => true),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   eliminarRequisicion(_id: string): Observable<boolean> {
     return throwError(() => new Error('eliminarRequisicion: endpoint DELETE no disponible en backend'));
   }

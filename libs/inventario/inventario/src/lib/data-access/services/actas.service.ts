@@ -51,6 +51,7 @@ export class ActasService {
       );
   }
 
+  /** POST /legalization/actas/{id}/{accion} — para PENDIENTE_FIRMAS, FIRMADA, ARCHIVADA (sin body) */
   cambiarEstado(id: string, estado: ActaLegalizacion['estado']): Observable<boolean> {
     const accion = ACCION_ESTADO[estado];
     if (!accion) return throwError(() => new Error(`Estado ${estado} sin transición de endpoint`));
@@ -63,15 +64,28 @@ export class ActasService {
       );
   }
 
+  /** POST /legalization/actas/{id}/revisar — revisorId es @NotBlank en backend */
+  revisarActa(id: string, revisorId: string): Observable<boolean> {
+    return this.http
+      .post<void>(`${API}/legalization/actas/${id}/revisar`, { revisorId })
+      .pipe(
+        map(() => true),
+        catchError(err => throwError(() => err))
+      );
+  }
+
   /** TODO: insumos/compromisos/firmantes — verificar si el backend los expone por separado */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getInsumosByActa(_id: string): Observable<InsumoActa[]> {
     return throwError(() => new Error('getInsumosByActa: endpoint pendiente de confirmación'));
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getCompromisosByActa(_id: string): Observable<CompromisoActa[]> {
     return throwError(() => new Error('getCompromisosByActa: endpoint pendiente de confirmación'));
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getFirmantesByActa(_id: string): Observable<FirmanteActa[]> {
     return throwError(() => new Error('getFirmantesByActa: endpoint pendiente de confirmación'));
   }
