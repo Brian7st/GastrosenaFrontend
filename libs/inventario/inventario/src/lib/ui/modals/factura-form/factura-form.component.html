@@ -130,15 +130,19 @@
         </div>
 
         <!-- Archivos adjuntos chips (dynamic display based on actual files added) -->
-        <div class="file-chips" *ngIf="archivosNombres().length > 0">
-          <div class="file-chip" *ngFor="let name of archivosNombres()">
+        @if (archivosNombres().length > 0) {
+<div class="file-chips">
+          @for (name of archivosNombres(); track name) {
+<div class="file-chip">
             <span class="material-symbols-outlined">attach_file</span>
             <span>{{ name }}</span>
             <button type="button" (click)="removeFile(name)">
               <span class="material-symbols-outlined">close</span>
             </button>
           </div>
+}
         </div>
+}
 
         <!-- SECTION: Vínculos y Responsables -->
         <div class="form-section">

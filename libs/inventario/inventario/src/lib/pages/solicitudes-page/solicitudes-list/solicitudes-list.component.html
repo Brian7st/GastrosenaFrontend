@@ -65,7 +65,9 @@
       <!-- Filtro Estado -->
       <div class="select-box">
         <select #estadoSelect (change)="onFilterEstado(estadoSelect.value)">
-          <option *ngFor="let opt of estadoOptions" [value]="opt.value">{{ opt.label }}</option>
+          @for (opt of estadoOptions; track opt) {
+<option [value]="opt.value">{{ opt.label }}</option>
+}
         </select>
         <span class="material-symbols-outlined dropdown-icon">expand_more</span>
       </div>
@@ -73,7 +75,9 @@
       <!-- Filtro Fecha -->
       <div class="select-box">
         <select #fechaSelect (change)="onFilterFecha(fechaSelect.value)">
-          <option *ngFor="let opt of fechaOptions" [value]="opt.value">{{ opt.label }}</option>
+          @for (opt of fechaOptions; track opt) {
+<option [value]="opt.value">{{ opt.label }}</option>
+}
         </select>
         <span class="material-symbols-outlined dropdown-icon">calendar_month</span>
       </div>
@@ -104,7 +108,8 @@
 
   <!-- Filas de datos -->
   <tbody>
-    <tr *ngFor="let s of solicitudes()">
+    @for (s of solicitudes(); track s) {
+<tr>
 
       <!-- Código -->
       <td>
@@ -169,6 +174,7 @@
         </div>
       </td>
     </tr>
+}
   </tbody>
 
   <!-- Paginación -->

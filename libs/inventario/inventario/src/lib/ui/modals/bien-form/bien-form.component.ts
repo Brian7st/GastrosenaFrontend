@@ -2,14 +2,14 @@ import {
   ChangeDetectionStrategy, Component, EventEmitter, Input,
   OnInit, Output, inject, computed
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Bien, BienFormDto } from '../../../models/inventario.model';
 
 @Component({
   selector: 'restaurant-bien-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './bien-form.component.html',
   styleUrl: './bien-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,7 +20,9 @@ export class BienFormComponent implements OnInit {
   @Input() mode: 'create' | 'edit' = 'create';
   @Input() bien?: Bien;
 
+  // eslint-disable-next-line @angular-eslint/no-output-native
   @Output() save = new EventEmitter<BienFormDto>();
+  // eslint-disable-next-line @angular-eslint/no-output-native
   @Output() cancel = new EventEmitter<void>();
 
   form!: FormGroup;

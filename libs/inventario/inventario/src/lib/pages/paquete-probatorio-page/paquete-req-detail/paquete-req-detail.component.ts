@@ -3,7 +3,7 @@ import {
   Component,
   inject,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute, Router } from '@angular/router';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 import { PaqueteFacade } from '../../../data-access/paquete.facade';
@@ -12,7 +12,7 @@ import { PaqueteFacade } from '../../../data-access/paquete.facade';
   selector: 'restaurant-paquete-req-detail',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, LucideIconComponent],
+  imports: [LucideIconComponent],
   templateUrl: './paquete-req-detail.component.html',
   styleUrl: './paquete-req-detail.component.scss',
 })

@@ -149,14 +149,17 @@
     </div>
   </div>
 
-  <restaurant-exportar-consolidado-modal
-    *ngIf="showExportModal()"
+  @if (showExportModal()) {
+<restaurant-exportar-consolidado-modal
+   
     (close)="closeExportModal()"
     (export)="onExport($event)">
   </restaurant-exportar-consolidado-modal>
+}
 
-  <restaurant-reversar-consolidado-modal
-    *ngIf="showReversarModal() && selectedReversarItem()"
+  @if (showReversarModal() && selectedReversarItem()) {
+<restaurant-reversar-consolidado-modal
+   
     [consolidadoId]="selectedReversarItem()!.id"
     [periodo]="selectedReversarItem()!.fechaGeneracion"
     [total]="(selectedReversarItem()!.totales.totalGeneral | currency:'COP':'symbol-narrow':'1.0-0') ?? ''"
@@ -165,4 +168,5 @@
     (close)="closeReversarModal()"
     (confirm)="confirmReversar()">
   </restaurant-reversar-consolidado-modal>
+}
 </div>

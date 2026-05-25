@@ -31,7 +31,9 @@
             <label class="field-label">CÓD. INTERNO SENA</label>
             <input class="field-input field-input--disabled" formControlName="codigoSena"
                    [placeholder]="mode === 'create' ? 'Autogenerado' : ''" />
-            <p class="field-hint" *ngIf="mode === 'create'">Se generará automáticamente al guardar</p>
+            @if (mode === 'create') {
+<p class="field-hint">Se generará automáticamente al guardar</p>
+}
           </div>
           <div class="field-group">
             <label class="field-label">CÓD. PROVEEDOR</label>
@@ -54,7 +56,9 @@
           <input class="field-input" formControlName="nombre"
                  placeholder="Descripción clara del activo"
                  [class.field-input--error]="hasError('nombre')" />
-          <p class="field-error" *ngIf="hasError('nombre')">El nombre es obligatorio (mín. 3 caracteres)</p>
+          @if (hasError('nombre')) {
+<p class="field-error">El nombre es obligatorio (mín. 3 caracteres)</p>
+}
         </div>
 
         <div class="field-group">
@@ -68,17 +72,21 @@
             <select class="field-select" formControlName="categoria"
                     [class.field-input--error]="hasError('categoria')">
               <option value="" disabled>Seleccione una categoría</option>
-              <option *ngFor="let cat of CATEGORIAS" [value]="cat">{{ cat }}</option>
+              @for (cat of CATEGORIAS; track cat) {
+<option [value]="cat">{{ cat }}</option>
+}
             </select>
           </div>
 
           <div class="field-group">
             <label class="field-label">
               UNIDAD DE MEDIDA (UM) <span class="required">*</span>
-              <span class="um-lock-badge" *ngIf="umBloqueada()">
+              @if (umBloqueada()) {
+<span class="um-lock-badge">
                 <span class="material-symbols-outlined">lock</span>
                 Bloqueada — tiene historial
               </span>
+}
             </label>
             <select class="field-select" formControlName="unidadMedida"
                     [class.field-input--disabled]="umBloqueada()">

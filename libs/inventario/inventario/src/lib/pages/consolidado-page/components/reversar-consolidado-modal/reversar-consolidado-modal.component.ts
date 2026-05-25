@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'restaurant-reversar-consolidado-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './reversar-consolidado-modal.component.html',
   styleUrl: './reversar-consolidado-modal.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -19,7 +19,9 @@ export class ReversarConsolidadoModalComponent {
   // If true, shows the "Blocked" view. If false, shows the "Confirm" view.
   @Input() isBlocked = false;
 
+  // eslint-disable-next-line @angular-eslint/no-output-native
   @Output() close = new EventEmitter<void>();
+  // eslint-disable-next-line @angular-eslint/no-output-native
   @Output() confirm = new EventEmitter<void>();
 
   confirmKeyword = signal('');
