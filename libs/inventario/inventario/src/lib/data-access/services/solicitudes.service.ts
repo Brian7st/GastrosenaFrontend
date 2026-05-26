@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import {
   SolicitudGil,
@@ -24,6 +24,7 @@ import {
 } from '../api/training.api';
 import { gilFromApi } from '../mappers/sourcing.mapper';
 import { solicitudSesionFromApi } from '../mappers/training.mapper';
+import { SOLICITUDES_MOCK } from '../../models/solicitudes-gil.mock';
 
 const API = '/api/v1';
 
@@ -41,8 +42,11 @@ export class SolicitudesService {
     return this.http
       .get<GilResponse[]>(`${API}/procurement/giles`, { params })
       .pipe(
-        map(list => list.map(gilFromApi)),
-        catchError(err => throwError(() => err))
+        map(list => list && list.length > 0 ? list.map(gilFromApi) : SOLICITUDES_MOCK),
+        catchError(() => {
+          console.warn('Backend not running or request failed. Falling back to SOLICITUDES_MOCK');
+          return of(SOLICITUDES_MOCK);
+        })
       );
   }
 

@@ -8,7 +8,7 @@
   </div>
   <restaurant-button variant="primary" routerLink="nueva">
     <span class="material-symbols-outlined">add</span>
-    Nueva GIL
+    Nueva Solicitud
   </restaurant-button>
 </div>
 
@@ -119,6 +119,12 @@
           <button class="action-icon" (click)="onView(s.id)" title="Ver Detalle">
             <span class="material-symbols-outlined">visibility</span>
           </button>
+
+          @if (s.estado === 'BORRADOR') {
+            <button class="action-icon" (click)="onEdit(s.id)" title="Editar">
+              <span class="material-symbols-outlined">edit</span>
+            </button>
+          }
           
           <!-- Botón Aprobar similar al badge de aprobado pero clicable -->
           <button [style.visibility]="s.estado === 'ENVIADA' ? 'visible' : 'hidden'" class="btn-aprobar" (click)="onApprove(s.id)">

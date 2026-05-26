@@ -1,0 +1,173 @@
+<!-- ══════════════════════════════════════════════════════════════════════════
+     Contenedor Principal de Nueva Solicitud de Insumos
+     ══════════════════════════════════════════════════════════════════════════ -->
+<div class="form-page-container">
+  
+  <!-- Breadcrumbs & Header -->
+  <div class="page-header">
+    <div class="header-nav-wrapper">
+      <inventario-back-button (clicked)="onCancel()" />
+      
+      <div class="header-titles-col">
+        <div class="breadcrumbs">
+          <a (click)="onCancel()" class="breadcrumb-link">Solicitudes</a>
+          <span class="material-symbols-outlined separator">chevron_right</span>
+          <span class="current">{{ isEdit() ? 'Editar' : 'Nueva' }}</span>
+        </div>
+        
+        <div class="header-titles">
+          <div class="title-row">
+            <h2 class="page-title">{{ isEdit() ? 'Editar Solicitud de Insumos' : 'Nueva Solicitud de Insumos' }}</h2>
+            @if (isEdit()) {
+              <span class="status-badge status-badge--edicion">EN EDICIÓN</span>
+              <span class="status-badge status-badge--codigo">{{ solicitudCodigo() }}</span>
+            } @else {
+              <span class="status-badge status-badge--borrador">BORRADOR</span>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tarjeta 1: Información General -->
+  <div class="form-card">
+    <h3 class="section-title">
+      <span class="material-symbols-outlined section-icon">info</span>
+      Información General
+    </h3>
+
+    <div class="form-grid">
+      <!-- Columna 1 -->
+      <div class="form-col">
+        <div class="form-group">
+          <label class="form-label">Instructor Solicitante</label>
+          <div class="readonly-input">
+            <div class="instructor-avatar">
+              <span class="material-symbols-outlined">person</span>
+            </div>
+            <span class="readonly-text">{{ instructor() }}</span>
+            <span class="material-symbols-outlined icon-locked">lock</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Ambiente de formación</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            placeholder="Ej. Cocina Laboratorio A"
+            [value]="ambiente()"
+            (input)="ambiente.set($any($event.target).value)"
+          />
+        </div>
+      </div>
+
+      <!-- Columna 2 -->
+      <div class="form-col">
+        <div class="form-group">
+          <label class="form-label">Fecha de Solicitud</label>
+          <div class="readonly-input">
+            <span class="readonly-text">{{ fecha() }}</span>
+            <span class="material-symbols-outlined icon-locked">lock</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Número de Ficha</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            placeholder="Ej. 2560892"
+            [value]="ficha()"
+            (input)="ficha.set($any($event.target).value)"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Observaciones (Fila completa) -->
+    <div class="form-group mt-6">
+      <label class="form-label">Observaciones</label>
+      <textarea 
+        class="form-control" 
+        rows="3" 
+        placeholder="Ingrese observaciones adicionales si es necesario..."
+        [value]="observaciones()"
+        (input)="observaciones.set($any($event.target).value)"
+      ></textarea>
+    </div>
+  </div>
+
+  <!-- Tarjeta 2: Ítems Solicitados -->
+  <div class="form-card">
+    <div class="section-header-row">
+      <h3 class="section-title m-0">
+        <span class="material-symbols-outlined section-icon">shopping_cart</span>
+        Ítems Solicitados
+      </h3>
+      <restaurant-button variant="ghost" class="btn-add-item" (click)="onAddBien()">
+        <span class="material-symbols-outlined">add</span>
+        Agregar ítem
+      </restaurant-button>
+    </div>
+
+    <div class="table-container">
+      <table class="items-table">
+        <thead>
+          <tr>
+            <th class="w-full">Insumo</th>
+            <th>Cantidad</th>
+            <th>Unidad</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (bien of bienes(); track bien; let i = $index) {
+            <tr>
+              <td>
+                <input 
+                  type="text" 
+                  class="form-control-table" 
+                  placeholder="Ej. Harina de Trigo"
+                  [(ngModel)]="bien.nombre"
+                />
+              </td>
+              <td>
+                <input 
+                  type="number" 
+                  class="form-control-table text-right w-24" 
+                  placeholder="0"
+                  [(ngModel)]="bien.cantidad"
+                />
+              </td>
+              <td>
+                <input 
+                  type="text" 
+                  class="form-control-table w-20" 
+                  placeholder="kg"
+                  [(ngModel)]="bien.unidad"
+                />
+              </td>
+              <td class="text-center">
+                <button class="btn-icon btn-icon--danger" type="button" (click)="onRemoveBien(i)" title="Eliminar ítem">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Botones de Acción (Footer) -->
+  <div class="actions-footer">
+    <restaurant-button variant="ghost" (click)="onCancel()">Guardar borrador</restaurant-button>
+    <restaurant-button variant="primary" (click)="onSave()">
+      Enviar solicitud
+      <span class="material-symbols-outlined right-icon">arrow_forward</span>
+    </restaurant-button>
+  </div>
+
+</div>
