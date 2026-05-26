@@ -44,8 +44,8 @@ export class BienExportPageComponent {
     { id: 'csv', label: 'CSV', sub: 'Texto plano', icon: 'csv', iconColor: '#475569' },
   ];
 
-  readonly CATEGORIAS = ['Todas las categorías', ...CATEGORIAS_BIEN];
-  readonly ALMACENES = ['Todos los almacenes', 'Almacén Central', 'Sede Norte', 'Sede Sur', 'Laboratorio 302'];
+  readonly CATEGORIAS = CATEGORIAS_BIEN;
+  readonly ALMACENES = ['Almacén Central', 'Sede Norte', 'Sede Sur', 'Laboratorio 302'];
 
   readonly EXPORTACIONES_RECIENTES = [
     { nombre: 'Inv_Bienes_Oct.xlsx', tiempo: 'Hace 2 horas', tamano: '4.2 MB', icono: 'table_chart', color: '#217346' },

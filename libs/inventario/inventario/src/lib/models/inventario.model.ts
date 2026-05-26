@@ -76,6 +76,15 @@ export interface BienFiltros {
   busqueda?: string;
   categoria?: string;
   estado?: EstadoBien;
+  page?: number;
+  size?: number;
+}
+
+export interface BienPaginacion {
+  totalElements: number;
+  totalPages: number;
+  page: number;
+  size: number;
 }
 
 /**
