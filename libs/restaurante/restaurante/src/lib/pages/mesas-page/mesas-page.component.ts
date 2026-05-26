@@ -34,54 +34,49 @@ import { Mesa } from '../../models/restaurante.model';
 })
 export class MesasPageComponent {
   private facade = inject(RestauranteFacade);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private router  = inject(Router);
+  private route   = inject(ActivatedRoute);
 
-  // Signals del Facade
-  mesas = this.facade.mesas;
-  mesasActivas = computed(() => this.mesas().filter(m => m.isActive !== false));
-  mesasInactivas = computed(() => this.mesas().filter(m => m.isActive === false));
-  stats = this.facade.stats;
+  // ── Signals del Facade ──────────────────────────────────────────────────────
+  mesas          = this.facade.mesas;
+  mesasCargando  = this.facade.mesasCargando;
+  mesasError     = this.facade.mesasError;
+  mesasActivas   = computed(() => this.mesas().filter(m => m.activo));
+  mesasInactivas = computed(() => this.mesas().filter(m => !m.activo));
+  stats          = this.facade.stats;
 
-  // Estado local reactivo (Signals)
-  modalActivo = signal<string | null>(null);
+  // ── Estado local del modal ───────────────────────────────────────────────────
+  modalActivo      = signal<string | null>(null);
   mesaSeleccionada = signal<Mesa | null>(null);
-  tabActivo = signal<'desactivar' | 'activar'>('desactivar');
-  
-  // Signals para crear mesa
-  nuevoNumero = signal<number>(1);
-  nuevoAsientos = signal<number>(4);
-  nuevaZona = signal<string>('');
-  nuevoActivo = signal<boolean>(true);
+  tabActivo        = signal<'desactivar' | 'activar'>('desactivar');
 
-  // Eliminamos mesaIdParaEliminar ya que no usaremos eliminar-global
-  
-  // Signals para abrir mesa
-  nuevoComensal = signal<string>('');
-  nuevaNota = signal<string>('');
-  nuevaCantidadComensales = signal<number>(1);
+  // ── Signals para CREAR mesa (MesaCreateRequest) ──────────────────────────────
+  nuevoNombre    = signal<string>('');
+  nuevaCapacidad = signal<number>(4);
+  nuevaZona      = signal<string>('');
 
+  // ── Signals para EDITAR mesa (MesaUpdateRequest) — se pre-llenan al abrir ──
+  editNombre    = signal<string>('');
+  editCapacidad = signal<number>(4);
+  editZona      = signal<string>('');
+
+  // ── Apertura / cierre de modales ─────────────────────────────────────────────
   abrirModal(nombre: string, mesa: Mesa | null = null) {
     this.modalActivo.set(nombre);
     this.mesaSeleccionada.set(mesa);
-    
+
     if (nombre === 'agregar') {
-      const mesas = this.facade.mesas();
-      const nextNum = mesas.length > 0 ? Math.max(...mesas.map(m => m.numero)) + 1 : 1;
-      this.nuevoNumero.set(nextNum);
-      this.nuevoAsientos.set(1);
+      // Resetear formulario de creación
+      this.nuevoNombre.set('');
+      this.nuevaCapacidad.set(4);
       this.nuevaZona.set('');
-      this.nuevoActivo.set(true);
+    } else if (nombre === 'editar' && mesa) {
+      // Pre-llenar formulario de edición con los datos actuales de la mesa
+      this.editNombre.set(mesa.nombre);
+      this.editCapacidad.set(mesa.capacidad);
+      this.editZona.set(mesa.zona ?? '');
     } else if (nombre === 'gestion-mesas') {
       this.tabActivo.set('desactivar');
-    } else if (mesa) {
-      this.nuevoComensal.set(mesa.comensal || '');
-      this.nuevaNota.set(mesa.notas || '');
-      this.nuevaCantidadComensales.set(mesa.cantidadComensales || 1);
-    } else {
-      this.nuevoComensal.set('');
-      this.nuevaNota.set('');
-      this.nuevaCantidadComensales.set(1);
     }
   }
 
@@ -90,58 +85,101 @@ export class MesasPageComponent {
     this.mesaSeleccionada.set(null);
   }
 
+  // ── CREAR ────────────────────────────────────────────────────────────────────
   crearMesa() {
-    this.facade.agregarMesa(
-      this.nuevoNumero(),
-      this.nuevoAsientos(),
-      this.nuevaZona(),
-      this.nuevoActivo()
-    );
-    this.cerrarModales();
-  }
+    const nombre    = this.nuevoNombre().trim();
+    const capacidad = this.nuevaCapacidad();
+    const zona      = this.nuevaZona().trim();
 
-  abrirMesa(id: number) {
-    if (this.nuevoComensal().trim()) {
-      this.facade.abrirMesa(id, this.nuevoComensal(), this.nuevaCantidadComensales());
-      this.facade.seleccionarMesaParaPedido(id);
-      this.cerrarModales();
-      this.router.navigate(['../pedidos'], { relativeTo: this.route });
+    if (!nombre) {
+      alert('El nombre de la mesa es obligatorio.');
+      return;
     }
+    if (capacidad < 1 || capacidad > 20) {
+      alert('La capacidad debe ser entre 1 y 20 personas.');
+      return;
+    }
+
+    // Cierra el modal inmediatamente para dar feedback visual rápido;
+    // el signal _mesas del Facade se actualiza cuando el backend confirme.
+    this.cerrarModales();
+    this.facade.agregarMesa(nombre, capacidad, zona);
   }
 
-  verPedido(id: number) {
+  // ── EDITAR ───────────────────────────────────────────────────────────────────
+  guardarEdicion() {
+    const mesa = this.mesaSeleccionada();
+    if (!mesa) return;
+
+    const nombre    = this.editNombre().trim();
+    const capacidad = this.editCapacidad();
+    const zona      = this.editZona().trim();
+
+    if (!nombre) {
+      alert('El nombre de la mesa es obligatorio.');
+      return;
+    }
+    if (capacidad < 1 || capacidad > 20) {
+      alert('La capacidad debe ser entre 1 y 20 personas.');
+      return;
+    }
+
+    this.cerrarModales();
+    this.facade.editarMesa(mesa.id, {
+      nombre,
+      capacidad,
+      zona: zona || null,
+    });
+  }
+
+  // ── ACCIONES DE ESTADO ───────────────────────────────────────────────────────
+  abrirMesa(id: string) {
+    this.facade.abrirMesa(id, '', 1);
+    this.cerrarModales();
+    this.router.navigate(['../pedidos'], { relativeTo: this.route });
+  }
+
+  verPedido(id: string) {
     this.facade.seleccionarMesaParaPedido(id);
     this.router.navigate(['../pedidos'], { relativeTo: this.route });
   }
 
-  guardarNotas() {
-    const mesa = this.mesaSeleccionada();
-    if (mesa) {
-      this.facade.actualizarNotas(mesa.id, this.nuevaNota());
-      this.cerrarModales();
-    }
-  }
-
-  eliminarMesa(id: number) {
-    this.facade.eliminarMesa(id);
+  liberarMesa(id: string) {
     this.cerrarModales();
-  }
-
-  cambiarEstadoMesa(id: number, isActive: boolean) {
-    this.facade.cambiarEstadoActivoMesa(id, isActive);
-  }
-
-  liberarMesa(id: number) {
     this.facade.liberarMesa(id);
+  }
+
+  // ── ACTIVAR / DESACTIVAR ─────────────────────────────────────────────────────
+  /**
+   * Llama a /activar o /desactivar según el flag.
+   * Para la acción de desactivar se pide confirmación antes de llamar al backend.
+   */
+  cambiarEstadoMesa(id: string, activo: boolean) {
+    if (!activo) {
+      const ok = confirm('¿Desactivar esta mesa? Quedará oculta del salón.');
+      if (!ok) return;
+    }
+    this.facade.cambiarEstadoActivoMesa(id, activo);
+  }
+
+  /** Alias para el flujo de "eliminar" de la tarjeta (mapea a desactivar). */
+  eliminarMesa(id: string) {
+    this.cambiarEstadoMesa(id, false);
     this.cerrarModales();
   }
 
+  recargarMesas() {
+    this.facade.cargarMesas();
+  }
+
+  // ── Helpers de UI ────────────────────────────────────────────────────────────
   getBadgeType(estado: string): 'info' | 'success' | 'warning' | 'danger' {
     switch (estado) {
-      case 'libre': return 'success';
-      case 'ocupada': return 'danger';
-      case 'por_pagar': return 'warning';
-      default: return 'info';
+      case 'LIBRE':     return 'success';
+      case 'OCUPADA':   return 'danger';
+      case 'POR_PAGAR': return 'warning';
+      case 'INACTIVA':  return 'info';
+      default:          return 'info';
     }
   }
 }

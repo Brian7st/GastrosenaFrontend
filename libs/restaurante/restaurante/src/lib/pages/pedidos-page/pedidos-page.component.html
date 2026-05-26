@@ -8,8 +8,8 @@
         </button>
         @if (mesaActual(); as mesa) {
           <div class="mesa-info">
-            <h2>Mesa {{ mesa.numero }}</h2>
-            <span class="comensal">{{ mesa.comensal || 'Sin comensal asignado' }}</span>
+            <h2>{{ mesa.nombre }}</h2>
+            <!-- comensal eliminado del modelo Mesa (TODO: leer del Pedido activo en fase siguiente) -->
           </div>
         }
       </div>
