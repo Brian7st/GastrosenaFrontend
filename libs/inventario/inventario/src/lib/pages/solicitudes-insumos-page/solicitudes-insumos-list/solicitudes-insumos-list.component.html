@@ -120,11 +120,9 @@
             <span class="material-symbols-outlined">visibility</span>
           </button>
 
-          @if (s.estado === 'BORRADOR') {
-            <button class="action-icon" (click)="onEdit(s.id)" title="Editar">
-              <span class="material-symbols-outlined">edit</span>
-            </button>
-          }
+          <button class="action-icon" (click)="onEdit(s.id)" title="Editar">
+            <span class="material-symbols-outlined">edit</span>
+          </button>
           
           @if (s.estado === 'ENVIADA') {
             <button class="btn-aprobar" (click)="onApprove(s.id)">
