@@ -14,12 +14,16 @@ import { UsuariosState } from './store/reducers/usuarios.reducer';
 import {
   selectError,
   selectHayError,
+  selectHistorial,
   selectImportando,
   selectLoading,
   selectLoadingAccion,
+  selectLoadingHistorial,
+  selectLoadingRolesDetalle,
   selectMensajeExport,
   selectResultadoImport,
   selectRoles,
+  selectRolesDetalle,
   selectTotalActivos,
   selectTotalElements,
   selectTotalInactivos,
@@ -47,6 +51,10 @@ export class UsuariosFacade {
   readonly resultadoImport$     = this.store.select(selectResultadoImport);
   readonly mensajeExport$       = this.store.select(selectMensajeExport);
   readonly hayError$            = this.store.select(selectHayError);
+  readonly historial$           = this.store.select(selectHistorial);
+  readonly loadingHistorial$    = this.store.select(selectLoadingHistorial);
+  readonly rolesDetalle$        = this.store.select(selectRolesDetalle);
+  readonly loadingRolesDetalle$ = this.store.select(selectLoadingRolesDetalle);
 
   // ── Comandos ──────────────────────────────────────────────────────────────
   cargarUsuarios(filtros?: Partial<FiltrosUsuarios>): void {
@@ -95,5 +103,13 @@ export class UsuariosFacade {
 
   limpiarSeleccion(): void {
     this.store.dispatch(UsuariosActions.limpiarSeleccion());
+  }
+
+  cargarHistorial(): void {
+    this.store.dispatch(UsuariosActions.cargarHistorial());
+  }
+
+  cargarRolesDetalle(): void {
+    this.store.dispatch(UsuariosActions.cargarRolesDetalle());
   }
 }

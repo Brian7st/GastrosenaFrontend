@@ -5,6 +5,7 @@ import {
 
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Bien, BienFormDto } from '../../../models/inventario.model';
+import { CATEGORIAS_BIEN } from '../../../models/categorias.model';
 
 @Component({
   selector: 'restaurant-bien-form',
@@ -27,10 +28,7 @@ export class BienFormComponent implements OnInit {
 
   form!: FormGroup;
 
-  readonly CATEGORIAS = [
-    'Equipos de Cómputo', 'Mobiliario', 'Papelería', 'Cocina',
-    'Audiovisuales', 'Herramientas', 'Electrodomésticos', 'Otro',
-  ];
+  readonly CATEGORIAS = CATEGORIAS_BIEN;
 
   readonly isEdit = computed(() => this.mode === 'edit');
   readonly umBloqueada = computed(() => this.mode === 'edit' && !!this.bien?.tieneHistorial);
@@ -45,7 +43,10 @@ export class BienFormComponent implements OnInit {
         descripcion:     this.bien.descripcion ?? '',
         categoria:       this.bien.categoria,
         unidadMedida:    this.bien.unidadMedida,
+        imagenUrl:       this.bien.imagenUrl ?? '',
       });
+      // En edición el código SENA es inmutable — no se puede cambiar
+      this.form.get('codigoSena')?.disable();
       if (this.umBloqueada()) {
         this.form.get('unidadMedida')?.disable();
       }
@@ -54,12 +55,13 @@ export class BienFormComponent implements OnInit {
 
   private initForm(): void {
     this.form = this.fb.group({
-      codigoSena:      [{ value: '', disabled: true }],
+      codigoSena:      ['', Validators.required],   // habilitado en create; se deshabilita en edit
       codigoProveedor: [''],
       nombre:          ['', [Validators.required, Validators.minLength(3)]],
       descripcion:     [''],
       categoria:       ['', Validators.required],
       unidadMedida:    ['', Validators.required],
+      imagenUrl:       [''],
     });
   }
 
@@ -73,6 +75,16 @@ export class BienFormComponent implements OnInit {
 
   onCancel(): void {
     this.cancel.emit();
+  }
+
+  onImagenSeleccionada(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.form.patchValue({ imagenUrl: reader.result as string });
+    };
+    reader.readAsDataURL(file);
   }
 
   hasError(field: string): boolean {

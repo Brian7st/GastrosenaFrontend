@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ButtonComponent, KpiCardComponent, LoadingSkeletonComponent } from '@restaurant/shared/ui';
@@ -29,9 +29,14 @@ export class BienesListPageComponent implements OnInit {
   private router = inject(Router);
 
   // State signals
-  bienes = this.facade.bienes;
-  kpis = this.facade.kpis;
-  loading = this.facade.loading;
+  bienes      = this.facade.bienes;
+  kpis        = this.facade.kpis;
+  loading     = this.facade.loading;
+  paginacion  = this.facade.paginacion;
+
+  paginas = computed(() =>
+    Array.from({ length: this.paginacion().totalPages }, (_, i) => i)
+  );
 
   // Modal controls
   showFormModal = signal(false);
@@ -45,7 +50,11 @@ export class BienesListPageComponent implements OnInit {
   }
 
   onSearch(query: string): void {
-    this.facade.setFiltros({ busqueda: query });
+    this.facade.cargarBienes({ busqueda: query });
+  }
+
+  onIrAPagina(page: number): void {
+    this.facade.irAPagina(page);
   }
 
   onImportBienes(): void {

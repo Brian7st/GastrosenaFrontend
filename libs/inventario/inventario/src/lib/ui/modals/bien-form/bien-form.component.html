@@ -28,12 +28,18 @@
 
         <div class="field-row">
           <div class="field-group">
-            <label class="field-label">CÓD. INTERNO SENA</label>
-            <input class="field-input field-input--disabled" formControlName="codigoSena"
-                   [placeholder]="mode === 'create' ? 'Autogenerado' : ''" />
-            @if (mode === 'create') {
-<p class="field-hint">Se generará automáticamente al guardar</p>
-}
+            <label class="field-label">CÓD. INTERNO SENA <span class="required">*</span></label>
+            <input class="field-input"
+                   formControlName="codigoSena"
+                   [class.field-input--disabled]="mode === 'edit'"
+                   [class.field-input--error]="hasError('codigoSena')"
+                   [placeholder]="mode === 'create' ? 'Ej. SENA-00123' : ''" />
+            @if (hasError('codigoSena')) {
+              <p class="field-error">El código SENA es obligatorio</p>
+            }
+            @if (mode === 'edit') {
+              <p class="field-hint">El código SENA no puede modificarse una vez creado</p>
+            }
           </div>
           <div class="field-group">
             <label class="field-label">CÓD. PROVEEDOR</label>
@@ -99,6 +105,21 @@
               <option value="CAJA">CAJA – Caja</option>
             </select>
           </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">IMAGEN DEL BIEN</label>
+          <label class="file-upload-label">
+            <input type="file" accept="image/*" class="file-input-hidden"
+                   (change)="onImagenSeleccionada($event)" />
+            <span class="material-symbols-outlined">upload_file</span>
+            <span>{{ form.get('imagenUrl')?.value ? 'Cambiar imagen' : 'Seleccionar archivo' }}</span>
+          </label>
+          @if (form.get('imagenUrl')?.value) {
+            <img [src]="form.get('imagenUrl')?.value"
+                 alt="Vista previa"
+                 class="imagen-preview" />
+          }
         </div>
       </div>
 

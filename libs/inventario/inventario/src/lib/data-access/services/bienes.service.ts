@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of, throwError, forkJoin } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { Bien, BienFiltros, BienKpis, BienFormDto } from '../../models/inventario.model';
+import { Bien, BienFiltros, BienKpis, BienFormDto, BienPaginacion } from '../../models/inventario.model';
 import {
   PagedResponse,
   ProductoResponse,
@@ -27,18 +27,27 @@ export class BienesService {
 
   // ── Listado ──────────────────────────────────────────────────────────────────
 
-  /** GET /catalog/productos — lista paginada.
-   *  Estado derivado de `activo`; valor = 0 (sin endpoint de precio). */
-  getBienes(filtros?: BienFiltros): Observable<Bien[]> {
+  /** GET /catalog/productos — lista paginada (page 0-based, size por defecto 10). */
+  getBienes(filtros?: BienFiltros): Observable<{ bienes: Bien[]; paginacion: BienPaginacion }> {
     let params = new HttpParams();
     if (filtros?.busqueda)  params = params.set('q', filtros.busqueda);
     if (filtros?.categoria) params = params.set('categoria', filtros.categoria);
     if (filtros?.estado)    params = params.set('estado', filtros.estado);
+    params = params.set('page', String(filtros?.page ?? 0));
+    params = params.set('size', String(filtros?.size ?? 10));
 
     return this.http
       .get<PagedResponse<ProductoResponse>>(`${API}/catalog/productos`, { params })
       .pipe(
-        map(res => res.content.map(bienFromCatalogo)),
+        map(res => ({
+          bienes: res.content.map(bienFromCatalogo),
+          paginacion: {
+            totalElements: res.totalElements,
+            totalPages:    res.totalPages,
+            page:          res.page,
+            size:          res.size,
+          },
+        })),
         catchError(err => throwError(() => err))
       );
   }
@@ -92,9 +101,9 @@ export class BienesService {
       );
   }
 
-  /** DELETE /catalog/productos/{id}?confirmacion={id} — @RequestParam requerido en backend */
+  /** DELETE /catalog/productos/{id}?confirmacion=ELIMINAR — @RequestParam requerido en backend */
   deleteBien(id: string | number): Observable<void> {
-    const params = new HttpParams().set('confirmacion', String(id));
+    const params = new HttpParams().set('confirmacion', 'ELIMINAR');
     return this.http
       .delete<void>(`${API}/catalog/productos/${id}`, { params })
       .pipe(catchError(err => throwError(() => err)));

@@ -24,16 +24,19 @@
           </div>
         </div>
 
+        <!-- Regional: código numérico + nombre -->
         <div class="form-group">
-          <label class="form-label">Regional</label>
-          <select class="form-control">
-            <option>Seleccione Regional</option>
-            <option selected>Distrito Capital</option>
-            <option>Antioquia</option>
-            <option>Valle del Cauca</option>
-          </select>
+          <label class="form-label">Regional (Código)</label>
+          <input type="number" class="form-control" value="63" placeholder="Ej. 63" min="1" />
+          <p class="form-hint">Código numérico de la regional SENA.</p>
         </div>
 
+        <div class="form-group">
+          <label class="form-label">Nombre de la Regional</label>
+          <input type="text" class="form-control" value="Quindío" placeholder="Ej. Quindío" />
+        </div>
+
+        <!-- Cuentadante con cédula -->
         <div class="form-group">
           <label class="form-label">Cuentadante</label>
           <select class="form-control">
@@ -57,6 +60,16 @@
                 (input)="nuevaCuenta.set($any($event.target).value)"
               />
             </div>
+            <div class="form-group mt-2">
+              <label class="form-label">Cédula del cuentadante</label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Ej. 1001234567"
+                [value]="nuevaCuentaCedula()"
+                (input)="nuevaCuentaCedula.set($any($event.target).value)"
+              />
+            </div>
             <button class="btn-link btn-link--add mt-2" type="button"
                     [disabled]="!nuevaCuenta().trim()"
                     (click)="onConfirmarCuentadante()">
@@ -66,6 +79,13 @@
           </div>
         </div>
 
+        <!-- Código de Grupo -->
+        <div class="form-group">
+          <label class="form-label">Código de Grupo</label>
+          <input type="text" class="form-control" placeholder="Ej. ADSO-2670687" />
+        </div>
+
+        <!-- Ficha de Caracterización -->
         <div class="form-group">
           <label class="form-label">Ficha de Caracterización</label>
           <input type="text" class="form-control" maxlength="7" pattern="\d{7}" placeholder="Ej. 2471532" />
@@ -81,35 +101,40 @@
       <!-- Columna 2 -->
       <div class="form-col">
         <div class="form-group">
-          <label class="form-label">Fecha Requerida</label>
-          <input type="date" class="form-control" />
-        </div>
-
-        <div class="form-group">
           <label class="form-label">Área</label>
           <select class="form-control">
-            <option>Seleccione Área</option>
-            <option selected>Tecnología y Logística</option>
-            <option>Centro de Comercio y Servicios</option>
+            <option value="">Seleccione Área</option>
+            @for (area of AREAS; track area) {
+              <option [value]="area">{{ area }}</option>
+            }
           </select>
         </div>
 
+        <!-- Centro de Costos: código numérico + nombre -->
         <div class="form-group">
-          <label class="form-label">Centro de Costos</label>
-          <select class="form-control">
-            <option>Seleccione Centro de Costo</option>
-            <option selected>CC-9201-450 - Bogotá</option>
-            <option>CC-1102-120 - Medellin</option>
-          </select>
+          <label class="form-label">Centro de Costos (Código)</label>
+          <input type="number" class="form-control" value="953810" placeholder="Ej. 953810" min="1" />
+          <p class="form-hint">Código numérico del centro de costos.</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Nombre del Centro</label>
+          <input type="text" class="form-control" value="Comercio y Turismo" placeholder="Ej. Comercio y Turismo" />
         </div>
 
         <div class="form-group">
           <label class="form-label">Destino de Bienes</label>
           <select class="form-control">
-            <option>Seleccione Destino</option>
-            <option selected>Laboratorio 402 - Computo Avanzado</option>
-            <option>Aula 101 - Gastronomía</option>
+            <option value="FORMACION" selected>Formación</option>
+            <option value="LABORATORIO">Laboratorio</option>
+            <option value="AULA">Aula</option>
+            <option value="OTRO">Otro</option>
           </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Jefe de Oficina / Coordinador de Área</label>
+          <input type="text" class="form-control" placeholder="Ej. María García Rincón" />
         </div>
 
         <div class="form-group">
@@ -119,36 +144,6 @@
             <option selected>Ing. Ricardo Sarmiento</option>
             <option>Lic. Martha Lucía Peña</option>
           </select>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Trazabilidad Académica Section -->
-  <div class="form-card form-card--bordered">
-    <h3 class="section-title">
-      <span class="material-symbols-outlined section-icon">school</span>
-      Trazabilidad Académica <span class="required-asterisk">*</span>
-    </h3>
-    <div class="form-grid">
-      <div class="form-col">
-        <div class="form-group">
-          <label class="form-label">Vocero de Aprendices (Nombre Completo)</label>
-          <input type="text" class="form-control" placeholder="Ingrese nombre completo" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Cédula del Vocero</label>
-          <input type="text" class="form-control" placeholder="Ingrese número de documento" />
-        </div>
-      </div>
-      <div class="form-col">
-        <div class="form-group">
-          <label class="form-label">Resultado de Aprendizaje (RA)</label>
-          <textarea class="form-control" rows="2" placeholder="Especifique el resultado de aprendizaje asociado"></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Franja Horaria</label>
-          <input type="time" class="form-control" />
         </div>
       </div>
     </div>
@@ -176,27 +171,138 @@
         </thead>
         <tbody>
           @for (bien of bienes(); track bien; let i = $index) {
-<tr>
-            <td class="font-medium">{{ bien.codigo }}</td>
-            <td class="text-secondary">{{ bien.descripcion }}</td>
-            <td class="text-secondary">{{ bien.um }}</td>
-            <td class="text-right font-medium">{{ bien.cantidad }}</td>
-            <td class="text-right text-secondary">{{ bien.valorUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
-            <td class="text-right font-bold">{{ bien.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
-            <td class="text-center">
-              <button class="btn-icon btn-icon--danger" type="button" (click)="onRemoveBien(i)" title="Eliminar bien">
-                <span class="material-symbols-outlined">delete</span>
-              </button>
-            </td>
-          </tr>
-}
+            <tr>
+              <td class="font-medium">{{ bien.codigo }}</td>
+              <td class="text-secondary">{{ bien.descripcion }}</td>
+              <td class="text-secondary">{{ bien.um }}</td>
+              <td class="text-right">
+                <input
+                  type="number"
+                  class="qty-input"
+                  [value]="bien.cantidad"
+                  min="1"
+                  (change)="onCantidadChange(i, +$any($event.target).value)"
+                />
+              </td>
+              <td class="text-right text-secondary">{{ bien.valorUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+              <td class="text-right font-bold">{{ bien.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+              <td class="text-center">
+                <button class="btn-icon btn-icon--danger" type="button" (click)="onRemoveBien(i)" title="Eliminar bien">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
+              </td>
+            </tr>
+          }
+          @if (bienes().length === 0) {
+            <tr>
+              <td colspan="7" class="empty-bienes-row">
+                <span class="material-symbols-outlined">category</span>
+                Sin bienes agregados — usá el botón de abajo para buscar del catálogo
+              </td>
+            </tr>
+          }
         </tbody>
       </table>
     </div>
-    <button class="btn-link btn-link--add mt-4" type="button" (click)="onAddBien()">
+    <button class="btn-link btn-link--add mt-4" type="button" (click)="onAbrirSelectorBien()">
       <span class="material-symbols-outlined">add_circle</span>
-      Agregar bien
+      Agregar bien del catálogo
     </button>
+  </div>
+
+  <!-- Consolidar Solicitudes Aprobadas (Generar GIL) Section -->
+  <div class="form-card form-card--bordered">
+    <h3 class="section-title">
+      <span class="material-symbols-outlined section-icon">library_add_check</span>
+      Consolidar Solicitudes Aprobadas (Generar GIL)
+    </h3>
+    <p class="form-hint mb-4" style="margin-top: -0.5rem; color: var(--color-text-secondary, #666);">
+      Seleccione las solicitudes aprobadas para consolidar en una Guía de Ingreso Local (GIL).
+    </p>
+
+    <div class="consolidar-container">
+      <!-- Columna Izquierda: Tabla Compacta de Solicitudes -->
+      <div class="consolidar-main">
+        <div class="toolbar-compact">
+          <div class="search-box-compact">
+            <span class="material-symbols-outlined search-icon">search</span>
+            <input 
+              type="text" 
+              placeholder="Buscar por código o solicitante..." 
+              [value]="searchTerm()"
+              (input)="searchTerm.set($any($event.target).value)"
+            />
+          </div>
+        </div>
+
+        <div class="table-container-compact">
+          <table class="styled-table-compact">
+            <thead>
+              <tr>
+                <th class="w-checkbox"></th>
+                <th>Código / Ficha</th>
+                <th>Solicitante</th>
+                <th>Resumen</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of filteredSolicitudes(); track row) {
+                <tr [class.row-disabled]="!isAprobada(row.estado)">
+                  <td class="td-checkbox">
+                    @if (isAprobada(row.estado)) {
+                      <label class="custom-checkbox">
+                        <input 
+                          type="checkbox" 
+                          [checked]="isSelected(row.id)"
+                          (change)="toggleSelection(row.id)"
+                        />
+                        <span class="checkmark">
+                          <span class="material-symbols-outlined icon">check</span>
+                        </span>
+                      </label>
+                    }
+                  </td>
+                  <td class="font-medium text-dark line-clamp">
+                    {{ row.codigoFicha }}
+                  </td>
+                  <td class="text-dark">{{ row.solicitante }}</td>
+                  <td class="text-muted">{{ row.totalBienes }} ítems</td>
+                  <td>
+                    <span class="estado-badge estado-badge--{{ row.estado | lowercase }}">
+                      {{ row.estado }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Columna Derecha: Panel de Acciones -->
+      <div class="consolidar-sidebar">
+        <div class="summary-box-compact">
+          <div class="summary-item-compact">
+            <span>Seleccionadas</span>
+            <span class="value">{{ solicitudesSeleccionadas() }}</span>
+          </div>
+          <div class="summary-item-compact">
+            <span>Ítems a consolidar</span>
+            <span class="value">{{ itemsTotalesConsolidar() }}</span>
+          </div>
+          
+          <restaurant-button 
+            variant="primary" 
+            class="w-full mt-4"
+            [disabled]="solicitudesSeleccionadas() === 0"
+            (click)="onGenerar()">
+            Generar GIL
+            <span class="material-symbols-outlined right-icon" style="margin-left: 0.25rem;">arrow_forward</span>
+          </restaurant-button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Observaciones -->
@@ -215,6 +321,159 @@
   </div>
 
 </div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     MODAL DE CONFIRMACIÓN
+══════════════════════════════════════════════════════════════════════════ -->
+@if (showModal()) {
+<div class="modal-overlay">
+  <!-- Background Backdrop -->
+  <div class="modal-backdrop" (click)="cerrarModal()"></div>
+
+  <!-- Modal Container -->
+  <div class="modal-container">
+    <div class="modal-header-strip modal-header-strip--primary"></div>
+    <div class="modal-body">
+      <div class="modal-icon-container modal-icon-container--primary">
+        <span class="material-symbols-outlined modal-icon">library_add_check</span>
+      </div>
+      
+      <div class="modal-text-center">
+        <h3 class="modal-title">Confirmar Consolidación</h3>
+        <p class="modal-desc">
+          ¿Estás seguro de generar la Guía de Ingreso Local (GIL) con 
+          <span class="font-bold">{{ solicitudesSeleccionadas() }}</span> 
+          solicitudes seleccionadas y un total de 
+          <span class="font-bold">{{ itemsTotalesConsolidar() }}</span> ítems?
+        </p>
+      </div>
+
+      <div class="modal-actions-col">
+        <restaurant-button variant="primary" (click)="confirmarGeneracion()">
+          Confirmar y Generar GIL
+        </restaurant-button>
+        <restaurant-button variant="surface" (click)="cerrarModal()">
+          Cancelar
+        </restaurant-button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     MODAL SELECTOR DE BIENES DEL CATÁLOGO
+══════════════════════════════════════════════════════════════════════════ -->
+@if (mostrarSelectorBien()) {
+<div class="selector-overlay">
+  <div class="selector-backdrop" (click)="mostrarSelectorBien.set(false)"></div>
+
+  <div class="selector-panel">
+
+    <!-- Header -->
+    <div class="selector-header">
+      <h3>
+        <span class="material-symbols-outlined">inventory_2</span>
+        Catálogo de Bienes
+      </h3>
+      <button class="btn-close" type="button" (click)="mostrarSelectorBien.set(false)">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <!-- Búsqueda -->
+    <div class="selector-search">
+      <div class="search-box-compact">
+        <span class="material-symbols-outlined search-icon">search</span>
+        <input
+          type="text"
+          placeholder="Buscar por nombre o código SENA..."
+          (input)="onBuscarBienCatalogo($any($event.target).value)"
+        />
+      </div>
+    </div>
+
+    <!-- Tabla de resultados -->
+    <div class="selector-table-wrap">
+      @if (catalogoLoading()) {
+        <div class="selector-loading">
+          <span class="material-symbols-outlined" style="display:block;font-size:2rem;margin-bottom:0.5rem;color:#cbd5e1">hourglass_empty</span>
+          Cargando catálogo...
+        </div>
+      } @else {
+        <table>
+          <thead>
+            <tr>
+              <th>Cód. SENA</th>
+              <th>Nombre del Bien</th>
+              <th>Categoría</th>
+              <th class="text-center">Stock</th>
+              <th>UM</th>
+              <th class="text-right">Valor Unit.</th>
+              <th class="text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (bien of catalogoBienes(); track bien.id) {
+              <tr>
+                <td><span style="font-family:monospace;font-size:0.8125rem;font-weight:600">{{ bien.codigoSena }}</span></td>
+                <td>
+                  <p style="margin:0;font-weight:600">{{ bien.nombre }}</p>
+                  <p style="margin:0;font-size:0.75rem;color:#64748b">{{ bien.descripcion }}</p>
+                </td>
+                <td class="text-muted">{{ bien.categoria }}</td>
+                <td class="text-center">
+                  <span [style.color]="bien.stockActual < bien.stockMinimo ? '#ba1a1a' : 'inherit'" style="font-weight:600">
+                    {{ bien.stockActual }}
+                  </span>
+                </td>
+                <td class="text-muted">{{ bien.unidadMedida }}</td>
+                <td class="text-right" style="font-weight:600">{{ bien.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                <td class="text-center">
+                  <button class="btn-agregar" type="button" (click)="onSeleccionarBien(bien)">
+                    <span class="material-symbols-outlined">add</span>
+                    Agregar
+                  </button>
+                </td>
+              </tr>
+            }
+            @if (catalogoBienes().length === 0) {
+              <tr>
+                <td colspan="7" class="empty-bienes-row">
+                  <span class="material-symbols-outlined">search_off</span>
+                  No se encontraron bienes en el catálogo
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+
+    <!-- Paginación -->
+    <div class="selector-footer">
+      <button class="selector-page-btn"
+        [disabled]="catalogoPaginacion().page === 0"
+        (click)="onSelectorIrAPagina(catalogoPaginacion().page - 1)">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      @for (p of paginasSelectorBien(); track p) {
+        <button class="selector-page-btn"
+          [class.selector-page-btn--active]="p === catalogoPaginacion().page"
+          (click)="onSelectorIrAPagina(p)">
+          {{ p + 1 }}
+        </button>
+      }
+      <button class="selector-page-btn"
+        [disabled]="catalogoPaginacion().page >= catalogoPaginacion().totalPages - 1"
+        (click)="onSelectorIrAPagina(catalogoPaginacion().page + 1)">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+}
 
 <!-- Footer -->
 <footer class="page-footer">
