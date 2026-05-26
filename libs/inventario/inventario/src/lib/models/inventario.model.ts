@@ -143,12 +143,16 @@ export interface ProductoCatalogo {
  */
 export interface ExistenciaProducto {
   productoId: string | number;
-  codigoSena: string;
-  nombre: string;
-  categoria: string;
-  unidadMedida: string;
+  stockFisico: number;
+  stockReservado: number;
   stockDisponible: number;
-  stockMinimo?: number;
+  stockMinimo: number;
+  bajoMinimo: boolean;
+  // Metadatos opcionales — join con catálogo cuando se necesiten
+  codigoSena?: string;
+  nombre?: string;
+  categoria?: string;
+  unidadMedida?: string;
 }
 
 /**

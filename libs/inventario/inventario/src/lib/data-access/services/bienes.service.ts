@@ -30,9 +30,9 @@ export class BienesService {
   /** GET /catalog/productos — lista paginada (page 0-based, size por defecto 10). */
   getBienes(filtros?: BienFiltros): Observable<{ bienes: Bien[]; paginacion: BienPaginacion }> {
     let params = new HttpParams();
-    if (filtros?.busqueda)  params = params.set('q', filtros.busqueda);
-    if (filtros?.categoria) params = params.set('categoria', filtros.categoria);
-    if (filtros?.estado)    params = params.set('estado', filtros.estado);
+    if (filtros?.busqueda)              params = params.set('nombre', filtros.busqueda);
+    if (filtros?.estado === 'Activo')   params = params.set('activo', 'true');
+    if (filtros?.estado === 'Inactivo') params = params.set('activo', 'false');
     params = params.set('page', String(filtros?.page ?? 0));
     params = params.set('size', String(filtros?.size ?? 10));
 

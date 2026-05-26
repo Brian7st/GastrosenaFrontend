@@ -26,7 +26,13 @@ export interface CrearProductoRequest {
   unidadMedida: string;
 }
 
-export type ActualizarProductoRequest = Partial<CrearProductoRequest>;
+export interface ActualizarProductoRequest {
+  nombre: string;
+  unidadMedida: string;
+  descripcion?: string;
+  categoria?: string;
+  codigoProveedor?: string;
+}
 
 /** POST /catalog/productos/eliminacion-masiva */
 export interface EliminarProductosMasivaRequest {
