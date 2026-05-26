@@ -1,0 +1,153 @@
+<!-- ══════════════════════════════════════════════════════════════════════════
+     Header: Título + Botón Nueva Solicitud
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="page-header-row">
+  <div>
+    <h1 class="page-title">Bandeja de Aprobación</h1>
+    <p class="page-subtitle">Gestión y revisión de solicitudes de insumos.</p>
+  </div>
+  <restaurant-button variant="primary" routerLink="nueva">
+    <span class="material-symbols-outlined">add</span>
+    Nueva GIL
+  </restaurant-button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     KPI Grid — 4 tarjetas con restaurant-kpi-card
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="kpi-grid">
+
+  <restaurant-kpi-card
+    label="Enviadas pendientes"
+    [value]="12" 
+    icon="send"
+    iconColor="blue"
+  />
+
+  <restaurant-kpi-card
+    label="Aprobadas hoy"
+    [value]="8"
+    icon="check-circle"
+    iconColor="green"
+  />
+
+
+  <restaurant-kpi-card variant="states">
+    <div class="custom-kpi-body">
+      <span class="kpi-card__label">Cerradas</span>
+      <span class="kpi-card__value">45</span>
+    </div>
+    <div class="custom-kpi-icon custom-kpi-icon--slate">
+      <span class="material-symbols-outlined">lock</span>
+    </div>
+  </restaurant-kpi-card>
+
+  
+  <restaurant-kpi-card variant="states">
+    <div class="custom-kpi-body">
+      <span class="kpi-card__label">Libres</span>
+      <span class="kpi-card__value">{{ totalLibres() | number }}</span>
+    </div>
+    <div class="custom-kpi-icon custom-kpi-icon--red">
+      <span class="material-symbols-outlined">pending_actions</span>
+    </div>
+  </restaurant-kpi-card>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     Tabla con filtros
+══════════════════════════════════════════════════════════════════════════ -->
+<restaurant-data-table
+  tableTitle="Solicitudes de Insumos"
+  tableIcon="clipboard-list"
+  searchPlaceholder="Buscar por instructor o código...">
+
+  <!-- Cabecera de tabla -->
+  <thead>
+    <tr>
+      <th>ID Solicitud</th>
+      <th>Instructor</th>
+      <th>Ficha</th>
+      <th>Fecha</th>
+      <th>Ítems</th>
+      <th>Estado</th>
+      <th style="text-align: center;">Acciones</th>
+    </tr>
+  </thead>
+
+  <!-- Filas de datos -->
+  <tbody>
+    @for (s of solicitudes(); track s) {
+<tr>
+      
+      <!-- ID Solicitud -->
+      <td>
+        <span class="code-bold" [class.opacity-40]="s.estado === 'CERRADA'">{{ s.codigo }}</span>
+      </td>
+
+      <!-- Instructor con avatar -->
+      <td>
+        <div class="solicitante-cell" [class.opacity-40]="s.estado === 'CERRADA'">
+          <div class="avatar" [ngClass]="getAvatarColor(s.estado)">
+            {{ getInitials(s.instructor) }}
+          </div>
+          <span class="solicitante-nombre">{{ s.instructor }}</span>
+        </div>
+      </td>
+
+      <!-- Ficha -->
+      <td class="text-secondary" [class.opacity-40]="s.estado === 'CERRADA'">{{ s.ficha }}</td>
+
+      <!-- Fecha -->
+      <td class="text-secondary" [class.opacity-40]="s.estado === 'CERRADA'">{{ s.fecha }}</td>
+
+      <!-- Ítems -->
+      <td class="text-secondary" [class.opacity-40]="s.estado === 'CERRADA'">{{ s.itemsCount }} ítems</td>
+
+      <!-- Estado badge -->
+      <td>
+        <restaurant-status-badge
+          [label]="s.estado"
+          [variant]="getSolicitudVariant(s.estado)">
+        </restaurant-status-badge>
+      </td>
+
+      <!-- Acciones -->
+      <td>
+        <div class="actions-row">
+          <button class="action-icon" (click)="onView(s.id)" title="Ver Detalle">
+            <span class="material-symbols-outlined">visibility</span>
+          </button>
+          
+          <button [style.visibility]="s.estado === 'ENVIADA' ? 'visible' : 'hidden'"
+            class="action-icon action-icon--primary"
+            title="Aprobar Solicitud"
+            (click)="onApprove(s.id); $event.stopPropagation()"
+          >
+            <lucide-icon name="check-circle" [size]="18"></lucide-icon>
+          </button>
+        </div>
+      </td>
+    </tr>
+}
+  </tbody>
+
+  <!-- Paginación -->
+  <div dtFooter class="pagination-footer">
+    <div class="page-numbers">
+      <button class="page-btn page-btn--active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+    </div>
+  </div>
+
+</restaurant-data-table>
+
+<!-- Modal de aprobación -->
+<restaurant-aprobar-solicitud-modal
+  [isOpen]="solicitudSeleccionada() !== null"
+  [solicitud]="solicitudSeleccionada()"
+  (cancel)="onCloseModal()"
+  (confirm)="onConfirmApprove($event)">
+</restaurant-aprobar-solicitud-modal>

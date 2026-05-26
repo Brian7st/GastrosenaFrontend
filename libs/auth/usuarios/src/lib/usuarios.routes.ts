@@ -21,4 +21,34 @@ export const USUARIOS_ROUTES: Routes = [
     redirectTo: '',
     pathMatch: 'full',
   },
+
+  {
+    path: 'perfil',
+    loadComponent: () =>
+      import('./pages/perfil-page/perfil-page.component').then(
+        m => m.PerfilPageComponent,
+      ),
+  },
+  
+  {
+    path: 'cuentas',
+    loadComponent: () =>
+      import('./pages/cuentas-page/cuentas-page.component').then(
+        m => m.CuentasPageComponent,
+      ),
+  },
+  {
+    path: 'historial',
+    loadComponent: () =>
+      import('./pages/historial-page/historial-page.component').then(
+        m => m.HistorialPageComponent,
+      ),
+  },
+  {
+    path: 'roles',
+    loadComponent: () =>
+      import('./pages/roles-page/roles-page.component').then(
+        m => m.RolesPageComponent,
+      ),
+  },
 ];

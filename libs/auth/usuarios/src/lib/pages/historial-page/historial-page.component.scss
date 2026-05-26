@@ -1,0 +1,88 @@
+.historial-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-6);
+
+  &__filters {
+    display: flex;
+    gap: var(--space-4);
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+
+  &__user {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  &__user-name {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+    margin: 0;
+  }
+
+  &__user-email {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+
+  &__fecha,
+  &__ip {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+  }
+
+  &__detalles {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+    max-width: 240px;
+  }
+
+  &__empty-cell {
+    padding: var(--space-8);
+    text-align: center;
+  }
+}
+
+.accion-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+
+  &--login {
+    background: var(--color-success-bg);
+    color: var(--color-success-text);
+  }
+
+  &--logout {
+    background: var(--color-superficie-contenedor);
+    color: var(--color-text-secondary);
+  }
+
+  &--crear {
+    background: var(--color-info-bg);
+    color: var(--color-info-text);
+  }
+
+  &--editar {
+    background: var(--color-warning-bg);
+    color: var(--color-warning-text);
+  }
+
+  &--eliminar,
+  &--bloqueo {
+    background: var(--color-error-bg);
+    color: var(--color-error-text);
+  }
+}

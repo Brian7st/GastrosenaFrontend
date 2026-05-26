@@ -72,10 +72,21 @@
   display: flex;
   gap: var(--space-3, 15px);
   margin-bottom: var(--space-5, 25px);
+  
   .search-wrapper { flex: 3; position: relative; }
   .search-wrapper i { position: absolute; left: 10px; top: 15px; color: var(--color-text-muted); }
   .search-bar { width: 100%; padding: var(--space-2, 12px) var(--space-2, 12px) var(--space-2, 12px) var(--space-6, 35px); border-radius: var(--radius-md, 10px); border: 1px solid var(--color-border); }
   .filter-select { flex: 1; padding: var(--space-2, 12px); border-radius: var(--radius-md, 10px); border: 1px solid var(--color-border); background: var(--color-surface-secondary); }
+
+  /* Responsivo para filtros (Smartphones & Tablets: 352px a 920px) */
+  @media (max-width: 920px) {
+    flex-direction: column;
+    gap: var(--space-3, 12px);
+    
+    .search-wrapper {
+      width: 100%;
+    }
+  }
 }
 
 .comandas-grid {
@@ -95,6 +106,12 @@
   &.col-espera { border-color: var(--color-warning, #f59e0b); }
   &.col-preparando { border-color: var(--color-info, #3b82f6); }
   &.col-listo { border-color: var(--color-primario); }
+
+  /* Altura automática en pantallas táctiles y móviles para evitar espacios vacíos gigantes */
+  @media (max-width: 920px) {
+    min-height: auto;
+    padding: var(--space-4, 18px);
+  }
 
   .col-header {
     display: flex;

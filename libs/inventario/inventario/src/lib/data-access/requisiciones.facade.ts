@@ -1,7 +1,7 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
 import { finalize, catchError, of } from 'rxjs';
 import { RequisicionesService } from './services/requisiciones.service';
-import { Requisicion, RequisicionEstado } from '../models/requisicion.model';
+import { Requisicion } from '../models/requisicion.model';
 
 @Injectable({ providedIn: 'root' })
 export class RequisicionesFacade {
@@ -21,16 +21,16 @@ export class RequisicionesFacade {
 
   // KPIs computados por estado
   public kpiBorradores = computed(() =>
-    this._requisiciones().filter(r => r.estado === 'borrador').length
+    this._requisiciones().filter(r => r.estado === 'BORRADOR').length
   );
   public kpiEnviadas = computed(() =>
-    this._requisiciones().filter(r => r.estado === 'enviada').length
+    this._requisiciones().filter(r => r.estado === 'ENVIADA').length
   );
   public kpiEnDespacho = computed(() =>
-    this._requisiciones().filter(r => r.estado === 'en_despacho').length
+    this._requisiciones().filter(r => r.estado === 'DESPACHADA').length
   );
   public kpiFirmadas = computed(() =>
-    this._requisiciones().filter(r => r.estado === 'firmada').length
+    this._requisiciones().filter(r => r.estado === 'FIRMADA').length
   );
 
   /** Carga el listado completo de requisiciones. */
@@ -61,18 +61,32 @@ export class RequisicionesFacade {
       .subscribe(data => this._requisicionSeleccionada.set(data ?? null));
   }
 
-  /** Cambia el estado de una requisición y recarga el listado. */
-  cambiarEstado(id: string, estado: RequisicionEstado): void {
-    this.requisicionesService.cambiarEstado(id, estado)
+  /** PATCH /legalization/requisiciones/{id}/despachar — economoId obligatorio */
+  despacharRequisicion(id: string, economoId: string): void {
+    this._loading.set(true);
+    this.requisicionesService.despacharRequisicion(id, economoId)
       .pipe(
         catchError(() => {
-          this._error.set('Error al cambiar el estado');
+          this._error.set('Error al despachar la requisición');
           return of(false);
-        })
+        }),
+        finalize(() => this._loading.set(false))
       )
-      .subscribe(ok => {
-        if (ok) this.loadAll();
-      });
+      .subscribe(ok => { if (ok) this.loadAll(); });
+  }
+
+  /** PATCH /legalization/requisiciones/{id}/firmar — voceroId obligatorio */
+  firmarRequisicion(id: string, voceroId: string): void {
+    this._loading.set(true);
+    this.requisicionesService.firmarRequisicion(id, voceroId)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al firmar la requisición');
+          return of(false);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(ok => { if (ok) this.loadAll(); });
   }
 
   /** Elimina una requisición y recarga el listado. */

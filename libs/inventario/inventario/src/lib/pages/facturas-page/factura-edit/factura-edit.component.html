@@ -1,10 +1,13 @@
-<div class="factura-edit" *ngIf="factura() as f; else loadingTpl">
+@if (factura(); as f) {
+<div class="factura-edit">
 
   <!-- ── BLOCKED BANNER (Vista 4) ── -->
-  <div class="blocked-banner" *ngIf="isBlocked()">
+  @if (isBlocked()) {
+<div class="blocked-banner">
     <span class="material-symbols-outlined">lock</span>
     <span>Factura bloqueada — estado: <strong>{{ f.estado }}</strong></span>
   </div>
+}
 
   <!-- ── PAGE HEADER ── -->
   <div class="page-header">
@@ -21,7 +24,7 @@
           <h1>Editar Factura FEL</h1>
         </div>
         <p class="page-header__sub">
-          Modificando Documento: <strong class="page-header__doc-id">{{ f.numeroFEL }}</strong>
+          Modificando Documento: <strong class="page-header__doc-id">{{ f.numeroFactura }}</strong>
         </p>
       </div>
     </div>
@@ -63,11 +66,11 @@
       </div>
     </div>
 
-    <div class="form-grid form-grid--3">
+    <div class="form-grid form-grid--2">
       <div class="form-field">
         <label>Tipo de Documento</label>
         <div class="select-wrapper">
-          <select id="field-tipo-doc" [(ngModel)]="tipoDoc" [disabled]="isBlocked()">
+          <select id="field-tipo-doc" [ngModel]="tipoDoc()" (ngModelChange)="tipoDoc.set($event)" [disabled]="isBlocked()">
             <option>Factura Electrónica</option>
             <option>Nota Crédito</option>
             <option>Nota Débito</option>
@@ -85,17 +88,6 @@
           [disabled]="isBlocked()"
         />
       </div>
-      <div class="form-field">
-        <label>Moneda</label>
-        <div class="select-wrapper">
-          <select id="field-moneda" [(ngModel)]="moneda" [disabled]="isBlocked()">
-            <option value="COP">COP - Pesos Colombianos</option>
-            <option value="GTQ">GTQ - Quetzales</option>
-            <option value="USD">USD - Dólares</option>
-          </select>
-          <span class="material-symbols-outlined">expand_more</span>
-        </div>
-      </div>
     </div>
 
     <!-- ── ITEMS TABLE ── -->
@@ -104,10 +96,12 @@
         <span class="material-symbols-outlined">table_rows</span>
         <h3>Detalle de Productos/Servicios</h3>
       </div>
-      <button class="btn btn--add-item" *ngIf="!isBlocked()" (click)="onAgregarItem()">
+      @if (!isBlocked()) {
+<button class="btn btn--add-item" (click)="onAgregarItem()">
         <span class="material-symbols-outlined">add_circle</span>
         Agregar Ítem
       </button>
+}
     </div>
 
     <div class="items-table-wrapper">
@@ -119,41 +113,57 @@
             <th>Precio U.</th>
             <th>IVA (%)</th>
             <th>Total</th>
-            <th *ngIf="!isBlocked()"></th>
+            @if (!isBlocked()) {
+<th></th>
+}
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of localItems(); let i = index">
+          @for (item of localItems(); track item; let i = $index) {
+<tr>
             <td class="td--num">
-              <input *ngIf="!isBlocked(); else showCantidad"
+              @if (!isBlocked()) {
+<input
                 class="td-input td-input--num"
                 type="number" min="1"
                 [ngModel]="item.cantidad"
                 (ngModelChange)="onItemChange(i, 'cantidad', +$event)"
               />
-              <ng-template #showCantidad>{{ item.cantidad }}</ng-template>
+} @else {
+{{ item.cantidad }}
+}
+              
             </td>
             <td>
-              <input *ngIf="!isBlocked(); else showDesc"
+              @if (!isBlocked()) {
+<input
                 class="td-input td-input--desc"
                 type="text"
                 [ngModel]="item.descripcion"
                 (ngModelChange)="onItemChange(i, 'descripcion', $event)"
                 placeholder="Descripción del producto..."
               />
-              <ng-template #showDesc>{{ item.descripcion }}</ng-template>
+} @else {
+{{ item.descripcion }}
+}
+              
             </td>
             <td class="td--currency">
-              <input *ngIf="!isBlocked(); else showPrecio"
+              @if (!isBlocked()) {
+<input
                 class="td-input td-input--num"
                 type="number" min="0"
                 [ngModel]="item.precioUnitario"
                 (ngModelChange)="onItemChange(i, 'precioUnitario', +$event)"
               />
-              <ng-template #showPrecio>{{ formatMoney(item.precioUnitario, f.moneda) }}</ng-template>
+} @else {
+{{ formatMoney(item.precioUnitario) }}
+}
+              
             </td>
             <td class="td--iva">
-              <div class="iva-select" *ngIf="!isBlocked(); else showIva">
+              @if (!isBlocked()) {
+<div class="iva-select">
                 <select
                   [ngModel]="item.iva"
                   (ngModelChange)="onItemChange(i, 'iva', +$event)"
@@ -164,26 +174,35 @@
                 </select>
                 <span class="material-symbols-outlined">expand_more</span>
               </div>
-              <ng-template #showIva>{{ item.iva }}%</ng-template>
+} @else {
+{{ item.iva }}%
+}
+              
             </td>
-            <td class="td--currency td--bold">{{ formatMoney(item.total, f.moneda) }}</td>
-            <td *ngIf="!isBlocked()">
+            <td class="td--currency td--bold">{{ formatMoney(item.total) }}</td>
+            @if (!isBlocked()) {
+<td>
               <button class="icon-btn icon-btn--danger" (click)="onEliminarItem(i)">
                 <span class="material-symbols-outlined">delete</span>
               </button>
             </td>
+}
           </tr>
-          <tr *ngIf="localItems().length === 0">
+}
+          @if (localItems().length === 0) {
+<tr>
             <td [attr.colspan]="isBlocked() ? 5 : 6" class="empty-row">
               Sin ítems registrados
             </td>
           </tr>
+}
         </tbody>
       </table>
     </div>
 
     <!-- ── CONCILIACIÓN GIL (Vista 4) ── -->
-    <div class="conciliacion-section" *ngIf="hasConciliacion() && f.conciliacion">
+    @if (hasConciliacion() && f.conciliacion) {
+<div class="conciliacion-section">
       <div class="section-header">
         <div class="section-header__left">
           <span class="material-symbols-outlined">sync_alt</span>
@@ -204,50 +223,41 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let c of f.conciliacion">
+            @for (c of f.conciliacion; track c) {
+<tr>
               <td>{{ c.descripcion }}</td>
               <td class="td--num">{{ c.cantidadGil }}</td>
               <td class="td--num">{{ c.cantidadFactura }}</td>
               <td class="td--num" [ngClass]="getDiffClass(c.diferenciaCantidad)">
                 {{ c.diferenciaCantidad === 0 ? '0' : c.diferenciaCantidad }}
               </td>
-              <td class="td--currency">{{ formatMoney(c.precioGil, f.moneda) }}</td>
-              <td class="td--currency">{{ formatMoney(c.precioFactura, f.moneda) }}</td>
+              <td class="td--currency">{{ formatMoney(c.precioGil) }}</td>
+              <td class="td--currency">{{ formatMoney(c.precioFactura) }}</td>
               <td class="td--currency" [ngClass]="getDiffClass(c.diferenciaPrecio)">
-                {{ c.diferenciaPrecio > 0 ? '+' : '' }}{{ formatMoney(c.diferenciaPrecio, f.moneda) }}
+                {{ c.diferenciaPrecio > 0 ? '+' : '' }}{{ formatMoney(c.diferenciaPrecio) }}
               </td>
             </tr>
+}
           </tbody>
         </table>
       </div>
     </div>
+}
 
-    <!-- ── NOTAS + TOTALES ── -->
+    <!-- ── TOTALES ── -->
     <div class="bottom-section">
-      <div class="notas-section">
-        <label class="notas-section__label">Notas Internas</label>
-        <textarea
-          id="field-notas"
-          rows="4"
-          [ngModel]="notasInternas()"
-          (ngModelChange)="notasInternas.set($event)"
-          [disabled]="isBlocked()"
-          placeholder="Añade observaciones internas..."
-        ></textarea>
-      </div>
-
       <div class="totals-card">
         <div class="totals-row">
           <span>Subtotal:</span>
-          <span>{{ formatMoney(f.subtotal, f.moneda) }}</span>
+          <span>{{ formatMoney(f.subtotal) }}</span>
         </div>
         <div class="totals-row">
-          <span>IVA ({{ f.ivaTotal > 0 ? '12' : '0' }}%):</span>
-          <span>{{ formatMoney(f.ivaTotal, f.moneda) }}</span>
+          <span>IVA ({{ f.totalIva > 0 ? '12' : '0' }}%):</span>
+          <span>{{ formatMoney(f.totalIva) }}</span>
         </div>
         <div class="totals-row totals-row--total">
           <span>TOTAL FEL:</span>
-          <span class="totals-total-value">{{ formatMoney(f.total, f.moneda) }}</span>
+          <span class="totals-total-value">{{ formatMoney(f.total) }}</span>
         </div>
       </div>
     </div>
@@ -255,10 +265,12 @@
 
   <!-- ── FOOTER ACTIONS ── -->
   <div class="page-footer">
-    <button class="btn btn--anular" *ngIf="!isBlocked()" (click)="onAnular()">
+    @if (!isBlocked()) {
+<button class="btn btn--anular" (click)="onAnular()">
       <span class="material-symbols-outlined">cancel</span>
       Anular Documento
     </button>
+}
     <div class="footer-right">
       <button class="btn btn--ghost" (click)="onVolver()">Cancelar</button>
       <button
@@ -273,11 +285,30 @@
     </div>
   </div>
 </div>
+} @else {
 
-<!-- Loading -->
-<ng-template #loadingTpl>
   <div class="loading-state">
     <div class="loading-spinner"></div>
     <p>Cargando factura...</p>
   </div>
-</ng-template>
+
+}
+
+<!-- ── MODAL: Confirmar Anulación ── -->
+<restaurant-keyword-confirm-modal
+  [open]="showAnularModal()"
+  title="Anular edición de FEL"
+  description="Esta acción marcará el documento como Anulado. No podrá ser revertida."
+  keyword="ANULAR"
+  keywordLabel="Escribe ANULAR para confirmar"
+  confirmLabel="Sí, anular documento"
+  cancelLabel="Cancelar"
+  [identifierLabel]="'Documento'"
+  [identifierValue]="factura()?.numeroFactura ?? ''"
+  accent="warning"
+  (confirm)="onConfirmarAnular()"
+  (cancel)="onCancelarAnular()"
+/>
+
+<!-- Loading -->
+

@@ -45,15 +45,11 @@ export const CONCILIACION_DETALLE_MOCK: ConciliacionDetalle = {
   id: 'CONC-2024-012',
   fecha: '24 Oct 2024',
   responsable: 'Carlos Ruiz',
-  almacen: 'Almacén Seco',
   estado: 'Completada',
-  totalItems: 120,
-  itemsCorrectos: 112,
+  totalItemsContados: 120,
   diferencias: 8,
   precision: 93.3,
-  valoracionMonetaria: -340000,
-  perdidas: -320000,
-  sobrantes: 20000,
+  valorTotalDiferencias: -340000,
 };
 
 // ─────────────── Lista de diferencias del detalle ───────────────
@@ -135,7 +131,7 @@ export const TOMA_FISICA_ITEMS_MOCK: TomaFisicaItem[] = [
 
 // ─────────────── Top diferencias (panel del historial) ───────────────
 export const TOP_DIFERENCIAS_MOCK: TopDiferencia[] = [
-  { producto: 'Aceite Vegetal', dif: '-15 L', icon: 'droplet' },
-  { producto: 'Azúcar Refinada', dif: '-8 Kg', icon: 'package' },
-  { producto: 'Carne de Res', dif: '-5 Kg', icon: 'beef' },
+  { producto: 'Aceite Vegetal', diferencia: '-15 L', icon: 'droplet' },
+  { producto: 'Azúcar Refinada', diferencia: '-8 Kg', icon: 'package' },
+  { producto: 'Carne de Res', diferencia: '-5 Kg', icon: 'beef' },
 ];

@@ -8,7 +8,6 @@ import {
   PageHeaderComponent,
   SearchFilterComponent,
   SelectFilterComponent,
-  CardComponent,
   SectionTitleComponent
 } from '@restaurant/shared/ui';
 

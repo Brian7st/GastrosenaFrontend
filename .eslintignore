@@ -1,0 +1,4 @@
+# ESLint ignore patterns
+# Exclude generated files only
+**/node_modules/
+**/dist/

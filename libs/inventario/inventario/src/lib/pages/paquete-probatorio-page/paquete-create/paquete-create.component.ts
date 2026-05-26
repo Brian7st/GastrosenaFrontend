@@ -4,36 +4,44 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { LucideIconComponent } from '@restaurant/shared/ui';
+import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import { PaqueteFacade } from '../../../data-access/paquete.facade';
 
 @Component({
   selector: 'restaurant-paquete-create',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule, LucideIconComponent, BackButtonComponent],
+  imports: [ReactiveFormsModule, LucideIconComponent, ButtonComponent, BackButtonComponent],
   templateUrl: './paquete-create.component.html',
   styleUrl: './paquete-create.component.scss',
 })
 export class PaqueteCreateComponent {
   private router = inject(Router);
-  private fb = inject(FormBuilder);
+  private fb     = inject(FormBuilder);
+  private facade = inject(PaqueteFacade);
 
   // ── Formulario ──────────────────────────────────────────────────────────
   createForm = this.fb.nonNullable.group({
-    expediente: ['', Validators.required], // Auto-generado idealmente
-    titulo: ['', Validators.required],
-    programa: ['', Validators.required],
-    ficha: ['', Validators.required],
-    gilVinculado: [''],
-    responsable: ['', Validators.required],
+    expediente:   [this.generarIdExpediente(), Validators.required],
+    titulo:       ['', Validators.required],
+    fichaId:      ['', Validators.required],
+    gilId:        [''],
+    instructorId: ['', Validators.required],
   });
 
   // ── Estado del Stepper ──────────────────────────────────────────────────
   currentStep = signal<number>(1);
+
+  // ── Helpers ─────────────────────────────────────────────────────────────
+  private generarIdExpediente(): string {
+    const año = new Date().getFullYear();
+    const seq = String(Math.floor(Math.random() * 9000) + 1000);
+    return `EXP-${año}-${seq}`;
+  }
 
   // ── Navegación ─────────────────────────────────────────────────────────
   volver(): void {
@@ -60,8 +68,7 @@ export class PaqueteCreateComponent {
 
   guardarPaquete(): void {
     if (this.createForm.valid) {
-      // TODO(paquete-facade): llamar facade.crearPaquete(this.createForm.getRawValue())
-      console.warn('guardarPaquete: pendiente integración con PaqueteFacade');
+      this.facade.crearPaquete(this.createForm.getRawValue());
       this.volver();
     }
   }

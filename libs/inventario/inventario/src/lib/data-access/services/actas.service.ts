@@ -1,46 +1,92 @@
-import { Injectable } from '@angular/core';
-import { Observable, of, delay } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import {
   ActaLegalizacion,
   InsumoActa,
   CompromisoActa,
   FirmanteActa,
-  MOCK_ACTAS,
-  MOCK_INSUMOS,
-  MOCK_COMPROMISOS,
-  MOCK_FIRMANTES,
 } from '../../models/acta.model';
+import { ActaResponse } from '../api/legalization.api';
+import { actaFromApi } from '../mappers/legalization.mapper';
+
+const API = '/api/v1';
+
+const ACCION_ESTADO: Record<string, string> = {
+  PENDIENTE_FIRMAS: 'enviar-a-firmas',
+  FIRMADA:          'firmar',
+  REVISADA:         'revisar',
+  ARCHIVADA:        'archivar',
+};
 
 @Injectable({ providedIn: 'root' })
 export class ActasService {
+  private http = inject(HttpClient);
 
   getActas(): Observable<ActaLegalizacion[]> {
-    return of([...MOCK_ACTAS]).pipe(delay(300));
+    return this.http
+      .get<ActaResponse[]>(`${API}/legalization/actas`)
+      .pipe(
+        map(list => list.map(actaFromApi)),
+        catchError(err => throwError(() => err))
+      );
   }
 
   getActaById(id: string): Observable<ActaLegalizacion | undefined> {
-    return of(MOCK_ACTAS.find(a => a.id === id)).pipe(delay(200));
-  }
-
-  getInsumosByActa(_id: string): Observable<InsumoActa[]> {
-    return of([...MOCK_INSUMOS]).pipe(delay(200));
-  }
-
-  getCompromisosByActa(_id: string): Observable<CompromisoActa[]> {
-    return of([...MOCK_COMPROMISOS]).pipe(delay(200));
-  }
-
-  getFirmantesByActa(_id: string): Observable<FirmanteActa[]> {
-    return of([...MOCK_FIRMANTES]).pipe(delay(200));
+    return this.http
+      .get<ActaResponse>(`${API}/legalization/actas/${id}`)
+      .pipe(
+        map(actaFromApi),
+        catchError(err => throwError(() => err))
+      );
   }
 
   crearActa(data: Partial<ActaLegalizacion>): Observable<ActaLegalizacion> {
-    const nueva = { ...data, id: String(Date.now()) } as ActaLegalizacion;
-    return of(nueva).pipe(delay(800));
+    return this.http
+      .post<ActaResponse>(`${API}/legalization/actas`, data)
+      .pipe(
+        map(actaFromApi),
+        catchError(err => throwError(() => err))
+      );
   }
 
+  /** POST /legalization/actas/{id}/{accion} — para PENDIENTE_FIRMAS, FIRMADA, ARCHIVADA (sin body) */
   cambiarEstado(id: string, estado: ActaLegalizacion['estado']): Observable<boolean> {
-    console.log(`[ActasService] Cambiar estado acta ${id} → ${estado}`);
-    return of(true).pipe(delay(400));
+    const accion = ACCION_ESTADO[estado];
+    if (!accion) return throwError(() => new Error(`Estado ${estado} sin transición de endpoint`));
+
+    return this.http
+      .post<void>(`${API}/legalization/actas/${id}/${accion}`, {})
+      .pipe(
+        map(() => true),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** POST /legalization/actas/{id}/revisar — revisorId es @NotBlank en backend */
+  revisarActa(id: string, revisorId: string): Observable<boolean> {
+    return this.http
+      .post<void>(`${API}/legalization/actas/${id}/revisar`, { revisorId })
+      .pipe(
+        map(() => true),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** TODO: insumos/compromisos/firmantes — verificar si el backend los expone por separado */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getInsumosByActa(_id: string): Observable<InsumoActa[]> {
+    return throwError(() => new Error('getInsumosByActa: endpoint pendiente de confirmación'));
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getCompromisosByActa(_id: string): Observable<CompromisoActa[]> {
+    return throwError(() => new Error('getCompromisosByActa: endpoint pendiente de confirmación'));
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getFirmantesByActa(_id: string): Observable<FirmanteActa[]> {
+    return throwError(() => new Error('getFirmantesByActa: endpoint pendiente de confirmación'));
   }
 }
