@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 
+import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { ButtonComponent } from '@restaurant/shared/ui';
+import { ButtonComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 
 interface ConsolidacionItem {
