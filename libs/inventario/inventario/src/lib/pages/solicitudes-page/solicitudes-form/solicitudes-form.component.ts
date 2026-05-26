@@ -6,6 +6,8 @@ import { ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { BienSolicitud } from '../../../models/solicitudes-gil.mock';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
+import { InventarioFacade } from '../../../data-access/inventario.facade';
+import { Bien } from '../../../models/inventario.model';
 
 interface SolicitudRow {
   id: string;
@@ -24,11 +26,24 @@ interface SolicitudRow {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SolicitudesFormComponent implements OnInit {
-  private router = inject(Router);
-  private facade = inject(SolicitudesFacade);
+  private router            = inject(Router);
+  private facade            = inject(SolicitudesFacade);
+  private inventarioFacade  = inject(InventarioFacade);
+
+  // ── Opciones de dominio ──────────────────────────────────────────────────
+  readonly AREAS = ['Centro de Comercio y Turismo', 'Escuela de Gastronomía'];
 
   // ── Estado reactivo desde facade ─────────────────────────────────────────
   loading = this.facade.loading;
+
+  // ── Selector de bienes del catálogo ─────────────────────────────────────
+  mostrarSelectorBien  = signal(false);
+  catalogoBienes       = this.inventarioFacade.bienes;
+  catalogoPaginacion   = this.inventarioFacade.paginacion;
+  catalogoLoading      = this.inventarioFacade.loading;
+  paginasSelectorBien  = computed(() =>
+    Array.from({ length: this.catalogoPaginacion().totalPages }, (_, i) => i)
+  );
 
   fechaSolicitud    = signal('2024-05-20');
   bienes            = signal<BienSolicitud[]>([]);
@@ -54,6 +69,7 @@ export class SolicitudesFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.facade.loadAll();
+    this.inventarioFacade.cargarBienes({ page: 0, size: 8 });
   }
 
   filteredSolicitudes = computed(() => {
@@ -134,18 +150,42 @@ export class SolicitudesFormComponent implements OnInit {
     this.nuevaCuenta.set('');
   }
 
-  onAddBien(): void {
+  onAbrirSelectorBien(): void {
+    this.mostrarSelectorBien.set(true);
+    this.inventarioFacade.cargarBienes({ page: 0, size: 8 });
+  }
+
+  onBuscarBienCatalogo(term: string): void {
+    this.inventarioFacade.cargarBienes({ busqueda: term, page: 0, size: 8 });
+  }
+
+  onSelectorIrAPagina(page: number): void {
+    this.inventarioFacade.irAPagina(page);
+  }
+
+  onSeleccionarBien(bien: Bien): void {
     this.bienes.update(items => [
       ...items,
       {
-        codigo: 'ALM-' + String(items.length + 1).padStart(3, '0'),
-        descripcion: 'Nuevo Bien',
-        um: 'Und',
-        cantidad: 1,
-        valorUnitario: 0,
-        subtotal: 0
+        codigo:        bien.codigoSena ?? '',
+        descripcion:   bien.nombre,
+        um:            bien.unidadMedida,
+        cantidad:      1,
+        valorUnitario: bien.valor ?? 0,
+        subtotal:      bien.valor ?? 0,
       }
     ]);
+    this.mostrarSelectorBien.set(false);
+  }
+
+  onCantidadChange(index: number, cantidad: number): void {
+    this.bienes.update(items =>
+      items.map((item, i) =>
+        i === index
+          ? { ...item, cantidad, subtotal: cantidad * item.valorUnitario }
+          : item
+      )
+    );
   }
 
   onRemoveBien(index: number): void {

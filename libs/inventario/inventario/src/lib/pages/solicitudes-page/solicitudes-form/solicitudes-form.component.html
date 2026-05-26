@@ -88,9 +88,10 @@
         <div class="form-group">
           <label class="form-label">Área</label>
           <select class="form-control">
-            <option>Seleccione Área</option>
-            <option selected>Tecnología y Logística</option>
-            <option>Centro de Comercio y Servicios</option>
+            <option value="">Seleccione Área</option>
+            @for (area of AREAS; track area) {
+              <option [value]="area">{{ area }}</option>
+            }
           </select>
         </div>
 
@@ -176,26 +177,42 @@
         </thead>
         <tbody>
           @for (bien of bienes(); track bien; let i = $index) {
-<tr>
-            <td class="font-medium">{{ bien.codigo }}</td>
-            <td class="text-secondary">{{ bien.descripcion }}</td>
-            <td class="text-secondary">{{ bien.um }}</td>
-            <td class="text-right font-medium">{{ bien.cantidad }}</td>
-            <td class="text-right text-secondary">{{ bien.valorUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
-            <td class="text-right font-bold">{{ bien.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
-            <td class="text-center">
-              <button class="btn-icon btn-icon--danger" type="button" (click)="onRemoveBien(i)" title="Eliminar bien">
-                <span class="material-symbols-outlined">delete</span>
-              </button>
-            </td>
-          </tr>
-}
+            <tr>
+              <td class="font-medium">{{ bien.codigo }}</td>
+              <td class="text-secondary">{{ bien.descripcion }}</td>
+              <td class="text-secondary">{{ bien.um }}</td>
+              <td class="text-right">
+                <input
+                  type="number"
+                  class="qty-input"
+                  [value]="bien.cantidad"
+                  min="1"
+                  (change)="onCantidadChange(i, +$any($event.target).value)"
+                />
+              </td>
+              <td class="text-right text-secondary">{{ bien.valorUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+              <td class="text-right font-bold">{{ bien.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+              <td class="text-center">
+                <button class="btn-icon btn-icon--danger" type="button" (click)="onRemoveBien(i)" title="Eliminar bien">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
+              </td>
+            </tr>
+          }
+          @if (bienes().length === 0) {
+            <tr>
+              <td colspan="7" class="empty-bienes-row">
+                <span class="material-symbols-outlined">category</span>
+                Sin bienes agregados — usá el botón de abajo para buscar del catálogo
+              </td>
+            </tr>
+          }
         </tbody>
       </table>
     </div>
-    <button class="btn-link btn-link--add mt-4" type="button" (click)="onAddBien()">
+    <button class="btn-link btn-link--add mt-4" type="button" (click)="onAbrirSelectorBien()">
       <span class="material-symbols-outlined">add_circle</span>
-      Agregar bien
+      Agregar bien del catálogo
     </button>
   </div>
 
@@ -346,6 +363,120 @@
         </restaurant-button>
       </div>
     </div>
+  </div>
+</div>
+}
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     MODAL SELECTOR DE BIENES DEL CATÁLOGO
+══════════════════════════════════════════════════════════════════════════ -->
+@if (mostrarSelectorBien()) {
+<div class="selector-overlay">
+  <div class="selector-backdrop" (click)="mostrarSelectorBien.set(false)"></div>
+
+  <div class="selector-panel">
+
+    <!-- Header -->
+    <div class="selector-header">
+      <h3>
+        <span class="material-symbols-outlined">inventory_2</span>
+        Catálogo de Bienes
+      </h3>
+      <button class="btn-close" type="button" (click)="mostrarSelectorBien.set(false)">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <!-- Búsqueda -->
+    <div class="selector-search">
+      <div class="search-box-compact">
+        <span class="material-symbols-outlined search-icon">search</span>
+        <input
+          type="text"
+          placeholder="Buscar por nombre o código SENA..."
+          (input)="onBuscarBienCatalogo($any($event.target).value)"
+        />
+      </div>
+    </div>
+
+    <!-- Tabla de resultados -->
+    <div class="selector-table-wrap">
+      @if (catalogoLoading()) {
+        <div class="selector-loading">
+          <span class="material-symbols-outlined" style="display:block;font-size:2rem;margin-bottom:0.5rem;color:#cbd5e1">hourglass_empty</span>
+          Cargando catálogo...
+        </div>
+      } @else {
+        <table>
+          <thead>
+            <tr>
+              <th>Cód. SENA</th>
+              <th>Nombre del Bien</th>
+              <th>Categoría</th>
+              <th class="text-center">Stock</th>
+              <th>UM</th>
+              <th class="text-right">Valor Unit.</th>
+              <th class="text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (bien of catalogoBienes(); track bien.id) {
+              <tr>
+                <td><span style="font-family:monospace;font-size:0.8125rem;font-weight:600">{{ bien.codigoSena }}</span></td>
+                <td>
+                  <p style="margin:0;font-weight:600">{{ bien.nombre }}</p>
+                  <p style="margin:0;font-size:0.75rem;color:#64748b">{{ bien.descripcion }}</p>
+                </td>
+                <td class="text-muted">{{ bien.categoria }}</td>
+                <td class="text-center">
+                  <span [style.color]="bien.stockActual < bien.stockMinimo ? '#ba1a1a' : 'inherit'" style="font-weight:600">
+                    {{ bien.stockActual }}
+                  </span>
+                </td>
+                <td class="text-muted">{{ bien.unidadMedida }}</td>
+                <td class="text-right" style="font-weight:600">{{ bien.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                <td class="text-center">
+                  <button class="btn-agregar" type="button" (click)="onSeleccionarBien(bien)">
+                    <span class="material-symbols-outlined">add</span>
+                    Agregar
+                  </button>
+                </td>
+              </tr>
+            }
+            @if (catalogoBienes().length === 0) {
+              <tr>
+                <td colspan="7" class="empty-bienes-row">
+                  <span class="material-symbols-outlined">search_off</span>
+                  No se encontraron bienes en el catálogo
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+
+    <!-- Paginación -->
+    <div class="selector-footer">
+      <button class="selector-page-btn"
+        [disabled]="catalogoPaginacion().page === 0"
+        (click)="onSelectorIrAPagina(catalogoPaginacion().page - 1)">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      @for (p of paginasSelectorBien(); track p) {
+        <button class="selector-page-btn"
+          [class.selector-page-btn--active]="p === catalogoPaginacion().page"
+          (click)="onSelectorIrAPagina(p)">
+          {{ p + 1 }}
+        </button>
+      }
+      <button class="selector-page-btn"
+        [disabled]="catalogoPaginacion().page >= catalogoPaginacion().totalPages - 1"
+        (click)="onSelectorIrAPagina(catalogoPaginacion().page + 1)">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
+    </div>
+
   </div>
 </div>
 }
