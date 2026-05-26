@@ -5,6 +5,7 @@ import {
 
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Bien, BienFormDto } from '../../../models/inventario.model';
+import { CATEGORIAS_BIEN } from '../../../models/categorias.model';
 
 @Component({
   selector: 'restaurant-bien-form',
@@ -27,10 +28,7 @@ export class BienFormComponent implements OnInit {
 
   form!: FormGroup;
 
-  readonly CATEGORIAS = [
-    'Equipos de Cómputo', 'Mobiliario', 'Papelería', 'Cocina',
-    'Audiovisuales', 'Herramientas', 'Electrodomésticos', 'Otro',
-  ];
+  readonly CATEGORIAS = CATEGORIAS_BIEN;
 
   readonly isEdit = computed(() => this.mode === 'edit');
   readonly umBloqueada = computed(() => this.mode === 'edit' && !!this.bien?.tieneHistorial);
