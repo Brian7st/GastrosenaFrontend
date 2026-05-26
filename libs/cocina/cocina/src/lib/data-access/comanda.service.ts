@@ -43,12 +43,28 @@ export interface EstadisticasKpi {
   totalPlatosDespachadosHoy: number;
 }
 
+export interface IngredienteReceta {
+  idIngrediente: string;
+  nombreIngrediente: string;
+  cantidadRequerida: number;
+  unidadMedida: string;
+}
+
+export interface PasoReceta {
+  idPaso: string;
+  orden: number;
+  descripcionPaso: string;
+  notasAdicionales: string;
+}
+
 export interface Receta {
-  idPlato: string;
-  nombre: string;
-  tiempoMinutos: number;
-  ingredientes: string[];
-  pasos: string[];
+  idReceta: string;
+  nombreReceta: string;
+  nombreCategoria: string;
+  tiempoPreparacion: number;
+  temperatura: string;
+  ingredientes: IngredienteReceta[];
+  pasos: PasoReceta[];
 }
 
 @Injectable({
@@ -87,24 +103,7 @@ export class ComandaService {
     return this.http.get<Comanda[]>(this.baseUrlComandas);
   }
 
-  getRecetaMock(idPlato: string): Receta {
-    return {
-      idPlato: idPlato,
-      nombre: 'Hamburguesa',
-      tiempoMinutos: 35,
-      ingredientes: [
-        'Pan de hamburguesa artesanal',
-        'Carne de res 200g',
-        'Queso cheddar',
-        'Cebolla caramelizada',
-        'Lechuga fresca'
-      ],
-      pasos: [
-        'Sellar el pan en la plancha',
-        'Cocinar la carne a término deseado',
-        'Fundir el queso sobre la carne',
-        'Ensamblar la hamburguesa'
-      ]
-    };
+  getRecetaById(idReceta: string): Observable<Receta> {
+    return this.http.get<Receta>(`http://localhost:8080/api/recetas/${idReceta}`);
   }
 }

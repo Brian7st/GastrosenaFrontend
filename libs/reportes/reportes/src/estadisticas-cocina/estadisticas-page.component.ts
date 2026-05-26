@@ -1,7 +1,12 @@
 import { Component, ChangeDetectionStrategy, inject, signal, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ComandaService, EstadisticasKpi } from '../../data-access/comanda.service';
+import { ComandaService, EstadisticasKpi } from '../../../../cocina/cocina/src/lib/data-access/comanda.service';
 import { Chart, registerables, ChartConfiguration } from 'chart.js';
+
+/** Lee un token CSS del :root en tiempo de ejecución */
+function cssToken(name: string, fallback = '#888'): string {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
+}
 
 @Component({
   selector: 'restaurant-estadisticas-page',
@@ -44,7 +49,7 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
           labels: data.map(d => d.nombreReceta),
           datasets: [{
             data: data.map(d => d.promedioMinutos),
-            backgroundColor: '#3A76D2',
+            backgroundColor: cssToken('--color-chart-bar'),
             borderRadius: 4
           }]
         };
@@ -56,7 +61,7 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
           labels: ['Hamburguesa', 'Pasta Carbonara', 'Ensalada César', 'Papas Fritas', 'Jugo de Mora'],
           datasets: [{
             data: [15, 20, 8, 5, 3],
-            backgroundColor: '#3A76D2',
+            backgroundColor: cssToken('--color-chart-bar'),
             borderRadius: 4
           }]
         };
@@ -70,8 +75,8 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
           labels: data.map(d => d.hora),
           datasets: [{
             data: data.map(d => d.totalPlatos),
-            borderColor: '#DCA543',
-            backgroundColor: 'rgba(220, 165, 67, 0.2)',
+            borderColor: cssToken('--color-chart-line'),
+            backgroundColor: cssToken('--color-chart-line-fill', 'rgba(220,165,67,0.2)'),
             fill: true,
             tension: 0.4
           }]
@@ -84,8 +89,8 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
           labels: ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00'],
           datasets: [{
             data: [5, 12, 35, 42, 20, 15],
-            borderColor: '#DCA543',
-            backgroundColor: 'rgba(220, 165, 67, 0.2)',
+            borderColor: cssToken('--color-chart-line'),
+            backgroundColor: cssToken('--color-chart-line-fill', 'rgba(220,165,67,0.2)'),
             fill: true,
             tension: 0.4
           }]
