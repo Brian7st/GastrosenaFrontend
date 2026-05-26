@@ -2,7 +2,7 @@ import { inject, Injectable, signal, computed } from '@angular/core';
 import { Bien, BienFiltros, BienKpis, BienFormDto } from '../models/inventario.model';
 import { ExportacionProductosResponse } from './api/catalog.api';
 import { BienesService } from './services/bienes.service';
-import { finalize, catchError, of } from 'rxjs';
+import { finalize, catchError, of, switchMap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -93,24 +93,24 @@ export class InventarioFacade {
   }
 
   /**
-   * Elimina un bien y refresca los datos.
+   * Elimina un bien: primero desactiva (PATCH /desactivar), luego elimina (DELETE).
+   * El backend requiere que el producto esté inactivo antes de aceptar el DELETE.
    */
   eliminarBien(id: string | number): void {
     this._loading.set(true);
-    this.bienesService.deleteBien(id)
-      .pipe(
-        catchError(() => {
-          this._error.set('Error al eliminar el bien');
-          return of(null);
-        }),
-        finalize(() => this._loading.set(false))
-      )
-      .subscribe((res) => {
-        if (res !== null) {
-          this.cargarBienes();
-          this.cargarKpis();
-        }
-      });
+    this.bienesService.desactivarBien(id).pipe(
+      switchMap(() => this.bienesService.deleteBien(id)),
+      catchError(() => {
+        this._error.set('Error al eliminar el bien');
+        return of(null);
+      }),
+      finalize(() => this._loading.set(false))
+    ).subscribe((res) => {
+      if (res !== null) {
+        this.cargarBienes();
+        this.cargarKpis();
+      }
+    });
   }
 
   /**
