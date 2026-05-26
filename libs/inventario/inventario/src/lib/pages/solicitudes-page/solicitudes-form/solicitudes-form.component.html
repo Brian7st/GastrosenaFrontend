@@ -24,16 +24,19 @@
           </div>
         </div>
 
+        <!-- Regional: código numérico + nombre -->
         <div class="form-group">
-          <label class="form-label">Regional</label>
-          <select class="form-control">
-            <option>Seleccione Regional</option>
-            <option selected>Distrito Capital</option>
-            <option>Antioquia</option>
-            <option>Valle del Cauca</option>
-          </select>
+          <label class="form-label">Regional (Código)</label>
+          <input type="number" class="form-control" value="63" placeholder="Ej. 63" min="1" />
+          <p class="form-hint">Código numérico de la regional SENA.</p>
         </div>
 
+        <div class="form-group">
+          <label class="form-label">Nombre de la Regional</label>
+          <input type="text" class="form-control" value="Quindío" placeholder="Ej. Quindío" />
+        </div>
+
+        <!-- Cuentadante con cédula -->
         <div class="form-group">
           <label class="form-label">Cuentadante</label>
           <select class="form-control">
@@ -57,6 +60,16 @@
                 (input)="nuevaCuenta.set($any($event.target).value)"
               />
             </div>
+            <div class="form-group mt-2">
+              <label class="form-label">Cédula del cuentadante</label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Ej. 1001234567"
+                [value]="nuevaCuentaCedula()"
+                (input)="nuevaCuentaCedula.set($any($event.target).value)"
+              />
+            </div>
             <button class="btn-link btn-link--add mt-2" type="button"
                     [disabled]="!nuevaCuenta().trim()"
                     (click)="onConfirmarCuentadante()">
@@ -66,6 +79,13 @@
           </div>
         </div>
 
+        <!-- Código de Grupo -->
+        <div class="form-group">
+          <label class="form-label">Código de Grupo</label>
+          <input type="text" class="form-control" placeholder="Ej. ADSO-2670687" />
+        </div>
+
+        <!-- Ficha de Caracterización -->
         <div class="form-group">
           <label class="form-label">Ficha de Caracterización</label>
           <input type="text" class="form-control" maxlength="7" pattern="\d{7}" placeholder="Ej. 2471532" />
@@ -81,11 +101,6 @@
       <!-- Columna 2 -->
       <div class="form-col">
         <div class="form-group">
-          <label class="form-label">Fecha Requerida</label>
-          <input type="date" class="form-control" />
-        </div>
-
-        <div class="form-group">
           <label class="form-label">Área</label>
           <select class="form-control">
             <option value="">Seleccione Área</option>
@@ -95,22 +110,31 @@
           </select>
         </div>
 
+        <!-- Centro de Costos: código numérico + nombre -->
         <div class="form-group">
-          <label class="form-label">Centro de Costos</label>
-          <select class="form-control">
-            <option>Seleccione Centro de Costo</option>
-            <option selected>CC-9201-450 - Bogotá</option>
-            <option>CC-1102-120 - Medellin</option>
-          </select>
+          <label class="form-label">Centro de Costos (Código)</label>
+          <input type="number" class="form-control" value="953810" placeholder="Ej. 953810" min="1" />
+          <p class="form-hint">Código numérico del centro de costos.</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Nombre del Centro</label>
+          <input type="text" class="form-control" value="Comercio y Turismo" placeholder="Ej. Comercio y Turismo" />
         </div>
 
         <div class="form-group">
           <label class="form-label">Destino de Bienes</label>
           <select class="form-control">
-            <option>Seleccione Destino</option>
-            <option selected>Laboratorio 402 - Computo Avanzado</option>
-            <option>Aula 101 - Gastronomía</option>
+            <option value="FORMACION" selected>Formación</option>
+            <option value="LABORATORIO">Laboratorio</option>
+            <option value="AULA">Aula</option>
+            <option value="OTRO">Otro</option>
           </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Jefe de Oficina / Coordinador de Área</label>
+          <input type="text" class="form-control" placeholder="Ej. María García Rincón" />
         </div>
 
         <div class="form-group">
@@ -120,36 +144,6 @@
             <option selected>Ing. Ricardo Sarmiento</option>
             <option>Lic. Martha Lucía Peña</option>
           </select>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Trazabilidad Académica Section -->
-  <div class="form-card form-card--bordered">
-    <h3 class="section-title">
-      <span class="material-symbols-outlined section-icon">school</span>
-      Trazabilidad Académica <span class="required-asterisk">*</span>
-    </h3>
-    <div class="form-grid">
-      <div class="form-col">
-        <div class="form-group">
-          <label class="form-label">Vocero de Aprendices (Nombre Completo)</label>
-          <input type="text" class="form-control" placeholder="Ingrese nombre completo" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Cédula del Vocero</label>
-          <input type="text" class="form-control" placeholder="Ingrese número de documento" />
-        </div>
-      </div>
-      <div class="form-col">
-        <div class="form-group">
-          <label class="form-label">Resultado de Aprendizaje (RA)</label>
-          <textarea class="form-control" rows="2" placeholder="Especifique el resultado de aprendizaje asociado"></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Franja Horaria</label>
-          <input type="time" class="form-control" />
         </div>
       </div>
     </div>

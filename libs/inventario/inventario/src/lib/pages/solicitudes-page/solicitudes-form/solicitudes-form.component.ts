@@ -45,10 +45,11 @@ export class SolicitudesFormComponent implements OnInit {
     Array.from({ length: this.catalogoPaginacion().totalPages }, (_, i) => i)
   );
 
-  fechaSolicitud    = signal('2024-05-20');
-  bienes            = signal<BienSolicitud[]>([]);
+  fechaSolicitud     = signal('2024-05-20');
+  bienes             = signal<BienSolicitud[]>([]);
   mostrarNuevaCuenta = signal(false);
-  nuevaCuenta       = signal('');
+  nuevaCuenta        = signal('');
+  nuevaCuentaCedula  = signal('');
 
   // ── Datos para la Consolidación (Generar GIL) ───────────────────────────
   solicitudesReales = this.facade.solicitudes;
@@ -142,12 +143,14 @@ export class SolicitudesFormComponent implements OnInit {
     this.mostrarNuevaCuenta.update(v => !v);
     if (!this.mostrarNuevaCuenta()) {
       this.nuevaCuenta.set('');
+      this.nuevaCuentaCedula.set('');
     }
   }
 
   onConfirmarCuentadante(): void {
     this.mostrarNuevaCuenta.set(false);
     this.nuevaCuenta.set('');
+    this.nuevaCuentaCedula.set('');
   }
 
   onAbrirSelectorBien(): void {
