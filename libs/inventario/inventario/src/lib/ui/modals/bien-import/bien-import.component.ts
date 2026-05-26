@@ -11,7 +11,9 @@ import { BienImportRow } from '../../../models/inventario.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BienImportModalComponent {
+  // eslint-disable-next-line @angular-eslint/no-output-native
   @Output() cancel = new EventEmitter<void>();
+  // eslint-disable-next-line @angular-eslint/no-output-native
   @Output() import = new EventEmitter<BienImportRow[]>();
 
   isDragging = signal(false);

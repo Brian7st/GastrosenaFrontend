@@ -28,6 +28,9 @@
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
+    "@angular-eslint/eslint-plugin": "^21.4.0",
+    "@angular-eslint/eslint-plugin-template": "^21.4.0",
+    "@angular-eslint/template-parser": "^21.4.0",
     "@angular/build": "^20.3.24",
     "@angular/cli": "^20.3.24",
     "@angular/compiler-cli": "^20.3.19",
@@ -36,8 +39,8 @@
     "@nx/eslint-plugin": "^20.0.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.10.2",
-    "@typescript-eslint/eslint-plugin": "^8.59.1",
-    "@typescript-eslint/parser": "^8.59.1",
+    "@typescript-eslint/eslint-plugin": "^8.59.4",
+    "@typescript-eslint/parser": "^8.59.4",
     "eslint": "^9.18.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.2.10",

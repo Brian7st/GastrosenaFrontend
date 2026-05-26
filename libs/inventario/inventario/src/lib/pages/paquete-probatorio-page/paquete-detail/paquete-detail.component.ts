@@ -5,15 +5,15 @@ import {
   inject,
   OnInit,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute, Router, RouterOutlet, RouterLink } from '@angular/router';
 import {
   StatusBadgeComponent,
   LucideIconComponent,
+  ButtonComponent,
 } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import {
-  PaqueteProbatorio,
   PaqueteEstado,
   TimelineEntry,
 } from '../../../models/paquete.model';
@@ -24,13 +24,13 @@ import { PaqueteFacade } from '../../../data-access/paquete.facade';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     RouterOutlet,
     RouterLink,
     StatusBadgeComponent,
     LucideIconComponent,
-    BackButtonComponent,
-  ],
+    ButtonComponent,
+    BackButtonComponent
+],
   templateUrl: './paquete-detail.component.html',
   styleUrl: './paquete-detail.component.scss',
 })
@@ -46,12 +46,13 @@ export class PaqueteDetailComponent implements OnInit {
   // ── Estado derivado ──────────────────────────────────────────────────────
   isCompleto = computed(() => {
     const p = this.paquete();
-    return p ? p.documentos.every(d => d.vinculado) : false;
+    return p ? (!!p.actaId && !!p.requisicionId && p.registroAsistenciaAdjunto) : false;
   });
 
   docsCompletados = computed(() => {
     const p = this.paquete();
-    return p ? p.documentos.filter(d => d.vinculado).length : 0;
+    if (!p) return 0;
+    return (p.actaId ? 1 : 0) + (p.requisicionId ? 1 : 0) + (p.registroAsistenciaAdjunto ? 1 : 0);
   });
 
   timeline = computed<TimelineEntry[]>(() => {
@@ -60,9 +61,9 @@ export class PaqueteDetailComponent implements OnInit {
 
     const entries: TimelineEntry[] = [];
 
-    if (p.estado === 'incompleto') {
+    if (p.estado === 'INCOMPLETO') {
       entries.push({
-        estado: 'Falta Asistencia',
+        estado: 'Falta documentación',
         fecha: 'Pendiente de acción',
         activo: true,
         tipo: 'error',
@@ -70,7 +71,7 @@ export class PaqueteDetailComponent implements OnInit {
       });
     }
 
-    if (p.estado === 'completo') {
+    if (p.estado === 'COMPLETO') {
       entries.push({
         estado: 'Completo',
         fecha: p.fecha,
@@ -79,16 +80,7 @@ export class PaqueteDetailComponent implements OnInit {
       });
     }
 
-    if (p.estado === 'en_revision') {
-      entries.push({
-        estado: 'En revisión',
-        fecha: p.fecha,
-        activo: true,
-        tipo: 'neutral',
-      });
-    }
-
-    if (p.estado === 'archivado') {
+    if (p.estado === 'ARCHIVADO') {
       entries.push({
         estado: 'Archivado',
         fecha: p.fecha,
@@ -97,22 +89,15 @@ export class PaqueteDetailComponent implements OnInit {
       });
     }
 
-    // Historical states
-    if (p.estado !== 'borrador' && p.estado !== 'en_revision') {
+    // Historical: show previous state if not INCOMPLETO
+    if (p.estado !== 'INCOMPLETO') {
       entries.push({
-        estado: 'En revisión',
+        estado: 'Incompleto',
         fecha: p.fecha,
         activo: false,
         tipo: 'neutral',
       });
     }
-
-    entries.push({
-      estado: 'Borrador',
-      fecha: p.fecha,
-      activo: p.estado === 'borrador',
-      tipo: 'neutral',
-    });
 
     return entries;
   });
@@ -120,22 +105,18 @@ export class PaqueteDetailComponent implements OnInit {
   // ── Helpers de UI ────────────────────────────────────────────────────────
   getEstadoLabel(estado: PaqueteEstado): string {
     const map: Record<PaqueteEstado, string> = {
-      borrador: 'Borrador',
-      en_revision: 'En revisión',
-      completo: 'Completo',
-      archivado: 'Archivado',
-      incompleto: 'Incompleto',
+      INCOMPLETO: 'Incompleto',
+      COMPLETO:   'Completo',
+      ARCHIVADO:  'Archivado',
     };
     return map[estado];
   }
 
   getEstadoVariant(estado: PaqueteEstado): 'success' | 'warning' | 'danger' | 'info' {
     const map: Record<PaqueteEstado, 'success' | 'warning' | 'danger' | 'info'> = {
-      borrador: 'info',
-      en_revision: 'warning',
-      completo: 'success',
-      archivado: 'info',
-      incompleto: 'danger',
+      INCOMPLETO: 'danger',
+      COMPLETO:   'success',
+      ARCHIVADO:  'info',
     };
     return map[estado];
   }
@@ -159,6 +140,36 @@ export class PaqueteDetailComponent implements OnInit {
     const p = this.paquete();
     if (p) {
       this.router.navigate(['/app/inventario/paquete-probatorio', p.id, 'adjuntar']);
+    }
+  }
+
+  exportarPaquete(): void {
+    const p = this.paquete();
+    if (p) {
+      console.log('Exportar paquete:', p.expediente);
+    }
+  }
+
+  archivarExpediente(): void {
+    const p = this.paquete();
+    if (p) {
+      console.log('Archivar expediente:', p.expediente);
+    }
+  }
+
+  verDocumento(tipo: string): void {
+    const p = this.paquete();
+    if (p) {
+      this.router.navigate(['/app/inventario/paquete-probatorio', p.id, tipo]);
+    }
+  }
+
+  cambiarDocumento(tipo: string): void {
+    const p = this.paquete();
+    if (p) {
+      this.router.navigate(['/app/inventario/paquete-probatorio', p.id, 'adjuntar'], {
+        queryParams: { tipo },
+      });
     }
   }
 }

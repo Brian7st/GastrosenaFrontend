@@ -1,6 +1,13 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
-import { SolicitudGil, SolicitudesGilFiltros, EstadoGil, CrearSolicitudData, ActualizarSolicitudData } from '../models/solicitudes-gil.model';
+import { SolicitudGil, SolicitudesGilFiltros, SolicitudesPaginacion, EstadoGil, CrearSolicitudData, ActualizarSolicitudData } from '../models/solicitudes-gil.model';
+import {
+  SolicitudSesion,
+  CrearSolicitudSesionData,
+  AprobarSesionData,
+  RechazarSesionData,
+} from '../models/solicitud-sesion.model';
 import { SolicitudesService } from './services/solicitudes.service';
+import { EnviarProveedorRequest } from './api/sourcing.api';
 import { finalize, catchError, of } from 'rxjs';
 
 @Injectable({
@@ -9,19 +16,25 @@ import { finalize, catchError, of } from 'rxjs';
 export class SolicitudesFacade {
   private solicitudesService = inject(SolicitudesService);
 
-  // Estados internos (Signals)
-  private _solicitudes = signal<SolicitudGil[]>([]);
-  private _loading = signal<boolean>(false);
-  private _filtros = signal<SolicitudesGilFiltros>({});
+  // ── Estado GIL (Procurement) ───────────────────────────────────────────────
+  private _solicitudes           = signal<SolicitudGil[]>([]);
+  private _loading               = signal<boolean>(false);
+  private _filtros               = signal<SolicitudesGilFiltros>({ page: 0, size: 10 });
+  private _paginacion            = signal<SolicitudesPaginacion>({ totalElements: 0, totalPages: 0, page: 0, size: 10 });
   private _solicitudSeleccionada = signal<SolicitudGil | undefined>(undefined);
-  private _error = signal<string | null>(null);
+  private _error                 = signal<string | null>(null);
 
-  // Exposición pública (Solo lectura)
-  public solicitudes = computed(() => this._solicitudes());
-  public loading = computed(() => this._loading());
-  public filtros = computed(() => this._filtros());
-  public solicitudSeleccionada = computed(() => this._solicitudSeleccionada());
-  public error = computed(() => this._error());
+  // ── Estado Training/Solicitudes ────────────────────────────────────────────
+  private _solicitudSesionSeleccionada = signal<SolicitudSesion | undefined>(undefined);
+
+  // ── Exposición pública ─────────────────────────────────────────────────────
+  public solicitudes                  = computed(() => this._solicitudes());
+  public loading                      = computed(() => this._loading());
+  public filtros                      = computed(() => this._filtros());
+  public paginacion                   = computed(() => this._paginacion());
+  public solicitudSeleccionada        = computed(() => this._solicitudSeleccionada());
+  public error                        = computed(() => this._error());
+  public solicitudSesionSeleccionada  = computed(() => this._solicitudSesionSeleccionada());
 
   /**
    * Carga inicial de datos.
@@ -32,20 +45,46 @@ export class SolicitudesFacade {
 
   /**
    * Carga el listado de solicitudes aplicando los filtros actuales.
+   * Si se pasan filtros nuevos (búsqueda, estado, etc.) se resetea a page 0.
    */
   cargarSolicitudes(filtros?: SolicitudesGilFiltros): void {
-    if (filtros) this._filtros.set(filtros);
-    
+    if (filtros) {
+      this._filtros.set({ ...this._filtros(), ...filtros, page: 0 });
+    }
+
     this._loading.set(true);
     this.solicitudesService.getSolicitudes(this._filtros())
       .pipe(
         catchError(() => {
           this._error.set('Error al cargar la lista de solicitudes');
-          return of([]);
+          return of({ solicitudes: [], paginacion: { totalElements: 0, totalPages: 0, page: 0, size: 10 } });
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe(data => this._solicitudes.set(data));
+      .subscribe(({ solicitudes, paginacion }) => {
+        this._solicitudes.set(solicitudes);
+        this._paginacion.set(paginacion);
+      });
+  }
+
+  /**
+   * Navega a una página específica sin cambiar el resto de filtros.
+   */
+  irAPagina(page: number): void {
+    this._filtros.update(f => ({ ...f, page }));
+    this._loading.set(true);
+    this.solicitudesService.getSolicitudes(this._filtros())
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al cargar la lista de solicitudes');
+          return of({ solicitudes: [], paginacion: this._paginacion() });
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(({ solicitudes, paginacion }) => {
+        this._solicitudes.set(solicitudes);
+        this._paginacion.set(paginacion);
+      });
   }
 
   /**
@@ -65,10 +104,10 @@ export class SolicitudesFacade {
   }
 
   /**
-   * Actualiza los filtros y recarga la lista.
+   * Actualiza los filtros, resetea a página 0 y recarga la lista.
    */
   setFiltros(filtros: SolicitudesGilFiltros): void {
-    this._filtros.set({ ...this._filtros(), ...filtros });
+    this._filtros.set({ ...this._filtros(), ...filtros, page: 0 });
     this.cargarSolicitudes();
   }
 
@@ -143,6 +182,109 @@ export class SolicitudesFacade {
         if (success) {
           this.cargarSolicitudes();
         }
+      });
+  }
+
+  /** PUT /procurement/giles/{id}/enviar-proveedor con proveedorDestinatarioId y fechaEnvio */
+  enviarAProveedor(id: string, data: EnviarProveedorRequest): void {
+    this._loading.set(true);
+    this.solicitudesService.enviarAProveedor(id, data)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al enviar el GIL al proveedor');
+          return of(false);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(ok => { if (ok) this.cargarSolicitudById(id); });
+  }
+
+  generarGils(ids: (string | number)[]): void {
+    this._loading.set(true);
+    this.solicitudesService.generarGils(ids)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al generar los GIL');
+          return of(false);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe((success) => {
+        if (success) {
+          this.cargarSolicitudes();
+        }
+      });
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Training — /api/v1/training/solicitudes
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /** POST /training/solicitudes — crea la solicitud y la deja seleccionada */
+  crearSolicitudSesion(data: CrearSolicitudSesionData): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this.solicitudesService.crearSolicitudSesion(data)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al crear la solicitud de sesión');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => {
+        if (res !== null) this._solicitudSesionSeleccionada.set(res);
+      });
+  }
+
+  /** PATCH /training/solicitudes/{id}/aprobar */
+  aprobarSolicitudSesion(id: string, data: AprobarSesionData): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this.solicitudesService.aprobarSolicitudSesion(id, data)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al aprobar la solicitud de sesión');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => {
+        if (res !== null) this._solicitudSesionSeleccionada.set(res);
+      });
+  }
+
+  /** PATCH /training/solicitudes/{id}/rechazar */
+  rechazarSolicitudSesion(id: string, data: RechazarSesionData): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this.solicitudesService.rechazarSolicitudSesion(id, data)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al rechazar la solicitud de sesión');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => {
+        if (res !== null) this._solicitudSesionSeleccionada.set(res);
+      });
+  }
+
+  /** PATCH /training/solicitudes/{id}/comprometer */
+  comprometerSolicitudSesion(id: string): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this.solicitudesService.comprometerSolicitudSesion(id)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al comprometer la solicitud de sesión');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => {
+        if (res !== null) this._solicitudSesionSeleccionada.set(res);
       });
   }
 }

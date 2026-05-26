@@ -1,143 +1,11 @@
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: var(--color-backdrop);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: var(--space-4);
-}
+@use '../../styles/modal';
+@include modal.base(480px);
 
 .modal {
-  background: var(--color-surface-primary);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-md);
-  width: 100%;
-  max-width: 480px;
-  display: flex;
-  flex-direction: column;
-  max-height: 90vh;
-  overflow-y: auto;
-
-  &__header {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-3);
-    padding: var(--space-5) var(--space-6);
-    border-bottom: 1px solid var(--color-border);
-    position: sticky;
-    top: 0;
-    background: var(--color-surface-primary);
-    z-index: 1;
+  &__header-icon--import {
+    background: var(--color-brand-primary-soft);
+    color: var(--color-brand-primary-strong);
   }
-
-  &__header-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: var(--radius-md);
-    flex-shrink: 0;
-
-    &--import {
-      background: var(--color-brand-primary-soft);
-      color: var(--color-brand-primary-strong);
-    }
-  }
-
-  &__title {
-    font-family: var(--font-family-headline);
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-text-heading);
-    margin: 0;
-    line-height: 1.2;
-  }
-
-  &__subtitle {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
-    margin: var(--space-1) 0 0;
-  }
-
-  &__close {
-    margin-left: auto;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: var(--color-text-secondary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--space-1);
-    border-radius: var(--radius-sm);
-    flex-shrink: 0;
-    transition: background var(--duration-fast) var(--ease-standard),
-                color    var(--duration-fast) var(--ease-standard);
-
-    &:hover {
-      background: var(--color-superficie-contenedor);
-      color: var(--color-text-primary);
-    }
-  }
-
-  &__body {
-    padding: var(--space-6);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-  }
-
-  // ── Select field (Corrección 2) ───────────────────────────────────────────
-
-  &__field {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-  }
-
-  &__label {
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    color: var(--color-text-primary);
-  }
-
-  &__select-wrapper {
-    position: relative;
-  }
-
-  &__select {
-    width: 100%;
-    appearance: none;
-    padding: var(--space-2) var(--space-8) var(--space-2) var(--space-3);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    font-size: var(--font-size-sm);
-    color: var(--color-text-primary);
-    background: var(--color-surface-primary);
-    cursor: pointer;
-    transition: border-color var(--duration-fast) var(--ease-standard);
-    font-family: var(--font-family-base);
-
-    &:focus {
-      outline: none;
-      border-color: var(--color-primario);
-      box-shadow: var(--focus-ring);
-    }
-  }
-
-  &__select-icon {
-    position: absolute;
-    right: var(--space-3);
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--color-text-secondary);
-    pointer-events: none;
-  }
-
-  // ── Drop zone ─────────────────────────────────────────────────────────────
 
   &__dropzone {
     position: relative;
@@ -203,8 +71,6 @@
     cursor: pointer;
   }
 
-  // ── Yellow note ───────────────────────────────────────────────────────────
-
   &__note {
     display: flex;
     align-items: flex-start;
@@ -234,8 +100,6 @@
     margin: 0;
   }
 
-  // ── Loading (Corrección 6) ────────────────────────────────────────────────
-
   &__loading {
     display: flex;
     align-items: center;
@@ -256,8 +120,6 @@
     to { transform: rotate(360deg); }
   }
 
-  // ── Result summary (Corrección 6) ─────────────────────────────────────────
-
   &__result {
     display: flex;
     flex-direction: column;
@@ -275,13 +137,8 @@
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
 
-    &--success {
-      color: var(--color-success-text);
-    }
-
-    &--error {
-      color: var(--color-error-text);
-    }
+    &--success { color: var(--color-success-text); }
+    &--error   { color: var(--color-error-text); }
   }
 
   &__result-errors {
@@ -296,60 +153,5 @@
   &__result-error-item {
     font-size: var(--font-size-xs);
     color: var(--color-error-text);
-  }
-
-  // ── Footer ────────────────────────────────────────────────────────────────
-
-  &__footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--space-3);
-    padding: var(--space-4) var(--space-6);
-    border-top: 1px solid var(--color-border);
-    background: var(--color-superficie-contenedor-bajo);
-    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
-    position: sticky;
-    bottom: 0;
-  }
-
-  &__btn {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-2) var(--space-5);
-    border-radius: var(--radius-md);
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    font-family: var(--font-family-base);
-    cursor: pointer;
-    border: none;
-    transition: background var(--duration-fast) var(--ease-standard),
-                box-shadow  var(--duration-fast) var(--ease-standard);
-
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    &--ghost {
-      background: transparent;
-      color: var(--color-text-secondary);
-      border: 1px solid var(--color-border);
-
-      &:hover:not(:disabled) {
-        background: var(--color-superficie-contenedor);
-        color: var(--color-text-primary);
-      }
-    }
-
-    &--primary {
-      background: var(--color-primario);
-      color: var(--color-en-primario);
-
-      &:hover:not(:disabled) {
-        background: var(--color-primario-hover);
-        box-shadow: var(--shadow-primary);
-      }
-    }
   }
 }

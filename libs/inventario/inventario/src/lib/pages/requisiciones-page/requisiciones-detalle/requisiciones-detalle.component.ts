@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
@@ -7,7 +7,7 @@ import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
 @Component({
   selector: 'restaurant-requisiciones-detalle',
   standalone: true,
-  imports: [CommonModule, RouterModule, LucideIconComponent],
+  imports: [RouterModule, LucideIconComponent],
   templateUrl: './requisiciones-detalle.component.html',
   styleUrl: './requisiciones-detalle.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

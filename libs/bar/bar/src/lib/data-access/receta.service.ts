@@ -85,11 +85,11 @@ export class RecetaService {
     ];
   }
 
-  guardarRecetaCompleta(datos: any) {
+  guardarRecetaCompleta(datos: Partial<Receta>) {
     return this.http.post(this.url, datos);
   }
 
-  actualizarRecetaCompleta(id: string, datos: any) {
+  actualizarRecetaCompleta(id: string, datos: Partial<Receta>) {
     return this.http.put(`${this.url}/${id}`, datos);
   }
 

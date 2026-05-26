@@ -147,7 +147,7 @@
 
     .section-icon {
       font-size: 24px;
-      color: #006e25;
+      color: var(--color-primario);
     }
 
     h3 {
@@ -212,7 +212,7 @@
   transition: all 0.2s;
 
   &:focus {
-    border-color: #006e25;
+    border-color: var(--color-primario);
     background: white;
   }
 }
@@ -279,8 +279,8 @@
   }
 
   input[type="checkbox"]:checked + .custom-checkbox {
-    background: #006e25;
-    border-color: #006e25;
+    background: var(--color-primario);
+    border-color: var(--color-primario);
 
     .check-icon {
       opacity: 1;
@@ -314,12 +314,12 @@
   }
 
   &--selected {
-    background: rgba(0, 110, 37, 0.05);
-    border-color: #006e25;
+    background: var(--color-brand-primary-soft);
+    border-color: var(--color-primario);
 
     &:hover {
-      background: rgba(0, 110, 37, 0.08);
-      border-color: #006e25;
+      background: rgba(57, 169, 0, 0.12);
+      border-color: var(--color-primario);
     }
   }
 
@@ -337,14 +337,14 @@
   }
 
   &--selected .radio-circle {
-    border-color: #006e25;
+    border-color: var(--color-primario);
   }
 
   .radio-dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #006e25;
+    background: var(--color-primario);
   }
 
   .format-icon {
@@ -371,7 +371,7 @@
 
 /* Summary Card */
 .summary-card {
-  background: #111827; /* Dark background as in prototype */
+  background: var(--color-primario);
   border-radius: 1.25rem;
   padding: 1.5rem;
   color: white;
@@ -454,18 +454,18 @@
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-brand-primary-strong) 100%);
   border: none;
   border-radius: 1rem;
   padding: 1rem;
   color: white;
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25);
+  box-shadow: var(--shadow-primary);
   transition: all 0.2s;
 
   &:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 12px 24px rgba(16, 185, 129, 0.3);
+    box-shadow: var(--shadow-primary-hover);
   }
 
   &:disabled {
@@ -565,14 +565,14 @@
 .btn-download-sm {
   background: none;
   border: none;
-  color: #006e25;
+  color: var(--color-primario);
   cursor: pointer;
   padding: 0.25rem;
   border-radius: 0.25rem;
   transition: background 0.2s;
 
   &:hover {
-    background: rgba(0, 110, 37, 0.1);
+    background: var(--color-brand-primary-soft);
   }
 
   .material-symbols-outlined {

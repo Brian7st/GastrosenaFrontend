@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, RouterModule } from '@angular/router';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 
@@ -8,7 +8,7 @@ export type ImportStatus = 'idle' | 'loading' | 'success' | 'error' | 'warning';
 @Component({
   selector: 'restaurant-factura-import',
   standalone: true,
-  imports: [CommonModule, RouterModule, BackButtonComponent],
+  imports: [RouterModule, BackButtonComponent],
   templateUrl: './factura-import.component.html',
   styleUrl: './factura-import.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

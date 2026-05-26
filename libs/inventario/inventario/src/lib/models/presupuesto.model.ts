@@ -1,33 +1,35 @@
 // ============================================================
-// Presupuesto General — Modelos e interfaces
+// Presupuesto General — Modelos e interfaces (F-08)
 // RF-5.7.1 → RF-5.7.9, RF6.1.11
 // ============================================================
 
 export type TipoAfectacion = 'Compromiso' | 'Pago' | 'Traslado' | 'Anulación';
 export type UrgenciaVencimiento = 'critico' | 'proximo' | 'normal';
 
-export interface Programa {
-  id: string;
-  nombre: string;
-  rubros: Rubro[];
-  totalApropiacion: number;
-  totalDisponible: number;
-  totalComprometido: number;
-  totalPagado: number;
-  totalZese: number;
-  porcentajeEjecucion: number;
-}
-
 export interface Rubro {
   id: string;
   codigo: string;
-  nombre: string;
-  programaId: string;
-  apropiacionInicial: number;
-  disponible: number;
-  comprometido: number;
-  pagado: number;
+  descripcion: string;       // era: nombre
+  fichaId: string;           // era: programaId
+  programaFormacion: string; // nuevo — nombre del programa
+  montoAsignado: number;     // era: apropiacionInicial
+  saldoDisponible: number;   // era: disponible
+  montoComprometido: number; // era: comprometido
+  montoPagado: number;       // era: pagado
   retencionZese: number;
+  porcentajeEjecucion: number;
+}
+
+/** Vista agrupada calculada en cliente — no viene del API */
+export interface GrupoPresupuestal {
+  fichaId: string;
+  programaFormacion: string;
+  rubros: Rubro[];
+  totalMontoAsignado: number;
+  totalSaldoDisponible: number;
+  totalMontoComprometido: number;
+  totalMontoPagado: number;
+  totalZese: number;
   porcentajeEjecucion: number;
 }
 
@@ -71,6 +73,27 @@ export interface EjecucionMensual {
   esMesActual: boolean;
 }
 
+/** Detalle de un presupuesto (GET /budget/presupuestos/{id}) */
+export interface PresupuestoDetalle {
+  id: string;
+  fichaId: string;
+  programaFormacion: string;
+  vigencia: number;
+  fechaAprobacion: string;
+  rubros: Rubro[];
+}
+
+/** Resumen global de presupuestos (GET /budget/presupuestos/resumen) */
+export interface ResumenPresupuestosGlobal {
+  totalPresupuestos: number;
+  vigencia?: number;
+  totalAsignado: number;
+  totalComprometido: number;
+  totalPagado: number;
+  saldoGlobal: number;
+  porcentajeEjecucion: number;
+}
+
 /** Payload para registrar un nuevo rubro presupuestal */
 export interface RegistrarPresupuestoData {
   programaId: string;
@@ -86,6 +109,42 @@ export interface TrasladarRubroData {
   rubroDestinoId: string;
   valor: number;
   motivo?: string;
+}
+
+// ── Compromisos presupuestales ────────────────────────────────────────────────
+
+/** Compromiso presupuestal (GET /budget/compromisos) */
+export interface Compromiso {
+  id: string;
+  presupuestoId: string;
+  rubroId: string;
+  gilId?: string;
+  concepto: string;
+  monto: number;
+  montoRetencionZese: number;
+  fecha: string;
+  estado: 'VIGENTE' | 'ANULADO';
+}
+
+/** Payload UI para comprometer presupuesto (POST /budget/compromisos) */
+export interface ComprometerData {
+  presupuestoId: string;
+  rubroId: string;
+  gilId?: string;
+  facturaId?: string;
+  fichaId: string;
+  programaId: string;
+  concepto: string;
+  monto: number;
+  aplicarZESE: boolean;
+  fecha: string;
+}
+
+/** Payload UI para registrar pago (POST /budget/compromisos/{id}/pagos) */
+export interface PagoData {
+  cufeFuenteId: string;
+  monto: number;
+  fecha: string;
 }
 
 // ============================================================
@@ -104,126 +163,97 @@ export const MOCK_RESUMEN: PresupuestoResumen = {
   variacionAnual: 5.2,
 };
 
-export const MOCK_PROGRAMAS: Programa[] = [
+export const MOCK_RUBROS: Rubro[] = [
   {
-    id: 'PRG-001',
-    nombre: 'Formación Profesional Integral',
-    totalApropiacion: 1200000000,
-    totalDisponible: 580000000,
-    totalComprometido: 420000000,
-    totalPagado: 200000000,
-    totalZese: 6250000,
-    porcentajeEjecucion: 51.7,
-    rubros: [
-      {
-        id: 'RUB-001',
-        codigo: '212-04-01-01',
-        nombre: 'Materiales para Formación',
-        programaId: 'PRG-001',
-        apropiacionInicial: 450000000,
-        disponible: 180000000,
-        comprometido: 170000000,
-        pagado: 100000000,
-        retencionZese: 2500000,
-        porcentajeEjecucion: 60.0,
-      },
-      {
-        id: 'RUB-002',
-        codigo: '212-04-01-02',
-        nombre: 'Equipos de Laboratorio',
-        programaId: 'PRG-001',
-        apropiacionInicial: 350000000,
-        disponible: 150000000,
-        comprometido: 120000000,
-        pagado: 80000000,
-        retencionZese: 1875000,
-        porcentajeEjecucion: 57.1,
-      },
-      {
-        id: 'RUB-003',
-        codigo: '212-04-01-03',
-        nombre: 'Servicios Públicos',
-        programaId: 'PRG-001',
-        apropiacionInicial: 400000000,
-        disponible: 250000000,
-        comprometido: 130000000,
-        pagado: 20000000,
-        retencionZese: 1875000,
-        porcentajeEjecucion: 37.5,
-      },
-    ],
+    id: 'RUB-001',
+    codigo: '212-04-01-01',
+    descripcion: 'Materiales para Formación',
+    fichaId: 'PRG-001',
+    programaFormacion: 'Formación Profesional Integral',
+    montoAsignado: 450000000,
+    saldoDisponible: 180000000,
+    montoComprometido: 170000000,
+    montoPagado: 100000000,
+    retencionZese: 2500000,
+    porcentajeEjecucion: 60.0,
   },
   {
-    id: 'PRG-002',
-    nombre: 'Gestión Administrativa Regional',
-    totalApropiacion: 800000000,
-    totalDisponible: 380000000,
-    totalComprometido: 320000000,
-    totalPagado: 100000000,
-    totalZese: 4375000,
-    porcentajeEjecucion: 52.5,
-    rubros: [
-      {
-        id: 'RUB-004',
-        codigo: '213-01-02-01',
-        nombre: 'Mantenimiento de Infraestructura',
-        programaId: 'PRG-002',
-        apropiacionInicial: 500000000,
-        disponible: 230000000,
-        comprometido: 200000000,
-        pagado: 70000000,
-        retencionZese: 2500000,
-        porcentajeEjecucion: 54.0,
-      },
-      {
-        id: 'RUB-005',
-        codigo: '213-01-02-02',
-        nombre: 'Gastos de Personal',
-        programaId: 'PRG-002',
-        apropiacionInicial: 300000000,
-        disponible: 150000000,
-        comprometido: 120000000,
-        pagado: 30000000,
-        retencionZese: 1875000,
-        porcentajeEjecucion: 50.0,
-      },
-    ],
+    id: 'RUB-002',
+    codigo: '212-04-01-02',
+    descripcion: 'Equipos de Laboratorio',
+    fichaId: 'PRG-001',
+    programaFormacion: 'Formación Profesional Integral',
+    montoAsignado: 350000000,
+    saldoDisponible: 150000000,
+    montoComprometido: 120000000,
+    montoPagado: 80000000,
+    retencionZese: 1875000,
+    porcentajeEjecucion: 57.1,
   },
   {
-    id: 'PRG-003',
-    nombre: 'Investigación y Desarrollo (SENNOVA)',
-    totalApropiacion: 450000000,
-    totalDisponible: 250000000,
-    totalComprometido: 500000000,
-    totalPagado: 592000000,
-    totalZese: 5000000,
+    id: 'RUB-003',
+    codigo: '212-04-01-03',
+    descripcion: 'Servicios Públicos',
+    fichaId: 'PRG-001',
+    programaFormacion: 'Formación Profesional Integral',
+    montoAsignado: 400000000,
+    saldoDisponible: 250000000,
+    montoComprometido: 130000000,
+    montoPagado: 20000000,
+    retencionZese: 1875000,
+    porcentajeEjecucion: 37.5,
+  },
+  {
+    id: 'RUB-004',
+    codigo: '213-01-02-01',
+    descripcion: 'Mantenimiento de Infraestructura',
+    fichaId: 'PRG-002',
+    programaFormacion: 'Gestión Administrativa Regional',
+    montoAsignado: 500000000,
+    saldoDisponible: 230000000,
+    montoComprometido: 200000000,
+    montoPagado: 70000000,
+    retencionZese: 2500000,
+    porcentajeEjecucion: 54.0,
+  },
+  {
+    id: 'RUB-005',
+    codigo: '213-01-02-02',
+    descripcion: 'Gastos de Personal',
+    fichaId: 'PRG-002',
+    programaFormacion: 'Gestión Administrativa Regional',
+    montoAsignado: 300000000,
+    saldoDisponible: 150000000,
+    montoComprometido: 120000000,
+    montoPagado: 30000000,
+    retencionZese: 1875000,
+    porcentajeEjecucion: 50.0,
+  },
+  {
+    id: 'RUB-006',
+    codigo: '214-02-01-01',
+    descripcion: 'Proyectos de Investigación',
+    fichaId: 'PRG-003',
+    programaFormacion: 'Investigación y Desarrollo (SENNOVA)',
+    montoAsignado: 250000000,
+    saldoDisponible: 12500000,
+    montoComprometido: 200000000,
+    montoPagado: 37500000,
+    retencionZese: 2500000,
     porcentajeEjecucion: 95.0,
-    rubros: [
-      {
-        id: 'RUB-006',
-        codigo: '214-02-01-01',
-        nombre: 'Proyectos de Investigación',
-        programaId: 'PRG-003',
-        apropiacionInicial: 250000000,
-        disponible: 12500000,
-        comprometido: 200000000,
-        pagado: 37500000,
-        retencionZese: 2500000,
-        porcentajeEjecucion: 95.0,
-      },
-      {
-        id: 'RUB-007',
-        codigo: '214-02-01-02',
-        nombre: 'Transferencia de Tecnología',
-        programaId: 'PRG-003',
-        apropiacionInicial: 200000000,
-        disponible: 237500000,
-        comprometido: 300000000,
-        pagado: 554500000,
-        retencionZese: 2500000,
-        porcentajeEjecucion: 95.0,
-      },
-    ],
+  },
+  {
+    id: 'RUB-007',
+    codigo: '214-02-01-02',
+    descripcion: 'Transferencia de Tecnología',
+    fichaId: 'PRG-003',
+    programaFormacion: 'Investigación y Desarrollo (SENNOVA)',
+    montoAsignado: 200000000,
+    saldoDisponible: 237500000,
+    montoComprometido: 300000000,
+    montoPagado: 554500000,
+    retencionZese: 2500000,
+    porcentajeEjecucion: 95.0,
   },
 ];
 

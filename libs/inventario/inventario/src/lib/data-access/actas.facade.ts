@@ -84,7 +84,7 @@ export class ActasFacade {
       });
   }
 
-  /** Cambia el estado de un acta y recarga su detalle. */
+  /** Cambia el estado de un acta (PENDIENTE_FIRMAS, FIRMADA, ARCHIVADA — sin body). */
   cambiarEstado(id: string, estado: ActaLegalizacion['estado']): void {
     this.actasService.cambiarEstado(id, estado)
       .pipe(
@@ -96,5 +96,19 @@ export class ActasFacade {
       .subscribe(ok => {
         if (ok) this.cargarActa(id);
       });
+  }
+
+  /** POST /legalization/actas/{id}/revisar — revisorId obligatorio (@NotBlank en backend). */
+  revisarActa(id: string, revisorId: string): void {
+    this._loading.set(true);
+    this.actasService.revisarActa(id, revisorId)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al revisar el acta');
+          return of(false);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(ok => { if (ok) this.cargarActa(id); });
   }
 }
