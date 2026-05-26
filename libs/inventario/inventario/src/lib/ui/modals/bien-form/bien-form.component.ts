@@ -77,6 +77,16 @@ export class BienFormComponent implements OnInit {
     this.cancel.emit();
   }
 
+  onImagenSeleccionada(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.form.patchValue({ imagenUrl: reader.result as string });
+    };
+    reader.readAsDataURL(file);
+  }
+
   hasError(field: string): boolean {
     const ctrl = this.form.get(field);
     return !!(ctrl?.invalid && ctrl?.touched);
