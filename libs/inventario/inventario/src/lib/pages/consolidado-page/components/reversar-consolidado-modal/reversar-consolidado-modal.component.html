@@ -16,19 +16,24 @@
         <h2 class="modal-title">
           {{ isBlocked ? 'Reversión Bloqueada' : '¿Está seguro de reversar este consolidado?' }}
         </h2>
-        <p class="modal-subtitle" *ngIf="!isBlocked">
+        @if (!isBlocked) {
+<p class="modal-subtitle">
           Esta acción es <span class="font-bold text-tertiary">irreversible</span> y deshará la agrupación contable de los comprobantes asociados. Todos los registros volverán a estado pendiente.
         </p>
+}
       </div>
       
       <!-- Summary Panel -->
       <div class="summary-panel" [class.summary-panel--blocked]="isBlocked">
-        <div class="summary-panel__header" *ngIf="!isBlocked">
+        @if (!isBlocked) {
+<div class="summary-panel__header">
           <span class="summary-panel__label">Consolidado a Reversar</span>
           <span class="summary-panel__value">{{ consolidadoId }}</span>
         </div>
+}
         
-        <div class="summary-panel__body" *ngIf="!isBlocked">
+        @if (!isBlocked) {
+<div class="summary-panel__body">
           <div class="summary-row">
             <span class="summary-row__label">Período</span>
             <span class="summary-row__value">{{ periodo }}</span>
@@ -38,14 +43,18 @@
             <span class="summary-row__value">{{ comprobantes }}</span>
           </div>
         </div>
+}
 
-        <div class="summary-panel__footer" *ngIf="!isBlocked">
+        @if (!isBlocked) {
+<div class="summary-panel__footer">
           <span class="summary-panel__total-label">Valor Total a Reversar</span>
           <span class="summary-panel__total-value">{{ total }}</span>
         </div>
+}
 
         <!-- Blocked layout is simplified -->
-        <ng-container *ngIf="isBlocked">
+        @if (isBlocked) {
+
           <div class="flex-between">
             <div>
               <p class="font-bold text-on-surface">{{ consolidadoId }}</p>
@@ -53,19 +62,23 @@
             </div>
             <p class="font-extrabold text-on-surface text-lg">{{ total }}</p>
           </div>
-        </ng-container>
+        
+}
       </div>
 
       <!-- Blocked Error Banner -->
-      <div class="blocked-banner" *ngIf="isBlocked">
+      @if (isBlocked) {
+<div class="blocked-banner">
         <span class="material-symbols-outlined text-error">error</span>
         <p class="blocked-banner__text">
           Este consolidado ya fue reportado a tesorería — reversión no permitida
         </p>
       </div>
+}
 
       <!-- Security Input (Confirm only) -->
-      <div class="security-box" *ngIf="!isBlocked">
+      @if (!isBlocked) {
+<div class="security-box">
         <label class="security-box__label" for="security-confirm">
           Escriba la palabra "REVERSAR" para confirmar
         </label>
@@ -78,10 +91,12 @@
           (ngModelChange)="confirmKeyword.set($event)"
         />
       </div>
+}
 
       <!-- Action Buttons -->
       <div class="modal-actions" [class.modal-actions--blocked]="isBlocked">
-        <ng-container *ngIf="!isBlocked">
+        @if (!isBlocked) {
+
           <button 
             class="modal-btn modal-btn--danger" 
             [disabled]="!isValid"
@@ -92,13 +107,16 @@
           <button class="modal-btn modal-btn--cancel" (click)="onClose()">
             Cancelar
           </button>
-        </ng-container>
+        
+}
 
-        <ng-container *ngIf="isBlocked">
+        @if (isBlocked) {
+
           <button class="modal-btn modal-btn--cancel modal-btn--full" (click)="onClose()">
             Entendido
           </button>
-        </ng-container>
+        
+}
       </div>
 
       <!-- Extra Caution Hint -->

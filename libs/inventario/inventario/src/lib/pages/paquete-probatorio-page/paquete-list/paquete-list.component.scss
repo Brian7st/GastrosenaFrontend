@@ -174,13 +174,13 @@
 .paquete-table__expediente {
   font-family: var(--font-family-mono);
   font-weight: 700;
-  color: var(--color-primario);
+  color: var(--color-en-superficie);
   cursor: pointer;
   text-decoration: none;
 
   &:hover {
     text-decoration: underline;
-    text-decoration-color: rgba(57, 169, 0, 0.3);
+    text-decoration-color: var(--color-superficie-contenedor-alto);
     text-underline-offset: 4px;
   }
 }

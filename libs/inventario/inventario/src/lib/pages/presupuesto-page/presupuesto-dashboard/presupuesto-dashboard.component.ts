@@ -8,15 +8,10 @@ import {
   ButtonComponent,
   StatusBadgeComponent,
 } from '@restaurant/shared/ui';
-import {
-  Programa,
-  PresupuestoResumen,
-  VencimientoProximo,
-  EjecucionMensual,
-} from '../../../models/presupuesto.model';
 import { PresupuestoFacade } from '../../../data-access/presupuesto.facade';
 import { OnInit, inject } from '@angular/core';
 import { FormatoMonedaPipe } from '../../../pipes/formato-moneda.pipe';
+import { ExportarComponent } from '../../../components/exportar/exportar.component';
 
 @Component({
   selector: 'restaurant-presupuesto-dashboard',
@@ -31,6 +26,7 @@ import { FormatoMonedaPipe } from '../../../pipes/formato-moneda.pipe';
     ButtonComponent,
     StatusBadgeComponent,
     FormatoMonedaPipe,
+    ExportarComponent,
   ],
   templateUrl: './presupuesto-dashboard.component.html',
   styleUrl: './presupuesto-dashboard.component.scss',
@@ -39,13 +35,16 @@ import { FormatoMonedaPipe } from '../../../pipes/formato-moneda.pipe';
 export class PresupuestoDashboardComponent implements OnInit {
   public facade = inject(PresupuestoFacade);
 
+  // ── Modal de exportación ──────────────────────────────────────────────────
+  showExportModal = signal(false);
+
   /** Datos de resumen presupuestal */
   resumen = this.facade.resumen;
 
-  /** Programas con sus rubros (tabla colapsable) */
-  programas = this.facade.programas;
+  /** Grupos de rubros agrupados por ficha (tabla colapsable) */
+  grupos = this.facade.grupos;
 
-  /** Estado de expansión por programa id */
+  /** Estado de expansión por fichaId */
   expandidos = signal<Record<string, boolean>>({
     'PRG-001': true,
     'PRG-002': false,
@@ -95,16 +94,16 @@ export class PresupuestoDashboardComponent implements OnInit {
   }
 
   /** Toggle de grupo colapsable */
-  togglePrograma(programaId: string): void {
+  toggleGrupo(fichaId: string): void {
     this.expandidos.update(prev => ({
       ...prev,
-      [programaId]: !prev[programaId],
+      [fichaId]: !prev[fichaId],
     }));
   }
 
-  /** Helper: verificar si programa está expandido */
-  isExpanded(programaId: string): boolean {
-    return this.expandidos()[programaId] ?? false;
+  /** Helper: verificar si grupo está expandido */
+  isExpanded(fichaId: string): boolean {
+    return this.expandidos()[fichaId] ?? false;
   }
 
   /** Helper: clase CSS del badge de ejecución */
@@ -137,5 +136,18 @@ export class PresupuestoDashboardComponent implements OnInit {
       case 'proximo': return 'vencimiento-card--proximo';
       default:        return 'vencimiento-card--normal';
     }
+  }
+
+  openExportModal(): void {
+    this.showExportModal.set(true);
+  }
+
+  closeExportModal(): void {
+    this.showExportModal.set(false);
+  }
+
+  onExport(formato: string): void {
+    console.log('Exportar presupuesto:', formato);
+    this.closeExportModal();
   }
 }

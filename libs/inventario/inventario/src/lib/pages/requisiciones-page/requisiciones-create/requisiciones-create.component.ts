@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, RouterModule } from '@angular/router';
 import { ButtonComponent, LucideIconComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
@@ -7,7 +7,7 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
 @Component({
   selector: 'restaurant-requisiciones-create',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonComponent, LucideIconComponent, BackButtonComponent],
+  imports: [RouterModule, ButtonComponent, LucideIconComponent, BackButtonComponent],
   templateUrl: './requisiciones-create.component.html',
   styleUrl: './requisiciones-create.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

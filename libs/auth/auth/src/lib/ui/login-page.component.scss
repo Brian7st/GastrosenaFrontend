@@ -50,10 +50,12 @@
 
 
 .auth-panel__illustration {
-  width: 200px;
-  height: 200px;
+  width: 80%;
+  max-width: 470px;
   margin: 0 auto;
   opacity: 0.9;
+  overflow: hidden;
+  border-radius: 50%;
 }
 
 .auth-panel__logo {

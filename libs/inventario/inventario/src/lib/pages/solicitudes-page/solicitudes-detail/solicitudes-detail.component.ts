@@ -20,10 +20,10 @@ export class SolicitudesDetailComponent implements OnInit {
   // ── Estado reactivo desde facade ─────────────────────────────────────────
   solicitud     = this.facade.solicitudSeleccionada;
   loading       = this.facade.loading;
-  solicitudId   = computed(() => this.solicitud()?.codigo ?? '');
-  estadoActual  = computed(() => this.solicitud()?.estado ?? 'Borrador');
+  solicitudId   = computed(() => this.solicitud()?.numeroGil ?? '');
+  estadoActual  = computed(() => this.solicitud()?.estado ?? 'BORRADOR');
   fechaCreacion = computed(() => this.solicitud()?.fecha ?? '');
-  totalEstimado = computed(() => this.solicitud()?.montoTotal ?? 0);
+  totalEstimado = computed(() => this.solicitud()?.bienes?.reduce((acc, b) => acc + b.subtotal, 0) ?? 0);
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
@@ -35,15 +35,14 @@ export class SolicitudesDetailComponent implements OnInit {
   }
 
   // ─── Helpers para el Timeline ───────────────────────────
-  estados = ['Borrador', 'Pendiente', 'Validado', 'Aprobado', 'Procesado'];
+  estados = ['BORRADOR', 'EMITIDO', 'ENVIADO_PROVEEDOR', 'CERRADO'];
 
   getIcon(estado: string): string {
     const iconos: Record<string, string> = {
-      Borrador: 'edit_document',
-      Pendiente: 'hourglass_empty',
-      Validado: 'fact_check',
-      Aprobado: 'thumb_up',
-      Procesado: 'check_circle'
+      BORRADOR:          'edit_document',
+      EMITIDO:           'hourglass_empty',
+      ENVIADO_PROVEEDOR: 'local_shipping',
+      CERRADO:           'check_circle',
     };
     return iconos[estado] || 'help';
   }
@@ -73,7 +72,7 @@ export class SolicitudesDetailComponent implements OnInit {
   }
 
   onEnviarAprobacion(): void {
-    const codigo = this.solicitud()?.codigo;
-    if (codigo) this.facade.cambiarEstado(codigo, 'Pendiente');
+    const codigo = this.solicitud()?.numeroGil;
+    if (codigo) this.facade.cambiarEstado(codigo, 'EMITIDO');
   }
 }

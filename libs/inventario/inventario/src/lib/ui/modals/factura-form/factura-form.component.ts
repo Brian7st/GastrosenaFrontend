@@ -1,31 +1,32 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
-import { Factura } from '../../../models/facturas.model';
+import { FacturaFormDto } from '../../../models/facturas.model';
 
 @Component({
   selector: 'restaurant-factura-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './factura-form.component.html',
   styleUrl: './factura-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FacturaFormComponent {
+  // eslint-disable-next-line @angular-eslint/no-output-native
   @Output() close = new EventEmitter<void>();
-  @Output() save  = new EventEmitter<Partial<Factura>>();
+  // eslint-disable-next-line @angular-eslint/no-output-native
+  @Output() save  = new EventEmitter<FacturaFormDto>();
 
   // Form model
-  numeroFEL      = signal('');
-  fechaEmision   = signal('');
+  numeroFactura    = signal('');
+  fechaEmision     = signal('');
   fechaVencimiento = signal('');
-  nitEmisor      = signal('');
-  nitReceptor    = signal('');
-  gilVinculado   = signal('');
-  instructorCuentadante = signal('Carlos Ruiz (Autocompletado)');
-  codigoCufe     = signal('');
-  retencionZESE  = signal(0.625);
-  ordenCompra    = signal('');
+  proveedorNit     = signal('');
+  nitReceptor      = signal('');
+  gilVinculado     = signal('');
+  instructorId     = signal('Carlos Ruiz (Autocompletado)');
+  valorRetencionZese = signal(0.625);
+  ordenCompra      = signal('');
   
   // Datos Bancarios
   banco = signal('');
@@ -62,21 +63,16 @@ export class FacturaFormComponent {
   }
 
   onSubmit(): void {
-    // Note: The model `Factura` or `FacturaFormDto` might need to be updated to accept bank details later
     this.save.emit({
-      numeroFEL: this.numeroFEL(),
+      numeroFactura: this.numeroFactura(),
       fechaEmision: this.fechaEmision(),
       fechaVencimiento: this.fechaVencimiento() || undefined,
-      nitEmisor: this.nitEmisor(),
+      proveedorNit: this.proveedorNit(),
       nitReceptor: this.nitReceptor(),
       gilVinculado: this.gilVinculado() || undefined,
-      instructorCuentadante: this.instructorCuentadante(),
-      codigoCufe: this.codigoCufe() || undefined,
-      retencionZESE: this.retencionZESE(),
+      instructorId: this.instructorId(),
+      valorRetencionZese: this.valorRetencionZese(),
       ordenCompra: this.ordenCompra() || undefined,
-      // banco: this.banco(),
-      // tipoCuenta: this.tipoCuenta(),
-      // numeroCuenta: this.numeroCuenta(),
     });
   }
 

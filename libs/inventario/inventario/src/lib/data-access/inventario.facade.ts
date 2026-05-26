@@ -1,5 +1,6 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
 import { Bien, BienFiltros, BienKpis, BienFormDto } from '../models/inventario.model';
+import { ExportacionProductosResponse } from './api/catalog.api';
 import { BienesService } from './services/bienes.service';
 import { finalize, catchError, of } from 'rxjs';
 
@@ -10,20 +11,22 @@ export class InventarioFacade {
   private bienesService = inject(BienesService);
 
   // Estados internos (Signals)
-  private _bienes = signal<Bien[]>([]);
-  private _kpis = signal<BienKpis | null>(null);
-  private _loading = signal<boolean>(false);
-  private _filtros = signal<BienFiltros>({});
-  private _bienSeleccionado = signal<Bien | undefined>(undefined);
-  private _error = signal<string | null>(null);
+  private _bienes              = signal<Bien[]>([]);
+  private _kpis                = signal<BienKpis | null>(null);
+  private _loading             = signal<boolean>(false);
+  private _filtros             = signal<BienFiltros>({});
+  private _bienSeleccionado    = signal<Bien | undefined>(undefined);
+  private _exportacionPendiente = signal<ExportacionProductosResponse | null>(null);
+  private _error               = signal<string | null>(null);
 
   // Exposición pública (Solo lectura)
-  public bienes = computed(() => this._bienes());
-  public kpis = computed(() => this._kpis());
-  public loading = computed(() => this._loading());
-  public filtros = computed(() => this._filtros());
-  public bienSeleccionado = computed(() => this._bienSeleccionado());
-  public error = computed(() => this._error());
+  public bienes               = computed(() => this._bienes());
+  public kpis                 = computed(() => this._kpis());
+  public loading              = computed(() => this._loading());
+  public filtros              = computed(() => this._filtros());
+  public bienSeleccionado     = computed(() => this._bienSeleccionado());
+  public exportacionPendiente = computed(() => this._exportacionPendiente());
+  public error                = computed(() => this._error());
 
   /**
    * Carga inicial de datos.
@@ -129,6 +132,23 @@ export class InventarioFacade {
   }
 
   /**
+   * Desactiva un bien (soft delete → activo: false).
+   * Usa PATCH /catalog/productos/{id}/desactivar.
+   */
+  desactivarBien(id: string | number): void {
+    this._loading.set(true);
+    this.bienesService.desactivarBien(id)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al desactivar el bien');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => { if (res !== null) this.cargarBienes(); });
+  }
+
+  /**
    * Actualiza un bien existente y refresca los datos.
    */
   actualizarBien(id: string | number, dto: BienFormDto): void {
@@ -144,5 +164,49 @@ export class InventarioFacade {
       .subscribe((res) => {
         if (res !== null) this.loadAll();
       });
+  }
+
+  // ── Operaciones masivas ────────────────────────────────────────────────────
+
+  /** POST /catalog/productos/eliminacion-masiva */
+  eliminarBienesMasivo(ids: string[], confirmacion: string): void {
+    this._loading.set(true);
+    this.bienesService.eliminarBienesMasivo(ids, confirmacion)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al eliminar los bienes en masa');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => { if (res !== null) this.cargarBienes(); });
+  }
+
+  /** POST /catalog/productos/importar */
+  importarBienes(productos: BienFormDto[]): void {
+    this._loading.set(true);
+    this.bienesService.importarBienes(productos)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al importar los bienes');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => { if (res !== null) this.loadAll(); });
+  }
+
+  /** POST /catalog/productos/exportaciones (202 Accepted — async) */
+  solicitarExportacion(formato: 'CSV' | 'EXCEL'): void {
+    this._loading.set(true);
+    this.bienesService.solicitarExportacion(formato)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al solicitar la exportación');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => { if (res !== null) this._exportacionPendiente.set(res); });
   }
 }

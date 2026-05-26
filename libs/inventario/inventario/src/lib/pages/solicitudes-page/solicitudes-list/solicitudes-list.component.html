@@ -65,7 +65,9 @@
       <!-- Filtro Estado -->
       <div class="select-box">
         <select #estadoSelect (change)="onFilterEstado(estadoSelect.value)">
-          <option *ngFor="let opt of estadoOptions" [value]="opt.value">{{ opt.label }}</option>
+          @for (opt of estadoOptions; track opt) {
+<option [value]="opt.value">{{ opt.label }}</option>
+}
         </select>
         <span class="material-symbols-outlined dropdown-icon">expand_more</span>
       </div>
@@ -73,7 +75,9 @@
       <!-- Filtro Fecha -->
       <div class="select-box">
         <select #fechaSelect (change)="onFilterFecha(fechaSelect.value)">
-          <option *ngFor="let opt of fechaOptions" [value]="opt.value">{{ opt.label }}</option>
+          @for (opt of fechaOptions; track opt) {
+<option [value]="opt.value">{{ opt.label }}</option>
+}
         </select>
         <span class="material-symbols-outlined dropdown-icon">calendar_month</span>
       </div>
@@ -87,7 +91,6 @@
       </div>
     </div>
 
-    <p class="results-count">Mostrando 1–{{ solicitudes().length }} de {{ totalSolicitudes() }} resultados</p>
   </div>
 
   <!-- Cabecera de tabla -->
@@ -105,11 +108,12 @@
 
   <!-- Filas de datos -->
   <tbody>
-    <tr *ngFor="let s of solicitudes()">
+    @for (s of solicitudes(); track s) {
+<tr>
 
       <!-- Código -->
       <td>
-        <span class="code-bold">{{ s.codigo }}</span>
+        <span class="code-bold">{{ s.numeroGil }}</span>
       </td>
 
       <!-- Fecha -->
@@ -118,25 +122,24 @@
       <!-- Solicitante con avatar -->
       <td>
         <div class="solicitante-cell">
-          <div class="avatar" [ngClass]="'avatar--' + (s.avatarColor ?? 'slate')">
-            {{ getInitials(s.cuentadante) }}
+          <div class="avatar" [ngClass]="'avatar--' + getAvatarColor(s.id)">
+            {{ getInitials(s.cuentadantes[0]?.nombre ?? '') }}
           </div>
-          <span class="solicitante-nombre">{{ s.cuentadante }}</span>
+          <span class="solicitante-nombre">{{ s.cuentadantes[0]?.nombre ?? '—' }}</span>
         </div>
       </td>
 
       <!-- Ficha / Grupo -->
-      <td class="text-secondary">{{ s.ficha }}</td>
+      <td class="text-secondary">{{ s.fichaId }}</td>
 
       <!-- Estado badge -->
       <td>
         <span class="estado-badge"
               [ngClass]="{
-                'estado-badge--borrador':  s.estado === 'Borrador',
-                'estado-badge--pendiente': s.estado === 'Pendiente',
-                'estado-badge--validado':  s.estado === 'Validado',
-                'estado-badge--aprobado':  s.estado === 'Aprobado',
-                'estado-badge--procesado': s.estado === 'Procesado'
+                'estado-badge--borrador':  s.estado === 'BORRADOR',
+                'estado-badge--pendiente': s.estado === 'EMITIDO',
+                'estado-badge--validado':  s.estado === 'ENVIADO_PROVEEDOR',
+                'estado-badge--procesado': s.estado === 'CERRADO'
               }">
           {{ s.estado }}
         </span>
@@ -144,7 +147,7 @@
 
       <!-- Total COP -->
       <td>
-        <span class="monto-text">{{ formatCOP(s.montoTotal ?? 0) }}</span>
+        <span class="monto-text">{{ formatCOP(getMontoTotal(s)) }}</span>
       </td>
 
       <!-- Acciones: Ver · Editar · PDF · Eliminar -->
@@ -171,10 +174,12 @@
         </div>
       </td>
     </tr>
+}
   </tbody>
 
   <!-- Paginación -->
   <div dtFooter class="pagination-footer">
+    <p class="results-count">Mostrando 1–{{ solicitudes().length }} de {{ totalSolicitudes() }} resultados</p>
     <div class="page-numbers">
       <button class="page-btn page-btn--active">1</button>
       <button class="page-btn">2</button>
@@ -195,7 +200,7 @@
   confirmLabel="Sí, eliminar GIL"
   cancelLabel="Cancelar"
   [identifierLabel]="'GIL'"
-  [identifierValue]="itemToDelete()?.codigo ?? ''"
+  [identifierValue]="itemToDelete()?.numeroGil ?? ''"
   accent="danger"
   (confirm)="confirmDelete()"
   (cancel)="closeDeleteModal()"

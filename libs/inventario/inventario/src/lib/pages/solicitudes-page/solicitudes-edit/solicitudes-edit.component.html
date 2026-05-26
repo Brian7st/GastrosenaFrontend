@@ -26,10 +26,12 @@
     <div class="main-form-col">
       
       <!-- Locked Banner -->
-      <div *ngIf="isBlocked()" class="bg-red-50 p-4 rounded-xl border border-red-200 flex items-center gap-3 mb-6">
+      @if (isBlocked()) {
+<div class="bg-red-50 p-4 rounded-xl border border-red-200 flex items-center gap-3 mb-6">
         <span class="material-symbols-outlined text-red-600">lock</span>
         <p class="text-sm font-medium text-red-800">GIL Procesado — no se permiten modificaciones</p>
       </div>
+}
 
       <!-- Información del Solicitante -->
       <div class="form-card" [class.opacity-70]="isBlocked()" [class.pointer-events-none]="isBlocked()">
@@ -133,38 +135,48 @@
                 <th class="text-right">Cantidad</th>
                 <th class="text-right">Valor Unitario</th>
                 <th class="text-right">Subtotal</th>
-                <th class="text-center" *ngIf="!isBlocked()">Acción</th>
+                @if (!isBlocked()) {
+<th class="text-center">Acción</th>
+}
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let bien of bienes(); let i = index">
+              @for (bien of bienes(); track bien; let i = $index) {
+<tr>
                 <td class="font-medium text-dark">{{ bien.codigo }}</td>
                 <td class="text-muted">{{ bien.descripcion }}</td>
                 <td class="text-muted">{{ bien.um }}</td>
                 <td class="text-right font-medium text-dark">{{ bien.cantidad }}</td>
                 <td class="text-right text-muted">{{ bien.valorUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
                 <td class="text-right font-bold text-dark">{{ bien.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
-                <td class="text-center" *ngIf="!isBlocked()">
+                @if (!isBlocked()) {
+<td class="text-center">
                   <button type="button" class="btn-icon btn-icon--danger" (click)="onRemoveBien(i)">
                     <span class="material-symbols-outlined">delete</span>
                   </button>
                 </td>
+}
               </tr>
+}
             </tbody>
           </table>
         </div>
-        <button type="button" class="btn-link btn-link--add mt-4" (click)="onAddBien()" *ngIf="!isBlocked()">
+        @if (!isBlocked()) {
+<button type="button" class="btn-link btn-link--add mt-4" (click)="onAddBien()">
           <span class="material-symbols-outlined">add_circle</span> Agregar bien
         </button>
+}
       </div>
 
       <!-- Actions -->
-      <div class="actions-footer" *ngIf="!isBlocked()">
+      @if (!isBlocked()) {
+<div class="actions-footer">
         <restaurant-button variant="ghost" (click)="onCancel()" [disabled]="isSaving()">Cancelar</restaurant-button>
         <restaurant-button variant="primary" (click)="onSave()" [disabled]="isSaving()">
           {{ isSaving() ? 'Guardando...' : 'Guardar Cambios' }}
         </restaurant-button>
       </div>
+}
 
     </div>
 

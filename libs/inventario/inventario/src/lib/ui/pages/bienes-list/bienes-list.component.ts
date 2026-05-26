@@ -52,6 +52,7 @@ export class BienesListPageComponent implements OnInit {
     this.showImportModal.set(true);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onProcessImport(data: BienImportRow[]): void {
     this.showImportModal.set(false);
     this.facade.loadAll();

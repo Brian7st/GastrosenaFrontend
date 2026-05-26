@@ -5,23 +5,35 @@
     <div class="doc-header__left">
       <inventario-back-button (clicked)="back.emit()" />
 
-      <nav class="breadcrumb" *ngIf="breadcrumbs.length">
+      @if (breadcrumbs.length) {
+<nav class="breadcrumb">
         <ol>
-          <ng-container *ngFor="let crumb of breadcrumbs; let last = last">
-            <li *ngIf="!last">
+          @for (crumb of breadcrumbs; track crumb; let last = $last) {
+
+            @if (!last) {
+<li>
               <a [routerLink]="crumb.routerLink">{{ crumb.label }}</a>
             </li>
-            <li *ngIf="!last" class="separator">
+}
+            @if (!last) {
+<li class="separator">
               <span class="material-symbols-outlined">chevron_right</span>
             </li>
-            <li *ngIf="last" class="current">{{ crumb.label }}</li>
-          </ng-container>
+}
+            @if (last) {
+<li class="current">{{ crumb.label }}</li>
+}
+          
+}
         </ol>
       </nav>
+}
 
       <div class="doc-header__title-block">
         <h1 class="doc-header__title">{{ title }}</h1>
-        <p class="doc-header__subtitle" *ngIf="subtitle">{{ subtitle }}</p>
+        @if (subtitle) {
+<p class="doc-header__subtitle">{{ subtitle }}</p>
+}
       </div>
     </div>
 
@@ -61,8 +73,12 @@
       [disabled]="saving"
       (click)="save.emit()"
     >
-      <span class="material-symbols-outlined" *ngIf="saving">progress_activity</span>
-      <span class="material-symbols-outlined" *ngIf="!saving">save</span>
+      @if (saving) {
+<span class="material-symbols-outlined">progress_activity</span>
+}
+      @if (!saving) {
+<span class="material-symbols-outlined">save</span>
+}
       {{ saving ? 'Guardando…' : saveLabel }}
     </button>
   </div>

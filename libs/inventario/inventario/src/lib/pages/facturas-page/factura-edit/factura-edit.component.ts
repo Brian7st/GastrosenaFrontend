@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { KeywordConfirmModalComponent } from '@restaurant/shared/ui';
 import { FacturasFacade } from '../../../data-access/facturas.facade';
-import { Factura, FacturaItem, ConciliacionItem, MonedaFEL } from '../../../models/facturas.model';
+import { FacturaLinea } from '../../../models/facturas.model';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 
 @Component({
@@ -24,20 +24,18 @@ export class FacturaEditPageComponent implements OnInit {
   loading = this.facade.loading;
 
   // Editable fields (local state)
-  nitCliente    = signal('');
-  razonSocial   = signal('');
-  tipoDoc       = signal('Factura Electrónica');
-  fechaEmision  = signal('');
-  moneda        = signal<MonedaFEL>('COP');
-  notasInternas = signal('');
-  localItems    = signal<FacturaItem[]>([]);
+  nitCliente   = signal('');
+  razonSocial  = signal('');
+  tipoDoc      = signal('Factura Electrónica');
+  fechaEmision = signal('');
+  localItems   = signal<FacturaLinea[]>([]);
 
   // Modal de confirmación de anulación
   showAnularModal = signal(false);
 
   isBlocked = computed(() => {
     const f = this.factura();
-    return f?.estado === 'Verificada' || f?.estado === 'Pagada' || f?.estado === 'Anulada';
+    return f?.estado === 'VERIFICADA' || f?.estado === 'PAGADA' || f?.estado === 'ANULADA';
   });
 
   hasConciliacion = computed(() => (this.factura()?.conciliacion?.length ?? 0) > 0);
@@ -46,12 +44,11 @@ export class FacturaEditPageComponent implements OnInit {
     effect(() => {
       const f = this.factura();
       if (f) {
-        this.nitCliente.set(f.nitEmisor);
+        this.nitCliente.set(f.proveedorNit);
         this.razonSocial.set(f.razonSocial);
+        this.tipoDoc.set(f.tipoDocumento);
         this.fechaEmision.set(f.fechaEmision);
-        this.moneda.set(f.moneda);
-        this.notasInternas.set(f.notasInternas ?? '');
-        this.localItems.set([...f.items]);
+        this.localItems.set([...f.lineas]);
       }
     });
   }
@@ -82,10 +79,10 @@ export class FacturaEditPageComponent implements OnInit {
     this.localItems.update(items => items.filter((_, i) => i !== index));
   }
 
-  onItemChange(index: number, field: keyof FacturaItem, value: string | number): void {
+  onItemChange(index: number, field: keyof FacturaLinea, value: string | number): void {
     this.localItems.update(items => {
       const updated = [...items];
-      const item = { ...updated[index], [field]: value } as FacturaItem;
+      const item = { ...updated[index], [field]: value } as FacturaLinea;
       item.total = item.cantidad * item.precioUnitario * (1 + item.iva / 100);
       updated[index] = item;
       return updated;
@@ -111,21 +108,14 @@ export class FacturaEditPageComponent implements OnInit {
     const f = this.factura();
     if (!f) return;
     this.facade.actualizarFactura(f.id, {
-      nitEmisor: this.nitCliente(),
+      proveedorNit: this.nitCliente(),
       razonSocial: this.razonSocial(),
       fechaEmision: this.fechaEmision(),
-      moneda: this.moneda(),
-      notasInternas: this.notasInternas(),
     });
   }
 
-  getCurrencySymbol(moneda: MonedaFEL): string {
-    return moneda === 'GTQ' ? 'Q' : moneda === 'USD' ? '$' : '$';
-  }
-
-  formatMoney(value: number, moneda: MonedaFEL): string {
-    const sym = this.getCurrencySymbol(moneda);
-    return `${sym} ${value.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  formatMoney(value: number): string {
+    return `$ ${value.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   }
 
   getDiffClass(diff: number): string {

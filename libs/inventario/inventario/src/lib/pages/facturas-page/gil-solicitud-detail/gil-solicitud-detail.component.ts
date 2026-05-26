@@ -20,7 +20,7 @@ export class GilSolicitudDetailPageComponent implements OnInit {
   solicitud = this.facade.solicitudGIL;
 
   /** Ordered steps for the timeline */
-  readonly STEPS: EstadoGIL[] = ['Borrador', 'Pendiente', 'Validado', 'Aprobado', 'Procesado'];
+  readonly STEPS: EstadoGIL[] = ['BORRADOR', 'EMITIDO', 'ENVIADO_PROVEEDOR', 'CERRADO'];
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');

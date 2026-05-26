@@ -3,7 +3,7 @@
   <div class="acta-detail__topbar-left">
     <inventario-back-button (clicked)="volver()" />
     <div class="acta-detail__topbar-divider"></div>
-    <span class="acta-detail__topbar-title">{{ acta().consecutivo }}</span>
+    <span class="acta-detail__topbar-title">{{ acta().numeroActa }}</span>
   </div>
   <div class="acta-detail__topbar-right">
     <button class="acta-detail__export-btn">
@@ -58,7 +58,7 @@
       <h1 class="acta-detail__doc-institution">SERVICIO NACIONAL DE APRENDIZAJE — SENA</h1>
       <h2 class="acta-detail__doc-regional">REGIONAL DISTRITO CAPITAL</h2>
       <div class="acta-detail__doc-badge">
-        <h3 class="acta-detail__doc-badge-text">{{ acta().consecutivo | uppercase }}</h3>
+        <h3 class="acta-detail__doc-badge-text">{{ acta().numeroActa | uppercase }}</h3>
       </div>
       <p class="acta-detail__doc-comite">
         <span class="acta-detail__doc-comite-label">Comité:</span>
@@ -78,7 +78,7 @@
           </div>
           <div>
             <span class="acta-detail__field-label">Fecha</span>
-            <span class="acta-detail__field-value">{{ acta().fechaTaller }}</span>
+            <span class="acta-detail__field-value">{{ acta().fecha }}</span>
           </div>
           <div>
             <span class="acta-detail__field-label">Lugar</span>
@@ -109,13 +109,13 @@
             <div class="acta-detail__desarrollo-grid">
               <div>
                 <span class="acta-detail__field-label">Instructor a Cargo</span>
-                <span class="acta-detail__field-value acta-detail__field-value--medium">{{ acta().instructor }}</span>
+                <span class="acta-detail__field-value acta-detail__field-value--medium">{{ acta().instructorId }}</span>
               </div>
               <div>
                 <span class="acta-detail__field-label">Documento Soporte</span>
                 <span class="acta-detail__doc-soporte">
                   <lucide-icon name="file-text" [size]="14"></lucide-icon>
-                  Requisición {{ acta().requisicion }}
+                  Requisición {{ acta().requisicionId }}
                 </span>
               </div>
               <div class="acta-detail__desarrollo-full">
@@ -135,7 +135,7 @@
       <section class="acta-detail__section">
         <h4 class="acta-detail__section-title">
           <span class="acta-detail__section-indicator"></span>
-          Consumo de Materiales (Requisición {{ acta().requisicion }})
+          Consumo de Materiales (Requisición {{ acta().requisicionId }})
         </h4>
         <div class="acta-detail__insumos-table-wrapper">
           <table class="acta-detail__insumos-table">

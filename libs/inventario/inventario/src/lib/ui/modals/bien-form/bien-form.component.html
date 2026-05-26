@@ -6,7 +6,7 @@
       <div>
         <h2 class="modal-title">{{ mode === 'create' ? 'Registrar Nuevo Bien' : 'Editar Bien' }}</h2>
         <p class="modal-subtitle">
-          {{ mode === 'create' ? 'Ingrese los detalles del nuevo activo para el inventario.' : 'Actualice la información técnica y administrativa del activo en el sistema.' }}
+          {{ mode === 'create' ? 'Ingrese los datos del nuevo producto en el catálogo.' : 'Actualice la información del producto en el catálogo.' }}
         </p>
       </div>
       <button class="close-btn" (click)="onCancel()">
@@ -17,171 +17,91 @@
     <!-- Body -->
     <div class="modal-body" [formGroup]="form">
 
-      <div class="form-columns">
-        <!-- ── Columna izquierda ── -->
-        <div class="form-col">
-
-          <!-- 1. Identificación -->
-          <div class="form-section">
-            <div class="form-section__header">
-              <div class="section-icon section-icon--green">
-                <span class="material-symbols-outlined filled">badge</span>
-              </div>
-              <span class="form-section__title">Identificación</span>
-            </div>
-
-            <div class="field-group">
-              <label class="field-label">CÓD. INTERNO SENA</label>
-              <input class="field-input field-input--disabled" formControlName="codigoSena"
-                     [placeholder]="mode === 'create' ? 'Ej. SENA-001' : ''" />
-              <p class="field-hint" *ngIf="mode === 'create'">Se generará automáticamente al guardar</p>
-            </div>
-
-            <div class="field-group">
-              <label class="field-label">CÓD. PROVEEDOR</label>
-              <input class="field-input" formControlName="codigoProveedor" placeholder="Ej. PRV-992" />
-            </div>
+      <!-- 1. Identificación -->
+      <div class="form-section">
+        <div class="form-section__header">
+          <div class="section-icon section-icon--green">
+            <span class="material-symbols-outlined filled">badge</span>
           </div>
-
-          <!-- 2. Bodega -->
-          <div class="form-section">
-            <div class="form-section__header">
-              <div class="section-icon section-icon--green">
-                <span class="material-symbols-outlined filled">warehouse</span>
-              </div>
-              <span class="form-section__title">Bodega</span>
-            </div>
-
-            <div class="field-group">
-              <label class="field-label">NOMBRE DEL BIEN <span class="required">*</span></label>
-              <input class="field-input" formControlName="nombre"
-                     placeholder="Descripción clara del activo"
-                     [class.field-input--error]="hasError('nombre')" />
-              <p class="field-error" *ngIf="hasError('nombre')">El nombre es obligatorio (mín. 3 caracteres)</p>
-            </div>
-
-            <div class="field-group">
-              <label class="field-label">CATEGORÍA <span class="required">*</span></label>
-              <select class="field-select" formControlName="categoria"
-                      [class.field-input--error]="hasError('categoria')">
-                <option value="" disabled>Seleccione una categoría</option>
-                <option *ngFor="let cat of CATEGORIAS" [value]="cat">{{ cat }}</option>
-              </select>
-            </div>
-
-            <!-- Stocks -->
-            <div class="field-row">
-              <div class="field-group" *ngIf="mode === 'edit'">
-                <label class="field-label">STOCK ACTUAL</label>
-                <div class="stock-control">
-                  <button type="button" class="stock-btn" (click)="form.get('stockActual')!.setValue(+form.get('stockActual')!.value - 1)">
-                    <span class="material-symbols-outlined">remove</span>
-                  </button>
-                  <input class="field-input text-center" formControlName="stockActual" type="number" />
-                  <button type="button" class="stock-btn" (click)="form.get('stockActual')!.setValue(+form.get('stockActual')!.value + 1)">
-                    <span class="material-symbols-outlined">add</span>
-                  </button>
-                </div>
-              </div>
-
-              <div class="field-group">
-                <label class="field-label">STOCK MÍNIMO ALERTA <span class="required">*</span></label>
-                <input class="field-input" formControlName="stockMinimo" type="number" placeholder="5" />
-                <p class="field-hint warn">Se notificará al llegar a este límite.</p>
-              </div>
-            </div>
-
-            <!-- UM + Factor de conversión -->
-            <div class="field-row">
-              <div class="field-group">
-                <label class="field-label">
-                  UNIDAD DE MEDIDA (UM) <span class="required">*</span>
-                  <span class="um-lock-badge" *ngIf="umBloqueada()">
-                    <span class="material-symbols-outlined">lock</span>
-                    UM bloqueada — el bien tiene historial
-                  </span>
-                </label>
-                <select class="field-select" formControlName="unidadMedida"
-                        [class.field-input--disabled]="umBloqueada()">
-                  <option value="" disabled>Seleccionar UM</option>
-                  <option value="UND">UND – Unidad</option>
-                  <option value="KG">KG – Kilogramo</option>
-                  <option value="L">L – Litro</option>
-                  <option value="M">M – Metro</option>
-                  <option value="SET">SET – Set</option>
-                  <option value="CAJA">CAJA – Caja</option>
-                </select>
-              </div>
-              <div class="field-group">
-                <label class="field-label">FACTOR DE CONVERSIÓN</label>
-                <input class="field-input" formControlName="factorConversion" type="number" step="0.01" />
-              </div>
-            </div>
-
-            <!-- Estado (solo edición) -->
-            <div class="field-group" *ngIf="mode === 'edit'">
-              <label class="field-label">ESTADO DEL ACTIVO</label>
-              <div class="estado-toggle">
-                <span class="dot-green"></span>
-                <span class="estado-text">{{ form.get('estado')?.value }}</span>
-                <button type="button" class="toggle-icon">
-                  <span class="material-symbols-outlined">swap_vert</span>
-                </button>
-              </div>
-            </div>
-          </div>
+          <span class="form-section__title">Identificación</span>
         </div>
 
-        <!-- ── Columna derecha ── -->
-        <div class="form-col">
-
-          <!-- 3. Información Financiera -->
-          <div class="form-section">
-            <div class="form-section__header">
-              <div class="section-icon section-icon--blue">
-                <span class="material-symbols-outlined filled">payments</span>
-              </div>
-              <span class="form-section__title">Información Financiera</span>
-            </div>
-
-            <div class="field-group">
-              <label class="field-label">PROVEEDOR ASOCIADO</label>
-              <select class="field-select" formControlName="proveedor">
-                <option value="">Seleccione un proveedor</option>
-                <option *ngFor="let p of PROVEEDORES" [value]="p">{{ p }}</option>
-              </select>
-            </div>
-
-            <div class="valor-container">
-              <div class="field-group">
-                <label class="field-label">VALOR UNITARIO NETO <span class="required">*</span></label>
-                <div class="currency-input">
-                  <span class="currency-symbol">$</span>
-                  <input class="field-input" formControlName="valorNeto" type="number" placeholder="0.00" />
-                </div>
-              </div>
-
-              <div class="field-group">
-                <label class="field-label">IVA (%)</label>
-                <select class="field-select" formControlName="iva">
-                  <option *ngFor="let opt of IVA_OPTIONS" [value]="opt.value">{{ opt.label }}</option>
-                </select>
-              </div>
-
-              <div class="total-row">
-                <span class="total-label">Valor Total con IVA</span>
-                <span class="total-value">$ {{ valorTotal() | number:'1.2-2' }}</span>
-              </div>
-            </div>
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label">CÓD. INTERNO SENA</label>
+            <input class="field-input field-input--disabled" formControlName="codigoSena"
+                   [placeholder]="mode === 'create' ? 'Autogenerado' : ''" />
+            @if (mode === 'create') {
+<p class="field-hint">Se generará automáticamente al guardar</p>
+}
           </div>
-
-          <!-- Última modificación (solo edición) -->
-          <div class="mod-info" *ngIf="mode === 'edit'">
-            <span class="material-symbols-outlined">history</span>
-            <span>Última modificación: <strong>12 Oct 2024, 08:34 AM</strong> por <a href="#" class="mod-link">Admin_Sena_Bogota</a></span>
+          <div class="field-group">
+            <label class="field-label">CÓD. PROVEEDOR</label>
+            <input class="field-input" formControlName="codigoProveedor" placeholder="Ej. PRV-992" />
           </div>
         </div>
       </div>
+
+      <!-- 2. Datos del producto -->
+      <div class="form-section">
+        <div class="form-section__header">
+          <div class="section-icon section-icon--green">
+            <span class="material-symbols-outlined filled">warehouse</span>
+          </div>
+          <span class="form-section__title">Datos del Producto</span>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">NOMBRE DEL BIEN <span class="required">*</span></label>
+          <input class="field-input" formControlName="nombre"
+                 placeholder="Descripción clara del activo"
+                 [class.field-input--error]="hasError('nombre')" />
+          @if (hasError('nombre')) {
+<p class="field-error">El nombre es obligatorio (mín. 3 caracteres)</p>
+}
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">DESCRIPCIÓN</label>
+          <input class="field-input" formControlName="descripcion" placeholder="Descripción detallada (opcional)" />
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label">CATEGORÍA <span class="required">*</span></label>
+            <select class="field-select" formControlName="categoria"
+                    [class.field-input--error]="hasError('categoria')">
+              <option value="" disabled>Seleccione una categoría</option>
+              @for (cat of CATEGORIAS; track cat) {
+<option [value]="cat">{{ cat }}</option>
+}
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">
+              UNIDAD DE MEDIDA (UM) <span class="required">*</span>
+              @if (umBloqueada()) {
+<span class="um-lock-badge">
+                <span class="material-symbols-outlined">lock</span>
+                Bloqueada — tiene historial
+              </span>
+}
+            </label>
+            <select class="field-select" formControlName="unidadMedida"
+                    [class.field-input--disabled]="umBloqueada()">
+              <option value="" disabled>Seleccionar UM</option>
+              <option value="UND">UND – Unidad</option>
+              <option value="KG">KG – Kilogramo</option>
+              <option value="L">L – Litro</option>
+              <option value="M">M – Metro</option>
+              <option value="SET">SET – Set</option>
+              <option value="CAJA">CAJA – Caja</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- Footer -->

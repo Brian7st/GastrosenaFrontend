@@ -98,10 +98,10 @@ export class FacturasListPageComponent implements OnInit {
 
   getEstadoBadgeClass(estado: EstadoFactura): string {
     const map: Record<EstadoFactura, string> = {
-      Registrada: 'status-badge--registrada',
-      Verificada: 'status-badge--verificada',
-      Pagada:     'status-badge--pagada',
-      Anulada:    'status-badge--anulada',
+      REGISTRADA: 'status-badge--registrada',
+      VERIFICADA: 'status-badge--verificada',
+      PAGADA:     'status-badge--pagada',
+      ANULADA:    'status-badge--anulada',
     };
     return map[estado] ?? 'status-badge--default';
   }
