@@ -176,4 +176,13 @@ export class SolicitudesService {
         catchError(err => throwError(() => err))
       );
   }
+
+  updateSolicitud(id: string | number, payload: Partial<SolicitudGil>): Observable<SolicitudGil> {
+    return this.http
+      .patch<GilResponse>(`${API}/procurement/giles/${id}`, payload)
+      .pipe(
+        map(gilFromApi),
+        catchError(err => throwError(() => err))
+      );
+  }
 }
