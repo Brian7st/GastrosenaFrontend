@@ -199,6 +199,101 @@
     </button>
   </div>
 
+  <!-- Consolidar Solicitudes Aprobadas (Generar GIL) Section -->
+  <div class="form-card form-card--bordered">
+    <h3 class="section-title">
+      <span class="material-symbols-outlined section-icon">library_add_check</span>
+      Consolidar Solicitudes Aprobadas (Generar GIL)
+    </h3>
+    <p class="form-hint mb-4" style="margin-top: -0.5rem; color: var(--color-text-secondary, #666);">
+      Seleccione las solicitudes aprobadas para consolidar en una Guía de Ingreso Local (GIL).
+    </p>
+
+    <div class="consolidar-container">
+      <!-- Columna Izquierda: Tabla Compacta de Solicitudes -->
+      <div class="consolidar-main">
+        <div class="toolbar-compact">
+          <div class="search-box-compact">
+            <span class="material-symbols-outlined search-icon">search</span>
+            <input 
+              type="text" 
+              placeholder="Buscar por código o solicitante..." 
+              [value]="searchTerm()"
+              (input)="searchTerm.set($any($event.target).value)"
+            />
+          </div>
+        </div>
+
+        <div class="table-container-compact">
+          <table class="styled-table-compact">
+            <thead>
+              <tr>
+                <th class="w-checkbox"></th>
+                <th>Código / Ficha</th>
+                <th>Solicitante</th>
+                <th>Resumen</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of filteredSolicitudes(); track row) {
+                <tr [class.row-disabled]="!isAprobada(row.estado)">
+                  <td class="td-checkbox">
+                    @if (isAprobada(row.estado)) {
+                      <label class="custom-checkbox">
+                        <input 
+                          type="checkbox" 
+                          [checked]="isSelected(row.id)"
+                          (change)="toggleSelection(row.id)"
+                        />
+                        <span class="checkmark">
+                          <span class="material-symbols-outlined icon">check</span>
+                        </span>
+                      </label>
+                    }
+                  </td>
+                  <td class="font-medium text-dark line-clamp">
+                    {{ row.codigoFicha }}
+                  </td>
+                  <td class="text-dark">{{ row.solicitante }}</td>
+                  <td class="text-muted">{{ row.totalBienes }} ítems</td>
+                  <td>
+                    <span class="estado-badge estado-badge--{{ row.estado | lowercase }}">
+                      {{ row.estado }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Columna Derecha: Panel de Acciones -->
+      <div class="consolidar-sidebar">
+        <div class="summary-box-compact">
+          <div class="summary-item-compact">
+            <span>Seleccionadas</span>
+            <span class="value">{{ solicitudesSeleccionadas() }}</span>
+          </div>
+          <div class="summary-item-compact">
+            <span>Ítems a consolidar</span>
+            <span class="value">{{ itemsTotalesConsolidar() }}</span>
+          </div>
+          
+          <restaurant-button 
+            variant="primary" 
+            class="w-full mt-4"
+            [disabled]="solicitudesSeleccionadas() === 0"
+            (click)="onGenerar()">
+            Generar GIL
+            <span class="material-symbols-outlined right-icon" style="margin-left: 0.25rem;">arrow_forward</span>
+          </restaurant-button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Observaciones -->
   <div class="form-card mb-12">
     <label class="form-label mb-4">Observaciones</label>
@@ -215,6 +310,45 @@
   </div>
 
 </div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     MODAL DE CONFIRMACIÓN
+══════════════════════════════════════════════════════════════════════════ -->
+@if (showModal()) {
+<div class="modal-overlay">
+  <!-- Background Backdrop -->
+  <div class="modal-backdrop" (click)="cerrarModal()"></div>
+
+  <!-- Modal Container -->
+  <div class="modal-container">
+    <div class="modal-header-strip modal-header-strip--primary"></div>
+    <div class="modal-body">
+      <div class="modal-icon-container modal-icon-container--primary">
+        <span class="material-symbols-outlined modal-icon">library_add_check</span>
+      </div>
+      
+      <div class="modal-text-center">
+        <h3 class="modal-title">Confirmar Consolidación</h3>
+        <p class="modal-desc">
+          ¿Estás seguro de generar la Guía de Ingreso Local (GIL) con 
+          <span class="font-bold">{{ solicitudesSeleccionadas() }}</span> 
+          solicitudes seleccionadas y un total de 
+          <span class="font-bold">{{ itemsTotalesConsolidar() }}</span> ítems?
+        </p>
+      </div>
+
+      <div class="modal-actions-col">
+        <restaurant-button variant="primary" (click)="confirmarGeneracion()">
+          Confirmar y Generar GIL
+        </restaurant-button>
+        <restaurant-button variant="surface" (click)="cerrarModal()">
+          Cancelar
+        </restaurant-button>
+      </div>
+    </div>
+  </div>
+</div>
+}
 
 <!-- Footer -->
 <footer class="page-footer">
