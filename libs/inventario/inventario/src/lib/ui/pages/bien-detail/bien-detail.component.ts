@@ -6,7 +6,6 @@ import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { ButtonComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
 import { BienFormComponent } from '../../modals/bien-form/bien-form.component';
 import { BienFormDto, EstadoBien } from '../../../models/inventario.model';
-import { MOVIMIENTOS_MOCK } from '../../../models/inventario.mock';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 
 @Component({
@@ -48,7 +47,7 @@ export class BienDetailPageComponent implements OnInit {
 
   private loadData(id: string): void {
     this.facade.cargarBienPorId(id);
-    this.movimientos.set(MOVIMIENTOS_MOCK);
+    this.movimientos.set([]);
   }
 
   onVolver(): void {
