@@ -406,3 +406,11 @@
 .filled {
   font-variation-settings: 'FILL' 1;
 }
+
+.imagen-preview {
+  margin-top: 0.5rem;
+  max-height: 120px;
+  border-radius: 0.5rem;
+  object-fit: contain;
+  border: 1px solid #e2e8f0;
+}

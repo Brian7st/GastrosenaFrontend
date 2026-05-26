@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MovimientoBien } from '../../../models/inventario.model';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
-import { StatusBadgeComponent } from '@restaurant/shared/ui';
+import { ButtonComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
 import { BienFormComponent } from '../../modals/bien-form/bien-form.component';
 import { BienFormDto, EstadoBien } from '../../../models/inventario.model';
 import { MOVIMIENTOS_MOCK } from '../../../models/inventario.mock';
@@ -12,7 +12,7 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
 @Component({
   selector: 'restaurant-bien-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, BienFormComponent, BackButtonComponent, StatusBadgeComponent],
+  imports: [CommonModule, RouterModule, BienFormComponent, BackButtonComponent, StatusBadgeComponent, ButtonComponent],
   templateUrl: './bien-detail.component.html',
   styleUrl: './bien-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

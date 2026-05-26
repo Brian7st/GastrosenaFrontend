@@ -45,6 +45,7 @@ export class BienFormComponent implements OnInit {
         descripcion:     this.bien.descripcion ?? '',
         categoria:       this.bien.categoria,
         unidadMedida:    this.bien.unidadMedida,
+        imagenUrl:       this.bien.imagenUrl ?? '',
       });
       if (this.umBloqueada()) {
         this.form.get('unidadMedida')?.disable();
@@ -60,6 +61,7 @@ export class BienFormComponent implements OnInit {
       descripcion:     [''],
       categoria:       ['', Validators.required],
       unidadMedida:    ['', Validators.required],
+      imagenUrl:       [''],
     });
   }
 
