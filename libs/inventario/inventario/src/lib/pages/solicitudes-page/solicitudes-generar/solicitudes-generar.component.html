@@ -46,9 +46,11 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let row of filteredSolicitudes()" [class.row-disabled]="!isAprobada(row.estado)">
+              @for (row of filteredSolicitudes(); track row) {
+<tr [class.row-disabled]="!isAprobada(row.estado)">
                 <td class="td-checkbox">
-                  <label class="custom-checkbox" *ngIf="isAprobada(row.estado)">
+                  @if (isAprobada(row.estado)) {
+<label class="custom-checkbox">
                     <input 
                       type="checkbox" 
                       [checked]="isSelected(row.id)"
@@ -58,6 +60,7 @@
                       <span class="material-symbols-outlined icon">check</span>
                     </span>
                   </label>
+}
                 </td>
                 <td class="font-medium text-dark line-clamp">
                   {{ row.codigoFicha }}
@@ -70,6 +73,7 @@
                   </span>
                 </td>
               </tr>
+}
             </tbody>
           </table>
         </div>
@@ -122,7 +126,8 @@
 <!-- ══════════════════════════════════════════════════════════════════════════
      MODAL DE CONFIRMACIÓN
 ══════════════════════════════════════════════════════════════════════════ -->
-<div *ngIf="showModal()" class="modal-overlay">
+@if (showModal()) {
+<div class="modal-overlay">
   <!-- Background Backdrop -->
   <div class="modal-backdrop" (click)="cerrarModal()"></div>
 
@@ -145,13 +150,14 @@
       </div>
 
       <div class="modal-actions-col">
-        <button (click)="confirmarGeneracion()" class="btn-modal btn-modal--primary">
+        <restaurant-button variant="primary" (click)="confirmarGeneracion()">
           Confirmar y Generar GIL
-        </button>
-        <button (click)="cerrarModal()" class="btn-modal btn-modal--secondary">
+        </restaurant-button>
+        <restaurant-button variant="surface" (click)="cerrarModal()">
           Cancelar
-        </button>
+        </restaurant-button>
       </div>
     </div>
   </div>
 </div>
+}

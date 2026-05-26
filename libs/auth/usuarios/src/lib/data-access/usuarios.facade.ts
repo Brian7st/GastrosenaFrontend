@@ -1,23 +1,29 @@
 import { inject, Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Usuario } from '@restaurant/shared/models';
 import { AppState } from '@restaurant/shared/state';
 import {
   ActualizarUsuarioRequest,
   CrearUsuarioRequest,
+  ExportarConfig,
   FiltrosUsuarios,
   ImportarUsuariosRequest,
+  UsuarioDetalle,
 } from '../models/usuarios.model';
 import { UsuariosActions } from './store/actions/usuarios.actions';
 import { UsuariosState } from './store/reducers/usuarios.reducer';
 import {
   selectError,
   selectHayError,
+  selectHistorial,
   selectImportando,
-  selectLoadingAccion,
   selectLoading,
+  selectLoadingAccion,
+  selectLoadingHistorial,
+  selectLoadingRolesDetalle,
+  selectMensajeExport,
   selectResultadoImport,
   selectRoles,
+  selectRolesDetalle,
   selectTotalActivos,
   selectTotalElements,
   selectTotalInactivos,
@@ -43,7 +49,12 @@ export class UsuariosFacade {
   readonly totalInactivos$      = this.store.select(selectTotalInactivos);
   readonly importando$          = this.store.select(selectImportando);
   readonly resultadoImport$     = this.store.select(selectResultadoImport);
+  readonly mensajeExport$       = this.store.select(selectMensajeExport);
   readonly hayError$            = this.store.select(selectHayError);
+  readonly historial$           = this.store.select(selectHistorial);
+  readonly loadingHistorial$    = this.store.select(selectLoadingHistorial);
+  readonly rolesDetalle$        = this.store.select(selectRolesDetalle);
+  readonly loadingRolesDetalle$ = this.store.select(selectLoadingRolesDetalle);
 
   // ── Comandos ──────────────────────────────────────────────────────────────
   cargarUsuarios(filtros?: Partial<FiltrosUsuarios>): void {
@@ -82,15 +93,23 @@ export class UsuariosFacade {
     this.store.dispatch(UsuariosActions.importarMasivo({ request }));
   }
 
-  exportarUsuarios(): void {
-    this.store.dispatch(UsuariosActions.exportarUsuarios());
+  exportarUsuarios(config: ExportarConfig): void {
+    this.store.dispatch(UsuariosActions.exportarUsuarios({ config }));
   }
 
-  seleccionarUsuario(usuario: Usuario): void {
+  seleccionarUsuario(usuario: UsuarioDetalle): void {
     this.store.dispatch(UsuariosActions.seleccionarUsuario({ usuario }));
   }
 
   limpiarSeleccion(): void {
     this.store.dispatch(UsuariosActions.limpiarSeleccion());
+  }
+
+  cargarHistorial(): void {
+    this.store.dispatch(UsuariosActions.cargarHistorial());
+  }
+
+  cargarRolesDetalle(): void {
+    this.store.dispatch(UsuariosActions.cargarRolesDetalle());
   }
 }

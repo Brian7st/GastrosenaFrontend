@@ -42,9 +42,28 @@
             <option>Jorge Eduardo Londoño</option>
           </select>
           <button class="btn-link btn-link--add mt-2" type="button" (click)="onAddCuentadante()">
-            <span class="material-symbols-outlined">add</span>
-            Agregar otro cuentadante
+            <span class="material-symbols-outlined">{{ mostrarNuevaCuenta() ? 'remove' : 'add' }}</span>
+            {{ mostrarNuevaCuenta() ? 'Cancelar' : 'Agregar otro cuentadante' }}
           </button>
+
+          <div class="nueva-cuenta-panel" [class.nueva-cuenta-panel--visible]="mostrarNuevaCuenta()">
+            <div class="form-group mt-2">
+              <label class="form-label">Nombre del nuevo cuentadante</label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Ej. Juan Pablo Gómez"
+                [value]="nuevaCuenta()"
+                (input)="nuevaCuenta.set($any($event.target).value)"
+              />
+            </div>
+            <button class="btn-link btn-link--add mt-2" type="button"
+                    [disabled]="!nuevaCuenta().trim()"
+                    (click)="onConfirmarCuentadante()">
+              <span class="material-symbols-outlined">check_circle</span>
+              Confirmar cuentadante
+            </button>
+          </div>
         </div>
 
         <div class="form-group">
@@ -156,7 +175,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let bien of bienes(); let i = index">
+          @for (bien of bienes(); track bien; let i = $index) {
+<tr>
             <td class="font-medium">{{ bien.codigo }}</td>
             <td class="text-secondary">{{ bien.descripcion }}</td>
             <td class="text-secondary">{{ bien.um }}</td>
@@ -169,6 +189,7 @@
               </button>
             </td>
           </tr>
+}
         </tbody>
       </table>
     </div>

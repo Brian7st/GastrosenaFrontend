@@ -110,11 +110,11 @@
 
     <!-- ── Footer ──────────────────────────────────────────────────── -->
     <div class="modal-footer">
-      <button class="btn-cancel" (click)="cerrar()">Cancelar</button>
-      <button class="btn-confirm" (click)="onConfirmar()">
+      <restaurant-button variant="surface" (click)="cerrar()">Cancelar</restaurant-button>
+      <restaurant-button variant="primary" (click)="onConfirmar()">
         <span class="material-symbols-outlined">check_circle</span>
         Confirmar Resolución
-      </button>
+      </restaurant-button>
     </div>
 
   </div>

@@ -256,6 +256,20 @@
 
 /* Action buttons use restaurant-button component */
 
+/* ── Panel nueva cuenta (SOL-01) ─────────────────────────────────────────── */
+.nueva-cuenta-panel {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height var(--duration-base) var(--ease-decelerate),
+              opacity var(--duration-fast) ease;
+
+  &--visible {
+    max-height: 120px;
+    opacity: 1;
+  }
+}
+
 /* ── Page Footer ─────────────────────────────────────────────────────────── */
 .page-footer {
   margin-top: auto;

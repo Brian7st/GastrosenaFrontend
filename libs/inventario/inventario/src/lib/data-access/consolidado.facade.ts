@@ -1,6 +1,8 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { catchError, finalize, of } from 'rxjs';
 import { ConsolidadoService } from './services/consolidado.service';
 import { Consolidado } from '../models/consolidado.model';
+import { EjecucionPresupuestal } from '../models/reporting.model';
 
 @Injectable({
   providedIn: 'root'
@@ -8,72 +10,90 @@ import { Consolidado } from '../models/consolidado.model';
 export class ConsolidadoFacade {
   private consolidadoService = inject(ConsolidadoService);
 
-  private _consolidados = signal<Consolidado[]>([]);
-  private _consolidadoSeleccionado = signal<Consolidado | null>(null);
-  private _loading = signal<boolean>(false);
+  private _consolidados              = signal<Consolidado[]>([]);
+  private _consolidadoSeleccionado   = signal<Consolidado | null>(null);
+  private _ejecucionPresupuestal     = signal<EjecucionPresupuestal[]>([]);
+  private _loading                   = signal<boolean>(false);
+  private _error                     = signal<string | null>(null);
 
-  // Computed public signals
-  consolidados = computed(() => this._consolidados());
-  consolidadoSeleccionado = computed(() => this._consolidadoSeleccionado());
-  loading = computed(() => this._loading());
+  consolidados              = computed(() => this._consolidados());
+  consolidadoSeleccionado   = computed(() => this._consolidadoSeleccionado());
+  ejecucionPresupuestal     = computed(() => this._ejecucionPresupuestal());
+  loading                   = computed(() => this._loading());
+  error                     = computed(() => this._error());
 
   loadAll(): void {
     this._loading.set(true);
-    this.consolidadoService.getConsolidados().subscribe({
-      next: (data) => {
-        this._consolidados.set(data);
-        this._loading.set(false);
-      },
-      error: (err) => {
-        console.error('Error cargando consolidados', err);
-        this._loading.set(false);
-      }
-    });
+    this.consolidadoService.getConsolidados()
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al cargar los consolidados');
+          return of([]);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(data => this._consolidados.set(data));
   }
 
   cargarConsolidado(id: string): void {
     this._loading.set(true);
-    this.consolidadoService.getConsolidado(id).subscribe({
-      next: (data) => {
-        this._consolidadoSeleccionado.set(data ?? null);
-        this._loading.set(false);
-      },
-      error: (err) => {
-        console.error('Error cargando detalle consolidado', err);
-        this._loading.set(false);
-      }
-    });
+    this.consolidadoService.getConsolidado(id)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al cargar el detalle del consolidado');
+          return of(undefined);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(data => this._consolidadoSeleccionado.set(data ?? null));
   }
 
   generarConsolidado(gils: string[]): void {
     this._loading.set(true);
-    this.consolidadoService.generarConsolidado(gils).subscribe({
-      next: (data) => {
-        // Optionally append the new item or just reload all
-        this._consolidados.update(list => [data, ...list]);
-        this._loading.set(false);
-      },
-      error: (err) => {
-        console.error('Error generando consolidado', err);
-        this._loading.set(false);
-      }
-    });
+    this.consolidadoService.generarConsolidado(gils)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al generar el consolidado');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(data => {
+        if (data) this._consolidados.update(list => [data, ...list]);
+      });
+  }
+
+  /** GET /reporting/ejecucion-presupuestal */
+  cargarEjecucionPresupuestal(params?: { fichaId?: string; vigencia?: number }): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this.consolidadoService.getEjecucionPresupuestal(params)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al cargar la ejecución presupuestal');
+          return of([]);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(data => this._ejecucionPresupuestal.set(data));
   }
 
   reversarConsolidado(id: string): void {
     this._loading.set(true);
-    this.consolidadoService.reversarConsolidado(id).subscribe({
-      next: () => {
-        // Optimistic update
-        this._consolidados.update(list => 
-          list.map(c => c.id === id ? { ...c, estado: 'Reversado', variant: 'danger' } : c)
-        );
-        this._loading.set(false);
-      },
-      error: (err) => {
-        console.error('Error reversando consolidado', err);
-        this._loading.set(false);
-      }
-    });
+    this.consolidadoService.reversarConsolidado(id)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al reversar el consolidado');
+          return of(false);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(ok => {
+        if (ok) {
+          this._consolidados.update(list =>
+            list.map(c => c.id === id ? { ...c, estado: 'REVERSADO' as const } : c)
+          );
+        }
+      });
   }
 }

@@ -1,7 +1,8 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
 import { AlertasService } from './services/alertas.service';
 import { Alerta, RegistroHistorial, UmbralConfig } from '../models/alerta.model';
-import { finalize, catchError, of, firstValueFrom } from 'rxjs';
+import { ResumenAlertas } from '../models/reporting.model';
+import { finalize, catchError, of, firstValueFrom, forkJoin } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,21 +10,23 @@ import { finalize, catchError, of, firstValueFrom } from 'rxjs';
 export class AlertasFacade {
   private alertasService = inject(AlertasService);
 
-  // Estados internos (Signals)
-  private _alertas = signal<Alerta[]>([]);
-  private _alertaSeleccionada = signal<Alerta | undefined>(undefined);
-  private _historial = signal<RegistroHistorial[]>([]);
-  private _umbrales  = signal<UmbralConfig[]>([]);
-  private _loading = signal<boolean>(false);
-  private _error = signal<string | null>(null);
+  // ── Estado interno ────────────────────────────────────────────────────────
+  private _alertas              = signal<Alerta[]>([]);
+  private _alertaSeleccionada   = signal<Alerta | undefined>(undefined);
+  private _historial            = signal<RegistroHistorial[]>([]); // legacy, mantenido por compat
+  private _resumenAlertas       = signal<ResumenAlertas | null>(null);
+  private _umbrales             = signal<UmbralConfig[]>([]);
+  private _loading              = signal<boolean>(false);
+  private _error                = signal<string | null>(null);
 
-  // Exposición pública (Solo lectura)
-  public alertas = computed(() => this._alertas());
+  // ── Exposición pública ────────────────────────────────────────────────────
+  public alertas            = computed(() => this._alertas());
   public alertaSeleccionada = computed(() => this._alertaSeleccionada());
-  public historial = computed(() => this._historial());
-  public umbrales  = computed(() => this._umbrales());
-  public loading = computed(() => this._loading());
-  public error = computed(() => this._error());
+  public historial          = computed(() => this._historial());
+  public resumenAlertas     = computed(() => this._resumenAlertas());
+  public umbrales           = computed(() => this._umbrales());
+  public loading            = computed(() => this._loading());
+  public error              = computed(() => this._error());
 
   /**
    * Carga inicial de datos.
@@ -58,18 +61,19 @@ export class AlertasFacade {
     }
   }
 
-  /** Carga el historial de resoluciones de alertas. */
-  cargarHistorial(): void {
+  /** GET /reporting/alertas/resumen — carga el resumen de alertas */
+  cargarHistorial(destinatarioId?: string): void {
     this._loading.set(true);
-    this.alertasService.getHistorial()
+    this._error.set(null);
+    this.alertasService.getResumenAlertas(destinatarioId)
       .pipe(
         catchError(() => {
-          this._error.set('Error al cargar el historial de alertas');
-          return of([]);
+          this._error.set('Error al cargar el resumen de alertas');
+          return of(null);
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe(data => this._historial.set(data));
+      .subscribe(data => { if (data) this._resumenAlertas.set(data); });
   }
 
   /** Carga la configuración de umbrales. */
@@ -88,22 +92,39 @@ export class AlertasFacade {
 
   /**
    * Guarda los umbrales de configuración.
+   * Llama PUT /alerts/alertas/umbrales/{productoId} por cada umbral modificado.
    */
   guardarUmbrales(nuevosUmbrales: UmbralConfig[]): void {
+    if (!nuevosUmbrales.length) return;
     this._loading.set(true);
-    this.alertasService.updateUmbrales(nuevosUmbrales)
+    const requests$ = nuevosUmbrales.map(u =>
+      this.alertasService.updateUmbral(u.id, u.stockMinimo)
+    );
+    forkJoin(requests$)
       .pipe(
         catchError(() => {
           this._error.set('Error al guardar umbrales');
-          return of(false);
+          return of([]);
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe((res) => {
-        if (res) {
-          this._umbrales.set(nuevosUmbrales);
-        }
+      .subscribe(res => {
+        if (res.length) this._umbrales.set(nuevosUmbrales);
       });
+  }
+
+  /** Exporta el historial de alertas en formato CSV. */
+  exportarHistorialCSV(): void {
+    this._loading.set(true);
+    this.alertasService.exportarHistorialCSV()
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al exportar el historial');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe();
   }
 
   /** Resuelve una alerta con datos tipados. */

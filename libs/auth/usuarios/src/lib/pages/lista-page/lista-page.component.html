@@ -1,1 +1,170 @@
-<p>lista-page.component works!</p>
+<div class="lista-page">
+
+  <!-- Page Header -->
+  <div class="lista-page__header">
+    <div class="lista-page__header-text">
+      <h1 class="lista-page__title">Gestión de Usuarios</h1>
+      <p class="lista-page__subtitle">Administrá los accesos y roles del equipo</p>
+    </div>
+    <div class="lista-page__header-actions">
+      <button class="lista-page__btn lista-page__btn--ghost" type="button" (click)="mostrarImportar.set(true)">
+        <lucide-icon name="upload" [size]="16"></lucide-icon>
+        Importar
+      </button>
+      <button class="lista-page__btn lista-page__btn--ghost" type="button" (click)="mostrarExportar.set(true)">
+        <lucide-icon name="download" [size]="16"></lucide-icon>
+        Exportar
+      </button>
+      <button class="lista-page__btn lista-page__btn--primary" type="button" (click)="onCrearUsuario()">
+        <lucide-icon name="user-plus" [size]="16"></lucide-icon>
+        Nuevo Usuario
+      </button>
+    </div>
+  </div>
+
+  @if (mensajeExport()) {
+    <restaurant-alert
+      [type]="mensajeExport()!.tipo"
+      [message]="mensajeExport()!.texto"
+    ></restaurant-alert>
+  }
+
+  <!-- KPI Cards -->
+  <div class="lista-page__kpis">
+    <restaurant-kpi-card
+      label="Total Usuarios"
+      [value]="totalMostrar().toString()"
+      icon="users"
+      iconColor="blue"
+    ></restaurant-kpi-card>
+    <restaurant-kpi-card
+      label="Activos"
+      [value]="activosMostrar().toString()"
+      icon="user-check"
+      iconColor="green"
+    ></restaurant-kpi-card>
+    <restaurant-kpi-card
+      label="Inactivos"
+      [value]="inactivosMostrar().toString()"
+      icon="user-x"
+      iconColor="red"
+    ></restaurant-kpi-card>
+  </div>
+
+  <!-- Filtros -->
+  <div class="lista-page__filters">
+    <restaurant-search-filter
+      label="Buscar"
+      placeholder="Nombre, email o documento..."
+      [value]="busqueda()"
+      (valueChange)="busqueda.set($event)"
+    ></restaurant-search-filter>
+    <restaurant-select-filter
+      label="Rol"
+      [value]="rolFiltro()"
+      [options]="rolOpciones()"
+      (valueChange)="rolFiltro.set($event)"
+    ></restaurant-select-filter>
+  </div>
+
+  <!-- Tabla -->
+  <restaurant-data-table>
+    <thead>
+      <tr>
+        <th>Usuario</th>
+        <th>Rol</th>
+        <th>Estado</th>
+        <th>Último acceso</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (loading()) {
+        <tr>
+          <td colspan="5" class="lista-page__loading">
+            <lucide-icon name="loader-circle" [size]="20"></lucide-icon>
+            Cargando usuarios...
+          </td>
+        </tr>
+      } @else if (usuariosMostrar().length === 0) {
+        <tr>
+          <td colspan="5" class="lista-page__empty">Sin resultados</td>
+        </tr>
+      } @else {
+        @for (u of usuariosMostrar(); track u.id) {
+          <tr>
+            <td>
+              <div class="lista-page__user">
+                <restaurant-usuario-avatar
+                  [nombre]="u.nombre"
+                  [apellidos]="u.apellidos"
+                ></restaurant-usuario-avatar>
+                <div>
+                  <p class="lista-page__user-name">{{ u.nombre }} {{ u.apellidos }}</p>
+                  <p class="lista-page__user-email">{{ u.email }}</p>
+                </div>
+              </div>
+            </td>
+            <td>
+              <restaurant-usuario-rol-badge [rol]="u.rol"></restaurant-usuario-rol-badge>
+            </td>
+            <td>
+              <span
+                class="lista-page__badge"
+                [class.lista-page__badge--activo]="u.activo"
+                [class.lista-page__badge--inactivo]="!u.activo"
+              >
+                {{ u.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td class="lista-page__last-access">
+              {{ (u.ultimoAcceso | date:'dd/MM/yyyy') || '—' }}
+            </td>
+            <td>
+              <div class="lista-page__actions">
+                <button class="lista-page__action-btn" type="button" (click)="onEditarUsuario(u)" aria-label="Editar">
+                  <lucide-icon name="pencil" [size]="16"></lucide-icon>
+                </button>
+                <button
+                  class="lista-page__action-btn lista-page__action-btn--danger"
+                  type="button"
+                  (click)="onEliminar(u.id)"
+                  aria-label="Eliminar"
+                >
+                  <lucide-icon name="trash-2" [size]="16"></lucide-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+      }
+    </tbody>
+  </restaurant-data-table>
+
+</div>
+
+<!-- Modals -->
+@if (mostrarExportar()) {
+  <restaurant-exportar-usuarios
+    [totalUsuarios]="totalElements()"
+    (cerrar)="mostrarExportar.set(false)"
+    (exportar)="onExportar($event)"
+  ></restaurant-exportar-usuarios>
+}
+
+@if (mostrarImportar()) {
+  <restaurant-importar-usuarios
+    [resultado]="resultadoImport()"
+    [importando]="importando()"
+    (cerrar)="mostrarImportar.set(false)"
+    (importar)="onImportar($event)"
+  ></restaurant-importar-usuarios>
+}
+
+@if (mostrarFormulario()) {
+  <restaurant-usuario-form
+    [usuario]="usuarioEditando()"
+    (cerrar)="onCerrarFormulario()"
+    (guardar)="onGuardarUsuario($event)"
+  ></restaurant-usuario-form>
+}

@@ -1,19 +1,30 @@
-export type EstadoGil = 'Borrador' | 'Pendiente' | 'Validado' | 'Aprobado' | 'Procesado';
+export type EstadoGil = 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'CERRADO';
+
+export interface CuentadanteGil {
+  id: string | number;
+  nombre: string;
+  documento?: string;
+}
 
 export interface SolicitudGil {
   id: string | number;
-  codigo: string;          // Consecutivo GIL-F-014-YYYY-NNN
-  fecha: string;           // Fecha de emisión o creación
-  centroCostos: string;
+  numeroGil: string;           // Consecutivo GIL-F-014-YYYY-NNN
+  fecha: string;               // Fecha de emisión o creación
+  centroFormacionId: string;
   area: string;
-  cuentadante: string;     // Instructor/responsable principal
+  cuentadantes: CuentadanteGil[];
   destino: string;
-  ficha: string;           // Código tipo ADSO-2670687
+  fichaId: string;             // Código tipo ADSO-2670687
   estado: EstadoGil;
-  totalBienes?: number;    // Cantidad de ítems
-  montoTotal?: number;     // Valor total en COP
-  avatarColor?: string;    // Color del avatar para el listado
-  bienes?: BienSolicitud[]; // Lista de bienes
+  programaId?: string;
+  emitidoPor?: string;
+  resultadoAprendizaje?: string;
+  actividades?: string;
+  voceroNombre?: string;
+  voceroDocumento?: string;
+  solicitudesOrigenIds?: string[];
+  observaciones?: string;
+  bienes?: BienSolicitud[];
 }
 
 export interface BienSolicitud {
@@ -30,4 +41,21 @@ export interface SolicitudesGilFiltros {
   instructor?: string;
   estado?: EstadoGil;
   fechaRango?: string;
+}
+
+export interface CrearSolicitudData {
+  fecha: string;
+  centroFormacionId?: string;
+  area?: string;
+  cuentadantes?: CuentadanteGil[];
+  destino?: string;
+  fichaId?: string;
+}
+
+export interface ActualizarSolicitudData {
+  centroFormacionId?: string;
+  area?: string;
+  cuentadantes?: CuentadanteGil[];
+  destino?: string;
+  fichaId?: string;
 }

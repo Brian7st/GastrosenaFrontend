@@ -12,13 +12,13 @@ import { LucideIconComponent } from '@restaurant/shared/ui';
 })
 export class DetalleRecetaComponent {
   @Input({ required: true }) receta!: Receta;
-  @Output() close = new EventEmitter<void>();
+  @Output() closeDetail = new EventEmitter<void>();
 
   cerrar() {
-    this.close.emit();
+    this.closeDetail.emit();
   }
 
-  cerrarModal(event: MouseEvent) {
+  cerrarModal() {
     // Si se hace clic en el fondo gris, se cierra el modal
     this.cerrar();
   }

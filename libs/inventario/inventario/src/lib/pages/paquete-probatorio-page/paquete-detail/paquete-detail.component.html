@@ -28,19 +28,19 @@
     </div>
     <div class="paquete-detail__header-actions">
       @if (isCompleto()) {
-        <button class="paquete-detail__btn-secondary">
+        <restaurant-button variant="surface" (click)="exportarPaquete()">
           <lucide-icon name="download" [size]="16"></lucide-icon>
           Exportar Paquete
-        </button>
-        <button class="paquete-detail__btn-primary">
+        </restaurant-button>
+        <restaurant-button variant="primary" (click)="archivarExpediente()">
           <lucide-icon name="archive" [size]="16"></lucide-icon>
           Archivar Expediente
-        </button>
+        </restaurant-button>
       } @else {
-        <button class="paquete-detail__btn-disabled" disabled>
+        <restaurant-button variant="surface" [disabled]="true">
           <lucide-icon name="archive" [size]="16"></lucide-icon>
           Archivar Expediente
-        </button>
+        </restaurant-button>
         <p class="paquete-detail__btn-hint">
           <lucide-icon name="alert-triangle" [size]="12"></lucide-icon>
           Todos los 3 documentos son requeridos
@@ -65,13 +65,13 @@
           <div class="paquete-detail__trace-card">
             <p class="paquete-detail__trace-label">Enlace GIL</p>
             <a class="paquete-detail__trace-link" href="#">
-              {{ p.gilVinculado }}
+              {{ p.gilId }}
               <lucide-icon name="external-link" [size]="12"></lucide-icon>
             </a>
           </div>
           <div class="paquete-detail__trace-card">
             <p class="paquete-detail__trace-label">Código CUFE</p>
-            <p class="paquete-detail__trace-cufe">{{ p.cufe || 'Sin asignar' }}</p>
+            <p class="paquete-detail__trace-cufe">{{ p.cufeFuenteId || 'Sin asignar' }}</p>
           </div>
         </div>
       </section>
@@ -83,55 +83,79 @@
           <h3 class="paquete-detail__section-title">Documentos del Paquete</h3>
         </div>
         <div class="paquete-detail__docs-grid">
-          @for (doc of p.documentos; track doc.tipo) {
-            <div
-              class="paquete-detail__doc-card"
-              [class.paquete-detail__doc-card--missing]="!doc.vinculado"
-            >
-              <!-- Icon -->
-              <div class="paquete-detail__doc-icon-wrapper" [class.paquete-detail__doc-icon-wrapper--missing]="!doc.vinculado">
-                @if (doc.tipo === 'acta') {
-                  <lucide-icon name="file-text" [size]="20"></lucide-icon>
-                } @else if (doc.tipo === 'requisicion') {
-                  <lucide-icon name="scroll-text" [size]="20"></lucide-icon>
-                } @else {
-                  <lucide-icon name="users" [size]="20"></lucide-icon>
-                }
-              </div>
 
-              <!-- Text -->
-              <h4 class="paquete-detail__doc-name">
-                {{ doc.tipo === 'acta' ? 'Acta de Legalización' : doc.tipo === 'requisicion' ? 'Requisición' : 'Asistencia' }}
-              </h4>
-
-              @if (doc.vinculado) {
-                <p class="paquete-detail__doc-sub">{{ doc.referencia || 'Documento adjunto' }}</p>
-                <div class="paquete-detail__doc-footer">
-                  @if (doc.tipo === 'requisicion') {
-                    <a class="paquete-detail__doc-link" [routerLink]="['./requisicion']">
-                      Ver documento
-                      <lucide-icon name="arrow-right" [size]="14"></lucide-icon>
-                    </a>
-                  } @else {
-                    <a class="paquete-detail__doc-link" href="#">
-                      Ver documento
-                      <lucide-icon name="arrow-right" [size]="14"></lucide-icon>
-                    </a>
-                  }
-                  <button class="paquete-detail__doc-change">
-                    <lucide-icon name="refresh-cw" [size]="12"></lucide-icon>
-                    Cambiar
-                  </button>
-                </div>
-              } @else {
-                <p class="paquete-detail__doc-missing-text">Falta adjuntar</p>
-                <button class="paquete-detail__doc-upload-btn" (click)="irAdjuntar()">
-                  <lucide-icon name="upload" [size]="14"></lucide-icon>
-                  Adjuntar
-                </button>
-              }
+          <!-- Acta de Legalización -->
+          <div class="paquete-detail__doc-card" [class.paquete-detail__doc-card--missing]="!p.actaId">
+            <div class="paquete-detail__doc-icon-wrapper" [class.paquete-detail__doc-icon-wrapper--missing]="!p.actaId">
+              <lucide-icon name="file-text" [size]="20"></lucide-icon>
             </div>
-          }
+            <h4 class="paquete-detail__doc-name">Acta de Legalización</h4>
+            @if (p.actaId) {
+              <p class="paquete-detail__doc-sub">{{ p.actaId }}</p>
+              <div class="paquete-detail__doc-footer">
+                <a class="paquete-detail__doc-link" (click)="verDocumento('acta')" role="button" style="cursor:pointer;">
+                  Ver documento <lucide-icon name="arrow-right" [size]="14"></lucide-icon>
+                </a>
+                <button class="paquete-detail__doc-change" (click)="cambiarDocumento('acta')">
+                  <lucide-icon name="refresh-cw" [size]="12"></lucide-icon> Cambiar
+                </button>
+              </div>
+            } @else {
+              <p class="paquete-detail__doc-missing-text">Falta adjuntar</p>
+              <button class="paquete-detail__doc-upload-btn" (click)="irAdjuntar()">
+                <lucide-icon name="upload" [size]="14"></lucide-icon> Adjuntar
+              </button>
+            }
+          </div>
+
+          <!-- Requisición -->
+          <div class="paquete-detail__doc-card" [class.paquete-detail__doc-card--missing]="!p.requisicionId">
+            <div class="paquete-detail__doc-icon-wrapper" [class.paquete-detail__doc-icon-wrapper--missing]="!p.requisicionId">
+              <lucide-icon name="scroll-text" [size]="20"></lucide-icon>
+            </div>
+            <h4 class="paquete-detail__doc-name">Requisición</h4>
+            @if (p.requisicionId) {
+              <p class="paquete-detail__doc-sub">{{ p.requisicionId }}</p>
+              <div class="paquete-detail__doc-footer">
+                <a class="paquete-detail__doc-link" [routerLink]="['./requisicion']">
+                  Ver documento <lucide-icon name="arrow-right" [size]="14"></lucide-icon>
+                </a>
+                <button class="paquete-detail__doc-change" (click)="cambiarDocumento('requisicion')">
+                  <lucide-icon name="refresh-cw" [size]="12"></lucide-icon> Cambiar
+                </button>
+              </div>
+            } @else {
+              <p class="paquete-detail__doc-missing-text">Falta adjuntar</p>
+              <button class="paquete-detail__doc-upload-btn" (click)="irAdjuntar()">
+                <lucide-icon name="upload" [size]="14"></lucide-icon> Adjuntar
+              </button>
+            }
+          </div>
+
+          <!-- Registro de Asistencia -->
+          <div class="paquete-detail__doc-card" [class.paquete-detail__doc-card--missing]="!p.registroAsistenciaAdjunto">
+            <div class="paquete-detail__doc-icon-wrapper" [class.paquete-detail__doc-icon-wrapper--missing]="!p.registroAsistenciaAdjunto">
+              <lucide-icon name="users" [size]="20"></lucide-icon>
+            </div>
+            <h4 class="paquete-detail__doc-name">Asistencia</h4>
+            @if (p.registroAsistenciaAdjunto) {
+              <p class="paquete-detail__doc-sub">Documento adjunto</p>
+              <div class="paquete-detail__doc-footer">
+                <a class="paquete-detail__doc-link" (click)="verDocumento('asistencia')" role="button" style="cursor:pointer;">
+                  Ver documento <lucide-icon name="arrow-right" [size]="14"></lucide-icon>
+                </a>
+                <button class="paquete-detail__doc-change" (click)="cambiarDocumento('asistencia')">
+                  <lucide-icon name="refresh-cw" [size]="12"></lucide-icon> Cambiar
+                </button>
+              </div>
+            } @else {
+              <p class="paquete-detail__doc-missing-text">Falta adjuntar</p>
+              <button class="paquete-detail__doc-upload-btn" (click)="irAdjuntar()">
+                <lucide-icon name="upload" [size]="14"></lucide-icon> Adjuntar
+              </button>
+            }
+          </div>
+
         </div>
       </section>
     </div>

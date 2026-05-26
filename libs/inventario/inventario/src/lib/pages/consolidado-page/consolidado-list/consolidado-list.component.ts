@@ -1,17 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { ButtonComponent, DataTableComponent, KpiCardComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
 import { ExportarConsolidadoModalComponent } from '../components/exportar-consolidado-modal/exportar-consolidado-modal.component';
 import { ReversarConsolidadoModalComponent } from '../components/reversar-consolidado-modal/reversar-consolidado-modal.component';
-import { Consolidado, ConsolidadoMock } from '../../../models/consolidado.model';
-
-interface ConsolidadoKpis {
-  retencionZese: number;
-  ivaAcumulado: number;
-  totalEjecutado: number;
-  gilsPendientes: number;
-}
+import { Consolidado } from '../../../models/consolidado.model';
+import { ConsolidadoFacade } from '../../../data-access/consolidado.facade';
 
 @Component({
   selector: 'restaurant-consolidado-list',
@@ -21,20 +15,36 @@ interface ConsolidadoKpis {
   styleUrl: './consolidado-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ConsolidadoListComponent {
+export class ConsolidadoListComponent implements OnInit {
   private router = inject(Router);
+  private facade = inject(ConsolidadoFacade);
 
-  showExportModal = signal(false);
-  showReversarModal = signal(false);
+  // ── Estado reactivo desde facade ─────────────────────────────────────────
+  consolidados = this.facade.consolidados;
+  loading      = this.facade.loading;
+
+  showExportModal      = signal(false);
+  showReversarModal    = signal(false);
   selectedReversarItem = signal<Consolidado | null>(null);
-  isReversarBlocked = signal(false);
+  isReversarBlocked    = signal(false);
 
-  kpis = signal<ConsolidadoKpis>({
-    retencionZese: 1452890,
-    ivaAcumulado: 3842120.45,
-    totalEjecutado: 12980500,
-    gilsPendientes: 14
-  });
+  // ── KPIs derivados de la lista real ─────────────────────────────────────
+  kpiTotalEjecutado = computed(() =>
+    this.consolidados().reduce((acc, c) => acc + c.totales.totalGeneral, 0)
+  );
+  kpiContabilizados = computed(() =>
+    this.consolidados().filter(c => c.estado === 'CONTABILIZADO').length
+  );
+  kpiGenerados = computed(() =>
+    this.consolidados().filter(c => c.estado === 'GENERADO').length
+  );
+  kpiReversados = computed(() =>
+    this.consolidados().filter(c => c.estado === 'REVERSADO').length
+  );
+
+  ngOnInit(): void {
+    this.facade.loadAll();
+  }
 
   openExportModal(): void {
     this.showExportModal.set(true);
@@ -44,16 +54,13 @@ export class ConsolidadoListComponent {
     this.showExportModal.set(false);
   }
 
-  onExport(format: 'excel' | 'pdf'): void {
-    // TODO: llamar a consolidadoFacade.exportar(format)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onExport(_format: 'excel' | 'pdf'): void {
+    // Exportación real pendiente de integración HTTP
     this.showExportModal.set(false);
   }
 
-  // Mocks para la tabla de consolidados históricos
-  consolidados = signal<Consolidado[]>(ConsolidadoMock);
-
   goToDetail(id: string): void {
-    // Navigate to the detail view based on ID
     this.router.navigate(['/app/inventario/consolidado', id]);
   }
 
@@ -61,10 +68,18 @@ export class ConsolidadoListComponent {
     const item = this.consolidados().find(c => c.id === id);
     if (item) {
       this.selectedReversarItem.set(item);
-      // Mock logic: block if variant is 'success' (e.g. Contabilizado) just to show both modals for demo.
-      this.isReversarBlocked.set(item.variant === 'success');
+      this.isReversarBlocked.set(item.estado === 'CONTABILIZADO');
       this.showReversarModal.set(true);
     }
+  }
+
+  getVariantFromEstado(estado: string): 'info' | 'success' | 'danger' | 'warning' {
+    const map: Record<string, 'info' | 'success' | 'danger' | 'warning'> = {
+      GENERADO:      'info',
+      CONTABILIZADO: 'success',
+      REVERSADO:     'danger',
+    };
+    return map[estado] ?? 'warning';
   }
 
   closeReversarModal(): void {
@@ -73,9 +88,8 @@ export class ConsolidadoListComponent {
   }
 
   confirmReversar(): void {
-    if (this.selectedReversarItem()) {
-      // TODO: llamar a consolidadoFacade.reversarConsolidado(this.selectedReversarItem()!.id)
-    }
+    const id = this.selectedReversarItem()?.id;
+    if (id) this.facade.reversarConsolidado(id);
     this.closeReversarModal();
   }
 }

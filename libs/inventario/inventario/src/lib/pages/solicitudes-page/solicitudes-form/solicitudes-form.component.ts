@@ -1,9 +1,10 @@
-import { Component, ChangeDetectionStrategy, signal, inject, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
-import { BienSolicitud, BIENES_SOLICITUD_MOCK } from '../../../models/solicitudes-gil.mock';
+import { BienSolicitud } from '../../../models/solicitudes-gil.mock';
+import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 
 @Component({
   selector: 'restaurant-solicitudes-form',
@@ -13,26 +14,37 @@ import { BienSolicitud, BIENES_SOLICITUD_MOCK } from '../../../models/solicitude
   styleUrl: './solicitudes-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SolicitudesFormComponent implements OnInit {
+export class SolicitudesFormComponent {
   private router = inject(Router);
+  private facade = inject(SolicitudesFacade);
 
-  fechaSolicitud = signal('2024-05-20');
-  
-  bienes = signal<BienSolicitud[]>([...BIENES_SOLICITUD_MOCK]);
+  // ── Estado reactivo desde facade ─────────────────────────────────────────
+  loading = this.facade.loading;
 
-  ngOnInit(): void { /* no route params needed here */ }
+  fechaSolicitud    = signal('2024-05-20');
+  bienes            = signal<BienSolicitud[]>([]);
+  mostrarNuevaCuenta = signal(false);
+  nuevaCuenta       = signal('');
 
   onCancel(): void {
     this.router.navigate(['/app/inventario/solicitudes-gil']);
   }
 
   onSave(): void {
-    // TODO: llamar a solicitudesFacade.crearSolicitud(dto) cuando exista la facade
+    this.facade.crearSolicitud({ fecha: this.fechaSolicitud() });
     this.router.navigate(['/app/inventario/solicitudes-gil']);
   }
 
   onAddCuentadante(): void {
-    // TODO: abrir selector de cuentadante
+    this.mostrarNuevaCuenta.update(v => !v);
+    if (!this.mostrarNuevaCuenta()) {
+      this.nuevaCuenta.set('');
+    }
+  }
+
+  onConfirmarCuentadante(): void {
+    this.mostrarNuevaCuenta.set(false);
+    this.nuevaCuenta.set('');
   }
 
   onAddBien(): void {

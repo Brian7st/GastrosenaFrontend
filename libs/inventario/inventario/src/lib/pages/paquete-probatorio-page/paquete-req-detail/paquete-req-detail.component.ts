@@ -3,30 +3,37 @@ import {
   Component,
   inject,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute, Router } from '@angular/router';
 import { LucideIconComponent } from '@restaurant/shared/ui';
+import { PaqueteFacade } from '../../../data-access/paquete.facade';
 
 @Component({
   selector: 'restaurant-paquete-req-detail',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, LucideIconComponent],
+  imports: [LucideIconComponent],
   templateUrl: './paquete-req-detail.component.html',
   styleUrl: './paquete-req-detail.component.scss',
 })
 export class PaqueteReqDetailComponent {
   private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private route  = inject(ActivatedRoute);
+  private facade = inject(PaqueteFacade);
+
+  // ── Estado reactivo desde facade ─────────────────────────────────────────
+  loading = this.facade.loading;
 
   cerrarPanel(): void {
-    // Navigate relative to the parent (detail view)
     this.router.navigate(['../'], { relativeTo: this.route });
   }
 
   incluirEnPaquete(): void {
-    // TODO(paquete-facade): llamar facade.incluirRequisicionEnPaquete(...)
-    console.warn('incluirEnPaquete: pendiente integración con PaqueteFacade');
+    const paqueteId = this.route.parent?.snapshot.paramMap.get('id') ?? '';
+    const reqId     = this.route.snapshot.queryParamMap.get('reqId') ?? '';
+    if (paqueteId) {
+      this.facade.incluirRequisicion(paqueteId, reqId);
+    }
     this.cerrarPanel();
   }
 }

@@ -153,17 +153,19 @@ export const importarMasivo$ = createEffect(
   { functional: true },
 );
 
+// Corrección 1 — exportarUsuarios con parámetros
 export const exportarUsuarios$ = createEffect(
   (actions$ = inject(Actions), svc = inject(UsuariosService)) =>
     actions$.pipe(
       ofType(UsuariosActions.exportarUsuarios),
-      concatMap(() =>
-        svc.exportarUsuarios().pipe(
+      concatMap(({ config }) =>
+        svc.exportarUsuarios(config).pipe(
           map(blob => {
-            const url = URL.createObjectURL(blob);
+            const ext    = config.formato === 'csv' ? 'csv' : 'xlsx';
+            const url    = URL.createObjectURL(blob);
             const anchor = document.createElement('a');
-            anchor.href = url;
-            anchor.download = `usuarios_${new Date().toISOString().split('T')[0]}.xlsx`;
+            anchor.href     = url;
+            anchor.download = `usuarios_${new Date().toISOString().split('T')[0]}.${ext}`;
             anchor.click();
             URL.revokeObjectURL(url);
             return UsuariosActions.exportarUsuariosExitoso();
@@ -173,6 +175,57 @@ export const exportarUsuarios$ = createEffect(
           ),
         ),
       ),
+    ),
+  { functional: true },
+);
+
+export const cargarRolesDetalle$ = createEffect(
+  (actions$ = inject(Actions), svc = inject(UsuariosService)) =>
+    actions$.pipe(
+      ofType(UsuariosActions.cargarRolesDetalle),
+      switchMap(() =>
+        svc.getRolesDetalle().pipe(
+          map(roles => UsuariosActions.cargarRolesDetalleExitoso({ roles })),
+          catchError((err: unknown) =>
+            of(UsuariosActions.cargarRolesDetalleFallido({ error: extractErrorMessage(err) })),
+          ),
+        ),
+      ),
+    ),
+  { functional: true },
+);
+
+export const cargarHistorial$ = createEffect(
+  (actions$ = inject(Actions), svc = inject(UsuariosService)) =>
+    actions$.pipe(
+      ofType(UsuariosActions.cargarHistorial),
+      switchMap(() =>
+        svc.getHistorial().pipe(
+          map(historial => UsuariosActions.cargarHistorialExitoso({ historial })),
+          catchError((err: unknown) =>
+            of(UsuariosActions.cargarHistorialFallido({ error: extractErrorMessage(err) })),
+          ),
+        ),
+      ),
+    ),
+  { functional: true },
+);
+
+// Corrección 4 — recargar lista tras crear/eliminar
+export const recargarTrasCrear$ = createEffect(
+  (actions$ = inject(Actions)) =>
+    actions$.pipe(
+      ofType(UsuariosActions.crearUsuarioExitoso),
+      map(() => UsuariosActions.cargarUsuarios({})),
+    ),
+  { functional: true },
+);
+
+export const recargarTrasEliminar$ = createEffect(
+  (actions$ = inject(Actions)) =>
+    actions$.pipe(
+      ofType(UsuariosActions.eliminarUsuarioExitoso),
+      map(() => UsuariosActions.cargarUsuarios({})),
     ),
   { functional: true },
 );

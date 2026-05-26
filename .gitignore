@@ -33,6 +33,7 @@ log_implementacion.md
 
 # Documentos locales de desarrollo (no subir al repo)
 docs/informacionRestaurante/
+BACKLOG_FRONTEND_ORGANIZADO.md
 
 # Inteligencia Artificial - prompts y especificaciones locales
 .ai/domains/inventario.md

@@ -21,7 +21,8 @@
 </div>
 
 <!-- Summary Dashboard Stats -->
-<div class="kpi-grid" *ngIf="kpis() as k">
+@if (kpis(); as k) {
+<div class="kpi-grid">
 
   <restaurant-kpi-card
     label="Valor Total Inventario"
@@ -51,6 +52,7 @@
   />
 
 </div>
+}
 
 <!-- Dashboard Card Container (Tabla) -->
 <div class="card-container">
@@ -73,7 +75,8 @@
   </div>
 
   <!-- Data Table -->
-  <ng-container *ngIf="!loading(); else loadingTemplate">
+  @if (!loading()) {
+
     <div class="table-scroll">
       <table class="data-table">
         <thead>
@@ -90,7 +93,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let bien of bienes()" class="table-row">
+          @for (bien of bienes(); track bien) {
+<tr class="table-row">
             <td>
               <span class="code-mono">{{ bien.codigoSena }}</span>
             </td>
@@ -133,48 +137,70 @@
               </div>
             </td>
           </tr>
+}
         </tbody>
       </table>
     </div>
 
     <!-- Pagination Footer -->
     <div class="pagination-footer">
-      <p class="pagination-info">MOSTRANDO {{ bienes().length }} DE {{ bienes().length }} BIENES</p>
+      <p class="pagination-info">
+        MOSTRANDO {{ bienes().length }} DE {{ paginacion().totalElements }} BIENES
+      </p>
       <div class="pagination-controls">
-        <button class="page-btn" disabled>
+        <button class="page-btn"
+          [disabled]="paginacion().page === 0"
+          (click)="onIrAPagina(paginacion().page - 1)">
           <span class="material-symbols-outlined">chevron_left</span>
         </button>
-        <button class="page-btn page-btn--active">1</button>
-        <button class="page-btn" disabled>
+        @for (p of paginas(); track p) {
+          <button class="page-btn"
+            [class.page-btn--active]="p === paginacion().page"
+            (click)="onIrAPagina(p)">
+            {{ p + 1 }}
+          </button>
+        }
+        <button class="page-btn"
+          [disabled]="paginacion().page >= paginacion().totalPages - 1"
+          (click)="onIrAPagina(paginacion().page + 1)">
           <span class="material-symbols-outlined">chevron_right</span>
         </button>
       </div>
     </div>
-  </ng-container>
+  
+} @else {
 
-  <ng-template #loadingTemplate>
     <restaurant-loading-skeleton [rows]="5" [columns]="10"></restaurant-loading-skeleton>
-  </ng-template>
+  
+}
+
+  
 </div>
 
 <!-- Modales -->
+@if (showFormModal()) {
 <restaurant-bien-form
-  *ngIf="showFormModal()"
+ 
   [mode]="formMode()"
   [bien]="selectedBien()"
   (save)="onSaveBien($event)"
   (cancel)="showFormModal.set(false)"
 ></restaurant-bien-form>
+}
 
+@if (showDeleteModal() && selectedBien()) {
 <restaurant-bien-delete-modal
-  *ngIf="showDeleteModal() && selectedBien()"
+ 
   [bien]="selectedBien()!"
   (cancel)="showDeleteModal.set(false)"
   (confirm)="confirmarEliminacion()"
 ></restaurant-bien-delete-modal>
+}
 
+@if (showImportModal()) {
 <restaurant-bien-import
-  *ngIf="showImportModal()"
+ 
   (cancel)="showImportModal.set(false)"
   (import)="onProcessImport($event)"
 ></restaurant-bien-import>
+}

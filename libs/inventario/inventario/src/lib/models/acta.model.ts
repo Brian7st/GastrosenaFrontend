@@ -3,16 +3,16 @@
  * RF-5.10 — Legalización de materiales de formación por sesión.
  */
 
-export type ActaEstado = 'borrador' | 'pendiente' | 'firmada' | 'revisada' | 'archivada';
+export type ActaEstado = 'BORRADOR' | 'PENDIENTE_FIRMAS' | 'FIRMADA' | 'REVISADA' | 'ARCHIVADA';
 
 export interface ActaLegalizacion {
   id: string;
-  consecutivo: string;
-  fechaTaller: string;
+  numeroActa: string;
+  fecha: string;
   programa: string;
-  ficha: string;
-  instructor: string;
-  requisicion: string;
+  fichaId: string;
+  instructorId: string;
+  requisicionId: string;
   estado: ActaEstado;
   ciudad?: string;
   lugar?: string;
@@ -45,13 +45,13 @@ export interface FirmanteActa {
 export const MOCK_ACTAS: ActaLegalizacion[] = [
   {
     id: '1',
-    consecutivo: 'Acta #0120',
-    fechaTaller: '12 Oct 2023',
+    numeroActa: 'Acta #0120',
+    fecha: '12 Oct 2023',
     programa: 'Cocina Básica',
-    ficha: '24501A',
-    instructor: 'Chef Sebastián',
-    requisicion: '45-S',
-    estado: 'borrador',
+    fichaId: '24501A',
+    instructorId: 'Chef Sebastián',
+    requisicionId: '45-S',
+    estado: 'BORRADOR',
     ciudad: 'Armenia',
     lugar: 'Escuela de Gastronomía',
     agendaSesion: 'Legalizar la entrega y consumo de materiales correspondientes al taller de cocina programado.',
@@ -61,13 +61,13 @@ export const MOCK_ACTAS: ActaLegalizacion[] = [
   },
   {
     id: '2',
-    consecutivo: 'Acta #0121',
-    fechaTaller: '14 Oct 2023',
+    numeroActa: 'Acta #0121',
+    fecha: '14 Oct 2023',
     programa: 'Panadería Artesanal',
-    ficha: '24502B',
-    instructor: 'Chef Valentina',
-    requisicion: '46-P',
-    estado: 'pendiente',
+    fichaId: '24502B',
+    instructorId: 'Chef Valentina',
+    requisicionId: '46-P',
+    estado: 'PENDIENTE_FIRMAS',
     ciudad: 'Armenia',
     lugar: 'Escuela de Gastronomía',
     agendaSesion: 'Legalizar entrega de materiales para clase de panadería artesanal.',
@@ -77,13 +77,13 @@ export const MOCK_ACTAS: ActaLegalizacion[] = [
   },
   {
     id: '3',
-    consecutivo: 'Acta #0122',
-    fechaTaller: '15 Oct 2023',
+    numeroActa: 'Acta #0122',
+    fecha: '15 Oct 2023',
     programa: 'Taller de Salsas Madre',
-    ficha: '24503C',
-    instructor: 'Chef Sebastián',
-    requisicion: '48-S',
-    estado: 'firmada',
+    fichaId: '24503C',
+    instructorId: 'Chef Sebastián',
+    requisicionId: '48-S',
+    estado: 'FIRMADA',
     ciudad: 'Armenia',
     lugar: 'Escuela de Gastronomía',
     agendaSesion: 'Legalizar materiales utilizados en sesión de salsas madre.',
@@ -93,13 +93,13 @@ export const MOCK_ACTAS: ActaLegalizacion[] = [
   },
   {
     id: '4',
-    consecutivo: 'Acta #0123',
-    fechaTaller: '18 Oct 2023',
+    numeroActa: 'Acta #0123',
+    fecha: '18 Oct 2023',
     programa: 'Cocina Internacional',
-    ficha: '24504D',
-    instructor: 'Chef Alejandro',
-    requisicion: '50-I',
-    estado: 'revisada',
+    fichaId: '24504D',
+    instructorId: 'Chef Alejandro',
+    requisicionId: '50-I',
+    estado: 'REVISADA',
     ciudad: 'Armenia',
     lugar: 'Escuela de Gastronomía',
     agendaSesion: 'Legalizar materiales consumidos en clase de cocina internacional.',
@@ -109,13 +109,13 @@ export const MOCK_ACTAS: ActaLegalizacion[] = [
   },
   {
     id: '5',
-    consecutivo: 'Acta #0124',
-    fechaTaller: '20 Oct 2023',
+    numeroActa: 'Acta #0124',
+    fecha: '20 Oct 2023',
     programa: 'Repostería Fina',
-    ficha: '24505E',
-    instructor: 'Chef Valentina',
-    requisicion: '52-R',
-    estado: 'archivada',
+    fichaId: '24505E',
+    instructorId: 'Chef Valentina',
+    requisicionId: '52-R',
+    estado: 'ARCHIVADA',
     ciudad: 'Armenia',
     lugar: 'Escuela de Gastronomía',
     agendaSesion: 'Legalizar insumos utilizados en taller de repostería fina.',

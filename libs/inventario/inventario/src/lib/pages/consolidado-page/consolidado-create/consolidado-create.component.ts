@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { ButtonComponent, DataTableComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { GilItem, GIL_ITEMS_MOCK } from '../../../models/consolidado.model';
+import { ConsolidadoFacade } from '../../../data-access/consolidado.facade';
 
 @Component({
   selector: 'restaurant-consolidado-create',
@@ -14,8 +15,9 @@ import { GilItem, GIL_ITEMS_MOCK } from '../../../models/consolidado.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConsolidadoCreateComponent {
-  private router = inject(Router);
+  private router   = inject(Router);
   private location = inject(Location);
+  private facade   = inject(ConsolidadoFacade);
 
   gils = signal<GilItem[]>(GIL_ITEMS_MOCK);
 
@@ -63,7 +65,10 @@ export class ConsolidadoCreateComponent {
   }
 
   confirmar(): void {
-    // TODO: llamar a consolidadoFacade.generarConsolidado(this.gils().filter(g => g.selected).map(g => g.id))
+    const ids = this.gils().filter(g => g.selected && g.estado === 'Disponible').map(g => g.id);
+    if (ids.length > 0) {
+      this.facade.generarConsolidado(ids);
+    }
     this.router.navigate(['/app/inventario/consolidado']);
   }
 }

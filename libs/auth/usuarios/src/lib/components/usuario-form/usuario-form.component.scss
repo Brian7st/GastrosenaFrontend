@@ -1,0 +1,60 @@
+@use '../../styles/modal';
+@include modal.base(540px);
+
+.modal {
+  &__header-icon--user {
+    background: var(--color-brand-primary-soft);
+    color: var(--color-brand-primary-strong);
+  }
+
+  &__field {
+    gap: var(--space-1);
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+  }
+
+  &__input {
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+    background: var(--color-surface-primary);
+    font-family: var(--font-family-base);
+    transition: border-color var(--duration-fast) var(--ease-standard);
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: var(--color-text-secondary);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-primario);
+      box-shadow: var(--focus-ring);
+    }
+
+    &--error {
+      border-color: var(--color-error-text);
+
+      &:focus {
+        border-color: var(--color-error-text);
+        box-shadow: 0 0 0 3px var(--color-error-bg);
+      }
+    }
+  }
+
+  &__select--error {
+    border-color: var(--color-error-text);
+  }
+
+  &__error {
+    font-size: var(--font-size-xs);
+    color: var(--color-error-text);
+  }
+}

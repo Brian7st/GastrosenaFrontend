@@ -27,18 +27,17 @@ export class SolicitudesListComponent implements OnInit {
 
   // ─── KPIs calculados (4 tarjetas del prototipo) ────────────────────────────
   totalSolicitudes   = computed(() => this.solicitudes().length);
-  totalBorradores    = computed(() => this.solicitudes().filter(s => s.estado === 'Borrador').length);
-  enTramite          = computed(() => this.solicitudes().filter(s => s.estado === 'Pendiente' || s.estado === 'Validado').length);
-  finalizadas        = computed(() => this.solicitudes().filter(s => s.estado === 'Aprobado' || s.estado === 'Procesado').length);
+  totalBorradores    = computed(() => this.solicitudes().filter(s => s.estado === 'BORRADOR').length);
+  enTramite          = computed(() => this.solicitudes().filter(s => s.estado === 'EMITIDO' || s.estado === 'ENVIADO_PROVEEDOR').length);
+  finalizadas        = computed(() => this.solicitudes().filter(s => s.estado === 'CERRADO').length);
 
   // ─── Opciones filtros ──────────────────────────────────────────────────────
   estadoOptions = [
-    { value: '', label: 'Filtrar por Estado' },
-    { value: 'Borrador',  label: 'Borrador'  },
-    { value: 'Pendiente', label: 'Pendiente' },
-    { value: 'Validado',  label: 'Validado'  },
-    { value: 'Aprobado',  label: 'Aprobado'  },
-    { value: 'Procesado', label: 'Procesado' },
+    { value: '',                  label: 'Filtrar por Estado'  },
+    { value: 'BORRADOR',          label: 'Borrador'            },
+    { value: 'EMITIDO',           label: 'Emitido'             },
+    { value: 'ENVIADO_PROVEEDOR', label: 'Enviado a Proveedor' },
+    { value: 'CERRADO',           label: 'Cerrado'             },
   ];
 
   fechaOptions = [
@@ -58,6 +57,15 @@ export class SolicitudesListComponent implements OnInit {
       .toUpperCase();
   }
 
+  getAvatarColor(id: string | number): string {
+    const colors = ['blue', 'purple', 'amber', 'green', 'slate'];
+    return colors[Number(id) % colors.length];
+  }
+
+  getMontoTotal(s: SolicitudGil): number {
+    return s.bienes?.reduce((acc, b) => acc + b.subtotal, 0) ?? 0;
+  }
+
   formatCOP(value: number): string {
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
@@ -67,20 +75,14 @@ export class SolicitudesListComponent implements OnInit {
     }).format(value);
   }
 
-  /** Editar solo está habilitado en Borrador o Pendiente */
+  /** Editar solo está habilitado en Borrador o Emitido */
   canEdit(estado: string): boolean {
-    return estado === 'Borrador' || estado === 'Pendiente';
+    return estado === 'BORRADOR' || estado === 'EMITIDO';
   }
 
   onSearch(term: string): void        { this.facade.setFiltros({ busqueda: term }); }
-  onFilterEstado(v: string): void      {
-    // TODO: llamar a solicitudesFacade.setFiltros(...) cuando exista la facade
-    this.facade.setFiltros({ estado: v ? (v as EstadoGil) : undefined });
-  }
-  onFilterFecha(v: string): void       {
-    // TODO: llamar a solicitudesFacade.setFiltros(...) cuando exista la facade
-    this.facade.setFiltros({ fechaRango: v });
-  }
+  onFilterEstado(v: string): void { this.facade.setFiltros({ estado: v ? (v as EstadoGil) : undefined }); }
+  onFilterFecha(v: string): void  { this.facade.setFiltros({ fechaRango: v }); }
   onExportPdf(id: string | number): void {
     this.router.navigate(['/app/inventario/solicitudes-gil', id, 'exportar']);
   }
@@ -99,8 +101,8 @@ export class SolicitudesListComponent implements OnInit {
   // ── Actions ──────────────────────────────────────────────────────────────
   onDelete(item: SolicitudGil): void {
     this.itemToDelete.set(item);
-    // Simulating block logic: Only 'Borrador' can be deleted
-    if (item.estado !== 'Borrador') {
+    // Simulating block logic: Only 'BORRADOR' can be deleted
+    if (item.estado !== 'BORRADOR') {
       this.deleteBlocked.set(true);
     } else {
       this.deleteBlocked.set(false);
@@ -114,7 +116,7 @@ export class SolicitudesListComponent implements OnInit {
   }
 
   confirmDelete(): void {
-    const id = this.itemToDelete()?.codigo;
+    const id = this.itemToDelete()?.numeroGil;
     if (id) {
       this.facade.eliminarSolicitud(id);
     }
