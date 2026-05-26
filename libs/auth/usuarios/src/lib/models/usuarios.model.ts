@@ -59,3 +59,28 @@ export interface ExportarConfig {
   incluirInactivos: boolean;
   rol:              string;
 }
+
+export interface PermisoItem {
+  id:          string;
+  nombre:      string;
+  descripcion: string;
+  activo:      boolean;
+}
+
+export interface RolDetalle {
+  id:            string;
+  nombre:        string;
+  descripcion:   string;
+  permisos:      PermisoItem[];
+  totalUsuarios: number;
+}
+
+export interface HistorialItem {
+  id:            string;
+  usuarioNombre: string;
+  usuarioEmail:  string;
+  accion:        'LOGIN' | 'LOGOUT' | 'CREAR' | 'EDITAR' | 'ELIMINAR' | 'BLOQUEO';
+  fecha:         string;
+  ip:            string;
+  detalles:      string;
+}

@@ -1,8 +1,8 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
-import { Bien, BienFiltros, BienKpis, BienFormDto } from '../models/inventario.model';
+import { Bien, BienFiltros, BienKpis, BienFormDto, BienPaginacion } from '../models/inventario.model';
 import { ExportacionProductosResponse } from './api/catalog.api';
 import { BienesService } from './services/bienes.service';
-import { finalize, catchError, of } from 'rxjs';
+import { finalize, catchError, of, switchMap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +14,8 @@ export class InventarioFacade {
   private _bienes              = signal<Bien[]>([]);
   private _kpis                = signal<BienKpis | null>(null);
   private _loading             = signal<boolean>(false);
-  private _filtros             = signal<BienFiltros>({});
+  private _filtros             = signal<BienFiltros>({ page: 0, size: 10 });
+  private _paginacion          = signal<BienPaginacion>({ totalElements: 0, totalPages: 1, page: 0, size: 10 });
   private _bienSeleccionado    = signal<Bien | undefined>(undefined);
   private _exportacionPendiente = signal<ExportacionProductosResponse | null>(null);
   private _error               = signal<string | null>(null);
@@ -24,6 +25,7 @@ export class InventarioFacade {
   public kpis                 = computed(() => this._kpis());
   public loading              = computed(() => this._loading());
   public filtros              = computed(() => this._filtros());
+  public paginacion           = computed(() => this._paginacion());
   public bienSeleccionado     = computed(() => this._bienSeleccionado());
   public exportacionPendiente = computed(() => this._exportacionPendiente());
   public error                = computed(() => this._error());
@@ -38,20 +40,42 @@ export class InventarioFacade {
 
   /**
    * Carga el listado de bienes aplicando los filtros actuales.
+   * Al cambiar filtros de búsqueda/categoría vuelve a página 0.
    */
   cargarBienes(filtros?: BienFiltros): void {
-    if (filtros) this._filtros.set(filtros);
-    
+    if (filtros) this._filtros.set({ ...this._filtros(), ...filtros, page: 0 });
+
     this._loading.set(true);
     this.bienesService.getBienes(this._filtros())
       .pipe(
         catchError(() => {
           this._error.set('Error al cargar la lista de bienes');
-          return of([]);
+          return of({ bienes: [], paginacion: { totalElements: 0, totalPages: 1, page: 0, size: 10 } });
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe(data => this._bienes.set(data));
+      .subscribe(({ bienes, paginacion }) => {
+        this._bienes.set(bienes);
+        this._paginacion.set(paginacion);
+      });
+  }
+
+  /** Navega a una página específica sin resetear los filtros. */
+  irAPagina(page: number): void {
+    this._filtros.update(f => ({ ...f, page }));
+    this._loading.set(true);
+    this.bienesService.getBienes(this._filtros())
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al cargar la página');
+          return of({ bienes: [], paginacion: this._paginacion() });
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(({ bienes, paginacion }) => {
+        this._bienes.set(bienes);
+        this._paginacion.set(paginacion);
+      });
   }
 
   /**
@@ -93,24 +117,24 @@ export class InventarioFacade {
   }
 
   /**
-   * Elimina un bien y refresca los datos.
+   * Elimina un bien: primero desactiva (PATCH /desactivar), luego elimina (DELETE).
+   * El backend requiere que el producto esté inactivo antes de aceptar el DELETE.
    */
   eliminarBien(id: string | number): void {
     this._loading.set(true);
-    this.bienesService.deleteBien(id)
-      .pipe(
-        catchError(() => {
-          this._error.set('Error al eliminar el bien');
-          return of(null);
-        }),
-        finalize(() => this._loading.set(false))
-      )
-      .subscribe((res) => {
-        if (res !== null) {
-          this.cargarBienes();
-          this.cargarKpis();
-        }
-      });
+    this.bienesService.desactivarBien(id).pipe(
+      switchMap(() => this.bienesService.deleteBien(id)),
+      catchError(() => {
+        this._error.set('Error al eliminar el bien');
+        return of(null);
+      }),
+      finalize(() => this._loading.set(false))
+    ).subscribe((res) => {
+      if (res !== null) {
+        this.cargarBienes();
+        this.cargarKpis();
+      }
+    });
   }
 
   /**

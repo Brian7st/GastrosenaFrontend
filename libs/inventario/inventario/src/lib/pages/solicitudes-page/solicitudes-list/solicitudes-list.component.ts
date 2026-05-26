@@ -19,14 +19,19 @@ export class SolicitudesListComponent implements OnInit {
   private router  = inject(Router);
 
   solicitudes = this.facade.solicitudes;
-  loading = this.facade.loading;
+  loading     = this.facade.loading;
+  paginacion  = this.facade.paginacion;
+
+  paginas = computed(() =>
+    Array.from({ length: this.paginacion().totalPages }, (_, i) => i)
+  );
 
   ngOnInit(): void {
     this.facade.loadAll();
   }
 
-  // ─── KPIs calculados (4 tarjetas del prototipo) ────────────────────────────
-  totalSolicitudes   = computed(() => this.solicitudes().length);
+  // ─── KPIs calculados ─────────────────────────────────────────────────────
+  totalSolicitudes   = computed(() => this.paginacion().totalElements);
   totalBorradores    = computed(() => this.solicitudes().filter(s => s.estado === 'BORRADOR').length);
   enTramite          = computed(() => this.solicitudes().filter(s => s.estado === 'EMITIDO' || s.estado === 'ENVIADO_PROVEEDOR').length);
   finalizadas        = computed(() => this.solicitudes().filter(s => s.estado === 'CERRADO').length);
@@ -80,9 +85,10 @@ export class SolicitudesListComponent implements OnInit {
     return estado === 'BORRADOR' || estado === 'EMITIDO';
   }
 
-  onSearch(term: string): void        { this.facade.setFiltros({ busqueda: term }); }
-  onFilterEstado(v: string): void { this.facade.setFiltros({ estado: v ? (v as EstadoGil) : undefined }); }
-  onFilterFecha(v: string): void  { this.facade.setFiltros({ fechaRango: v }); }
+  onSearch(term: string): void        { this.facade.cargarSolicitudes({ busqueda: term }); }
+  onFilterEstado(v: string): void     { this.facade.cargarSolicitudes({ estado: v ? (v as EstadoGil) : undefined }); }
+  onFilterFecha(v: string): void      { this.facade.cargarSolicitudes({ fechaRango: v }); }
+  onIrAPagina(page: number): void     { this.facade.irAPagina(page); }
   onExportPdf(id: string | number): void {
     this.router.navigate(['/app/inventario/solicitudes-gil', id, 'exportar']);
   }

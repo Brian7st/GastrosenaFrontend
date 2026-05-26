@@ -144,13 +144,25 @@
 
     <!-- Pagination Footer -->
     <div class="pagination-footer">
-      <p class="pagination-info">MOSTRANDO {{ bienes().length }} DE {{ bienes().length }} BIENES</p>
+      <p class="pagination-info">
+        MOSTRANDO {{ bienes().length }} DE {{ paginacion().totalElements }} BIENES
+      </p>
       <div class="pagination-controls">
-        <button class="page-btn" disabled>
+        <button class="page-btn"
+          [disabled]="paginacion().page === 0"
+          (click)="onIrAPagina(paginacion().page - 1)">
           <span class="material-symbols-outlined">chevron_left</span>
         </button>
-        <button class="page-btn page-btn--active">1</button>
-        <button class="page-btn" disabled>
+        @for (p of paginas(); track p) {
+          <button class="page-btn"
+            [class.page-btn--active]="p === paginacion().page"
+            (click)="onIrAPagina(p)">
+            {{ p + 1 }}
+          </button>
+        }
+        <button class="page-btn"
+          [disabled]="paginacion().page >= paginacion().totalPages - 1"
+          (click)="onIrAPagina(paginacion().page + 1)">
           <span class="material-symbols-outlined">chevron_right</span>
         </button>
       </div>

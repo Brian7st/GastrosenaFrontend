@@ -33,6 +33,13 @@ export const INVENTARIO_ROUTES: Routes = [
           ),
       },
       {
+        path: 'generar',
+        loadComponent: () =>
+          import('./pages/solicitudes-page/solicitudes-generar/solicitudes-generar.component').then(
+            m => m.SolicitudesGenerarComponent
+          ),
+      },
+      {
         path: 'nueva',
         loadComponent: () =>
           import('./pages/solicitudes-page/solicitudes-form/solicitudes-form.component').then(
