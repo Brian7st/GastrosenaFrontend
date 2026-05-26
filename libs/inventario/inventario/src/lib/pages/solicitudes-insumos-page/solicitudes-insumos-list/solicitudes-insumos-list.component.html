@@ -120,10 +120,12 @@
             <span class="material-symbols-outlined">visibility</span>
           </button>
           
-          <!-- Botón Aprobar similar al badge de aprobado pero clicable -->
-          <button [style.visibility]="s.estado === 'ENVIADA' ? 'visible' : 'hidden'" class="btn-aprobar" (click)="onApprove(s.id)">
-            <span class="material-symbols-outlined" style="font-size: 16px;">check</span>
-            Aprobar
+          <button [style.visibility]="s.estado === 'ENVIADA' ? 'visible' : 'hidden'"
+            class="action-icon action-icon--primary"
+            title="Aprobar Solicitud"
+            (click)="onApprove(s.id); $event.stopPropagation()"
+          >
+            <lucide-icon name="check-circle" [size]="18"></lucide-icon>
           </button>
         </div>
       </td>
