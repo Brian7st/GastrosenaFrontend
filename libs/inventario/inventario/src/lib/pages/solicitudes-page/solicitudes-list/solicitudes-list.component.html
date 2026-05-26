@@ -175,11 +175,27 @@
 
   <!-- Paginación -->
   <div dtFooter class="pagination-footer">
-    <p class="results-count">Mostrando 1–{{ solicitudes().length }} de {{ totalSolicitudes() }} resultados</p>
+    <p class="results-count">
+      MOSTRANDO {{ solicitudes().length }} DE {{ paginacion().totalElements }} SOLICITUDES
+    </p>
     <div class="page-numbers">
-      <button class="page-btn page-btn--active">1</button>
-      <button class="page-btn">2</button>
-      <button class="page-btn">3</button>
+      <button class="page-btn"
+        [disabled]="paginacion().page === 0"
+        (click)="onIrAPagina(paginacion().page - 1)">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      @for (p of paginas(); track p) {
+        <button class="page-btn"
+          [class.page-btn--active]="p === paginacion().page"
+          (click)="onIrAPagina(p)">
+          {{ p + 1 }}
+        </button>
+      }
+      <button class="page-btn"
+        [disabled]="paginacion().page >= paginacion().totalPages - 1"
+        (click)="onIrAPagina(paginacion().page + 1)">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
     </div>
   </div>
 

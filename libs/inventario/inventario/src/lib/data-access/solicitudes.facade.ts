@@ -1,5 +1,5 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
-import { SolicitudGil, SolicitudesGilFiltros, EstadoGil, CrearSolicitudData, ActualizarSolicitudData } from '../models/solicitudes-gil.model';
+import { SolicitudGil, SolicitudesGilFiltros, SolicitudesPaginacion, EstadoGil, CrearSolicitudData, ActualizarSolicitudData } from '../models/solicitudes-gil.model';
 import {
   SolicitudSesion,
   CrearSolicitudSesionData,
@@ -19,7 +19,8 @@ export class SolicitudesFacade {
   // ── Estado GIL (Procurement) ───────────────────────────────────────────────
   private _solicitudes           = signal<SolicitudGil[]>([]);
   private _loading               = signal<boolean>(false);
-  private _filtros               = signal<SolicitudesGilFiltros>({});
+  private _filtros               = signal<SolicitudesGilFiltros>({ page: 0, size: 10 });
+  private _paginacion            = signal<SolicitudesPaginacion>({ totalElements: 0, totalPages: 0, page: 0, size: 10 });
   private _solicitudSeleccionada = signal<SolicitudGil | undefined>(undefined);
   private _error                 = signal<string | null>(null);
 
@@ -30,6 +31,7 @@ export class SolicitudesFacade {
   public solicitudes                  = computed(() => this._solicitudes());
   public loading                      = computed(() => this._loading());
   public filtros                      = computed(() => this._filtros());
+  public paginacion                   = computed(() => this._paginacion());
   public solicitudSeleccionada        = computed(() => this._solicitudSeleccionada());
   public error                        = computed(() => this._error());
   public solicitudSesionSeleccionada  = computed(() => this._solicitudSesionSeleccionada());
@@ -43,20 +45,46 @@ export class SolicitudesFacade {
 
   /**
    * Carga el listado de solicitudes aplicando los filtros actuales.
+   * Si se pasan filtros nuevos (búsqueda, estado, etc.) se resetea a page 0.
    */
   cargarSolicitudes(filtros?: SolicitudesGilFiltros): void {
-    if (filtros) this._filtros.set(filtros);
-    
+    if (filtros) {
+      this._filtros.set({ ...this._filtros(), ...filtros, page: 0 });
+    }
+
     this._loading.set(true);
     this.solicitudesService.getSolicitudes(this._filtros())
       .pipe(
         catchError(() => {
           this._error.set('Error al cargar la lista de solicitudes');
-          return of([]);
+          return of({ solicitudes: [], paginacion: { totalElements: 0, totalPages: 0, page: 0, size: 10 } });
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe(data => this._solicitudes.set(data));
+      .subscribe(({ solicitudes, paginacion }) => {
+        this._solicitudes.set(solicitudes);
+        this._paginacion.set(paginacion);
+      });
+  }
+
+  /**
+   * Navega a una página específica sin cambiar el resto de filtros.
+   */
+  irAPagina(page: number): void {
+    this._filtros.update(f => ({ ...f, page }));
+    this._loading.set(true);
+    this.solicitudesService.getSolicitudes(this._filtros())
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al cargar la lista de solicitudes');
+          return of({ solicitudes: [], paginacion: this._paginacion() });
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(({ solicitudes, paginacion }) => {
+        this._solicitudes.set(solicitudes);
+        this._paginacion.set(paginacion);
+      });
   }
 
   /**
@@ -76,10 +104,10 @@ export class SolicitudesFacade {
   }
 
   /**
-   * Actualiza los filtros y recarga la lista.
+   * Actualiza los filtros, resetea a página 0 y recarga la lista.
    */
   setFiltros(filtros: SolicitudesGilFiltros): void {
-    this._filtros.set({ ...this._filtros(), ...filtros });
+    this._filtros.set({ ...this._filtros(), ...filtros, page: 0 });
     this.cargarSolicitudes();
   }
 
