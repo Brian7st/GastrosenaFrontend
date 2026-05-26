@@ -178,15 +178,11 @@ export class SolicitudesService {
   }
 
   updateSolicitud(id: string | number, payload: Partial<SolicitudGil>): Observable<SolicitudGil> {
-    const solicitud = SOLICITUDES_GIL_MOCK.find(s => s.codigo === id || s.id.toString() === id.toString());
-    if (!solicitud) throw new Error('Not found');
-    const updated = { ...solicitud, ...payload };
-    return of(updated).pipe(delay(600));
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  generarGils(ids: (string | number)[]): Observable<boolean> {
-    // Simulated action — ids will be used when real endpoint is connected
-    return of(true).pipe(delay(800));
+    return this.http
+      .patch<GilResponse>(`${API}/procurement/giles/${id}`, payload)
+      .pipe(
+        map(gilFromApi),
+        catchError(err => throwError(() => err))
+      );
   }
 }
