@@ -1,11 +1,7 @@
 .roles-page {
   display: flex;
   flex-direction: column;
-<<<<<<< HEAD
-  gap: var(--space-6);
-=======
   gap: var(--space-8);
->>>>>>> d718d77 (feat(auth): mejorar filtros lista-page y cuentas-page con barra unificada)
   padding: var(--space-6);
 
   // ── KPI Cards ─────────────────────────────────────────────────────────────
@@ -14,15 +10,6 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: var(--space-4);
-<<<<<<< HEAD
-
-    @media (max-width: 480px) {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  // ── Grid ──────────────────────────────────────────────────────────────────
-=======
 
     @media (max-width: 480px) {
       grid-template-columns: 1fr;
@@ -48,7 +35,6 @@
   }
 
   // ── Grid de cards ─────────────────────────────────────────────────────────
->>>>>>> d718d77 (feat(auth): mejorar filtros lista-page y cuentas-page con barra unificada)
 
   &__grid {
     display: grid;
