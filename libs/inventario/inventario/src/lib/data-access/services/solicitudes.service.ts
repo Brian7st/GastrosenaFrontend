@@ -5,6 +5,7 @@ import { catchError, map } from 'rxjs/operators';
 import {
   SolicitudGil,
   SolicitudesGilFiltros,
+  SolicitudesPaginacion,
   EstadoGil,
   CrearSolicitudData,
   ActualizarSolicitudData,
@@ -31,17 +32,29 @@ const API = '/api/v1';
 export class SolicitudesService {
   private http = inject(HttpClient);
 
-  getSolicitudes(filtros?: SolicitudesGilFiltros): Observable<SolicitudGil[]> {
+  getSolicitudes(filtros?: SolicitudesGilFiltros): Observable<{ solicitudes: SolicitudGil[]; paginacion: SolicitudesPaginacion }> {
     let params = new HttpParams();
     if (filtros?.busqueda)   params = params.set('q', filtros.busqueda);
     if (filtros?.estado)     params = params.set('estado', filtros.estado);
     if (filtros?.instructor) params = params.set('instructor', filtros.instructor);
     if (filtros?.fechaRango) params = params.set('fechaRango', filtros.fechaRango);
+    params = params.set('page', String(filtros?.page ?? 0));
+    params = params.set('size', String(filtros?.size ?? 10));
 
     return this.http
-      .get<GilResponse[]>(`${API}/procurement/giles`, { params })
+      .get<{ content: GilResponse[]; totalElements: number; totalPages: number; number: number; size: number }>(
+        `${API}/procurement/giles`, { params }
+      )
       .pipe(
-        map(list => list.map(gilFromApi)),
+        map(res => ({
+          solicitudes: res.content.map(gilFromApi),
+          paginacion: {
+            totalElements: res.totalElements,
+            totalPages:    res.totalPages,
+            page:          res.number,
+            size:          res.size,
+          },
+        })),
         catchError(err => throwError(() => err))
       );
   }

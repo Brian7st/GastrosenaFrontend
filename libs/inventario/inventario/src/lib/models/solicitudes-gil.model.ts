@@ -41,6 +41,15 @@ export interface SolicitudesGilFiltros {
   instructor?: string;
   estado?: EstadoGil;
   fechaRango?: string;
+  page?: number;
+  size?: number;
+}
+
+export interface SolicitudesPaginacion {
+  totalElements: number;
+  totalPages: number;
+  page: number;
+  size: number;
 }
 
 export interface CrearSolicitudData {
