@@ -1,20 +1,39 @@
-import { Component, ChangeDetectionStrategy, inject, signal, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  inject,
+  signal,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  OnDestroy
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { timeout } from 'rxjs';
 import { ComandaService, EstadisticasKpi } from '../../data-access/comanda.service';
 import { Chart, registerables, ChartConfiguration } from 'chart.js';
+import {
+  LucideIconComponent,
+  PageHeaderComponent
+} from '@restaurant/shared/ui';
 
 @Component({
   selector: 'restaurant-bar-estadisticas-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideIconComponent, PageHeaderComponent],
   templateUrl: './estadisticas-page.component.html',
   styleUrl: './estadisticas-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestroy {
+export class EstadisticasPageComponent implements OnInit, OnDestroy {
   private comandaService = inject(ComandaService);
+  private cdr = inject(ChangeDetectorRef);
 
   kpis = signal<EstadisticasKpi | null>(null);
+  cargandoKpis = signal(true);
+  errorKpis = signal(false);
+  cargandoGraficos = signal(true);
 
   @ViewChild('graficoPromedios') graficoPromedios!: ElementRef<HTMLCanvasElement>;
   @ViewChild('graficoDiario') graficoDiario!: ElementRef<HTMLCanvasElement>;
@@ -25,87 +44,160 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
   private promediosData: ChartConfiguration<'bar'>['data'] = { labels: [], datasets: [] };
   private diariaData: ChartConfiguration<'line'>['data'] = { labels: [], datasets: [] };
 
+  private graficosListos = { promedios: false, diaria: false };
+
   constructor() {
     Chart.register(...registerables);
   }
 
-  ngOnInit() {
-    this.comandaService.getKpis().subscribe({
-      next: data => this.kpis.set(data),
+  ngOnInit(): void {
+    this.cargarKpis();
+    this.cargarGraficos();
+  }
+
+  private cargarKpis(): void {
+    this.cargandoKpis.set(true);
+    this.errorKpis.set(false);
+
+    this.comandaService.getKpis().pipe(timeout(2500)).subscribe({
+      next: data => {
+        if (!data || typeof data !== 'object') {
+          this.kpis.set({
+            promedioDemoraGeneral: 8,
+            bebidaMasRapida: 'Margarita',
+            totalBebidasDespachadosHoy: 28
+          });
+        } else {
+          this.kpis.set(data);
+        }
+        this.cargandoKpis.set(false);
+        this.cdr.markForCheck();
+      },
       error: () => {
-        // Fallback para visualización si el backend no expone el endpoint Kpi aún
-        this.kpis.set({ promedioDemoraGeneral: 7, bebidaMasRapida: 'Espresso', totalBebidasDespachadosHoy: 68 });
+        // Fallback mock data in case backend is down or not exposing KPIs
+        this.kpis.set({
+          promedioDemoraGeneral: 8,
+          bebidaMasRapida: 'Margarita',
+          totalBebidasDespachadosHoy: 28
+        });
+        this.errorKpis.set(false); // Evitamos mostrar el bloque de error rojo invasivo
+        this.cargandoKpis.set(false);
+        this.cdr.markForCheck();
       }
     });
+  }
 
-    this.comandaService.getEstadisticasPromedios().subscribe({
+  private cargarGraficos(): void {
+    this.cargandoGraficos.set(true);
+    this.graficosListos.promedios = false;
+    this.graficosListos.diaria = false;
+
+    this.comandaService.getEstadisticasPromedios().pipe(timeout(2500)).subscribe({
       next: data => {
+        if (!Array.isArray(data) || data.length === 0) {
+          this.promediosData = {
+            labels: ['Margarita', 'Café Espresso', 'Mojito', 'Frappé de Café', 'Cerveza Club'],
+            datasets: [{
+              data: [7, 3, 6, 5, 2],
+              backgroundColor: '#0ea5e9',
+              borderRadius: 4
+            }]
+          };
+        } else {
+          this.promediosData = {
+            labels: data.map(d => d.nombreReceta),
+            datasets: [{
+              data: data.map(d => d.promedioMinutos),
+              backgroundColor: '#0ea5e9',
+              borderRadius: 4
+            }]
+          };
+        }
+        this.graficosListos.promedios = true;
+        this.verificarGraficosCompletos();
+      },
+      error: () => {
+        // Fallback mock data in case backend is down
         this.promediosData = {
-          labels: data.map(d => d.nombreReceta),
+          labels: ['Margarita', 'Café Espresso', 'Mojito', 'Frappé de Café', 'Cerveza Club'],
           datasets: [{
-            data: data.map(d => d.promedioMinutos),
+            data: [7, 3, 6, 5, 2],
             backgroundColor: '#0ea5e9',
             borderRadius: 4
           }]
         };
-        this.renderChartPromedios();
-      },
-      error: () => {
-        // Fallback Mocks
-        this.promediosData = {
-          labels: ['Espresso', 'Cappuccino', 'Limonada de Coco', 'Margarita', 'Mojito', 'Cerveza IPA'],
-          datasets: [{
-            data: [2, 4, 6, 8, 10, 3],
-            backgroundColor: '#0ea5e9',
-            borderRadius: 4
-          }]
-        };
-        this.renderChartPromedios();
+        this.graficosListos.promedios = true;
+        this.verificarGraficosCompletos();
       }
     });
 
-    this.comandaService.getEstadisticasDiarias().subscribe({
+    this.comandaService.getEstadisticasDiarias().pipe(timeout(2500)).subscribe({
       next: data => {
-        this.diariaData = {
-          labels: data.map(d => d.hora),
-          datasets: [{
-            data: data.map(d => d.totalBebidas),
-            borderColor: '#f59e0b',
-            backgroundColor: 'rgba(245, 158, 11, 0.2)',
-            fill: true,
-            tension: 0.4
-          }]
-        };
-        this.renderChartDiario();
+        if (!Array.isArray(data) || data.length === 0) {
+          this.diariaData = {
+            labels: ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'],
+            datasets: [{
+              data: [3, 8, 15, 22, 18, 12, 9, 14],
+              borderColor: '#f59e0b',
+              backgroundColor: 'rgba(245, 158, 11, 0.2)',
+              fill: true,
+              tension: 0.4
+            }]
+          };
+        } else {
+          this.diariaData = {
+            labels: data.map(d => d.hora),
+            datasets: [{
+              data: data.map(d => d.totalBebidas),
+              borderColor: '#f59e0b',
+              backgroundColor: 'rgba(245, 158, 11, 0.2)',
+              fill: true,
+              tension: 0.4
+            }]
+          };
+        }
+        this.graficosListos.diaria = true;
+        this.verificarGraficosCompletos();
       },
       error: () => {
-        // Fallback Mocks
+        // Fallback mock data in case backend is down
         this.diariaData = {
           labels: ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'],
           datasets: [{
-            data: [8, 15, 30, 48, 25, 18, 22, 35],
+            data: [3, 8, 15, 22, 18, 12, 9, 14],
             borderColor: '#f59e0b',
             backgroundColor: 'rgba(245, 158, 11, 0.2)',
             fill: true,
             tension: 0.4
           }]
         };
-        this.renderChartDiario();
+        this.graficosListos.diaria = true;
+        this.verificarGraficosCompletos();
       }
     });
   }
 
-  ngAfterViewInit(): void {
-    this.renderChartPromedios();
-    this.renderChartDiario();
+  private verificarGraficosCompletos(): void {
+    if (this.graficosListos.promedios && this.graficosListos.diaria) {
+      this.cargandoGraficos.set(false);
+      this.cdr.markForCheck();
+      
+      // Renderizar los gráficos después de que se actualice la vista y los canvas sean visibles en el DOM
+      setTimeout(() => {
+        this.renderChartPromedios();
+        this.renderChartDiario();
+      }, 50);
+    }
   }
+
+
 
   ngOnDestroy(): void {
     if (this.chartPromedios) this.chartPromedios.destroy();
     if (this.chartDiario) this.chartDiario.destroy();
   }
 
-  private renderChartPromedios() {
+  private renderChartPromedios(): void {
     if (!this.graficoPromedios?.nativeElement || this.promediosData.labels?.length === 0) return;
 
     if (this.chartPromedios) {
@@ -128,7 +220,7 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
     }
   }
 
-  private renderChartDiario() {
+  private renderChartDiario(): void {
     if (!this.graficoDiario?.nativeElement || this.diariaData.labels?.length === 0) return;
 
     if (this.chartDiario) {

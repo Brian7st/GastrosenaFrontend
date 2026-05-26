@@ -12,14 +12,14 @@
   <div class="showcase__grid-3 stats-grid">
     <restaurant-kpi-card 
       label="Comandas Activas" 
-      [value]="estadisticas.activos.toString()" 
+      [value]="estadisticas().activos.toString()" 
       icon="clock" 
       iconColor="orange"
     ></restaurant-kpi-card>
 
     <restaurant-kpi-card 
       label="Completadas Hoy" 
-      [value]="estadisticas.completados.toString()" 
+      [value]="estadisticas().completados.toString()" 
       icon="check-circle" 
       iconColor="green"
     ></restaurant-kpi-card>
@@ -27,7 +27,7 @@
     <div (click)="abrirModal('CANCELACION')" style="cursor: pointer;">
       <restaurant-kpi-card 
         label="Canceladas" 
-        [value]="estadisticas.cancelados.toString()" 
+        [value]="estadisticas().cancelados.toString()" 
         icon="x-circle" 
         iconColor="red"
       ></restaurant-kpi-card>
@@ -36,7 +36,7 @@
     <div (click)="abrirModal('DEVOLUCION')" style="cursor: pointer;">
       <restaurant-kpi-card 
         label="Devueltas" 
-        [value]="estadisticas.devueltos.toString()" 
+        [value]="estadisticas().devueltos.toString()" 
         icon="arrow-left-right" 
         iconColor="yellow"
       ></restaurant-kpi-card>
@@ -51,7 +51,7 @@
     ></restaurant-section-title>
 
     <div class="order-list showcase__stack">
-      @for (pedido of pedidosPendientes; track pedido.platos) {
+      @for (pedido of pedidosPendientes(); track pedido.platos) {
         <div class="order-item showcase__row" style="justify-content: space-between; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-secondary);">
           <div class="left showcase__row">
             <span class="showcase__value">Mesa {{ pedido.mesa }}</span>

@@ -1,98 +1,87 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  OnInit,
+  computed,
+  inject,
+  signal,
 } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Rol } from '@restaurant/shared/models';
-import { LucideIconComponent } from '@restaurant/shared/ui';
-import { getRolClass } from '../../util/rol-class.util';
+import {
+  AlertComponent,
+  EmptyStateComponent,
+  KpiCardComponent,
+  LoadingSkeletonComponent,
+  LucideIconComponent,
+  PageHeaderComponent,
+  SearchFilterComponent,
+} from '@restaurant/shared/ui';
+import { ROL_CLASS_MAP } from '../../util/rol-class.util';
+import { UsuariosFacade } from '../../data-access/usuarios.facade';
+import { RolDetalle } from '../../models/usuarios.model';
 
-interface RolInfo {
-  readonly rol:           Rol;
-  readonly icono:         string;
-  readonly descripcion:   string;
-  readonly permisos:      readonly string[];
-  readonly totalUsuarios: number;
-}
-
-const MOCK_ROLES: readonly RolInfo[] = [
-  {
-    rol: Rol.ADMINISTRADOR,
-    icono: 'shield',
-    descripcion: 'Acceso total al sistema',
-    permisos: ['Gestión de usuarios', 'Reportes completos', 'Configuración del sistema', 'Inventario', 'Caja'],
-    totalUsuarios: 1,
-  },
-  {
-    rol: Rol.CONTADORA,
-    icono: 'banknote',
-    descripcion: 'Gestión financiera y reportes',
-    permisos: ['Reportes financieros', 'Presupuesto', 'Facturas', 'Caja'],
-    totalUsuarios: 1,
-  },
-  {
-    rol: Rol.INSTRUCTOR,
-    icono: 'graduation-cap',
-    descripcion: 'Gestión académica y evaluaciones',
-    permisos: ['Evaluaciones', 'Actividades', 'Recetas', 'Reportes académicos'],
-    totalUsuarios: 2,
-  },
-  {
-    rol: Rol.CHEF,
-    icono: 'chef-hat',
-    descripcion: 'Operaciones de cocina',
-    permisos: ['Comandas', 'Recetas', 'Menú', 'Ingredientes'],
-    totalUsuarios: 3,
-  },
-  {
-    rol: Rol.LIDER_BAR,
-    icono: 'coffee',
-    descripcion: 'Operaciones de bar y barismo',
-    permisos: ['Comandas bar', 'Recetas bebidas', 'Menú bar'],
-    totalUsuarios: 1,
-  },
-  {
-    rol: Rol.MESERO,
-    icono: 'utensils',
-    descripcion: 'Atención al cliente',
-    permisos: ['Mesas', 'Pedidos', 'Comandas'],
-    totalUsuarios: 3,
-  },
-  {
-    rol: Rol.BARTENDER,
-    icono: 'glass-water',
-    descripcion: 'Preparación de bebidas',
-    permisos: ['Comandas bar', 'Recetas bebidas'],
-    totalUsuarios: 2,
-  },
-  {
-    rol: Rol.AUXILIAR_COCINA,
-    icono: 'package',
-    descripcion: 'Apoyo en operaciones de cocina',
-    permisos: ['Comandas', 'Ingredientes'],
-    totalUsuarios: 2,
-  },
-  {
-    rol: Rol.CAJERO,
-    icono: 'calculator',
-    descripcion: 'Gestión de caja y pagos',
-    permisos: ['Caja', 'Pagos', 'Facturas'],
-    totalUsuarios: 2,
-  },
-];
+const ICONO_MAP: Record<string, string> = {
+  ADMINISTRADOR:   'shield',
+  CONTADORA:       'banknote',
+  INSTRUCTOR:      'graduation-cap',
+  CHEF:            'chef-hat',
+  LIDER_BAR:       'coffee',
+  MESERO:          'utensils',
+  BARTENDER:       'glass-water',
+  AUXILIAR_COCINA: 'package',
+  CAJERO:          'calculator',
+  ADMIN_COCINA:    'chef-hat',
+  ADMIN_BAR:       'coffee',
+};
 
 @Component({
   selector: 'restaurant-roles-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [LucideIconComponent],
+  imports: [
+    AlertComponent,
+    EmptyStateComponent,
+    KpiCardComponent,
+    LoadingSkeletonComponent,
+    LucideIconComponent,
+    PageHeaderComponent,
+    SearchFilterComponent,
+  ],
   templateUrl: './roles-page.component.html',
   styleUrl:    './roles-page.component.scss',
 })
-export class RolesPageComponent {
-  readonly roles = MOCK_ROLES;
+export class RolesPageComponent implements OnInit {
+  private readonly facade = inject(UsuariosFacade);
 
-  readonly totalUsuarios = MOCK_ROLES.reduce((sum, r) => sum + r.totalUsuarios, 0);
-  readonly totalRoles    = MOCK_ROLES.length;
+  readonly roles   = toSignal(this.facade.rolesDetalle$,        { initialValue: [] as RolDetalle[] });
+  readonly loading = toSignal(this.facade.loadingRolesDetalle$, { initialValue: false });
+  readonly error   = toSignal(this.facade.error$,               { initialValue: null });
 
-  readonly getRolClass = getRolClass;
+  readonly busqueda = signal('');
+
+  readonly rolesFiltrados = computed(() => {
+    const q = this.busqueda().toLowerCase();
+    if (!q) return this.roles();
+    return this.roles().filter(r =>
+      r.nombre.toLowerCase().includes(q) || r.descripcion.toLowerCase().includes(q)
+    );
+  });
+
+  readonly totalRoles    = computed(() => this.roles().length);
+  readonly totalPermisos = computed(() =>
+    this.roles().reduce((sum, r) => sum + r.permisos.length, 0)
+  );
+
+  ngOnInit(): void {
+    this.facade.cargarRolesDetalle();
+  }
+
+  getRolClass(nombre: string): string {
+    return ROL_CLASS_MAP[nombre as Rol] ?? 'default';
+  }
+
+  getIcono(nombre: string): string {
+    return ICONO_MAP[nombre] ?? 'shield';
+  }
 }
