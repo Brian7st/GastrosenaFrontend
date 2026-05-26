@@ -92,9 +92,9 @@ export class BienesService {
       );
   }
 
-  /** DELETE /catalog/productos/{id}?confirmacion={id} — @RequestParam requerido en backend */
+  /** DELETE /catalog/productos/{id}?confirmacion=ELIMINAR — @RequestParam requerido en backend */
   deleteBien(id: string | number): Observable<void> {
-    const params = new HttpParams().set('confirmacion', String(id));
+    const params = new HttpParams().set('confirmacion', 'ELIMINAR');
     return this.http
       .delete<void>(`${API}/catalog/productos/${id}`, { params })
       .pipe(catchError(err => throwError(() => err)));
