@@ -6,17 +6,18 @@ import {
   inject,
   OnInit,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-import { Alerta, AccionResolver } from '../../../../models/alerta.model';
+import { ButtonComponent } from '@restaurant/shared/ui';
+import { AccionResolver } from '../../../../models/alerta.model';
 import { AlertasFacade } from '../../../../data-access/alertas.facade';
 
 @Component({
   selector: 'restaurant-alerta-resolver',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [ReactiveFormsModule, RouterModule, ButtonComponent],
   templateUrl: './alerta-resolver.component.html',
   styleUrl: './alerta-resolver.component.scss',
 })
@@ -53,9 +54,9 @@ export class AlertaResolverComponent implements OnInit {
 
   prioridadLabel = computed(() => {
     const map: Record<string, string> = {
-      critica: 'Crítica', alta: 'Alta', media: 'Media', baja: 'Baja',
+      ALTA: 'Alta', MEDIA: 'Media', BAJA: 'Baja',
     };
-    return map[this.alerta()?.prioridad ?? 'critica'] ?? 'Crítica';
+    return map[this.alerta()?.prioridad ?? 'ALTA'] ?? 'Alta';
   });
 
   selectAccion(accion: AccionResolver): void {

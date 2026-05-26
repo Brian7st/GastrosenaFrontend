@@ -21,17 +21,17 @@
        KPI ROW
        ═══════════════════════════════════════════════════════════════════════ -->
   <div class="kpi-grid">
-    <restaurant-kpi-card label="BORRADORES" value="03" icon="file-edit"
+    <restaurant-kpi-card label="BORRADORES" [value]="kpiBorradores()" icon="file-edit"
       iconColor="blue" trend="Pendientes de envío" [trendUp]="null"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="ENVIADAS" value="05" icon="send"
+    <restaurant-kpi-card label="ENVIADAS" [value]="kpiEnviadas()" icon="send"
       iconColor="orange" trend="Esperando aprobación" [trendUp]="null"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="EN DESPACHO" value="02" icon="truck"
+    <restaurant-kpi-card label="EN DESPACHO" [value]="kpiEnDespacho()" icon="truck"
       iconColor="green" trend="En preparación" [trendUp]="null"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="FIRMADAS" value="18" icon="check-circle"
-      iconColor="green" trend="Completadas este mes" [trendUp]="true"></restaurant-kpi-card>
+    <restaurant-kpi-card label="FIRMADAS" [value]="kpiFirmadas()" icon="check-circle"
+      iconColor="green" trend="Completadas" [trendUp]="null"></restaurant-kpi-card>
   </div>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
@@ -44,88 +44,40 @@
       <div class="kanban-column__header">
         <div class="kanban-column__title-group">
           <h3 class="kanban-column__title">Borrador</h3>
-          <span class="kanban-column__count">03</span>
+          <span class="kanban-column__count">{{ borradores().length }}</span>
         </div>
       </div>
       <div class="kanban-column__cards">
-        <!-- Card 1 -->
-        <div class="kanban-card kanban-card--borrador" routerLink="detalle/0895">
-          <div class="kanban-card__header">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span class="kanban-card__id">REQ-2024-0895</span>
-              <span class="kanban-card__badge kanban-card__badge--borrador">
-                <lucide-icon name="file-edit" [size]="12"></lucide-icon>
-                Borrador
+        @for (req of borradores(); track req.id) {
+          <div class="kanban-card kanban-card--borrador" [routerLink]="['detalle', req.id]">
+            <div class="kanban-card__header">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="kanban-card__id">REQ-{{ req.numero }}</span>
+                <span class="kanban-card__badge kanban-card__badge--borrador">
+                  <lucide-icon name="file-edit" [size]="12"></lucide-icon>
+                  Borrador
+                </span>
+              </div>
+              <button class="kanban-card__menu">
+                <lucide-icon name="more-vertical" [size]="16"></lucide-icon>
+              </button>
+            </div>
+            <p class="kanban-card__desc">{{ req.programa }} — Ficha {{ req.fichaId }}</p>
+            <div class="kanban-card__meta">
+              <span class="kanban-card__meta-item">
+                <lucide-icon name="package" [size]="14"></lucide-icon>
+                {{ req.items.length }} ítem(s)
+              </span>
+              <span class="kanban-card__meta-item">
+                <lucide-icon name="clock" [size]="14"></lucide-icon>
+                {{ req.fecha }}
               </span>
             </div>
-            <button class="kanban-card__menu">
-              <lucide-icon name="more-vertical" [size]="16"></lucide-icon>
-            </button>
           </div>
-          <p class="kanban-card__desc">Cocina Básica — Ficha 2560893</p>
-          <div class="kanban-card__meta">
-            <span class="kanban-card__meta-item">
-              <lucide-icon name="package" [size]="14"></lucide-icon>
-              8 ítems
-            </span>
-            <span class="kanban-card__meta-item">
-              <lucide-icon name="clock" [size]="14"></lucide-icon>
-              Hace 2h
-            </span>
-          </div>
-        </div>
-        <!-- Card 2 -->
-        <div class="kanban-card kanban-card--borrador" routerLink="detalle/0896">
-          <div class="kanban-card__header">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span class="kanban-card__id">REQ-2024-0896</span>
-              <span class="kanban-card__badge kanban-card__badge--borrador">
-                <lucide-icon name="file-edit" [size]="12"></lucide-icon>
-                Borrador
-              </span>
-            </div>
-            <button class="kanban-card__menu">
-              <lucide-icon name="more-vertical" [size]="16"></lucide-icon>
-            </button>
-          </div>
-          <p class="kanban-card__desc">Repostería Avanzada — Ficha 2560894</p>
-          <div class="kanban-card__meta">
-            <span class="kanban-card__meta-item">
-              <lucide-icon name="package" [size]="14"></lucide-icon>
-              5 ítems
-            </span>
-            <span class="kanban-card__meta-item">
-              <lucide-icon name="clock" [size]="14"></lucide-icon>
-              Hace 1d
-            </span>
-          </div>
-        </div>
-        <!-- Card 3 -->
-        <div class="kanban-card kanban-card--borrador" routerLink="detalle/0897">
-          <div class="kanban-card__header">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span class="kanban-card__id">REQ-2024-0897</span>
-              <span class="kanban-card__badge kanban-card__badge--borrador">
-                <lucide-icon name="file-edit" [size]="12"></lucide-icon>
-                Borrador
-              </span>
-            </div>
-            <button class="kanban-card__menu">
-              <lucide-icon name="more-vertical" [size]="16"></lucide-icon>
-            </button>
-          </div>
-          <p class="kanban-card__desc">Cocina Internacional — Ficha 2560891</p>
-          <div class="kanban-card__meta">
-            <span class="kanban-card__meta-item">
-              <lucide-icon name="package" [size]="14"></lucide-icon>
-              12 ítems
-            </span>
-            <span class="kanban-card__meta-item">
-              <lucide-icon name="clock" [size]="14"></lucide-icon>
-              Hace 3d
-            </span>
-          </div>
-        </div>
+        }
+        @if (borradores().length === 0) {
+          <p class="kanban-empty">Sin borradores</p>
+        }
       </div>
     </div>
 
@@ -134,60 +86,40 @@
       <div class="kanban-column__header">
         <div class="kanban-column__title-group">
           <h3 class="kanban-column__title">Pendiente Aprobación</h3>
-          <span class="kanban-column__count kanban-column__count--warning">05</span>
+          <span class="kanban-column__count kanban-column__count--warning">{{ enviadas().length }}</span>
         </div>
       </div>
       <div class="kanban-column__cards">
-        <div class="kanban-card kanban-card--enviada" routerLink="detalle/0892">
-          <div class="kanban-card__header">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span class="kanban-card__id">REQ-2024-0892</span>
-              <span class="kanban-card__badge kanban-card__badge--enviada">
-                <lucide-icon name="send" [size]="12"></lucide-icon>
-                Enviada
+        @for (req of enviadas(); track req.id) {
+          <div class="kanban-card kanban-card--enviada" [routerLink]="['detalle', req.id]">
+            <div class="kanban-card__header">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="kanban-card__id">REQ-{{ req.numero }}</span>
+                <span class="kanban-card__badge kanban-card__badge--enviada">
+                  <lucide-icon name="send" [size]="12"></lucide-icon>
+                  Enviada
+                </span>
+              </div>
+              <button class="kanban-card__menu">
+                <lucide-icon name="more-vertical" [size]="16"></lucide-icon>
+              </button>
+            </div>
+            <p class="kanban-card__desc">{{ req.programa }} — Ficha {{ req.fichaId }}</p>
+            <div class="kanban-card__meta">
+              <span class="kanban-card__meta-item">
+                <lucide-icon name="package" [size]="14"></lucide-icon>
+                {{ req.items.length }} ítem(s)
+              </span>
+              <span class="kanban-card__meta-item">
+                <lucide-icon name="clock" [size]="14"></lucide-icon>
+                {{ req.fecha }}
               </span>
             </div>
-            <button class="kanban-card__menu">
-              <lucide-icon name="more-vertical" [size]="16"></lucide-icon>
-            </button>
           </div>
-          <p class="kanban-card__desc">Panadería Francesa — Ficha 2560892</p>
-          <div class="kanban-card__meta">
-            <span class="kanban-card__meta-item">
-              <lucide-icon name="package" [size]="14"></lucide-icon>
-              10 ítems
-            </span>
-            <span class="kanban-card__meta-item">
-              <lucide-icon name="clock" [size]="14"></lucide-icon>
-              15 Oct
-            </span>
-          </div>
-        </div>
-        <div class="kanban-card kanban-card--enviada" routerLink="detalle/0893">
-          <div class="kanban-card__header">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span class="kanban-card__id">REQ-2024-0893</span>
-              <span class="kanban-card__badge kanban-card__badge--enviada">
-                <lucide-icon name="send" [size]="12"></lucide-icon>
-                Enviada
-              </span>
-            </div>
-            <button class="kanban-card__menu">
-              <lucide-icon name="more-vertical" [size]="16"></lucide-icon>
-            </button>
-          </div>
-          <p class="kanban-card__desc">Gastronomía Básica — Ficha 2560890</p>
-          <div class="kanban-card__meta">
-            <span class="kanban-card__meta-item">
-              <lucide-icon name="package" [size]="14"></lucide-icon>
-              6 ítems
-            </span>
-            <span class="kanban-card__meta-item">
-              <lucide-icon name="clock" [size]="14"></lucide-icon>
-              14 Oct
-            </span>
-          </div>
-        </div>
+        }
+        @if (enviadas().length === 0) {
+          <p class="kanban-empty">Sin enviadas</p>
+        }
       </div>
     </div>
 
@@ -196,30 +128,35 @@
       <div class="kanban-column__header">
         <div class="kanban-column__title-group">
           <h3 class="kanban-column__title">En Despacho</h3>
-          <span class="kanban-column__count kanban-column__count--info">02</span>
+          <span class="kanban-column__count kanban-column__count--info">{{ enDespacho().length }}</span>
         </div>
       </div>
       <div class="kanban-column__cards">
-        <div class="kanban-card kanban-card--despacho" routerLink="despacho/0890">
-          <div class="kanban-card__header">
-            <span class="kanban-card__id">REQ-2024-0890</span>
-            <span class="kanban-card__badge kanban-card__badge--despacho">
-              <lucide-icon name="truck" [size]="12"></lucide-icon>
-              En preparación
-            </span>
+        @for (req of enDespacho(); track req.id) {
+          <div class="kanban-card kanban-card--despacho" [routerLink]="['despacho', req.id]">
+            <div class="kanban-card__header">
+              <span class="kanban-card__id">REQ-{{ req.numero }}</span>
+              <span class="kanban-card__badge kanban-card__badge--despacho">
+                <lucide-icon name="truck" [size]="12"></lucide-icon>
+                En preparación
+              </span>
+            </div>
+            <p class="kanban-card__desc">{{ req.programa }} — Ficha {{ req.fichaId }}</p>
+            <div class="kanban-card__meta">
+              <span class="kanban-card__meta-item">
+                <lucide-icon name="package" [size]="14"></lucide-icon>
+                {{ req.items.length }} ítem(s)
+              </span>
+              <span class="kanban-card__meta-item">
+                <lucide-icon name="clock" [size]="14"></lucide-icon>
+                {{ req.fecha }}
+              </span>
+            </div>
           </div>
-          <p class="kanban-card__desc">Cocina Colombiana — Ficha 2560889</p>
-          <div class="kanban-card__meta">
-            <span class="kanban-card__meta-item">
-              <lucide-icon name="package" [size]="14"></lucide-icon>
-              7 ítems
-            </span>
-            <span class="kanban-card__meta-item">
-              <lucide-icon name="clock" [size]="14"></lucide-icon>
-              10 Oct
-            </span>
-          </div>
-        </div>
+        }
+        @if (enDespacho().length === 0) {
+          <p class="kanban-empty">Sin despachos activos</p>
+        }
       </div>
     </div>
 
@@ -228,50 +165,35 @@
       <div class="kanban-column__header">
         <div class="kanban-column__title-group">
           <h3 class="kanban-column__title">Firmadas</h3>
-          <span class="kanban-column__count kanban-column__count--success">02</span>
+          <span class="kanban-column__count kanban-column__count--success">{{ firmadas().length }}</span>
         </div>
       </div>
       <div class="kanban-column__cards">
-        <div class="kanban-card kanban-card--firmada" routerLink="detalle/0888">
-          <div class="kanban-card__header">
-            <span class="kanban-card__id">REQ-2024-0888</span>
-            <span class="kanban-card__badge kanban-card__badge--firmada">
-              <lucide-icon name="shield-check" [size]="12"></lucide-icon>
-              Verificada
-            </span>
+        @for (req of firmadas(); track req.id) {
+          <div class="kanban-card kanban-card--firmada" [routerLink]="['detalle', req.id]">
+            <div class="kanban-card__header">
+              <span class="kanban-card__id">REQ-{{ req.numero }}</span>
+              <span class="kanban-card__badge kanban-card__badge--firmada">
+                <lucide-icon name="shield-check" [size]="12"></lucide-icon>
+                Firmada
+              </span>
+            </div>
+            <p class="kanban-card__desc">{{ req.programa }} — Ficha {{ req.fichaId }}</p>
+            <div class="kanban-card__meta">
+              <span class="kanban-card__meta-item">
+                <lucide-icon name="package" [size]="14"></lucide-icon>
+                {{ req.items.length }} ítem(s)
+              </span>
+              <span class="kanban-card__meta-item">
+                <lucide-icon name="clock" [size]="14"></lucide-icon>
+                {{ req.fecha }}
+              </span>
+            </div>
           </div>
-          <p class="kanban-card__desc">Técnicas de Cocción — Ficha 2560887</p>
-          <div class="kanban-card__meta">
-            <span class="kanban-card__meta-item">
-              <lucide-icon name="package" [size]="14"></lucide-icon>
-              15 ítems
-            </span>
-            <span class="kanban-card__meta-item">
-              <lucide-icon name="clock" [size]="14"></lucide-icon>
-              05 Oct
-            </span>
-          </div>
-        </div>
-        <div class="kanban-card kanban-card--firmada" routerLink="detalle/0885">
-          <div class="kanban-card__header">
-            <span class="kanban-card__id">REQ-2024-0885</span>
-            <span class="kanban-card__badge kanban-card__badge--firmada">
-              <lucide-icon name="shield-check" [size]="12"></lucide-icon>
-              Verificada
-            </span>
-          </div>
-          <p class="kanban-card__desc">Mesa y Bar — Ficha 2560886</p>
-          <div class="kanban-card__meta">
-            <span class="kanban-card__meta-item">
-              <lucide-icon name="package" [size]="14"></lucide-icon>
-              9 ítems
-            </span>
-            <span class="kanban-card__meta-item">
-              <lucide-icon name="clock" [size]="14"></lucide-icon>
-              02 Oct
-            </span>
-          </div>
-        </div>
+        }
+        @if (firmadas().length === 0) {
+          <p class="kanban-empty">Sin firmadas</p>
+        }
       </div>
     </div>
 

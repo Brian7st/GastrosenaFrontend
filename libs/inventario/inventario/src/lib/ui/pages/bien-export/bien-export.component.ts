@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BienExportConfig } from '../../../models/inventario.model';
+import { CATEGORIAS_BIEN } from '../../../models/categorias.model';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { BienExportService } from '../../../data-access/services/bien-export.service';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
@@ -43,8 +44,8 @@ export class BienExportPageComponent {
     { id: 'csv', label: 'CSV', sub: 'Texto plano', icon: 'csv', iconColor: '#475569' },
   ];
 
-  readonly CATEGORIAS = ['Todas las categorías', 'Equipos de Cómputo', 'Mobiliario', 'Papelería', 'Cocina', 'Audiovisuales'];
-  readonly ALMACENES = ['Todos los almacenes', 'Almacén Central', 'Sede Norte', 'Sede Sur', 'Laboratorio 302'];
+  readonly CATEGORIAS = CATEGORIAS_BIEN;
+  readonly ALMACENES = ['Almacén Central', 'Sede Norte', 'Sede Sur', 'Laboratorio 302'];
 
   readonly EXPORTACIONES_RECIENTES = [
     { nombre: 'Inv_Bienes_Oct.xlsx', tiempo: 'Hace 2 horas', tamano: '4.2 MB', icono: 'table_chart', color: '#217346' },

@@ -8,8 +8,10 @@ import {
   CrearUsuarioRequest,
   ExportarConfig,
   FiltrosUsuarios,
+  HistorialItem,
   ImportarUsuariosRequest,
   ImportarUsuariosResponse,
+  RolDetalle,
   RolOpcion,
   UsuarioDetalle,
 } from '../models/usuarios.model';
@@ -33,6 +35,10 @@ export class UsuariosService extends BaseHttpService {
 
   getRoles(): Observable<RolOpcion[]> {
     return this.http.get<RolOpcion[]>(this.buildUrl('roles'));
+  }
+
+  getRolesDetalle(): Observable<RolDetalle[]> {
+    return this.http.get<RolDetalle[]>(this.buildUrl('roles'));
   }
 
   crearUsuario(data: CrearUsuarioRequest): Observable<UsuarioDetalle> {
@@ -67,6 +73,10 @@ export class UsuariosService extends BaseHttpService {
       this.buildUrl(`${this.resource}/importar`),
       formData,
     );
+  }
+
+  getHistorial(): Observable<HistorialItem[]> {
+    return this.http.get<HistorialItem[]>(this.buildUrl(`${this.resource}/historial`));
   }
 
   exportarUsuarios(config: ExportarConfig): Observable<Blob> {

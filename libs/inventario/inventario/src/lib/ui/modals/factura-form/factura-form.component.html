@@ -56,8 +56,8 @@
                 class="field-input"
                 type="text"
                 placeholder="Ej. FEL-12345"
-                [(ngModel)]="numeroFEL"
-                name="numeroFEL"
+                [(ngModel)]="numeroFactura"
+                name="numeroFactura"
               />
             </div>
             <div class="field-group">
@@ -87,8 +87,8 @@
                 class="field-input"
                 type="text"
                 placeholder="Ej. 900.123.456-7"
-                [(ngModel)]="nitEmisor"
-                name="nitEmisor"
+                [(ngModel)]="proveedorNit"
+                name="proveedorNit"
               />
             </div>
             <div class="field-group col-span-2">
@@ -130,15 +130,19 @@
         </div>
 
         <!-- Archivos adjuntos chips (dynamic display based on actual files added) -->
-        <div class="file-chips" *ngIf="archivosNombres().length > 0">
-          <div class="file-chip" *ngFor="let name of archivosNombres()">
+        @if (archivosNombres().length > 0) {
+<div class="file-chips">
+          @for (name of archivosNombres(); track name) {
+<div class="file-chip">
             <span class="material-symbols-outlined">attach_file</span>
             <span>{{ name }}</span>
             <button type="button" (click)="removeFile(name)">
               <span class="material-symbols-outlined">close</span>
             </button>
           </div>
+}
         </div>
+}
 
         <!-- SECTION: Vínculos y Responsables -->
         <div class="form-section">
@@ -164,28 +168,10 @@
                   class="field-input field-input--readonly"
                   id="field-instructor"
                   type="text"
-                  [value]="instructorCuentadante()"
+                  [value]="instructorId()"
                   readonly
                 />
                 <span class="material-symbols-outlined input-icon">person</span>
-              </div>
-            </div>
-
-            <div class="field-group col-span-2">
-              <label class="field-label" for="field-cufe">Código CUFE (64 caracteres)</label>
-              <div class="cufe-wrapper">
-                <input
-                  id="field-cufe"
-                  class="field-input cufe-input"
-                  type="text"
-                  placeholder="7084931a27e3...b7a8d0f1"
-                  [ngModel]="codigoCufe()"
-                  (ngModelChange)="codigoCufe.set($event)"
-                  name="codigoCufe"
-                  maxlength="64"
-                />
-                <span class="cufe-tag">AUTO-DETECT</span>
-                <span class="cufe-count">{{ codigoCufe().length }} / 64</span>
               </div>
             </div>
 
@@ -196,9 +182,9 @@
                   id="field-retencion"
                   class="field-input field-input--readonly text-primary font-bold"
                   type="text"
-                  [value]="retencionZESE() + '%'"
+                  [value]="valorRetencionZese() + '%'"
                   readonly
-                  name="retencionZESE"
+                  name="valorRetencionZese"
                 />
                 <span class="material-symbols-outlined input-icon text-primary">verified</span>
               </div>

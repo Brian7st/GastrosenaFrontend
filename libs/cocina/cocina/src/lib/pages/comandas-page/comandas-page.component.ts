@@ -7,7 +7,6 @@ import {
   PageHeaderComponent,
   SearchFilterComponent,
   SelectFilterComponent,
-  CardComponent,
   SectionTitleComponent
 } from '@restaurant/shared/ui';
 
@@ -21,7 +20,6 @@ import {
     PageHeaderComponent,
     SearchFilterComponent,
     SelectFilterComponent,
-    CardComponent,
     SectionTitleComponent
   ],
   templateUrl: './comandas-page.component.html',

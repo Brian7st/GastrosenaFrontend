@@ -1,0 +1,104 @@
+.reportes-wrapper {
+  padding: var(--space-6);
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+// ── Filtros ──────────────────────────────────────────────────────────────────
+
+.reportes-filtros {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-4);
+  background: var(--color-surface-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+// ── Secciones ─────────────────────────────────────────────────────────────────
+
+.reportes-seccion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+}
+
+.reportes-seccion__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-md);
+  border-left: 4px solid var(--color-warning);
+  background: rgba(253, 203, 110, 0.08);
+  width: 100%;
+}
+
+.reportes-seccion__titulo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.reportes-seccion__icono {
+  color: var(--color-warning);
+}
+
+.reportes-seccion__nombre {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+
+  &--warning { color: #b45309; }
+  &--danger  { color: #dc2626; }
+  &--info    { color: #0284c7; }
+}
+
+// ── Grid de cards ─────────────────────────────────────────────────────────────
+
+.reportes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.reporte-card {
+  background: var(--color-surface-primary);
+  border: 1px solid var(--color-border);
+  border-top: 3px solid var(--color-warning);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.reporte-card__body {
+  flex: 1;
+}
+
+.reporte-card__titulo {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.reporte-card__desc {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-base);
+}
+
+.reporte-card__actions {
+  display: flex;
+  gap: var(--space-2);
+}

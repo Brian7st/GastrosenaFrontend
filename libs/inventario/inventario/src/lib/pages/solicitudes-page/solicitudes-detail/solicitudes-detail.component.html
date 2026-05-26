@@ -10,20 +10,22 @@
 
     <div class="header-actions">
       <inventario-back-button (clicked)="onVolver()" />
-      <button class="btn-action" (click)="onEditar()" [disabled]="estadoActual() !== 'Borrador'">
+      <button class="btn-action" (click)="onEditar()" [disabled]="estadoActual() !== 'BORRADOR'">
         <span class="material-symbols-outlined">edit</span> Editar
       </button>
       <button class="btn-action" (click)="onDownloadPdf()">
         <span class="material-symbols-outlined">picture_as_pdf</span> Descargar PDF
       </button>
-      
+
       <div class="action-group">
-        <button class="btn-primary" (click)="onEnviarAprobacion()" [disabled]="estadoActual() !== 'Borrador'">
+        <button class="btn-primary" (click)="onEnviarAprobacion()" [disabled]="estadoActual() !== 'BORRADOR'">
           Enviar a Aprobación
         </button>
-        <div class="tooltip" *ngIf="estadoActual() !== 'Borrador'">
+        @if (estadoActual() !== 'BORRADOR') {
+<div class="tooltip">
           La solicitud ya fue enviada o no puede ser aprobada.
         </div>
+}
       </div>
     </div>
   </div>
@@ -36,7 +38,8 @@
     <div class="timeline-line-active" [style.width]="(estados.indexOf(estadoActual()) * 25) + '%'"></div>
 
     <div class="timeline-nodes">
-      <div class="node" *ngFor="let est of estados">
+      @for (est of estados; track est) {
+<div class="node">
         <div class="node-icon" 
              [ngClass]="{
                'node-icon--active': isActive(est) || isPast(est),
@@ -49,6 +52,7 @@
           {{ est }}
         </span>
       </div>
+}
     </div>
   </div>
 

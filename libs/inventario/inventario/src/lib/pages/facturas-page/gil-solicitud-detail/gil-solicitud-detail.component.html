@@ -1,4 +1,5 @@
-<div class="gil-detail" *ngIf="solicitud() as s; else loadingTpl">
+@if (solicitud(); as s) {
+<div class="gil-detail">
 
   <!-- ── TOPBAR ── -->
   <div class="topbar">
@@ -30,19 +31,29 @@
 
   <!-- ── TIMELINE ── -->
   <div class="timeline-container">
-    <div
-      *ngFor="let step of STEPS; let last = last"
+    @for (step of STEPS; track step; let last = $last) {
+<div
+     
       class="timeline-step"
       [ngClass]="'timeline-step--' + getStepState(step, s.estadoSolicitud)"
     >
       <div class="timeline-step__icon">
-        <span class="material-symbols-outlined" *ngIf="getStepState(step, s.estadoSolicitud) === 'active'">play_arrow</span>
-        <span class="material-symbols-outlined" *ngIf="getStepState(step, s.estadoSolicitud) === 'done'">check</span>
-        <span class="material-symbols-outlined" *ngIf="getStepState(step, s.estadoSolicitud) === 'pending'">radio_button_unchecked</span>
+        @if (getStepState(step, s.estadoSolicitud) === 'active') {
+<span class="material-symbols-outlined">play_arrow</span>
+}
+        @if (getStepState(step, s.estadoSolicitud) === 'done') {
+<span class="material-symbols-outlined">check</span>
+}
+        @if (getStepState(step, s.estadoSolicitud) === 'pending') {
+<span class="material-symbols-outlined">radio_button_unchecked</span>
+}
       </div>
       <span class="timeline-step__label">{{ step | uppercase }}</span>
-      <div class="timeline-step__connector" *ngIf="!last"></div>
+      @if (!last) {
+<div class="timeline-step__connector"></div>
+}
     </div>
+}
   </div>
 
   <!-- ── MAIN GRID ── -->
@@ -133,7 +144,8 @@
         </div>
 
         <div class="prefacturas-list">
-          <div class="prefactura-item" *ngFor="let pf of s.preFacturas">
+          @for (pf of s.preFacturas; track pf) {
+<div class="prefactura-item">
             <div class="prefactura-header">
               <div class="prefactura-header__left">
                 <span class="material-symbols-outlined">receipt_long</span>
@@ -155,15 +167,18 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let item of pf.items">
+                @for (item of pf.items; track item) {
+<tr>
                   <td>{{ item.descripcion }}</td>
                   <td class="td--center">{{ item.cantidad }}</td>
                   <td class="td--right">{{ formatMoney(item.precioUnitario) }}</td>
                   <td class="td--right td--bold">{{ formatMoney(item.total) }}</td>
                 </tr>
+}
               </tbody>
             </table>
           </div>
+}
         </div>
       </div>
 
@@ -175,10 +190,14 @@
         </div>
         <blockquote class="observacion-quote">{{ s.observaciones }}</blockquote>
 
-        <div class="comentarios-row" *ngIf="s.comentarios?.length">
-          <div class="comentario-bubble" *ngFor="let c of s.comentarios">{{ c }}</div>
+        @if (s.comentarios?.length) {
+<div class="comentarios-row">
+          @for (c of s.comentarios; track c) {
+<div class="comentario-bubble">{{ c }}</div>
+}
           <button class="btn-comentario">Añadir comentario +</button>
         </div>
+}
       </div>
 
     </div>
@@ -196,10 +215,13 @@
   </div>
 
 </div>
+} @else {
 
-<ng-template #loadingTpl>
   <div class="loading-state">
     <div class="loading-spinner"></div>
     <p>Cargando solicitud GIL...</p>
   </div>
-</ng-template>
+
+}
+
+

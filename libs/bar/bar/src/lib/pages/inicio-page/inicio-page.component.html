@@ -51,17 +51,19 @@
     ></restaurant-section-title>
 
     <div class="order-list showcase__stack">
-      <div class="order-item showcase__row" *ngFor="let pedido of pedidosPendientes" style="justify-content: space-between; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-secondary);">
-        <div class="left showcase__row">
-          <span class="showcase__value">Mesa {{ pedido.mesa }}</span>
-          <restaurant-status-badge 
-            [label]="pedido.estado" 
-            [variant]="getBadgeVariant(pedido.estado)"
-          ></restaurant-status-badge>
-          <p class="order-details" style="margin: 0; font-size: var(--font-size-sm);">{{ pedido.platos }}</p>
+      @for (pedido of pedidosPendientes; track pedido.platos) {
+        <div class="order-item showcase__row" style="justify-content: space-between; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-secondary);">
+          <div class="left showcase__row">
+            <span class="showcase__value">Mesa {{ pedido.mesa }}</span>
+            <restaurant-status-badge 
+              [label]="pedido.estado" 
+              [variant]="getBadgeVariant(pedido.estado)"
+            ></restaurant-status-badge>
+            <p class="order-details" style="margin: 0; font-size: var(--font-size-sm);">{{ pedido.platos }}</p>
+          </div>
+          <span class="time" style="font-size: var(--font-size-sm); color: var(--color-text-secondary);"><lucide-icon name="clock" size="14"></lucide-icon> {{ pedido.tiempo }}</span>
         </div>
-        <span class="time" style="font-size: var(--font-size-sm); color: var(--color-text-secondary);"><lucide-icon name="clock" size="14"></lucide-icon> {{ pedido.tiempo }}</span>
-      </div>
+      }
     </div>
 
     <div style="margin-top: var(--space-4);">

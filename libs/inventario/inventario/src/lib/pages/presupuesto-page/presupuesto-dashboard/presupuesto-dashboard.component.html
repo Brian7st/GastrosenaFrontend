@@ -11,7 +11,7 @@
       </p>
     </div>
     <div class="header-actions">
-      <restaurant-button variant="surface" routerLink="exportar">
+      <restaurant-button variant="surface" (click)="openExportModal()">
         <div class="btn-icon-text">
           <lucide-icon name="download" [size]="20"></lucide-icon>
           Exportar PDF
@@ -43,7 +43,7 @@
     <restaurant-kpi-card label="DISPONIBLE" [value]="resumen()!.totalDisponible | formatoMoneda" icon="wallet"
       iconColor="blue" trend="Saldo sin comprometer" [trendUp]="null"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="TOTAL ZESE APLICADA" [value]="resumen()!.totalZese | formatoMoneda" icon="percent"
+    <restaurant-kpi-card label="TOTAL ZESE APLICADA" [value]="resumen()!.totalZese | formatoMoneda" icon="shield-check"
       iconColor="red" trend="Retención 0.625%" [trendUp]="null"></restaurant-kpi-card>
   </div>
   }
@@ -79,41 +79,41 @@
           </tr>
         </thead>
         <tbody>
-          @for (programa of programas(); track programa.id) {
-          <!-- Fila de grupo (programa) -->
-          <tr class="grupo-row" (click)="togglePrograma(programa.id)">
+          @for (grupo of grupos(); track grupo.fichaId) {
+          <!-- Fila de grupo (agrupado por ficha) -->
+          <tr class="grupo-row" (click)="toggleGrupo(grupo.fichaId)">
             <td class="col-estructura">
               <div class="grupo-toggle">
-                <lucide-icon [name]="isExpanded(programa.id) ? 'chevron-down' : 'chevron-right'" [size]="16"
+                <lucide-icon [name]="isExpanded(grupo.fichaId) ? 'chevron-down' : 'chevron-right'" [size]="16"
                   class="toggle-chevron"></lucide-icon>
-                <span class="grupo-nombre">{{ programa.nombre }}</span>
+                <span class="grupo-nombre">{{ grupo.programaFormacion }}</span>
               </div>
             </td>
-            <td class="col-money grupo-value">{{ programa.totalApropiacion | formatoMoneda:false }}</td>
-            <td class="col-money grupo-value">{{ programa.totalDisponible | formatoMoneda:false }}</td>
-            <td class="col-money grupo-value">{{ programa.totalComprometido | formatoMoneda:false }}</td>
-            <td class="col-money grupo-value">{{ programa.totalPagado | formatoMoneda:false }}</td>
-            <td class="col-money grupo-value">{{ programa.totalZese | formatoMoneda:false }}</td>
+            <td class="col-money grupo-value">{{ grupo.totalMontoAsignado | formatoMoneda:false }}</td>
+            <td class="col-money grupo-value">{{ grupo.totalSaldoDisponible | formatoMoneda:false }}</td>
+            <td class="col-money grupo-value">{{ grupo.totalMontoComprometido | formatoMoneda:false }}</td>
+            <td class="col-money grupo-value">{{ grupo.totalMontoPagado | formatoMoneda:false }}</td>
+            <td class="col-money grupo-value">{{ grupo.totalZese | formatoMoneda:false }}</td>
             <td class="col-ejecucion">
-              <span class="ejecucion-badge" [ngClass]="getEjecucionClass(programa.porcentajeEjecucion)">
-                {{ programa.porcentajeEjecucion }}%
+              <span class="ejecucion-badge" [ngClass]="getEjecucionClass(grupo.porcentajeEjecucion)">
+                {{ grupo.porcentajeEjecucion }}%
               </span>
             </td>
           </tr>
-          <!-- Filas de rubros (se muestran si el programa está expandido) -->
-          @if (isExpanded(programa.id)) {
-          @for (rubro of programa.rubros; track rubro.id) {
+          <!-- Filas de rubros (se muestran si el grupo está expandido) -->
+          @if (isExpanded(grupo.fichaId)) {
+          @for (rubro of grupo.rubros; track rubro.id) {
           <tr class="rubro-row">
             <td class="col-estructura">
               <div class="rubro-info">
                 <span class="rubro-codigo">{{ rubro.codigo }}</span>
-                <span class="rubro-nombre">{{ rubro.nombre }}</span>
+                <span class="rubro-nombre">{{ rubro.descripcion }}</span>
               </div>
             </td>
-            <td class="col-money">{{ rubro.apropiacionInicial | formatoMoneda:false }}</td>
-            <td class="col-money">{{ rubro.disponible | formatoMoneda:false }}</td>
-            <td class="col-money">{{ rubro.comprometido | formatoMoneda:false }}</td>
-            <td class="col-money">{{ rubro.pagado | formatoMoneda:false }}</td>
+            <td class="col-money">{{ rubro.montoAsignado | formatoMoneda:false }}</td>
+            <td class="col-money">{{ rubro.saldoDisponible | formatoMoneda:false }}</td>
+            <td class="col-money">{{ rubro.montoComprometido | formatoMoneda:false }}</td>
+            <td class="col-money">{{ rubro.montoPagado | formatoMoneda:false }}</td>
             <td class="col-money">{{ rubro.retencionZese | formatoMoneda:false }}</td>
             <td class="col-ejecucion">
               <div class="ejecucion-bar-container">
@@ -214,7 +214,7 @@
       </tr>
     </thead>
     <tbody>
-      @for (a of afectaciones(); track a.id) {
+      @for (a of afectacionesPaginadas(); track a.id) {
       <tr class="table-row">
         <td class="text-center">
           <span class="fecha-text">{{ a.fecha }}</span>
@@ -247,15 +247,51 @@
     </tbody>
     
     <div dtFooter class="pagination-footer">
-      <span class="results-count">Mostrando 1–{{ afectaciones().length }} de {{ afectaciones().length }} resultados</span>
+      <span class="results-count">
+        Mostrando {{ (paginaActual() - 1) * ITEMS_POR_PAGINA + 1 }}–{{ minOf(paginaActual() * ITEMS_POR_PAGINA, afectaciones().length) }}
+        de {{ afectaciones().length }} resultados
+      </span>
       <div class="page-numbers">
-        <button class="page-btn page-btn--active">1</button>
-        <button class="page-btn">2</button>
-        <button class="page-btn">3</button>
+        <button
+          class="page-btn page-btn--nav"
+          [disabled]="paginaActual() === 1"
+          (click)="anterior()"
+          aria-label="Página anterior"
+        >
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+
+        @for (p of paginas(); track p) {
+          <button
+            class="page-btn"
+            [class.page-btn--active]="paginaActual() === p"
+            (click)="irAPagina(p)"
+          >{{ p }}</button>
+        }
+
+        <button
+          class="page-btn page-btn--nav"
+          [disabled]="paginaActual() === totalPaginas()"
+          (click)="siguiente()"
+          aria-label="Página siguiente"
+        >
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
       </div>
     </div>
   </restaurant-data-table>
 </div>
 
-<!-- Router outlet para modales (registrar, traslado, exportar, cargar-gil) -->
+<!-- Modal de exportación -->
+@if (showExportModal()) {
+<inventario-exportar
+ 
+  titulo="Exportar Presupuesto"
+  subtitulo="Seleccione el formato de salida para el presupuesto general"
+  (exportar)="onExport($event)"
+  (cerrar)="closeExportModal()">
+</inventario-exportar>
+}
+
+<!-- Router outlet para modales (registrar, traslado, cargar-gil) -->
 <router-outlet></router-outlet>

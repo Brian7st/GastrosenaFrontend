@@ -1,1 +1,146 @@
-<p>cuentas-page.component works!</p>
+<div class="cuentas-page">
+
+  <restaurant-page-header
+    title="Gestión de Cuentas"
+    subtitle="Bloqueo, desbloqueo e historial de accesos por usuario"
+  ></restaurant-page-header>
+
+  @if (error()) {
+    <restaurant-alert type="error" [message]="error()!"></restaurant-alert>
+  }
+
+  <!-- KPI Cards -->
+  <div class="cuentas-page__kpis">
+    <restaurant-kpi-card
+      label="Cuentas Bloqueadas"
+      [value]="totalBloqueadas().toString()"
+      icon="lock"
+      iconColor="red"
+    ></restaurant-kpi-card>
+    <restaurant-kpi-card
+      label="Cuentas Activas"
+      [value]="totalActivas().toString()"
+      icon="shield-check"
+      iconColor="green"
+    ></restaurant-kpi-card>
+  </div>
+
+  <!-- Filtros -->
+  <div class="cuentas-page__filters">
+    <button
+      class="cuentas-page__filter-btn"
+      [class.cuentas-page__filter-btn--active]="filtroEstado() === 'todos'"
+      type="button"
+      (click)="filtroEstado.set('todos')"
+    >
+      Todos
+    </button>
+    <button
+      class="cuentas-page__filter-btn"
+      [class.cuentas-page__filter-btn--active]="filtroEstado() === 'bloqueados'"
+      type="button"
+      (click)="filtroEstado.set('bloqueados')"
+    >
+      <lucide-icon name="lock" [size]="14"></lucide-icon>
+      Bloqueados
+    </button>
+    <button
+      class="cuentas-page__filter-btn"
+      [class.cuentas-page__filter-btn--active]="filtroEstado() === 'activos'"
+      type="button"
+      (click)="filtroEstado.set('activos')"
+    >
+      <lucide-icon name="shield-check" [size]="14"></lucide-icon>
+      Activos
+    </button>
+  </div>
+
+  @if (loading()) {
+    <restaurant-loading-skeleton [lines]="5"></restaurant-loading-skeleton>
+  } @else {
+    <restaurant-data-table>
+      <thead>
+        <tr>
+          <th>Usuario</th>
+          <th>Rol</th>
+          <th>Intentos fallidos</th>
+          <th>Estado cuenta</th>
+          <th>Último acceso</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (u of usuariosFiltrados(); track u.id) {
+          <tr>
+            <td>
+              <div class="cuentas-page__user">
+                <restaurant-usuario-avatar
+                  [nombre]="u.nombre"
+                  [apellidos]="u.apellidos"
+                ></restaurant-usuario-avatar>
+                <div>
+                  <p class="cuentas-page__user-name">{{ u.nombre }} {{ u.apellidos }}</p>
+                  <p class="cuentas-page__user-email">{{ u.email }}</p>
+                </div>
+              </div>
+            </td>
+            <td>
+              <restaurant-usuario-rol-badge [rol]="u.rol"></restaurant-usuario-rol-badge>
+            </td>
+            <td>
+              <span
+                class="cuentas-page__intentos"
+                [class.cuentas-page__intentos--alert]="u.intentosFallidos > 0"
+              >
+                {{ u.intentosFallidos }}
+              </span>
+            </td>
+            <td>
+              <span
+                class="cuentas-page__estado"
+                [class.cuentas-page__estado--bloqueada]="u.cuentaBloqueada"
+                [class.cuentas-page__estado--activa]="!u.cuentaBloqueada"
+              >
+                {{ u.cuentaBloqueada ? 'Bloqueada' : 'Activa' }}
+              </span>
+            </td>
+            <td class="cuentas-page__last-access">
+              {{ (u.ultimoAcceso | date:'dd/MM/yyyy HH:mm') || '—' }}
+            </td>
+            <td>
+              @if (u.cuentaBloqueada) {
+                <button
+                  class="cuentas-page__action-btn cuentas-page__action-btn--unlock"
+                  type="button"
+                  (click)="onDesbloquear(u.id)"
+                >
+                  <lucide-icon name="unlock" [size]="14"></lucide-icon>
+                  Desbloquear
+                </button>
+              } @else {
+                <button
+                  class="cuentas-page__action-btn cuentas-page__action-btn--lock"
+                  type="button"
+                  (click)="onBloquear(u.id)"
+                >
+                  <lucide-icon name="lock" [size]="14"></lucide-icon>
+                  Bloquear
+                </button>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="cuentas-page__empty-cell">
+              <restaurant-empty-state
+                title="Sin resultados"
+                message="No hay cuentas que coincidan con el filtro seleccionado."
+              ></restaurant-empty-state>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </restaurant-data-table>
+  }
+
+</div>

@@ -39,40 +39,36 @@
   <!-- KPIs Bento Grid -->
   <div class="kpi-grid">
     <restaurant-kpi-card
-      label="ENTRADAS HOY"
-      value="142"
+      label="ENTRADAS"
+      [value]="kpiEntradas()"
       icon="log-in"
-      iconColor="green"
-      trend="+12%"
-      [trendUp]="true"
-    ></restaurant-kpi-card>
+      iconColor="green">
+    </restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="SALIDAS HOY"
-      value="86"
+      label="SALIDAS"
+      [value]="kpiSalidas()"
       icon="log-out"
-      iconColor="orange"
-      trend="-4%"
-      [trendUp]="false"
-    ></restaurant-kpi-card>
+      iconColor="orange">
+    </restaurant-kpi-card>
 
     <restaurant-kpi-card
       label="VALOR ENTRADAS"
-      value="$4.2M"
+      [value]="kpiValorEntradas() | currency:'COP':'symbol-narrow':'1.0-0'"
       icon="banknote"
       iconColor="blue"
-      trend="Semana Actual"
-      [trendUp]="null"
-    ></restaurant-kpi-card>
+      trend="Total cargado"
+      [trendUp]="null">
+    </restaurant-kpi-card>
 
     <restaurant-kpi-card
       label="PENDIENTES"
-      value="09"
+      [value]="kpiPendientes()"
       icon="alert-circle"
       iconColor="red"
       trend="Requieren verificación"
-      [trendUp]="null"
-    ></restaurant-kpi-card>
+      [trendUp]="null">
+    </restaurant-kpi-card>
   </div>
 
   <!-- Main Data Table Container -->
@@ -97,8 +93,6 @@
         <th style="text-align: center;">Código SENA</th>
         <th style="text-align: center;">Cantidad</th>
         <th style="text-align: center;">Fecha/Hora</th>
-        <th style="text-align: center;">Origen/Destino</th>
-        <th style="text-align: center;">Doc. origen</th>
         <th style="text-align: center;">Valor</th>
         <th style="text-align: center;">Estado</th>
         <th style="text-align: center;">Acciones</th>
@@ -115,7 +109,6 @@
         </td>
         <td style="text-align: center;">
           <p class="prod-name">{{ movimiento.productoNombre }}</p>
-          <p class="prod-sku">SKU: {{ movimiento.productoSku }}</p>
         </td>
         <td style="text-align: center;">
           <span class="code-sena">{{ movimiento.codigoSena }}</span>
@@ -124,19 +117,11 @@
           <span class="qty-val" [ngClass]="movimiento.tipo === 'ENTRADA' ? 'qty-val--entrada' : 'qty-val--salida'">
             {{ movimiento.tipo === 'ENTRADA' ? '+' : '-' }}{{ movimiento.cantidad }}
           </span>
-          <span class="qty-unit">{{ movimiento.unidad }}</span>
+          <span class="qty-unit">{{ movimiento.unidadMedida }}</span>
         </td>
         <td style="text-align: center;">
-          <p class="date-text">{{ movimiento.fecha }}</p>
-          <p class="time-text">{{ movimiento.hora }}</p>
-        </td>
-        <td style="text-align: center;">
-          <p class="origin-text">{{ movimiento.origenDestino }}</p>
-        </td>
-        <td style="text-align: center;">
-          <a href="javascript:void(0)" class="doc-link">
-            <lucide-icon name="external-link" [size]="14"></lucide-icon> {{ movimiento.docOrigen }}
-          </a>
+          <p class="date-text">{{ movimiento.fechaMovimiento.split('T')[0] }}</p>
+          <p class="time-text">{{ movimiento.fechaMovimiento.split('T')[1]?.slice(0, 5) }}</p>
         </td>
         <td style="text-align: center;">
           <p class="money-val">{{ movimiento.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
@@ -155,7 +140,7 @@
       }
     </tbody>
     <div dtFooter class="dt-footer">
-      <span class="table-pagination__info">Mostrando 4 de 12 registros de movimientos</span>
+      <span class="table-pagination__info">Mostrando {{ movimientos().length }} movimiento(s)</span>
       <div class="pagination-btns">
         <button class="pagination-btn" disabled>
           <span class="material-symbols-outlined">chevron_left</span>

@@ -1,1 +1,1 @@
-export const usuarios_util_placeholder = true;
+export { ROL_CLASS_MAP, getRolClass } from './rol-class.util';

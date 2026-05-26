@@ -28,10 +28,10 @@
 
 .acta-create__stepper-track {
   position: absolute;
-  left: 0;
+  left: 1.25rem; /* centro del primer círculo (2.5rem / 2) */
   top: 50%;
   transform: translateY(-50%);
-  width: 100%;
+  width: calc(100% - 2.5rem); /* de centro a centro */
   height: 4px;
   background: var(--color-superficie-contenedor-alto);
   border-radius: var(--radius-pill);
@@ -40,10 +40,11 @@
 
 .acta-create__stepper-progress {
   position: absolute;
-  left: 0;
+  left: 1.25rem; /* mismo origen que el track */
   top: 50%;
   transform: translateY(-50%);
   height: 4px;
+  max-width: calc(100% - 2.5rem); /* nunca supera el último círculo */
   background: var(--color-primario);
   border-radius: var(--radius-pill);
   z-index: 0;
