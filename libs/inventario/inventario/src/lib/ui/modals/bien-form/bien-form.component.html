@@ -28,12 +28,18 @@
 
         <div class="field-row">
           <div class="field-group">
-            <label class="field-label">CÓD. INTERNO SENA</label>
-            <input class="field-input field-input--disabled" formControlName="codigoSena"
-                   [placeholder]="mode === 'create' ? 'Autogenerado' : ''" />
-            @if (mode === 'create') {
-<p class="field-hint">Se generará automáticamente al guardar</p>
-}
+            <label class="field-label">CÓD. INTERNO SENA <span class="required">*</span></label>
+            <input class="field-input"
+                   formControlName="codigoSena"
+                   [class.field-input--disabled]="mode === 'edit'"
+                   [class.field-input--error]="hasError('codigoSena')"
+                   [placeholder]="mode === 'create' ? 'Ej. SENA-00123' : ''" />
+            @if (hasError('codigoSena')) {
+              <p class="field-error">El código SENA es obligatorio</p>
+            }
+            @if (mode === 'edit') {
+              <p class="field-hint">El código SENA no puede modificarse una vez creado</p>
+            }
           </div>
           <div class="field-group">
             <label class="field-label">CÓD. PROVEEDOR</label>

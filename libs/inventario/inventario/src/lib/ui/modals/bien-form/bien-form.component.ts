@@ -45,6 +45,8 @@ export class BienFormComponent implements OnInit {
         unidadMedida:    this.bien.unidadMedida,
         imagenUrl:       this.bien.imagenUrl ?? '',
       });
+      // En edición el código SENA es inmutable — no se puede cambiar
+      this.form.get('codigoSena')?.disable();
       if (this.umBloqueada()) {
         this.form.get('unidadMedida')?.disable();
       }
@@ -53,7 +55,7 @@ export class BienFormComponent implements OnInit {
 
   private initForm(): void {
     this.form = this.fb.group({
-      codigoSena:      [{ value: '', disabled: true }],
+      codigoSena:      ['', Validators.required],   // habilitado en create; se deshabilita en edit
       codigoProveedor: [''],
       nombre:          ['', [Validators.required, Validators.minLength(3)]],
       descripcion:     [''],
