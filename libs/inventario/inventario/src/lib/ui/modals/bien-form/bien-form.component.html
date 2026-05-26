@@ -100,6 +100,21 @@
             </select>
           </div>
         </div>
+
+        <div class="field-group">
+          <label class="field-label">IMAGEN DEL BIEN</label>
+          <label class="file-upload-label">
+            <input type="file" accept="image/*" class="file-input-hidden"
+                   (change)="onImagenSeleccionada($event)" />
+            <span class="material-symbols-outlined">upload_file</span>
+            <span>{{ form.get('imagenUrl')?.value ? 'Cambiar imagen' : 'Seleccionar archivo' }}</span>
+          </label>
+          @if (form.get('imagenUrl')?.value) {
+            <img [src]="form.get('imagenUrl')?.value"
+                 alt="Vista previa"
+                 class="imagen-preview" />
+          }
+        </div>
       </div>
 
     </div>

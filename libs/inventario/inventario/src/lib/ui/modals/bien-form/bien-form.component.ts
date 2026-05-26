@@ -43,6 +43,7 @@ export class BienFormComponent implements OnInit {
         descripcion:     this.bien.descripcion ?? '',
         categoria:       this.bien.categoria,
         unidadMedida:    this.bien.unidadMedida,
+        imagenUrl:       this.bien.imagenUrl ?? '',
       });
       if (this.umBloqueada()) {
         this.form.get('unidadMedida')?.disable();
@@ -58,6 +59,7 @@ export class BienFormComponent implements OnInit {
       descripcion:     [''],
       categoria:       ['', Validators.required],
       unidadMedida:    ['', Validators.required],
+      imagenUrl:       [''],
     });
   }
 
@@ -71,6 +73,16 @@ export class BienFormComponent implements OnInit {
 
   onCancel(): void {
     this.cancel.emit();
+  }
+
+  onImagenSeleccionada(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.form.patchValue({ imagenUrl: reader.result as string });
+    };
+    reader.readAsDataURL(file);
   }
 
   hasError(field: string): boolean {

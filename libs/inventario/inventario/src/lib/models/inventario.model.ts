@@ -158,4 +158,5 @@ export interface BienFormDto {
   descripcion?: string;
   categoria: string;
   unidadMedida: string;
+  imagenUrl?: string;
 }

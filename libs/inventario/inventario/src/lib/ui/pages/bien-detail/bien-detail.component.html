@@ -24,10 +24,10 @@
         <span class="material-symbols-outlined">history</span>
         Exportar Historial
       </button>
-      <button class="btn-gradient" (click)="onEditarActivo()">
+      <restaurant-button variant="primary" (click)="onEditarActivo()">
         <span class="material-symbols-outlined">edit</span>
-        Editar Activo
-      </button>
+        Editar Bien
+      </restaurant-button>
     </div>
   </div>
 
@@ -121,41 +121,49 @@
       <button class="link-btn">Ver todo el historial</button>
     </div>
 
-    <div class="movements-table-wrap">
-      <table class="movements-table">
-        <thead>
-          <tr>
-            <th>FECHA</th>
-            <th>TIPO</th>
-            <th>RESPONSABLE</th>
-            <th>UBICACIÓN</th>
-            <th>CANTIDAD</th>
-            <th>OBSERVACIÓN</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (m of movimientos(); track m) {
-<tr>
-            <td class="mov-fecha">{{ m.fecha | date:'dd/MM/yyyy' }}</td>
-            <td>
-              <restaurant-status-badge
-                [label]="m.tipo"
-                [variant]="getTipoVariant(m.tipo)">
-              </restaurant-status-badge>
-            </td>
-            <td class="mov-responsable">{{ m.responsable }}</td>
-            <td class="mov-ubicacion">{{ m.ubicacion }}</td>
-            <td>
-              <span class="cantidad-text" [ngClass]="getCantidadClass(m.cantidad)">
-                {{ getCantidadPrefix(m.cantidad) }}
-              </span>
-            </td>
-            <td class="mov-obs">{{ m.observacion }}</td>
-          </tr>
-}
-        </tbody>
-      </table>
-    </div>
+    @if (movimientos().length > 0) {
+      <div class="movements-table-wrap">
+        <table class="movements-table">
+          <thead>
+            <tr>
+              <th>FECHA</th>
+              <th>TIPO</th>
+              <th>RESPONSABLE</th>
+              <th>UBICACIÓN</th>
+              <th>CANTIDAD</th>
+              <th>OBSERVACIÓN</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (m of movimientos(); track m) {
+              <tr>
+                <td class="mov-fecha">{{ m.fecha | date:'dd/MM/yyyy' }}</td>
+                <td>
+                  <restaurant-status-badge
+                    [label]="m.tipo"
+                    [variant]="getTipoVariant(m.tipo)">
+                  </restaurant-status-badge>
+                </td>
+                <td class="mov-responsable">{{ m.responsable }}</td>
+                <td class="mov-ubicacion">{{ m.ubicacion }}</td>
+                <td>
+                  <span class="cantidad-text" [ngClass]="getCantidadClass(m.cantidad)">
+                    {{ getCantidadPrefix(m.cantidad) }}
+                  </span>
+                </td>
+                <td class="mov-obs">{{ m.observacion }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="empty-state">
+        <span class="material-symbols-outlined">sync</span>
+        <p>Sin movimientos registrados</p>
+        <small>Este bien aún no tiene movimientos de inventario.</small>
+      </div>
+    }
   </section>
 
   <!-- Facturas de Abastecimiento -->
