@@ -7,6 +7,7 @@ import {
   FacturarPedidoRequest, MetodoPago
 } from '../models/restaurante.model';
 import { RestauranteService } from './restaurante.service';
+import { AuthService } from './auth.service';
 import { catchError, of } from 'rxjs';
 
 /**
@@ -40,6 +41,7 @@ export interface PedidoCarrito {
 @Injectable({ providedIn: 'root' })
 export class RestauranteFacade {
   private restauranteService = inject(RestauranteService);
+  private authService = inject(AuthService);
 
   // Estado privado con Signals
   private _mesas          = signal<Mesa[]>([]);
@@ -293,7 +295,7 @@ export class RestauranteFacade {
     this._pedidoActivo.set({
       id: `LOCAL-${Date.now()}`, // UUID temporal
       mesaId,
-      meseroId: '00000000-0000-0000-0000-000000000000', // El backend lo sobrescribe con el user autenticado
+      meseroId: this.authService.getUsuarioId(),
       numeroComensales: numeroComensales || 1,
       estado: 'BORRADOR',
       fechaCreacion: new Date().toISOString(),
