@@ -18,6 +18,7 @@ export const {
   selectLoadingHistorial,
   selectRolesDetalle,
   selectLoadingRolesDetalle,
+  selectLoadingAsignacion,
 } = usuariosFeature;
 
 export const selectTotalActivos = createSelector(

@@ -24,6 +24,7 @@ export interface UsuariosState {
   loadingHistorial:    boolean;
   rolesDetalle:        RolDetalle[];
   loadingRolesDetalle: boolean;
+  loadingAsignacion:   boolean;
 }
 
 const initialState: UsuariosState = {
@@ -43,6 +44,7 @@ const initialState: UsuariosState = {
   loadingHistorial:    false,
   rolesDetalle:        [],
   loadingRolesDetalle: false,
+  loadingAsignacion:   false,
 };
 
 export const usuariosFeature = createFeature({
@@ -186,6 +188,17 @@ export const usuariosFeature = createFeature({
     })),
     on(UsuariosActions.cargarRolesDetalleFallido, (state, { error }) => ({
       ...state, loadingRolesDetalle: false, error,
+    })),
+
+    // ── Asignación masiva de rol ──────────────────────────────────────────────
+    on(UsuariosActions.asignarRolMasivo, state => ({
+      ...state, loadingAsignacion: true, error: null,
+    })),
+    on(UsuariosActions.asignarRolMasivoExitoso, state => ({
+      ...state, loadingAsignacion: false,
+    })),
+    on(UsuariosActions.asignarRolMasivoFallido, (state, { error }) => ({
+      ...state, loadingAsignacion: false, error,
     })),
 
     // ── Historial ─────────────────────────────────────────────────────────────

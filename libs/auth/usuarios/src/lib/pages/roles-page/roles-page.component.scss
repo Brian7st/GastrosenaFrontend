@@ -1,7 +1,11 @@
 .roles-page {
   display: flex;
   flex-direction: column;
+<<<<<<< HEAD
   gap: var(--space-6);
+=======
+  gap: var(--space-8);
+>>>>>>> d718d77 (feat(auth): mejorar filtros lista-page y cuentas-page con barra unificada)
   padding: var(--space-6);
 
   // ── KPI Cards ─────────────────────────────────────────────────────────────
@@ -10,6 +14,7 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: var(--space-4);
+<<<<<<< HEAD
 
     @media (max-width: 480px) {
       grid-template-columns: 1fr;
@@ -17,17 +22,48 @@
   }
 
   // ── Grid ──────────────────────────────────────────────────────────────────
+=======
+
+    @media (max-width: 480px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // ── Secciones ─────────────────────────────────────────────────────────────
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  &__section-title {
+    font-family: var(--font-family-headline);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-heading);
+    margin: 0;
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  // ── Grid de cards ─────────────────────────────────────────────────────────
+>>>>>>> d718d77 (feat(auth): mejorar filtros lista-page y cuentas-page con barra unificada)
 
   &__grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-5);
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-4);
 
-    @media (max-width: 1024px) {
+    @media (max-width: 1200px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    @media (max-width: 768px) {
       grid-template-columns: repeat(2, 1fr);
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: 480px) {
       grid-template-columns: 1fr;
     }
   }
@@ -44,11 +80,11 @@
     background: var(--color-surface-primary);
     border-radius: var(--radius-xl);
     border: 1px solid var(--color-border);
+    border-top: 3px solid var(--card-accent);
     box-shadow: var(--shadow-sm);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    border-top: 3px solid var(--card-accent);
     transition: box-shadow var(--duration-fast) var(--ease-standard),
                 transform   var(--duration-fast) var(--ease-standard);
 
@@ -57,15 +93,9 @@
       transform: translateY(-2px);
     }
 
-    // ── Per-role accent colors ─────────────────────────────────────────────
-
-    &--admin      { --card-accent: var(--color-rol-administrador); }
-    &--contadora  { --card-accent: var(--color-rol-contadora); }
-    &--instructor { --card-accent: var(--color-rol-instructor); }
-    &--chef       { --card-accent: var(--color-rol-chef); }
-    &--lider-bar  { --card-accent: var(--color-rol-lider-bar); }
     &--mesero     { --card-accent: var(--color-rol-mesero); }
     &--bartender  { --card-accent: var(--color-rol-bartender); }
+    &--chef       { --card-accent: var(--color-rol-chef); }
     &--auxiliar   { --card-accent: var(--color-rol-auxiliar); }
     &--cajero     { --card-accent: var(--color-rol-cajero); }
     &--admin-cocina { --card-accent: var(--color-rol-chef); }
@@ -83,8 +113,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 42px;
-    height: 42px;
+    width: 40px;
+    height: 40px;
     border-radius: var(--radius-md);
     background: color-mix(in srgb, var(--card-accent) 12%, transparent);
     color: var(--card-accent);
@@ -97,12 +127,10 @@
   }
 
   &__card-title {
-    font-family: var(--font-family-headline);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-semibold);
     color: var(--color-text-heading);
     margin: 0 0 var(--space-1);
-    word-break: break-word;
   }
 
   &__card-desc {
@@ -112,12 +140,12 @@
     line-height: 1.4;
   }
 
-  // ── Permisos list ─────────────────────────────────────────────────────────
+  // ── Permisos ──────────────────────────────────────────────────────────────
 
   &__permisos {
     list-style: none;
     margin: 0;
-    padding: var(--space-1) var(--space-4) var(--space-3);
+    padding: 0 var(--space-4) var(--space-3);
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
@@ -157,5 +185,148 @@
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-medium);
     color: var(--color-text-secondary);
+  }
+
+  // ── Toolbar de asignación ──────────────────────────────────────────────────
+
+  &__toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-superficie-contenedor-bajo);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+  }
+
+  &__check-all {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  &__checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--color-primario);
+  }
+
+  &__badge-count {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-full);
+    background: var(--color-brand-primary-soft);
+    color: var(--color-brand-primary-strong);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+  }
+
+  &__rol-select {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-primary);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
+    font-family: var(--font-family-base);
+    cursor: pointer;
+    min-width: 180px;
+
+    &:focus {
+      outline: 2px solid var(--color-primario);
+      outline-offset: 2px;
+    }
+  }
+
+  &__asignar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border: none;
+    border-radius: var(--radius-md);
+    background: var(--color-primario);
+    color: var(--color-en-primario);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    font-family: var(--font-family-base);
+    cursor: pointer;
+    transition: background var(--duration-fast) var(--ease-standard);
+    margin-left: auto;
+
+    &:hover:not(:disabled) {
+      background: var(--color-primario-hover);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  // ── Tabla ─────────────────────────────────────────────────────────────────
+
+  &__col-check {
+    width: 44px;
+  }
+
+  &__row--selected {
+    background: var(--color-brand-primary-soft);
+  }
+
+  &__user {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  &__user-name {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+    margin: 0;
+  }
+
+  &__user-email {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+
+  &__ficha {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+  }
+
+  &__action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    transition: background var(--duration-fast) var(--ease-standard),
+                color    var(--duration-fast) var(--ease-standard);
+
+    &:hover {
+      background: var(--color-superficie-contenedor);
+      color: var(--color-text-primary);
+    }
+  }
+
+  &__empty-cell {
+    text-align: center;
+    padding: var(--space-8);
   }
 }
