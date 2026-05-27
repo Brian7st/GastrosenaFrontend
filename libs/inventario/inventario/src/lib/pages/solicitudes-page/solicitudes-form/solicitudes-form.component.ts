@@ -8,6 +8,7 @@ import { BienSolicitud } from '../../../models/solicitudes-gil.model';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { Bien } from '../../../models/inventario.model';
+import { GIL_DEFAULTS } from '../../../util/gil-defaults.config';
 
 interface SolicitudRow {
   id: string;
@@ -52,12 +53,13 @@ export class SolicitudesFormComponent implements OnInit {
   );
 
   // ── Signals de campos del formulario (alineados con CrearGilHttpRequest) ─
+  // Los campos institucionales se pre-llenan con los valores del centro SENA Quindío.
   fechaSolicitud          = signal(new Date().toISOString().split('T')[0]);
-  regionalCodigo          = signal<number | null>(null);
-  regionalNombre          = signal('');
-  centroCostosCodigo      = signal<number | null>(null);
-  centroCostosNombre      = signal('');
-  area                    = signal('');
+  regionalCodigo          = signal<number | null>(GIL_DEFAULTS.regionalCodigo);
+  regionalNombre          = signal(GIL_DEFAULTS.regionalNombre);
+  centroCostosCodigo      = signal<number | null>(GIL_DEFAULTS.centroCostosCodigo);
+  centroCostosNombre      = signal(GIL_DEFAULTS.centroCostosNombre);
+  area                    = signal(GIL_DEFAULTS.area);
   destinoBienes           = signal('FORMACION');
   jefeOficinaCoordinador  = signal('');
   solicitante             = signal('');
