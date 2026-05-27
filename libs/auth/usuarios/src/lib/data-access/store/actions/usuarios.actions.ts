@@ -2,6 +2,7 @@ import { createActionGroup, emptyProps, props } from '@ngrx/store';
 import { PaginatedResponse } from '@restaurant/shared/models';
 import {
   ActualizarUsuarioRequest,
+  AsignacionMasivaRequest,
   CrearUsuarioRequest,
   ExportarConfig,
   FiltrosUsuarios,
@@ -70,6 +71,11 @@ export const UsuariosActions = createActionGroup({
     'Cargar Roles Detalle':         emptyProps(),
     'Cargar Roles Detalle Exitoso': props<{ roles: RolDetalle[] }>(),
     'Cargar Roles Detalle Fallido': props<{ error: string }>(),
+
+    // ── Asignación masiva de rol ──────────────────────────────────────────────
+    'Asignar Rol Masivo':           props<{ request: AsignacionMasivaRequest }>(),
+    'Asignar Rol Masivo Exitoso':   emptyProps(),
+    'Asignar Rol Masivo Fallido':   props<{ error: string }>(),
 
     // ── Historial ─────────────────────────────────────────────────────────────
     'Cargar Historial':             emptyProps(),

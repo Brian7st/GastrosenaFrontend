@@ -195,6 +195,22 @@ export const cargarRolesDetalle$ = createEffect(
   { functional: true },
 );
 
+export const asignarRolMasivo$ = createEffect(
+  (actions$ = inject(Actions), svc = inject(UsuariosService)) =>
+    actions$.pipe(
+      ofType(UsuariosActions.asignarRolMasivo),
+      concatMap(({ request }) =>
+        svc.asignarRolMasivo(request).pipe(
+          map(() => UsuariosActions.asignarRolMasivoExitoso()),
+          catchError((err: unknown) =>
+            of(UsuariosActions.asignarRolMasivoFallido({ error: extractErrorMessage(err) })),
+          ),
+        ),
+      ),
+    ),
+  { functional: true },
+);
+
 export const cargarHistorial$ = createEffect(
   (actions$ = inject(Actions), svc = inject(UsuariosService)) =>
     actions$.pipe(

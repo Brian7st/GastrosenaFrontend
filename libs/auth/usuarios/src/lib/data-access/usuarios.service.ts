@@ -5,6 +5,7 @@ import { BaseHttpService } from '@restaurant/shared/api';
 import { PaginatedResponse } from '@restaurant/shared/models';
 import {
   ActualizarUsuarioRequest,
+  AsignacionMasivaRequest,
   CrearUsuarioRequest,
   ExportarConfig,
   FiltrosUsuarios,
@@ -73,6 +74,10 @@ export class UsuariosService extends BaseHttpService {
       this.buildUrl(`${this.resource}/importar`),
       formData,
     );
+  }
+
+  asignarRolMasivo(request: AsignacionMasivaRequest): Observable<void> {
+    return this.http.put<void>(this.buildUrl(`${this.resource}/roles/masivo`), request);
   }
 
   getHistorial(): Observable<HistorialItem[]> {

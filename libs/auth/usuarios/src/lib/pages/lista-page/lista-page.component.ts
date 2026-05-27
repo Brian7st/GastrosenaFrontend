@@ -14,8 +14,6 @@ import {
   DataTableComponent,
   KpiCardComponent,
   LucideIconComponent,
-  SearchFilterComponent,
-  SelectFilterComponent,
 } from '@restaurant/shared/ui';
 import { ExportarUsuariosComponent } from '../../components/exportar-usuarios/exportar-usuarios.component';
 import { ImportarUsuariosComponent } from '../../components/importar-usuarios/importar-usuarios.component';
@@ -28,7 +26,6 @@ import {
   CrearUsuarioRequest,
   ExportarConfig,
   ImportarUsuariosRequest,
-  RolOpcion,
   UsuarioDetalle,
 } from '../../models/usuarios.model';
 
@@ -65,8 +62,6 @@ const MOCK_USUARIOS: UsuarioDetalle[] = [
     DataTableComponent,
     KpiCardComponent,
     LucideIconComponent,
-    SearchFilterComponent,
-    SelectFilterComponent,
     ExportarUsuariosComponent,
     ImportarUsuariosComponent,
     UsuarioFormComponent,
@@ -88,14 +83,11 @@ export class ListaPageComponent implements OnInit {
   readonly resultadoImport = toSignal(this.facade.resultadoImport$, { initialValue: null });
   readonly mensajeExport   = toSignal(this.facade.mensajeExport$,   { initialValue: null });
 
-  private readonly roles = toSignal(this.facade.roles$, { initialValue: [] as RolOpcion[] });
-  readonly rolOpciones   = computed(() => [
-    { value: '', label: 'Todos los roles' },
-    ...this.roles().map(r => ({ value: r.idRol, label: r.nombreRol })),
-  ]);
+  readonly rolesDisponibles = Object.values(Rol);
 
-  readonly busqueda          = signal('');
-  readonly rolFiltro         = signal('');
+  readonly busqueda     = signal('');
+  readonly rolFiltro    = signal('');
+  readonly estadoFiltro = signal<'todos' | 'activos' | 'inactivos'>('todos');
   readonly mostrarExportar   = signal(false);
   readonly mostrarImportar   = signal(false);
   readonly mostrarFormulario = signal(false);
@@ -105,15 +97,19 @@ export class ListaPageComponent implements OnInit {
   private readonly usandoMock      = computed(() => this.usuarios().length === 0);
 
   readonly usuariosFiltrados = computed(() => {
-    const q   = this.busqueda().toLowerCase();
-    const rol = this.rolFiltro();
+    const q      = this.busqueda().toLowerCase();
+    const rol    = this.rolFiltro();
+    const estado = this.estadoFiltro();
     return this.usuarios().filter(u => {
-      const matchBusq = !q ||
+      const matchBusq   = !q ||
         u.nombre.toLowerCase().includes(q) ||
         u.apellidos.toLowerCase().includes(q) ||
         u.email.toLowerCase().includes(q);
-      const matchRol = !rol || u.rol === rol;
-      return matchBusq && matchRol;
+      const matchRol    = !rol || u.rol === rol;
+      const matchEstado = estado === 'todos' ||
+        (estado === 'activos'   &&  u.activo) ||
+        (estado === 'inactivos' && !u.activo);
+      return matchBusq && matchRol && matchEstado;
     });
   });
 
