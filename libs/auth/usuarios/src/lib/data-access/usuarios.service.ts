@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { BaseHttpService } from '@restaurant/shared/api';
 import { PaginatedResponse } from '@restaurant/shared/models';
 import {
@@ -23,11 +24,23 @@ export class UsuariosService extends BaseHttpService {
 
   getUsuarios(filtros?: Partial<FiltrosUsuarios>): Observable<PaginatedResponse<UsuarioDetalle>> {
     let params = new HttpParams();
-    if (filtros?.busqueda)  params = params.set('busqueda', filtros.busqueda);
-    if (filtros?.rol)       params = params.set('rol', filtros.rol);
+    if (filtros?.busqueda) params = params.set('busqueda', filtros.busqueda);
+    if (filtros?.rol)      params = params.set('rol',      filtros.rol);
     if (filtros?.pagina  !== undefined) params = params.set('pagina',  String(filtros.pagina));
     if (filtros?.tamano  !== undefined) params = params.set('tamano',  String(filtros.tamano));
-    return this.http.get<PaginatedResponse<UsuarioDetalle>>(this.buildUrl(this.resource), { params });
+
+    return this.http.get<any>(this.buildUrl(this.resource), { params }).pipe(
+      map(res => {
+        console.log('📦 Respuesta backend /api/usuarios:', res);
+        return {
+          content:       res.content       ?? [],
+          totalElements: res.totalElements ?? 0,
+          totalPages:    res.totalPages    ?? 0,
+          currentPage:   res.currentPage   ?? res.page ?? 0,
+          size:          res.size          ?? 0,
+        };
+      })
+    );
   }
 
   getUsuarioPorId(id: string): Observable<UsuarioDetalle> {
@@ -43,6 +56,7 @@ export class UsuariosService extends BaseHttpService {
   }
 
   crearUsuario(data: CrearUsuarioRequest): Observable<UsuarioDetalle> {
+    console.log('📤 Enviando POST /api/usuarios:', data);
     return this.http.post<UsuarioDetalle>(this.buildUrl(this.resource), data);
   }
 
@@ -69,7 +83,7 @@ export class UsuariosService extends BaseHttpService {
   importarMasivo(request: ImportarUsuariosRequest): Observable<ImportarUsuariosResponse> {
     const formData = new FormData();
     formData.append('archivo', request.archivo);
-    formData.append('tipo', request.tipo);
+    formData.append('tipo',    request.tipo);
     return this.http.post<ImportarUsuariosResponse>(
       this.buildUrl(`${this.resource}/importar`),
       formData,

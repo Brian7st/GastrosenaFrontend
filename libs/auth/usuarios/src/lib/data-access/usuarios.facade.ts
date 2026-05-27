@@ -39,7 +39,6 @@ type LocalState = AppState & { readonly usuarios: UsuariosState };
 export class UsuariosFacade {
   private readonly store = inject<Store<LocalState>>(Store);
 
-  // ── Observables ───────────────────────────────────────────────────────────
   readonly usuarios$            = this.store.select(selectUsuarios);
   readonly roles$               = this.store.select(selectRoles);
   readonly usuarioSeleccionado$ = this.store.select(selectUsuarioSeleccionado);
@@ -59,7 +58,6 @@ export class UsuariosFacade {
   readonly loadingRolesDetalle$ = this.store.select(selectLoadingRolesDetalle);
   readonly loadingAsignacion$   = this.store.select(selectLoadingAsignacion);
 
-  // ── Comandos ──────────────────────────────────────────────────────────────
   cargarUsuarios(filtros?: Partial<FiltrosUsuarios>): void {
     this.store.dispatch(UsuariosActions.cargarUsuarios({ filtros }));
   }

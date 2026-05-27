@@ -19,7 +19,7 @@ export interface CrearUsuarioRequest {
   email:      string;
   telefono:   string;
   contrasena: string;
-  idRol:      string;
+  nombreRol:  string;  // ← cambio
 }
 
 /**
