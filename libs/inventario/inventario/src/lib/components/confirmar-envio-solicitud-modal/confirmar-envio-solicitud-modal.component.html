@@ -1,0 +1,19 @@
+@if (isOpen) {
+  <div class="modal-backdrop" (click)="cancelled.emit()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      <div class="modal-content">
+        <div class="icon-wrapper">
+          <span class="material-symbols-outlined">send</span>
+        </div>
+        
+        <h2 class="modal-title">¿Confirmar envío?</h2>
+        <p class="modal-text">Una vez enviada no podrá editar la solicitud.</p>
+        
+        <div class="modal-actions">
+          <button class="btn-cancel" type="button" (click)="cancelled.emit()">Cancelar</button>
+          <button class="btn-confirm" type="button" (click)="confirmed.emit()">Confirmar envío</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

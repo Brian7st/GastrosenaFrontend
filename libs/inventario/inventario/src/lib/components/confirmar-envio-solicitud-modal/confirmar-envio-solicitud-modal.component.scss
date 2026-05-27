@@ -1,0 +1,130 @@
+:host {
+  display: block;
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+  padding: 20px;
+}
+
+.modal-container {
+  background-color: var(--color-superficie-contenedor-alto, #ffffff);
+  border-radius: var(--radius-xl, 12px);
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  animation: modalEnter 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-content {
+  padding: 36px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.icon-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background-color: #e8f5e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+
+  .material-symbols-outlined {
+    font-size: 32px;
+    color: var(--color-primario, #39a900);
+    // Angular/Lucide sometimes requires specific classes, but material icon is fine.
+    // Small rotation for the send icon to make it look like paper airplane going up
+    transform: rotate(-25deg);
+    margin-left: 6px; 
+    margin-top: 2px;
+  }
+}
+
+.modal-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-en-superficie, #1a1a1a);
+  margin: 0 0 12px;
+}
+
+.modal-text {
+  font-family: 'Manrope', sans-serif;
+  font-size: 15px;
+  color: var(--color-text-secondary, #6b7280);
+  margin: 0 0 32px;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.btn-cancel,
+.btn-confirm {
+  flex: 1;
+  padding: 14px 16px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-cancel {
+  background-color: transparent;
+  color: var(--color-en-superficie, #374151);
+  border: 1px solid var(--color-superficie-contenedor-mas-bajo, #d1d5db);
+
+  &:hover {
+    background-color: var(--color-superficie-contenedor-mas-bajo, #f9fafb);
+    border-color: var(--color-text-secondary, #9ca3af);
+  }
+}
+
+.btn-confirm {
+  background-color: var(--color-primario, #39a900);
+  color: #ffffff;
+  border: none;
+
+  &:hover {
+    filter: brightness(0.92);
+    box-shadow: 0 4px 12px rgba(57, 169, 0, 0.25);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
