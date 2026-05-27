@@ -4,7 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
-import { BienSolicitud } from '../../../models/solicitudes-gil.mock';
+import { BienSolicitud } from '../../../models/solicitudes-gil.model';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { Bien } from '../../../models/inventario.model';
@@ -26,12 +26,18 @@ interface SolicitudRow {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SolicitudesFormComponent implements OnInit {
-  private router            = inject(Router);
-  private facade            = inject(SolicitudesFacade);
-  private inventarioFacade  = inject(InventarioFacade);
+  private router           = inject(Router);
+  private facade           = inject(SolicitudesFacade);
+  private inventarioFacade = inject(InventarioFacade);
 
   // ── Opciones de dominio ──────────────────────────────────────────────────
   readonly AREAS = ['Centro de Comercio y Turismo', 'Escuela de Gastronomía'];
+  readonly DESTINOS = [
+    { value: 'FORMACION',   label: 'Formación'    },
+    { value: 'LABORATORIO', label: 'Laboratorio'  },
+    { value: 'AULA',        label: 'Aula'         },
+    { value: 'OTRO',        label: 'Otro'         },
+  ];
 
   // ── Estado reactivo desde facade ─────────────────────────────────────────
   loading = this.facade.loading;
@@ -45,28 +51,64 @@ export class SolicitudesFormComponent implements OnInit {
     Array.from({ length: this.catalogoPaginacion().totalPages }, (_, i) => i)
   );
 
-  fechaSolicitud     = signal('2024-05-20');
-  bienes             = signal<BienSolicitud[]>([]);
-  mostrarNuevaCuenta = signal(false);
-  nuevaCuenta        = signal('');
-  nuevaCuentaCedula  = signal('');
+  // ── Signals de campos del formulario (alineados con CrearGilHttpRequest) ─
+  fechaSolicitud          = signal(new Date().toISOString().split('T')[0]);
+  regionalCodigo          = signal<number | null>(null);
+  regionalNombre          = signal('');
+  centroCostosCodigo      = signal<number | null>(null);
+  centroCostosNombre      = signal('');
+  area                    = signal('');
+  destinoBienes           = signal('FORMACION');
+  jefeOficinaCoordinador  = signal('');
+  solicitante             = signal('');
+  codigoGrupo             = signal('');
+  fichaCaracterizacion    = signal('');
+  observaciones           = signal('');
 
-  // ── Datos para la Consolidación (Generar GIL) ───────────────────────────
-  solicitudesReales = this.facade.solicitudes;
-  
-  solicitudes = computed<SolicitudRow[]>(() => {
-    return this.solicitudesReales().map(s => ({
-      id: String(s.id),
-      codigoFicha: `${s.numeroGil}\n${s.fichaId}`,
-      solicitante: s.cuentadantes[0]?.nombre ?? '',
-      totalBienes: s.bienes?.length ?? 0,
-      estado: s.estado
-    }));
+  // ── Cuentadantes ─────────────────────────────────────────────────────────
+  cuentadantes        = signal<{ nombre: string; cedula: string }[]>([]);
+  mostrarNuevaCuenta  = signal(false);
+  nuevaCuenta         = signal('');
+  nuevaCuentaCedula   = signal('');
+
+  // ── Bienes ───────────────────────────────────────────────────────────────
+  bienes = signal<BienSolicitud[]>([]);
+
+  // ── Validación: todos los campos required ────────────────────────────────
+  formularioValido = computed(() => {
+    return (
+      this.fechaSolicitud().trim() !== '' &&
+      this.regionalCodigo() !== null &&
+      this.regionalNombre().trim() !== '' &&
+      this.centroCostosCodigo() !== null &&
+      this.centroCostosNombre().trim() !== '' &&
+      this.area().trim() !== '' &&
+      this.destinoBienes().trim() !== '' &&
+      this.jefeOficinaCoordinador().trim() !== '' &&
+      this.solicitante().trim() !== '' &&
+      this.codigoGrupo().trim() !== '' &&
+      this.fichaCaracterizacion().trim() !== '' &&
+      this.cuentadantes().length > 0 &&
+      this.bienes().length > 0
+    );
   });
 
-  searchTerm = signal<string>('');
+  // ── Consolidación (Generar GIL) ───────────────────────────────────────────
+  solicitudesReales = this.facade.solicitudes;
+
+  solicitudes = computed<SolicitudRow[]>(() =>
+    this.solicitudesReales().map(s => ({
+      id:          String(s.id),
+      codigoFicha: `${s.numeroGil}\n${s.fichaCaracterizacion}`,
+      solicitante: s.cuentadantes[0]?.nombre ?? '',
+      totalBienes: s.bienes?.length ?? 0,
+      estado:      s.estado,
+    }))
+  );
+
+  searchTerm  = signal<string>('');
   selectedIds = signal<Set<string>>(new Set<string>());
-  showModal = signal<boolean>(false);
+  showModal   = signal<boolean>(false);
 
   ngOnInit(): void {
     this.facade.loadAll();
@@ -76,38 +118,28 @@ export class SolicitudesFormComponent implements OnInit {
   filteredSolicitudes = computed(() => {
     const term = this.searchTerm().toLowerCase();
     if (!term) return this.solicitudes();
-    return this.solicitudes().filter(s => 
-      s.codigoFicha.toLowerCase().includes(term) || 
+    return this.solicitudes().filter(s =>
+      s.codigoFicha.toLowerCase().includes(term) ||
       s.solicitante.toLowerCase().includes(term)
     );
   });
 
-  solicitudesSeleccionadas = computed(() => this.selectedIds().size);
-  
-  itemsTotalesConsolidar = computed(() => {
-    let total = 0;
+  solicitudesSeleccionadas  = computed(() => this.selectedIds().size);
+  itemsTotalesConsolidar    = computed(() => {
     const ids = this.selectedIds();
-    for (const s of this.solicitudes()) {
-      if (ids.has(s.id)) {
-        total += s.totalBienes ?? 0;
-      }
-    }
-    return total;
+    return this.solicitudes()
+      .filter(s => ids.has(s.id))
+      .reduce((acc, s) => acc + (s.totalBienes ?? 0), 0);
   });
 
+  // ── Handlers de consolidación ─────────────────────────────────────────────
   toggleSelection(id: string): void {
     const current = new Set(this.selectedIds());
-    if (current.has(id)) {
-      current.delete(id);
-    } else {
-      current.add(id);
-    }
+    if (current.has(id)) { current.delete(id); } else { current.add(id); }
     this.selectedIds.set(current);
   }
 
-  isSelected(id: string): boolean {
-    return this.selectedIds().has(id);
-  }
+  isSelected(id: string): boolean { return this.selectedIds().has(id); }
 
   isAprobada(estado: string): boolean {
     const e = estado.toUpperCase();
@@ -120,25 +152,14 @@ export class SolicitudesFormComponent implements OnInit {
   }
 
   confirmarGeneracion(): void {
-    const ids = Array.from(this.selectedIds());
-    this.facade.generarGils(ids);
+    this.facade.generarGils(Array.from(this.selectedIds()));
     this.showModal.set(false);
     this.router.navigate(['/app/inventario/solicitudes-gil']);
   }
 
-  cerrarModal(): void {
-    this.showModal.set(false);
-  }
+  cerrarModal(): void { this.showModal.set(false); }
 
-  onCancel(): void {
-    this.router.navigate(['/app/inventario/solicitudes-gil']);
-  }
-
-  onSave(): void {
-    this.facade.crearSolicitud({ fecha: this.fechaSolicitud() });
-    this.router.navigate(['/app/inventario/solicitudes-gil']);
-  }
-
+  // ── Handlers de cuentadantes ──────────────────────────────────────────────
   onAddCuentadante(): void {
     this.mostrarNuevaCuenta.update(v => !v);
     if (!this.mostrarNuevaCuenta()) {
@@ -148,11 +169,20 @@ export class SolicitudesFormComponent implements OnInit {
   }
 
   onConfirmarCuentadante(): void {
+    const nombre = this.nuevaCuenta().trim();
+    const cedula = this.nuevaCuentaCedula().trim();
+    if (!nombre || !cedula) return;
+    this.cuentadantes.update(list => [...list, { nombre, cedula }]);
     this.mostrarNuevaCuenta.set(false);
     this.nuevaCuenta.set('');
     this.nuevaCuentaCedula.set('');
   }
 
+  onRemoveCuentadante(index: number): void {
+    this.cuentadantes.update(list => list.filter((_, i) => i !== index));
+  }
+
+  // ── Handlers del catálogo de bienes ──────────────────────────────────────
   onAbrirSelectorBien(): void {
     this.mostrarSelectorBien.set(true);
     this.inventarioFacade.cargarBienes({ page: 0, size: 8 });
@@ -170,13 +200,13 @@ export class SolicitudesFormComponent implements OnInit {
     this.bienes.update(items => [
       ...items,
       {
-        codigo:        bien.codigoSena ?? '',
+        codigoSena:    bien.codigoSena ?? '',
         descripcion:   bien.nombre,
-        um:            bien.unidadMedida,
+        unidadMedida:  bien.unidadMedida,
         cantidad:      1,
         valorUnitario: bien.valor ?? 0,
         subtotal:      bien.valor ?? 0,
-      }
+      },
     ]);
     this.mostrarSelectorBien.set(false);
   }
@@ -193,5 +223,33 @@ export class SolicitudesFormComponent implements OnInit {
 
   onRemoveBien(index: number): void {
     this.bienes.update(items => items.filter((_, i) => i !== index));
+  }
+
+  // ── Acciones principales ─────────────────────────────────────────────────
+  onCancel(): void {
+    this.router.navigate(['/app/inventario/solicitudes-gil']);
+  }
+
+  onSave(): void {
+    if (!this.formularioValido()) return;
+
+    this.facade.crearSolicitud({
+      fechaSolicitud:         this.fechaSolicitud(),
+      regionalCodigo:         this.regionalCodigo()!,
+      regionalNombre:         this.regionalNombre(),
+      centroCostosCodigo:     this.centroCostosCodigo()!,
+      centroCostosNombre:     this.centroCostosNombre(),
+      area:                   this.area(),
+      destinoBienes:          this.destinoBienes(),
+      jefeOficinaCoordinador: this.jefeOficinaCoordinador(),
+      cuentadantes:           this.cuentadantes(),
+      solicitante:            this.solicitante(),
+      codigoGrupo:            this.codigoGrupo(),
+      fichaCaracterizacion:   this.fichaCaracterizacion(),
+      bienes:                 this.bienes(),
+      observaciones:          this.observaciones() || undefined,
+    });
+
+    this.router.navigate(['/app/inventario/solicitudes-gil']);
   }
 }

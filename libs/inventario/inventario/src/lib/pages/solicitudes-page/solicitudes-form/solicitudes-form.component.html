@@ -2,7 +2,7 @@
      Contenedor Principal de la Vista Formulario
 ══════════════════════════════════════════════════════════════════════════ -->
 <div class="form-page-container">
-  
+
   <div class="page-header">
     <inventario-back-button (clicked)="onCancel()" />
     <div>
@@ -19,39 +19,65 @@
         <div class="form-group">
           <label class="form-label">Código de Solicitud</label>
           <div class="readonly-input">
-            <span class="readonly-text">GIL-F-014-2024-XXX</span>
+            <span class="readonly-text">GIL-F-014-YYYY-XXX</span>
             <span class="material-symbols-outlined icon-locked">lock</span>
           </div>
+          <p class="form-hint">Generado automáticamente por el sistema.</p>
         </div>
 
         <!-- Regional: código numérico + nombre -->
         <div class="form-group">
-          <label class="form-label">Regional (Código)</label>
-          <input type="number" class="form-control" value="63" placeholder="Ej. 63" min="1" />
+          <label class="form-label">Regional (Código) <span class="required-asterisk">*</span></label>
+          <input
+            type="number"
+            class="form-control"
+            placeholder="Ej. 63"
+            min="1"
+            [value]="regionalCodigo() ?? ''"
+            (input)="regionalCodigo.set(+$any($event.target).value || null)"
+          />
           <p class="form-hint">Código numérico de la regional SENA.</p>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Nombre de la Regional</label>
-          <input type="text" class="form-control" value="Quindío" placeholder="Ej. Quindío" />
+          <label class="form-label">Nombre de la Regional <span class="required-asterisk">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Ej. Quindío"
+            [value]="regionalNombre()"
+            (input)="regionalNombre.set($any($event.target).value)"
+          />
         </div>
 
         <!-- Cuentadante con cédula -->
         <div class="form-group">
-          <label class="form-label">Cuentadante</label>
-          <select class="form-control">
-            <option>Seleccione Cuentadante</option>
-            <option selected>Carlos Mario Estrada</option>
-            <option>Jorge Eduardo Londoño</option>
-          </select>
+          <label class="form-label">Cuentadante(s) <span class="required-asterisk">*</span></label>
+
+          <!-- Lista de cuentadantes confirmados -->
+          @if (cuentadantes().length > 0) {
+            <div class="cuentadantes-list">
+              @for (c of cuentadantes(); track c; let i = $index) {
+                <div class="cuentadante-chip">
+                  <span class="material-symbols-outlined">person</span>
+                  <span class="cuentadante-nombre">{{ c.nombre }}</span>
+                  <span class="cuentadante-cedula">CC {{ c.cedula }}</span>
+                  <button class="btn-chip-remove" type="button" (click)="onRemoveCuentadante(i)" title="Quitar">
+                    <span class="material-symbols-outlined">close</span>
+                  </button>
+                </div>
+              }
+            </div>
+          }
+
           <button class="btn-link btn-link--add mt-2" type="button" (click)="onAddCuentadante()">
             <span class="material-symbols-outlined">{{ mostrarNuevaCuenta() ? 'remove' : 'add' }}</span>
-            {{ mostrarNuevaCuenta() ? 'Cancelar' : 'Agregar otro cuentadante' }}
+            {{ mostrarNuevaCuenta() ? 'Cancelar' : 'Agregar cuentadante' }}
           </button>
 
           <div class="nueva-cuenta-panel" [class.nueva-cuenta-panel--visible]="mostrarNuevaCuenta()">
             <div class="form-group mt-2">
-              <label class="form-label">Nombre del nuevo cuentadante</label>
+              <label class="form-label">Nombre del cuentadante</label>
               <input
                 type="text"
                 class="form-control"
@@ -61,7 +87,7 @@
               />
             </div>
             <div class="form-group mt-2">
-              <label class="form-label">Cédula del cuentadante</label>
+              <label class="form-label">Cédula del cuentadante <span class="required-asterisk">*</span></label>
               <input
                 type="text"
                 class="form-control"
@@ -70,9 +96,11 @@
                 (input)="nuevaCuentaCedula.set($any($event.target).value)"
               />
             </div>
-            <button class="btn-link btn-link--add mt-2" type="button"
-                    [disabled]="!nuevaCuenta().trim()"
-                    (click)="onConfirmarCuentadante()">
+            <button
+              class="btn-link btn-link--add mt-2"
+              type="button"
+              [disabled]="!nuevaCuenta().trim() || !nuevaCuentaCedula().trim()"
+              (click)="onConfirmarCuentadante()">
               <span class="material-symbols-outlined">check_circle</span>
               Confirmar cuentadante
             </button>
@@ -81,69 +109,114 @@
 
         <!-- Código de Grupo -->
         <div class="form-group">
-          <label class="form-label">Código de Grupo</label>
-          <input type="text" class="form-control" placeholder="Ej. ADSO-2670687" />
+          <label class="form-label">Código de Grupo <span class="required-asterisk">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Ej. ADSO-2670687"
+            [value]="codigoGrupo()"
+            (input)="codigoGrupo.set($any($event.target).value)"
+          />
         </div>
 
         <!-- Ficha de Caracterización -->
         <div class="form-group">
-          <label class="form-label">Ficha de Caracterización</label>
-          <input type="text" class="form-control" maxlength="7" pattern="\d{7}" placeholder="Ej. 2471532" />
+          <label class="form-label">Ficha de Caracterización <span class="required-asterisk">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            maxlength="7"
+            pattern="\d{7}"
+            placeholder="Ej. 2471532"
+            [value]="fichaCaracterizacion()"
+            (input)="fichaCaracterizacion.set($any($event.target).value)"
+          />
           <p class="form-hint">Debe contener exactamente 7 dígitos.</p>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Fecha de Solicitud</label>
-          <input type="date" class="form-control" [value]="fechaSolicitud()" />
+          <label class="form-label">Fecha de Solicitud <span class="required-asterisk">*</span></label>
+          <input
+            type="date"
+            class="form-control"
+            [value]="fechaSolicitud()"
+            (input)="fechaSolicitud.set($any($event.target).value)"
+          />
         </div>
       </div>
 
       <!-- Columna 2 -->
       <div class="form-col">
         <div class="form-group">
-          <label class="form-label">Área</label>
-          <select class="form-control">
+          <label class="form-label">Área <span class="required-asterisk">*</span></label>
+          <select
+            class="form-control"
+            [value]="area()"
+            (change)="area.set($any($event.target).value)">
             <option value="">Seleccione Área</option>
-            @for (area of AREAS; track area) {
-              <option [value]="area">{{ area }}</option>
+            @for (a of AREAS; track a) {
+              <option [value]="a">{{ a }}</option>
             }
           </select>
         </div>
 
         <!-- Centro de Costos: código numérico + nombre -->
         <div class="form-group">
-          <label class="form-label">Centro de Costos (Código)</label>
-          <input type="number" class="form-control" value="953810" placeholder="Ej. 953810" min="1" />
+          <label class="form-label">Centro de Costos (Código) <span class="required-asterisk">*</span></label>
+          <input
+            type="number"
+            class="form-control"
+            placeholder="Ej. 953810"
+            min="1"
+            [value]="centroCostosCodigo() ?? ''"
+            (input)="centroCostosCodigo.set(+$any($event.target).value || null)"
+          />
           <p class="form-hint">Código numérico del centro de costos.</p>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Nombre del Centro</label>
-          <input type="text" class="form-control" value="Comercio y Turismo" placeholder="Ej. Comercio y Turismo" />
+          <label class="form-label">Nombre del Centro <span class="required-asterisk">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Ej. Comercio y Turismo"
+            [value]="centroCostosNombre()"
+            (input)="centroCostosNombre.set($any($event.target).value)"
+          />
         </div>
 
         <div class="form-group">
-          <label class="form-label">Destino de Bienes</label>
-          <select class="form-control">
-            <option value="FORMACION" selected>Formación</option>
-            <option value="LABORATORIO">Laboratorio</option>
-            <option value="AULA">Aula</option>
-            <option value="OTRO">Otro</option>
+          <label class="form-label">Destino de Bienes <span class="required-asterisk">*</span></label>
+          <select
+            class="form-control"
+            [value]="destinoBienes()"
+            (change)="destinoBienes.set($any($event.target).value)">
+            @for (d of DESTINOS; track d.value) {
+              <option [value]="d.value">{{ d.label }}</option>
+            }
           </select>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Jefe de Oficina / Coordinador de Área</label>
-          <input type="text" class="form-control" placeholder="Ej. María García Rincón" />
+          <label class="form-label">Jefe de Oficina / Coordinador de Área <span class="required-asterisk">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Ej. María García Rincón"
+            [value]="jefeOficinaCoordinador()"
+            (input)="jefeOficinaCoordinador.set($any($event.target).value)"
+          />
         </div>
 
         <div class="form-group">
-          <label class="form-label">Solicitante</label>
-          <select class="form-control">
-            <option>Nombre del instructor solicitante</option>
-            <option selected>Ing. Ricardo Sarmiento</option>
-            <option>Lic. Martha Lucía Peña</option>
-          </select>
+          <label class="form-label">Solicitante <span class="required-asterisk">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Ej. Ing. Ricardo Sarmiento"
+            [value]="solicitante()"
+            (input)="solicitante.set($any($event.target).value)"
+          />
         </div>
       </div>
     </div>
@@ -155,7 +228,7 @@
       <span class="material-symbols-outlined section-icon">category</span>
       Bienes Solicitados <span class="required-asterisk">*</span>
     </h3>
-    
+
     <div class="table-container">
       <table class="bienes-table">
         <thead>
@@ -172,9 +245,9 @@
         <tbody>
           @for (bien of bienes(); track bien; let i = $index) {
             <tr>
-              <td class="font-medium">{{ bien.codigo }}</td>
+              <td class="font-medium">{{ bien.codigoSena }}</td>
               <td class="text-secondary">{{ bien.descripcion }}</td>
-              <td class="text-secondary">{{ bien.um }}</td>
+              <td class="text-secondary">{{ bien.unidadMedida }}</td>
               <td class="text-right">
                 <input
                   type="number"
@@ -226,9 +299,9 @@
         <div class="toolbar-compact">
           <div class="search-box-compact">
             <span class="material-symbols-outlined search-icon">search</span>
-            <input 
-              type="text" 
-              placeholder="Buscar por código o solicitante..." 
+            <input
+              type="text"
+              placeholder="Buscar por código o solicitante..."
               [value]="searchTerm()"
               (input)="searchTerm.set($any($event.target).value)"
             />
@@ -252,8 +325,8 @@
                   <td class="td-checkbox">
                     @if (isAprobada(row.estado)) {
                       <label class="custom-checkbox">
-                        <input 
-                          type="checkbox" 
+                        <input
+                          type="checkbox"
                           [checked]="isSelected(row.id)"
                           (change)="toggleSelection(row.id)"
                         />
@@ -263,9 +336,7 @@
                       </label>
                     }
                   </td>
-                  <td class="font-medium text-dark line-clamp">
-                    {{ row.codigoFicha }}
-                  </td>
+                  <td class="font-medium text-dark line-clamp">{{ row.codigoFicha }}</td>
                   <td class="text-dark">{{ row.solicitante }}</td>
                   <td class="text-muted">{{ row.totalBienes }} ítems</td>
                   <td>
@@ -291,9 +362,9 @@
             <span>Ítems a consolidar</span>
             <span class="value">{{ itemsTotalesConsolidar() }}</span>
           </div>
-          
-          <restaurant-button 
-            variant="primary" 
+
+          <restaurant-button
+            variant="primary"
             class="w-full mt-4"
             [disabled]="solicitudesSeleccionadas() === 0"
             (click)="onGenerar()">
@@ -308,13 +379,22 @@
   <!-- Observaciones -->
   <div class="form-card mb-12">
     <label class="form-label mb-4">Observaciones</label>
-    <textarea class="form-control" rows="4" placeholder="Ingrese detalles adicionales de la solicitud, justificación técnica o notas de despacho..."></textarea>
+    <textarea
+      class="form-control"
+      rows="4"
+      placeholder="Ingrese detalles adicionales de la solicitud, justificación técnica o notas de despacho..."
+      [value]="observaciones()"
+      (input)="observaciones.set($any($event.target).value)">
+    </textarea>
   </div>
 
   <!-- Action Buttons -->
   <div class="actions-footer">
     <restaurant-button variant="ghost" (click)="onCancel()">Cancelar</restaurant-button>
-    <restaurant-button variant="primary" (click)="onSave()">
+    <restaurant-button
+      variant="primary"
+      [disabled]="!formularioValido()"
+      (click)="onSave()">
       <span class="material-symbols-outlined">save</span>
       Crear Solicitud
     </restaurant-button>
@@ -327,27 +407,22 @@
 ══════════════════════════════════════════════════════════════════════════ -->
 @if (showModal()) {
 <div class="modal-overlay">
-  <!-- Background Backdrop -->
   <div class="modal-backdrop" (click)="cerrarModal()"></div>
-
-  <!-- Modal Container -->
   <div class="modal-container">
     <div class="modal-header-strip modal-header-strip--primary"></div>
     <div class="modal-body">
       <div class="modal-icon-container modal-icon-container--primary">
         <span class="material-symbols-outlined modal-icon">library_add_check</span>
       </div>
-      
       <div class="modal-text-center">
         <h3 class="modal-title">Confirmar Consolidación</h3>
         <p class="modal-desc">
-          ¿Estás seguro de generar la Guía de Ingreso Local (GIL) con 
-          <span class="font-bold">{{ solicitudesSeleccionadas() }}</span> 
-          solicitudes seleccionadas y un total de 
+          ¿Estás seguro de generar la Guía de Ingreso Local (GIL) con
+          <span class="font-bold">{{ solicitudesSeleccionadas() }}</span>
+          solicitudes seleccionadas y un total de
           <span class="font-bold">{{ itemsTotalesConsolidar() }}</span> ítems?
         </p>
       </div>
-
       <div class="modal-actions-col">
         <restaurant-button variant="primary" (click)="confirmarGeneracion()">
           Confirmar y Generar GIL
@@ -370,7 +445,6 @@
 
   <div class="selector-panel">
 
-    <!-- Header -->
     <div class="selector-header">
       <h3>
         <span class="material-symbols-outlined">inventory_2</span>
@@ -381,7 +455,6 @@
       </button>
     </div>
 
-    <!-- Búsqueda -->
     <div class="selector-search">
       <div class="search-box-compact">
         <span class="material-symbols-outlined search-icon">search</span>
@@ -393,7 +466,6 @@
       </div>
     </div>
 
-    <!-- Tabla de resultados -->
     <div class="selector-table-wrap">
       @if (catalogoLoading()) {
         <div class="selector-loading">
@@ -450,7 +522,6 @@
       }
     </div>
 
-    <!-- Paginación -->
     <div class="selector-footer">
       <button class="selector-page-btn"
         [disabled]="catalogoPaginacion().page === 0"

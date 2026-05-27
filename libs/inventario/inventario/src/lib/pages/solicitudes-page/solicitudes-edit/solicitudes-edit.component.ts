@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
-import { BienSolicitud } from '../../../models/solicitudes-gil.mock';
+import { BienSolicitud } from '../../../models/solicitudes-gil.model';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 
 @Component({
@@ -56,9 +56,9 @@ export class SolicitudesEditComponent implements OnInit {
     this.bienes.update(items => [
       ...items,
       {
-        codigo: 'ALM-' + String(items.length + 1).padStart(3, '0'),
+        codigoSena: 'ALM-' + String(items.length + 1).padStart(3, '0'),
         descripcion: 'Nuevo Bien Solicitado',
-        um: 'Und',
+        unidadMedida: 'Und',
         cantidad: 1,
         valorUnitario: 0,
         subtotal: 0
