@@ -27,32 +27,26 @@
 
   <!-- Filtros -->
   <div class="cuentas-page__filters">
-    <button
-      class="cuentas-page__filter-btn"
-      [class.cuentas-page__filter-btn--active]="filtroEstado() === 'todos'"
-      type="button"
-      (click)="filtroEstado.set('todos')"
-    >
-      Todos
-    </button>
-    <button
-      class="cuentas-page__filter-btn"
-      [class.cuentas-page__filter-btn--active]="filtroEstado() === 'bloqueados'"
-      type="button"
-      (click)="filtroEstado.set('bloqueados')"
-    >
-      <lucide-icon name="lock" [size]="14"></lucide-icon>
-      Bloqueados
-    </button>
-    <button
-      class="cuentas-page__filter-btn"
-      [class.cuentas-page__filter-btn--active]="filtroEstado() === 'activos'"
-      type="button"
-      (click)="filtroEstado.set('activos')"
-    >
-      <lucide-icon name="shield-check" [size]="14"></lucide-icon>
-      Activos
-    </button>
+    <div class="cuentas-page__search-wrapper">
+      <lucide-icon name="search" [size]="16" class="cuentas-page__search-icon"></lucide-icon>
+      <input
+        class="cuentas-page__search-input"
+        type="text"
+        placeholder="Buscar por nombre o email..."
+        [value]="busqueda()"
+        (input)="busqueda.set($any($event.target).value)"
+      >
+    </div>
+    <div class="cuentas-page__filter-selects">
+      <div class="cuentas-page__select-wrapper">
+        <select class="cuentas-page__select" (change)="filtroEstado.set($any($event.target).value)">
+          <option value="todos">Todos</option>
+          <option value="bloqueados">Bloqueados</option>
+          <option value="activos">Activos</option>
+        </select>
+        <lucide-icon name="filter" [size]="14" class="cuentas-page__select-icon"></lucide-icon>
+      </div>
+    </div>
   </div>
 
   @if (loading()) {

@@ -1,6 +1,8 @@
 export type BackendDateArray = [number, number, number];
 export type InfoBancariaTipo = 'AHORROS' | 'CORRIENTE';
 
+// ─── Facturas Proveedor (/api/v1/sourcing/facturas) ────────────────────────
+
 export interface FacturaLineaResponse {
   productoId?: string;
   descripcion: string;
@@ -89,12 +91,55 @@ export interface InfoBancariaRequest {
   tipoCuenta: string;
 }
 
+// ─── GIL — Request types (alineados con CrearGilHttpRequest del backend) ───
+
+/** Cuentadante en requests — sin id, cedula obligatoria */
+export interface CuentadanteGilRequest {
+  nombre: string;
+  cedula: string;
+}
+
+/** Ítem de bien en requests — nombres de campo del backend */
+export interface BienGilRequest {
+  codigoSena: string;
+  descripcion: string;
+  unidadMedida: string;
+  cantidad: number;
+  valorUnitario: number;
+  subtotal: number;
+}
+
+/**
+ * Payload de creación: POST /api/v1/procurement/giles
+ * Todos los campos son REQUIRED según validaciones del backend.
+ */
+export interface CrearGilRequest {
+  fechaSolicitud: string;
+  regionalCodigo: number;
+  regionalNombre: string;
+  centroCostosCodigo: number;
+  centroCostosNombre: string;
+  area: string;
+  destinoBienes: string;
+  jefeOficinaCoordinador: string;
+  cuentadantes: CuentadanteGilRequest[];
+  solicitante: string;
+  codigoGrupo: string;
+  fichaCaracterizacion: string;
+  bienes: BienGilRequest[];
+  observaciones?: string;
+}
+
+// ─── GIL — Response types (esperados del backend — verificar cuando haya datos) ──
+
+/** Cuentadante en responses — incluye id y cedula */
 export interface CuentadanteGilResponse {
   id: string;
   nombre: string;
-  documento?: string;
+  cedula: string;
 }
 
+/** Ítem de bien en responses */
 export interface BienGilResponse {
   codigoSena: string;
   descripcion: string;
@@ -104,47 +149,48 @@ export interface BienGilResponse {
   subtotal: number;
 }
 
+/**
+ * Response del backend para GET /procurement/giles y GET /procurement/giles/{id}.
+ * NOTA: el backend documenta el response como `type: object` sin schema explícito
+ * (tarea BACKEND #2). Esta interface refleja los nombres esperados basados en el
+ * contrato de request. Verificar y ajustar cuando el backend exponga GilResponse.
+ */
 export interface GilResponse {
   id: string;
   numeroGil: string;
-  estado: 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'CERRADO';
   fechaSolicitud: string;
-  regionalCodigo?: number;
-  regionalNombre?: string;
-  centroCostosCodigo?: number;
-  centroCostosNombre?: string;
+  regionalCodigo: number;
+  regionalNombre: string;
+  centroCostosCodigo: number;
+  centroCostosNombre: string;
   area: string;
   destinoBienes: string;
-  jefeOficinaCoordinador?: string;
+  jefeOficinaCoordinador: string;
   cuentadantes: CuentadanteGilResponse[];
-  solicitante?: string;
-  codigoGrupo?: string;
+  solicitante: string;
+  codigoGrupo: string;
   fichaCaracterizacion: string;
-  bienes?: BienGilResponse[];
+  estado: 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'CERRADO';
   observaciones?: string;
-  creadoEn?: string;
-  actualizadoEn?: string;
+  bienes?: BienGilResponse[];
+  // Campos opcionales del módulo training (si el backend los incluye)
+  programaId?: string;
+  emitidoPor?: string;
+  resultadoAprendizaje?: string;
+  actividades?: string;
+  voceroNombre?: string;
+  voceroDocumento?: string;
+  solicitudesOrigenIds?: string[];
 }
 
-export interface CrearGilRequest {
-  fecha: string;
-  centroFormacionId?: string;
-  area?: string;
-  cuentadantes?: CuentadanteGilResponse[];
-  destino?: string;
-  fichaId?: string;
-}
-
-export type ActualizarGilRequest = Partial<CrearGilRequest>;
-
-export interface VincularInstructorRequest {
-  instructorId: string;
-}
-
-/** PUT /procurement/giles/{id}/enviar-proveedor */
+/** PUT → PATCH /api/v1/procurement/giles/{id}/enviar-proveedor */
 export interface EnviarProveedorRequest {
   proveedorDestinatarioId: string;
   fechaEnvio: string;
+}
+
+export interface VincularInstructorRequest {
+  instructorId: string;
 }
 
 // ─── Sourcing — Conciliación Factura-GIL (/api/v1/sourcing/conciliaciones-gil) ─

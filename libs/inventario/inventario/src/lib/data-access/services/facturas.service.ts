@@ -227,10 +227,10 @@ export class FacturasService {
       resultadoAprendizaje:    '',
       estadoSolicitud:         g.estado as EstadoGIL,
       fechaCreacion:           g.fechaSolicitud,
-      totalEstimado:           0,
-      responsable:             g.solicitante ?? '',
+      totalEstimado:           0,    // calculado en backend
+      responsable:             g.emitidoPor ?? '',
       regional:                g.regionalNombre ?? '',
-      centroFormacion:         g.fichaCaracterizacion,
+      centroFormacion:         g.centroCostosNombre ?? '',
       areaPrograma:            g.area,
       cuentadanteResponsable:  g.cuentadantes?.[0]?.nombre ?? '',
       destinoBien:             g.destinoBienes,
