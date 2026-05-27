@@ -41,20 +41,21 @@ export class LoginPageComponent {
   get emailCtrl() { return this.form.get('email')!; }
   get passCtrl()  { return this.form.get('contrasena')!; }
 
-  async onSubmit(): Promise<void> {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-    this.loading.set(true);
-    this.errorMsg.set('');
-    try {
-      const { email, contrasena } = this.form.getRawValue();
-      this.authService.login(email!, contrasena!);
-      await this.router.navigateByUrl('/app/inventario');
-    } catch {
-      this.errorMsg.set('Credenciales inválidas. Verificá tu correo y contraseña.');
-      this.loading.set(false);
-    }
+async onSubmit(): Promise<void> {
+  if (this.form.invalid) {
+    this.form.markAllAsTouched();
+    return;
   }
+  this.loading.set(true);
+  this.errorMsg.set('');
+  try {
+    const { email, contrasena } = this.form.getRawValue();
+    await this.authService.login(email!, contrasena!); // ✅ espera el login
+    await this.router.navigateByUrl('/app/inventario'); // solo si login OK
+  } catch (err) {
+    this.errorMsg.set('Credenciales inválidas. Verificá tu correo y contraseña.');
+  } finally {
+    this.loading.set(false);
+  }
+}
 }

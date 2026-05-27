@@ -21,7 +21,6 @@ export const USUARIOS_ROUTES: Routes = [
     redirectTo: '',
     pathMatch: 'full',
   },
-
   {
     path: 'perfil',
     loadComponent: () =>
@@ -29,7 +28,6 @@ export const USUARIOS_ROUTES: Routes = [
         m => m.PerfilPageComponent,
       ),
   },
-  
   {
     path: 'cuentas',
     loadComponent: () =>
