@@ -5,15 +5,17 @@ import { Ingrediente } from '../models/receta.model';
 @Injectable({ providedIn: 'root' })
 export class IngredienteService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/ingredientes';
+  private apiUrl = '/api/ingredientes';
 
   private _ingredientes = signal<Ingrediente[]>([]);
   public ingredientes = this._ingredientes.asReadonly();
 
   listarIngredientes() {
-    this.http.get<any>(this.apiUrl).subscribe({
+    this.http.get<unknown>(this.apiUrl).subscribe({
       next: (respuesta) => {
-        const data = respuesta && respuesta.content ? respuesta.content : respuesta;
+        const data = (respuesta && typeof respuesta === 'object' && 'content' in (respuesta as Record<string, unknown>))
+          ? (respuesta as { content: Ingrediente[] }).content
+          : (respuesta as Ingrediente[]);
         this._ingredientes.set(data && data.length > 0 ? data : this.getMockIngredients());
       },
       error: (err) => {

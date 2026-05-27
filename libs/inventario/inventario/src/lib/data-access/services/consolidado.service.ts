@@ -1,41 +1,71 @@
-import { Injectable } from '@angular/core';
-import { delay, Observable, of } from 'rxjs';
-import { Consolidado, MOCK_CONSOLIDADOS } from '../../models/consolidado.model';
+import { inject, Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { Consolidado } from '../../models/consolidado.model';
+import { EjecucionPresupuestal } from '../../models/reporting.model';
+import { ConsolidadoResponse } from '../api/budget.api';
+import { EjecucionPresupuestalItemResponse } from '../api/reporting.api';
+import { consolidadoFromApi } from '../mappers/budget.mapper';
+import { ejecucionPresupuestalFromApi } from '../mappers/reporting.mapper';
 
-@Injectable({
-  providedIn: 'root'
-})
+const API = '/api/v1';
+
+@Injectable({ providedIn: 'root' })
 export class ConsolidadoService {
+  private http = inject(HttpClient);
 
   getConsolidados(): Observable<Consolidado[]> {
-    return of(MOCK_CONSOLIDADOS).pipe(delay(500));
+    return this.http
+      .get<ConsolidadoResponse[]>(`${API}/budget/consolidados`)
+      .pipe(
+        map(list => list.map(consolidadoFromApi)),
+        catchError(err => throwError(() => err))
+      );
   }
 
   getConsolidado(id: string): Observable<Consolidado | undefined> {
-    const found = MOCK_CONSOLIDADOS.find(c => c.id === id);
-    return of(found).pipe(delay(500));
+    return this.http
+      .get<ConsolidadoResponse>(`${API}/budget/consolidados/${id}`)
+      .pipe(
+        map(consolidadoFromApi),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  generarConsolidado(gils: string[]): Observable<Consolidado> {
-    const newId = `CON-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
-    const newConsolidado: Consolidado = {
-      id:              newId,
-      numero:          MOCK_CONSOLIDADOS.length + 1,
-      fechaGeneracion: new Date().toISOString().split('T')[0],
-      generadoPor:     'SISTEMA',
-      estado:          'GENERADO',
-      lineas:          [],
-      totales:         { totalBienes: 0, totalServicios: 0, totalGeneral: 0 },
-    };
-    MOCK_CONSOLIDADOS.unshift(newConsolidado);
-    return of(newConsolidado).pipe(delay(800));
+  generarConsolidado(gilIds: string[]): Observable<Consolidado> {
+    return this.http
+      .post<ConsolidadoResponse>(`${API}/budget/consolidados`, { gilIds })
+      .pipe(
+        map(consolidadoFromApi),
+        catchError(err => throwError(() => err))
+      );
   }
 
   reversarConsolidado(id: string): Observable<boolean> {
-    const found = MOCK_CONSOLIDADOS.find(c => c.id === id);
-    if (found) {
-      found.estado = 'REVERSADO';
-    }
-    return of(true).pipe(delay(500));
+    return this.http
+      .patch<void>(`${API}/budget/consolidados/${id}/reversar`, {})
+      .pipe(
+        map(() => true),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** GET /reporting/ejecucion-presupuestal?fichaId?&vigencia? */
+  getEjecucionPresupuestal(
+    params?: { fichaId?: string; vigencia?: number },
+  ): Observable<EjecucionPresupuestal[]> {
+    let httpParams = new HttpParams();
+    if (params?.fichaId)  httpParams = httpParams.set('fichaId',  params.fichaId);
+    if (params?.vigencia) httpParams = httpParams.set('vigencia', String(params.vigencia));
+    return this.http
+      .get<EjecucionPresupuestalItemResponse[]>(
+        `${API}/reporting/ejecucion-presupuestal`,
+        { params: httpParams },
+      )
+      .pipe(
+        map(list => list.map(ejecucionPresupuestalFromApi)),
+        catchError(err => throwError(() => err))
+      );
   }
 }

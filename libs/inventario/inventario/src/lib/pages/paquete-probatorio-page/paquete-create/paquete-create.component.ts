@@ -4,7 +4,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
@@ -15,7 +15,7 @@ import { PaqueteFacade } from '../../../data-access/paquete.facade';
   selector: 'restaurant-paquete-create',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule, LucideIconComponent, ButtonComponent, BackButtonComponent],
+  imports: [ReactiveFormsModule, LucideIconComponent, ButtonComponent, BackButtonComponent],
   templateUrl: './paquete-create.component.html',
   styleUrl: './paquete-create.component.scss',
 })

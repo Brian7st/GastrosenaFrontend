@@ -15,40 +15,34 @@
     </div>
   </div>
 
-  <!-- Bento-Style KPI Grid (Using standard KpiCardComponent) -->
+  <!-- KPI Grid derivado de la lista real -->
   <div class="kpi-grid">
-    <restaurant-kpi-card 
-      label="Retención ZESE Acumulada" 
-      [value]="kpis().retencionZese | currency:'COP':'symbol-narrow':'1.0-0'" 
-      icon="landmark" 
-      iconColor="blue"
-      trend="+4.2%" 
-      [trendUp]="true">
+    <restaurant-kpi-card
+      label="Total Ejecutado"
+      [value]="kpiTotalEjecutado() | currency:'COP':'symbol-narrow':'1.0-0'"
+      icon="bar-chart-2"
+      iconColor="blue">
     </restaurant-kpi-card>
 
-    <restaurant-kpi-card 
-      label="Total IVA Acumulado" 
-      [value]="kpis().ivaAcumulado | currency:'COP':'symbol-narrow':'1.0-0'" 
-      icon="banknote" 
-      iconColor="green"
-      trend="Estable" 
-      [trendUp]="null">
+    <restaurant-kpi-card
+      label="Contabilizados"
+      [value]="kpiContabilizados()"
+      icon="check-circle"
+      iconColor="green">
     </restaurant-kpi-card>
 
-    <restaurant-kpi-card 
-      label="Total Ejecutado Neto" 
-      [value]="kpis().totalEjecutado | currency:'COP':'symbol-narrow':'1.0-0'" 
-      icon="bar-chart-2" 
-      iconColor="red"
-      trend="Alerta" 
-      [trendUp]="false">
-    </restaurant-kpi-card>
-
-    <restaurant-kpi-card 
-      label="GILs Pendientes" 
-      [value]="kpis().gilsPendientes" 
-      icon="file-text" 
+    <restaurant-kpi-card
+      label="Generados"
+      [value]="kpiGenerados()"
+      icon="file-text"
       iconColor="orange">
+    </restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      label="Reversados"
+      [value]="kpiReversados()"
+      icon="undo-2"
+      iconColor="red">
     </restaurant-kpi-card>
   </div>
 
@@ -100,7 +94,7 @@
     </tbody>
     
     <div dtFooter class="dt-footer">
-      <span class="table-pagination__info">Mostrando 4 de 12 registros de consolidados</span>
+      <span class="table-pagination__info">Mostrando {{ consolidados().length }} consolidado(s)</span>
       <div class="pagination-btns">
         <button class="pagination-btn" disabled>
           <span class="material-symbols-outlined">chevron_left</span>
@@ -149,14 +143,17 @@
     </div>
   </div>
 
-  <restaurant-exportar-consolidado-modal
-    *ngIf="showExportModal()"
+  @if (showExportModal()) {
+<restaurant-exportar-consolidado-modal
+   
     (close)="closeExportModal()"
     (export)="onExport($event)">
   </restaurant-exportar-consolidado-modal>
+}
 
-  <restaurant-reversar-consolidado-modal
-    *ngIf="showReversarModal() && selectedReversarItem()"
+  @if (showReversarModal() && selectedReversarItem()) {
+<restaurant-reversar-consolidado-modal
+   
     [consolidadoId]="selectedReversarItem()!.id"
     [periodo]="selectedReversarItem()!.fechaGeneracion"
     [total]="(selectedReversarItem()!.totales.totalGeneral | currency:'COP':'symbol-narrow':'1.0-0') ?? ''"
@@ -165,4 +162,5 @@
     (close)="closeReversarModal()"
     (confirm)="confirmReversar()">
   </restaurant-reversar-consolidado-modal>
+}
 </div>

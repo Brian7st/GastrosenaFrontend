@@ -19,7 +19,8 @@
 
         <!-- Drop zone -->
         <div class="upload-card">
-          <ng-container *ngIf="!file(); else fileSelected">
+          @if (!file()) {
+
             <div class="drop-zone" [class.is-dragging]="isDragging()"
                  (dragover)="onDragOver($event)" (dragleave)="onDragLeave()" (drop)="onDrop($event)">
               <div class="drop-icon">
@@ -32,9 +33,9 @@
                 <input type="file" accept=".csv,.xlsx,.xls" (change)="onFileSelected($event)" />
               </label>
             </div>
-          </ng-container>
+          
+} @else {
 
-          <ng-template #fileSelected>
             <div class="file-card">
               <div class="file-icon">
                 <span class="material-symbols-outlined">description</span>
@@ -47,7 +48,10 @@
                 <span class="material-symbols-outlined">close</span>
               </button>
             </div>
-          </ng-template>
+          
+}
+
+          
         </div>
 
         <!-- Instrucciones -->
@@ -57,10 +61,12 @@
             <h4>Instrucciones</h4>
           </div>
           <ol class="instr-list">
-            <li *ngFor="let item of INSTRUCCIONES; let i = index">
+            @for (item of INSTRUCCIONES; track item; let i = $index) {
+<li>
               <span class="instr-num">{{ i + 1 }}</span>
               <span>{{ item }}</span>
             </li>
+}
           </ol>
           <div class="server-status">
             <p class="status-label">ESTADO DEL SERVIDOR</p>
@@ -73,23 +79,31 @@
       </div>
 
       <!-- Vista Previa -->
-      <ng-container *ngIf="previewData().length > 0 || isProcessing()">
+      @if (previewData().length > 0 || isProcessing()) {
+
         <div class="preview-card">
           <div class="preview-header">
             <div class="preview-title">
               <span class="material-symbols-outlined">visibility</span>
               <h3>Vista Previa de Datos</h3>
             </div>
-            <span class="preview-count" *ngIf="!isProcessing()">{{ previewData().length }} FILAS ENCONTRADAS</span>
-            <span class="preview-count" *ngIf="isProcessing()">Procesando...</span>
+            @if (!isProcessing()) {
+<span class="preview-count">{{ previewData().length }} FILAS ENCONTRADAS</span>
+}
+            @if (isProcessing()) {
+<span class="preview-count">Procesando...</span>
+}
           </div>
 
-          <div *ngIf="isProcessing()" class="processing-indicator">
+          @if (isProcessing()) {
+<div class="processing-indicator">
             <span class="material-symbols-outlined spin">sync</span>
             Analizando archivo...
           </div>
+}
 
-          <div class="preview-table-wrap" *ngIf="!isProcessing()">
+          @if (!isProcessing()) {
+<div class="preview-table-wrap">
             <table class="preview-table">
               <thead>
                 <tr>
@@ -103,7 +117,8 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let row of previewData()">
+                @for (row of previewData(); track row) {
+<tr>
                   <td class="code-mono">{{ row.codigoPlaca }}</td>
                   <td class="row-nombre">{{ row.descripcion }}</td>
                   <td>{{ row.um }}</td>
@@ -120,11 +135,14 @@
                     </span>
                   </td>
                 </tr>
+}
               </tbody>
             </table>
           </div>
+}
         </div>
-      </ng-container>
+      
+}
     </div>
 
     <!-- Footer -->

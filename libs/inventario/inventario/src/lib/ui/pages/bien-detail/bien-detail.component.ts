@@ -1,18 +1,17 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Bien, MovimientoBien } from '../../../models/inventario.model';
+import { MovimientoBien } from '../../../models/inventario.model';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
-import { StatusBadgeComponent } from '@restaurant/shared/ui';
+import { ButtonComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
 import { BienFormComponent } from '../../modals/bien-form/bien-form.component';
 import { BienFormDto, EstadoBien } from '../../../models/inventario.model';
-import { MOVIMIENTOS_MOCK } from '../../../models/inventario.mock';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 
 @Component({
   selector: 'restaurant-bien-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, BienFormComponent, BackButtonComponent, StatusBadgeComponent],
+  imports: [CommonModule, RouterModule, BienFormComponent, BackButtonComponent, StatusBadgeComponent, ButtonComponent],
   templateUrl: './bien-detail.component.html',
   styleUrl: './bien-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,7 +47,7 @@ export class BienDetailPageComponent implements OnInit {
 
   private loadData(id: string): void {
     this.facade.cargarBienPorId(id);
-    this.movimientos.set(MOVIMIENTOS_MOCK);
+    this.movimientos.set([]);
   }
 
   onVolver(): void {

@@ -30,14 +30,14 @@ export class UsuarioFormComponent implements OnChanges {
   readonly rolOptions = Object.values(Rol);
 
   readonly form = this.fb.nonNullable.group({
-    nombre:     ['', Validators.required],
-    apellidos:  ['', Validators.required],
-    email:      ['', [Validators.required, Validators.email]],
-    documento:  ['', Validators.required],
-    telefono:   ['', Validators.required],
-    idRol:      ['', Validators.required],
-    contrasena: ['', [Validators.required, Validators.minLength(8)]],
-  });
+  nombre:     ['', Validators.required],
+  apellidos:  ['', Validators.required],
+  email:      ['', [Validators.required, Validators.email]],
+  documento:  ['', Validators.required],
+  telefono:   ['', Validators.required],
+  nombreRol:  ['', Validators.required],  // ← cambio
+  contrasena: ['', [Validators.required, Validators.minLength(8)]],
+});
 
   get modoEdicion(): boolean {
     return this.usuario !== null;
@@ -51,7 +51,7 @@ export class UsuarioFormComponent implements OnChanges {
         email:     this.usuario.email,
         documento: this.usuario.documento,
         telefono:  this.usuario.telefono,
-        idRol:     this.usuario.rol,
+        nombreRol: this.usuario.rol,  // ← cambio
       });
       this.form.controls.contrasena.clearValidators();
       this.form.controls.contrasena.setValue('');

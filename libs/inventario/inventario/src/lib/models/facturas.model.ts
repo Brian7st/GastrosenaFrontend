@@ -108,6 +108,30 @@ export interface FacturaFormDto {
   motivoAnulacion?: string;
 }
 
+// ─── Conciliación Factura-GIL ───────────────────────────────────────────────
+
+export interface ConciliacionGilDiferencia {
+  gilItemId:             string;
+  descripcion:           string;
+  cantidadGil:           number;
+  cantidadFactura:       number;
+  precioUnitarioGil:     number;
+  precioUnitarioFactura: number;
+  diferencia:            number;
+  observacion?:          string;
+  resuelta:              boolean;
+}
+
+export interface ConciliacionGil {
+  id:          string;
+  facturaId:   string;
+  gilId:       string;
+  estado:      string;
+  diferencias: ConciliacionGilDiferencia[];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 /**
  * Estado de la solicitud GIL F-014.
  */

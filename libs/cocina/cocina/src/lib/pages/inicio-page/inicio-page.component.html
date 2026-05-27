@@ -9,25 +9,27 @@
     <div class="date-badge">{{ fechaActual }}</div>
   </div>
 
-  <div class="showcase__grid-3 stats-grid">
+  <div class="stats-grid">
     <restaurant-kpi-card 
-      label="Comandas Activas" 
-      [value]="estadisticas.activos.toString()" 
+      label="Comandas en espera" 
+      [value]="estadisticas().activos.toString()" 
       icon="clock" 
       iconColor="orange"
     ></restaurant-kpi-card>
 
-    <restaurant-kpi-card 
-      label="Completadas Hoy" 
-      [value]="estadisticas.completados.toString()" 
-      icon="check-circle" 
-      iconColor="green"
-    ></restaurant-kpi-card>
+    <div (click)="abrirModal('LISTAS')" style="cursor: pointer;">
+      <restaurant-kpi-card 
+        label="Comandas listas" 
+        [value]="estadisticas().completados.toString()" 
+        icon="check-circle" 
+        iconColor="green"
+      ></restaurant-kpi-card>
+    </div>
 
     <div (click)="abrirModal('CANCELACION')" style="cursor: pointer;">
       <restaurant-kpi-card 
         label="Canceladas" 
-        [value]="estadisticas.cancelados.toString()" 
+        [value]="estadisticas().cancelados.toString()" 
         icon="x-circle" 
         iconColor="red"
       ></restaurant-kpi-card>
@@ -36,7 +38,7 @@
     <div (click)="abrirModal('DEVOLUCION')" style="cursor: pointer;">
       <restaurant-kpi-card 
         label="Devueltas" 
-        [value]="estadisticas.devueltos.toString()" 
+        [value]="estadisticas().devueltos.toString()" 
         icon="arrow-left-right" 
         iconColor="yellow"
       ></restaurant-kpi-card>
@@ -51,7 +53,7 @@
     ></restaurant-section-title>
 
     <div class="order-list showcase__stack">
-      <div class="order-item showcase__row" *ngFor="let pedido of pedidosPendientes" style="justify-content: space-between; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-secondary);">
+      <div class="order-item showcase__row" *ngFor="let pedido of pedidosPendientes()" style="justify-content: space-between; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-secondary);">
         <div class="left showcase__row">
           <span class="showcase__value">Mesa {{ pedido.mesa }}</span>
           <restaurant-status-badge 
@@ -60,7 +62,9 @@
           ></restaurant-status-badge>
           <p class="order-details" style="margin: 0; font-size: var(--font-size-sm);">{{ pedido.platos }}</p>
         </div>
-        <span class="time" style="font-size: var(--font-size-sm); color: var(--color-text-secondary);"><lucide-icon name="clock" size="14"></lucide-icon> {{ pedido.tiempo }}</span>
+        <span class="time" style="font-size: var(--font-size-sm); color: var(--color-text-secondary); display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+          <i class="bi bi-clock"></i> {{ pedido.tiempo }}
+        </span>
       </div>
     </div>
 
@@ -76,14 +80,37 @@
     <div class="modal-incidencias">
 
       <div class="modal-header">
-        <div class="modal-title-row">
-          <lucide-icon name="x-circle" size="24" class="modal-icon"></lucide-icon>
-          <div>
+        <div class="modal-title-row" style="width: 100%;">
+          @if (modalTipo() === 'LISTAS') {
+            <lucide-icon name="check-circle" size="24" class="modal-icon-success" style="color: var(--color-brand-primary); margin-top: var(--space-1);"></lucide-icon>
+          } @else {
+            <lucide-icon name="x-circle" size="24" class="modal-icon-error" style="color: var(--color-error-text); margin-top: var(--space-1);"></lucide-icon>
+          }
+          <div style="flex: 1;">
             <h2>{{ modalTitulo() }}</h2>
-            <p class="modal-subtitle">Listado completo de pedidos cancelados con motivos y detalles</p>
+            @if (modalTipo() === 'LISTAS') {
+               <!-- Controles de filtrado y eliminación de fechas -->
+               <div class="modal-controls" style="display: flex; gap: 10px; margin-top: 10px; align-items: center; flex-wrap: wrap;">
+                 <input type="text" [ngModel]="busquedaModal()" (ngModelChange)="busquedaModal.set($event)" placeholder="Buscar por fecha, mesero o #comanda..." class="form-input" style="flex: 1; padding: 6px 12px; border-radius: 4px; border: 1px solid var(--color-border);" />
+                 
+                 <div class="delete-range-controls" style="display: flex; gap: 8px; align-items: center; border: 1px solid var(--color-danger, #d63031); padding: 6px 10px; border-radius: 20px; background: white;">
+                   <span style="font-size: 12px; color: var(--color-text-muted); font-weight: 500;">Eliminar entre:</span>
+                   <input type="date" [ngModel]="fechaInicioEliminar()" (ngModelChange)="fechaInicioEliminar.set($event)" [min]="minDateAnioActual" [max]="maxDateAnioActual" class="form-input form-date" style="border: none; outline: none; background: transparent; cursor: pointer; font-size: 12px;" />
+                   <span style="color: var(--color-text-muted);">-</span>
+                   <input type="date" [ngModel]="fechaFinEliminar()" (ngModelChange)="fechaFinEliminar.set($event)" [min]="minDateAnioActual" [max]="maxDateAnioActual" class="form-input form-date" style="border: none; outline: none; background: transparent; cursor: pointer; font-size: 12px;" />
+                   <button class="btn-delete-range" (click)="eliminarPorRango()"
+                     style="background: #fde8e8; color: #9b1c1c; border: 1.5px solid #f87171; padding: 5px 14px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 5px;"
+                     title="Eliminar en rango seleccionado">
+                      Eliminar
+                   </button>
+                 </div>
+               </div>
+            } @else {
+               <p class="modal-subtitle">Listado completo de pedidos cancelados con motivos y detalles</p>
+            }
           </div>
         </div>
-        <button class="modal-close" (click)="cerrarModal()">
+        <button class="modal-close" (click)="cerrarModal()" style="margin-left: 15px; align-self: flex-start;">
           <lucide-icon name="x" size="20"></lucide-icon>
         </button>
       </div>
@@ -94,14 +121,14 @@
             <div class="spinner"></div>
             <p>Cargando incidencias...</p>
           </div>
-        } @else if (incidencias().length === 0) {
+        } @else if (incidenciasFiltradas().length === 0) {
           <div class="modal-empty">
             <lucide-icon name="package" size="48"></lucide-icon>
-            <p>No hay incidencias de este tipo registradas</p>
+            <p>No hay coincidencias para mostrar</p>
           </div>
         } @else {
-          @for (inc of incidencias(); track inc.idAuditoria) {
-            <div class="incidencia-card">
+          @for (inc of incidenciasFiltradas(); track inc.idAuditoria) {
+            <div class="incidencia-card" [ngClass]="'tipo-' + inc.tipoIncidencia.toLowerCase()">
               <div class="incidencia-left">
                 <div class="incidencia-meta">
                   <span class="comanda-id">#{{ inc.comanda.idComanda | slice:0:6 | uppercase }}</span>
@@ -113,7 +140,14 @@
                 </div>
               </div>
 
-              <div class="incidencia-right">
+              <div class="incidencia-right" style="position: relative;">
+                @if (modalTipo() === 'LISTAS') {
+                  <button class="btn-delete-item" (click)="eliminarComandaIndividual(inc.idAuditoria)"
+                    style="position: absolute; right: 0; top: 0; background: none; border: none; color: #d63031; cursor: pointer; padding: 2px;"
+                    title="Eliminar esta comanda">
+                    <lucide-icon name="trash-2" [size]="20"></lucide-icon>
+                  </button>
+                }
                 @if (inc.detalleModificado) {
                   <p class="platos-label">Platos:</p>
                   <p class="platos-text">{{ inc.detalleModificado }}</p>
@@ -129,7 +163,7 @@
       </div>
 
       <div class="modal-footer">
-        Total cancelaciones hoy: <strong>{{ incidencias().length }} pedidos</strong>
+        Total mostrado: <strong>{{ incidenciasFiltradas().length }} pedidos</strong>
       </div>
 
     </div>

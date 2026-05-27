@@ -55,3 +55,13 @@ export interface TopDiferencia {
   diferencia: string;
   icon: string;
 }
+
+/** Payload UI para registrar el conteo físico de un ítem
+ *  (POST /reconciliation/conciliaciones/{id}/conteo) */
+export interface ConteoItemData {
+  codigoSena: string;
+  descripcion: string;
+  cantidadSistema: number;
+  cantidadFisica: number;
+  valorUnitario: number;
+}

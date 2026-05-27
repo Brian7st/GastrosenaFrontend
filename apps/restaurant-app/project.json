@@ -32,7 +32,8 @@
     "serve": {
       "executor": "@angular/build:dev-server",
       "options": {
-        "buildTarget": "restaurant-app:build:development"
+        "buildTarget": "restaurant-app:build:development",
+        "proxyConfig": "apps/restaurant-app/proxy.conf.json"
       }
     }
   }

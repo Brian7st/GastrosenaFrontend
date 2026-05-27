@@ -6,7 +6,7 @@ import { Receta } from '../models/receta.model';
 export class RecetaService {
   private http = inject(HttpClient);
   // URL base para el backend de recetas
-  private url = 'http://localhost:8080/api/recetas';
+  private url = '/api/recetas';
 
   recetas = signal<Receta[]>([]);
 
@@ -85,11 +85,11 @@ export class RecetaService {
     ];
   }
 
-  guardarRecetaCompleta(datos: any) {
+  guardarRecetaCompleta(datos: Partial<Receta>) {
     return this.http.post(this.url, datos);
   }
 
-  actualizarRecetaCompleta(id: string, datos: any) {
+  actualizarRecetaCompleta(id: string, datos: Partial<Receta>) {
     return this.http.put(`${this.url}/${id}`, datos);
   }
 

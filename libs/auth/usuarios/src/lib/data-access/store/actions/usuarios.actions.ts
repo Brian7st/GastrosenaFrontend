@@ -2,11 +2,14 @@ import { createActionGroup, emptyProps, props } from '@ngrx/store';
 import { PaginatedResponse } from '@restaurant/shared/models';
 import {
   ActualizarUsuarioRequest,
+  AsignacionMasivaRequest,
   CrearUsuarioRequest,
   ExportarConfig,
   FiltrosUsuarios,
+  HistorialItem,
   ImportarUsuariosRequest,
   ImportarUsuariosResponse,
+  RolDetalle,
   RolOpcion,
   UsuarioDetalle,
 } from '../../../models/usuarios.model';
@@ -63,6 +66,21 @@ export const UsuariosActions = createActionGroup({
     'Exportar Usuarios':            props<{ config: ExportarConfig }>(),
     'Exportar Usuarios Exitoso':    emptyProps(),
     'Exportar Usuarios Fallido':    props<{ error: string }>(),
+
+    // ── Roles detalle ─────────────────────────────────────────────────────────
+    'Cargar Roles Detalle':         emptyProps(),
+    'Cargar Roles Detalle Exitoso': props<{ roles: RolDetalle[] }>(),
+    'Cargar Roles Detalle Fallido': props<{ error: string }>(),
+
+    // ── Asignación masiva de rol ──────────────────────────────────────────────
+    'Asignar Rol Masivo':           props<{ request: AsignacionMasivaRequest }>(),
+    'Asignar Rol Masivo Exitoso':   emptyProps(),
+    'Asignar Rol Masivo Fallido':   props<{ error: string }>(),
+
+    // ── Historial ─────────────────────────────────────────────────────────────
+    'Cargar Historial':             emptyProps(),
+    'Cargar Historial Exitoso':     props<{ historial: HistorialItem[] }>(),
+    'Cargar Historial Fallido':     props<{ error: string }>(),
 
     // ── Selección local ───────────────────────────────────────────────────────
     'Seleccionar Usuario':          props<{ usuario: UsuarioDetalle }>(),

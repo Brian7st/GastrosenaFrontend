@@ -35,7 +35,7 @@ export class SolicitudesGenerarComponent implements OnInit {
   solicitudes = computed<SolicitudRow[]>(() => {
     return this.solicitudesReales().map(s => ({
       id: String(s.id),
-      codigoFicha: `${s.numeroGil}\n${s.fichaId}`,
+      codigoFicha: `${s.numeroGil}\n${s.fichaCaracterizacion}`,
       solicitante: s.cuentadantes[0]?.nombre ?? '',
       totalBienes: s.bienes?.length ?? 0,
       estado: s.estado // 'Aprobado', 'Borrador', etc.

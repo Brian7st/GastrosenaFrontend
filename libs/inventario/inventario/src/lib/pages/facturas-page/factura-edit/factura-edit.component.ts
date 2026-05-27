@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { KeywordConfirmModalComponent } from '@restaurant/shared/ui';
 import { FacturasFacade } from '../../../data-access/facturas.facade';
-import { Factura, FacturaLinea, ConciliacionItem } from '../../../models/facturas.model';
+import { FacturaLinea } from '../../../models/facturas.model';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 
 @Component({
