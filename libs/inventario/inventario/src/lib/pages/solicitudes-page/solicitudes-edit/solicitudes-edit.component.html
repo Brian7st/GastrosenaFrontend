@@ -143,9 +143,9 @@
             <tbody>
               @for (bien of bienes(); track bien; let i = $index) {
 <tr>
-                <td class="font-medium text-dark">{{ bien.codigo }}</td>
+                <td class="font-medium text-dark">{{ bien.codigoSena }}</td>
                 <td class="text-muted">{{ bien.descripcion }}</td>
-                <td class="text-muted">{{ bien.um }}</td>
+                <td class="text-muted">{{ bien.unidadMedida }}</td>
                 <td class="text-right font-medium text-dark">{{ bien.cantidad }}</td>
                 <td class="text-right text-muted">{{ bien.valorUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
                 <td class="text-right font-bold text-dark">{{ bien.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
