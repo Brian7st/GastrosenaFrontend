@@ -32,14 +32,19 @@ const API = '/api/v1';
 export class SolicitudesService {
   private http = inject(HttpClient);
 
+  // ─────────────────────────────────────────────────────────────────────────
+  // Procurement — /api/v1/procurement/giles
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /** GET /procurement/giles — solo se envían los filtros que el backend admite */
   getSolicitudes(filtros?: SolicitudesGilFiltros): Observable<{ solicitudes: SolicitudGil[]; paginacion: SolicitudesPaginacion }> {
     let params = new HttpParams();
-    if (filtros?.busqueda)   params = params.set('q', filtros.busqueda);
-    if (filtros?.estado)     params = params.set('estado', filtros.estado);
-    if (filtros?.instructor) params = params.set('instructor', filtros.instructor);
-    if (filtros?.fechaRango) params = params.set('fechaRango', filtros.fechaRango);
+    // Parámetros soportados por el backend:
+    if (filtros?.estado)               params = params.set('estado', filtros.estado);
+    if (filtros?.fichaCaracterizacion) params = params.set('fichaCaracterizacion', filtros.fichaCaracterizacion);
     params = params.set('page', String(filtros?.page ?? 0));
     params = params.set('size', String(filtros?.size ?? 10));
+    // Nota: busqueda, instructor y fechaRango NO existen en el backend — se omiten.
 
     return this.http
       .get<{ content: GilResponse[]; totalElements: number; totalPages: number; number: number; size: number }>(
@@ -59,6 +64,7 @@ export class SolicitudesService {
       );
   }
 
+  /** GET /procurement/giles/{id} */
   getSolicitudById(id: string | number): Observable<SolicitudGil | undefined> {
     return this.http
       .get<GilResponse>(`${API}/procurement/giles/${id}`)
@@ -68,6 +74,7 @@ export class SolicitudesService {
       );
   }
 
+  /** POST /procurement/giles — crea un GIL en estado BORRADOR */
   crearSolicitud(data: CrearSolicitudData): Observable<{ success: boolean }> {
     return this.http
       .post<GilResponse>(`${API}/procurement/giles`, data)
@@ -77,20 +84,30 @@ export class SolicitudesService {
       );
   }
 
-  actualizarSolicitud(id: string, data: ActualizarSolicitudData): Observable<{ success: boolean }> {
-    return this.http
-      .patch<GilResponse>(`${API}/procurement/giles/${id}`, data)
-      .pipe(
-        map(() => ({ success: true })),
-        catchError(err => throwError(() => err))
-      );
+  /**
+   * PATCH /procurement/giles/{id} — actualiza un GIL en BORRADOR.
+   * NOTA: este endpoint aún NO existe en el backend (pendiente tarea BACKEND #3).
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  actualizarSolicitud(_id: string, _data: ActualizarSolicitudData): Observable<{ success: boolean }> {
+    return throwError(() => new Error('actualizarSolicitud: PATCH /procurement/giles/{id} no existe en backend — pendiente tarea BACKEND #3'));
   }
 
+  /**
+   * PATCH /procurement/giles/{id} — alias usado por facturas facade.
+   * NOTA: mismo endpoint inexistente — pendiente tarea BACKEND #3.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  updateSolicitud(_id: string | number, _payload: Partial<SolicitudGil>): Observable<SolicitudGil> {
+    return throwError(() => new Error('updateSolicitud: PATCH /procurement/giles/{id} no existe en backend — pendiente tarea BACKEND #3'));
+  }
+
+  /** PATCH /procurement/giles/{id}/emitir o /cerrar */
   cambiarEstado(id: string, estado: EstadoGil): Observable<boolean> {
     const accionMap: Record<EstadoGil, string> = {
       BORRADOR:          '',
       EMITIDO:           'emitir',
-      ENVIADO_PROVEEDOR: '', // usa enviarAProveedor() — requiere PUT con body
+      ENVIADO_PROVEEDOR: '', // usa enviarAProveedor() — requiere PATCH con body
       CERRADO:           'cerrar',
     };
     const accion = accionMap[estado];
@@ -104,21 +121,23 @@ export class SolicitudesService {
       );
   }
 
-  /** PUT /procurement/giles/{id}/enviar-proveedor — requiere body con proveedorDestinatarioId y fechaEnvio */
+  /** PATCH /procurement/giles/{id}/enviar-proveedor — requiere body con proveedorDestinatarioId y fechaEnvio */
   enviarAProveedor(id: string, data: EnviarProveedorRequest): Observable<boolean> {
     return this.http
-      .put<GilResponse>(`${API}/procurement/giles/${id}/enviar-proveedor`, data)
+      .patch<GilResponse>(`${API}/procurement/giles/${id}/enviar-proveedor`, data) // era: http.put — corregido a PATCH
       .pipe(
         map(() => true),
         catchError(err => throwError(() => err))
       );
   }
 
+  /** DELETE — endpoint NO disponible en backend */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   deleteSolicitud(_codigo: string): Observable<boolean> {
     return throwError(() => new Error('deleteSolicitud: endpoint DELETE no disponible en backend'));
   }
 
+  /** Generar GILs desde solicitudes aprobadas — endpoint NO disponible en backend */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   generarGils(_ids: (string | number)[]): Observable<boolean> {
     return throwError(() => new Error('generarGils: endpoint no disponible — revisar con backend'));
@@ -186,15 +205,6 @@ export class SolicitudesService {
       .patch<SolicitudSesionResponse>(`${API}/training/solicitudes/${id}/comprometer`, {})
       .pipe(
         map(solicitudSesionFromApi),
-        catchError(err => throwError(() => err))
-      );
-  }
-
-  updateSolicitud(id: string | number, payload: Partial<SolicitudGil>): Observable<SolicitudGil> {
-    return this.http
-      .patch<GilResponse>(`${API}/procurement/giles/${id}`, payload)
-      .pipe(
-        map(gilFromApi),
         catchError(err => throwError(() => err))
       );
   }
