@@ -9,7 +9,7 @@ import {
 } from '../models/solicitud-sesion.model';
 import { SolicitudesService } from './services/solicitudes.service';
 import { EnviarProveedorRequest } from './api/sourcing.api';
-import { finalize, catchError, of, map } from 'rxjs';
+import { finalize, catchError, of, map, EMPTY } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -186,23 +186,28 @@ export class SolicitudesFacade {
   }
 
   /**
-   * Elimina una solicitud y refresca los datos.
+   * Elimina un GIL por su UUID y refresca el listado.
+   * Solo GILes en estado BORRADOR pueden eliminarse (backend devuelve 409 si no).
    */
-  eliminarSolicitud(codigo: string): void {
+  eliminarSolicitud(id: string): void {
     this._loading.set(true);
-    this.solicitudesService.deleteSolicitud(codigo)
+    this._error.set(null);
+    this.solicitudesService.deleteSolicitud(id)
       .pipe(
-        catchError(() => {
-          this._error.set('Error al eliminar la solicitud');
-          return of(false);
+        catchError((err: unknown) => {
+          const httpErr = err as { status?: number };
+          if (httpErr.status === 404) {
+            this._error.set('GIL no encontrado');
+          } else if (httpErr.status === 409) {
+            this._error.set('Solo se pueden eliminar GILes en estado Borrador');
+          } else {
+            this._error.set('Error al eliminar la solicitud');
+          }
+          return EMPTY;
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe((success) => {
-        if (success) {
-          this.cargarSolicitudes();
-        }
-      });
+      .subscribe(() => this.cargarSolicitudes());
   }
 
   /** PUT /procurement/giles/{id}/enviar-proveedor con proveedorDestinatarioId y fechaEnvio */
