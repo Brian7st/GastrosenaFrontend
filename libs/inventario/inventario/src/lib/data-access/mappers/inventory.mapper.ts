@@ -45,28 +45,23 @@ export function existenciaFromApi(dto: ExistenciaResponse): ExistenciaProducto {
 
 export function entradaToRequest(data: EntradaMovimientoData): EntradaRequest {
   return {
-    productoId: data.producto,
-    cantidad: data.cantidad,
-    fecha: data.fecha,
-    proveedorId: data.proveedor,
-    facturaId: data.factura,
-    ubicacion: data.ubicacion,
-    valorUnitario: data.valorUnitario,
-    observaciones: data.observaciones,
+    productoId:      data.productoId,
+    cantidad:        data.cantidad,
+    precioUnitario:  data.precioUnitario,
+    facturaId:       data.facturaId,
+    proveedorNit:    data.proveedorNit,
+    gilId:           data.gilId,
+    conciliacionId:  data.conciliacionId,
   };
 }
 
 export function salidaToRequest(data: SalidaMovimientoData): SalidaRequest {
   return {
-    productoId: data.producto,
-    cantidad: data.cantidad,
-    fecha: data.fecha,
-    areaDestino: data.areaDestino,
-    instructorId: data.instructor,
-    fichaId: data.ficha,
-    categoria: data.categoria,
-    proposito: data.proposito,
-    observaciones: data.observaciones,
+    productoId:    data.productoId,
+    cantidad:      data.cantidad,
+    requisicionId: data.requisicionId,
+    instructorId:  data.instructorId,
+    categoria:     data.categoria,
   };
 }
 

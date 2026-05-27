@@ -128,7 +128,7 @@ export class KardexFacade {
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe(res => { if (res) this.cargarKardex(data.producto); });
+      .subscribe(res => { if (res) this.cargarKardex(data.productoId); });
   }
 
   registrarSalida(data: SalidaMovimientoData): void {
@@ -141,7 +141,7 @@ export class KardexFacade {
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe(res => { if (res) this.cargarKardex(data.producto); });
+      .subscribe(res => { if (res) this.cargarKardex(data.productoId); });
   }
 
   registrarReserva(data: ReservaMovimientoData): void {

@@ -1,7 +1,7 @@
 <div class="modal-overlay">
-  <!-- Modal Container -->
   <div class="modal-content">
-    <!-- Modal Header -->
+
+    <!-- Header -->
     <div class="modal-header">
       <div class="header-info">
         <div class="header-icon">
@@ -12,7 +12,7 @@
             <h3 class="modal-title">Registrar Salida de Producto</h3>
             <span class="req-badge">REQ-45-S</span>
           </div>
-          <p class="modal-subtitle">Control de Inventario</p>
+          <p class="modal-subtitle">La salida debe estar vinculada a una Requisición DESPACHADA.</p>
         </div>
       </div>
       <button class="close-btn" (click)="closeModal()">
@@ -20,107 +20,134 @@
       </button>
     </div>
 
-    <!-- Modal Body -->
+    <!-- Body -->
     <form [formGroup]="salidaForm" (ngSubmit)="onSubmit()" class="modal-body">
       <div class="form-grid">
-        
-        <!-- Two Column Row: Product & Qty -->
-        <div class="product-qty-row">
-          <div class="form-group product-col">
-            <label>Producto o Código</label>
-            <div class="input-wrapper">
-              <lucide-icon name="scan-barcode" class="input-icon" [size]="18"></lucide-icon>
-              <input type="text" formControlName="producto" placeholder="Busque por nombre o escanee código" class="form-input" style="padding-left: 2.5rem; font-family: monospace;">
+
+        <!-- Selector de requisición -->
+        <div class="form-group full-width">
+          <label>REQUISICIÓN ORIGEN <span class="required">*</span></label>
+          @if (requisicionesFacade.loading()) {
+            <select class="form-select full-select" disabled>
+              <option>Cargando requisiciones...</option>
+            </select>
+          } @else if (requisicionesDespachadas().length === 0) {
+            <div class="empty-notice">
+              <lucide-icon name="inbox" [size]="16"></lucide-icon>
+              No hay requisiciones en estado DESPACHADA disponibles.
+            </div>
+          } @else {
+            <select class="form-select full-select" (change)="onRequisicionChange($event)">
+              <option value="">Seleccione una requisición despachada...</option>
+              @for (req of requisicionesDespachadas(); track req.id) {
+                <option [value]="req.id">
+                  {{ req.numero }} — {{ req.instructorNombre }} — {{ req.fecha }} ({{ req.programa }})
+                </option>
+              }
+            </select>
+          }
+        </div>
+
+        <!-- Detalle de la requisición seleccionada -->
+        @if (requisicionSeleccionada(); as req) {
+          <div class="requisicion-detail full-width">
+            <div class="detail-row">
+              <span class="detail-label">Instructor ID</span>
+              <span class="detail-value" style="font-family: monospace;">{{ req.instructorId }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Ficha</span>
+              <span class="detail-value">{{ req.fichaId }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Sesión</span>
+              <span class="detail-value">{{ req.diaSemana }} {{ req.horaSesion }}</span>
             </div>
           </div>
-          
-          <div class="form-group qty-col">
-            <label>Cantidad</label>
-            <div class="input-wrapper">
-              <input type="number" formControlName="cantidad" placeholder="0" class="form-input qty-input" [class.error]="salidaForm.get('cantidad')?.value > stockDisponible()">
-              <span class="suffix">uds</span>
+
+          <!-- Ítems de la requisición (referencia visual) -->
+          @if (req.items.length > 0) {
+            <div class="items-ref full-width">
+              <p class="items-ref-title">
+                <lucide-icon name="list" [size]="14"></lucide-icon>
+                Ítems de la requisición (referencia):
+              </p>
+              <ul class="items-ref-list">
+                @for (item of req.items; track item.codigo) {
+                  <li>
+                    <span class="item-code">{{ item.codigo }}</span>
+                    {{ item.descripcion }} — {{ item.cantidad }} {{ item.unidad }}
+                  </li>
+                }
+              </ul>
+              <p class="hint-text">
+                <lucide-icon name="info" [size]="13"></lucide-icon>
+                Pendiente backend B-02: cuando los ítems expongan productoId, el formulario se pre-llenará automáticamente.
+              </p>
             </div>
-            @if (salidaForm.get('cantidad')?.value > stockDisponible()) {
-<p class="error-hint">
-              La cantidad excede el stock disponible ({{stockDisponible()}})
-            </p>
-}
+          }
+        }
+
+        <!-- Separador -->
+        <div class="separator full-width"></div>
+
+        <!-- Producto + Cantidad -->
+        <div class="form-group product-col">
+          <label>ID DEL PRODUCTO <span class="required">*</span></label>
+          <div class="input-wrapper">
+            <lucide-icon name="scan-barcode" class="input-icon" [size]="18"></lucide-icon>
+            <input
+              type="text"
+              formControlName="productoId"
+              placeholder="UUID del producto"
+              class="form-input"
+              style="font-family: monospace;">
+          </div>
+          @if (salidaForm.get('productoId')?.invalid && salidaForm.get('productoId')?.touched) {
+            <p class="error-hint">El ID del producto es obligatorio.</p>
+          }
+        </div>
+
+        <div class="form-group qty-col">
+          <label>CANTIDAD <span class="required">*</span></label>
+          <div class="input-wrapper">
+            <input type="number" formControlName="cantidad" placeholder="0" class="form-input qty-input">
+            <span class="suffix">uds</span>
           </div>
         </div>
 
-        <!-- Two Column Row: Date & Area -->
-        <div class="form-row-2">
-          <div class="form-group">
-            <label>Fecha</label>
-            <div class="input-wrapper">
-              <lucide-icon name="calendar" class="input-icon" [size]="18"></lucide-icon>
-              <input type="date" formControlName="fecha" class="form-input">
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label>Área de Destino</label>
-            <div class="input-wrapper">
-              <select formControlName="areaDestino" class="form-select">
-                <option value="">Seleccione un área</option>
-                <option value="sistemas">Sistemas y Desarrollo</option>
-                <option value="administracion">Administración</option>
-                <option value="mantenimiento">Mantenimiento</option>
-                <option value="bienestar">Bienestar Estudiantil</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- Instructor & Ficha -->
-        <div class="form-row-2">
-          <div class="form-group">
-            <label>Instructor</label>
-            <div class="input-wrapper">
-              <lucide-icon name="user" class="input-icon" [size]="18"></lucide-icon>
-              <input type="text" formControlName="instructor" placeholder="Nombre completo del instructor" class="form-input">
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label>Ficha</label>
-            <div class="input-wrapper">
-              <lucide-icon name="hash" class="input-icon" [size]="18"></lucide-icon>
-              <input type="text" formControlName="ficha" placeholder="1234567" maxlength="7" class="form-input" style="font-family: monospace;">
-            </div>
-          </div>
-        </div>
-
-        <!-- Category -->
-        <div class="form-group">
-          <label>Categoría de Alimento</label>
+        <!-- Categoría -->
+        <div class="form-group full-width">
+          <label>CATEGORÍA <span class="required">*</span></label>
           <select formControlName="categoria" class="form-select full-select">
             <option value="" disabled selected>Seleccione una categoría</option>
             <option value="abarrotes">Abarrotes</option>
             <option value="lacteos">Lácteos</option>
             <option value="frutas">Frutas y Vegetales</option>
             <option value="carnes">Carnes y Pescados</option>
+            <option value="bebidas">Bebidas</option>
+            <option value="condimentos">Condimentos y Especias</option>
+            <option value="otros">Otros</option>
           </select>
         </div>
 
-        <!-- Purpose -->
-        <div class="form-group">
-          <label>Propósito</label>
-          <input type="text" formControlName="proposito" placeholder="Motivo de la salida (ej: Mantenimiento, Dotación)" class="form-input">
-        </div>
-
-        <!-- Observations -->
-        <div class="form-group">
-          <label>Observaciones</label>
-          <textarea formControlName="observaciones" rows="3" placeholder="Detalles adicionales del movimiento..." class="form-textarea"></textarea>
-        </div>
+        <!-- Error de facade -->
+        @if (kardexFacade.error()) {
+          <div class="error-inline full-width">
+            <lucide-icon name="alert-triangle" [size]="16"></lucide-icon>
+            {{ kardexFacade.error() }}
+          </div>
+        }
 
       </div>
 
-      <!-- Modal Footer -->
+      <!-- Footer -->
       <div class="modal-footer">
         <restaurant-button variant="surface" (click)="closeModal()" type="button">Cancelar</restaurant-button>
-        <restaurant-button variant="primary" type="submit" [disabled]="salidaForm.invalid || salidaForm.get('cantidad')?.value > stockDisponible">
+        <restaurant-button
+          variant="primary"
+          type="submit"
+          [disabled]="salidaForm.invalid || kardexFacade.loading()">
           <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: bold;">
             <lucide-icon name="check-circle" [size]="18"></lucide-icon>
             Registrar Salida

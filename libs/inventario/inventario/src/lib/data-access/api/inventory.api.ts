@@ -22,27 +22,24 @@ export interface MovimientoResponse {
   estado: 'Completado' | 'Pendiente' | 'Cancelado';
 }
 
+/** RegistrarEntradaHttpRequest — POST /api/v1/inventory/movimientos/entrada */
 export interface EntradaRequest {
-  productoId: string;
-  cantidad: number;
-  fecha: string;
-  proveedorId?: string;
-  facturaId?: string;
-  ubicacion: string;
-  valorUnitario: number;
-  observaciones?: string;
+  productoId:      string;
+  cantidad:        number;
+  precioUnitario:  number;
+  facturaId?:      string;
+  proveedorNit?:   string;
+  gilId?:          string;
+  conciliacionId?: string;
 }
 
+/** RegistrarSalidaHttpRequest — POST /api/v1/inventory/movimientos/salida */
 export interface SalidaRequest {
-  productoId: string;
-  cantidad: number;
-  fecha: string;
-  areaDestino: string;
-  instructorId?: string;
-  fichaId?: string;
-  categoria: string;
-  proposito: string;
-  observaciones?: string;
+  productoId:    string;
+  cantidad:      number;
+  requisicionId: string;
+  instructorId:  string;
+  categoria:     string;
 }
 
 export interface ReservaRequest {

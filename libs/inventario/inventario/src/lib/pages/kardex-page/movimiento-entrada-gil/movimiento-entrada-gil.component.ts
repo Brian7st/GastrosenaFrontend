@@ -1,20 +1,114 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
-
+import { Component, inject, ChangeDetectionStrategy, computed, signal, effect } from '@angular/core';
+import { ReactiveFormsModule, FormBuilder, FormArray, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
+import { GilesFacade } from '../../../data-access/giles.facade';
+import { KardexFacade } from '../../../data-access/kardex.facade';
+import { BienGilResponse, GilResponse } from '../../../data-access/api/procurement.api';
+import { EntradaMovimientoData } from '../../../models/movimiento.model';
 
 @Component({
   selector: 'restaurant-movimiento-entrada-gil',
   standalone: true,
-  imports: [RouterModule, LucideIconComponent, ButtonComponent],
+  imports: [ReactiveFormsModule, RouterModule, LucideIconComponent, ButtonComponent],
   templateUrl: './movimiento-entrada-gil.component.html',
   styleUrl: './movimiento-entrada-gil.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MovimientoEntradaGilComponent {
-  private router = inject(Router);
+  private fb            = inject(FormBuilder);
+  private router        = inject(Router);
+  readonly gilesFacade  = inject(GilesFacade);
+  readonly kardexFacade = inject(KardexFacade);
+
+  // ── Estado del selector ───────────────────────────────────────────────────
+  gilIdSeleccionado = signal<string>('');
+
+  // ── Computed ──────────────────────────────────────────────────────────────
+  gilSeleccionado    = computed(() => this.gilesFacade.gilSeleccionado());
+  bienesActuales     = computed(() => this.gilSeleccionado()?.bienes ?? []);
+  bienesConProducto  = computed(() => this.bienesActuales().filter(b => !!b.productoId));
+  hayBienSinProducto = computed(() => this.bienesActuales().some(b => !b.productoId));
+  puedeRegistrar     = computed(() =>
+    this.gilIdSeleccionado() !== '' &&
+    this.bienesConProducto().length > 0 &&
+    this.bienesForm.valid &&
+    !this.kardexFacade.loading()
+  );
+
+  // ── FormArray: un FormGroup por bien ──────────────────────────────────────
+  bienesForm: FormArray = this.fb.array([]);
+
+  constructor() {
+    this.gilesFacade.cargarGilesValidados();
+
+    // Reconstruye el FormArray cada vez que cambia el GIL seleccionado
+    effect(() => {
+      this.reconstruirFormArray(this.bienesActuales());
+    });
+  }
+
+  // ── Handlers ─────────────────────────────────────────────────────────────
+
+  onGilChange(event: Event): void {
+    const id = (event.target as HTMLSelectElement).value;
+    this.gilIdSeleccionado.set(id);
+    const gil: GilResponse | null = this.gilesFacade.giles().find(g => g.id === id) ?? null;
+    this.gilesFacade.seleccionarGil(gil);
+  }
+
+  onSubmit(): void {
+    if (!this.puedeRegistrar()) return;
+
+    const gil = this.gilSeleccionado();
+    if (!gil?.id) return;
+
+    this.bienesActuales().forEach((bien, i) => {
+      if (!bien.productoId) return; // pendiente backend B-01
+
+      const grupo = this.getBienGroup(i);
+      if (!grupo.valid) return;
+
+      const cantidadRecibida: number = grupo.get('cantidadRecibida')?.value ?? 0;
+      if (cantidadRecibida <= 0) return;
+
+      const entrada: EntradaMovimientoData = {
+        productoId:     bien.productoId,
+        cantidad:       cantidadRecibida,
+        precioUnitario: grupo.get('precioUnitario')?.value ?? 0,
+        gilId:          gil.id,
+      };
+
+      this.kardexFacade.registrarEntrada(entrada);
+    });
+
+    this.closeModal();
+  }
 
   closeModal(): void {
+    this.gilesFacade.limpiarSeleccion();
     this.router.navigate(['/app/inventario/movimientos']);
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+
+  getBienGroup(index: number): FormGroup {
+    return this.bienesForm.at(index) as FormGroup;
+  }
+
+  private reconstruirFormArray(bienes: BienGilResponse[]): void {
+    const grupos = bienes.map(bien =>
+      this.fb.group({
+        cantidadRecibida: [
+          bien.cantidad ?? 0,
+          [Validators.required, Validators.min(0), Validators.max(bien.cantidad ?? 9999)],
+        ],
+        precioUnitario: [
+          bien.valorUnitario ?? 0,
+          [Validators.required, Validators.min(0)],
+        ],
+      })
+    );
+    this.bienesForm = this.fb.array(grupos);
   }
 }
