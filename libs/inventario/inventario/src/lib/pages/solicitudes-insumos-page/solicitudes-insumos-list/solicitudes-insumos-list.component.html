@@ -120,7 +120,7 @@
             <span class="material-symbols-outlined">visibility</span>
           </button>
 
-          <button class="action-icon" (click)="onEdit(s.id)" title="Editar">
+          <button class="action-icon" (click)="onEdit(s.id)" [attr.title]="s.estado === 'BORRADOR' ? 'Editar' : 'Solo lectura'" [disabled]="s.estado !== 'BORRADOR'">
             <span class="material-symbols-outlined">edit</span>
           </button>
           
