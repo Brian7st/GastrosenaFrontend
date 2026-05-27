@@ -1,6 +1,6 @@
 {
   "/api/barybarismo": {
-    "target": "http://localhost:8080",
+    "target": "http://localhost:8086",
     "secure": false,
     "changeOrigin": true,
     "pathRewrite": { "^/api/barybarismo": "/api/barybarismo" }
