@@ -8,7 +8,7 @@
   </div>
   <restaurant-button variant="primary" routerLink="nueva">
     <span class="material-symbols-outlined">add</span>
-    Nueva GIL
+    Nueva Solicitud
   </restaurant-button>
 </div>
 
@@ -119,9 +119,12 @@
           <button class="action-icon" (click)="onView(s.id)" title="Ver Detalle">
             <span class="material-symbols-outlined">visibility</span>
           </button>
+
+          <button class="action-icon" (click)="onEdit(s.id)" [attr.title]="s.estado === 'BORRADOR' ? 'Editar' : 'Solo lectura'" [disabled]="s.estado !== 'BORRADOR'">
+            <span class="material-symbols-outlined">edit</span>
+          </button>
           
-          <!-- Botón Aprobar similar al badge de aprobado pero clicable -->
-          <button [style.visibility]="s.estado === 'ENVIADA' ? 'visible' : 'hidden'" class="btn-aprobar" (click)="onApprove(s.id)">
+          <button class="btn-aprobar" [style.visibility]="s.estado === 'ENVIADA' ? 'visible' : 'hidden'" (click)="onApprove(s.id); $event.stopPropagation()" title="Aprobar Solicitud">
             <span class="material-symbols-outlined" style="font-size: 16px;">check</span>
             Aprobar
           </button>

@@ -2,7 +2,7 @@
      Vista Previa y Exportación - Layout
 ══════════════════════════════════════════════════════════════════════════ -->
 <div class="export-page-container bg-zinc-900/10">
-  
+
   <!-- Toolbar Overlay -->
   <div class="export-toolbar">
     <div class="toolbar-left">
@@ -10,7 +10,7 @@
         <span class="material-symbols-outlined text-primary">picture_as_pdf</span>
       </div>
       <div>
-        <h2 class="title">Vista Previa: {{ solicitudId() }}_Inventario_2024.pdf</h2>
+        <h2 class="title">Vista Previa: {{ solicitudId() }}_Inventario.pdf</h2>
         <p class="subtitle">Documento Oficial SENA</p>
       </div>
     </div>
@@ -34,7 +34,7 @@
   <div class="pdf-scroll-area bg-zinc-200">
     <!-- Paper Document -->
     <div class="paper-document">
-      
+
       <!-- Header Section -->
       <header class="doc-header">
         <div class="doc-logo">
@@ -55,19 +55,19 @@
       <div class="doc-info-grid">
         <div class="info-item">
           <span class="info-label">Regional:</span>
-          <span class="info-value">Distrito Capital</span>
+          <span class="info-value">{{ solicitud()?.regionalNombre ?? '—' }}</span>
         </div>
         <div class="info-item">
           <span class="info-label">Centro de Formación:</span>
-          <span class="info-value">Centro de Gestión Administrativa</span>
+          <span class="info-value">{{ solicitud()?.centroCostosNombre ?? '—' }}</span>
         </div>
         <div class="info-item">
           <span class="info-label">Solicitante:</span>
-          <span class="info-value">Admin_Precision_Ledger</span>
+          <span class="info-value">{{ solicitud()?.solicitante ?? '—' }}</span>
         </div>
         <div class="info-item">
           <span class="info-label">Fecha de Solicitud:</span>
-          <span class="info-value">12 de Octubre, 2024</span>
+          <span class="info-value">{{ solicitud()?.fechaSolicitud ?? '—' }}</span>
         </div>
       </div>
 
@@ -82,40 +82,25 @@
               <th class="w-12 text-center">Cant.</th>
               <th class="w-20 text-right">Valor Unitario</th>
               <th class="w-20 text-right">Total</th>
-              <th class="w-24 text-left">Observaciones</th>
+              <th class="w-24 text-left">Código SENA</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td class="text-center">01</td>
-              <td>Portátil Corporativo Core i7 16GB RAM - Serial: SN-9283-A</td>
-              <td class="text-center">UND</td>
-              <td class="text-center">05</td>
-              <td class="text-right">$3.500.000</td>
-              <td class="text-right">$17.500.000</td>
-              <td class="italic text-secondary">Asignación Aula 402</td>
-            </tr>
-            <tr>
-              <td class="text-center">02</td>
-              <td>Monitor Ultrawide 34" Curvo para Diseño Gráfico</td>
-              <td class="text-center">UND</td>
-              <td class="text-center">02</td>
-              <td class="text-right">$1.200.000</td>
-              <td class="text-right">$2.400.000</td>
-              <td class="italic text-secondary">Reposición por daño</td>
-            </tr>
-            <tr>
-              <td class="text-center">03</td>
-              <td>Silla Ergonómica con Soporte Lumbar Ajustable</td>
-              <td class="text-center">UND</td>
-              <td class="text-center">10</td>
-              <td class="text-right">$450.000</td>
-              <td class="text-right">$4.500.000</td>
-              <td class="italic text-secondary">Dotación personal planta</td>
-            </tr>
-            <!-- Filler rows -->
-            <tr class="filler-row"><td colspan="7"></td></tr>
-            <tr class="filler-row"><td colspan="7"></td></tr>
+            @for (bien of solicitud()?.bienes ?? []; track bien.codigoSena; let i = $index) {
+              <tr>
+                <td class="text-center">{{ (i + 1).toString().padStart(2, '0') }}</td>
+                <td>{{ bien.descripcion }}</td>
+                <td class="text-center">{{ bien.unidadMedida }}</td>
+                <td class="text-center">{{ bien.cantidad }}</td>
+                <td class="text-right">{{ bien.valorUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                <td class="text-right">{{ bien.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                <td class="italic text-secondary">{{ bien.codigoSena }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="text-center italic text-secondary">Sin bienes registrados</td>
+              </tr>
+            }
           </tbody>
         </table>
       </div>
@@ -151,7 +136,7 @@
       <!-- Footer Note -->
       <footer class="doc-footer">
         <p>
-          Este documento es propiedad del Servicio Nacional de Aprendizaje - SENA. Cualquier reproducción no autorizada será sancionada de acuerdo con la normatividad vigente. <br/> Documento generado automáticamente por el sistema Precision Ledger para la Gestión de Bienes.
+          Este documento es propiedad del Servicio Nacional de Aprendizaje - SENA. Cualquier reproducción no autorizada será sancionada de acuerdo con la normatividad vigente.
         </p>
       </footer>
 

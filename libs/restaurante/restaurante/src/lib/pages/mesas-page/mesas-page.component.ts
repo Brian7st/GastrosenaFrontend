@@ -126,6 +126,8 @@ export class MesasPageComponent {
       else this.showEditZonaDropdown.set(false);
     }, 150);
   }
+  // ── Signals para ABRIR mesa ──────────────────────────────────────────────────
+  comensales    = signal<number>(1);
 
   // ── Apertura / cierre de modales ─────────────────────────────────────────────
   abrirModal(nombre: string, mesa: Mesa | null = null) {
@@ -146,6 +148,8 @@ export class MesasPageComponent {
       this.editNombre.set(nombreLimpio);
       this.editCapacidad.set(mesa.capacidad);
       this.editZona.set(mesa.zona || '');
+    } else if (nombre === 'abrir' && mesa) {
+      this.comensales.set(1);
     } else if (nombre === 'gestion-mesas') {
       this.tabActivo.set('desactivar');
       this.searchQueryGestionMesas.set('');
@@ -260,9 +264,13 @@ export class MesasPageComponent {
 
   // ── ACCIONES DE ESTADO ───────────────────────────────────────────────────────
   abrirMesa(id: string) {
-    this.facade.abrirMesa(id, '', 1);
+    const comensales = this.comensales();
+    this.facade.abrirMesa(id, '', comensales);
     this.cerrarModales();
-    this.router.navigate(['../pedidos'], { relativeTo: this.route });
+    this.router.navigate(['../pedidos'], { 
+      relativeTo: this.route,
+      state: { comensales: comensales, mesaId: id }
+    });
   }
 
   verPedido(id: string) {

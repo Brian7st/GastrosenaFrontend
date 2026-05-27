@@ -105,9 +105,9 @@
           <select
             id="uf-rol"
             class="modal__select"
-            [class.modal__select--error]="form.controls.idRol.invalid && form.controls.idRol.touched"
-            formControlName="idRol"
-          >
+            [class.modal__select--error]="form.controls.nombreRol.invalid && form.controls.nombreRol.touched"
+            formControlName="nombreRol"
+          > 
             <option value="" disabled>Seleccioná un rol</option>
             @for (rol of rolOptions; track rol) {
               <option [value]="rol">{{ rol }}</option>
@@ -115,7 +115,7 @@
           </select>
           <lucide-icon name="chevron-down" [size]="16" class="modal__select-icon"></lucide-icon>
         </div>
-        @if (form.controls.idRol.invalid && form.controls.idRol.touched) {
+        @if (form.controls.nombreRol.invalid && form.controls.nombreRol.touched) {
           <span class="modal__error">Seleccioná un rol</span>
         }
       </div>

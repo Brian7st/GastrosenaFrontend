@@ -211,10 +211,15 @@ export class RestauranteFacade {
    * el MesaResponse actualizado, reemplaza la mesa en el signal _mesas
    * para que la UI reaccione sin recargar toda la lista.
    *
-   * Estrategia: "optimismo moderado" — esperamos la confirmación del backend
-   * antes de actualizar el estado local (evita inconsistencias si hay error).
+   * Estrategia: Actualización optimista — mutamos el signal local inmediatamente
+   * para dar feedback visual sin lag, y luego enlazamos con la respuesta del backend.
    */
   actualizarEstado(mesaId: string, nuevoEstado: EstadoMesa): void {
+    // Actualización optimista para reactividad instantánea en la UI
+    this._mesas.update(lista =>
+      lista.map(m => m.id === mesaId ? { ...m, estado: nuevoEstado } : m)
+    );
+
     this.restauranteService.cambiarEstadoMesa(mesaId, nuevoEstado).subscribe({
       next: (mesaActualizada) => {
         // Reemplaza solo la mesa modificada en el array del signal
@@ -280,8 +285,11 @@ export class RestauranteFacade {
     const pedido = this._pedidoActivo();
     if (!pedido) return;
 
-    // TODO: llamar al backend para confirmar el pedido y que este cambie el estado
-    // de la mesa a OCUPADA. Por ahora solo actualizamos el historial local.
+    // Reactividad: al confirmar el pedido, nos aseguramos que la mesa pase a OCUPADA
+    this.actualizarEstado(pedido.mesaId, 'OCUPADA');
+
+    // TODO: llamar al backend para confirmar el pedido real
+    // Por ahora solo actualizamos el historial local temporal.
     const pedidoConfirmado = { ...pedido, estado: EstadoPedido.PREPARACION };
     this._ordenesHistorial.update(historial => [pedidoConfirmado, ...historial]);
     this.limpiarPedidoActivo();

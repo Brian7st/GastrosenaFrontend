@@ -46,11 +46,11 @@
     </div>
   </div>
 
-  <div class="comandas-grid">
+  <div class="comandas-grid kanban-board-container">
 
-    <div class="column col-espera">
+    <div class="column col-espera kanban-column">
       <div class="col-header showcase__row" style="justify-content: space-between; margin-bottom: var(--space-4);">
-        <restaurant-section-title title="En Espera" align="left"></restaurant-section-title>
+        <h5 class="m-0 fw-bold">En Espera</h5>
         <span class="showcase__value">{{ enEspera().length }}</span>
       </div>
       @for (c of enEspera(); track c.idComanda) {
@@ -61,9 +61,9 @@
       }
     </div>
 
-    <div class="column col-preparando">
+    <div class="column col-preparando kanban-column">
       <div class="col-header showcase__row" style="justify-content: space-between; margin-bottom: var(--space-4);">
-        <restaurant-section-title title="Preparando" align="left"></restaurant-section-title>
+        <h5 class="m-0 fw-bold">Preparando</h5>
         <span class="showcase__value">{{ preparando().length }}</span>
       </div>
       @for (c of preparando(); track c.idComanda) {
@@ -74,9 +74,9 @@
       }
     </div>
 
-    <div class="column col-listo">
+    <div class="column col-listo kanban-column">
       <div class="col-header showcase__row" style="justify-content: space-between; margin-bottom: var(--space-4);">
-        <restaurant-section-title title="Listo" align="left"></restaurant-section-title>
+        <h5 class="m-0 fw-bold">Listo</h5>
         <span class="showcase__value">{{ listos().length }}</span>
       </div>
       @for (c of listos(); track c.idComanda) {

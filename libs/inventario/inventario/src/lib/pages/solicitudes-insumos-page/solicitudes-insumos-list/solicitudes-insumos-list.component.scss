@@ -269,15 +269,16 @@
 .actions-row {
   display: flex;
   align-items: center;
-  justify-content: center; /* Centrar para evitar superposición */
+  justify-content: flex-start;
   gap: 0.75rem;
   white-space: nowrap;
+  padding-left: 1.5rem; /* Centra el grupo y asegura alineación vertical perfecta */
 }
 
 /* Darle suficiente espacio a la columna de acciones para que no se amontone */
 ::ng-deep .dt-table th:last-child,
 ::ng-deep .dt-table td:last-child {
-  width: 180px;
+  width: 220px;
   text-align: center;
 }
 

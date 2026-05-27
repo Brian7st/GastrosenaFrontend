@@ -1,85 +1,178 @@
 <div class="roles-page">
 
   <restaurant-page-header
-    title="Roles del Sistema"
-    subtitle="Permisos y alcance de cada rol del restaurante"
+    title="Roles y Permisos"
+    subtitle="Gestión de roles de simulación para aprendices SENA"
   ></restaurant-page-header>
-
-  @if (error()) {
-    <restaurant-alert type="error" [message]="error()!"></restaurant-alert>
-  }
 
   <!-- KPI Cards -->
   <div class="roles-page__kpis">
     <restaurant-kpi-card
-      label="Total Roles"
-      [value]="totalRoles().toString()"
-      icon="shield"
+      label="Total Aprendices"
+      [value]="totalAprendices().toString()"
+      icon="users"
       iconColor="blue"
     ></restaurant-kpi-card>
     <restaurant-kpi-card
-      label="Total Permisos"
-      [value]="totalPermisos().toString()"
-      icon="key"
-      iconColor="orange"
+      label="Con Rol Asignado"
+      [value]="totalConRol().toString()"
+      icon="shield-check"
+      iconColor="green"
     ></restaurant-kpi-card>
   </div>
 
-  <!-- Búsqueda -->
-  <restaurant-search-filter
-    label="Filtrar roles"
-    placeholder="Buscar por nombre o descripción..."
-    [value]="busqueda()"
-    (valueChange)="busqueda.set($event)"
-  ></restaurant-search-filter>
-
-  <!-- Grid de roles -->
-  @if (loading()) {
-    <restaurant-loading-skeleton [lines]="6"></restaurant-loading-skeleton>
-  } @else {
+  <!-- SECCIÓN 1: Cards de roles de simulación -->
+  <section class="roles-page__section">
+    <h2 class="roles-page__section-title">Roles de Simulación</h2>
     <div class="roles-page__grid">
-      @for (r of rolesFiltrados(); track r.id) {
-        <div class="roles-page__card roles-page__card--{{ getRolClass(r.nombre) }}">
+      @for (rol of rolesInfo; track rol.rol) {
+        <div class="roles-page__card roles-page__card--{{ getRolClass(rol.rol) }}">
 
-          <!-- Card header -->
           <div class="roles-page__card-header">
             <div class="roles-page__card-icon">
-              <lucide-icon [name]="getIcono(r.nombre)" [size]="22"></lucide-icon>
+              <lucide-icon [name]="rol.icono" [size]="22"></lucide-icon>
             </div>
             <div class="roles-page__card-meta">
-              <h3 class="roles-page__card-title">{{ r.nombre }}</h3>
-              <p class="roles-page__card-desc">{{ r.descripcion }}</p>
+              <h3 class="roles-page__card-title">{{ rol.etiqueta }}</h3>
+              <p class="roles-page__card-desc">{{ rol.descripcion }}</p>
             </div>
           </div>
 
-          <!-- Permisos -->
           <ul class="roles-page__permisos">
-            @for (p of r.permisos; track p.id) {
+            @for (permiso of rol.permisos; track permiso) {
               <li class="roles-page__permiso">
                 <lucide-icon name="check" [size]="13" class="roles-page__permiso-icon"></lucide-icon>
-                <span>{{ p.nombre }}</span>
+                <span>{{ permiso }}</span>
               </li>
             }
           </ul>
 
-          <!-- Footer -->
           <div class="roles-page__card-footer">
             <lucide-icon name="users" [size]="14" class="roles-page__footer-icon"></lucide-icon>
             <span class="roles-page__footer-label">
-              {{ r.totalUsuarios }} usuario{{ r.totalUsuarios === 1 ? '' : 's' }}
+              {{ conteoPorRol().get(rol.rol) ?? 0 }}
+              aprendice{{ (conteoPorRol().get(rol.rol) ?? 0) === 1 ? '' : 's' }}
             </span>
           </div>
 
         </div>
-      } @empty {
-        <div class="roles-page__empty-cell">
-          <restaurant-empty-state
-            title="Sin resultados"
-            message="No se encontraron roles que coincidan con la búsqueda."
-          ></restaurant-empty-state>
-        </div>
       }
     </div>
-  }
+  </section>
+
+  <!-- SECCIÓN 2: Tabla de aprendices -->
+  <section class="roles-page__section">
+    <h2 class="roles-page__section-title">Aprendices</h2>
+
+    <!-- Toolbar de asignación masiva -->
+    <div class="roles-page__toolbar">
+      <label class="roles-page__check-all">
+        <input
+          class="roles-page__checkbox"
+          type="checkbox"
+          [checked]="todosSeleccionados()"
+          (change)="onToggleTodos()"
+        >
+        Seleccionar todos
+      </label>
+
+      @if (seleccionados().size > 0) {
+        <span class="roles-page__badge-count">
+          {{ seleccionados().size }} seleccionado{{ seleccionados().size === 1 ? '' : 's' }}
+        </span>
+      }
+
+      <select
+        class="roles-page__rol-select"
+        [value]="rolAsignacion()"
+        (change)="onRolChange($event)"
+      >
+        <option value="">Seleccionar rol...</option>
+        @for (r of rolesInfo; track r.rol) {
+          <option [value]="r.rol">{{ r.etiqueta }}</option>
+        }
+      </select>
+
+      <button
+        class="roles-page__asignar-btn"
+        type="button"
+        [disabled]="!puedeAsignar() || loadingAsignacion()"
+        (click)="onAsignarRol()"
+      >
+        @if (loadingAsignacion()) {
+          <lucide-icon name="loader-circle" [size]="14"></lucide-icon>
+          Asignando...
+        } @else {
+          <lucide-icon name="user-check" [size]="14"></lucide-icon>
+          Asignar Rol
+        }
+      </button>
+    </div>
+
+    @if (loading()) {
+      <restaurant-loading-skeleton [lines]="5"></restaurant-loading-skeleton>
+    } @else {
+      <restaurant-data-table>
+        <thead>
+          <tr>
+            <th class="roles-page__col-check"></th>
+            <th>Aprendiz</th>
+            <th>Rol actual</th>
+            <th>Ficha</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (u of aprendices(); track u.id) {
+            <tr [class.roles-page__row--selected]="estaSeleccionado(u.id)">
+              <td class="roles-page__col-check">
+                <input
+                  class="roles-page__checkbox"
+                  type="checkbox"
+                  [checked]="estaSeleccionado(u.id)"
+                  (change)="onToggleSeleccion(u.id)"
+                >
+              </td>
+              <td>
+                <div class="roles-page__user">
+                  <restaurant-usuario-avatar
+                    [nombre]="u.nombre"
+                    [apellidos]="u.apellidos"
+                  ></restaurant-usuario-avatar>
+                  <div>
+                    <p class="roles-page__user-name">{{ u.nombre }} {{ u.apellidos }}</p>
+                    <p class="roles-page__user-email">{{ u.email }}</p>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <restaurant-usuario-rol-badge [rol]="u.rol"></restaurant-usuario-rol-badge>
+              </td>
+              <td class="roles-page__ficha">{{ u.ficha || '—' }}</td>
+              <td>
+                <button
+                  class="roles-page__action-btn"
+                  type="button"
+                  (click)="onToggleSeleccion(u.id)"
+                  [attr.aria-label]="'Seleccionar ' + u.nombre"
+                >
+                  <lucide-icon name="user-cog" [size]="16"></lucide-icon>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="roles-page__empty-cell">
+                <restaurant-empty-state
+                  title="Sin aprendices"
+                  message="No se encontraron aprendices registrados en el sistema."
+                ></restaurant-empty-state>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </restaurant-data-table>
+    }
+  </section>
 
 </div>

@@ -16,6 +16,7 @@ import { Receta } from '../../models/receta.model';
 export class ComandaCardComponent implements OnInit, OnDestroy {
   comanda = input.required<ComandaBarYBarismo>();
   
+  
   iniciarPlato = output<string>();
   finalizarPlato = output<string>();
 
@@ -178,19 +179,25 @@ export class ComandaCardComponent implements OnInit, OnDestroy {
     return Math.floor((this.now() - start) / 60000);
   }
 
-  empezarTodo() {
-    this.comanda().items?.forEach(item => {
-      if (item.estado === 'ESPERA') {
-        this.iniciarPlato.emit(item.idDetalleComanda);
-      }
-    });
-  }
+  comandaActualizada = output<void>();
 
-  finalizarTodo() {
-    this.comanda().items?.forEach(item => {
-      if (item.estado === 'PREPARANDO') {
-        this.finalizarPlato.emit(item.idDetalleComanda);
-      }
+empezarTodo() {
+  const comanda = this.comanda();
+  if (comanda.estadoPreparacion === 'PENDIENTE') {
+    this.comandaService.actualizarEstado(comanda.idComanda.toString(), 'EN_PREPARACION').subscribe({
+      next: () => this.comandaActualizada.emit(),
+      error: (err) => console.error('Error al iniciar:', err)
     });
   }
+}
+
+finalizarTodo() {
+  const comanda = this.comanda();
+  if (comanda.estadoPreparacion === 'EN_PREPARACION') {
+    this.comandaService.actualizarEstado(comanda.idComanda.toString(), 'LISTO').subscribe({
+      next: () => this.comandaActualizada.emit(),
+      error: (err) => console.error('Error al finalizar:', err)
+    });
+  }
+}
 }

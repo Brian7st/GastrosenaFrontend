@@ -1,11 +1,10 @@
 export interface ExistenciaResponse {
   productoId: string;
-  codigoSena: string;
-  nombre: string;
-  categoria: string;
-  unidadMedida: string;
+  stockFisico: number;
+  stockReservado: number;
   stockDisponible: number;
-  stockMinimo?: number;
+  stockMinimo: number;
+  bajoMinimo: boolean;
 }
 
 export interface MovimientoResponse {
