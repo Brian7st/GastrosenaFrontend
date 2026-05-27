@@ -20,7 +20,7 @@
               <div class="drop-icon">
                 <span class="material-symbols-outlined">upload_file</span>
               </div>
-              <h3>Arrastre su archivo aqu�</h3>
+              <h3>Arrastre su archivo aquí</h3>
               <p>Solo archivos <strong>.csv</strong> generados desde la plantilla.</p>
               <label class="btn-select-file">
                 Seleccionar Archivo
@@ -99,24 +99,24 @@
               <table class="preview-table">
                 <thead>
                   <tr>
-                    <th>C�D. SENA</th>
+                    <th>CÓD. SENA</th>
                     <th>NOMBRE</th>
-                    <th>DESCRIPCI�N</th>
-                    <th>CATEGOR�A</th>
+                    <th>DESCRIPCIÓN</th>
+                    <th>CATEGORÍA</th>
                     <th>UM</th>
-                    <th>C�D. PROVEEDOR</th>
-                    <th>VALIDACI�N</th>
+                    <th>CÓD. PROVEEDOR</th>
+                    <th>VALIDACIÓN</th>
                   </tr>
                 </thead>
                 <tbody>
                   @for (row of previewData(); track row) {
                     <tr>
-                      <td class="code-mono">{{ row.codigoSena || '�' }}</td>
+                      <td class="code-mono">{{ row.codigoSena || '-' }}</td>
                       <td class="row-nombre">{{ row.nombre }}</td>
-                      <td>{{ row.descripcion || '�' }}</td>
-                      <td>{{ row.categoria || '�' }}</td>
+                      <td>{{ row.descripcion || '-' }}</td>
+                      <td>{{ row.categoria || '-' }}</td>
                       <td>{{ row.unidadMedida }}</td>
-                      <td class="code-mono text-muted">{{ row.codigoProveedor || '�' }}</td>
+                      <td class="code-mono text-muted">{{ row.codigoProveedor || '-' }}</td>
                       <td>
                         <span class="valid-badge" [ngClass]="getValidacionClass(row.validacion)">
                           {{ row.error || row.validacion }}

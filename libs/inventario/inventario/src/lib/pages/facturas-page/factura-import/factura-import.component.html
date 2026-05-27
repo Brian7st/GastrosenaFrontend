@@ -1,64 +1,43 @@
 <div class="factura-import-page">
-  <!-- 1. Header -->
   <header class="page-header">
     <inventario-back-button (clicked)="goBack()" />
     <div>
       <h1 class="page-header__title">Importar Factura Electrónica</h1>
-      <p class="page-header__subtitle">Cargue el archivo XML o PDF de la factura de su proveedor para registrarla automáticamente.</p>
+      <p class="page-header__subtitle">Subí el PDF FEL y el backend registrará la factura con el contrato real de importación.</p>
     </div>
   </header>
 
-  <!-- Alerts — se muestran según el estado del procesamiento -->
   @if (importStatus() !== 'idle') {
-<div class="alerts-container">
+    <div class="alerts-container">
+      @if (importStatus() === 'loading') {
+        <div class="alert alert--info">
+          <span class="material-symbols-outlined alert__spin">progress_activity</span>
+          <span class="alert__text font-medium">Procesando {{ fileName() }}…</span>
+        </div>
+      }
 
-    <!-- Procesando -->
-    @if (importStatus() === 'loading') {
-<div class="alert alert--info">
-      <span class="material-symbols-outlined alert__spin">progress_activity</span>
-      <span class="alert__text font-medium">Procesando archivo {{ fileName() }}…</span>
+      @if (importStatus() === 'error') {
+        <div class="alert alert--error">
+          <span class="material-symbols-outlined">error</span>
+          <div class="alert__content">
+            <h4 class="alert__title">No se pudo importar la factura</h4>
+            <p class="alert__text">{{ error() }}</p>
+          </div>
+        </div>
+      }
+
+      @if (importStatus() === 'success') {
+        <div class="alert alert--success">
+          <span class="material-symbols-outlined">check_circle</span>
+          <span class="alert__text font-medium">Factura importada correctamente desde {{ fileName() }} · {{ totalItems() }} ítems detectados</span>
+        </div>
+      }
     </div>
-}
+  }
 
-    <!-- Error de validación -->
-    @if (importStatus() === 'error') {
-<div class="alert alert--error">
-      <span class="material-symbols-outlined">error</span>
-      <div class="alert__content">
-        <h4 class="alert__title">Error de Validación</h4>
-        <p class="alert__text">El archivo supera el límite de 10 MB o no es un XML/PDF válido. Verifique el documento original.</p>
-      </div>
-    </div>
-}
-
-    <!-- Advertencia (PDF sin OC vinculada) -->
-    @if (importStatus() === 'warning') {
-<div class="alert alert--warning">
-      <span class="material-symbols-outlined">warning</span>
-      <div class="alert__content">
-        <h4 class="alert__title">Advertencia de Orden de Compra</h4>
-        <p class="alert__text">No se ha asociado una Guía de Ingreso (GIL) u Orden de Compra válida para este proveedor. Por favor seleccione una en el formulario.</p>
-      </div>
-    </div>
-}
-
-    <!-- Éxito -->
-    @if (importStatus() === 'success' || importStatus() === 'warning') {
-<div class="alert alert--success">
-      <span class="material-symbols-outlined">check_circle</span>
-      <span class="alert__text font-medium">Datos extraídos correctamente de {{ fileName() }} · 8 ítems detectados</span>
-    </div>
-}
-
-  </div>
-}
-
-  <!-- 2. Main Layout (Asymmetric) -->
   <div class="import-grid">
-    
-    <!-- Upload Zone (Left Col) -->
     <div class="upload-zone-wrapper">
-      <div 
+      <div
         class="upload-zone"
         [class.upload-zone--active]="isDragOver()"
         (dragover)="onDragOver($event)"
@@ -69,24 +48,35 @@
         <div class="upload-zone__icon-wrapper">
           <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">cloud_upload</span>
         </div>
-        <h3 class="upload-zone__title">Arrastra tu factura aquí</h3>
-        <p class="upload-zone__subtitle">Soporta XML (UBL 2.1) y PDF · Máximo 10MB</p>
-        
+        <h3 class="upload-zone__title">Arrastrá tu factura acá</h3>
+        <p class="upload-zone__subtitle">Swagger confirma que este endpoint recibe solo PDF FEL · máximo 10 MB</p>
+
+        <div class="field-group upload-zone__field">
+          <label class="field-label">GIL a vincular (opcional)</label>
+          <input
+            class="field-input"
+            type="text"
+            [value]="gilId()"
+            placeholder="UUID del GIL"
+            (input)="onGilIdInput($event); $event.stopPropagation()"
+            (click)="$event.stopPropagation()"
+          />
+        </div>
+
         <button class="btn btn--primary" (click)="fileInput.click(); $event.stopPropagation()">
           Seleccionar archivo
         </button>
 
-        <input 
-          #fileInput 
-          type="file" 
-          accept=".xml,.pdf" 
-          hidden 
+        <input
+          #fileInput
+          type="file"
+          accept=".pdf"
+          hidden
           (change)="onFileInput($event)"
         >
       </div>
     </div>
 
-    <!-- Instructions (Right Col) -->
     <div class="instructions-card">
       <h3 class="instructions-card__title">
         <span class="material-symbols-outlined">help</span>
@@ -95,189 +85,164 @@
       <ul class="instructions-list">
         <li>
           <div class="step-badge">1</div>
-          <p>Sube el archivo XML (preferido) o PDF de la factura electrónica emitida por tu proveedor.</p>
+          <p>Subí el PDF FEL original. El backend valida magic bytes de PDF y extrae el CUFE desde el documento.</p>
         </li>
         <li>
           <div class="step-badge">2</div>
-          <p>El sistema extraerá automáticamente los datos clave (NIT, valores, ítems) usando UBL 2.1.</p>
+          <p>Si enviás <strong>gilId</strong>, el backend intenta vincular la factura al GIL en la misma operación.</p>
         </li>
         <li>
           <div class="step-badge">3</div>
-          <p>Revisa la información extraída y asocia la factura a una Orden de Compra o GIL si es necesario.</p>
+          <p>Cuando la importación termina, la factura ya quedó registrada. Acá solo te mostramos el preview real de la respuesta.</p>
         </li>
       </ul>
     </div>
   </div>
 
-  <!-- 3. Review Data Section — visible solo cuando el archivo fue procesado correctamente -->
   @if (fileLoaded()) {
-<div class="review-section">
-    <h2 class="review-section__title">Revisión de Datos</h2>
-    
-    <!-- Document Data Card -->
-    <div class="data-card">
-      <div class="form-grid">
-        <div class="field-group">
-          <label class="field-label">Número FEL</label>
-          <input class="field-input field-input--readonly" readonly type="text" value="FEL-1314"/>
-        </div>
-        <div class="field-group col-span-2">
-          <label class="field-label">CUFE</label>
-          <div class="input-icon-wrapper">
-            <input class="field-input field-input--readonly font-mono" readonly type="text" value="0a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0e1f"/>
-            <span class="material-symbols-outlined text-primary select-icon">check_circle</span>
+    <div class="review-section">
+      <h2 class="review-section__title">Respuesta registrada por backend</h2>
+
+      <div class="data-card">
+        <div class="form-grid">
+          <div class="field-group">
+            <label class="field-label">Número Factura</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.numeroFactura ?? ''"/>
+          </div>
+          <div class="field-group col-span-2">
+            <label class="field-label">CUFE</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.cufe ?? ''"/>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Proveedor NIT</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.proveedorNit ?? ''"/>
+          </div>
+          <div class="field-group col-span-2">
+            <label class="field-label">Proveedor Nombre</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.proveedorNombre ?? ''"/>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Fecha Emisión</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.fechaEmision ?? ''"/>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Fecha Recepción</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.fechaRecepcion ?? ''"/>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Estado</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.estado ?? ''"/>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Orden de Compra</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.ordenCompra ?? 'No reportada'"/>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Instructor</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.instructorId ?? 'No vinculado'"/>
+          </div>
+          <div class="field-group">
+            <label class="field-label">ZESE</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.proveedorBeneficiarioZese ? 'Sí' : 'No'"/>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Banco</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.infoBancariaBanco ?? 'No reportado'"/>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Cuenta</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.infoBancariaCuenta ?? 'No reportada'"/>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Tipo de Cuenta</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.infoBancariaTipo ?? 'No reportado'"/>
           </div>
         </div>
-        
-        <div class="field-group">
-          <label class="field-label">Fecha Emisión</label>
-          <input class="field-input" type="date" value="2023-10-25"/>
-        </div>
-        <div class="field-group">
-          <label class="field-label">Fecha Vencimiento</label>
-          <input class="field-input" type="date" value="2023-11-25"/>
-        </div>
-        <div class="field-group">
-          <label class="field-label">NIT Emisor</label>
-          <input class="field-input" type="text" value="900.123.456-7"/>
+      </div>
+
+      <div class="items-summary-grid">
+        <div class="table-card">
+          <div class="table-wrapper">
+            <table class="fel-table">
+              <thead>
+                <tr>
+                  <th class="w-12 text-center">#</th>
+                  <th>Producto</th>
+                  <th>Descripción</th>
+                  <th class="text-right">Cant.</th>
+                  <th class="text-right">V. Unitario</th>
+                  <th class="text-center">IVA</th>
+                  <th class="text-right">Subtotal</th>
+                  <th class="text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (linea of facturaImportada()?.lineas ?? []; track $index) {
+                  <tr>
+                    <td class="text-center text-secondary">{{ $index + 1 }}</td>
+                    <td class="text-secondary">{{ linea.productoId || 'Sin producto' }}</td>
+                    <td class="font-bold">{{ linea.descripcion }}</td>
+                    <td class="text-right">{{ linea.cantidad }}</td>
+                    <td class="text-right">{{ formatMoney(linea.precioUnitario) }}</td>
+                    <td class="text-center">
+                      <span [class]="ivaBadgeClass(linea.porcentajeIva)">{{ linea.porcentajeIva ?? linea.iva ?? 0 }}%</span>
+                    </td>
+                    <td class="text-right font-bold">{{ formatMoney(linea.subtotal) }}</td>
+                    <td class="text-right font-bold">{{ formatMoney(linea.total) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        <div class="field-group">
-          <label class="field-label">GIL / Orden de Compra</label>
-          <div class="select-wrapper">
-            <select class="field-select">
-              <option>Seleccionar GIL/OC...</option>
-              <option>OC-2023-0892</option>
-              <option>GIL-4512</option>
-            </select>
-            <span class="material-symbols-outlined select-icon">expand_more</span>
-          </div>
-        </div>
-        <div class="field-group">
-          <label class="field-label">Instructor Asignado</label>
-          <input class="field-input" type="text" placeholder="Nombre del instructor"/>
-        </div>
-        <div class="field-group">
-          <label class="field-label">Método de Pago</label>
-          <div class="select-wrapper">
-            <select class="field-select">
-              <option>Transferencia Bancaria</option>
-              <option>Cheque</option>
-              <option>Efectivo</option>
-            </select>
-            <span class="material-symbols-outlined select-icon">expand_more</span>
-          </div>
-        </div>
+        <div class="summary-card">
+          <h3 class="summary-card__title">Resumen Fiscal</h3>
+          <div class="summary-card__body">
+            <div class="summary-row">
+              <span class="summary-label">Subtotal</span>
+              <span class="summary-value">{{ formatMoney(facturaImportada()?.subtotal) }}</span>
+            </div>
 
-        <div class="field-group col-span-3">
-          <label class="checkbox-wrapper mt-2">
-            <input type="checkbox" class="checkbox-input" />
-            <span class="checkbox-custom"></span>
-            <span class="checkbox-label">Aplicar Retención ZESE</span>
-          </label>
+            <div class="summary-divider"></div>
+
+            @for (item of totalIvaPorTarifa(); track item.porcentaje) {
+              <div class="summary-row summary-row--sm">
+                <span class="summary-label">IVA ({{ item.porcentaje }}%)</span>
+                <span class="summary-value">{{ formatMoney(item.valor) }}</span>
+              </div>
+            }
+
+            <div class="summary-divider"></div>
+
+            <div class="summary-row summary-row--sm">
+              <span class="summary-label">Total IVA</span>
+              <span class="summary-value">{{ formatMoney(facturaImportada()?.totalIva) }}</span>
+            </div>
+            <div class="summary-row summary-row--sm">
+              <span class="summary-label">Retención ZESE</span>
+              <span class="summary-value text-tertiary">-{{ formatMoney(facturaImportada()?.valorRetencionZese) }}</span>
+            </div>
+          </div>
+
+          <div class="summary-card__footer">
+            <span class="total-label">Total a Pagar</span>
+            <span class="total-value">{{ formatMoney(facturaImportada()?.total) }}</span>
+          </div>
         </div>
       </div>
     </div>
-
-    <!-- Items & Summary Grid -->
-    <div class="items-summary-grid">
-      <!-- Items Table -->
-      <div class="table-card">
-        <div class="table-wrapper">
-          <table class="fel-table">
-            <thead>
-              <tr>
-                <th class="w-12 text-center">#</th>
-                <th>Descripción</th>
-                <th>UM</th>
-                <th class="text-right">Cant.</th>
-                <th class="text-right">V. Unitario</th>
-                <th class="text-center">IVA</th>
-                <th class="text-right">Subtotal</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="text-center text-secondary">1</td>
-                <td class="font-bold">Arroz Blanco x 500g</td>
-                <td class="text-secondary">Bolsa</td>
-                <td class="text-right">100</td>
-                <td class="text-right">$2,500</td>
-                <td class="text-center">
-                  <span class="badge badge--gray">0%</span>
-                </td>
-                <td class="text-right font-bold">$250,000</td>
-              </tr>
-              <tr>
-                <td class="text-center text-secondary">2</td>
-                <td class="font-bold">Aceite de Girasol x 1L</td>
-                <td class="text-secondary">Botella</td>
-                <td class="text-right">50</td>
-                <td class="text-right">$8,200</td>
-                <td class="text-center">
-                  <span class="badge badge--orange">5%</span>
-                </td>
-                <td class="text-right font-bold">$410,000</td>
-              </tr>
-              <tr>
-                <td class="text-center text-secondary">3</td>
-                <td class="font-bold">Servilletas de Papel</td>
-                <td class="text-secondary">Paquete</td>
-                <td class="text-right">200</td>
-                <td class="text-right">$1,500</td>
-                <td class="text-center">
-                  <span class="badge badge--dark">19%</span>
-                </td>
-                <td class="text-right font-bold">$300,000</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Fiscal Summary Card -->
-      <div class="summary-card">
-        <h3 class="summary-card__title">Resumen Fiscal</h3>
-        <div class="summary-card__body">
-          <div class="summary-row">
-            <span class="summary-label">Subtotal</span>
-            <span class="summary-value">$960,000</span>
-          </div>
-          
-          <div class="summary-divider"></div>
-          
-          <div class="summary-row summary-row--sm">
-            <span class="summary-label">IVA (5%)</span>
-            <span class="summary-value">$20,500</span>
-          </div>
-          <div class="summary-row summary-row--sm">
-            <span class="summary-label">IVA (19%)</span>
-            <span class="summary-value">$57,000</span>
-          </div>
-
-          <div class="summary-divider"></div>
-
-          <div class="summary-row summary-row--sm">
-            <span class="summary-label">Retención ZESE</span>
-            <span class="summary-value text-tertiary">-$15,000</span>
-          </div>
-        </div>
-        
-        <div class="summary-card__footer">
-          <span class="total-label">Total a Pagar</span>
-          <span class="total-value">$1,022,500</span>
-        </div>
-      </div>
-    </div>
-  </div>
-}
+  }
 </div>
 
-<!-- Sticky Footer -->
 <div class="sticky-footer">
   <button class="btn btn--ghost" (click)="goBack()">Cancelar</button>
   <div class="footer-actions">
-    <button class="btn btn--outline">Guardar como borrador</button>
-    <button class="btn btn--primary" (click)="goBack()">Registrar Factura</button>
+    <button class="btn btn--outline" (click)="resetImport()">Limpiar</button>
+    <button class="btn btn--primary" [disabled]="!facturaImportada()" (click)="viewImportedFactura()">Ver factura registrada</button>
   </div>
-</div>
+</div>

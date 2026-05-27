@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import { FacturasFacade } from '../../../data-access/facturas.facade';
+import { FacturaLinea } from '../../../models/facturas.model';
 
-export type ImportStatus = 'idle' | 'loading' | 'success' | 'error' | 'warning';
+export type ImportStatus = 'idle' | 'loading' | 'success' | 'error';
 
 @Component({
   selector: 'restaurant-factura-import',
@@ -14,12 +15,26 @@ export type ImportStatus = 'idle' | 'loading' | 'success' | 'error' | 'warning';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FacturaImportPageComponent {
+  private facade = inject(FacturasFacade);
   private router = inject(Router);
 
-  fileLoaded   = signal(false);
-  isDragOver   = signal(false);
-  importStatus = signal<ImportStatus>('idle');
-  fileName     = signal<string>('');
+  isDragOver = signal(false);
+  fileName = signal('');
+  gilId = signal('');
+  localError = signal<string | null>(null);
+
+  facturaImportada = this.facade.facturaImportada;
+  loading = this.facade.loading;
+  error = computed(() => this.localError() ?? this.facade.error());
+  importStatus = computed<ImportStatus>(() => {
+    if (this.loading() && this.fileName()) return 'loading';
+    if (this.error() && this.fileName()) return 'error';
+    if (this.facturaImportada()) return 'success';
+    return 'idle';
+  });
+  fileLoaded = computed(() => this.facturaImportada() !== null);
+  totalItems = computed(() => this.facturaImportada()?.lineas.length ?? 0);
+  totalIvaPorTarifa = computed(() => this.groupIva(this.facturaImportada()?.lineas ?? []));
 
   onDragOver(e: DragEvent): void {
     e.preventDefault();
@@ -43,28 +58,75 @@ export class FacturaImportPageComponent {
     if (file) this.processFile(file);
   }
 
-  private processFile(file: File): void {
-    this.fileName.set(file.name);
-    this.importStatus.set('loading');
-    this.validateFile(file);
-  }
-
-  private validateFile(file: File): void {
-    // TODO: reemplazar por llamada a FacturasService.importarXML(file)
-    const isXml = file.name.toLowerCase().endsWith('.xml');
-    const isValidSize = file.size <= 10 * 1024 * 1024;
-
-    if (!isValidSize) {
-      this.importStatus.set('error');
-      return;
-    }
-
-    // XML → éxito directo; PDF → advertencia por falta de OC vinculada
-    this.importStatus.set(isXml ? 'success' : 'warning');
-    this.fileLoaded.set(true);
+  onGilIdInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.gilId.set(input.value);
   }
 
   goBack(): void {
     this.router.navigate(['/app/inventario/facturas']);
   }
-}
+
+  viewImportedFactura(): void {
+    const factura = this.facturaImportada();
+    if (!factura) return;
+    this.router.navigate(['/app/inventario/facturas', factura.id]);
+  }
+
+  resetImport(): void {
+    this.fileName.set('');
+    this.gilId.set('');
+    this.localError.set(null);
+    this.facade.limpiarImportacionFactura();
+  }
+
+  formatMoney(value: number | undefined): string {
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      maximumFractionDigits: 2,
+    }).format(value ?? 0);
+  }
+
+  ivaBadgeClass(iva: number | undefined): string {
+    if ((iva ?? 0) <= 0) return 'badge badge--gray';
+    if ((iva ?? 0) <= 5) return 'badge badge--orange';
+    return 'badge badge--dark';
+  }
+
+  private processFile(file: File): void {
+    this.fileName.set(file.name);
+    this.localError.set(null);
+    this.facade.limpiarImportacionFactura();
+
+    const isPdf = file.name.toLowerCase().endsWith('.pdf');
+    const isValidSize = file.size <= 10 * 1024 * 1024;
+
+    if (!isPdf) {
+      this.localError.set('El backend solo acepta PDF FEL en este flujo.');
+      return;
+    }
+
+    if (!isValidSize) {
+      this.localError.set('El archivo supera el límite de 10 MB.');
+      return;
+    }
+
+    const normalizedGilId = this.gilId().trim();
+    this.facade.importarFacturaFel(file, normalizedGilId || undefined);
+  }
+
+  private groupIva(lineas: FacturaLinea[]): Array<{ porcentaje: number; valor: number }> {
+    const grouped = new Map<number, number>();
+
+    for (const linea of lineas) {
+      const porcentaje = linea.porcentajeIva ?? linea.iva ?? 0;
+      const current = grouped.get(porcentaje) ?? 0;
+      grouped.set(porcentaje, current + (linea.valorIva ?? 0));
+    }
+
+    return Array.from(grouped.entries())
+      .map(([porcentaje, valor]) => ({ porcentaje, valor }))
+      .sort((a, b) => a.porcentaje - b.porcentaje);
+  }
+}

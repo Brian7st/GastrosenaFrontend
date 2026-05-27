@@ -1,7 +1,8 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
 import { finalize, catchError, of } from 'rxjs';
-import { Factura, FacturaFiltros, FacturaKpis, SolicitudGIL, ConciliacionGil } from '../models/facturas.model';
+import { Factura, FacturaFiltros, FacturaKpis, SolicitudGIL, ConciliacionGil, FacturaFormDto } from '../models/facturas.model';
 import { FacturasService } from './services/facturas.service';
+import { ActualizarFacturaRequest } from './api/sourcing.api';
 
 @Injectable({
   providedIn: 'root'
@@ -9,33 +10,31 @@ import { FacturasService } from './services/facturas.service';
 export class FacturasFacade {
   private svc = inject(FacturasService);
 
-  // ── Estado interno ────────────────────────────────────────────────────────
-  private _facturas             = signal<Factura[]>([]);
-  private _kpis                 = signal<FacturaKpis | null>(null);
-  private _facturaSeleccionada  = signal<Factura | null>(null);
-  private _solicitudGIL         = signal<SolicitudGIL | null>(null);
-  private _conciliacionGil      = signal<ConciliacionGil | null>(null);
-  private _loading              = signal<boolean>(false);
-  private _filtros              = signal<FacturaFiltros>({});
-  private _error                = signal<string | null>(null);
+  private _facturas = signal<Factura[]>([]);
+  private _kpis = signal<FacturaKpis | null>(null);
+  private _facturaSeleccionada = signal<Factura | null>(null);
+  private _facturaImportada = signal<Factura | null>(null);
+  private _solicitudGIL = signal<SolicitudGIL | null>(null);
+  private _conciliacionGil = signal<ConciliacionGil | null>(null);
+  private _loading = signal<boolean>(false);
+  private _filtros = signal<FacturaFiltros>({});
+  private _error = signal<string | null>(null);
 
-  // ── Exposición pública ────────────────────────────────────────────────────
-  public facturas            = computed(() => this._facturas());
-  public kpis                = computed(() => this._kpis());
+  public facturas = computed(() => this._facturas());
+  public kpis = computed(() => this._kpis());
   public facturaSeleccionada = computed(() => this._facturaSeleccionada());
-  public solicitudGIL        = computed(() => this._solicitudGIL());
-  public conciliacionGil     = computed(() => this._conciliacionGil());
-  public loading             = computed(() => this._loading());
-  public filtros             = computed(() => this._filtros());
-  public error               = computed(() => this._error());
+  public facturaImportada = computed(() => this._facturaImportada());
+  public solicitudGIL = computed(() => this._solicitudGIL());
+  public conciliacionGil = computed(() => this._conciliacionGil());
+  public loading = computed(() => this._loading());
+  public filtros = computed(() => this._filtros());
+  public error = computed(() => this._error());
 
-  /** Carga inicial del panel */
   loadAll(): void {
     this.cargarFacturas();
     this.cargarKpis();
   }
 
-  /** Carga listado con filtros actuales */
   cargarFacturas(filtros?: FacturaFiltros): void {
     if (filtros) this._filtros.set(filtros);
     this._loading.set(true);
@@ -50,7 +49,6 @@ export class FacturasFacade {
       .subscribe(data => this._facturas.set(data));
   }
 
-  /** Carga KPIs del panel */
   cargarKpis(): void {
     this.svc.getKpis()
       .pipe(
@@ -62,13 +60,11 @@ export class FacturasFacade {
       .subscribe(data => this._kpis.set(data));
   }
 
-  /** Aplica filtros y recarga */
   setFiltros(filtros: FacturaFiltros): void {
     this._filtros.set({ ...this._filtros(), ...filtros });
     this.cargarFacturas();
   }
 
-  /** Carga una factura por ID */
   cargarFactura(id: string | number): void {
     this._loading.set(true);
     this.svc.getFacturaById(id)
@@ -82,8 +78,7 @@ export class FacturasFacade {
       .subscribe(f => this._facturaSeleccionada.set(f ?? null));
   }
 
-  /** Crea una nueva factura */
-  crearFactura(data: Partial<Factura>): void {
+  crearFactura(data: FacturaFormDto): void {
     this._loading.set(true);
     this.svc.createFactura(data)
       .pipe(
@@ -98,8 +93,35 @@ export class FacturasFacade {
       });
   }
 
-  /** Actualiza una factura */
-  actualizarFactura(id: string | number, data: Partial<Factura>): void {
+  importarFacturaFel(file: File, gilId?: string): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this._facturaImportada.set(null);
+
+    this.svc.importarFacturaFel(file, gilId)
+      .pipe(
+        catchError((error) => {
+          this._error.set(this.getImportErrorMessage(error));
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe((factura) => {
+        if (factura !== null) {
+          this._facturaImportada.set(factura);
+          this._facturaSeleccionada.set(factura);
+          this.cargarFacturas();
+          this.cargarKpis();
+        }
+      });
+  }
+
+  limpiarImportacionFactura(): void {
+    this._facturaImportada.set(null);
+    this._error.set(null);
+  }
+
+  actualizarFactura(id: string | number, data: ActualizarFacturaRequest): void {
     this._loading.set(true);
     this.svc.updateFactura(id, data)
       .pipe(
@@ -117,8 +139,6 @@ export class FacturasFacade {
       });
   }
 
-  /** Anula una factura — motivo es @NotBlank en backend.
-   *  TODO visual phase: reemplazar default con input real del usuario. */
   anularFactura(id: string | number, motivo = 'Anulación solicitada'): void {
     this._loading.set(true);
     this.svc.anularFactura(id, motivo)
@@ -134,7 +154,6 @@ export class FacturasFacade {
       });
   }
 
-  /** Verifica la factura (dispara entrada automática de stock) */
   verificarFactura(id: string | number): void {
     this._loading.set(true);
     this.svc.verificarFactura(id)
@@ -150,7 +169,6 @@ export class FacturasFacade {
       });
   }
 
-  /** Marca la factura como pagada (solo desde estado VERIFICADA) */
   marcarPagada(id: string | number): void {
     this._loading.set(true);
     this.svc.marcarPagada(id)
@@ -166,7 +184,6 @@ export class FacturasFacade {
       });
   }
 
-  /** Actualiza los datos bancarios del proveedor (solo en REGISTRADA o VERIFICADA) */
   actualizarInfoBancaria(
     id: string | number,
     data: { banco: string; tipoCuenta: string; numeroCuenta: string },
@@ -183,7 +200,6 @@ export class FacturasFacade {
       .subscribe(res => { if (res) this._facturaSeleccionada.set(res); });
   }
 
-  /** Carga una solicitud GIL */
   cargarSolicitudGIL(id: string): void {
     this.svc.getSolicitudGIL(id)
       .pipe(
@@ -195,11 +211,6 @@ export class FacturasFacade {
       .subscribe(s => this._solicitudGIL.set(s ?? null));
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // Sourcing — Conciliación Factura-GIL
-  // ─────────────────────────────────────────────────────────────────────────
-
-  /** POST /sourcing/conciliaciones-gil — vincula factura con GIL y guarda el resultado */
   conciliarFacturaGil(facturaId: string, gilId: string): void {
     this._loading.set(true);
     this._error.set(null);
@@ -214,7 +225,6 @@ export class FacturasFacade {
       .subscribe(res => { if (res !== null) this._conciliacionGil.set(res); });
   }
 
-  /** GET /sourcing/conciliaciones-gil?facturaId=X ó ?gilId=Y */
   cargarConciliacionGil(params: { facturaId?: string; gilId?: string }): void {
     this._loading.set(true);
     this._error.set(null);
@@ -229,7 +239,6 @@ export class FacturasFacade {
       .subscribe(res => { if (res !== null) this._conciliacionGil.set(res); });
   }
 
-  /** PATCH /sourcing/conciliaciones-gil/{id}/diferencias/{gilItemId}/resolver */
   resolverDiferenciaGil(id: string, gilItemId: string, observacion: string): void {
     this._loading.set(true);
     this._error.set(null);
@@ -244,11 +253,6 @@ export class FacturasFacade {
       .subscribe(res => { if (res !== null) this._conciliacionGil.set(res); });
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // Sourcing — Vinculación Instructor
-  // ─────────────────────────────────────────────────────────────────────────
-
-  /** PUT /sourcing/instructor-vinculos/{ordenCompra} */
   vincularInstructorOrden(ordenCompra: string, instructorId: string): void {
     this._loading.set(true);
     this._error.set(null);
@@ -260,6 +264,21 @@ export class FacturasFacade {
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe(() => { /* 204 No Content — sin payload que actualizar */ });
+      .subscribe(() => { /* 204 No Content */ });
   }
-}
+
+  private getImportErrorMessage(error: unknown): string {
+    const httpError = error as {
+      error?: { detail?: string; title?: string };
+      status?: number;
+    };
+
+    if (httpError?.error?.detail) return httpError.error.detail;
+    if (httpError?.error?.title) return httpError.error.title;
+    if (httpError?.status === 409) return 'La factura ya existe en el sistema.';
+    if (httpError?.status === 400) return 'El archivo no es un PDF FEL válido.';
+    if (httpError?.status === 422) return 'No se pudo procesar el contenido de la factura.';
+
+    return 'Error al importar la factura electrónica';
+  }
+}
