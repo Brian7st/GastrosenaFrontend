@@ -1,11 +1,9 @@
-<div class="modal-overlay" (click)="cancel.emit()">
+<div class="modal-overlay" (click)="cancelar.emit()">
   <div class="modal-dialog import-dialog" (click)="$event.stopPropagation()">
-    
-    <!-- Header -->
     <div class="import-header">
       <div>
         <h1 class="import-title">Importar Bienes</h1>
-        <p class="import-subtitle">Cargue archivos masivos para actualizar el inventario nacional.</p>
+        <p class="import-subtitle">Cargue un archivo CSV con los bienes a importar.</p>
       </div>
       <button class="btn-plantilla" (click)="onDescargarPlantilla()">
         <span class="material-symbols-outlined">download</span>
@@ -14,28 +12,22 @@
     </div>
 
     <div class="modal-body-scroll">
-      <!-- Upload + Instrucciones -->
       <div class="upload-row">
-
-        <!-- Drop zone -->
         <div class="upload-card">
           @if (!file()) {
-
             <div class="drop-zone" [class.is-dragging]="isDragging()"
                  (dragover)="onDragOver($event)" (dragleave)="onDragLeave()" (drop)="onDrop($event)">
               <div class="drop-icon">
                 <span class="material-symbols-outlined">upload_file</span>
               </div>
-              <h3>Arrastre su archivo aquí</h3>
-              <p>Soporta formatos <strong>.xlsx</strong> y <strong>.csv</strong>. Máximo 25MB por archivo.</p>
+              <h3>Arrastre su archivo aqu�</h3>
+              <p>Solo archivos <strong>.csv</strong> generados desde la plantilla.</p>
               <label class="btn-select-file">
                 Seleccionar Archivo
                 <input type="file" accept=".csv,.xlsx,.xls" (change)="onFileSelected($event)" />
               </label>
             </div>
-          
-} @else {
-
+          } @else {
             <div class="file-card">
               <div class="file-icon">
                 <span class="material-symbols-outlined">description</span>
@@ -48,13 +40,9 @@
                 <span class="material-symbols-outlined">close</span>
               </button>
             </div>
-          
-}
-
-          
+          }
         </div>
 
-        <!-- Instrucciones -->
         <div class="instrucciones-card">
           <div class="instr-header">
             <span class="material-symbols-outlined">info</span>
@@ -62,25 +50,29 @@
           </div>
           <ol class="instr-list">
             @for (item of INSTRUCCIONES; track item; let i = $index) {
-<li>
-              <span class="instr-num">{{ i + 1 }}</span>
-              <span>{{ item }}</span>
-            </li>
-}
+              <li>
+                <span class="instr-num">{{ i + 1 }}</span>
+                <span>{{ item }}</span>
+              </li>
+            }
           </ol>
           <div class="server-status">
-            <p class="status-label">ESTADO DEL SERVIDOR</p>
+            <p class="status-label">ESTADO</p>
             <div class="status-value">
               <span class="status-dot"></span>
-              Listo para procesamiento
+              Listo para importar
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Vista Previa -->
-      @if (previewData().length > 0 || isProcessing()) {
+      @if (statusMessage()) {
+        <div class="preview-card">
+          <div class="processing-indicator">{{ statusMessage() }}</div>
+        </div>
+      }
 
+      @if (previewData().length > 0 || isProcessing()) {
         <div class="preview-card">
           <div class="preview-header">
             <div class="preview-title">
@@ -88,72 +80,65 @@
               <h3>Vista Previa de Datos</h3>
             </div>
             @if (!isProcessing()) {
-<span class="preview-count">{{ previewData().length }} FILAS ENCONTRADAS</span>
-}
+              <span class="preview-count">{{ previewData().length }} FILAS ENCONTRADAS</span>
+            }
             @if (isProcessing()) {
-<span class="preview-count">Procesando...</span>
-}
+              <span class="preview-count">Procesando...</span>
+            }
           </div>
 
           @if (isProcessing()) {
-<div class="processing-indicator">
-            <span class="material-symbols-outlined spin">sync</span>
-            Analizando archivo...
-          </div>
-}
+            <div class="processing-indicator">
+              <span class="material-symbols-outlined spin">sync</span>
+              Analizando archivo...
+            </div>
+          }
 
           @if (!isProcessing()) {
-<div class="preview-table-wrap">
-            <table class="preview-table">
-              <thead>
-                <tr>
-                  <th>CÓDIGO PLACA</th>
-                  <th>DESCRIPCIÓN DEL BIEN</th>
-                  <th>UM</th>
-                  <th>SERIAL</th>
-                  <th>UBICACIÓN</th>
-                  <th>ESTADO</th>
-                  <th>VALIDACIÓN</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (row of previewData(); track row) {
-<tr>
-                  <td class="code-mono">{{ row.codigoPlaca }}</td>
-                  <td class="row-nombre">{{ row.descripcion }}</td>
-                  <td>{{ row.um }}</td>
-                  <td class="code-mono text-muted">{{ row.serial }}</td>
-                  <td>{{ row.ubicacion }}</td>
-                  <td>
-                    <span class="estado-pill" [ngClass]="row.estado === 'Activo' ? 'estado-pill--activo' : 'estado-pill--bajo'">
-                      {{ row.estado }}
-                    </span>
-                  </td>
-                  <td>
-                    <span class="valid-badge" [ngClass]="getValidacionClass(row.validacion)">
-                      {{ row.validacion }}
-                    </span>
-                  </td>
-                </tr>
-}
-              </tbody>
-            </table>
-          </div>
-}
+            <div class="preview-table-wrap">
+              <table class="preview-table">
+                <thead>
+                  <tr>
+                    <th>C�D. SENA</th>
+                    <th>NOMBRE</th>
+                    <th>DESCRIPCI�N</th>
+                    <th>CATEGOR�A</th>
+                    <th>UM</th>
+                    <th>C�D. PROVEEDOR</th>
+                    <th>VALIDACI�N</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of previewData(); track row) {
+                    <tr>
+                      <td class="code-mono">{{ row.codigoSena || '�' }}</td>
+                      <td class="row-nombre">{{ row.nombre }}</td>
+                      <td>{{ row.descripcion || '�' }}</td>
+                      <td>{{ row.categoria || '�' }}</td>
+                      <td>{{ row.unidadMedida }}</td>
+                      <td class="code-mono text-muted">{{ row.codigoProveedor || '�' }}</td>
+                      <td>
+                        <span class="valid-badge" [ngClass]="getValidacionClass(row.validacion)">
+                          {{ row.error || row.validacion }}
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
         </div>
-      
-}
+      }
     </div>
 
-    <!-- Footer -->
     <div class="import-footer">
-      <button class="btn-cancel" (click)="cancel.emit()">Cancelar</button>
-      <button class="btn-procesar" [disabled]="!file() || isProcessing() || previewData().length === 0"
+      <button class="btn-cancel" (click)="cancelar.emit()">Cancelar</button>
+      <button class="btn-procesar" [disabled]="!file() || isProcessing() || previewData().length === 0 || hasErrors()"
               (click)="onProcesar()">
         <span class="material-symbols-outlined">check_circle</span>
-        Procesar Importación
+        Importar Bienes
       </button>
     </div>
-
   </div>
 </div>

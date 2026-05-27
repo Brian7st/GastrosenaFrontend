@@ -21,6 +21,15 @@ export const USUARIOS_ROUTES: Routes = [
     redirectTo: '',
     pathMatch: 'full',
   },
+
+  {
+    path: 'perfil',
+    loadComponent: () =>
+      import('./pages/perfil-page/perfil-page.component').then(
+        m => m.PerfilPageComponent,
+      ),
+  },
+  
   {
     path: 'cuentas',
     loadComponent: () =>
