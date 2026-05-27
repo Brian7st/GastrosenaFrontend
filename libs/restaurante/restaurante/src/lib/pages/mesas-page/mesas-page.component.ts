@@ -60,6 +60,9 @@ export class MesasPageComponent {
   editCapacidad = signal<number>(4);
   editZona      = signal<string>('');
 
+  // ── Signals para ABRIR mesa ──────────────────────────────────────────────────
+  comensales    = signal<number>(1);
+
   // ── Apertura / cierre de modales ─────────────────────────────────────────────
   abrirModal(nombre: string, mesa: Mesa | null = null) {
     this.modalActivo.set(nombre);
@@ -71,10 +74,11 @@ export class MesasPageComponent {
       this.nuevaCapacidad.set(4);
       this.nuevaZona.set('');
     } else if (nombre === 'editar' && mesa) {
-      // Pre-llenar formulario de edición con los datos actuales de la mesa
       this.editNombre.set(mesa.nombre);
       this.editCapacidad.set(mesa.capacidad);
       this.editZona.set(mesa.zona ?? '');
+    } else if (nombre === 'abrir' && mesa) {
+      this.comensales.set(1);
     } else if (nombre === 'gestion-mesas') {
       this.tabActivo.set('desactivar');
     }
@@ -134,9 +138,13 @@ export class MesasPageComponent {
 
   // ── ACCIONES DE ESTADO ───────────────────────────────────────────────────────
   abrirMesa(id: string) {
-    this.facade.abrirMesa(id, '', 1);
+    const comensales = this.comensales();
+    this.facade.abrirMesa(id, '', comensales);
     this.cerrarModales();
-    this.router.navigate(['../pedidos'], { relativeTo: this.route });
+    this.router.navigate(['../pedidos'], { 
+      relativeTo: this.route,
+      state: { comensales: comensales, mesaId: id }
+    });
   }
 
   verPedido(id: string) {

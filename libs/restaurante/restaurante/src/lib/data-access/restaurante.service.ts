@@ -6,8 +6,8 @@ import { Mesa, EstadoMesa, MesaCreateRequest, MesaUpdateRequest, PedidoResumenRe
 @Injectable({ providedIn: 'root' })
 export class RestauranteService {
   private http = inject(HttpClient);
-  /** URL del microservicio de restaurante (dev: localhost:8080) */
-  private readonly mesasUrl    = 'http://localhost:8080/api/mesas';
+  /** URL del microservicio de restaurante (interceptada por proxy) */
+  private readonly mesasUrl    = '/api/mesas';
   private readonly apiUrl      = '/api/pedidos';
 
   /**
