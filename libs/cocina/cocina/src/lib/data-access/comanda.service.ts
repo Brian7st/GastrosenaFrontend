@@ -28,13 +28,15 @@ export interface Comanda {
 }
 
 export interface PromedioPlato {
-  nombreReceta: string;
-  promedioMinutos: number;
+  nombrePlato: string;
+  tiempoPromedioMinutos: number;
+  cantidadPreparada: number;
 }
 
 export interface CargaTrabajoDiaria {
-  hora: string;
-  totalPlatos: number;
+  fecha: string;
+  totalPlatosPreparados: number;
+  tiempoPromedioGlobalMinutos: number;
 }
 
 export interface EstadisticasKpi {
@@ -86,7 +88,7 @@ export class ComandaService {
   }
 
   getEstadisticasPromedios(): Observable<PromedioPlato[]> {
-    return this.http.get<PromedioPlato[]>(`${this.baseUrlEstadisticas}/promedios`);
+    return this.http.get<PromedioPlato[]>(`${this.baseUrlEstadisticas}/promedio`);
   }
 
   getEstadisticasDiarias(): Observable<CargaTrabajoDiaria[]> {

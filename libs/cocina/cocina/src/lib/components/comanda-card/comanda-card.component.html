@@ -41,9 +41,7 @@
                 <div class="plato-title-row">
                   <span class="plato-qty">{{ plato.cantidad }}x</span>
                   <span class="plato-name">{{ plato.nombrePlato }}</span>
-                </div>
-                <div>
-                  <span class="comanda-estado-badge" [ngClass]="'estado-' + plato.estado.toLowerCase()" style="font-size: 0.6rem; padding: 2px 8px;">
+                  <span class="comanda-estado-badge" [ngClass]="'estado-' + plato.estado.toLowerCase()" style="font-size: 0.6rem; padding: 2px 8px; margin-left: 4px;">
                     {{ plato.estado }}
                   </span>
                 </div>
@@ -97,11 +95,8 @@
       <div class="modal-header-custom">
         <div class="modal-header-titles">
           <h4 class="modal-title">Detalles del Pedido - Mesa {{ comanda().numeroMesa }}</h4>
-          <p class="modal-subtitle">Información completa del pedido #{{ comanda().idComanda | slice:0:8 }} - Estado: {{ comanda().estado | titlecase }}</p>
+          <p class="modal-subtitle">Información completa del pedido #{{ comanda().idComanda | slice:0:8 }}</p>
         </div>
-        <button class="btn-modal-close-icon" (click)="cerrarVista()" aria-label="Cerrar">
-          <lucide-icon name="x"></lucide-icon>
-        </button>
       </div>
 
       <!-- Info Grid -->
@@ -176,9 +171,6 @@
           </h3>
           <p class="modal-subtitle">Receta completa con ingredientes y procedimiento paso a paso</p>
         </div>
-        <button class="btn-modal-close-icon" (click)="cerrarVista()" aria-label="Cerrar">
-          <lucide-icon name="x"></lucide-icon>
-        </button>
       </div>
 
       @if (recetaActiva(); as receta) {

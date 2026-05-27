@@ -46,35 +46,26 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
     this.comandaService.getEstadisticasPromedios().subscribe({
       next: data => {
         this.promediosData = {
-          labels: data.map(d => d.nombreReceta),
+          labels: data.map(d => d.nombrePlato),
           datasets: [{
-            data: data.map(d => d.promedioMinutos),
+            data: data.map(d => d.tiempoPromedioMinutos),
             backgroundColor: cssToken('--color-chart-bar'),
             borderRadius: 4
           }]
         };
         this.renderChartPromedios();
       },
-      error: () => {
-        // Fallback Mocks
-        this.promediosData = {
-          labels: ['Hamburguesa', 'Pasta Carbonara', 'Ensalada César', 'Papas Fritas', 'Jugo de Mora'],
-          datasets: [{
-            data: [15, 20, 8, 5, 3],
-            backgroundColor: cssToken('--color-chart-bar'),
-            borderRadius: 4
-          }]
-        };
-        this.renderChartPromedios();
+      error: (err) => {
+        console.error('Error cargando estadísticas promedios:', err);
       }
     });
 
     this.comandaService.getEstadisticasDiarias().subscribe({
       next: data => {
         this.diariaData = {
-          labels: data.map(d => d.hora),
+          labels: data.map(d => d.fecha),
           datasets: [{
-            data: data.map(d => d.totalPlatos),
+            data: data.map(d => d.totalPlatosPreparados),
             borderColor: cssToken('--color-chart-line'),
             backgroundColor: cssToken('--color-chart-line-fill', 'rgba(220,165,67,0.2)'),
             fill: true,
@@ -83,19 +74,8 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
         };
         this.renderChartDiario();
       },
-      error: () => {
-        // Fallback Mocks
-        this.diariaData = {
-          labels: ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00'],
-          datasets: [{
-            data: [5, 12, 35, 42, 20, 15],
-            borderColor: cssToken('--color-chart-line'),
-            backgroundColor: cssToken('--color-chart-line-fill', 'rgba(220,165,67,0.2)'),
-            fill: true,
-            tension: 0.4
-          }]
-        };
-        this.renderChartDiario();
+      error: (err) => {
+        console.error('Error cargando estadísticas diarias:', err);
       }
     });
   }

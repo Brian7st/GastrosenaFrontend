@@ -149,8 +149,9 @@
   .plato-main-row {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    gap: 32px;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
   }
 
 .plato-info {
@@ -177,6 +178,53 @@
         font-weight: 600;
       }
     }
+
+.plato-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.btn-round {
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s;
+  color: var(--color-surface-primary, #ffffff);
+
+  &:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+
+  &.btn-detalle {
+    background-color: var(--color-pizarra-200, #e2e8f0);
+    color: var(--color-pizarra-700, #334155);
+
+    &:hover, &.active {
+      background-color: var(--color-pizarra-300, #cbd5e1);
+      color: var(--color-pizarra-900, #0f172a);
+    }
+  }
+
+  &.btn-receta {
+    background-color: var(--color-pizarra-200, #e2e8f0);
+    color: var(--color-pizarra-700, #334155);
+
+    &:hover {
+      background-color: var(--color-pizarra-300, #cbd5e1);
+      color: var(--color-pizarra-900, #0f172a);
+    }
+  }
+}
 
 
   .plato-nota {
@@ -408,6 +456,56 @@
   }
 }
 
+// ── Badges ────────────────────────────────────────────────────────────────────
+
+.prioridad-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill, 999px);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &.badge-normal {
+    background-color: var(--color-info-bg, #eff6ff);
+    color: var(--color-info, #0984e3);
+    border: 1px solid var(--color-info-border);
+  }
+  &.badge-alta {
+    background-color: var(--color-warning-bg, #fefce8);
+    color: var(--color-warning, #fdcb6e);
+  }
+  &.badge-urgente {
+    background-color: var(--color-error-bg, #fee2e2);
+    color: var(--color-danger, #d63031);
+  }
+}
+
+.comanda-estado-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill, 999px);
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &.estado-pendiente {
+    background-color: var(--color-warning-interactive, #d97706);
+    color: var(--color-surface-primary, #fff);
+  }
+  &.estado-preparando {
+    background-color: var(--color-info, #0984e3);
+    color: var(--color-surface-primary, #fff);
+  }
+  &.estado-listo {
+    background-color: var(--color-brand-primary, #39a900);
+    color: var(--color-surface-primary, #fff);
+  }
+}
+
 /* COLORES DINÁMICOS DE PRIORIDAD */
 .prioridad-normal { 
   background-color: var(--color-prioridad-normal-bg) !important; 
@@ -508,6 +606,19 @@
 /* =========================================================================
    Modal Custom Semantic Layout
    ========================================================================= */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: var(--color-backdrop, rgba(15, 23, 42, 0.6));
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .modal-detalles-content {
   max-width: 650px;
