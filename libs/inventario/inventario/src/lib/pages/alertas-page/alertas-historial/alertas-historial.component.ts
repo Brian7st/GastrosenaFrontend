@@ -6,7 +6,7 @@ import {
   inject,
   OnInit,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import { LucideIconComponent, DataTableComponent, ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
@@ -18,7 +18,7 @@ import { AlertasFacade } from '../../../data-access/alertas.facade';
   selector: 'restaurant-alertas-historial',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, LucideIconComponent, DataTableComponent, ButtonComponent, BackButtonComponent, ExportarComponent],
+  imports: [LucideIconComponent, DataTableComponent, ButtonComponent, BackButtonComponent, ExportarComponent],
   templateUrl: './alertas-historial.component.html',
   styleUrl: './alertas-historial.component.scss',
 })
@@ -103,6 +103,7 @@ export class AlertasHistorialComponent implements OnInit {
     this.showExportModal.set(false);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onExport(formato: string): void {
     this.facade.exportarHistorialCSV();
     this.closeExportModal();

@@ -1,0 +1,71 @@
+<div class="historial-page">
+
+  <restaurant-page-header
+    title="Historial de Actividades"
+    subtitle="Registro de acciones realizadas por los usuarios del sistema"
+  ></restaurant-page-header>
+
+  <!-- Filtros -->
+  <div class="historial-page__filters">
+    <restaurant-search-filter
+      label="Buscar usuario"
+      placeholder="Nombre o email..."
+      [value]="busqueda()"
+      (valueChange)="busqueda.set($event)"
+    ></restaurant-search-filter>
+    <restaurant-select-filter
+      label="Tipo de acción"
+      [value]="filtroAccion()"
+      [options]="accionOpciones"
+      (valueChange)="filtroAccion.set($event)"
+    ></restaurant-select-filter>
+  </div>
+
+  @if (loading()) {
+    <restaurant-loading-skeleton [lines]="8"></restaurant-loading-skeleton>
+  } @else {
+    <restaurant-data-table>
+      <thead>
+        <tr>
+          <th>Usuario</th>
+          <th>Acción</th>
+          <th>Fecha y hora</th>
+          <th>IP</th>
+          <th>Detalles</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of historialFiltrado(); track item.id) {
+          <tr>
+            <td>
+              <div class="historial-page__user">
+                <p class="historial-page__user-name">{{ item.usuarioNombre }}</p>
+                <p class="historial-page__user-email">{{ item.usuarioEmail }}</p>
+              </div>
+            </td>
+            <td>
+              <span class="accion-badge accion-badge--{{ getAccionClass(item.accion) }}">
+                {{ item.accion }}
+              </span>
+            </td>
+            <td class="historial-page__fecha">
+              {{ item.fecha | date:'dd/MM/yyyy HH:mm' }}
+            </td>
+            <td class="historial-page__ip">{{ item.ip }}</td>
+            <td class="historial-page__detalles">{{ item.detalles }}</td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="historial-page__empty-cell">
+              <restaurant-empty-state
+                title="Sin actividad registrada"
+                message="No se encontraron registros con los filtros aplicados."
+              ></restaurant-empty-state>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </restaurant-data-table>
+  }
+
+</div>

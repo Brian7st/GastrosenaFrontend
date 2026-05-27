@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
@@ -9,7 +9,7 @@ import { RegistrarPresupuestoData } from '../../../models/presupuesto.model';
 @Component({
   selector: 'restaurant-presupuesto-registrar',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, LucideIconComponent, ButtonComponent],
+  imports: [ReactiveFormsModule, LucideIconComponent, ButtonComponent],
   templateUrl: './presupuesto-registrar.component.html',
   styleUrl: './presupuesto-registrar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -3,6 +3,7 @@ import { Store } from '@ngrx/store';
 import { AppState } from '@restaurant/shared/state';
 import {
   ActualizarUsuarioRequest,
+  AsignacionMasivaRequest,
   CrearUsuarioRequest,
   ExportarConfig,
   FiltrosUsuarios,
@@ -14,12 +15,17 @@ import { UsuariosState } from './store/reducers/usuarios.reducer';
 import {
   selectError,
   selectHayError,
+  selectHistorial,
   selectImportando,
   selectLoading,
   selectLoadingAccion,
+  selectLoadingAsignacion,
+  selectLoadingHistorial,
+  selectLoadingRolesDetalle,
   selectMensajeExport,
   selectResultadoImport,
   selectRoles,
+  selectRolesDetalle,
   selectTotalActivos,
   selectTotalElements,
   selectTotalInactivos,
@@ -33,7 +39,6 @@ type LocalState = AppState & { readonly usuarios: UsuariosState };
 export class UsuariosFacade {
   private readonly store = inject<Store<LocalState>>(Store);
 
-  // ── Observables ───────────────────────────────────────────────────────────
   readonly usuarios$            = this.store.select(selectUsuarios);
   readonly roles$               = this.store.select(selectRoles);
   readonly usuarioSeleccionado$ = this.store.select(selectUsuarioSeleccionado);
@@ -47,8 +52,12 @@ export class UsuariosFacade {
   readonly resultadoImport$     = this.store.select(selectResultadoImport);
   readonly mensajeExport$       = this.store.select(selectMensajeExport);
   readonly hayError$            = this.store.select(selectHayError);
+  readonly historial$           = this.store.select(selectHistorial);
+  readonly loadingHistorial$    = this.store.select(selectLoadingHistorial);
+  readonly rolesDetalle$        = this.store.select(selectRolesDetalle);
+  readonly loadingRolesDetalle$ = this.store.select(selectLoadingRolesDetalle);
+  readonly loadingAsignacion$   = this.store.select(selectLoadingAsignacion);
 
-  // ── Comandos ──────────────────────────────────────────────────────────────
   cargarUsuarios(filtros?: Partial<FiltrosUsuarios>): void {
     this.store.dispatch(UsuariosActions.cargarUsuarios({ filtros }));
   }
@@ -95,5 +104,17 @@ export class UsuariosFacade {
 
   limpiarSeleccion(): void {
     this.store.dispatch(UsuariosActions.limpiarSeleccion());
+  }
+
+  cargarHistorial(): void {
+    this.store.dispatch(UsuariosActions.cargarHistorial());
+  }
+
+  cargarRolesDetalle(): void {
+    this.store.dispatch(UsuariosActions.cargarRolesDetalle());
+  }
+
+  asignarRolMasivo(request: AsignacionMasivaRequest): void {
+    this.store.dispatch(UsuariosActions.asignarRolMasivo({ request }));
   }
 }

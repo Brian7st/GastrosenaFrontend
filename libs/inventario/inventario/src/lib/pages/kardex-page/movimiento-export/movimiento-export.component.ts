@@ -1,5 +1,5 @@
 import { Component, inject, ChangeDetectionStrategy, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, RouterModule } from '@angular/router';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -7,7 +7,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 @Component({
   selector: 'restaurant-movimiento-export',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, LucideIconComponent, ButtonComponent],
+  imports: [RouterModule, ReactiveFormsModule, LucideIconComponent, ButtonComponent],
   templateUrl: './movimiento-export.component.html',
   styleUrl: './movimiento-export.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

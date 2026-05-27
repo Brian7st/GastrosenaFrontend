@@ -1,10 +1,13 @@
-<div class="factura-edit" *ngIf="factura() as f; else loadingTpl">
+@if (factura(); as f) {
+<div class="factura-edit">
 
   <!-- ── BLOCKED BANNER (Vista 4) ── -->
-  <div class="blocked-banner" *ngIf="isBlocked()">
+  @if (isBlocked()) {
+<div class="blocked-banner">
     <span class="material-symbols-outlined">lock</span>
     <span>Factura bloqueada — estado: <strong>{{ f.estado }}</strong></span>
   </div>
+}
 
   <!-- ── PAGE HEADER ── -->
   <div class="page-header">
@@ -93,10 +96,12 @@
         <span class="material-symbols-outlined">table_rows</span>
         <h3>Detalle de Productos/Servicios</h3>
       </div>
-      <button class="btn btn--add-item" *ngIf="!isBlocked()" (click)="onAgregarItem()">
+      @if (!isBlocked()) {
+<button class="btn btn--add-item" (click)="onAgregarItem()">
         <span class="material-symbols-outlined">add_circle</span>
         Agregar Ítem
       </button>
+}
     </div>
 
     <div class="items-table-wrapper">
@@ -108,41 +113,57 @@
             <th>Precio U.</th>
             <th>IVA (%)</th>
             <th>Total</th>
-            <th *ngIf="!isBlocked()"></th>
+            @if (!isBlocked()) {
+<th></th>
+}
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of localItems(); let i = index">
+          @for (item of localItems(); track item; let i = $index) {
+<tr>
             <td class="td--num">
-              <input *ngIf="!isBlocked(); else showCantidad"
+              @if (!isBlocked()) {
+<input
                 class="td-input td-input--num"
                 type="number" min="1"
                 [ngModel]="item.cantidad"
                 (ngModelChange)="onItemChange(i, 'cantidad', +$event)"
               />
-              <ng-template #showCantidad>{{ item.cantidad }}</ng-template>
+} @else {
+{{ item.cantidad }}
+}
+              
             </td>
             <td>
-              <input *ngIf="!isBlocked(); else showDesc"
+              @if (!isBlocked()) {
+<input
                 class="td-input td-input--desc"
                 type="text"
                 [ngModel]="item.descripcion"
                 (ngModelChange)="onItemChange(i, 'descripcion', $event)"
                 placeholder="Descripción del producto..."
               />
-              <ng-template #showDesc>{{ item.descripcion }}</ng-template>
+} @else {
+{{ item.descripcion }}
+}
+              
             </td>
             <td class="td--currency">
-              <input *ngIf="!isBlocked(); else showPrecio"
+              @if (!isBlocked()) {
+<input
                 class="td-input td-input--num"
                 type="number" min="0"
                 [ngModel]="item.precioUnitario"
                 (ngModelChange)="onItemChange(i, 'precioUnitario', +$event)"
               />
-              <ng-template #showPrecio>{{ formatMoney(item.precioUnitario) }}</ng-template>
+} @else {
+{{ formatMoney(item.precioUnitario) }}
+}
+              
             </td>
             <td class="td--iva">
-              <div class="iva-select" *ngIf="!isBlocked(); else showIva">
+              @if (!isBlocked()) {
+<div class="iva-select">
                 <select
                   [ngModel]="item.iva"
                   (ngModelChange)="onItemChange(i, 'iva', +$event)"
@@ -153,26 +174,35 @@
                 </select>
                 <span class="material-symbols-outlined">expand_more</span>
               </div>
-              <ng-template #showIva>{{ item.iva }}%</ng-template>
+} @else {
+{{ item.iva }}%
+}
+              
             </td>
             <td class="td--currency td--bold">{{ formatMoney(item.total) }}</td>
-            <td *ngIf="!isBlocked()">
+            @if (!isBlocked()) {
+<td>
               <button class="icon-btn icon-btn--danger" (click)="onEliminarItem(i)">
                 <span class="material-symbols-outlined">delete</span>
               </button>
             </td>
+}
           </tr>
-          <tr *ngIf="localItems().length === 0">
+}
+          @if (localItems().length === 0) {
+<tr>
             <td [attr.colspan]="isBlocked() ? 5 : 6" class="empty-row">
               Sin ítems registrados
             </td>
           </tr>
+}
         </tbody>
       </table>
     </div>
 
     <!-- ── CONCILIACIÓN GIL (Vista 4) ── -->
-    <div class="conciliacion-section" *ngIf="hasConciliacion() && f.conciliacion">
+    @if (hasConciliacion() && f.conciliacion) {
+<div class="conciliacion-section">
       <div class="section-header">
         <div class="section-header__left">
           <span class="material-symbols-outlined">sync_alt</span>
@@ -193,7 +223,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let c of f.conciliacion">
+            @for (c of f.conciliacion; track c) {
+<tr>
               <td>{{ c.descripcion }}</td>
               <td class="td--num">{{ c.cantidadGil }}</td>
               <td class="td--num">{{ c.cantidadFactura }}</td>
@@ -206,10 +237,12 @@
                 {{ c.diferenciaPrecio > 0 ? '+' : '' }}{{ formatMoney(c.diferenciaPrecio) }}
               </td>
             </tr>
+}
           </tbody>
         </table>
       </div>
     </div>
+}
 
     <!-- ── TOTALES ── -->
     <div class="bottom-section">
@@ -232,10 +265,12 @@
 
   <!-- ── FOOTER ACTIONS ── -->
   <div class="page-footer">
-    <button class="btn btn--anular" *ngIf="!isBlocked()" (click)="onAnular()">
+    @if (!isBlocked()) {
+<button class="btn btn--anular" (click)="onAnular()">
       <span class="material-symbols-outlined">cancel</span>
       Anular Documento
     </button>
+}
     <div class="footer-right">
       <button class="btn btn--ghost" (click)="onVolver()">Cancelar</button>
       <button
@@ -250,6 +285,14 @@
     </div>
   </div>
 </div>
+} @else {
+
+  <div class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>Cargando factura...</p>
+  </div>
+
+}
 
 <!-- ── MODAL: Confirmar Anulación ── -->
 <restaurant-keyword-confirm-modal
@@ -268,9 +311,4 @@
 />
 
 <!-- Loading -->
-<ng-template #loadingTpl>
-  <div class="loading-state">
-    <div class="loading-spinner"></div>
-    <p>Cargando factura...</p>
-  </div>
-</ng-template>
+

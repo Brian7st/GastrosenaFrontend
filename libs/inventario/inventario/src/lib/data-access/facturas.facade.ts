@@ -117,10 +117,11 @@ export class FacturasFacade {
       });
   }
 
-  /** Anula una factura */
-  anularFactura(id: string | number): void {
+  /** Anula una factura — motivo es @NotBlank en backend.
+   *  TODO visual phase: reemplazar default con input real del usuario. */
+  anularFactura(id: string | number, motivo = 'Anulación solicitada'): void {
     this._loading.set(true);
-    this.svc.anularFactura(id)
+    this.svc.anularFactura(id, motivo)
       .pipe(
         catchError(() => {
           this._error.set('Error al anular la factura');

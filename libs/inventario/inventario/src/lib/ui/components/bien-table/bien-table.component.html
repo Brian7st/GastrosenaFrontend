@@ -15,7 +15,8 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let bien of bienes" class="bien-row">
+      @for (bien of bienes; track bien) {
+<tr class="bien-row">
         <td>
           <span class="code-badge">{{ bien.codigoSena }}</span>
         </td>
@@ -64,11 +65,14 @@
           </div>
         </td>
       </tr>
+}
 
       <!-- Empty State / Loading placeholder logic can go here -->
-      <tr *ngIf="bienes.length === 0 && !isLoading">
+      @if (bienes.length === 0 && !isLoading) {
+<tr>
         <td colspan="10" class="empty-row">No se encontraron bienes con los filtros aplicados.</td>
       </tr>
+}
     </tbody>
   </table>
 </div>

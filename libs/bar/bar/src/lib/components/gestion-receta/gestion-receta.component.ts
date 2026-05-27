@@ -173,6 +173,30 @@ export class GestionRecetaComponent implements OnInit {
           };
         });
       }
+
+      // Mapear los ingredientes ingresados por texto a su ID correspondiente del backend
+      if (formValue.ingredientes) {
+        const ingredientsList = this.ingService.ingredientes();
+        const ingredientesMapeados = [];
+
+        for (const ing of formValue.ingredientes) {
+          const match = ingredientsList.find(
+            i => i.nombreIngrediente.toLowerCase().trim() === ing.nombreIngrediente?.toLowerCase().trim()
+          );
+
+          if (!match) {
+            alert(`El ingrediente "${ing.nombreIngrediente}" no es válido o no está registrado en el sistema.`);
+            this.isSaving = false;
+            return;
+          }
+
+          ingredientesMapeados.push({
+            ...ing,
+            idIngrediente: match.idIngrediente
+          });
+        }
+        formValue.ingredientes = ingredientesMapeados;
+      }
       
       const observable = this.receta?.idReceta 
         ? this.recetaService.actualizarRecetaCompleta(this.receta.idReceta, formValue)

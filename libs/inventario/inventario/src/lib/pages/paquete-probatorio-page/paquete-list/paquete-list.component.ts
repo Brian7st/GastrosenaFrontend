@@ -6,7 +6,7 @@ import {
   inject,
   OnInit,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import {
   DataTableComponent,
@@ -23,13 +23,12 @@ import { PaqueteFacade } from '../../../data-access/paquete.facade';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     DataTableComponent,
     StatusBadgeComponent,
     LucideIconComponent,
     KpiCardComponent,
-    ButtonComponent,
-  ],
+    ButtonComponent
+],
   templateUrl: './paquete-list.component.html',
   styleUrl: './paquete-list.component.scss',
 })
