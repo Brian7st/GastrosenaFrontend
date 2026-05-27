@@ -1,5 +1,6 @@
 <div class="factura-detail-page">
-  <ng-container *ngIf="factura() as f; else loadingTpl">
+  @if (factura(); as f) {
+
   <!-- Header Section -->
   <header class="page-header">
     <div class="page-header__left">
@@ -95,7 +96,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let item of f.lineas; let i = index">
+            @for (item of f.lineas; track item; let i = $index) {
+<tr>
               <td class="text-center font-medium text-secondary">{{ i + 1 }}</td>
               <td class="font-medium">{{ item.descripcion }}</td>
               <td class="text-secondary">UND</td>
@@ -104,9 +106,12 @@
               <td class="text-right text-secondary">{{ item.iva }}%</td>
               <td class="text-right font-semibold">{{ item.total | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
             </tr>
-            <tr *ngIf="!f.lineas || f.lineas.length === 0">
+}
+            @if (!f.lineas || f.lineas.length === 0) {
+<tr>
               <td colspan="7" class="text-center text-secondary py-4">No hay artículos registrados.</td>
             </tr>
+}
           </tbody>
         </restaurant-data-table>
       </section>
@@ -161,18 +166,24 @@
                 <span class="linked-header__label">Documento Vinculado</span>
                 <h4 class="linked-header__title">{{ f.gilVinculado || 'Sin vincular' }}</h4>
               </div>
-              <span class="badge badge--primary-soft text-[10px]" *ngIf="f.gilVinculado">VINCULADO</span>
+              @if (f.gilVinculado) {
+<span class="badge badge--primary-soft text-[10px]">VINCULADO</span>
+}
             </div>
 
-            <div class="linked-details" *ngIf="f.gilVinculado">
+            @if (f.gilVinculado) {
+<div class="linked-details">
               <p><span class="material-symbols-outlined">person</span> {{ f.instructorId || 'Responsable' }}</p>
               <p class="font-bold"><span class="material-symbols-outlined">payments</span> {{ f.total | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
             </div>
+}
 
-            <button class="linked-btn group" *ngIf="f.gilVinculado" (click)="onVerGil(f.gilVinculado)">
+            @if (f.gilVinculado) {
+<button class="linked-btn group" (click)="onVerGil(f.gilVinculado)">
               Ver GIL completo
               <span class="material-symbols-outlined group-hover-translate">arrow_right_alt</span>
             </button>
+}
           </section>
 
           <!-- SECCIÓN 6: Documentos Soporte -->
@@ -262,12 +273,15 @@
       </section>
     </div>
   </div>
-  </ng-container>
+  
+} @else {
 
-  <ng-template #loadingTpl>
     <div class="flex flex-col items-center justify-center p-12 text-secondary">
       <span class="material-symbols-outlined animate-spin text-4xl mb-4">sync</span>
       <p>Cargando información de la factura...</p>
     </div>
-  </ng-template>
+  
+}
+
+  
 </div>

@@ -65,36 +65,50 @@ export function conciliacionGilFromApi(dto: ConciliacionGilResponse): Conciliaci
   };
 }
 
+/**
+ * Transforma el response del backend (GilResponse) al modelo interno (SolicitudGil).
+ * NOTA: los nombres de campo del response están alineados con los del request
+ * (fechaSolicitud, destinoBienes, fichaCaracterizacion, etc.).
+ * Revisar si el backend devuelve nombres distintos una vez que documente GilResponse
+ * (tarea BACKEND #2).
+ */
 export function gilFromApi(dto: GilResponse): SolicitudGil {
   return {
-    id: dto.id,
-    numeroGil: dto.numeroGil,
-    fecha: dto.fecha,
-    centroFormacionId: dto.centroFormacionId,
-    area: dto.area,
+    id:                   dto.id,
+    numeroGil:            dto.numeroGil,
+    fechaSolicitud:       dto.fechaSolicitud,
+    regionalCodigo:       dto.regionalCodigo,
+    regionalNombre:       dto.regionalNombre,
+    centroCostosCodigo:   dto.centroCostosCodigo,
+    centroCostosNombre:   dto.centroCostosNombre,
+    area:                 dto.area,
+    destinoBienes:        dto.destinoBienes,
+    jefeOficinaCoordinador: dto.jefeOficinaCoordinador,
+    solicitante:          dto.solicitante,
+    codigoGrupo:          dto.codigoGrupo,
+    fichaCaracterizacion: dto.fichaCaracterizacion,
+    estado:               dto.estado,
+    observaciones:        dto.observaciones,
     cuentadantes: dto.cuentadantes.map((c): CuentadanteGil => ({
-      id: c.id,
+      id:     c.id,
       nombre: c.nombre,
-      documento: c.documento,
+      cedula: c.cedula,
     })),
-    destino: dto.destino,
-    fichaId: dto.fichaId,
-    estado: dto.estado,
-    programaId: dto.programaId,
-    emitidoPor: dto.emitidoPor,
-    resultadoAprendizaje: dto.resultadoAprendizaje,
-    actividades: dto.actividades,
-    voceroNombre: dto.voceroNombre,
-    voceroDocumento: dto.voceroDocumento,
-    solicitudesOrigenIds: dto.solicitudesOrigenIds,
-    observaciones: dto.observaciones,
     bienes: dto.bienes?.map((b): BienSolicitud => ({
-      codigo: b.codigo,
-      descripcion: b.descripcion,
-      um: b.um,
-      cantidad: b.cantidad,
+      codigoSena:    b.codigoSena,
+      descripcion:   b.descripcion,
+      unidadMedida:  b.unidadMedida,
+      cantidad:      b.cantidad,
       valorUnitario: b.valorUnitario,
-      subtotal: b.subtotal,
+      subtotal:      b.subtotal,
     })),
+    // Campos opcionales del módulo training
+    programaId:          dto.programaId,
+    emitidoPor:          dto.emitidoPor,
+    resultadoAprendizaje: dto.resultadoAprendizaje,
+    actividades:         dto.actividades,
+    voceroNombre:        dto.voceroNombre,
+    voceroDocumento:     dto.voceroDocumento,
+    solicitudesOrigenIds: dto.solicitudesOrigenIds,
   };
 }

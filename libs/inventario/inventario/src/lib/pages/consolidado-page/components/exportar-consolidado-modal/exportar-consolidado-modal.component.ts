@@ -37,8 +37,10 @@ const FORMATOS_CONSOLIDADO: FormatoExportacion[] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExportarConsolidadoModalComponent {
-  @Output() close   = new EventEmitter<void>();
-  @Output() export  = new EventEmitter<string>();
+  // eslint-disable-next-line @angular-eslint/no-output-native
+  @Output() close  = new EventEmitter<void>();
+  // eslint-disable-next-line @angular-eslint/no-output-native
+  @Output() export = new EventEmitter<string>();
 
   readonly formatos = FORMATOS_CONSOLIDADO;
 }

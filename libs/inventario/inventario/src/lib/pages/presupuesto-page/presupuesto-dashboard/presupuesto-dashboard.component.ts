@@ -8,11 +8,6 @@ import {
   ButtonComponent,
   StatusBadgeComponent,
 } from '@restaurant/shared/ui';
-import {
-  PresupuestoResumen,
-  VencimientoProximo,
-  EjecucionMensual,
-} from '../../../models/presupuesto.model';
 import { PresupuestoFacade } from '../../../data-access/presupuesto.facade';
 import { OnInit, inject } from '@angular/core';
 import { FormatoMonedaPipe } from '../../../pipes/formato-moneda.pipe';

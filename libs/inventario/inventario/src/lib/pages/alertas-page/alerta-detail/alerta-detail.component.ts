@@ -2,22 +2,20 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  signal,
   OnInit,
   inject,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { StatusBadgeComponent, ButtonComponent, LucideIconComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
-import { Alerta } from '../../../models/alerta.model';
 import { AlertasFacade } from '../../../data-access/alertas.facade';
 
 @Component({
   selector: 'restaurant-alerta-detail',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, StatusBadgeComponent, ButtonComponent, LucideIconComponent, BackButtonComponent],
+  imports: [RouterModule, StatusBadgeComponent, ButtonComponent, LucideIconComponent, BackButtonComponent],
   templateUrl: './alerta-detail.component.html',
   styleUrl: './alerta-detail.component.scss',
 })

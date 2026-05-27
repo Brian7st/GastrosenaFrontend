@@ -22,7 +22,7 @@ export class SolicitudesDetailComponent implements OnInit {
   loading       = this.facade.loading;
   solicitudId   = computed(() => this.solicitud()?.numeroGil ?? '');
   estadoActual  = computed(() => this.solicitud()?.estado ?? 'BORRADOR');
-  fechaCreacion = computed(() => this.solicitud()?.fecha ?? '');
+  fechaCreacion = computed(() => this.solicitud()?.fechaSolicitud ?? '');
   totalEstimado = computed(() => this.solicitud()?.bienes?.reduce((acc, b) => acc + b.subtotal, 0) ?? 0);
 
   ngOnInit(): void {

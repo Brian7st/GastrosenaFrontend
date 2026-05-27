@@ -83,9 +83,10 @@ export class FacturasService {
       );
   }
 
-  anularFactura(id: string | number): Observable<void> {
+  /** PATCH /sourcing/facturas/{id}/anular — motivo es @NotBlank en backend */
+  anularFactura(id: string | number, motivo: string): Observable<void> {
     return this.http
-      .patch<void>(`${API}/sourcing/facturas/${id}/anular`, {})
+      .patch<void>(`${API}/sourcing/facturas/${id}/anular`, { motivo })
       .pipe(catchError(err => throwError(() => err)));
   }
 
@@ -195,14 +196,14 @@ export class FacturasService {
       horarios:                '',   // sin campo equivalente aún
       resultadoAprendizaje:    g.resultadoAprendizaje ?? '',
       estadoSolicitud:         g.estado as EstadoGIL,
-      fechaCreacion:           g.fecha,
+      fechaCreacion:           g.fechaSolicitud,
       totalEstimado:           0,    // calculado en backend
       responsable:             g.emitidoPor ?? '',
-      regional:                '',
-      centroFormacion:         g.centroFormacionId,
+      regional:                g.regionalNombre ?? '',
+      centroFormacion:         g.centroCostosNombre ?? '',
       areaPrograma:            g.area,
       cuentadanteResponsable:  g.cuentadantes?.[0]?.nombre ?? '',
-      destinoBien:             g.destino,
+      destinoBien:             g.destinoBienes,
       preFacturas:             [],
       observaciones:           g.observaciones ?? '',
       hashTransaccion:         '',

@@ -1,6 +1,6 @@
 .stats-container {
   padding: var(--space-5, 25px);
-  background-color: var(--color-background-soft, #f8fafc);
+  background-color: var(--color-surface-secondary);
   min-height: 100%;
 }
 
@@ -12,7 +12,7 @@
 }
 
 .kpi-card {
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: var(--radius-lg, 12px);
   padding: var(--space-4, 20px);
   display: flex;
@@ -30,16 +30,16 @@
     font-size: 1.5rem;
 
     &.icon-espera {
-      background: rgba(220, 165, 67, 0.15);
-      color: #DCA543;
+      background: var(--color-kpi-orange-bg);
+      color: var(--color-kpi-orange);
     }
     &.icon-preparando {
-      background: rgba(58, 118, 210, 0.15);
-      color: #3A76D2;
+      background: var(--color-kpi-blue-bg);
+      color: var(--color-kpi-blue);
     }
     &.icon-listo {
-      background: rgba(40, 167, 69, 0.15);
-      color: #28A745;
+      background: var(--color-kpi-green-bg);
+      color: var(--color-primario);
     }
   }
 
@@ -70,7 +70,7 @@
 }
 
 .chart-card {
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: var(--radius-lg, 12px);
   padding: var(--space-4, 20px);
   border: 1px solid var(--color-border, #e2e8f0);

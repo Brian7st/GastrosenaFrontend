@@ -406,3 +406,37 @@
 .filled {
   font-variation-settings: 'FILL' 1;
 }
+
+.file-input-hidden {
+  display: none;
+}
+
+.file-upload-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  color: #64748b;
+  font-size: 0.875rem;
+  transition: border-color 0.2s, background 0.2s;
+
+  .material-symbols-outlined { font-size: 1.25rem; }
+
+  &:hover {
+    border-color: #22c55e;
+    background: #f0fdf4;
+    color: #16a34a;
+  }
+}
+
+.imagen-preview {
+  margin-top: 0.75rem;
+  max-height: 140px;
+  border-radius: 0.5rem;
+  object-fit: contain;
+  border: 1px solid #e2e8f0;
+  display: block;
+}

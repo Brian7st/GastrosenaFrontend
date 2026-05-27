@@ -10,7 +10,8 @@
   </nav>
 </div>
 
-<ng-container *ngIf="bien() as b; else loadingTpl">
+@if (bien(); as b) {
+
 
   <!-- Page Header -->
   <div class="page-header">
@@ -23,10 +24,10 @@
         <span class="material-symbols-outlined">history</span>
         Exportar Historial
       </button>
-      <button class="btn-gradient" (click)="onEditarActivo()">
+      <restaurant-button variant="primary" (click)="onEditarActivo()">
         <span class="material-symbols-outlined">edit</span>
-        Editar Activo
-      </button>
+        Editar Bien
+      </restaurant-button>
     </div>
   </div>
 
@@ -35,13 +36,17 @@
     <!-- Left: imagen + badges -->
     <div class="asset-card">
       <div class="asset-image-wrap">
-        <img *ngIf="b.imagenUrl; else imgPlaceholder"
+        @if (b.imagenUrl) {
+<img
              [src]="b.imagenUrl" [alt]="b.nombre" class="asset-image" />
-        <ng-template #imgPlaceholder>
+} @else {
+
           <div class="asset-image-placeholder">
             <span class="material-symbols-outlined">inventory_2</span>
           </div>
-        </ng-template>
+        
+}
+        
       </div>
       <div class="asset-badges">
         <div class="asset-badge-item">
@@ -80,24 +85,30 @@
         <div>
           <p class="kpi-mini-label">VALOR UNITARIO</p>
           <h3 class="kpi-mini-value">{{ b.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</h3>
-          <p class="kpi-mini-sub" *ngIf="b.depreciacionAnual">Depreciación anual: {{ b.depreciacionAnual }}%</p>
+          @if (b.depreciacionAnual) {
+<p class="kpi-mini-sub">Depreciación anual: {{ b.depreciacionAnual }}%</p>
+}
         </div>
       </div>
     </div>
 
     <!-- Right: especificaciones técnicas -->
-    <div class="spec-card" *ngIf="espec().length > 0">
+    @if (espec().length > 0) {
+<div class="spec-card">
       <div class="spec-card__header">
         <span class="material-symbols-outlined">settings</span>
         <h4>Especificaciones Técnicas</h4>
       </div>
       <div class="spec-grid">
-        <div class="spec-item" *ngFor="let s of espec()">
+        @for (s of espec(); track s) {
+<div class="spec-item">
           <span class="spec-key">{{ s[0] }}</span>
           <span class="spec-val">{{ s[1] }}</span>
         </div>
+}
       </div>
     </div>
+}
   </div>
 
   <!-- Historial de Movimientos -->
@@ -110,39 +121,49 @@
       <button class="link-btn">Ver todo el historial</button>
     </div>
 
-    <div class="movements-table-wrap">
-      <table class="movements-table">
-        <thead>
-          <tr>
-            <th>FECHA</th>
-            <th>TIPO</th>
-            <th>RESPONSABLE</th>
-            <th>UBICACIÓN</th>
-            <th>CANTIDAD</th>
-            <th>OBSERVACIÓN</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let m of movimientos()">
-            <td class="mov-fecha">{{ m.fecha | date:'dd/MM/yyyy' }}</td>
-            <td>
-              <restaurant-status-badge
-                [label]="m.tipo"
-                [variant]="getTipoVariant(m.tipo)">
-              </restaurant-status-badge>
-            </td>
-            <td class="mov-responsable">{{ m.responsable }}</td>
-            <td class="mov-ubicacion">{{ m.ubicacion }}</td>
-            <td>
-              <span class="cantidad-text" [ngClass]="getCantidadClass(m.cantidad)">
-                {{ getCantidadPrefix(m.cantidad) }}
-              </span>
-            </td>
-            <td class="mov-obs">{{ m.observacion }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    @if (movimientos().length > 0) {
+      <div class="movements-table-wrap">
+        <table class="movements-table">
+          <thead>
+            <tr>
+              <th>FECHA</th>
+              <th>TIPO</th>
+              <th>RESPONSABLE</th>
+              <th>UBICACIÓN</th>
+              <th>CANTIDAD</th>
+              <th>OBSERVACIÓN</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (m of movimientos(); track m) {
+              <tr>
+                <td class="mov-fecha">{{ m.fecha | date:'dd/MM/yyyy' }}</td>
+                <td>
+                  <restaurant-status-badge
+                    [label]="m.tipo"
+                    [variant]="getTipoVariant(m.tipo)">
+                  </restaurant-status-badge>
+                </td>
+                <td class="mov-responsable">{{ m.responsable }}</td>
+                <td class="mov-ubicacion">{{ m.ubicacion }}</td>
+                <td>
+                  <span class="cantidad-text" [ngClass]="getCantidadClass(m.cantidad)">
+                    {{ getCantidadPrefix(m.cantidad) }}
+                  </span>
+                </td>
+                <td class="mov-obs">{{ m.observacion }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="empty-state">
+        <span class="material-symbols-outlined">sync</span>
+        <p>Sin movimientos registrados</p>
+        <small>Este bien aún no tiene movimientos de inventario.</small>
+      </div>
+    }
   </section>
 
   <!-- Facturas de Abastecimiento -->
@@ -152,15 +173,18 @@
         <span class="material-symbols-outlined filled text-primary">receipt_long</span>
         <h3>Facturas de Abastecimiento</h3>
       </div>
-      <button
+      @if (b.facturas && b.facturas.length > FACTURAS_PREVIEW_COUNT) {
+<button
         class="link-btn"
-        *ngIf="b.facturas && b.facturas.length > FACTURAS_PREVIEW_COUNT"
+       
         (click)="toggleFacturas()">
         {{ mostrarTodasFacturas() ? 'Ver menos' : 'Ver todas (' + b.facturas.length + ')' }}
       </button>
+}
     </div>
 
-    <ng-container *ngIf="b.facturas && b.facturas.length > 0; else noFacturas">
+    @if (b.facturas && b.facturas.length > 0) {
+
       <div class="movements-table-wrap">
         <table class="movements-table">
           <thead>
@@ -174,7 +198,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let f of (mostrarTodasFacturas() ? b.facturas : (b.facturas | slice:0:FACTURAS_PREVIEW_COUNT))">
+            @for (f of (mostrarTodasFacturas() ? b.facturas : (b.facturas | slice:0:FACTURAS_PREVIEW_COUNT)); track f) {
+<tr>
               <td class="code-mono">{{ f.fel }}</td>
               <td class="code-mono text-muted">{{ f.cufe }}</td>
               <td>{{ f.proveedor }}</td>
@@ -187,12 +212,13 @@
                 </restaurant-status-badge>
               </td>
             </tr>
+}
           </tbody>
         </table>
       </div>
-    </ng-container>
+    
+} @else {
 
-    <ng-template #noFacturas>
       <div class="empty-state">
         <span class="material-symbols-outlined">receipt_long</span>
         <p>No hay facturas vinculadas</p>
@@ -202,23 +228,31 @@
           Vincular Factura Manualmente
         </button>
       </div>
-    </ng-template>
+    
+}
+
+    
   </section>
 
-</ng-container>
 
-<ng-template #loadingTpl>
+} @else {
+
   <div class="loading-state">
     <span class="material-symbols-outlined loading-icon">inventory_2</span>
     <p>Cargando información del bien...</p>
   </div>
-</ng-template>
+
+}
+
+
 
 <!-- Modal de edición -->
+@if (showEditModal()) {
 <restaurant-bien-form
-  *ngIf="showEditModal()"
+ 
   mode="edit"
   [bien]="bien()"
   (save)="onSaveEdit($event)"
   (cancel)="showEditModal.set(false)"
 ></restaurant-bien-form>
+}
