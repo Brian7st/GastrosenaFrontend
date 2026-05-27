@@ -133,10 +133,13 @@ export class SolicitudesService {
       );
   }
 
-  /** DELETE — endpoint NO disponible en backend */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  deleteSolicitud(_codigo: string): Observable<boolean> {
-    return throwError(() => new Error('deleteSolicitud: endpoint DELETE no disponible en backend'));
+  /** DELETE /procurement/giles/{id} — elimina un GIL en estado BORRADOR */
+  deleteSolicitud(id: string): Observable<void> {
+    return this.http
+      .delete<void>(`${API}/procurement/giles/${id}`)
+      .pipe(
+        catchError(err => throwError(() => err))
+      );
   }
 
   /** Generar GILs desde solicitudes aprobadas — endpoint NO disponible en backend */
