@@ -73,6 +73,27 @@ export interface EjecucionMensual {
   esMesActual: boolean;
 }
 
+/** Detalle de un presupuesto (GET /budget/presupuestos/{id}) */
+export interface PresupuestoDetalle {
+  id: string;
+  fichaId: string;
+  programaFormacion: string;
+  vigencia: number;
+  fechaAprobacion: string;
+  rubros: Rubro[];
+}
+
+/** Resumen global de presupuestos (GET /budget/presupuestos/resumen) */
+export interface ResumenPresupuestosGlobal {
+  totalPresupuestos: number;
+  vigencia?: number;
+  totalAsignado: number;
+  totalComprometido: number;
+  totalPagado: number;
+  saldoGlobal: number;
+  porcentajeEjecucion: number;
+}
+
 /** Payload para registrar un nuevo rubro presupuestal */
 export interface RegistrarPresupuestoData {
   programaId: string;
@@ -88,6 +109,42 @@ export interface TrasladarRubroData {
   rubroDestinoId: string;
   valor: number;
   motivo?: string;
+}
+
+// ── Compromisos presupuestales ────────────────────────────────────────────────
+
+/** Compromiso presupuestal (GET /budget/compromisos) */
+export interface Compromiso {
+  id: string;
+  presupuestoId: string;
+  rubroId: string;
+  gilId?: string;
+  concepto: string;
+  monto: number;
+  montoRetencionZese: number;
+  fecha: string;
+  estado: 'VIGENTE' | 'ANULADO';
+}
+
+/** Payload UI para comprometer presupuesto (POST /budget/compromisos) */
+export interface ComprometerData {
+  presupuestoId: string;
+  rubroId: string;
+  gilId?: string;
+  facturaId?: string;
+  fichaId: string;
+  programaId: string;
+  concepto: string;
+  monto: number;
+  aplicarZESE: boolean;
+  fecha: string;
+}
+
+/** Payload UI para registrar pago (POST /budget/compromisos/{id}/pagos) */
+export interface PagoData {
+  cufeFuenteId: string;
+  monto: number;
+  fecha: string;
 }
 
 // ============================================================

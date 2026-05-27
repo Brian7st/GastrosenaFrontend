@@ -1,18 +1,20 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
-import { Factura, FacturaFormDto } from '../../../models/facturas.model';
+import { FacturaFormDto } from '../../../models/facturas.model';
 
 @Component({
   selector: 'restaurant-factura-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './factura-form.component.html',
   styleUrl: './factura-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FacturaFormComponent {
+  // eslint-disable-next-line @angular-eslint/no-output-native
   @Output() close = new EventEmitter<void>();
+  // eslint-disable-next-line @angular-eslint/no-output-native
   @Output() save  = new EventEmitter<FacturaFormDto>();
 
   // Form model

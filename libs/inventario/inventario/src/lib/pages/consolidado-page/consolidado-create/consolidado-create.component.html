@@ -100,15 +100,19 @@
                   <span class="td-bold">{{ item.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
                 </td>
                 <td class="text-center">
-                  <ng-container *ngIf="item.estado === 'Disponible'">
+                  @if (item.estado === 'Disponible') {
+
                     <restaurant-status-badge label="Activo" variant="success"></restaurant-status-badge>
-                  </ng-container>
-                  <ng-container *ngIf="item.estado !== 'Disponible'">
+                  
+}
+                  @if (item.estado !== 'Disponible') {
+
                     <span class="badge badge--surface">
                       <span class="material-symbols-outlined text-[14px] mr-1">link</span>
                       En {{ item.consolidadoRef }}
                     </span>
-                  </ng-container>
+                  
+}
                 </td>
               </tr>
             }

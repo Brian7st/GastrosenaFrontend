@@ -1,5 +1,5 @@
 import { Component, inject, ChangeDetectionStrategy, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
@@ -9,7 +9,7 @@ import { SalidaMovimientoData } from '../../../models/movimiento.model';
 @Component({
   selector: 'restaurant-movimiento-salida',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, LucideIconComponent, ButtonComponent],
+  imports: [RouterModule, ReactiveFormsModule, LucideIconComponent, ButtonComponent],
   templateUrl: './movimiento-salida.component.html',
   styleUrl: './movimiento-salida.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

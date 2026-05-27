@@ -6,7 +6,7 @@ import {
   inject,
   OnInit,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule, Router } from '@angular/router';
 import {
   KpiCardComponent,
@@ -15,7 +15,6 @@ import {
   LucideIconComponent,
 } from '@restaurant/shared/ui';
 import {
-  Alerta,
   AlertaPrioridad
 } from '../../../models/alerta.model';
 import { AlertasFacade } from '../../../data-access/alertas.facade';
@@ -36,7 +35,7 @@ export interface MovimientoReciente {
   selector: 'restaurant-alertas-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, KpiCardComponent, ButtonComponent, StatusBadgeComponent, LucideIconComponent],
+  imports: [RouterModule, KpiCardComponent, ButtonComponent, StatusBadgeComponent, LucideIconComponent],
   templateUrl: './alertas-list.component.html',
   styleUrl: './alertas-list.component.scss',
 })

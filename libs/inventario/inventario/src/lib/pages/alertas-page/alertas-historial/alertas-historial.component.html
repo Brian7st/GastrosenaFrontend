@@ -145,10 +145,12 @@
 
 </div>
 
+@if (showExportModal()) {
 <inventario-exportar
-  *ngIf="showExportModal()"
+ 
   titulo="Exportar Historial de Alertas"
   subtitulo="Seleccione el formato de salida para el historial de gestión de alertas"
   (exportar)="onExport($event)"
   (cerrar)="closeExportModal()"
 ></inventario-exportar>
+}

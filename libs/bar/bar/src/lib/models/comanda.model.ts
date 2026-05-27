@@ -16,8 +16,14 @@ export interface ComandaBarYBarismo {
 }
 
 export interface ComandaItem {
+    idDetalleComanda: string;
     nombre: string;
     cantidad: number;
     nota?: string;
+    estado: 'ESPERA' | 'PREPARANDO' | 'LISTO';
+    idReceta?: string;
     tiempoEstimado?: number;
+    horaInicioPreparacion?: string;
+    horaFinPreparacion?: string;
+    duracionMinutos?: number;
 }

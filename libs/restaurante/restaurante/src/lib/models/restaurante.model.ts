@@ -1,19 +1,28 @@
-import { Pedido } from '@restaurant/shared/models';
-
-export type EstadoMesa = 'libre' | 'ocupada' | 'por_pagar';
+export type EstadoMesa = 'LIBRE' | 'OCUPADA' | 'POR_PAGAR' | 'INACTIVA';
 
 export interface Mesa {
-  id: number;
-  numero: number;
-  asientos: number;
+  id: string;        // UUID proveniente del backend
+  nombre: string;
+  capacidad: number;
+  zona: string | null;
   estado: EstadoMesa;
-  comensal?: string;
-  cantidadComensales?: number;
-  ordenActual?: Pedido | null;
-  notas?: string;
-  zona?: string;
-  isActive?: boolean;
+  activo: boolean;
 }
+
+/** Espejo de MesaCreateRequest.java — @NotBlank nombre, @NotNull capacidad */
+export interface MesaCreateRequest {
+  nombre: string;
+  capacidad: number;
+  zona?: string | null;
+}
+
+/** Espejo de MesaUpdateRequest.java — todos los campos son opcionales (PATCH parcial) */
+export interface MesaUpdateRequest {
+  nombre?: string;
+  capacidad?: number;
+  zona?: string | null;
+}
+
 
 export interface RestauranteStats {
   totalMesas: number;

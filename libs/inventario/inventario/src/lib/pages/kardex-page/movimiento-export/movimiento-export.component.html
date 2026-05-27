@@ -53,9 +53,11 @@
               <lucide-icon name="file-spreadsheet" [size]="24"></lucide-icon>
             </div>
             <span class="format-title">Excel (.xlsx)</span>
-            <div class="check-indicator" *ngIf="formatoSeleccionado() === 'excel'">
+            @if (formatoSeleccionado() === 'excel') {
+<div class="check-indicator">
               <lucide-icon name="check-circle" [size]="18"></lucide-icon>
             </div>
+}
           </div>
 
           <!-- PDF Card -->
@@ -64,9 +66,11 @@
               <lucide-icon name="file-text" [size]="24"></lucide-icon>
             </div>
             <span class="format-title">PDF (.pdf)</span>
-            <div class="check-indicator" *ngIf="formatoSeleccionado() === 'pdf'">
+            @if (formatoSeleccionado() === 'pdf') {
+<div class="check-indicator">
               <lucide-icon name="check-circle" [size]="18"></lucide-icon>
             </div>
+}
           </div>
 
           <!-- CSV Card -->
@@ -75,9 +79,11 @@
               <lucide-icon name="file-type-csv" [size]="24"></lucide-icon>
             </div>
             <span class="format-title">CSV (.csv)</span>
-            <div class="check-indicator" *ngIf="formatoSeleccionado() === 'csv'">
+            @if (formatoSeleccionado() === 'csv') {
+<div class="check-indicator">
               <lucide-icon name="check-circle" [size]="18"></lucide-icon>
             </div>
+}
           </div>
 
         </div>

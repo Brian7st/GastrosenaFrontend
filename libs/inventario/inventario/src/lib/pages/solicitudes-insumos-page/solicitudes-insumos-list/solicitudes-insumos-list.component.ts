@@ -4,7 +4,8 @@ import { Router, RouterModule } from '@angular/router';
 import {
   ButtonComponent,
   DataTableComponent,
-  KpiCardComponent
+  KpiCardComponent,
+  LucideIconComponent
 } from '@restaurant/shared/ui';
 import { AprobarSolicitudModalComponent } from '../../../components/aprobar-solicitud-modal/aprobar-solicitud-modal.component';
 
@@ -28,6 +29,7 @@ interface SolicitudInsumo {
     ButtonComponent,
     DataTableComponent,
     KpiCardComponent,
+    LucideIconComponent,
     AprobarSolicitudModalComponent
   ],
   templateUrl: './solicitudes-insumos-list.component.html',

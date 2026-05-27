@@ -1,0 +1,51 @@
+<div class="stats-container">
+
+  <restaurant-page-header
+    title="Estadísticas de Bar y Barismo"
+    subtitle="Métricas de rendimiento y tiempos de preparación"
+  ></restaurant-page-header>
+
+  <!-- KPIs Header -->
+  <div class="kpis-grid">
+    <div class="kpi-card shadow-sm kpi-orange">
+      <div class="kpi-icon-wrapper">
+        <lucide-icon name="clock" [size]="24"></lucide-icon>
+      </div>
+      <div class="kpi-info">
+        <h3>PROMEDIO GENERAL</h3>
+        <p class="kpi-value">{{ promedioFormateado() || '00:00' }}</p>
+      </div>
+    </div>
+
+    <div class="kpi-card shadow-sm kpi-green">
+      <div class="kpi-icon-wrapper">
+        <lucide-icon name="check-circle" [size]="24"></lucide-icon>
+      </div>
+      <div class="kpi-info">
+        <h3>BEBIDA MÁS RÁPIDA</h3>
+        <p class="kpi-value">{{ kpis()?.bebidaMasRapida || '—' }}</p>
+      </div>
+    </div>
+
+    <div class="kpi-card shadow-sm kpi-blue">
+      <div class="kpi-icon-wrapper">
+        <lucide-icon name="clipboard-list" [size]="24"></lucide-icon>
+      </div>
+      <div class="kpi-info">
+        <h3>BEBIDAS PREPARADAS</h3>
+        <p class="kpi-value">{{ kpis()?.totalBebidasDespachadosHoy || 0 }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráficos -->
+  <div class="charts-grid">
+    <div class="chart-card shadow-sm full-width">
+      <h3>DEMORA PROMEDIO POR BEBIDA</h3>
+      <div class="chart-wrapper">
+        <canvas #graficoPromedios></canvas>
+      </div>
+    </div>
+  </div>
+
+</div>
