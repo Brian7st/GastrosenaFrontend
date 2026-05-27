@@ -29,7 +29,7 @@
     [value]="k.valorTotal | currency:'COP':'symbol-narrow':'1.0-0'"
     icon="landmark"
     iconColor="green"
-    [trend]="'+' + k.tendenciaValor + '% vs mes anterior'"
+    [trend]="'+' + (k.tendenciaValor ?? 0) + '% vs mes anterior'"
     [trendUp]="true"
   />
 

@@ -2,6 +2,10 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Output, signal } from
 import { CommonModule } from '@angular/common';
 import { BienImportRow } from '../../../models/inventario.model';
 
+export type BienImportPayload =
+  | { tipo: 'csv'; filas: BienImportRow[] }
+  | { tipo: 'excel'; archivo: File };
+
 @Component({
   selector: 'restaurant-bien-import',
   standalone: true,
@@ -12,7 +16,7 @@ import { BienImportRow } from '../../../models/inventario.model';
 })
 export class BienImportModalComponent {
   @Output() cancelar = new EventEmitter<void>();
-  @Output() importar = new EventEmitter<BienImportRow[]>();
+  @Output() importar = new EventEmitter<BienImportPayload>();
 
   isDragging = signal(false);
   file = signal<File | null>(null);
@@ -70,8 +74,17 @@ export class BienImportModalComponent {
   }
 
   onProcesar(): void {
+    const archivo = this.file();
+    if (!archivo) return;
+
+    const fileName = archivo.name.toLowerCase();
+    if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+      this.importar.emit({ tipo: 'excel', archivo });
+      return;
+    }
+
     const validos = this.previewData().filter(r => !r.error);
-    this.importar.emit(validos);
+    this.importar.emit({ tipo: 'csv', filas: validos });
   }
 
   onDescargarPlantilla(): void {
@@ -118,7 +131,7 @@ export class BienImportModalComponent {
 
     const fileName = f.name.toLowerCase();
     if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
-      this.statusMessage.set('Por ahora la importaci�n conectada soporta CSV. Use la plantilla descargada desde este modal.');
+      this.statusMessage.set('Archivo Excel listo para importación al backend.');
       this.isProcessing.set(false);
       return;
     }

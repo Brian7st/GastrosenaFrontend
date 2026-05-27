@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { FacturasFacade } from '../../../data-access/facturas.facade';
@@ -14,7 +14,7 @@ export type ImportStatus = 'idle' | 'loading' | 'success' | 'error';
   styleUrl: './factura-import.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FacturaImportPageComponent {
+export class FacturaImportPageComponent implements OnInit {
   private facade = inject(FacturasFacade);
   private router = inject(Router);
 
@@ -23,7 +23,9 @@ export class FacturaImportPageComponent {
   gilId = signal('');
   localError = signal<string | null>(null);
 
-  facturaImportada = this.facade.facturaImportada;
+  facturaImportada        = this.facade.facturaImportada;
+  gilesDisponibles        = this.facade.gilesDisponibles;
+  conciliacionImportacion = this.facade.conciliacionImportacion;
   loading = this.facade.loading;
   error = computed(() => this.localError() ?? this.facade.error());
   importStatus = computed<ImportStatus>(() => {
@@ -35,6 +37,10 @@ export class FacturaImportPageComponent {
   fileLoaded = computed(() => this.facturaImportada() !== null);
   totalItems = computed(() => this.facturaImportada()?.lineas.length ?? 0);
   totalIvaPorTarifa = computed(() => this.groupIva(this.facturaImportada()?.lineas ?? []));
+
+  ngOnInit(): void {
+    this.facade.cargarGilesDisponibles();
+  }
 
   onDragOver(e: DragEvent): void {
     e.preventDefault();
@@ -58,9 +64,9 @@ export class FacturaImportPageComponent {
     if (file) this.processFile(file);
   }
 
-  onGilIdInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.gilId.set(input.value);
+  onGilSelect(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    this.gilId.set(select.value);
   }
 
   goBack(): void {
@@ -103,7 +109,7 @@ export class FacturaImportPageComponent {
     const isValidSize = file.size <= 10 * 1024 * 1024;
 
     if (!isPdf) {
-      this.localError.set('El backend solo acepta PDF FEL en este flujo.');
+      this.localError.set('Solo se aceptan archivos en formato PDF.');
       return;
     }
 
@@ -129,4 +135,4 @@ export class FacturaImportPageComponent {
       .map(([porcentaje, valor]) => ({ porcentaje, valor }))
       .sort((a, b) => a.porcentaje - b.porcentaje);
   }
-}
+}

@@ -3,7 +3,7 @@
     <inventario-back-button (clicked)="goBack()" />
     <div>
       <h1 class="page-header__title">Importar Factura Electrónica</h1>
-      <p class="page-header__subtitle">Subí el PDF FEL y el backend registrará la factura con el contrato real de importación.</p>
+      <p class="page-header__subtitle">Subí el PDF de la factura electrónica para registrarla en el sistema.</p>
     </div>
   </header>
 
@@ -49,18 +49,21 @@
           <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">cloud_upload</span>
         </div>
         <h3 class="upload-zone__title">Arrastrá tu factura acá</h3>
-        <p class="upload-zone__subtitle">Swagger confirma que este endpoint recibe solo PDF FEL · máximo 10 MB</p>
+        <p class="upload-zone__subtitle">Solo se aceptan archivos PDF · máximo 10 MB</p>
 
         <div class="field-group upload-zone__field">
           <label class="field-label">GIL a vincular (opcional)</label>
-          <input
+          <select
             class="field-input"
-            type="text"
             [value]="gilId()"
-            placeholder="UUID del GIL"
-            (input)="onGilIdInput($event); $event.stopPropagation()"
+            (change)="onGilSelect($event); $event.stopPropagation()"
             (click)="$event.stopPropagation()"
-          />
+          >
+            <option value="">Sin GIL</option>
+            @for (gil of gilesDisponibles(); track gil.id) {
+              <option [value]="gil.id">{{ gil.numeroGil }} — {{ gil.destino }}</option>
+            }
+          </select>
         </div>
 
         <button class="btn btn--primary" (click)="fileInput.click(); $event.stopPropagation()">
@@ -85,15 +88,15 @@
       <ul class="instructions-list">
         <li>
           <div class="step-badge">1</div>
-          <p>Subí el PDF FEL original. El backend valida magic bytes de PDF y extrae el CUFE desde el documento.</p>
+          <p>Subí el PDF de la factura electrónica original. El sistema extrae automáticamente los datos del documento.</p>
         </li>
         <li>
           <div class="step-badge">2</div>
-          <p>Si enviás <strong>gilId</strong>, el backend intenta vincular la factura al GIL en la misma operación.</p>
+          <p>Si ingresás un GIL, la factura quedará vinculada a esa gestión de inventario automáticamente.</p>
         </li>
         <li>
           <div class="step-badge">3</div>
-          <p>Cuando la importación termina, la factura ya quedó registrada. Acá solo te mostramos el preview real de la respuesta.</p>
+          <p>Una vez procesada, podés revisar los datos extraídos antes de continuar.</p>
         </li>
       </ul>
     </div>
@@ -101,7 +104,7 @@
 
   @if (fileLoaded()) {
     <div class="review-section">
-      <h2 class="review-section__title">Respuesta registrada por backend</h2>
+      <h2 class="review-section__title">Datos de la factura importada</h2>
 
       <div class="data-card">
         <div class="form-grid">
@@ -237,6 +240,58 @@
       </div>
     </div>
   }
+
+  @if (conciliacionImportacion(); as conciliacion) {
+    <div class="review-section">
+      <div class="conciliacion-header">
+        <h2 class="review-section__title">Resultado del cruce con GIL</h2>
+        <span class="conciliacion-estado" [class.conciliacion-estado--ok]="conciliacion.diferencias.length === 0">
+          {{ conciliacion.diferencias.length === 0 ? 'Sin diferencias' : conciliacion.diferencias.length + ' diferencia(s) encontrada(s)' }}
+        </span>
+      </div>
+
+      @if (conciliacion.diferencias.length > 0) {
+        <div class="table-card">
+          <div class="table-wrapper">
+            <table class="fel-table">
+              <thead>
+                <tr>
+                  <th>Descripción</th>
+                  <th class="text-right">Cant. GIL</th>
+                  <th class="text-right">Cant. FEL</th>
+                  <th class="text-right">Precio GIL</th>
+                  <th class="text-right">Precio FEL</th>
+                  <th class="text-right">Diferencia</th>
+                  <th class="text-center">Resuelta</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (dif of conciliacion.diferencias; track dif.gilItemId) {
+                  <tr [class.conciliacion-row--alerta]="!dif.resuelta && dif.diferencia !== 0">
+                    <td>{{ dif.descripcion }}</td>
+                    <td class="text-right">{{ dif.cantidadGil }}</td>
+                    <td class="text-right">{{ dif.cantidadFactura }}</td>
+                    <td class="text-right">{{ formatMoney(dif.precioUnitarioGil) }}</td>
+                    <td class="text-right">{{ formatMoney(dif.precioUnitarioFactura) }}</td>
+                    <td class="text-right" [class.text-tertiary]="dif.diferencia !== 0">
+                      {{ formatMoney(dif.diferencia) }}
+                    </td>
+                    <td class="text-center">
+                      <span class="badge" [class.badge--green]="dif.resuelta" [class.badge--gray]="!dif.resuelta">
+                        {{ dif.resuelta ? 'Sí' : 'No' }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      } @else {
+        <p class="conciliacion-vacia">Todos los ítems del GIL coinciden con la factura.</p>
+      }
+    </div>
+  }
 </div>
 
 <div class="sticky-footer">
@@ -245,4 +300,4 @@
     <button class="btn btn--outline" (click)="resetImport()">Limpiar</button>
     <button class="btn btn--primary" [disabled]="!facturaImportada()" (click)="viewImportedFactura()">Ver factura registrada</button>
   </div>
-</div>
+</div>

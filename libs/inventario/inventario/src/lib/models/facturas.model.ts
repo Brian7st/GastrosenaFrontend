@@ -1,3 +1,5 @@
+import type { InfoBancariaTipo } from '../data-access/api/sourcing.api';
+
 /**
  * Estados posibles de una Factura Electrónica.
  */
@@ -7,10 +9,14 @@ export type EstadoFactura = 'REGISTRADA' | 'VERIFICADA' | 'PAGADA' | 'ANULADA';
  * Línea de detalle dentro de una factura.
  */
 export interface FacturaLinea {
+  productoId?: string;
   descripcion: string;
   cantidad: number;
   precioUnitario: number;
+  porcentajeIva?: number;
   iva: number;
+  subtotal?: number;
+  valorIva?: number;
   total: number;
 }
 
@@ -45,13 +51,9 @@ export interface Factura {
   numeroFactura: string;
   cufe: string;
   proveedorNit: string;
-  nitReceptor: string;
   proveedorNombre: string;
-  razonSocial: string;
-  tipoDocumento: string;
   fechaEmision: string;
-  fechaVencimiento?: string;
-  fechaRecepcion?: string;
+  fechaRecepcion: string;
   estado: EstadoFactura;
   lineas: FacturaLinea[];
   conciliacion?: ConciliacionItem[];
@@ -59,11 +61,13 @@ export interface Factura {
   totalIva: number;
   total: number;
   ordenCompra?: string;
-  gilVinculado?: string;
   instructorId?: string;
   valorRetencionZese?: number;
   motivoAnulacion?: string;
-  proveedorBeneficiarioZese?: string;
+  proveedorBeneficiarioZese?: boolean;
+  infoBancariaBanco?: string;
+  infoBancariaCuenta?: string;
+  infoBancariaTipo?: InfoBancariaTipo;
 }
 
 /**
@@ -89,6 +93,15 @@ export interface FacturaFiltros {
   proveedor?: string;
   fechaDesde?: string;
   fechaHasta?: string;
+  page?: number;
+  size?: number;
+}
+
+export interface FacturaPaginacion {
+  totalElements: number;
+  totalPages: number;
+  page: number;
+  size: number;
 }
 
 /**
@@ -96,16 +109,23 @@ export interface FacturaFiltros {
  */
 export interface FacturaFormDto {
   numeroFactura: string;
+  cufe: string;
   fechaEmision: string;
-  fechaVencimiento?: string;
-  fechaRecepcion?: string;
+  fechaRecepcion: string;
   proveedorNit: string;
-  nitReceptor: string;
-  gilVinculado?: string;
-  instructorId?: string;
-  valorRetencionZese?: number;
+  proveedorNombre: string;
+  proveedorBeneficiarioZese?: boolean;
   ordenCompra?: string;
-  motivoAnulacion?: string;
+  infoBancariaBanco?: string;
+  infoBancariaCuenta?: string;
+  infoBancariaTipo?: InfoBancariaTipo;
+  lineas: Array<{
+    productoId?: string;
+    descripcion: string;
+    cantidad: number;
+    precioUnitario: number;
+    porcentajeIva: number;
+  }>;
 }
 
 // ─── Conciliación Factura-GIL ───────────────────────────────────────────────
@@ -136,6 +156,12 @@ export interface ConciliacionGil {
  * Estado de la solicitud GIL F-014.
  */
 export type EstadoGIL = 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'CERRADO';
+
+export interface GilPickerItem {
+  id: string;
+  numeroGil: string;
+  destino: string;
+}
 
 /**
  * Solicitud GIL F-014 completa con trazabilidad.

@@ -29,6 +29,7 @@ export function bienFromCatalogo(dto: ProductoResponse): Bien {
     descripcion: dto.descripcion ?? '',
     categoria: dto.categoria ?? '',
     unidadMedida: dto.unidadMedida,
+    imagenUrl: dto.urlImagen ?? undefined,
     valor: 0,
     estado: (dto.activo ? 'Activo' : 'Inactivo') as EstadoBien,
     stockActual: 0,
@@ -74,5 +75,6 @@ export function bienFormToRequest(form: BienFormDto): CrearProductoRequest {
     descripcion: form.descripcion,
     categoria: form.categoria,
     unidadMedida: form.unidadMedida,
+    urlImagen: form.imagenUrl,
   };
 }

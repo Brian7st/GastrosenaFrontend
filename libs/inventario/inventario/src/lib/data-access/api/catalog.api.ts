@@ -14,6 +14,7 @@ export interface ProductoResponse {
   descripcion?: string;
   categoria: string;
   unidadMedida: string;
+  urlImagen?: string | null;
   activo: boolean;
 }
 
@@ -24,6 +25,7 @@ export interface CrearProductoRequest {
   descripcion?: string;
   categoria: string;
   unidadMedida: string;
+  urlImagen?: string;
 }
 
 export interface ActualizarProductoRequest {
@@ -32,6 +34,7 @@ export interface ActualizarProductoRequest {
   descripcion?: string;
   categoria?: string;
   codigoProveedor?: string;
+  urlImagen?: string;
 }
 
 /** POST /catalog/productos/eliminacion-masiva */

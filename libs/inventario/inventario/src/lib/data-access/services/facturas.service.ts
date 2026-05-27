@@ -2,9 +2,10 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { Factura, FacturaFiltros, FacturaKpis, SolicitudGIL, EstadoGIL, ConciliacionGil, FacturaFormDto } from '../../models/facturas.model';
+import { Factura, FacturaFiltros, FacturaKpis, FacturaPaginacion, SolicitudGIL, EstadoGIL, ConciliacionGil, FacturaFormDto, GilPickerItem } from '../../models/facturas.model';
 import {
   ActualizarFacturaRequest,
+  AnularFacturaRequest,
   FacturaPagedResponse,
   FacturaResponse,
   FacturaResumenResponse,
@@ -22,7 +23,7 @@ const API = '/api/v1';
 export class FacturasService {
   private http = inject(HttpClient);
 
-  getFacturas(filtros?: FacturaFiltros): Observable<Factura[]> {
+  getFacturas(filtros?: FacturaFiltros): Observable<{ facturas: Factura[]; paginacion: FacturaPaginacion }> {
     let params = new HttpParams();
     if (filtros?.busqueda)  params = params.set('numeroFactura', filtros.busqueda);
     if (filtros?.estado)    params = params.set('estado', filtros.estado);
@@ -33,7 +34,15 @@ export class FacturasService {
     return this.http
       .get<FacturaPagedResponse>(`${API}/sourcing/facturas`, { params })
       .pipe(
-        map(res => res.contenido.map(facturaFromApi)),
+        map(res => ({
+          facturas: res.contenido.map(facturaFromApi),
+          paginacion: {
+            totalElements: res.totalElementos,
+            totalPages:    res.totalPaginas,
+            page:          res.paginaActual,
+            size:          res.tamano,
+          },
+        })),
         catchError(err => throwError(() => err))
       );
   }
@@ -100,8 +109,9 @@ export class FacturasService {
 
   /** PATCH /sourcing/facturas/{id}/anular - motivo es @NotBlank en backend */
   anularFactura(id: string | number, motivo: string): Observable<void> {
+    const body: AnularFacturaRequest = { motivo };
     return this.http
-      .patch<void>(`${API}/sourcing/facturas/${id}/anular`, { motivo })
+      .patch<void>(`${API}/sourcing/facturas/${id}/anular`, body)
       .pipe(catchError(err => throwError(() => err)));
   }
 
@@ -184,6 +194,19 @@ export class FacturasService {
       .pipe(catchError(err => throwError(() => err)));
   }
 
+  /** GET /procurement/giles?estado=ENVIADO_PROVEEDOR — lista para picker en importación FEL */
+  getGilesEnviadosProveedor(): Observable<GilPickerItem[]> {
+    const params = new HttpParams()
+      .set('estado', 'ENVIADO_PROVEEDOR')
+      .set('size', '100');
+    return this.http
+      .get<{ content: GilResponse[] }>(`${API}/procurement/giles`, { params })
+      .pipe(
+        map(res => res.content.map(g => ({ id: g.id, numeroGil: g.numeroGil, destino: g.destinoBienes }))),
+        catchError(err => throwError(() => err))
+      );
+  }
+
   /** Mapea GilResponse al tipo SolicitudGIL que usa la FacturasFacade.
    *  SolicitudGIL (facturas.model) y SolicitudGil (solicitudes-gil.model) son dos
    *  tipos distintos - unificarlos es trabajo de un refactor posterior. */
@@ -199,22 +222,22 @@ export class FacturasService {
   private gilResponseToSolicitudGIL(g: GilResponse): SolicitudGIL {
     return {
       id: g.id,
-      nombreVocero:            g.voceroNombre ?? '',
+      nombreVocero:            g.jefeOficinaCoordinador ?? '',
       horarios:                '',
-      resultadoAprendizaje:    g.resultadoAprendizaje ?? '',
+      resultadoAprendizaje:    '',
       estadoSolicitud:         g.estado as EstadoGIL,
-      fechaCreacion:           g.fecha,
+      fechaCreacion:           g.fechaSolicitud,
       totalEstimado:           0,
-      responsable:             g.emitidoPor ?? '',
-      regional:                '',
-      centroFormacion:         g.centroFormacionId,
+      responsable:             g.solicitante ?? '',
+      regional:                g.regionalNombre ?? '',
+      centroFormacion:         g.fichaCaracterizacion,
       areaPrograma:            g.area,
       cuentadanteResponsable:  g.cuentadantes?.[0]?.nombre ?? '',
-      destinoBien:             g.destino,
+      destinoBien:             g.destinoBienes,
       preFacturas:             [],
       observaciones:           g.observaciones ?? '',
       hashTransaccion:         '',
       idTransaccion:           '',
     };
   }
-}
+}
