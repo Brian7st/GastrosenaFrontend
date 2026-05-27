@@ -72,7 +72,17 @@ export class ComandasPageComponent implements OnInit, OnDestroy {
   cargarComandas() {
     this.comandaService.getComandas().subscribe({
       next: (data) => {
-        this.comandas.set(data);
+        const now = new Date();
+        const comandasFiltradas = data.filter(c => {
+          if (c.estado === 'LISTO') {
+            const fechaComanda = new Date(c.horaEntrada);
+            return fechaComanda.getDate() === now.getDate() &&
+                   fechaComanda.getMonth() === now.getMonth() &&
+                   fechaComanda.getFullYear() === now.getFullYear();
+          }
+          return true;
+        });
+        this.comandas.set(comandasFiltradas);
       },
       error: (err) => {
         console.error('Error fetching comandas:', err);
@@ -153,8 +163,10 @@ export class ComandasPageComponent implements OnInit, OnDestroy {
 
   comandasFiltradas = computed(() => {
     let filtrados = this.comandas().filter(c => {
-      const matchBusqueda = c.numeroMesa.toString().includes(this.searchTerm()) || 
-                            c.nombreMesero.toLowerCase().includes(this.searchTerm().toLowerCase());
+      const term = this.searchTerm().toLowerCase();
+      const matchBusqueda = c.numeroMesa.toString().includes(term) || 
+                            c.nombreMesero.toLowerCase().includes(term) ||
+                            c.idComanda.toLowerCase().includes(term);
       const matchEstado = this.filtroEstado() === 'Todos los estados' || c.estado === this.filtroEstado();
       const matchPrioridad = this.filtroPrioridad() === 'Todas las prioridades' || c.prioridad === this.filtroPrioridad();
       return matchBusqueda && matchEstado && matchPrioridad;
