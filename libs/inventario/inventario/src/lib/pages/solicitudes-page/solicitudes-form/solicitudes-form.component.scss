@@ -130,6 +130,37 @@
   font-weight: 500;
 }
 
+.field-error {
+  font-size: 0.75rem;
+  color: #ba1a1a;
+  margin-top: 0.25rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+
+  &::before {
+    content: '!';
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #ba1a1a;
+    color: white;
+    font-size: 0.625rem;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+}
+
+.form-control--error {
+  box-shadow: 0 0 0 2px rgba(186, 26, 26, 0.3) !important;
+}
+
+.mt-2 { margin-top: 0.5rem; }
+
 /* Input readonly simulado */
 .readonly-input {
   display: flex;

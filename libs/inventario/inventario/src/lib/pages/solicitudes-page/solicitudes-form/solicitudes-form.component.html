@@ -31,11 +31,15 @@
           <input
             type="number"
             class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['regionalCodigo']"
             placeholder="Ej. 63"
             min="1"
             [value]="regionalCodigo() ?? ''"
             (input)="regionalCodigo.set(+$any($event.target).value || null)"
           />
+          @if (submitAttempted() && errores()['regionalCodigo']) {
+            <p class="field-error">{{ errores()['regionalCodigo'] }}</p>
+          }
           <p class="form-hint">Código numérico de la regional SENA.</p>
         </div>
 
@@ -44,16 +48,23 @@
           <input
             type="text"
             class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['regionalNombre']"
             placeholder="Ej. Quindío"
             [value]="regionalNombre()"
             (input)="regionalNombre.set($any($event.target).value)"
           />
+          @if (submitAttempted() && errores()['regionalNombre']) {
+            <p class="field-error">{{ errores()['regionalNombre'] }}</p>
+          }
         </div>
 
         <!-- Cuentadante con cédula -->
         <div class="form-group">
           <label class="form-label">Cuentadante(s) <span class="required-asterisk">*</span></label>
 
+          @if (submitAttempted() && errores()['cuentadantes']) {
+            <p class="field-error">{{ errores()['cuentadantes'] }}</p>
+          }
           <!-- Lista de cuentadantes confirmados -->
           @if (cuentadantes().length > 0) {
             <div class="cuentadantes-list">
@@ -113,10 +124,14 @@
           <input
             type="text"
             class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['codigoGrupo']"
             placeholder="Ej. ADSO-2670687"
             [value]="codigoGrupo()"
             (input)="codigoGrupo.set($any($event.target).value)"
           />
+          @if (submitAttempted() && errores()['codigoGrupo']) {
+            <p class="field-error">{{ errores()['codigoGrupo'] }}</p>
+          }
         </div>
 
         <!-- Ficha de Caracterización -->
@@ -125,13 +140,18 @@
           <input
             type="text"
             class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['fichaCaracterizacion']"
             maxlength="7"
             pattern="\d{7}"
             placeholder="Ej. 2471532"
             [value]="fichaCaracterizacion()"
             (input)="fichaCaracterizacion.set($any($event.target).value)"
           />
-          <p class="form-hint">Debe contener exactamente 7 dígitos.</p>
+          @if (submitAttempted() && errores()['fichaCaracterizacion']) {
+            <p class="field-error">{{ errores()['fichaCaracterizacion'] }}</p>
+          } @else {
+            <p class="form-hint">Debe contener exactamente 7 dígitos.</p>
+          }
         </div>
 
         <div class="form-group">
@@ -139,9 +159,13 @@
           <input
             type="date"
             class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['fechaSolicitud']"
             [value]="fechaSolicitud()"
             (input)="fechaSolicitud.set($any($event.target).value)"
           />
+          @if (submitAttempted() && errores()['fechaSolicitud']) {
+            <p class="field-error">{{ errores()['fechaSolicitud'] }}</p>
+          }
         </div>
       </div>
 
@@ -151,6 +175,7 @@
           <label class="form-label">Área <span class="required-asterisk">*</span></label>
           <select
             class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['area']"
             [value]="area()"
             (change)="area.set($any($event.target).value)">
             <option value="">Seleccione Área</option>
@@ -158,6 +183,9 @@
               <option [value]="a">{{ a }}</option>
             }
           </select>
+          @if (submitAttempted() && errores()['area']) {
+            <p class="field-error">{{ errores()['area'] }}</p>
+          }
         </div>
 
         <!-- Centro de Costos: código numérico + nombre -->
@@ -166,12 +194,17 @@
           <input
             type="number"
             class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['centroCostosCodigo']"
             placeholder="Ej. 953810"
             min="1"
             [value]="centroCostosCodigo() ?? ''"
             (input)="centroCostosCodigo.set(+$any($event.target).value || null)"
           />
-          <p class="form-hint">Código numérico del centro de costos.</p>
+          @if (submitAttempted() && errores()['centroCostosCodigo']) {
+            <p class="field-error">{{ errores()['centroCostosCodigo'] }}</p>
+          } @else {
+            <p class="form-hint">Código numérico del centro de costos.</p>
+          }
         </div>
 
         <div class="form-group">
@@ -179,10 +212,14 @@
           <input
             type="text"
             class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['centroCostosNombre']"
             placeholder="Ej. Comercio y Turismo"
             [value]="centroCostosNombre()"
             (input)="centroCostosNombre.set($any($event.target).value)"
           />
+          @if (submitAttempted() && errores()['centroCostosNombre']) {
+            <p class="field-error">{{ errores()['centroCostosNombre'] }}</p>
+          }
         </div>
 
         <div class="form-group">
@@ -202,10 +239,14 @@
           <input
             type="text"
             class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['jefeOficinaCoordinador']"
             placeholder="Ej. María García Rincón"
             [value]="jefeOficinaCoordinador()"
             (input)="jefeOficinaCoordinador.set($any($event.target).value)"
           />
+          @if (submitAttempted() && errores()['jefeOficinaCoordinador']) {
+            <p class="field-error">{{ errores()['jefeOficinaCoordinador'] }}</p>
+          }
         </div>
 
         <div class="form-group">
@@ -213,10 +254,14 @@
           <input
             type="text"
             class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['solicitante']"
             placeholder="Ej. Ing. Ricardo Sarmiento"
             [value]="solicitante()"
             (input)="solicitante.set($any($event.target).value)"
           />
+          @if (submitAttempted() && errores()['solicitante']) {
+            <p class="field-error">{{ errores()['solicitante'] }}</p>
+          }
         </div>
       </div>
     </div>
@@ -281,6 +326,9 @@
       <span class="material-symbols-outlined">add_circle</span>
       Agregar bien del catálogo
     </button>
+    @if (submitAttempted() && errores()['bienes']) {
+      <p class="field-error mt-2">{{ errores()['bienes'] }}</p>
+    }
   </div>
 
   <!-- Consolidar Solicitudes Aprobadas (Generar GIL) Section -->
