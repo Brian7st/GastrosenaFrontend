@@ -34,13 +34,12 @@ export function movimientoFromApi(dto: MovimientoResponse): Movimiento {
 
 export function existenciaFromApi(dto: ExistenciaResponse): ExistenciaProducto {
   return {
-    productoId: dto.productoId,
-    codigoSena: dto.codigoSena,
-    nombre: dto.nombre,
-    categoria: dto.categoria,
-    unidadMedida: dto.unidadMedida,
+    productoId:    dto.productoId,
+    stockFisico:   dto.stockFisico,
+    stockReservado: dto.stockReservado,
     stockDisponible: dto.stockDisponible,
-    stockMinimo: dto.stockMinimo,
+    stockMinimo:   dto.stockMinimo,
+    bajoMinimo:    dto.bajoMinimo,
   };
 }
 
