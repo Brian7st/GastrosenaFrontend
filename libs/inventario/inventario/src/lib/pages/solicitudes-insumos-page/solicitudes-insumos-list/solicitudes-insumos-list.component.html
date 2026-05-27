@@ -124,12 +124,10 @@
             <span class="material-symbols-outlined">edit</span>
           </button>
           
-          @if (s.estado === 'ENVIADA') {
-            <button class="btn-aprobar" (click)="onApprove(s.id)">
-              <span class="material-symbols-outlined" style="font-size: 16px;">check</span>
-              Aprobar
-            </button>
-          }
+          <button class="btn-aprobar" [style.visibility]="s.estado === 'ENVIADA' ? 'visible' : 'hidden'" (click)="onApprove(s.id)">
+            <span class="material-symbols-outlined" style="font-size: 16px;">check</span>
+            Aprobar
+          </button>
         </div>
       </td>
     </tr>
