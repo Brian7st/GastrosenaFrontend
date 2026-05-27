@@ -3,6 +3,7 @@ import { Store } from '@ngrx/store';
 import { AppState } from '@restaurant/shared/state';
 import {
   ActualizarUsuarioRequest,
+  AsignacionMasivaRequest,
   CrearUsuarioRequest,
   ExportarConfig,
   FiltrosUsuarios,
@@ -18,6 +19,7 @@ import {
   selectImportando,
   selectLoading,
   selectLoadingAccion,
+  selectLoadingAsignacion,
   selectLoadingHistorial,
   selectLoadingRolesDetalle,
   selectMensajeExport,
@@ -55,6 +57,7 @@ export class UsuariosFacade {
   readonly loadingHistorial$    = this.store.select(selectLoadingHistorial);
   readonly rolesDetalle$        = this.store.select(selectRolesDetalle);
   readonly loadingRolesDetalle$ = this.store.select(selectLoadingRolesDetalle);
+  readonly loadingAsignacion$   = this.store.select(selectLoadingAsignacion);
 
   // ── Comandos ──────────────────────────────────────────────────────────────
   cargarUsuarios(filtros?: Partial<FiltrosUsuarios>): void {
@@ -111,5 +114,9 @@ export class UsuariosFacade {
 
   cargarRolesDetalle(): void {
     this.store.dispatch(UsuariosActions.cargarRolesDetalle());
+  }
+
+  asignarRolMasivo(request: AsignacionMasivaRequest): void {
+    this.store.dispatch(UsuariosActions.asignarRolMasivo({ request }));
   }
 }
