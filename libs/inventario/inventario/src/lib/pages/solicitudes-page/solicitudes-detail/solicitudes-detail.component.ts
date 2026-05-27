@@ -18,12 +18,16 @@ export class SolicitudesDetailComponent implements OnInit {
   private facade = inject(SolicitudesFacade);
 
   // ── Estado reactivo desde facade ─────────────────────────────────────────
-  solicitud     = this.facade.solicitudSeleccionada;
-  loading       = this.facade.loading;
-  solicitudId   = computed(() => this.solicitud()?.numeroGil ?? '');
-  estadoActual  = computed(() => this.solicitud()?.estado ?? 'BORRADOR');
-  fechaCreacion = computed(() => this.solicitud()?.fechaSolicitud ?? '');
-  totalEstimado = computed(() => this.solicitud()?.bienes?.reduce((acc, b) => acc + b.subtotal, 0) ?? 0);
+  solicitud            = this.facade.solicitudSeleccionada;
+  loading              = this.facade.loading;
+  solicitudId          = computed(() => this.solicitud()?.numeroGil ?? '');
+  estadoActual         = computed(() => this.solicitud()?.estado ?? 'BORRADOR');
+  fechaCreacion        = computed(() => this.solicitud()?.fechaSolicitud ?? '');
+  totalEstimado        = computed(() => this.solicitud()?.bienes?.reduce((acc, b) => acc + b.subtotal, 0) ?? 0);
+  solicitanteIniciales = computed(() =>
+    (this.solicitud()?.solicitante ?? '')
+      .split(' ').slice(0, 2).map((w: string) => w[0] ?? '').join('').toUpperCase()
+  );
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
