@@ -535,6 +535,82 @@
         resize: vertical;
         min-height: 80px;
       }
+
+      &.no-spin {
+        -moz-appearance: textfield;
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+      }
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+
+      .input-group-text {
+        padding: var(--space-3) var(--space-4);
+        background-color: var(--color-surface-secondary);
+        border: 1px solid var(--color-border);
+        border-right: none;
+        border-radius: var(--radius-md) 0 0 var(--radius-md);
+        font-size: var(--font-size-sm);
+        color: var(--color-text-secondary);
+        font-weight: var(--font-weight-medium);
+      }
+
+      .form-control {
+        border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        flex: 1;
+      }
+    }
+
+    .capacity-control {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      width: fit-content;
+
+      .capacity-btn {
+        background-color: var(--color-surface-secondary);
+        border: none;
+        padding: var(--space-3) var(--space-4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: var(--color-text-secondary);
+        transition: background-color var(--duration-fast);
+
+        &:hover {
+          background-color: var(--color-border);
+          color: var(--color-text-primary);
+        }
+      }
+
+      .capacity-input {
+        width: 60px;
+        border: none;
+        border-radius: 0;
+        border-left: 1px solid var(--color-border);
+        border-right: 1px solid var(--color-border);
+        text-align: center;
+        -moz-appearance: textfield;
+        
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+
+        &:focus {
+          box-shadow: none;
+        }
+      }
     }
 
     .autocomplete-wrapper {

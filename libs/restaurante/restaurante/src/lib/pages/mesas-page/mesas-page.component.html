@@ -170,12 +170,32 @@
           <div class="modal-body-custom">
             <div class="form-group">
               <label>Nombre de la Mesa</label>
-              <input type="text" [ngModel]="nuevoNombre()" (ngModelChange)="nuevoNombre.set($event)" class="form-control" placeholder="Ej: Mesa Terraza 1">
+              <div class="input-group">
+                <span class="input-group-text">MESA</span>
+                <input 
+                  type="text" 
+                  inputmode="numeric" 
+                  pattern="[0-9]*" 
+                  maxlength="3" 
+                  (keypress)="soloNumeros($event)" 
+                  [ngModel]="nuevoNombre()" 
+                  (ngModelChange)="nuevoNombre.set($event)" 
+                  class="form-control" 
+                  placeholder="Ej: 1, 2, 3...">
+              </div>
             </div>
             
             <div class="form-group">
               <label>Capacidad (personas)</label>
-              <input type="number" min="1" max="20" [ngModel]="nuevaCapacidad()" (ngModelChange)="nuevaCapacidad.set($event)" class="form-control">
+              <div class="capacity-control">
+                <button type="button" class="capacity-btn" (click)="decrementarCapacidad('nueva')">
+                  <lucide-icon name="minus" [size]="16"></lucide-icon>
+                </button>
+                <input type="number" min="1" max="20" [ngModel]="nuevaCapacidad()" (ngModelChange)="nuevaCapacidad.set($event)" class="form-control text-center capacity-input">
+                <button type="button" class="capacity-btn" (click)="incrementarCapacidad('nueva')">
+                  <lucide-icon name="plus" [size]="16"></lucide-icon>
+                </button>
+              </div>
             </div>
 
             <div class="form-group">
@@ -280,24 +300,39 @@
           <div class="modal-body-custom">
             <div class="form-group">
               <label>Nombre de la Mesa</label>
-              <input
-                type="text"
-                [ngModel]="editNombre()"
-                (ngModelChange)="editNombre.set($event)"
-                class="form-control"
-                placeholder="Ej: Mesa Terraza 1"
-              >
+              <div class="input-group">
+                <span class="input-group-text">MESA</span>
+                <input
+                  type="text"
+                  inputmode="numeric" 
+                  pattern="[0-9]*" 
+                  maxlength="3" 
+                  (keypress)="soloNumeros($event)"
+                  [ngModel]="editNombre()"
+                  (ngModelChange)="editNombre.set($event)"
+                  class="form-control"
+                  placeholder="Ej: 1, 2, 3..."
+                >
+              </div>
             </div>
             <div class="form-group">
               <label>Capacidad (personas)</label>
-              <input
-                type="number"
-                min="1"
-                max="20"
-                [ngModel]="editCapacidad()"
-                (ngModelChange)="editCapacidad.set($event)"
-                class="form-control"
-              >
+              <div class="capacity-control">
+                <button type="button" class="capacity-btn" (click)="decrementarCapacidad('editar')">
+                  <lucide-icon name="minus" [size]="16"></lucide-icon>
+                </button>
+                <input
+                  type="number"
+                  min="1"
+                  max="20"
+                  [ngModel]="editCapacidad()"
+                  (ngModelChange)="editCapacidad.set($event)"
+                  class="form-control text-center capacity-input"
+                >
+                <button type="button" class="capacity-btn" (click)="incrementarCapacidad('editar')">
+                  <lucide-icon name="plus" [size]="16"></lucide-icon>
+                </button>
+              </div>
             </div>
             <div class="form-group">
               <label>Zona / Ubicación</label>

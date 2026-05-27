@@ -140,7 +140,10 @@ export class MesasPageComponent {
     } else if (nombre === 'editar' && mesa) {
       // Pre-llenar formulario de edición con los datos actuales de la mesa
       this.mesaSeleccionada.set(mesa);
-      this.editNombre.set(mesa.nombre);
+      const nombreLimpio = mesa.nombre.toUpperCase().startsWith('MESA ') 
+        ? mesa.nombre.substring(5) 
+        : mesa.nombre;
+      this.editNombre.set(nombreLimpio);
       this.editCapacidad.set(mesa.capacidad);
       this.editZona.set(mesa.zona || '');
     } else if (nombre === 'gestion-mesas') {
@@ -181,7 +184,8 @@ export class MesasPageComponent {
 
   // ── CREAR ────────────────────────────────────────────────────────────────────
   crearMesa() {
-    const nombre    = this.nuevoNombre().trim();
+    const rawNombre = this.nuevoNombre().trim();
+    const nombre    = rawNombre ? `MESA ${rawNombre}` : '';
     let capacidad   = this.nuevaCapacidad();
     const zona      = this.nuevaZona().trim();
 
@@ -192,8 +196,8 @@ export class MesasPageComponent {
     
     capacidad = Number(capacidad);
 
-    if (!nombre) {
-      this.mostrarError('El nombre de la mesa es obligatorio.');
+    if (!rawNombre) {
+      this.mostrarError('El número o identificador de la mesa es obligatorio.');
       return;
     }
     if (capacidad < 1 || capacidad > 20 || isNaN(capacidad)) {
@@ -211,12 +215,13 @@ export class MesasPageComponent {
     const mesa = this.mesaSeleccionada();
     if (!mesa) return;
 
-    const nombre    = this.editNombre().trim();
+    const rawNombre = this.editNombre().trim();
+    const nombre    = rawNombre ? `MESA ${rawNombre}` : '';
     const capacidad = this.editCapacidad();
     const zona      = this.editZona().trim();
 
-    if (!nombre) {
-      alert('El nombre de la mesa es obligatorio.');
+    if (!rawNombre) {
+      alert('El número o identificador de la mesa es obligatorio.');
       return;
     }
     if (capacidad < 1 || capacidad > 20) {
@@ -230,6 +235,27 @@ export class MesasPageComponent {
       capacidad,
       zona: zona || null,
     });
+  }
+
+  // ── CONTROLES DE CAPACIDAD ───────────────────────────────────────────────────
+  incrementarCapacidad(tipo: 'nueva' | 'editar') {
+    if (tipo === 'nueva') {
+      const actual = this.nuevaCapacidad() || 1;
+      if (actual < 20) this.nuevaCapacidad.set(actual + 1);
+    } else {
+      const actual = this.editCapacidad() || 1;
+      if (actual < 20) this.editCapacidad.set(actual + 1);
+    }
+  }
+
+  decrementarCapacidad(tipo: 'nueva' | 'editar') {
+    if (tipo === 'nueva') {
+      const actual = this.nuevaCapacidad() || 1;
+      if (actual > 1) this.nuevaCapacidad.set(actual - 1);
+    } else {
+      const actual = this.editCapacidad() || 1;
+      if (actual > 1) this.editCapacidad.set(actual - 1);
+    }
   }
 
   // ── ACCIONES DE ESTADO ───────────────────────────────────────────────────────
@@ -273,6 +299,14 @@ export class MesasPageComponent {
   }
 
   // ── Helpers de UI ────────────────────────────────────────────────────────────
+  soloNumeros(event: KeyboardEvent) {
+    const charCode = event.which ? event.which : event.keyCode;
+    // Solo permitir números (códigos 48 a 57)
+    if (charCode < 48 || charCode > 57) {
+      event.preventDefault();
+    }
+  }
+
   getBadgeType(estado: string): 'info' | 'success' | 'warning' | 'danger' {
     switch (estado) {
       case 'LIBRE':     return 'success';
