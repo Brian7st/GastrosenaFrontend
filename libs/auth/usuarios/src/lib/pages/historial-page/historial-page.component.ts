@@ -29,7 +29,6 @@ import { HistorialItem } from '../../models/usuarios.model';
     DataTableComponent,
     EmptyStateComponent,
     LoadingSkeletonComponent,
-    LucideIconComponent,
     PageHeaderComponent,
     SearchFilterComponent,
     SelectFilterComponent,
