@@ -6,7 +6,7 @@ import { Receta } from '../models/receta.model';
 export class RecetaService {
   private http = inject(HttpClient);
   // URL base para el backend de recetas
-  private url = '/api/recetas';
+  private url = '/api/barybarismo/recetas';
 
   recetas = signal<Receta[]>([]);
 
