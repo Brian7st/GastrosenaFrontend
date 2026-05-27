@@ -179,7 +179,7 @@
   font-weight: 500;
   color: #191c1d;
   transition: all 0.2s;
-  
+
   &:focus {
     outline: none;
     background-color: #ffffff;
@@ -222,12 +222,12 @@
 .qty-input {
   padding-right: 2.5rem;
   font-weight: 600;
-  
+
   &.error {
     border-color: #ba1a1a;
     color: #ba1a1a;
     background-color: rgba(255, 218, 214, 0.2);
-    
+
     &:focus {
       box-shadow: 0 0 0 2px rgba(186, 26, 26, 0.2);
     }
