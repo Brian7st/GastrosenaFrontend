@@ -166,6 +166,6 @@ export class ComandasComponent implements OnInit {
   });
 
   enEspera = computed(() => this.comandasFiltradas().filter(c => c.estadoPreparacion === 'PENDIENTE'));
-  preparando = computed(() => this.comandasFiltradas().filter(c => c.estadoPreparacion === 'PREPARANDO'));
+  preparando = computed(() => this.comandasFiltradas().filter(c => c.estadoPreparacion === 'EN_PREPARACION'));
   listos = computed(() => this.comandasFiltradas().filter(c => c.estadoPreparacion === 'LISTO'));
 }

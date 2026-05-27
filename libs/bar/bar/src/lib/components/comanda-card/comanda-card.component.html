@@ -89,12 +89,19 @@
     </div>
     <!-- Footer -->
     @if (comanda().estadoPreparacion === 'PENDIENTE') {
-      <div class="card-footer bg-light p-3 border-top">
-        <button class="btn btn-primary w-100 fw-bold d-flex align-items-center justify-content-center gap-2" (click)="empezarTodo()">
-          <i class="bi bi-play-circle fs-5"></i> Comenzar Todo
-        </button>
-      </div>
-    }
+  <div class="card-footer bg-light p-3 border-top">
+    <button class="btn btn-primary w-100 fw-bold d-flex align-items-center justify-content-center gap-2" (click)="empezarTodo()">
+      <i class="bi bi-play-circle fs-5"></i> Comenzar Todo
+    </button>
+  </div>
+}
+@if (comanda().estadoPreparacion === 'EN_PREPARACION') {
+  <div class="card-footer bg-light p-3 border-top">
+    <button class="btn btn-success w-100 fw-bold d-flex align-items-center justify-content-center gap-2" (click)="finalizarTodo()">
+      <i class="bi bi-check-circle fs-5"></i> Finalizar Todo
+    </button>
+  </div>
+}
   </div>
 } @else if (showDetalles()) {
   <div class="comanda-card details-view bg-white border rounded shadow-sm p-4 mb-3">

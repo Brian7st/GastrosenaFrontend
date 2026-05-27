@@ -28,13 +28,15 @@ export interface Comanda {
 }
 
 export interface PromedioPlato {
-  nombreReceta: string;
-  promedioMinutos: number;
+  nombrePlato: string;
+  tiempoPromedioMinutos: number;
+  cantidadPreparada: number;
 }
 
 export interface CargaTrabajoDiaria {
-  hora: string;
-  totalPlatos: number;
+  fecha: string;
+  totalPlatosPreparados: number;
+  tiempoPromedioGlobalMinutos: number;
 }
 
 export interface EstadisticasKpi {
@@ -43,12 +45,28 @@ export interface EstadisticasKpi {
   totalPlatosDespachadosHoy: number;
 }
 
+export interface IngredienteReceta {
+  idIngrediente: string;
+  nombreIngrediente: string;
+  cantidadRequerida: number;
+  unidadMedida: string;
+}
+
+export interface PasoReceta {
+  idPaso: string;
+  orden: number;
+  descripcionPaso: string;
+  notasAdicionales: string;
+}
+
 export interface Receta {
-  idPlato: string;
-  nombre: string;
-  tiempoMinutos: number;
-  ingredientes: string[];
-  pasos: string[];
+  idReceta: string;
+  nombreReceta: string;
+  nombreCategoria: string;
+  tiempoPreparacion: number;
+  temperatura: string;
+  ingredientes: IngredienteReceta[];
+  pasos: PasoReceta[];
 }
 
 @Injectable({
@@ -58,8 +76,8 @@ export class ComandaService {
   private http = inject(HttpClient);
   
   // Endpoints reales indicados por el usuario
-  private baseUrlComandas = 'http://localhost:8080/api/cocina/comandas';
-  private baseUrlEstadisticas = 'http://localhost:8080/api/cocina/estadisticas';
+  private baseUrlComandas = 'http://localhost:8082/api/cocina/comandas';
+  private baseUrlEstadisticas = 'http://localhost:8082/api/cocina/estadisticas';
 
   iniciarDetalle(idDetalle: string): Observable<any> {
     return this.http.patch(`${this.baseUrlComandas}/detalle/${idDetalle}/iniciar?idResponsable=550e8400-e29b-41d4-a716-446655440000`, {});
@@ -70,7 +88,7 @@ export class ComandaService {
   }
 
   getEstadisticasPromedios(): Observable<PromedioPlato[]> {
-    return this.http.get<PromedioPlato[]>(`${this.baseUrlEstadisticas}/promedios`);
+    return this.http.get<PromedioPlato[]>(`${this.baseUrlEstadisticas}/promedio`);
   }
 
   getEstadisticasDiarias(): Observable<CargaTrabajoDiaria[]> {
@@ -87,24 +105,17 @@ export class ComandaService {
     return this.http.get<Comanda[]>(this.baseUrlComandas);
   }
 
-  getRecetaMock(idPlato: string): Receta {
-    return {
-      idPlato: idPlato,
-      nombre: 'Hamburguesa',
-      tiempoMinutos: 35,
-      ingredientes: [
-        'Pan de hamburguesa artesanal',
-        'Carne de res 200g',
-        'Queso cheddar',
-        'Cebolla caramelizada',
-        'Lechuga fresca'
-      ],
-      pasos: [
-        'Sellar el pan en la plancha',
-        'Cocinar la carne a término deseado',
-        'Fundir el queso sobre la carne',
-        'Ensamblar la hamburguesa'
-      ]
-    };
+  getRecetaById(idReceta: string): Observable<Receta> {
+    return this.http.get<Receta>(`http://localhost:8080/api/recetas/${idReceta}`);
+  }
+
+  limpiarComandas(fechaInicio: string, fechaFin: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrlComandas}/limpiar`, {
+      params: { fechaInicio, fechaFin }
+    });
+  }
+
+  eliminarComandaPorId(idComanda: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrlComandas}/${idComanda}`);
   }
 }

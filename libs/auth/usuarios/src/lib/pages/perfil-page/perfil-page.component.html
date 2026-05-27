@@ -1,0 +1,168 @@
+<div class="perfil-wrapper">
+
+  <restaurant-page-header
+    title="Mi Perfil"
+    subtitle="Administra tu información personal y preferencias"
+  />
+
+  <!-- Header de perfil -->
+  <div class="perfil-header">
+    <div class="perfil-header__avatar-wrapper">
+  <div class="perfil-header__avatar" (click)="triggerFileInput()">
+    @if (fotoUrl()) {
+      <img [src]="fotoUrl()" alt="Foto de perfil" class="perfil-header__foto"/>
+    } @else {
+      {{ iniciales() }}
+    }
+    <div class="perfil-header__avatar-overlay">
+      <lucide-icon name="camera" [size]="20"></lucide-icon>
+    </div>
+  </div>
+  <input
+    #fileInput
+    type="file"
+    accept="image/*"
+    class="perfil-header__file-input"
+    (change)="onFotoChange($event)"
+  />
+</div>
+    <div class="perfil-header__info">
+      <h2 class="perfil-header__nombre">{{ usuario?.nombre }}</h2>
+      <div class="perfil-header__meta">
+        <lucide-icon name="user" [size]="14"></lucide-icon>
+        <span>{{ usuario?.rol }}</span>
+        <span class="perfil-header__dot">•</span>
+        <restaurant-status-badge label="Activo" variant="success"/>
+      </div>
+      <p class="perfil-header__email">{{ usuario?.email }}</p>
+    </div>
+  </div>
+
+  <!-- Información Personal -->
+  <div class="perfil-card">
+    <div class="perfil-card__title">
+      <lucide-icon name="user" [size]="18"></lucide-icon>
+      <h3>Información Personal</h3>
+    </div>
+    <form [formGroup]="infoForm" class="perfil-form">
+      <div class="perfil-form__row">
+        <restaurant-input
+          label="Nombre"
+          placeholder="Tu nombre"
+          type="text"
+          icon="user"
+          formControlName="nombre"
+          [error]="infoForm.get('nombre')?.invalid && infoForm.get('nombre')?.touched ? 'Campo requerido' : null"
+        />
+        <restaurant-input
+          label="Apellidos"
+          placeholder="Tus apellidos"
+          type="text"
+          icon="user"
+          formControlName="apellidos"
+          [error]="infoForm.get('apellidos')?.invalid && infoForm.get('apellidos')?.touched ? 'Campo requerido' : null"
+        />
+        <restaurant-input
+          label="Email"
+          placeholder="tu@email.com"
+          type="email"
+          icon="mail"
+          formControlName="email"
+          [error]="infoForm.get('email')?.invalid && infoForm.get('email')?.touched ? 'Email inválido' : null"
+        />
+      </div>
+      <div class="perfil-form__row">
+        <restaurant-input
+          label="Documento"
+          placeholder="Número de documento"
+          type="text"
+          icon="credit-card"
+          formControlName="documento"
+          [error]="infoForm.get('documento')?.invalid && infoForm.get('documento')?.touched ? 'Campo requerido' : null"
+        />
+        <restaurant-input
+          label="Teléfono"
+          placeholder="+57 300 000 0000"
+          type="tel"
+          icon="phone"
+          formControlName="telefono"
+          [error]="infoForm.get('telefono')?.invalid && infoForm.get('telefono')?.touched ? 'Campo requerido' : null"
+        />
+      </div>
+    </form>
+  </div>
+
+  <!-- Seguridad y Actividad -->
+  <div class="perfil-grid">
+
+    <!-- Seguridad -->
+    <div class="perfil-card">
+      <div class="perfil-card__title">
+        <lucide-icon name="lock" [size]="18"></lucide-icon>
+        <h3>Seguridad</h3>
+      </div>
+      <form [formGroup]="seguridadForm" class="perfil-form">
+        <restaurant-input
+          label="Contraseña Actual"
+          placeholder="••••••••"
+          type="password"
+          icon="lock"
+          formControlName="contrasenaActual"
+        />
+        <restaurant-input
+          label="Nueva Contraseña"
+          placeholder="••••••••"
+          type="password"
+          icon="lock"
+          formControlName="nuevaContrasena"
+        />
+        <restaurant-input
+          label="Confirmar Contraseña"
+          placeholder="••••••••"
+          type="password"
+          icon="lock"
+          formControlName="confirmar"
+        />
+      </form>
+    </div>
+
+    <!-- Actividad Reciente -->
+    <div class="perfil-card">
+      <div class="perfil-card__title">
+        <lucide-icon name="activity" [size]="18"></lucide-icon>
+        <h3>Actividad Reciente</h3>
+      </div>
+      <div class="perfil-actividad">
+        @for (item of actividadReciente; track item.fecha) {
+          <div class="perfil-actividad__item">
+            <p class="perfil-actividad__accion">{{ item.accion }}</p>
+            <div class="perfil-actividad__meta">
+              <lucide-icon name="calendar" [size]="12"></lucide-icon>
+              <span>{{ item.fecha }}</span>
+              <lucide-icon name="file-text" [size]="12"></lucide-icon>
+              <span>{{ item.modulo }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Botones -->
+  <div class="perfil-actions">
+    <restaurant-button variant="surface" (click)="onCancelar()">
+      <lucide-icon name="x" [size]="16"></lucide-icon>
+      Cancelar
+    </restaurant-button>
+    <restaurant-button variant="primary" (click)="onGuardar()" [disabled]="guardando()">
+      @if (!guardando()) {
+        <lucide-icon name="save" [size]="16"></lucide-icon>
+        Guardar Cambios
+      } @else {
+        <span class="perfil-spinner"></span>
+      }
+    </restaurant-button>
+  </div>
+
+</div>

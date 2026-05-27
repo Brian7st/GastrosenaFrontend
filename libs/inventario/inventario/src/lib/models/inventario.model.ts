@@ -42,8 +42,8 @@ export interface Bien extends Omit<SharedBien, 'id' | 'codigo'> {
   descripcion: string;
   categoriaColor?: CategoriaColor;
   valor: number;
-  valorNeto?: number;      // Valor sin IVA
-  iva?: number;            // Porcentaje de IVA (19, 5, 0)
+  valorNeto?: number;
+  iva?: number;
   estado: EstadoBien;
   imagenUrl?: string;
   tieneHistorial?: boolean;
@@ -51,14 +51,11 @@ export interface Bien extends Omit<SharedBien, 'id' | 'codigo'> {
   fechaCompra?: string;
   kilos?: number;
   factorConversion?: number;
-  depreciacionAnual?: number; // Porcentaje anual
+  depreciacionAnual?: number;
   especificaciones?: EspecificacionesTecnicas;
   facturas?: FacturaBien[];
 }
 
-/**
- * Representa un movimiento (entrada/salida) de un bien.
- */
 export interface MovimientoBien {
   id: string | number;
   fecha: string | Date;
@@ -69,9 +66,6 @@ export interface MovimientoBien {
   observacion: string;
 }
 
-/**
- * Filtros para la búsqueda y listado de bienes.
- */
 export interface BienFiltros {
   busqueda?: string;
   categoria?: string;
@@ -87,19 +81,13 @@ export interface BienPaginacion {
   size: number;
 }
 
-/**
- * Indicadores clave de desempeño (KPIs) para el dashboard de bienes.
- */
 export interface BienKpis {
   valorTotal: number;
   totalAlertas: number;
   movimientosHoy: number;
-  tendenciaValor?: number; // Porcentaje de cambio
+  tendenciaValor?: number;
 }
 
-/**
- * Configuración para la exportación de bienes.
- */
 export interface BienExportConfig {
   formato: 'pdf' | 'excel' | 'csv';
   soloActivos?: boolean;
@@ -109,24 +97,17 @@ export interface BienExportConfig {
   rangoFechas?: { inicio: string; fin: string };
 }
 
-/**
- * Estructura para la importación masiva de bienes.
- */
 export interface BienImportRow {
-  codigoPlaca: string;
-  descripcion: string;
-  serial: string;
-  ubicacion: string;
-  estado: EstadoBien;
-  um?: string;
+  codigoSena?: string;
+  nombre: string;
+  descripcion?: string;
+  categoria?: string;
+  unidadMedida: string;
+  codigoProveedor?: string;
   validacion?: 'Correcto' | 'Código duplicado' | 'Falta campo' | string;
   error?: string;
 }
 
-/**
- * Producto del catálogo (GET/POST /catalog/productos).
- * Solo contiene metadatos descriptivos; sin stock ni precio.
- */
 export interface ProductoCatalogo {
   id: string | number;
   codigoSena: string;
@@ -137,29 +118,21 @@ export interface ProductoCatalogo {
   unidadMedida: string;
 }
 
-/**
- * Existencia de un producto en un centro de costo (GET /inventario/existencias).
- * El campo stockActual del backend se llama stockDisponible.
- */
 export interface ExistenciaProducto {
   productoId: string | number;
-  codigoSena: string;
-  nombre: string;
-  categoria: string;
-  unidadMedida: string;
+  stockFisico: number;
+  stockReservado: number;
   stockDisponible: number;
-  stockMinimo?: number;
+  stockMinimo: number;
+  bajoMinimo: boolean;
+  codigoSena?: string;
+  nombre?: string;
+  categoria?: string;
+  unidadMedida?: string;
 }
 
-/**
- * Vista combinada para el listado/detalle de bienes en la UI.
- */
 export type BienVista = ProductoCatalogo & Partial<Omit<ExistenciaProducto, 'productoId'>>;
 
-/**
- * DTO para crear un producto en el catálogo (POST /catalog/productos).
- * El backend NO acepta stockMinimo ni datos de precio en este endpoint.
- */
 export interface BienFormDto {
   nombre: string;
   codigoSena?: string;
@@ -168,4 +141,4 @@ export interface BienFormDto {
   categoria: string;
   unidadMedida: string;
   imagenUrl?: string;
-}
+}

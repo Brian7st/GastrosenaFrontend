@@ -5,7 +5,8 @@ import {
   ButtonComponent,
   DataTableComponent,
   KpiCardComponent,
-  StatusBadgeComponent
+  StatusBadgeComponent,
+  LucideIconComponent
 } from '@restaurant/shared/ui';
 import { AprobarSolicitudModalComponent } from '../../../components/aprobar-solicitud-modal/aprobar-solicitud-modal.component';
 
@@ -30,6 +31,7 @@ interface SolicitudInsumo {
     DataTableComponent,
     KpiCardComponent,
     StatusBadgeComponent,
+    LucideIconComponent,
     AprobarSolicitudModalComponent
   ],
   templateUrl: './solicitudes-insumos-list.component.html',

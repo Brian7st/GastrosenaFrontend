@@ -124,7 +124,7 @@
             <span class="material-symbols-outlined">edit</span>
           </button>
           
-          <button class="btn-aprobar" [style.visibility]="s.estado === 'ENVIADA' ? 'visible' : 'hidden'" (click)="onApprove(s.id)">
+          <button class="btn-aprobar" [style.visibility]="s.estado === 'ENVIADA' ? 'visible' : 'hidden'" (click)="onApprove(s.id); $event.stopPropagation()" title="Aprobar Solicitud">
             <span class="material-symbols-outlined" style="font-size: 16px;">check</span>
             Aprobar
           </button>
