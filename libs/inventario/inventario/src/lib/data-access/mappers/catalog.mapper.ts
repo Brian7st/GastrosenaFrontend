@@ -27,11 +27,15 @@ export function bienFromCatalogo(dto: ProductoResponse): Bien {
     codigoSena: dto.codigoSena,
     codigoProveedor: dto.codigoProveedor ?? '',
     descripcion: dto.descripcion ?? '',
-    categoria: dto.categoria,
+    categoria: dto.categoria ?? '',
     unidadMedida: dto.unidadMedida,
-    valor: 0, // sin endpoint de precio en esta versión
+    imagenUrl: dto.urlImagen ?? undefined,
+    valor: 0,
     estado: (dto.activo ? 'Activo' : 'Inactivo') as EstadoBien,
-  } as Bien;
+    stockActual: 0,
+    stockMinimo: 0,
+    estadoStock: dto.activo ? 'DISPONIBLE' : 'AGOTADO',
+  };
 }
 
 // ── Catálogo + Existencia → Bien (con stock real) ────────────────────────────
@@ -46,6 +50,9 @@ export function bienFromCatalogoYExistencia(
   if (!ex) return base;
   return {
     ...base,
+    stockActual: ex.stockDisponible,
+    stockMinimo: ex.stockMinimo,
+    estadoStock: ex.bajoMinimo ? 'BAJO_STOCK' : ex.stockDisponible <= 0 ? 'AGOTADO' : 'DISPONIBLE',
     estado: derivarEstadoStock(ex.stockDisponible, ex.stockMinimo),
   };
 }
@@ -68,5 +75,6 @@ export function bienFormToRequest(form: BienFormDto): CrearProductoRequest {
     descripcion: form.descripcion,
     categoria: form.categoria,
     unidadMedida: form.unidadMedida,
+    urlImagen: form.imagenUrl,
   };
 }

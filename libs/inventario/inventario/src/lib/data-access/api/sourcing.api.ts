@@ -1,10 +1,17 @@
+export type BackendDateArray = [number, number, number];
+export type InfoBancariaTipo = 'AHORROS' | 'CORRIENTE';
+
 // ─── Facturas Proveedor (/api/v1/sourcing/facturas) ────────────────────────
 
 export interface FacturaLineaResponse {
+  productoId?: string;
   descripcion: string;
   cantidad: number;
   precioUnitario: number;
-  iva: number;
+  iva?: number;
+  porcentajeIva?: number;
+  subtotal?: number;
+  valorIva?: number;
   total: number;
 }
 
@@ -13,55 +20,69 @@ export interface FacturaResponse {
   numeroFactura: string;
   cufe: string;
   proveedorNit: string;
-  nitReceptor: string;
   proveedorNombre: string;
-  razonSocial: string;
-  tipoDocumento: string;
-  fechaEmision: string;
-  fechaVencimiento?: string;
-  fechaRecepcion?: string;
+  proveedorBeneficiarioZese?: boolean;
+  fechaEmision: BackendDateArray;
+  fechaRecepcion: BackendDateArray;
+  ordenCompra?: string | null;
+  infoBancariaBanco?: string | null;
+  infoBancariaCuenta?: string | null;
+  infoBancariaTipo?: InfoBancariaTipo | null;
   estado: 'REGISTRADA' | 'VERIFICADA' | 'PAGADA' | 'ANULADA';
   lineas: FacturaLineaResponse[];
   subtotal: number;
   totalIva: number;
-  total: number;
-  ordenCompra?: string;
-  gilVinculado?: string;
-  instructorId?: string;
   valorRetencionZese?: number;
-  motivoAnulacion?: string;
+  total: number;
+  instructorId?: string;
+  motivoAnulacion?: string | null;
+}
+
+export interface FacturaPagedResponse {
+  contenido: FacturaResponse[];
+  paginaActual: number;
+  totalPaginas: number;
+  totalElementos: number;
+  tamano: number;
 }
 
 export interface FacturaResumenResponse {
-  totalFacturas: number;
-  tendenciaTotalFacturas: number;
-  montoMensual: number;
-  tendenciaMonto: number;
-  registradas: number;
-  verificadas: number;
-  pagadas: number;
-  anuladas: number;
+  montoRegistradas: number;
+  totalGeneral: number;
+  montoGeneral: number;
+  totalRegistradas: number;
+  totalVerificadas: number;
+  montoVerificadas: number;
+  totalPagadas: number;
+  montoPagadas: number;
+  totalAnuladas: number;
 }
 
 export interface RegistrarFacturaRequest {
   numeroFactura: string;
   cufe: string;
   proveedorNit: string;
-  nitReceptor: string;
+  proveedorNombre: string;
+  proveedorBeneficiarioZese?: boolean;
   fechaEmision: string;
-  fechaVencimiento?: string;
-  fechaRecepcion?: string;
-  lineas: Pick<FacturaLineaResponse, 'descripcion' | 'cantidad' | 'precioUnitario' | 'iva'>[];
+  fechaRecepcion: string;
+  infoBancariaBanco?: string;
+  infoBancariaCuenta?: string;
+  infoBancariaTipo?: InfoBancariaTipo;
+  lineas: Array<{
+    productoId?: string;
+    descripcion: string;
+    cantidad: number;
+    precioUnitario: number;
+    porcentajeIva: number;
+  }>;
   ordenCompra?: string;
-  gilVinculado?: string;
-  instructorId?: string;
-  valorRetencionZese?: number;
 }
 
-export type ActualizarFacturaRequest = Partial<RegistrarFacturaRequest>;
+export type ActualizarFacturaRequest = RegistrarFacturaRequest;
 
 export interface AnularFacturaRequest {
-  motivoAnulacion: string;
+  motivo: string;
 }
 
 export interface InfoBancariaRequest {

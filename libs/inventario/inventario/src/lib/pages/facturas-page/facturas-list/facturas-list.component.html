@@ -15,10 +15,6 @@
         <span class="material-symbols-outlined">download</span>
         Exportar
       </restaurant-button>
-      <restaurant-button variant="primary" id="btn-nueva-factura" (click)="onNuevaFactura()">
-        <span class="material-symbols-outlined">add</span>
-        Nueva Factura
-      </restaurant-button>
     </div>
   </div>
 
@@ -31,8 +27,8 @@
       [value]="k.totalFacturas | number"
       icon="file-text"
       iconColor="green"
-      [trend]="'+' + k.tendenciaTotalFacturas + '% este mes'"
-      [trendUp]="true"
+      [trend]="'Tendencia no disponible'"
+      [trendUp]="false"
     />
 
     <restaurant-kpi-card
@@ -40,8 +36,8 @@
       [value]="'$' + (k.montoMensual | number:'1.2-2')"
       icon="banknote"
       iconColor="blue"
-      [trend]="'+' + k.tendenciaMonto + '% vs periodo anterior'"
-      [trendUp]="true"
+      [trend]="'Tendencia no disponible'"
+      [trendUp]="false"
     />
 
     <restaurant-kpi-card variant="states">
@@ -123,8 +119,8 @@
             </div>
             <div>
               <p class="proveedor-cell__name">
-                <span class="material-symbols-outlined doc-type-icon" [title]="factura.tipoDocumento">
-                  {{ getDocumentoIcono(factura.tipoDocumento) }}
+                <span class="material-symbols-outlined doc-type-icon" title="Factura electrónica">
+                  {{ getDocumentoIcono('Factura Electrónica') }}
                 </span>
                 {{ factura.proveedorNombre }}
               </p>
@@ -171,15 +167,17 @@
     <!-- Pagination slot -->
     @if (!loading() && facturas().length > 0) {
 <div dtFooter class="table-pagination">
-      <span class="table-pagination__info">Mostrando {{ facturas().length }} de {{ kpis()?.totalFacturas | number }} facturas</span>
+      <span class="table-pagination__info">
+        Mostrando {{ facturas().length }} de {{ paginacion().totalElements | number }} facturas
+      </span>
       <div class="pagination-btns">
-        <button class="pagination-btn" disabled>
+        <button class="pagination-btn" [disabled]="paginacion().page === 0" (click)="onIrAPagina(paginacion().page - 1)">
           <span class="material-symbols-outlined">chevron_left</span>
         </button>
-        <button class="pagination-btn pagination-btn--active">1</button>
-        <button class="pagination-btn">2</button>
-        <button class="pagination-btn">3</button>
-        <button class="pagination-btn">
+        @for (p of paginas(); track p) {
+          <button class="pagination-btn" [class.pagination-btn--active]="p === paginacion().page" (click)="onIrAPagina(p)">{{ p + 1 }}</button>
+        }
+        <button class="pagination-btn" [disabled]="paginacion().page >= paginacion().totalPages - 1" (click)="onIrAPagina(paginacion().page + 1)">
           <span class="material-symbols-outlined">chevron_right</span>
         </button>
       </div>
@@ -189,15 +187,6 @@
   </restaurant-data-table>
 
 </section>
-
-<!-- ── MODAL: Registrar Factura ── -->
-@if (showFormModal()) {
-<restaurant-factura-form
- 
-  (close)="onCloseForm()"
-  (save)="onSaveFactura($event)"
-></restaurant-factura-form>
-}
 
 <!-- ── MODAL: Exportar Facturas ── -->
 @if (showExportarModal()) {

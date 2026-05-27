@@ -5,6 +5,7 @@ import {
   ButtonComponent,
   DataTableComponent,
   KpiCardComponent,
+  StatusBadgeComponent,
   LucideIconComponent
 } from '@restaurant/shared/ui';
 import { AprobarSolicitudModalComponent } from '../../../components/aprobar-solicitud-modal/aprobar-solicitud-modal.component';
@@ -16,7 +17,7 @@ interface SolicitudInsumo {
   ficha: string;
   fecha: string;
   itemsCount: number;
-  estado: 'ENVIADA' | 'APROBADA' | 'CERRADA';
+  estado: 'BORRADOR' | 'ENVIADA' | 'APROBADA' | 'COMPROMETIDA' | 'CERRADA' | 'LIBRE';
   items?: { nombre: string; cantidad: string; icon: string }[];
 }
 
@@ -29,6 +30,7 @@ interface SolicitudInsumo {
     ButtonComponent,
     DataTableComponent,
     KpiCardComponent,
+    StatusBadgeComponent,
     LucideIconComponent,
     AprobarSolicitudModalComponent
   ],
@@ -90,6 +92,27 @@ export class SolicitudesInsumosListComponent {
       fecha: '14 Oct',
       itemsCount: 1,
       estado: 'ENVIADA'
+    },
+    {
+      id: 6,
+      codigo: 'SOL-2024-006',
+      instructor: 'Chef Sebastian Betancourt',
+      ficha: '2560892',
+      fecha: '15 Oct',
+      itemsCount: 1,
+      estado: 'BORRADOR',
+      items: [
+        { nombre: 'Harina de Trigo', cantidad: '10 kg', icon: 'bakery_dining' }
+      ]
+    },
+    {
+      id: 7,
+      codigo: 'SOL-2024-007',
+      instructor: 'Lic. Martha Lucía Peña',
+      ficha: '2339810',
+      fecha: '16 Oct',
+      itemsCount: 3,
+      estado: 'BORRADOR'
     }
   ]);
 
@@ -105,6 +128,7 @@ export class SolicitudesInsumosListComponent {
     { value: 'ENVIADA',  label: 'Enviada'  },
     { value: 'APROBADA', label: 'Aprobada' },
     { value: 'CERRADA',  label: 'Cerrada'  },
+    { value: 'BORRADOR',  label: 'Borrador' },
   ];
 
   fechaOptions = [
@@ -128,6 +152,7 @@ export class SolicitudesInsumosListComponent {
       case 'ENVIADA': return 'avatar--blue';
       case 'APROBADA': return 'avatar--green';
       case 'CERRADA': return 'avatar--slate';
+      case 'BORRADOR': return 'avatar--slate';
       default: return 'avatar--slate';
     }
   }
@@ -144,12 +169,17 @@ export class SolicitudesInsumosListComponent {
       'ENVIADA':  'warning',
       'APROBADA': 'success',
       'CERRADA':  'neutral',
+      'BORRADOR': 'neutral'
     };
     return map[estado] ?? 'neutral';
   }
 
   onView(id: string | number): void {
     this.router.navigate(['/app/inventario/solicitudes-insumos-page', id, 'consolidacion']);
+  }
+
+  onEdit(id: string | number): void {
+    this.router.navigate(['/app/inventario/solicitudes-insumos-page', id, 'editar']);
   }
   
   onApprove(id: number): void {
