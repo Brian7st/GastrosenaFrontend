@@ -1,126 +1,237 @@
 <!-- ══════════════════════════════════════════════════════════════════════════
-     Editar Solicitud - Layout
+     Editar Solicitud GIL-F-014
 ══════════════════════════════════════════════════════════════════════════ -->
 <div class="edit-page-container">
-  
-  <!-- Header de Acción -->
+
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
   <div class="page-header">
     <inventario-back-button (clicked)="onCancel()" />
     <div class="header-main">
       <div class="header-titles">
         <h2 class="title">Editar Solicitud GIL-F-014</h2>
-        <p class="subtitle">Actualice la información de asignación de bienes de inventario.</p>
+        <p class="subtitle">Modifique los campos necesarios. Solo GILes en estado Borrador pueden editarse.</p>
       </div>
       <div class="header-status">
-        <span class="badge badge--active">Activo</span>
-        <span class="header-id">ID: {{ solicitudId() }}</span>
+        <span class="badge badge--active">{{ solicitud()?.estado ?? 'Borrador' }}</span>
+        <span class="header-id">{{ solicitudId() }}</span>
       </div>
     </div>
   </div>
 
+  <!-- ── Feedback banner ─────────────────────────────────────────────────── -->
+  @if (feedbackMsg()) {
+    <div
+      class="feedback-banner"
+      [class.feedback-banner--success]="feedbackMsg()!.tipo === 'success'"
+      [class.feedback-banner--error]="feedbackMsg()!.tipo === 'error'">
+      <span class="material-symbols-outlined">
+        {{ feedbackMsg()!.tipo === 'success' ? 'check_circle' : 'error' }}
+      </span>
+      <p>{{ feedbackMsg()!.texto }}</p>
+    </div>
+  }
+
+  <!-- ── Blocked banner ──────────────────────────────────────────────────── -->
+  @if (isBlocked()) {
+    <div class="feedback-banner feedback-banner--warning">
+      <span class="material-symbols-outlined">lock</span>
+      <p>Este GIL está en estado <strong>{{ solicitud()?.estado }}</strong> — no se permiten modificaciones.</p>
+    </div>
+  }
+
+  <!-- ── Loading skeleton ────────────────────────────────────────────────── -->
+  @if (loading() && !solicitud()) {
+    <div class="loading-placeholder">
+      <span class="material-symbols-outlined spin">sync</span>
+      Cargando GIL…
+    </div>
+  }
+
   <div class="edit-grid">
-    
-    <!-- ══════════════════════════════════════════════════════════════════════════
-         Columna Principal (Formularios)
-    ══════════════════════════════════════════════════════════════════════════ -->
-    <div class="main-form-col">
-      
-      <!-- Locked Banner -->
-      @if (isBlocked()) {
-<div class="bg-red-50 p-4 rounded-xl border border-red-200 flex items-center gap-3 mb-6">
-        <span class="material-symbols-outlined text-red-600">lock</span>
-        <p class="text-sm font-medium text-red-800">GIL Procesado — no se permiten modificaciones</p>
-      </div>
-}
 
-      <!-- Información del Solicitante -->
-      <div class="form-card" [class.opacity-70]="isBlocked()" [class.pointer-events-none]="isBlocked()">
+    <!-- ════════════════════════════════════════════════════════════════════
+         Columna Principal
+    ════════════════════════════════════════════════════════════════════ -->
+    <div
+      class="main-form-col"
+      [class.opacity-50]="isBlocked()"
+      [class.pointer-events-none]="isBlocked()">
+
+      <!-- ── Información Institucional ─────────────────────────────────── -->
+      <div class="form-card">
         <div class="card-header">
-          <span class="material-symbols-outlined icon-primary">person</span>
-          <h3>Información del Solicitante</h3>
+          <span class="material-symbols-outlined icon-primary">corporate_fare</span>
+          <h3>Información Institucional</h3>
         </div>
         <div class="form-row-2">
-          <div class="form-group">
-            <label>Nombre Completo</label>
-            <input type="text" class="form-control" value="Carlos Alberto Ruiz" />
-          </div>
-          <div class="form-group">
-            <label>Identificación</label>
-            <input type="text" class="form-control" value="1.098.345.221" />
-          </div>
-          <div class="form-group">
-            <label>Centro de Formación</label>
-            <input type="text" class="form-control" value="Centro de Servicios y Gestión Empresarial" />
-          </div>
-          <div class="form-group">
-            <label>Cargo</label>
-            <input type="text" class="form-control" value="Instructor Técnico" />
-          </div>
-        </div>
-      </div>
 
-      <!-- Detalles del Bien -->
-      <div class="form-card" [class.opacity-70]="isBlocked()" [class.pointer-events-none]="isBlocked()">
-        <div class="card-header">
-          <span class="material-symbols-outlined icon-primary">inventory_2</span>
-          <h3>Detalles del Bien</h3>
-        </div>
-        <div class="form-row-2">
-          <div class="form-group col-span-2">
-            <label>Descripción del Equipo</label>
-            <input type="text" class="form-control" value="Portátil Dell Latitude 5420 - Procesador i7, 16GB RAM" [disabled]="isBlocked()" />
-          </div>
           <div class="form-group">
-            <label>Placa Inventario</label>
-            <input type="text" class="form-control" value="SENA-IV-2023-456" [disabled]="isBlocked()" />
+            <label>Fecha de Solicitud <span class="required">*</span></label>
+            <input
+              type="date"
+              class="form-control"
+              [value]="fechaSolicitud()"
+              (input)="fechaSolicitud.set($any($event.target).value)"
+            />
           </div>
+
           <div class="form-group">
-            <label>Número de Serie</label>
-            <input type="text" class="form-control" value="CZS984210L" [disabled]="isBlocked()" />
-          </div>
-          <div class="form-group">
-            <label>Estado Entrega</label>
-            <select class="form-control" [disabled]="isBlocked()">
-              <option selected>Excelente</option>
-              <option>Bueno</option>
-              <option>Regular</option>
+            <label>Destino de Bienes <span class="required">*</span></label>
+            <select
+              class="form-control"
+              [value]="destinoBienes()"
+              (change)="destinoBienes.set($any($event.target).value)">
+              @for (d of DESTINOS; track d.value) {
+                <option [value]="d.value">{{ d.label }}</option>
+              }
             </select>
           </div>
+
           <div class="form-group">
-            <label>Fecha de Asignación</label>
-            <input type="date" class="form-control" value="2023-05-15" [disabled]="isBlocked()" />
+            <label>Regional (Código) <span class="required">*</span></label>
+            <input
+              type="number"
+              class="form-control"
+              placeholder="Ej. 63"
+              min="1"
+              [value]="regionalCodigo() ?? ''"
+              (input)="regionalCodigo.set(+$any($event.target).value || null)"
+            />
           </div>
+
+          <div class="form-group">
+            <label>Nombre de la Regional <span class="required">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Ej. Quindío"
+              [value]="regionalNombre()"
+              (input)="regionalNombre.set($any($event.target).value)"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Centro de Costos (Código) <span class="required">*</span></label>
+            <input
+              type="number"
+              class="form-control"
+              placeholder="Ej. 953810"
+              min="1"
+              [value]="centroCostosCodigo() ?? ''"
+              (input)="centroCostosCodigo.set(+$any($event.target).value || null)"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Nombre del Centro de Costos <span class="required">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Ej. COMERCIO Y TURISMO"
+              [value]="centroCostosNombre()"
+              (input)="centroCostosNombre.set($any($event.target).value)"
+            />
+          </div>
+
+          <div class="form-group col-span-2">
+            <label>Área <span class="required">*</span></label>
+            <select
+              class="form-control"
+              [value]="area()"
+              (change)="area.set($any($event.target).value)">
+              <option value="">Seleccione Área</option>
+              @for (a of AREAS; track a) {
+                <option [value]="a">{{ a }}</option>
+              }
+            </select>
+          </div>
+
         </div>
       </div>
 
-      <!-- Trazabilidad Académica -->
-      <div class="form-card" [class.opacity-70]="isBlocked()" [class.pointer-events-none]="isBlocked()">
+      <!-- ── Solicitante y Coordinador ──────────────────────────────────── -->
+      <div class="form-card">
         <div class="card-header">
-          <span class="material-symbols-outlined icon-primary">school</span>
-          <h3>Trazabilidad Académica</h3>
+          <span class="material-symbols-outlined icon-primary">person</span>
+          <h3>Solicitante y Coordinador</h3>
         </div>
         <div class="form-row-2">
+
           <div class="form-group">
-            <label>Vocero (Nombre Completo) <span class="required">*</span></label>
-            <input type="text" class="form-control" placeholder="Nombre del vocero" required [disabled]="isBlocked()" />
+            <label>Solicitante <span class="required">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Ej. Ing. Ricardo Sarmiento"
+              [value]="solicitante()"
+              (input)="solicitante.set($any($event.target).value)"
+            />
           </div>
+
           <div class="form-group">
-            <label>Vocero (Cédula) <span class="required">*</span></label>
-            <input type="text" class="form-control" placeholder="Ej. 1.000.000.000" required [disabled]="isBlocked()" />
+            <label>Jefe de Oficina / Coordinador <span class="required">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Ej. María García Rincón"
+              [value]="jefeOficinaCoordinador()"
+              (input)="jefeOficinaCoordinador.set($any($event.target).value)"
+            />
           </div>
-          <div class="form-group col-span-2">
-            <label>Resultado de Aprendizaje (RA) <span class="required">*</span></label>
-            <textarea class="form-control min-h-[80px]" placeholder="Ingrese el texto detallado del RA..." required [disabled]="isBlocked()"></textarea>
-          </div>
+
           <div class="form-group">
-            <label>Franja Horaria <span class="required">*</span></label>
-            <input type="text" class="form-control" placeholder="Ej. 06:00 AM - 12:00 PM" required [disabled]="isBlocked()" />
+            <label>Código de Grupo <span class="required">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Ej. ADSO-2670687"
+              [value]="codigoGrupo()"
+              (input)="codigoGrupo.set($any($event.target).value)"
+            />
           </div>
+
+          <div class="form-group">
+            <label>Ficha de Caracterización <span class="required">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Ej. 2471532"
+              maxlength="7"
+              [value]="fichaCaracterizacion()"
+              (input)="fichaCaracterizacion.set($any($event.target).value)"
+            />
+          </div>
+
         </div>
       </div>
 
-      <!-- Bienes Solicitados -->
-      <div class="form-card" [class.opacity-70]="isBlocked()" [class.pointer-events-none]="isBlocked()">
+      <!-- ── Cuentadantes ───────────────────────────────────────────────── -->
+      <div class="form-card">
+        <div class="card-header">
+          <span class="material-symbols-outlined icon-primary">groups</span>
+          <h3>Cuentadantes</h3>
+        </div>
+
+        @if (cuentadantes().length > 0) {
+          <div class="cuentadantes-list">
+            @for (c of cuentadantes(); track c; let i = $index) {
+              <div class="cuentadante-chip">
+                <span class="material-symbols-outlined">person</span>
+                <span class="chip-nombre">{{ c.nombre }}</span>
+                <span class="chip-cedula">CC {{ c.cedula }}</span>
+                <button class="btn-icon btn-icon--danger" type="button" (click)="cuentadantes.update(list => list.filter((_, j) => j !== i))">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="empty-hint">Sin cuentadantes asignados.</p>
+        }
+      </div>
+
+      <!-- ── Bienes Solicitados ─────────────────────────────────────────── -->
+      <div class="form-card">
         <div class="card-header">
           <span class="material-symbols-outlined icon-primary">category</span>
           <h3>Bienes Solicitados</h3>
@@ -135,60 +246,79 @@
                 <th class="text-right">Cantidad</th>
                 <th class="text-right">Valor Unitario</th>
                 <th class="text-right">Subtotal</th>
-                @if (!isBlocked()) {
-<th class="text-center">Acción</th>
-}
+                <th class="text-center">Acción</th>
               </tr>
             </thead>
             <tbody>
               @for (bien of bienes(); track bien; let i = $index) {
-<tr>
-                <td class="font-medium text-dark">{{ bien.codigoSena }}</td>
-                <td class="text-muted">{{ bien.descripcion }}</td>
-                <td class="text-muted">{{ bien.unidadMedida }}</td>
-                <td class="text-right font-medium text-dark">{{ bien.cantidad }}</td>
-                <td class="text-right text-muted">{{ bien.valorUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
-                <td class="text-right font-bold text-dark">{{ bien.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
-                @if (!isBlocked()) {
-<td class="text-center">
-                  <button type="button" class="btn-icon btn-icon--danger" (click)="onRemoveBien(i)">
-                    <span class="material-symbols-outlined">delete</span>
-                  </button>
-                </td>
-}
-              </tr>
-}
+                <tr>
+                  <td class="font-medium text-dark">{{ bien.codigoSena }}</td>
+                  <td class="text-muted">{{ bien.descripcion }}</td>
+                  <td class="text-muted">{{ bien.unidadMedida }}</td>
+                  <td class="text-right font-medium text-dark">{{ bien.cantidad }}</td>
+                  <td class="text-right text-muted">{{ bien.valorUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                  <td class="text-right font-bold text-dark">{{ bien.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                  <td class="text-center">
+                    <button type="button" class="btn-icon btn-icon--danger" (click)="onRemoveBien(i)">
+                      <span class="material-symbols-outlined">delete</span>
+                    </button>
+                  </td>
+                </tr>
+              }
+              @if (bienes().length === 0) {
+                <tr>
+                  <td colspan="7" class="empty-row">
+                    <span class="material-symbols-outlined">category</span>
+                    Sin bienes — usá el botón de abajo para agregar
+                  </td>
+                </tr>
+              }
             </tbody>
           </table>
         </div>
-        @if (!isBlocked()) {
-<button type="button" class="btn-link btn-link--add mt-4" (click)="onAddBien()">
+        <button type="button" class="btn-link btn-link--add mt-4" (click)="onAddBien()">
           <span class="material-symbols-outlined">add_circle</span> Agregar bien
         </button>
-}
       </div>
 
-      <!-- Actions -->
-      @if (!isBlocked()) {
-<div class="actions-footer">
-        <restaurant-button variant="ghost" (click)="onCancel()" [disabled]="isSaving()">Cancelar</restaurant-button>
+      <!-- ── Observaciones ──────────────────────────────────────────────── -->
+      <div class="form-card">
+        <div class="card-header">
+          <span class="material-symbols-outlined icon-primary">notes</span>
+          <h3>Observaciones</h3>
+        </div>
+        <textarea
+          class="form-control"
+          rows="4"
+          placeholder="Notas adicionales, justificación técnica…"
+          [value]="observaciones()"
+          (input)="observaciones.set($any($event.target).value)">
+        </textarea>
+      </div>
+
+      <!-- ── Acciones ───────────────────────────────────────────────────── -->
+      <div class="actions-footer">
+        <restaurant-button variant="ghost" (click)="onCancel()" [disabled]="isSaving()">
+          Cancelar
+        </restaurant-button>
         <restaurant-button variant="primary" (click)="onSave()" [disabled]="isSaving()">
-          {{ isSaving() ? 'Guardando...' : 'Guardar Cambios' }}
+          <span class="material-symbols-outlined">save</span>
+          {{ isSaving() ? 'Guardando…' : 'Guardar Cambios' }}
         </restaurant-button>
       </div>
-}
 
     </div>
 
-    <!-- ══════════════════════════════════════════════════════════════════════════
-         Columna Sidebar (Auditoría e Información)
-    ══════════════════════════════════════════════════════════════════════════ -->
+    <!-- ════════════════════════════════════════════════════════════════════
+         Sidebar
+    ════════════════════════════════════════════════════════════════════ -->
     <div class="sidebar-col">
-      
+
       <!-- Historial -->
       <div class="side-card side-card--history">
         <h4>
-          <span class="material-symbols-outlined icon-history">history</span> Historial del Formato
+          <span class="material-symbols-outlined icon-history">history</span>
+          Historial del Formato
         </h4>
         <div class="history-timeline">
           <div class="timeline-item">
@@ -196,8 +326,8 @@
               <span class="material-symbols-outlined">check</span>
             </div>
             <div class="timeline-content">
-              <p class="history-title">Creado por Almacén</p>
-              <p class="history-date">14 Mayo, 2023 - 09:30 AM</p>
+              <p class="history-title">Creado</p>
+              <p class="history-date">{{ solicitud()?.fechaSolicitud ?? '—' }}</p>
             </div>
           </div>
           <div class="timeline-item timeline-item--last">
@@ -205,28 +335,29 @@
               <span class="material-symbols-outlined">edit</span>
             </div>
             <div class="timeline-content">
-              <p class="history-title">Edición Actual</p>
-              <p class="history-date">Hoy - En proceso</p>
+              <p class="history-title">Edición actual</p>
+              <p class="history-date">Hoy — en proceso</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Resumen Bienes -->
+      <!-- Resumen -->
       <div class="side-card side-card--summary">
-        <h4>Resumen de Bienes</h4>
-        <p class="summary-text">Este formulario representa el soporte legal de la entrega física de bienes a funcionarios. Cualquier modificación será registrada en la auditoría del sistema.</p>
+        <h4>Resumen del GIL</h4>
+        <p class="summary-text">
+          Este formulario es el soporte legal de la asignación de bienes institucionales.
+          Toda modificación queda registrada en la auditoría del sistema.
+        </p>
         <div class="summary-total">
-          <span>Valor Asegurado</span>
-          <span>$3.250.000 COP</span>
+          <span>Total bienes</span>
+          <span class="summary-value">{{ bienes().length }} ítem(s)</span>
         </div>
-      </div>
-
-      <!-- Imagen Decorativa -->
-      <div class="image-card">
-        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTGH4OIkhgXE8-BA-PCI1lhsljA3bKfDhUY_zRWc3JsYTPcje_8PdiVmzrPTuC0FLNViRdifq1dre17wzJ0qQ36kYfHFKnWTzctUFKndjZMRMRNhJ5bUWJDIzbu9yf_mrzCGdp3dxMLlVSOGWzbmL8LpRwxFjlS6wlEQBxhQIG0jlrQ2-kKio40cfQxhzZaicXJ4IerDAbGjAUKBIQT9i4iiYyWBlllOyZv6co4bbEwP4jPN0FFA78MieOnUTbd_0NAT8FicHXxaUT" alt="Vista del equipo" />
-        <div class="image-overlay">
-          <p>Referencia visual del activo asignado</p>
+        <div class="summary-total">
+          <span>Valor estimado</span>
+          <span class="summary-value">
+            {{ totalValor() | currency:'COP':'symbol-narrow':'1.0-0' }}
+          </span>
         </div>
       </div>
 

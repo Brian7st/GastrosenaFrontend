@@ -84,22 +84,24 @@ export class SolicitudesService {
       );
   }
 
-  /**
-   * PATCH /procurement/giles/{id} — actualiza un GIL en BORRADOR.
-   * NOTA: este endpoint aún NO existe en el backend (pendiente tarea BACKEND #3).
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  actualizarSolicitud(_id: string, _data: ActualizarSolicitudData): Observable<{ success: boolean }> {
-    return throwError(() => new Error('actualizarSolicitud: PATCH /procurement/giles/{id} no existe en backend — pendiente tarea BACKEND #3'));
+  /** PATCH /procurement/giles/{id} — actualiza un GIL en estado BORRADOR */
+  actualizarSolicitud(id: string, data: ActualizarSolicitudData): Observable<{ success: boolean }> {
+    return this.http
+      .patch<GilResponse>(`${API}/procurement/giles/${id}`, data)
+      .pipe(
+        map(() => ({ success: true })),
+        catchError(err => throwError(() => err))
+      );
   }
 
-  /**
-   * PATCH /procurement/giles/{id} — alias usado por facturas facade.
-   * NOTA: mismo endpoint inexistente — pendiente tarea BACKEND #3.
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  updateSolicitud(_id: string | number, _payload: Partial<SolicitudGil>): Observable<SolicitudGil> {
-    return throwError(() => new Error('updateSolicitud: PATCH /procurement/giles/{id} no existe en backend — pendiente tarea BACKEND #3'));
+  /** PATCH /procurement/giles/{id} — alias usado por facturas facade */
+  updateSolicitud(id: string | number, payload: Partial<SolicitudGil>): Observable<SolicitudGil> {
+    return this.http
+      .patch<GilResponse>(`${API}/procurement/giles/${id}`, payload)
+      .pipe(
+        map(gilFromApi),
+        catchError(err => throwError(() => err))
+      );
   }
 
   /** PATCH /procurement/giles/{id}/emitir o /cerrar */
