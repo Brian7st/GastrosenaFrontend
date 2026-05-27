@@ -8,7 +8,7 @@
   </div>
   <restaurant-button variant="primary" routerLink="nueva">
     <span class="material-symbols-outlined">add</span>
-    Nueva GIL
+    Nueva Solicitud
   </restaurant-button>
 </div>
 
@@ -119,13 +119,14 @@
           <button class="action-icon" (click)="onView(s.id)" title="Ver Detalle">
             <span class="material-symbols-outlined">visibility</span>
           </button>
+
+          <button class="action-icon" (click)="onEdit(s.id)" [attr.title]="s.estado === 'BORRADOR' ? 'Editar' : 'Solo lectura'" [disabled]="s.estado !== 'BORRADOR'">
+            <span class="material-symbols-outlined">edit</span>
+          </button>
           
-          <button [style.visibility]="s.estado === 'ENVIADA' ? 'visible' : 'hidden'"
-            class="action-icon action-icon--primary"
-            title="Aprobar Solicitud"
-            (click)="onApprove(s.id); $event.stopPropagation()"
-          >
-            <lucide-icon name="check-circle" [size]="18"></lucide-icon>
+          <button class="btn-aprobar" [style.visibility]="s.estado === 'ENVIADA' ? 'visible' : 'hidden'" (click)="onApprove(s.id); $event.stopPropagation()" title="Aprobar Solicitud">
+            <span class="material-symbols-outlined" style="font-size: 16px;">check</span>
+            Aprobar
           </button>
         </div>
       </td>
