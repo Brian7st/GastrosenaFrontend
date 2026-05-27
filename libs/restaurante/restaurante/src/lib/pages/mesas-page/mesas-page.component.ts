@@ -9,6 +9,7 @@ import {
   ButtonComponent,
   LucideIconComponent,
   EmptyStateComponent,
+  ConfirmDialogComponent
 } from '@restaurant/shared/ui';
 import { Router, ActivatedRoute } from '@angular/router';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
@@ -26,7 +27,8 @@ import { Mesa } from '../../models/restaurante.model';
     StatusBadgeComponent, 
     ButtonComponent,
     LucideIconComponent,
-    EmptyStateComponent
+    EmptyStateComponent,
+    ConfirmDialogComponent
   ],
   templateUrl: './mesas-page.component.html',
   styleUrl: './mesas-page.component.scss',
@@ -49,16 +51,81 @@ export class MesasPageComponent {
   modalActivo      = signal<string | null>(null);
   mesaSeleccionada = signal<Mesa | null>(null);
   tabActivo        = signal<'desactivar' | 'activar'>('desactivar');
+  searchQueryGestionMesas = signal<string>('');
+  
+  // ── Estado local de la vista principal ───────────────────────────────────────
+  searchQueryMain = signal<string>('');
+
+  filteredMesasActivasMain = computed(() => {
+    const q = this.searchQueryMain().toLowerCase();
+    return this.mesasActivas().filter(m => m.nombre.toLowerCase().includes(q));
+  });
+
+  filteredMesasActivasModal = computed(() => {
+    const q = this.searchQueryGestionMesas().toLowerCase();
+    return this.mesasActivas().filter(m => m.nombre.toLowerCase().includes(q));
+  });
+  
+  filteredMesasInactivasModal = computed(() => {
+    const q = this.searchQueryGestionMesas().toLowerCase();
+    return this.mesasInactivas().filter(m => m.nombre.toLowerCase().includes(q));
+  });
+
+  // ── Mesas en servicio (Ocupadas / Por pagar) ──────────────────────────────────
+  mesasEnServicio = computed(() => {
+    const meseros = ['Juan Pérez', 'Ana Gómez', 'Carlos Ruiz', 'María López', 'Luisa Fernanda'];
+    return this.mesasActivas()
+      .filter(m => m.estado === 'OCUPADA' || m.estado === 'POR_PAGAR')
+      .map(m => {
+        // Generador determinista simple basado en id para asignar mesero mock
+        const index = m.id.charCodeAt(0) % meseros.length;
+        return { ...m, meseroAsignado: meseros[index] };
+      });
+  });
 
   // ── Signals para CREAR mesa (MesaCreateRequest) ──────────────────────────────
   nuevoNombre    = signal<string>('');
-  nuevaCapacidad = signal<number>(4);
+  nuevaCapacidad = signal<number | null>(null);
   nuevaZona      = signal<string>('');
 
   // ── Signals para EDITAR mesa (MesaUpdateRequest) — se pre-llenan al abrir ──
   editNombre    = signal<string>('');
   editCapacidad = signal<number>(4);
   editZona      = signal<string>('');
+
+  // ── Opciones de Zona (Autocomplete) ──────────────────────────────────────────
+  opcionesZonas = ['Salón Principal', 'Terraza', 'Salón VIP', 'Barra'];
+  
+  showNuevaZonaDropdown = signal(false);
+  filteredNuevaZonas = computed(() => {
+    const q = this.nuevaZona().toLowerCase();
+    if (!q) return this.opcionesZonas;
+    return this.opcionesZonas.filter(z => z.toLowerCase().includes(q));
+  });
+
+  showEditZonaDropdown = signal(false);
+  filteredEditZonas = computed(() => {
+    const q = this.editZona().toLowerCase();
+    if (!q) return this.opcionesZonas;
+    return this.opcionesZonas.filter(z => z.toLowerCase().includes(q));
+  });
+
+  selectZona(zona: string, tipo: 'nueva' | 'editar') {
+    if (tipo === 'nueva') {
+      this.nuevaZona.set(zona);
+      this.showNuevaZonaDropdown.set(false);
+    } else {
+      this.editZona.set(zona);
+      this.showEditZonaDropdown.set(false);
+    }
+  }
+
+  onBlurZona(tipo: 'nueva' | 'editar') {
+    setTimeout(() => {
+      if (tipo === 'nueva') this.showNuevaZonaDropdown.set(false);
+      else this.showEditZonaDropdown.set(false);
+    }, 150);
+  }
 
   // ── Apertura / cierre de modales ─────────────────────────────────────────────
   abrirModal(nombre: string, mesa: Mesa | null = null) {
@@ -68,42 +135,75 @@ export class MesasPageComponent {
     if (nombre === 'agregar') {
       // Resetear formulario de creación
       this.nuevoNombre.set('');
-      this.nuevaCapacidad.set(4);
+      this.nuevaCapacidad.set(null);
       this.nuevaZona.set('');
     } else if (nombre === 'editar' && mesa) {
       // Pre-llenar formulario de edición con los datos actuales de la mesa
+      this.mesaSeleccionada.set(mesa);
       this.editNombre.set(mesa.nombre);
       this.editCapacidad.set(mesa.capacidad);
-      this.editZona.set(mesa.zona ?? '');
+      this.editZona.set(mesa.zona || '');
     } else if (nombre === 'gestion-mesas') {
       this.tabActivo.set('desactivar');
+      this.searchQueryGestionMesas.set('');
     }
   }
 
   cerrarModales() {
     this.modalActivo.set(null);
     this.mesaSeleccionada.set(null);
+    
+    // Limpiar estados de autocompletado y búsqueda
+    this.showNuevaZonaDropdown.set(false);
+    this.showEditZonaDropdown.set(false);
+    this.searchQueryGestionMesas.set('');
+  }
+
+  // ── Modal de alertas y notificaciones ────────────────────────────────────────
+  alertDialog = signal<{open: boolean, title: string, message: string, type: 'success' | 'error'}>({
+    open: false,
+    title: '',
+    message: '',
+    type: 'error'
+  });
+  
+  cerrarAlertDialog() {
+    this.alertDialog.update(state => ({...state, open: false}));
+  }
+
+  mostrarExito(mensaje: string) {
+    this.alertDialog.set({ open: true, title: '¡Éxito!', message: mensaje, type: 'success' });
+  }
+
+  mostrarError(mensaje: string) {
+    this.alertDialog.set({ open: true, title: 'Atención', message: mensaje, type: 'error' });
   }
 
   // ── CREAR ────────────────────────────────────────────────────────────────────
   crearMesa() {
     const nombre    = this.nuevoNombre().trim();
-    const capacidad = this.nuevaCapacidad();
+    let capacidad   = this.nuevaCapacidad();
     const zona      = this.nuevaZona().trim();
 
+    // Si no se llena la capacidad, por defecto será 1
+    if (capacidad === null || capacidad === undefined || capacidad.toString().trim() === '') {
+      capacidad = 1;
+    }
+    
+    capacidad = Number(capacidad);
+
     if (!nombre) {
-      alert('El nombre de la mesa es obligatorio.');
+      this.mostrarError('El nombre de la mesa es obligatorio.');
       return;
     }
-    if (capacidad < 1 || capacidad > 20) {
-      alert('La capacidad debe ser entre 1 y 20 personas.');
+    if (capacidad < 1 || capacidad > 20 || isNaN(capacidad)) {
+      this.mostrarError('La capacidad debe ser entre 1 y 20 personas.');
       return;
     }
 
-    // Cierra el modal inmediatamente para dar feedback visual rápido;
-    // el signal _mesas del Facade se actualiza cuando el backend confirme.
-    this.cerrarModales();
     this.facade.agregarMesa(nombre, capacidad, zona);
+    this.cerrarModales();
+    this.mostrarExito(`La mesa "${nombre}" ha sido creada correctamente.`);
   }
 
   // ── EDITAR ───────────────────────────────────────────────────────────────────
