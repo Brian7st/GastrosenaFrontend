@@ -76,24 +76,45 @@ export class SolicitudesFormComponent implements OnInit {
   // ── Bienes ───────────────────────────────────────────────────────────────
   bienes = signal<BienSolicitud[]>([]);
 
-  // ── Validación: todos los campos required ────────────────────────────────
-  formularioValido = computed(() => {
-    return (
-      this.fechaSolicitud().trim() !== '' &&
-      this.regionalCodigo() !== null &&
-      this.regionalNombre().trim() !== '' &&
-      this.centroCostosCodigo() !== null &&
-      this.centroCostosNombre().trim() !== '' &&
-      this.area().trim() !== '' &&
-      this.destinoBienes().trim() !== '' &&
-      this.jefeOficinaCoordinador().trim() !== '' &&
-      this.solicitante().trim() !== '' &&
-      this.codigoGrupo().trim() !== '' &&
-      this.fichaCaracterizacion().trim() !== '' &&
-      this.cuentadantes().length > 0 &&
-      this.bienes().length > 0
-    );
+  // ── Validación ────────────────────────────────────────────────────────────
+  private readonly FICHA_REGEX = /^\d{7}$/;
+  submitAttempted = signal(false);
+
+  errores = computed<Record<string, string>>(() => {
+    const e: Record<string, string> = {};
+    if (!this.fechaSolicitud().trim())
+      e['fechaSolicitud'] = 'La fecha de solicitud es requerida.';
+    if (this.regionalCodigo() === null)
+      e['regionalCodigo'] = 'El código de regional es requerido.';
+    if (!this.regionalNombre().trim())
+      e['regionalNombre'] = 'El nombre de la regional es requerido.';
+    if (this.centroCostosCodigo() === null)
+      e['centroCostosCodigo'] = 'El código del centro de costos es requerido.';
+    if (!this.centroCostosNombre().trim())
+      e['centroCostosNombre'] = 'El nombre del centro de costos es requerido.';
+    if (!this.area().trim())
+      e['area'] = 'El área es requerida.';
+    if (!this.destinoBienes().trim())
+      e['destinoBienes'] = 'El destino de bienes es requerido.';
+    if (!this.jefeOficinaCoordinador().trim())
+      e['jefeOficinaCoordinador'] = 'El jefe de oficina / coordinador es requerido.';
+    if (!this.solicitante().trim())
+      e['solicitante'] = 'El solicitante es requerido.';
+    if (!this.codigoGrupo().trim())
+      e['codigoGrupo'] = 'El código de grupo es requerido.';
+    if (!this.fichaCaracterizacion().trim()) {
+      e['fichaCaracterizacion'] = 'La ficha de caracterización es requerida.';
+    } else if (!this.FICHA_REGEX.test(this.fichaCaracterizacion())) {
+      e['fichaCaracterizacion'] = 'La ficha debe contener exactamente 7 dígitos.';
+    }
+    if (this.cuentadantes().length === 0)
+      e['cuentadantes'] = 'Debe agregar al menos un cuentadante.';
+    if (this.bienes().length === 0)
+      e['bienes'] = 'Debe agregar al menos un bien.';
+    return e;
   });
+
+  formularioValido = computed(() => Object.keys(this.errores()).length === 0);
 
   // ── Consolidación (Generar GIL) ───────────────────────────────────────────
   solicitudesReales = this.facade.solicitudes;
@@ -233,6 +254,7 @@ export class SolicitudesFormComponent implements OnInit {
   }
 
   onSave(): void {
+    this.submitAttempted.set(true);
     if (!this.formularioValido()) return;
 
     this.facade.crearSolicitud({
