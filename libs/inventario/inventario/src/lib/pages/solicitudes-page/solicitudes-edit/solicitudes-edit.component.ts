@@ -158,6 +158,10 @@ export class SolicitudesEditComponent implements OnInit {
     ]);
   }
 
+  onRemoveCuentadante(index: number): void {
+    this.cuentadantes.update(list => list.filter((_, i) => i !== index));
+  }
+
   onRemoveBien(index: number): void {
     this.bienes.update(items => items.filter((_, i) => i !== index));
   }

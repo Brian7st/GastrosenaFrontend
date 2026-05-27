@@ -219,7 +219,7 @@
                 <span class="material-symbols-outlined">person</span>
                 <span class="chip-nombre">{{ c.nombre }}</span>
                 <span class="chip-cedula">CC {{ c.cedula }}</span>
-                <button class="btn-icon btn-icon--danger" type="button" (click)="cuentadantes.update(list => list.filter((_, j) => j !== i))">
+                <button class="btn-icon btn-icon--danger" type="button" (click)="onRemoveCuentadante(i)">
                   <span class="material-symbols-outlined">close</span>
                 </button>
               </div>
