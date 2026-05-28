@@ -18,6 +18,12 @@ import {
   UsuarioDetalle,
 } from '../models/usuarios.model';
 
+export interface EstadoImportacion {
+  estado: 'EN_PROCESO' | 'COMPLETADO' | 'FALLIDO';
+  errores?: Array<{ fila?: number; campo?: string; mensaje: string }>;
+  registrosGuardados?: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class UsuariosService extends BaseHttpService {
   private readonly resource = 'usuarios';
@@ -31,13 +37,19 @@ export class UsuariosService extends BaseHttpService {
 
     return this.http.get<any>(this.buildUrl(this.resource), { params }).pipe(
       map(res => {
-        console.log('📦 Respuesta backend /api/usuarios:', res);
+        const raw = Array.isArray(res) ? res : (res.content ?? []);
+        const content = raw.map((u: any) => ({
+          ...u,
+          id:     u.idUsuario  ?? u.id,
+          activo: u.estado     ?? u.activo,
+          rol:    u.rol?.nombreRol ?? u.rol,
+        }));
         return {
-          content:       res.content       ?? [],
-          totalElements: res.totalElements ?? 0,
-          totalPages:    res.totalPages    ?? 0,
+          content,
+          totalElements: res.totalElements ?? content.length,
+          totalPages:    res.totalPages    ?? 1,
           currentPage:   res.currentPage   ?? res.page ?? 0,
-          size:          res.size          ?? 0,
+          size:          res.size          ?? content.length,
         };
       })
     );
@@ -56,7 +68,6 @@ export class UsuariosService extends BaseHttpService {
   }
 
   crearUsuario(data: CrearUsuarioRequest): Observable<UsuarioDetalle> {
-    console.log('📤 Enviando POST /api/usuarios:', data);
     return this.http.post<UsuarioDetalle>(this.buildUrl(this.resource), data);
   }
 
@@ -83,11 +94,21 @@ export class UsuariosService extends BaseHttpService {
   importarMasivo(request: ImportarUsuariosRequest): Observable<ImportarUsuariosResponse> {
     const formData = new FormData();
     formData.append('archivo', request.archivo);
-    formData.append('tipo',    request.tipo);
-    return this.http.post<ImportarUsuariosResponse>(
-      this.buildUrl(`${this.resource}/importar`),
-      formData,
-    );
+
+    const url = request.tipo === 'APRENDIZ'
+      ? this.buildUrl('usuarios/masivo/aprendices')
+      : this.buildUrl('usuarios/masivo/instructores');
+
+    return this.http.post<ImportarUsuariosResponse>(url, formData);
+  }
+
+  // ─── NUEVO: Obtener estado de importación (para polling) ────────────────────
+  obtenerEstadoImportacion(tareaId: string, tipo: 'APRENDIZ' | 'INSTRUCTOR'): Observable<EstadoImportacion> {
+    const url = tipo === 'APRENDIZ'
+      ? this.buildUrl(`usuarios/masivo/estado-aprendices/${tareaId}`)
+      : this.buildUrl(`usuarios/masivo/estado-instructores/${tareaId}`);
+
+    return this.http.get<EstadoImportacion>(url);
   }
 
   asignarRolMasivo(request: AsignacionMasivaRequest): Observable<void> {
