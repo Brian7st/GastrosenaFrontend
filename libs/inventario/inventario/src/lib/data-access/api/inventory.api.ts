@@ -1,3 +1,24 @@
+/**
+ * GET /inventory/movimientos/{productoId} — response paginado.
+ * El backend no documenta el schema en Swagger (type: object genérico).
+ * Se soportan ambas convenciones: inglés (content/totalElements) y
+ * español (contenido/totalElementos) para cubrir las variaciones del backend.
+ */
+export interface MovimientoPageResponse {
+  // Convención inglés (Spring Page<T> estándar — igual que PagedGilResponse)
+  content?:       MovimientoResponse[];
+  totalElements?: number;
+  totalPages?:    number;
+  number?:        number;
+  size?:          number;
+  // Convención español (patrón interno de otros módulos)
+  contenido?:       MovimientoResponse[];
+  totalElementos?:  number;
+  totalPaginas?:    number;
+  paginaActual?:    number;
+  tamano?:          number;
+}
+
 export interface ExistenciaResponse {
   productoId: string;
   stockFisico: number;

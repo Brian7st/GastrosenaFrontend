@@ -9,6 +9,7 @@ import {
 import { ExistenciaProducto } from '../../models/inventario.model';
 import {
   MovimientoResponse,
+  MovimientoPageResponse,
   ExistenciaResponse,
   EntradaRequest,
   SalidaRequest,
@@ -16,6 +17,25 @@ import {
   LiberacionRequest,
   AjusteRequest,
 } from '../api/inventory.api';
+
+/**
+ * Normaliza la respuesta paginada de GET /inventory/movimientos/{productoId}.
+ * El backend no documenta el schema en Swagger (type: object genérico) y puede
+ * usar convención inglés (content/totalElements) o español (contenido/totalElementos).
+ */
+export function movimientoPageFromApi(resp: MovimientoPageResponse): {
+  movimientos:    Movimiento[];
+  totalPaginas:   number;
+  totalElementos: number;
+} {
+  const dtos: MovimientoResponse[] =
+    resp.content ?? resp.contenido ?? [];
+  return {
+    movimientos:    dtos.map(movimientoFromApi),
+    totalPaginas:   resp.totalPages   ?? resp.totalPaginas   ?? 0,
+    totalElementos: resp.totalElements ?? resp.totalElementos ?? 0,
+  };
+}
 
 export function movimientoFromApi(dto: MovimientoResponse): Movimiento {
   return {

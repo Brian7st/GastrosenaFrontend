@@ -4,7 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 import { GilesFacade } from '../../../data-access/giles.facade';
 import { KardexFacade } from '../../../data-access/kardex.facade';
-import { BienGilResponse, GilResponse } from '../../../data-access/api/procurement.api';
+import { BienGilResponse } from '../../../data-access/api/procurement.api';
 import { EntradaMovimientoData } from '../../../models/movimiento.model';
 
 @Component({
@@ -51,8 +51,9 @@ export class MovimientoEntradaGilComponent {
   onGilChange(event: Event): void {
     const id = (event.target as HTMLSelectElement).value;
     this.gilIdSeleccionado.set(id);
-    const gil: GilResponse | null = this.gilesFacade.giles().find(g => g.id === id) ?? null;
-    this.gilesFacade.seleccionarGil(gil);
+    // Cargamos por ID para garantizar que bienes esté completo
+    // (el endpoint de lista puede omitir subarrays por rendimiento)
+    this.gilesFacade.cargarGilById(id);
   }
 
   onSubmit(): void {

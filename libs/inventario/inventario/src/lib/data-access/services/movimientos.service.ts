@@ -11,7 +11,7 @@ import {
   AjusteMovimientoData,
 } from '../../models/movimiento.model';
 import { ExistenciaProducto } from '../../models/inventario.model';
-import { MovimientoResponse, ExistenciaResponse } from '../api/inventory.api';
+import { MovimientoResponse, MovimientoPageResponse, ExistenciaResponse } from '../api/inventory.api';
 import { KardexValorizadoItemResponse } from '../api/reporting.api';
 import { KardexValorizadoItem } from '../../models/reporting.model';
 import {
@@ -22,6 +22,7 @@ import {
   reservaToRequest,
   liberacionToRequest,
   ajusteToRequest,
+  movimientoPageFromApi,
 } from '../mappers/inventory.mapper';
 import { kardexValorizadoFromApi } from '../mappers/reporting.mapper';
 
@@ -33,12 +34,23 @@ export class MovimientosService {
 
   // ── Kardex ──────────────────────────────────────────────────────────────────
 
-  /** Historial de movimientos de un producto (GET /inventory/movimientos/{productoId}) */
-  getKardex(productoId: string): Observable<Movimiento[]> {
+  /**
+   * GET /inventory/movimientos/{productoId}?pagina=0&tamano=10
+   * El Swagger declara params `pagina`/`tamano` (español) y respuesta genérica `object`.
+   * El mapper `movimientoPageFromApi` normaliza ambas convenciones de campo.
+   */
+  getKardex(
+    productoId: string,
+    pagina = 0,
+    tamano = 10,
+  ): Observable<{ movimientos: Movimiento[]; totalPaginas: number; totalElementos: number }> {
+    const params = new HttpParams()
+      .set('pagina', String(pagina))
+      .set('tamano', String(tamano));
     return this.http
-      .get<MovimientoResponse[]>(`${API}/inventory/movimientos/${productoId}`)
+      .get<MovimientoPageResponse>(`${API}/inventory/movimientos/${productoId}`, { params })
       .pipe(
-        map(list => list.map(movimientoFromApi)),
+        map(resp => movimientoPageFromApi(resp)),
         catchError(err => throwError(() => err))
       );
   }

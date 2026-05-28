@@ -25,6 +25,13 @@ export class KardexFacade {
   private _loading                  = signal<boolean>(false);
   private _error                    = signal<string | null>(null);
 
+  /** Paginación del kardex (GET /inventory/movimientos/{productoId}) */
+  private _paginacion = signal<{ totalElementos: number; totalPaginas: number; page: number; size: number }>({
+    totalElementos: 0, totalPaginas: 0, page: 0, size: 10,
+  });
+  /** productoId activo para reutilizarlo al navegar páginas sin pasarlo de nuevo */
+  private _productoIdActual = signal<string>('');
+
   // ── Lectura pública ──────────────────────────────────────────────────────────
   public movimientos              = computed(() => this._movimientos());
   public movimientoSeleccionado   = computed(() => this._movimientoSeleccionado());
@@ -33,6 +40,7 @@ export class KardexFacade {
   public kardexValorizado         = computed(() => this._kardexValorizado());
   public loading                  = computed(() => this._loading());
   public error                    = computed(() => this._error());
+  public paginacion               = computed(() => this._paginacion());
 
   // ── Kardex ───────────────────────────────────────────────────────────────────
 
@@ -41,20 +49,39 @@ export class KardexFacade {
   loadAll(): void {
     this._movimientos.set([]);
     this._error.set(null);
+    this._paginacion.set({ totalElementos: 0, totalPaginas: 0, page: 0, size: 10 });
   }
 
-  cargarKardex(productoId: string): void {
+  /**
+   * Carga la página indicada del kardex de un producto.
+   * Los params `pagina`/`tamano` coinciden con el Swagger (español).
+   * El productoId se memoriza para reutilizarlo en `irAPaginaKardex`.
+   */
+  cargarKardex(productoId: string, pagina = 0, tamano = 10): void {
     this._loading.set(true);
     this._error.set(null);
-    this.movimientosService.getKardex(productoId)
+    this._productoIdActual.set(productoId);
+    this.movimientosService.getKardex(productoId, pagina, tamano)
       .pipe(
         catchError(() => {
           this._error.set('Error al cargar el kardex');
-          return of([]);
+          return of({ movimientos: [], totalPaginas: 0, totalElementos: 0 });
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe(data => this._movimientos.set(data));
+      .subscribe(({ movimientos, totalPaginas, totalElementos }) => {
+        this._movimientos.set(movimientos);
+        this._paginacion.set({ totalElementos, totalPaginas, page: pagina, size: tamano });
+      });
+  }
+
+  /** Navega a la página indicada del kardex del producto actualmente cargado. */
+  irAPaginaKardex(page: number): void {
+    const { size } = this._paginacion();
+    const productoId = this._productoIdActual();
+    if (productoId) {
+      this.cargarKardex(productoId, page, size);
+    }
   }
 
   cargarMovimiento(id: string): void {
@@ -129,7 +156,10 @@ export class KardexFacade {
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe(() => this.cargarKardex(data.productoId));
+      .subscribe(() => {
+        const { page, size } = this._paginacion();
+        this.cargarKardex(data.productoId, page, size);
+      });
   }
 
   registrarSalida(data: SalidaMovimientoData): void {
@@ -143,7 +173,10 @@ export class KardexFacade {
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe(() => this.cargarKardex(data.productoId));
+      .subscribe(() => {
+        const { page, size } = this._paginacion();
+        this.cargarKardex(data.productoId, page, size);
+      });
   }
 
   registrarReserva(data: ReservaMovimientoData): void {

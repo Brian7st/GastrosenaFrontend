@@ -36,6 +36,34 @@
             }
             <lucide-icon name="chevron-down" [size]="18" class="icon-right"></lucide-icon>
           </div>
+
+          <!-- Paginación del selector de GIL -->
+          @if (!gilesFacade.loading() && gilesFacade.paginacion().totalPages > 1) {
+            <div class="pagination-row">
+              <button
+                class="page-btn"
+                type="button"
+                [disabled]="gilesFacade.paginacion().page === 0"
+                (click)="gilesFacade.irAPagina(gilesFacade.paginacion().page - 1)">
+                <lucide-icon name="chevron-left" [size]="14"></lucide-icon>
+                Anterior
+              </button>
+              <span class="page-info">
+                Página {{ gilesFacade.paginacion().page + 1 }}
+                de {{ gilesFacade.paginacion().totalPages }}
+                <span class="page-total">({{ gilesFacade.paginacion().totalElements }} GILes)</span>
+              </span>
+              <button
+                class="page-btn"
+                type="button"
+                [disabled]="gilesFacade.paginacion().page >= gilesFacade.paginacion().totalPages - 1"
+                (click)="gilesFacade.irAPagina(gilesFacade.paginacion().page + 1)">
+                Siguiente
+                <lucide-icon name="chevron-right" [size]="14"></lucide-icon>
+              </button>
+            </div>
+          }
+
           <p class="hint-text">
             <lucide-icon name="info" [size]="14"></lucide-icon>
             Solo GILes en estado EMITIDO, ENVIADO_PROVEEDOR o CERRADO.
