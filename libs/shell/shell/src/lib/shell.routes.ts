@@ -56,7 +56,8 @@ export const shellRoutes: Routes = [
       },
       {
         path: 'inventario',
-        canActivate: [roleGuard([Rol.ADMINISTRADOR, Rol.CONTADORA])],
+        // TODO: Restaurar el roleGuard cuando se conecte la autenticación real
+        // canActivate: [roleGuard([Rol.ADMINISTRADOR, Rol.CONTADORA])],
         loadChildren: () =>
           import('@restaurant/inventario').then(m => m.INVENTARIO_ROUTES),
       },

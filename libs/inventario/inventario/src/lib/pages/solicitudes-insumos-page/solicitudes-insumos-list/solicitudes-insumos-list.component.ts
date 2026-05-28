@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, signal, inject, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, inject, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import {
@@ -6,19 +6,11 @@ import {
   DataTableComponent,
   KpiCardComponent,
   StatusBadgeComponent,
+  LucideIconComponent
 } from '@restaurant/shared/ui';
 import { AprobarSolicitudModalComponent } from '../../../components/aprobar-solicitud-modal/aprobar-solicitud-modal.component';
-
-interface SolicitudInsumo {
-  id: number;
-  codigo: string;
-  instructor: string;
-  ficha: string;
-  fecha: string;
-  itemsCount: number;
-  estado: 'BORRADOR' | 'ENVIADA' | 'APROBADA' | 'COMPROMETIDA' | 'CERRADA' | 'LIBRE';
-  items?: { nombre: string; cantidad: string; icon: string }[];
-}
+import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
+import { SolicitudSesion } from '../../../models/solicitud-sesion.model';
 
 @Component({
   selector: 'app-solicitudes-insumos-list',
@@ -30,109 +22,51 @@ interface SolicitudInsumo {
     DataTableComponent,
     KpiCardComponent,
     StatusBadgeComponent,
+    LucideIconComponent,
     AprobarSolicitudModalComponent
   ],
   templateUrl: './solicitudes-insumos-list.component.html',
   styleUrls: ['./solicitudes-insumos-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SolicitudesInsumosListComponent {
-  private router = inject(Router);
+export class SolicitudesInsumosListComponent implements OnInit {
+  private router  = inject(Router);
+  readonly facade = inject(SolicitudesFacade);
 
-  // ─── Mock data fiel al prototipo de Bandeja de Aprobación ───────────
-  solicitudes = signal<SolicitudInsumo[]>([
-    {
-      id: 1,
-      codigo: 'SOL-2024-001',
-      instructor: 'Carlos Ruiz',
-      ficha: '2560892',
-      fecha: '12 Oct',
-      itemsCount: 3,
-      estado: 'ENVIADA',
-      items: [
-        { nombre: 'Harina de trigo', cantidad: '10 kg', icon: 'inventory_2' },
-        { nombre: 'Aceite vegetal', cantidad: '5 L', icon: 'local_drink' },
-        { nombre: 'Leche entera', cantidad: '12 L', icon: 'water_drop' }
-      ]
-    },
-    {
-      id: 2,
-      codigo: 'SOL-2024-002',
-      instructor: 'Marta López',
-      ficha: '2441029',
-      fecha: '11 Oct',
-      itemsCount: 5,
-      estado: 'APROBADA'
-    },
-    {
-      id: 3,
-      codigo: 'SOL-2024-003',
-      instructor: 'Jorge Méndez',
-      ficha: '2339810',
-      fecha: '10 Oct',
-      itemsCount: 2,
-      estado: 'CERRADA'
-    },
-    {
-      id: 4,
-      codigo: 'SOL-2024-004',
-      instructor: 'Ana Silva',
-      ficha: '2560892',
-      fecha: '13 Oct',
-      itemsCount: 8,
-      estado: 'ENVIADA'
-    },
-    {
-      id: 5,
-      codigo: 'SOL-2024-005',
-      instructor: 'Pedro Gómez',
-      ficha: '2441029',
-      fecha: '14 Oct',
-      itemsCount: 1,
-      estado: 'ENVIADA'
-    },
-    {
-      id: 6,
-      codigo: 'SOL-2024-006',
-      instructor: 'Chef Sebastian Betancourt',
-      ficha: '2560892',
-      fecha: '15 Oct',
-      itemsCount: 1,
-      estado: 'BORRADOR',
-      items: [
-        { nombre: 'Harina de Trigo', cantidad: '10 kg', icon: 'bakery_dining' }
-      ]
-    },
-    {
-      id: 7,
-      codigo: 'SOL-2024-007',
-      instructor: 'Lic. Martha Lucía Peña',
-      ficha: '2339810',
-      fecha: '16 Oct',
-      itemsCount: 3,
-      estado: 'BORRADOR'
-    }
-  ]);
-
-  // ─── KPIs calculados (4 tarjetas del prototipo) ────────────────────
-  totalEnviadasPendientes = computed(() => this.solicitudes().filter(s => s.estado === 'ENVIADA').length);
-  totalAprobadasHoy = computed(() => this.solicitudes().filter(s => s.estado === 'APROBADA').length);
-  totalCerradas = computed(() => this.solicitudes().filter(s => s.estado === 'CERRADA').length);
-  totalLibres = computed(() => 3); // Valor estático por el momento, según la imagen
+  // ─── KPIs calculados desde datos reales ───────────────────────────
+  totalCreadasPendientes = computed(() =>
+    this.facade.solicitudesSesion().filter(s => s.estado === 'CREADA').length
+  );
+  totalAprobadasHoy = computed(() =>
+    this.facade.solicitudesSesion().filter(s => s.estado === 'APROBADA').length
+  );
+  totalCerradas = computed(() =>
+    this.facade.solicitudesSesion().filter(s => s.estado === 'CERRADA').length
+  );
+  totalLibres = computed(() =>
+    this.facade.solicitudesSesion().filter(s => s.estado === 'LIBRE').length
+  );
 
   // ─── Opciones filtros ──────────────────────────────────────────────
   estadoOptions = [
-    { value: '', label: 'Todos los estados' },
-    { value: 'ENVIADA', label: 'Enviada' },
-    { value: 'APROBADA', label: 'Aprobada' },
-    { value: 'CERRADA', label: 'Cerrada' },
-    { value: 'BORRADOR', label: 'Borrador' },
+    { value: '',              label: 'Todos los estados' },
+    { value: 'CREADA',        label: 'Creada'       },
+    { value: 'APROBADA',      label: 'Aprobada'     },
+    { value: 'RECHAZADA',     label: 'Rechazada'    },
+    { value: 'COMPROMETIDA',  label: 'Comprometida' },
+    { value: 'CERRADA',       label: 'Cerrada'      },
   ];
 
   fechaOptions = [
     { value: '', label: 'Fecha (Rango)' },
-    { value: 'rango1', label: '10 Oct 2024 - 12 Oct 2024' }
   ];
+
+  // ─── Estado del modal de aprobación ───────────────────────────────
+  solicitudSeleccionada = signal<SolicitudSesion | null>(null);
+
+  ngOnInit(): void {
+    this.facade.cargarSolicitudesSesion();
+  }
 
   // ─── Helpers ───────────────────────────────────────────────────────
   getInitials(nombre: string): string {
@@ -147,57 +81,56 @@ export class SolicitudesInsumosListComponent {
 
   getAvatarColor(estado: string): string {
     switch (estado) {
-      case 'ENVIADA': return 'avatar--blue';
-      case 'APROBADA': return 'avatar--green';
-      case 'CERRADA': return 'avatar--slate';
-      case 'BORRADOR': return 'avatar--slate';
-      default: return 'avatar--slate';
+      case 'CREADA':       return 'avatar--blue';
+      case 'APROBADA':     return 'avatar--green';
+      case 'RECHAZADA':    return 'avatar--red';
+      case 'COMPROMETIDA': return 'avatar--green';
+      default:             return 'avatar--slate';
     }
   }
 
-  solicitudSeleccionada = signal<SolicitudInsumo | null>(null);
-
-  onSearch(term: string): void { console.log('Buscar:', term); }
-  onFilterEstado(v: string): void { console.log('Estado:', v); }
-  onFilterFecha(v: string): void { console.log('Fecha:', v); }
-  onClearFilters(): void { console.log('Limpiar filtros'); }
-
-  getSolicitudVariant(estado: string): 'warning' | 'success' | 'neutral' {
-    const map: Record<string, 'warning' | 'success' | 'neutral'> = {
-      'ENVIADA': 'warning',
-      'APROBADA': 'success',
-      'CERRADA': 'neutral',
-      'BORRADOR': 'neutral'
+  getSolicitudVariant(estado: string): 'warning' | 'success' | 'neutral' | 'danger' {
+    const map: Record<string, 'warning' | 'success' | 'neutral' | 'danger'> = {
+      'CREADA':       'warning',
+      'APROBADA':     'success',
+      'RECHAZADA':    'danger',
+      'COMPROMETIDA': 'success',
+      'CERRADA':      'neutral',
     };
     return map[estado] ?? 'neutral';
   }
 
-  onView(id: string | number): void {
+  // ─── Handlers ─────────────────────────────────────────────────────
+  onSearch(): void                 { this.facade.cargarSolicitudesSesion(); }
+  onFilterEstado(v: string): void  { this.facade.cargarSolicitudesSesion(v ? { estado: v } : undefined); }
+  onFilterFecha(): void            { /* date range — pendiente */ }
+  onClearFilters(): void          { this.facade.cargarSolicitudesSesion(); }
+
+  onView(id: string): void {
     this.router.navigate(['/app/inventario/solicitudes-insumos-page', id, 'consolidacion']);
   }
 
-  onEdit(id: string | number): void {
+  onEdit(id: string): void {
     this.router.navigate(['/app/inventario/solicitudes-insumos-page', id, 'editar']);
   }
 
-  onApprove(id: number): void {
-    const sol = this.solicitudes().find(s => s.id === id);
-    if (sol) {
-      this.solicitudSeleccionada.set(sol);
-    }
+  onApprove(solicitud: SolicitudSesion): void {
+    this.solicitudSeleccionada.set(solicitud);
   }
 
   onCloseModal(): void {
     this.solicitudSeleccionada.set(null);
   }
 
-  onConfirmApprove(id: number): void {
-    this.solicitudes.update(list => list.map(s => {
-      if (s.id === id) {
-        return { ...s, estado: 'APROBADA' };
-      }
-      return s;
-    }));
+  onConfirmApprove(id: string): void {
+    this.facade.aprobarSolicitudSesion(id, { aprobadorId: 'current-user' });
     this.onCloseModal();
+  }
+
+  onReject(id: string): void {
+    this.facade.rechazarSolicitudSesion(id, {
+      aprobadorId: 'current-user',
+      motivo: 'Rechazado por el responsable',
+    });
   }
 }

@@ -18,31 +18,29 @@
 <div class="kpi-grid">
 
   <restaurant-kpi-card
-    label="Enviadas pendientes"
-    [value]="12" 
+    label="Pendientes de aprobación"
+    [value]="totalCreadasPendientes()"
     icon="send"
     iconColor="blue"
   />
 
   <restaurant-kpi-card
-    label="Aprobadas hoy"
-    [value]="8"
+    label="Aprobadas"
+    [value]="totalAprobadasHoy()"
     icon="check-circle"
     iconColor="green"
   />
 
-
   <restaurant-kpi-card variant="states">
     <div class="custom-kpi-body">
       <span class="kpi-card__label">Cerradas</span>
-      <span class="kpi-card__value">45</span>
+      <span class="kpi-card__value">{{ totalCerradas() | number }}</span>
     </div>
     <div class="custom-kpi-icon custom-kpi-icon--slate">
       <span class="material-symbols-outlined">lock</span>
     </div>
   </restaurant-kpi-card>
 
-  
   <restaurant-kpi-card variant="states">
     <div class="custom-kpi-body">
       <span class="kpi-card__label">Libres</span>
@@ -66,80 +64,121 @@
   <!-- Cabecera de tabla -->
   <thead>
     <tr>
-      <th>ID Solicitud</th>
-      <th>Instructor</th>
-      <th>Ficha</th>
-      <th>Fecha</th>
-      <th>Ítems</th>
-      <th>Estado</th>
-      <th style="text-align: center;">Acciones</th>
+      <th style="width: 10%;">ID Solicitud</th>
+      <th style="width: 22%;">Instructor</th>
+      <th style="width: 10%;">Ficha</th>
+      <th style="width: 12%;">Fecha</th>
+      <th style="width: 8%;">Ítems</th>
+      <th style="width: 12%;">Estado</th>
+      <th style="width: 26%; text-align: center;">Acciones</th>
     </tr>
   </thead>
 
   <!-- Filas de datos -->
   <tbody>
-    @for (s of solicitudes(); track s) {
-<tr>
-      
-      <!-- ID Solicitud -->
-      <td>
-        <span class="code-bold" [class.opacity-40]="s.estado === 'CERRADA'">{{ s.codigo }}</span>
-      </td>
+    @if (facade.loadingSesion()) {
+      <tr>
+        <td colspan="7" style="text-align: center; padding: 2rem;">
+          <span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">progress_activity</span>
+          Cargando solicitudes...
+        </td>
+      </tr>
+    } @else if (facade.errorSesion()) {
+      <tr>
+        <td colspan="7" style="text-align: center; padding: 2rem; color: var(--color-danger);">
+          <span class="material-symbols-outlined">error</span>
+          {{ facade.errorSesion() }}
+        </td>
+      </tr>
+    } @else if (facade.solicitudesSesion().length === 0) {
+      <tr>
+        <td colspan="7" style="text-align: center; padding: 2rem; color: var(--color-text-secondary);">
+          No hay solicitudes registradas.
+        </td>
+      </tr>
+    } @else {
+      @for (s of facade.solicitudesSesion(); track s.id) {
+        <tr>
 
-      <!-- Instructor con avatar -->
-      <td>
-        <div class="solicitante-cell" [class.opacity-40]="s.estado === 'CERRADA'">
-          <div class="avatar" [ngClass]="getAvatarColor(s.estado)">
-            {{ getInitials(s.instructor) }}
-          </div>
-          <span class="solicitante-nombre">{{ s.instructor }}</span>
-        </div>
-      </td>
+          <!-- ID Solicitud -->
+          <td>
+            @if (s.numeroSolicitud) {
+              <span class="code-bold" [class.opacity-40]="s.estado === 'CERRADA'">
+                #{{ s.numeroSolicitud }}
+              </span>
+            } @else {
+              <span class="code-muted" [class.opacity-40]="s.estado === 'CERRADA'"
+                    [title]="s.id">
+                {{ s.id.slice(0, 8) }}&hellip;
+              </span>
+            }
+          </td>
 
-      <!-- Ficha -->
-      <td class="text-secondary" [class.opacity-40]="s.estado === 'CERRADA'">{{ s.ficha }}</td>
+          <!-- Instructor con avatar -->
+          <td>
+            <div class="solicitante-cell" [class.opacity-40]="s.estado === 'CERRADA'">
+              <div class="avatar" [ngClass]="getAvatarColor(s.estado)">
+                {{ getInitials(s.instructorId) }}
+              </div>
+              <span class="solicitante-nombre">{{ s.instructorId }}</span>
+            </div>
+          </td>
 
-      <!-- Fecha -->
-      <td class="text-secondary" [class.opacity-40]="s.estado === 'CERRADA'">{{ s.fecha }}</td>
+          <!-- Ficha -->
+          <td class="text-secondary" [class.opacity-40]="s.estado === 'CERRADA'">{{ s.fichaId }}</td>
 
-      <!-- Ítems -->
-      <td class="text-secondary" [class.opacity-40]="s.estado === 'CERRADA'">{{ s.itemsCount }} ítems</td>
+          <!-- Fecha -->
+          <td class="text-secondary" [class.opacity-40]="s.estado === 'CERRADA'">
+            {{ s.fechaSolicitud ?? '—' }}
+          </td>
 
-      <!-- Estado badge -->
-      <td>
-        <restaurant-status-badge
-          [label]="s.estado"
-          [variant]="getSolicitudVariant(s.estado)">
-        </restaurant-status-badge>
-      </td>
+          <!-- Ítems -->
+          <td class="text-secondary" [class.opacity-40]="s.estado === 'CERRADA'">
+            {{ s.items.length }} ítems
+          </td>
 
-      <!-- Acciones -->
-      <td>
-        <div class="actions-row">
-          <button class="action-icon" (click)="onView(s.id)" title="Ver Detalle">
-            <span class="material-symbols-outlined">visibility</span>
-          </button>
+          <!-- Estado badge -->
+          <td>
+            <restaurant-status-badge
+              [label]="s.estado"
+              [variant]="getSolicitudVariant(s.estado)">
+            </restaurant-status-badge>
+          </td>
 
-          <button class="action-icon" (click)="onEdit(s.id)" [attr.title]="s.estado === 'BORRADOR' ? 'Editar' : 'Solo lectura'" [disabled]="s.estado !== 'BORRADOR'">
-            <span class="material-symbols-outlined">edit</span>
-          </button>
-          
-          <button class="btn-aprobar" [style.visibility]="s.estado === 'ENVIADA' ? 'visible' : 'hidden'" (click)="onApprove(s.id); $event.stopPropagation()" title="Aprobar Solicitud">
-            <span class="material-symbols-outlined" style="font-size: 16px;">check</span>
-            Aprobar
-          </button>
-        </div>
-      </td>
-    </tr>
-}
+          <!-- Acciones -->
+          <td>
+            <div class="actions-row">
+              <button class="action-icon" (click)="onView(s.id)" title="Ver Detalle">
+                <span class="material-symbols-outlined">visibility</span>
+              </button>
+
+              <button
+                class="action-icon"
+                (click)="onEdit(s.id)"
+                title="Solo se pueden editar solicitudes en estado CREADA"
+                [disabled]="s.estado !== 'CREADA'">
+                <span class="material-symbols-outlined">edit</span>
+              </button>
+
+              @if (s.estado === 'CREADA') {
+                <button class="action-icon action-icon--approve" (click)="onApprove(s); $event.stopPropagation()" title="Aprobar Solicitud">
+                  <lucide-icon name="check-circle" [size]="16"></lucide-icon>
+                </button>
+                <button class="action-icon action-icon--reject" (click)="onReject(s.id); $event.stopPropagation()" title="Rechazar Solicitud">
+                  <lucide-icon name="x" [size]="16"></lucide-icon>
+                </button>
+              }
+            </div>
+          </td>
+        </tr>
+      }
+    }
   </tbody>
 
   <!-- Paginación -->
   <div dtFooter class="pagination-footer">
     <div class="page-numbers">
       <button class="page-btn page-btn--active">1</button>
-      <button class="page-btn">2</button>
-      <button class="page-btn">3</button>
     </div>
   </div>
 

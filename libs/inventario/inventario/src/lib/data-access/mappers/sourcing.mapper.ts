@@ -131,6 +131,8 @@ export function gilFromApi(dto: GilResponse): SolicitudGil {
       valorUnitario: b.valorUnitario,
       subtotal:      b.subtotal,
     })),
+    creadoEn:      dto.creadoEn,
+    actualizadoEn: dto.actualizadoEn,
     // Campos opcionales del módulo training
     programaId:          dto.programaId,
     emitidoPor:          dto.emitidoPor,

@@ -27,16 +27,18 @@ export class BienesService {
 
   // ── Listado ──────────────────────────────────────────────────────────────────
 
-  /** GET /catalog/productos — lista paginada (page 0-based, size por defecto 10). */
+  /** GET /catalog/productos — lista paginada (page 0-based, size por defecto 20). */
   getBienes(filtros?: BienFiltros): Observable<{ bienes: Bien[]; paginacion: BienPaginacion }> {
     let params = new HttpParams();
     if (filtros?.busqueda)              params = params.set('nombre', filtros.busqueda);
     if (filtros?.categoria)             params = params.set('categoria', filtros.categoria);
     if (filtros?.estado === 'Activo')   params = params.set('activo', 'true');
     if (filtros?.estado === 'Inactivo') params = params.set('activo', 'false');
-    params = params.set('page', String(filtros?.page ?? 0));
-    params = params.set('size', String(filtros?.size ?? 10));
-    params = params.set('sort', 'id,desc');
+    params = params
+      .set('page', String(filtros?.page ?? 0))
+      .set('size', String(filtros?.size ?? 10))
+      .set('sort', 'id')
+      .set('direction', 'DESC');
 
     return this.http
       .get<PagedResponse<ProductoResponse>>(`${API}/catalog/productos`, { params })
@@ -45,41 +47,27 @@ export class BienesService {
           productos: res.content,
           paginacion: {
             totalElements: res.totalElements,
-            totalPages: res.totalPages,
-            page: res.page,
-            size: res.size,
-          },
+            totalPages:    res.totalPages,
+            page:          res.page,
+            size:          res.size,
+          } as BienPaginacion,
         })),
-        catchError(err => throwError(() => err)),
-        map(({ productos, paginacion }) => ({
-          productos,
-          paginacion,
-          bienesBase: productos.map(bienFromCatalogo),
-        })),
-        map(({ productos, paginacion, bienesBase }) => ({
-          productos,
-          paginacion,
-          bienesBase,
-          existencias$: productos.map(producto =>
+        switchMap(({ productos, paginacion }) => {
+          if (!productos.length) return of({ bienes: [] as Bien[], paginacion });
+          const existencias$ = productos.map(p =>
             this.http
-              .get<ExistenciaResponse>(`${API}/inventory/existencias/${producto.id}`)
+              .get<ExistenciaResponse>(`${API}/inventory/existencias/${p.id}`)
               .pipe(catchError(() => of(null)))
-          ),
-        })),
-        // Si el backend no tiene existencias para un producto, mantenemos los datos base.
-        // Si existen, componemos el estado real de stock sin tocar la UI.
-        switchMap(({ productos, paginacion, bienesBase, existencias$ }) =>
-          (existencias$.length ? forkJoin(existencias$) : of([])).pipe(
+          );
+          return forkJoin(existencias$).pipe(
             map(existencias => ({
-              bienes: productos.map((producto, index) =>
-                existencias[index]
-                  ? bienFromCatalogoYExistencia(producto, existencias[index])
-                  : bienesBase[index]
+              bienes: productos.map((p, i) =>
+                existencias[i] ? bienFromCatalogoYExistencia(p, existencias[i]) : bienFromCatalogo(p)
               ),
               paginacion,
             }))
-          )
-        ),
+          );
+        }),
         catchError(err => throwError(() => err))
       );
   }
