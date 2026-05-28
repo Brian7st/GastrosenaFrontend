@@ -66,6 +66,13 @@
           <div class="mesa-icon-wrapper">
             <lucide-icon name="utensils" [size]="32"></lucide-icon>
           </div>
+          
+          @if (mesa.zona) {
+          <div class="mesa-card__zona">
+            <span>{{ mesa.zona }}</span>
+          </div>
+          }
+
           <div class="mesa-card__info-row">
             <div class="mesa-card__info">
               <lucide-icon name="users" [size]="14"></lucide-icon>
