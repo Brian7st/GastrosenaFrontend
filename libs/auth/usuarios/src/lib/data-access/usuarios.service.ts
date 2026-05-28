@@ -120,6 +120,9 @@ export class UsuariosService extends BaseHttpService {
     return this.http.get<HistorialItem[]>(this.buildUrl(`${this.resource}/historial`));
   }
 
+
+
+
   exportarUsuarios(config: ExportarConfig): Observable<Blob> {
     const params = new HttpParams()
       .set('formato',          config.formato)

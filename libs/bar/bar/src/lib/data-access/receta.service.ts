@@ -1,13 +1,13 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { Receta } from '../models/receta.model';
-
 
 @Injectable({ providedIn: 'root' })
 export class RecetaService {
   private http = inject(HttpClient);
   // URL base para el backend de recetas
-  private url = '/api/barybarismo/recetas';
+  private url = '/api/recetas';
 
   recetas = signal<Receta[]>([]);
 
@@ -22,6 +22,11 @@ export class RecetaService {
       }
     });
   }
+
+  buscarPorId(id: string): Observable<Receta> {
+    return this.http.get<Receta>(`${this.url}/${id}`);
+  }
+
 
   private getMockData(): Receta[] {
     return [

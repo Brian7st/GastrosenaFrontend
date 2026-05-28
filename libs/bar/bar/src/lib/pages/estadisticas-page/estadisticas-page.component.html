@@ -1,49 +1,75 @@
 <div class="stats-container">
 
   <restaurant-page-header
-    title="Estadísticas de Bar y Barismo"
+    title="Estadísticas del Bar"
     subtitle="Métricas de rendimiento y tiempos de preparación"
   ></restaurant-page-header>
 
   <!-- KPIs Header -->
-  <div class="kpis-grid">
-    <div class="kpi-card shadow-sm kpi-orange">
-      <div class="kpi-icon-wrapper">
-        <lucide-icon name="clock" [size]="24"></lucide-icon>
-      </div>
-      <div class="kpi-info">
-        <h3>PROMEDIO GENERAL</h3>
-        <p class="kpi-value">{{ promedioFormateado() || '00:00' }}</p>
-      </div>
+  @if (cargandoKpis()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando indicadores...</p>
     </div>
+  } @else if (errorKpis()) {
+    <div class="error-state">
+      <lucide-icon name="wifi-off" size="32"></lucide-icon>
+      <p>No se pudo conectar con el backend. Verificá que el servidor esté activo.</p>
+    </div>
+  } @else {
+    <div class="kpis-grid">
+      <div class="kpi-card shadow-sm">
+        <div class="kpi-icon icon-espera">
+          <lucide-icon name="clock" size="24"></lucide-icon>
+        </div>
+        <div class="kpi-info">
+          <h3>Promedio General</h3>
+          <p class="kpi-value">{{ kpis()?.promedioDemoraGeneral ?? 0 }} min</p>
+        </div>
+      </div>
 
-    <div class="kpi-card shadow-sm kpi-green">
-      <div class="kpi-icon-wrapper">
-        <lucide-icon name="check-circle" [size]="24"></lucide-icon>
+      <div class="kpi-card shadow-sm">
+        <div class="kpi-icon icon-listo">
+          <lucide-icon name="zap" size="24"></lucide-icon>
+        </div>
+        <div class="kpi-info">
+          <h3>Bebida Más Rápida</h3>
+          <p class="kpi-value text-sm">{{ kpis()?.bebidaMasRapida || '—' }}</p>
+        </div>
       </div>
-      <div class="kpi-info">
-        <h3>BEBIDA MÁS RÁPIDA</h3>
-        <p class="kpi-value">{{ kpis()?.bebidaMasRapida || '—' }}</p>
-      </div>
-    </div>
 
-    <div class="kpi-card shadow-sm kpi-blue">
-      <div class="kpi-icon-wrapper">
-        <lucide-icon name="clipboard-list" [size]="24"></lucide-icon>
-      </div>
-      <div class="kpi-info">
-        <h3>BEBIDAS PREPARADAS</h3>
-        <p class="kpi-value">{{ kpis()?.totalBebidasDespachadosHoy || 0 }}</p>
+      <div class="kpi-card shadow-sm">
+        <div class="kpi-icon icon-preparando">
+          <lucide-icon name="check-check" size="24"></lucide-icon>
+        </div>
+        <div class="kpi-info">
+          <h3>Total Despachados</h3>
+          <p class="kpi-value">{{ kpis()?.totalBebidasDespachadosHoy ?? 0 }}</p>
+        </div>
       </div>
     </div>
-  </div>
+  }
 
   <!-- Gráficos -->
-  <div class="charts-grid">
-    <div class="chart-card shadow-sm full-width">
-      <h3>DEMORA PROMEDIO POR BEBIDA</h3>
+  @if (cargandoGraficos()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando gráficos desde el backend...</p>
+    </div>
+  }
+
+  <div class="charts-grid" [class.hidden]="cargandoGraficos()">
+    <div class="chart-card shadow-sm">
+      <h3>Demora Promedio por Bebida</h3>
       <div class="chart-wrapper">
         <canvas #graficoPromedios></canvas>
+      </div>
+    </div>
+
+    <div class="chart-card shadow-sm">
+      <h3>Carga de Trabajo del Día</h3>
+      <div class="chart-wrapper">
+        <canvas #graficoDiario></canvas>
       </div>
     </div>
   </div>
