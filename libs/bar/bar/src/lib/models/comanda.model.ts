@@ -4,8 +4,11 @@ export interface ComandaBarYBarismo {
     preparacion: string;
     cantidad: number;
     estadoPreparacion: string;
-    especificacionesCliente: string;
+    especificacionesCliente?: string;
+    notasEspeciales?: string;
+    nota?: string;
     horaEntrada: string;
+    responsable?: string;
 
     prioridad?: 'normal' | 'alta' | 'urgente';
     mesero?: string;
@@ -14,6 +17,8 @@ export interface ComandaBarYBarismo {
     horaFinalizacion?: string;
     items?: ComandaItem[];
 }
+
+
 
 export interface ComandaItem {
     idDetalleComanda: string;

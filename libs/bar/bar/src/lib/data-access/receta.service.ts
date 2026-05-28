@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Receta } from '../models/receta.model';
 
+
 @Injectable({ providedIn: 'root' })
 export class RecetaService {
   private http = inject(HttpClient);

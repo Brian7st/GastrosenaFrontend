@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { ComandaBarYBarismo } from '../models/comanda.model';
+import { ComandaBarYBarismo, ComandaItem } from '../models/comanda.model';
+import { Receta } from '../models/receta.model';
+
 
 @Injectable({
     providedIn: 'root'
@@ -12,28 +14,114 @@ export class ComandaService {
 
     // Mock data temporal para la demo visual (similar a cocina)
     private mockComandas: ComandaBarYBarismo[] = [];
-listarComandas(): Observable<ComandaBarYBarismo[]> {
-    return this.http.get<ComandaBarYBarismo[]>(this.url);
-    // return of([...this.mockComandas]);
-}
+    private parseListaPlatosToItems(idComanda: string, listaPlatos: string, estadoComanda: string, notasEspeciales?: string): ComandaItem[] {
+        if (!listaPlatos) return [];
+        const parts = listaPlatos.split(',');
+        const items = parts.map((part, index) => {
+            const trimmed = part.trim();
+            const match = trimmed.match(/^(\d+)\s*[xX]\s*(.+)$/);
+            const cantidad = match ? parseInt(match[1], 10) : 1;
+            const nombreCompleto = match ? match[2].trim() : trimmed;
 
-buscarPorId(id: string): Observable<ComandaBarYBarismo> {
-    return this.http.get<ComandaBarYBarismo>(`${this.url}/${id}`);
-    // const found = this.mockComandas.find(c => c.idComanda === id);
-    // return of(found as ComandaBarYBarismo);
-}
+            // Extraer nota si viene en paréntesis, ej: "Mojito (Sin azúcar)"
+            let nombre = nombreCompleto;
+            let nota = '';
+            const notaMatch = nombreCompleto.match(/\(([^)]+)\)/);
+            if (notaMatch) {
+                nota = notaMatch[1].trim();
+                nombre = nombreCompleto.replace(/\([^)]+\)/, '').trim();
+            }
 
-actualizarEstado(idComanda: string, nuevoEstado: string): Observable<void> {
-    return this.http.put<void>(`${this.url}/${idComanda}/estado?estado=${nuevoEstado}`, {});
-}
-iniciarDetalle(idDetalle: string): Observable<unknown> {
-    return this.http.put(`${this.url}/${idDetalle}/iniciar?responsable=bartender`, {});
-}
+            // Determinar estado basado en local storage y comanda
+            let estado: 'ESPERA' | 'PREPARANDO' | 'LISTO' = 'ESPERA';
+            if (estadoComanda === 'PENDIENTE') {
+                estado = 'ESPERA';
+                localStorage.removeItem(`gastro_bar_item_status_${idComanda}_${nombre}`);
+            } else if (estadoComanda === 'LISTO') {
+                estado = 'LISTO';
+                localStorage.removeItem(`gastro_bar_item_status_${idComanda}_${nombre}`);
+            } else {
+                const local = localStorage.getItem(`gastro_bar_item_status_${idComanda}_${nombre}`);
+                if (local === 'PREPARANDO' || local === 'LISTO') {
+                    estado = local;
+                } else {
+                    estado = 'ESPERA';
+                }
+            }
+
+            // Mapeo simple de idReceta
+            let idReceta = '';
+            const nameLower = nombre.toLowerCase();
+            if (nameLower.includes('mojito')) idReceta = 'rec-mojito';
+            else if (nameLower.includes('limonada')) idReceta = 'rec-limonada-coco';
+            else if (nameLower.includes('capuchino')) idReceta = 'rec-001';
+
+            return {
+                idDetalleComanda: `${idComanda}-${index}`,
+                nombre,
+                cantidad,
+                estado,
+                idReceta,
+                nota: nota || undefined,
+                tiempoEstimado: 5
+            };
+        });
+
+        // Si hay una sola bebida y tiene notasEspeciales general de comanda, y no tiene nota individual, le asignamos esa
+        if (items.length === 1 && notasEspeciales && !items[0].nota) {
+            items[0].nota = notasEspeciales;
+        }
+
+        return items;
+    }
 
 
-finalizarDetalle(idDetalle: string): Observable<unknown> {
-    return this.http.put(`${this.url}/${idDetalle}/finalizar`, {});
-}
+    listarComandas(): Observable<ComandaBarYBarismo[]> {
+        return this.http.get<ComandaBarYBarismo[]>(this.url).pipe(
+            map(comandas => (comandas || []).map(c => {
+                const notasEsp = c.notasEspeciales || '';
+                return {
+                    ...c,
+                    idComanda: String(c.idComanda),
+                    prioridad: (c.prioridad?.toLowerCase() || 'normal') as 'normal' | 'alta' | 'urgente',
+                    mesero: c.mesero || '',
+                    especificacionesCliente: notasEsp,
+                    items: this.parseListaPlatosToItems(String(c.idComanda), c.preparacion, c.estadoPreparacion, notasEsp)
+                };
+            }))
+        );
+    }
+
+    buscarPorId(id: string): Observable<ComandaBarYBarismo> {
+        return this.http.get<ComandaBarYBarismo>(`${this.url}/${id}`).pipe(
+            map(c => {
+                if (!c) return c;
+                const notasEsp = c.notasEspeciales || '';
+                return {
+                    ...c,
+                    prioridad: (c.prioridad?.toLowerCase() || 'normal') as 'normal' | 'alta' | 'urgente',
+                    mesero: c.mesero || c.responsable || '',
+                    especificacionesCliente: notasEsp,
+                    items: this.parseListaPlatosToItems(c.idComanda, c.preparacion, c.estadoPreparacion, notasEsp)
+                };
+            })
+        );
+    }
+    actualizarEstado(idComanda: string, nuevoEstado: string): Observable<void> {
+        return this.http.put<void>(`${this.url}/${idComanda}/estado?estado=${nuevoEstado}`, {});
+    }
+
+    iniciarDetalle(idDetalle: string): Observable<unknown> {
+        return this.http.put(`${this.url}/${idDetalle}/iniciar?responsable=1`, {});
+    }
+
+    finalizarDetalle(idDetalle: string): Observable<unknown> {
+        return this.http.put(`${this.url}/${idDetalle}/finalizar`, {});
+    }
+
+    getRecetaById(idReceta: string): Observable<Receta> {
+        return this.http.get<Receta>(`/api/barybarismo/recetas/${idReceta}`);
+    }
     private evaluarYActualizarEstadoComanda(comanda: ComandaBarYBarismo) {
         if (!comanda.items || comanda.items.length === 0) return;
         const todosListos = comanda.items.every(i => i.estado === 'LISTO');

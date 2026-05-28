@@ -1,207 +1,156 @@
-<!-- Updated to match Cocina UI -->
-@if (!showDetalles() && !mostrarReceta()) {
-  <div class="comanda-card">
-    <!-- Header -->
-    <div class="card-header border-bottom p-3 bg-white d-flex justify-content-between align-items-start">
-      <div class="header-left d-flex flex-column gap-2">
-        <div class="header-title d-flex align-items-baseline gap-2">
-          <h5 class="mesa-text text-primary m-0 fw-bold">Mesa {{ comanda().numeroMesa }}</h5>
-          <span class="hora-text text-muted small fw-medium">{{ comanda().horaEntrada | date:'HH:mm' }}</span>
+@if (vistaActual() === 'platos') {
+<div class="comanda-card">
+  <div class="card-header border-bottom p-3 bg-white d-flex justify-content-between align-items-start">
+    <div class="header-left d-flex flex-column gap-2">
+      <div class="header-title d-flex align-items-baseline gap-2">
+        <h5 class="mesa-text text-primary m-0 fw-bold">Mesa {{ comanda().numeroMesa }}</h5>
+        <span class="hora-text text-muted small fw-medium">{{ comanda().horaEntrada | date:'HH:mm' }}</span>
+      </div>
+      <div class="badge-prioridad">
+        <span class="prioridad-badge" [ngClass]="'prioridad-' + (comanda().prioridad || 'normal')">
+          {{ comanda().prioridad || 'normal' }}
+        </span>
+      </div>
+    </div>
+    <div class="header-right d-flex flex-column align-items-end gap-2">
+      <div class="badge-estado-comanda">
+        <span class="comanda-estado-badge"
+          [ngClass]="'estado-' + (comanda().estadoPreparacion === 'EN_PREPARACION' ? 'preparando' : comanda().estadoPreparacion.toLowerCase())">
+          {{ comanda().estadoPreparacion === 'EN_PREPARACION' ? 'PREPARANDO' : comanda().estadoPreparacion }}
+        </span>
+      </div>
+      <div class="mesero-text small">
+        <span class="mesero-label">Mesero: </span>
+        <span class="mesero-name">{{ comanda().mesero || 'Mateo Suárez' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body p-3 bg-white">
+    @if (comanda().especificacionesCliente) {
+    <div class="nota-especial">
+      <div class="nota-titulo">NOTA ESPECIAL</div>
+      <div class="nota-texto">{{ comanda().especificacionesCliente }}</div>
+    </div>
+    }
+    <div class="platos-list">
+      @for (item of comanda().items; track item.idDetalleComanda) {
+      <div class="plato-card" [class.plato-listo]="item.estado === 'LISTO'">
+        <div class="plato-main-row">
+          <div class="plato-info">
+            <div class="plato-title-row">
+              <span class="plato-qty">{{ item.cantidad }}x</span>
+              <span class="plato-name" [class.text-decoration-line-through]="item.estado === 'LISTO'">
+                {{ item.nombre }}
+              </span>
+              <span class="comanda-estado-badge" [ngClass]="'estado-' + item.estado.toLowerCase()"
+                style="font-size: 0.6rem; padding: 2px 8px; margin-left: 4px;">
+                {{ item.estado }}
+              </span>
+            </div>
+          </div>
+          <div class="plato-actions">
+            @if (item.estado === 'ESPERA') {
+            <restaurant-button (click)="iniciar(item)" class="btn-override-warning">Preparar</restaurant-button>
+            }
+            @if (item.estado === 'PREPARANDO') {
+            <restaurant-button (click)="finalizar(item)" class="btn-override-success">Terminado</restaurant-button>
+            }
+            <button class="btn-icon-soft" (click)="verDetalles()" title="Ver Detalles">
+              <lucide-icon name="eye" style="width: 18px;"></lucide-icon>
+            </button>
+            <button class="btn-icon-soft" (click)="alternarReceta(item)" title="Ver Receta">
+              <lucide-icon name="book-open" style="width: 18px;"></lucide-icon>
+            </button>
+          </div>
         </div>
-        <div class="badge-prioridad">
-          @if (comanda().prioridad === 'alta' || comanda().prioridad === 'urgente') {
-            <span class="badge bg-danger text-uppercase">
-              <i class="bi bi-exclamation-triangle-fill me-1"></i> PRIORIDAD: {{ comanda().prioridad }}
-            </span>
-          } @else {
-            <span class="badge bg-secondary text-uppercase">PRIORIDAD: {{ comanda().prioridad || 'NORMAL' }}</span>
-          }
+        @if (item.nota) {
+        <div class="plato-nota">
+          <lucide-icon name="info" class="flex-shrink-0" style="width: 16px; height: 16px;"></lucide-icon>
+          <span>Nota: {{ item.nota }}</span>
+        </div>
+        }
+      </div>
+      }
+    </div>
+  </div>
+</div>
+}
+
+@if (vistaActual() === 'receta' && recetaActiva()) {
+<bar-detalle-receta [receta]="recetaActiva()!" (closeDetail)="cerrarVista()"></bar-detalle-receta>
+}
+
+@if (vistaActual() === 'detalles') {
+  <div class="modal-overlay" (click)="cerrarVista()">
+    <div class="modal-content modal-detalles-content" (click)="$event.stopPropagation()">
+      
+      <!-- Header -->
+      <div class="modal-header-custom">
+        <div class="modal-header-titles">
+          <h4 class="modal-title">Detalles del Pedido - Mesa {{ comanda().numeroMesa }}</h4>
+          <p class="modal-subtitle">Información completa del pedido #{{ comanda().idComanda | slice:0:8 }}</p>
         </div>
       </div>
-      <div class="header-right d-flex flex-column align-items-end gap-2">
-        <div class="mesero-text small">
-          <span class="text-muted fw-medium">Mesero:</span> <span class="fw-bold text-dark">{{ comanda().mesero || 'No asignado' }}</span>
+
+      <!-- Info Grid -->
+      <div class="modal-info-grid">
+        <div class="info-item">
+          <strong>Mesa:</strong> <span>{{ comanda().numeroMesa }}</span>
         </div>
-        <div class="badge-estado-comanda">
-          <span class="badge rounded-pill text-uppercase" 
-                [ngClass]="{'bg-warning text-dark': comanda().estadoPreparacion === 'PENDIENTE',
-                             'bg-primary': comanda().estadoPreparacion === 'PREPARANDO',
-                             'bg-success': comanda().estadoPreparacion === 'LISTO'}">
-            {{ comanda().estadoPreparacion }}
+        <div class="info-item">
+          <strong>Estado:</strong> 
+          <span class="comanda-estado-badge" [ngClass]="'estado-' + (comanda().estadoPreparacion === 'EN_PREPARACION' ? 'preparando' : comanda().estadoPreparacion.toLowerCase())">
+            {{ comanda().estadoPreparacion === 'EN_PREPARACION' ? 'PREPARANDO' : comanda().estadoPreparacion }}
           </span>
         </div>
+        <div class="info-item">
+          <strong>Prioridad:</strong> 
+          <span class="prioridad-badge" [ngClass]="'prioridad-' + (comanda().prioridad || 'normal')">
+            {{ comanda().prioridad || 'normal' }}
+          </span>
+        </div>
+        <div class="info-item">
+          <strong>Mesero:</strong> <span>{{ comanda().mesero || 'Mateo Suárez' }}</span>
+        </div>
+        <div class="info-item">
+          <strong>Hora de pedido:</strong> <span>{{ comanda().horaEntrada | date:'HH:mm' }}</span>
+        </div>
       </div>
-    </div>
-    <!-- Body -->
-    <div class="card-body p-3 bg-white">
-      <!-- Nota Especial -->
+
       @if (comanda().especificacionesCliente) {
-        <div class="alert alert-warning mb-3 py-2 px-3">
-          <strong class="d-block small mb-1 text-warning-emphasis">NOTA ESPECIAL</strong>
-          <span class="text-dark">{{ comanda().especificacionesCliente }}</span>
+        <div class="modal-section-title">Notas especiales:</div>
+        <div class="modal-nota-caja">
+          <span>{{ comanda().especificacionesCliente }}</span>
         </div>
       }
-      <!-- Platos/Bebidas -->
-      <div class="d-flex flex-column gap-2">
+
+      <div class="modal-section-title mt-4">Items del pedido:</div>
+      <div class="modal-items-list">
         @for (item of comanda().items; track item.idDetalleComanda) {
-          <div class="plato-card bg-light border rounded p-3">
-            <div class="d-flex justify-content-between align-items-start" style="gap: 32px;">
-              <div class="plato-info d-flex flex-column gap-1 flex-grow-1">
-                <div class="d-flex align-items-center gap-2">
-                  <span class="text-primary fw-bold">{{ item.cantidad }}x</span>
-                  <span class="text-dark fw-bold" [class.text-decoration-line-through]="item.estado === 'LISTO'">
-                    {{ item.nombre }}
-                  </span>
-                </div>
-                <div>
-                  <span class="badge bg-secondary text-uppercase" style="font-size: 0.7rem;">{{ item.estado }}</span>
-                </div>
-              </div>
-              <div class="d-flex align-items-center" style="gap: 12px;">
-                @if (item.estado === 'ESPERA') {
-                  <button class="btn btn-primary btn-sm" (click)="iniciar(item)">
-                    <i class="bi bi-play-fill"></i> Comenzar
-                  </button>
-                }
-                @if (item.estado === 'PREPARANDO') {
-                  <button class="btn btn-success btn-sm" (click)="finalizar(item)">
-                    <i class="bi bi-check-lg"></i> Listo
-                  </button>
-                }
-                <button class="btn btn-link text-secondary p-0 border-0" title="Ver Detalles" (click)="showDetalles.set(true)">
-                  <i class="bi bi-eye fs-5"></i>
-                </button>
-                @if (item.idReceta) {
-                  <button class="btn btn-link text-secondary p-0 border-0" title="Ver Receta" (click)="alternarReceta(item.idReceta)">
-                    <i class="bi bi-book fs-5"></i>
-                  </button>
-                }
-              </div>
+          <div class="modal-item-row">
+            <div class="item-details">
+              <span class="item-name">{{ item.cantidad }}x {{ item.nombre }}</span>
+              @if (item.nota) {
+                <span class="item-note">Nota: {{ item.nota }}</span>
+              } @else {
+                <span class="item-note">Nota: Sin especificaciones</span>
+              }
             </div>
-            @if (item.nota) {
-              <div class="mt-2 text-warning-emphasis small bg-warning bg-opacity-10 border border-warning rounded px-2 py-1">
-                <i class="bi bi-info-circle"></i> Nota: {{ item.nota }}
-              </div>
-            }
-          </div>
-        }
-      </div>
-    </div>
-    <!-- Footer -->
-    @if (comanda().estadoPreparacion === 'PENDIENTE') {
-      <div class="card-footer bg-light p-3 border-top">
-        <button class="btn btn-primary w-100 fw-bold d-flex align-items-center justify-content-center gap-2" (click)="empezarTodo()">
-          <i class="bi bi-play-circle fs-5"></i> Comenzar Todo
-        </button>
-      </div>
-    }
-  </div>
-} @else if (showDetalles()) {
-  <div class="comanda-card details-view bg-white border rounded shadow-sm p-4 mb-3">
-    <div class="d-flex justify-content-between align-items-start mb-2">
-      <h5 class="m-0 fw-bold text-dark">Detalles del Pedido - Mesa {{ comanda().numeroMesa }}</h5>
-      <button class="btn btn-link text-secondary p-0 fs-5 lh-1 border-0" (click)="showDetalles.set(false)">
-        <i class="bi bi-x-lg"></i>
-      </button>
-    </div>
-    <div class="text-muted small mb-4">
-      Información completa del pedido #{{ comanda().idComanda || '001' }} - Estado: {{ comanda().estadoPreparacion | titlecase }}
-    </div>
-
-    <div class="row g-3 mb-4 text-dark" style="font-size: 0.95rem;">
-      <div class="col-6"><strong>Mesa:</strong> {{ comanda().numeroMesa }}</div>
-      <div class="col-6"><strong>Estado:</strong> {{ comanda().estadoPreparacion | titlecase }}</div>
-      <div class="col-6"><strong>Prioridad:</strong> {{ comanda().prioridad || 'normal' | lowercase }}</div>
-      <div class="col-6"><strong>Mesero:</strong> {{ comanda().mesero || 'No asignado' }}</div>
-      <div class="col-6"><strong>Hora de pedido:</strong> {{ comanda().horaEntrada | date:'HH:mm' }}</div>
-      <div class="col-6"><strong>Tiempo estimado:</strong> {{ comanda().tiempoEstimado || '--' }} min</div>
-    </div>
-
-    @if (comanda().especificacionesCliente) {
-      <div class="mb-4">
-        <strong class="text-dark">Notas especiales:</strong>
-        <div class="alert alert-warning mt-2 mb-0">{{ comanda().especificacionesCliente }}</div>
-      </div>
-    }
-
-    <div>
-      <strong class="text-dark mb-2 d-block">Items del pedido:</strong>
-      <div class="mt-2">
-        @for (item of comanda().items; track item.idDetalleComanda) {
-          <div class="plato-card bg-light border rounded p-3 mb-3">
-            <div class="d-flex justify-content-between align-items-center">
-              <div class="d-flex flex-column w-100 pe-3">
-                <div class="fs-6">
-                  <span class="fw-bold text-primary">{{ item.cantidad }}x</span> 
-                  <span class="fw-medium text-dark">{{ item.nombre }}</span>
-                </div>
-                @if (item.nota) {
-                  <div class="text-muted small mt-1"><i class="bi bi-info-circle"></i> Nota: {{ item.nota }}</div>
-                }
-              </div>
-              <div class="d-flex gap-2 align-items-center">
-                <span class="badge bg-white text-dark border px-3 py-2 rounded-pill shadow-sm" style="font-weight: 500;">
-                  @if (item.estado === 'ESPERA') {
-                    -- min
-                  } @else {
-                    {{ item.duracionMinutos || getTiempoTranscurrido(item.horaInicioPreparacion) }} min
-                  }
-                </span>
-                <span class="badge bg-secondary px-3 py-2 rounded-pill text-uppercase" style="font-weight: 500;">
-                  {{ item.estado }}
-                </span>
-              </div>
+            <div class="item-status-group">
+              <span class="item-time">
+                @if (item.estado === 'ESPERA') { 15min }
+                @else { {{ item.duracionMinutos || getTiempoTranscurrido(item.horaInicioPreparacion) }}min }
+              </span>
+              <span class="comanda-estado-badge text-uppercase" [ngClass]="'estado-' + item.estado.toLowerCase()">{{ item.estado }}</span>
             </div>
           </div>
         }
       </div>
-    </div>
-    
-    <div class="d-flex justify-content-end mt-4 pt-3 border-top">
-      <button class="btn btn-outline-secondary px-4 rounded" (click)="showDetalles.set(false)">Cerrar</button>
-    </div>
-  </div>
-} @else if (mostrarReceta()) {
-  <div class="comanda-card details-view bg-white border rounded shadow-sm p-4 mb-3">
-    <div class="d-flex justify-content-between align-items-start mb-3">
-      <h5 class="m-0 fw-bold d-flex align-items-center gap-2 text-dark">
-        <i class="bi bi-book text-primary"></i> Receta: {{ recetaActiva()?.nombreReceta }}
-      </h5>
-      <button class="btn btn-link text-secondary p-0 fs-5 lh-1 border-0" (click)="cerrarReceta()">
-        <i class="bi bi-x-lg"></i>
-      </button>
-    </div>
-    @if (recetaActiva(); as receta) {
-      <div class="mb-4">
-        <span class="badge bg-light text-dark border px-3 py-2 rounded-pill"><i class="bi bi-clock"></i> {{ receta.tiempoPreparacion }} min</span>
-        <span class="badge bg-light text-dark border px-3 py-2 rounded-pill ms-2"><i class="bi bi-thermometer-half"></i> {{ receta.temperatura }}</span>
+
+      <div class="mt-5 pt-3" style="border-top: 1px solid var(--color-pizarra-100); margin-top: 32px !important;">
+        <restaurant-button (click)="cerrarVista()" class="btn-override-warning" style="display: block; width: 100%;">Cerrar Detalles</restaurant-button>
       </div>
-      <div class="mb-4">
-        <h6 class="fw-bold mb-3 text-dark">Ingredientes</h6>
-        <ul class="list-group list-group-flush border rounded overflow-hidden">
-          @for (ing of receta.ingredientes; track ing.nombreIngrediente) {
-            <li class="list-group-item bg-light border-bottom">• {{ ing.nombreIngrediente }} @if(ing.cantidadRequerida) { - {{ ing.cantidadRequerida }} {{ ing.unidadMedida }} }</li>
-          }
-        </ul>
-      </div>
-      @if (receta.pasos && receta.pasos.length > 0) {
-        <div>
-          <h6 class="fw-bold mb-3 text-dark">Preparación</h6>
-          <div class="d-flex flex-column gap-3">
-            @for (paso of receta.pasos; track paso.orden; let i = $index) {
-              <div class="d-flex align-items-start gap-3 bg-light p-3 rounded">
-                <span class="badge bg-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 1rem;">{{ i + 1 }}</span>
-                <div class="pt-1 text-dark">{{ paso.descripcionPaso }}</div>
-              </div>
-            }
-          </div>
-        </div>
-      }
-    } @else {
-      <div class="alert alert-warning d-flex align-items-center gap-2"><i class="bi bi-exclamation-triangle"></i> No se encontró información de la receta para este plato.</div>
-    }
-    <div class="d-flex justify-content-end mt-4 pt-3 border-top">
-      <button class="btn btn-outline-secondary px-4 rounded" (click)="cerrarReceta()">Cerrar</button>
     </div>
   </div>
 }
