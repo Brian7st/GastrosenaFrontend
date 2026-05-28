@@ -176,6 +176,7 @@
 @if (isModalOpen()) {
   <restaurant-confirmar-envio-solicitud-modal
     [isOpen]="true"
+    [isEdit]="isEdit()"
     (cancelled)="cerrarModalConfirmacion()"
     (confirmed)="confirmarEnvio()">
   </restaurant-confirmar-envio-solicitud-modal>

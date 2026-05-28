@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 })
 export class ConfirmarEnvioSolicitudModalComponent {
   @Input() isOpen = false;
+  @Input() isEdit = false;
   @Output() confirmed = new EventEmitter<void>();
   @Output() cancelled = new EventEmitter<void>();
 }

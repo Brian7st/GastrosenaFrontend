@@ -6,12 +6,12 @@
           <span class="material-symbols-outlined">send</span>
         </div>
         
-        <h2 class="modal-title">¿Confirmar envío?</h2>
+        <h2 class="modal-title">{{ isEdit ? 'Confirmar Edición' : 'Confirmar creación' }}</h2>
         <p class="modal-text">Una vez enviada no podrá editar la solicitud.</p>
         
         <div class="modal-actions">
           <button class="btn-cancel" type="button" (click)="cancelled.emit()">Cancelar</button>
-          <button class="btn-confirm" type="button" (click)="confirmed.emit()">Confirmar envío</button>
+          <button class="btn-confirm" type="button" (click)="confirmed.emit()">{{ isEdit ? 'Confirmar edición' : 'Confirmar creación' }}</button>
         </div>
       </div>
     </div>
