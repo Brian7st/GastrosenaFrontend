@@ -1,3 +1,24 @@
+/**
+ * GET /inventory/movimientos/{productoId} — response paginado.
+ * El backend no documenta el schema en Swagger (type: object genérico).
+ * Se soportan ambas convenciones: inglés (content/totalElements) y
+ * español (contenido/totalElementos) para cubrir las variaciones del backend.
+ */
+export interface MovimientoPageResponse {
+  // Convención inglés (Spring Page<T> estándar — igual que PagedGilResponse)
+  content?:       MovimientoResponse[];
+  totalElements?: number;
+  totalPages?:    number;
+  number?:        number;
+  size?:          number;
+  // Convención español (patrón interno de otros módulos)
+  contenido?:       MovimientoResponse[];
+  totalElementos?:  number;
+  totalPaginas?:    number;
+  paginaActual?:    number;
+  tamano?:          number;
+}
+
 export interface ExistenciaResponse {
   productoId: string;
   stockFisico: number;
@@ -22,27 +43,24 @@ export interface MovimientoResponse {
   estado: 'Completado' | 'Pendiente' | 'Cancelado';
 }
 
+/** RegistrarEntradaHttpRequest — POST /api/v1/inventory/movimientos/entrada */
 export interface EntradaRequest {
-  productoId: string;
-  cantidad: number;
-  fecha: string;
-  proveedorId?: string;
-  facturaId?: string;
-  ubicacion: string;
-  valorUnitario: number;
-  observaciones?: string;
+  productoId:      string;
+  cantidad:        number;
+  precioUnitario:  number;
+  facturaId?:      string;
+  proveedorNit?:   string;
+  gilId?:          string;
+  conciliacionId?: string;
 }
 
+/** RegistrarSalidaHttpRequest — POST /api/v1/inventory/movimientos/salida */
 export interface SalidaRequest {
-  productoId: string;
-  cantidad: number;
-  fecha: string;
-  areaDestino: string;
-  instructorId?: string;
-  fichaId?: string;
-  categoria: string;
-  proposito: string;
-  observaciones?: string;
+  productoId:    string;
+  cantidad:      number;
+  requisicionId: string;
+  instructorId:  string;
+  categoria:     string;
 }
 
 export interface ReservaRequest {
