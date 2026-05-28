@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ButtonComponent, KpiCardComponent, LoadingSkeletonComponent } from '@restaurant/shared/ui';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
-import { BienFormComponent } from '../../modals/bien-form/bien-form.component';
+import { BienFormComponent } from '../../../ui/modals/bien-form/bien-form.component';
 import { BienImportModalComponent, BienImportPayload } from '../../modals/bien-import/bien-import.component';
 import { BienDeleteModalComponent } from '../../modals/bien-delete-modal/bien-delete-modal.component';
 import { Bien, BienFormDto, EstadoBien } from '../../../models/inventario.model';

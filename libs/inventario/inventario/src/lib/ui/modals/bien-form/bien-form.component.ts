@@ -35,17 +35,28 @@ export class BienFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
+
     if (this.mode === 'edit' && this.bien) {
+      const bien = this.bien as Bien & {
+        vrlAdjudicado?: number | null;
+        vrlAntes?: number | null;
+        urlImagen?: string | null;
+      };
+
       this.form.patchValue({
-        codigoSena:      this.bien.codigoSena,
-        codigoProveedor: this.bien.codigoProveedor,
-        nombre:          this.bien.nombre,
-        descripcion:     this.bien.descripcion ?? '',
-        categoria:       this.bien.categoria,
-        unidadMedida:    this.bien.unidadMedida,
-        imagenUrl:       this.bien.imagenUrl ?? '',
+        codigoSena:      bien.codigoSena,
+        codigoProveedor: bien.codigoProveedor,
+        nombre:          bien.nombre,
+        descripcion:     bien.descripcion ?? '',
+        categoria:       bien.categoria,
+        unidadMedida:    bien.unidadMedida,
+        imagenUrl:       bien.imagenUrl ?? bien.urlImagen ?? '',
+        vrlAdjudicado:   bien.vrlAdjudicado ?? bien.valor ?? null,
+        vrlAntes:        bien.vrlAntes ?? bien.valorNeto ?? null,
+        iva:             bien.iva ?? null,
       });
-      // En edición el código SENA es inmutable — no se puede cambiar
+
+      // En edicion el codigo SENA es inmutable - no se puede cambiar
       this.form.get('codigoSena')?.disable();
       if (this.umBloqueada()) {
         this.form.get('unidadMedida')?.disable();
@@ -62,6 +73,9 @@ export class BienFormComponent implements OnInit {
       categoria:       ['', Validators.required],
       unidadMedida:    ['', Validators.required],
       imagenUrl:       [''],
+      vrlAdjudicado:   this.fb.control<number | null>(null),
+      vrlAntes:        this.fb.control<number | null>(null),
+      iva:             this.fb.control<number | null>(null),
     });
   }
 
