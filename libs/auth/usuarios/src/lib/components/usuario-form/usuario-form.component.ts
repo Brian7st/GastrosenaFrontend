@@ -32,13 +32,13 @@ export class UsuarioFormComponent implements OnChanges {
   readonly mostrarContrasena = signal(false);
 
   readonly form = this.fb.nonNullable.group({
-    nombre:     ['', Validators.required],
-    apellidos:  ['', Validators.required],
-    email:      ['', [Validators.required, Validators.email]],
-    documento:  ['', Validators.required],
-    telefono:   ['', Validators.required],
-    nombreRol:  ['', Validators.required],
-    contrasena: ['', [Validators.required, Validators.minLength(8)]],
+    nombre:    ['', Validators.required],
+    apellidos: ['', Validators.required],
+    email:     ['', [Validators.required, Validators.email]],
+    documento: ['', Validators.required],
+    telefono:  ['', Validators.required],
+    nombreRol: ['', Validators.required],
+    // contrasena eliminada — la genera el backend
   });
 
   get modoEdicion(): boolean {
@@ -55,17 +55,8 @@ export class UsuarioFormComponent implements OnChanges {
         telefono:  this.usuario.telefono,
         nombreRol: this.usuario.rol,
       });
-      this.form.controls.contrasena.clearValidators();
-      this.form.controls.contrasena.setValue('');
-      this.form.controls.contrasena.updateValueAndValidity();
     } else {
       this.form.reset();
-      this.mostrarContrasena.set(false);
-      this.form.controls.contrasena.setValidators([
-        Validators.required,
-        Validators.minLength(8),
-      ]);
-      this.form.controls.contrasena.updateValueAndValidity();
     }
   }
 

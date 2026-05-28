@@ -18,7 +18,7 @@ export interface CrearUsuarioRequest {
   apellidos:  string;
   email:      string;
   telefono:   string;
-  contrasena: string;
+  // contrasena ya no se envía — la genera el backend
   nombreRol:  string;  // ← cambio
 }
 
