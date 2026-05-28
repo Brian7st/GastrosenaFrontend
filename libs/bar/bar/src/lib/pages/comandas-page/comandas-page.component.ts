@@ -15,8 +15,8 @@ import { ComandaCardComponent } from '../../components/comanda-card/comanda-card
   selector: 'restaurant-bar-comandas-page',
   standalone: true,
   imports: [
-    CommonModule, 
-    FormsModule, 
+    CommonModule,
+    FormsModule,
     PageHeaderComponent,
     SearchFilterComponent,
     SelectFilterComponent,
@@ -44,14 +44,14 @@ export class ComandasComponent implements OnInit {
     { label: 'PREPARANDO', value: 'PREPARANDO' },
     { label: 'LISTO', value: 'LISTO' }
   ];
-  
+
   opcionesPrioridad = [
     { label: 'Todas las prioridades', value: 'Todas las prioridades' },
     { label: 'Urgente', value: 'urgente' },
     { label: 'Alta', value: 'alta' },
     { label: 'Normal', value: 'normal' }
   ];
-  
+
   opcionesOrden = [
     { label: 'Prioridad', value: 'Prioridad' },
     { label: 'Hora de llegada', value: 'Hora de llegada' },
@@ -78,23 +78,49 @@ export class ComandasComponent implements OnInit {
   }
 
   onIniciarPlato(idDetalle: string, idComanda: string) {
-    this.comandaService.iniciarDetalle(idDetalle).subscribe({
-      next: () => {
-        this.actualizarEstadoItem(idComanda, idDetalle, 'PREPARANDO' as const);
-        this.evaluarEstadoComanda(idComanda);
-      },
-      error: (err) => this.mostrarError('Error al iniciar bebida: ' + err.message)
-    });
+    const comanda = this.comandas().find(c => c.idComanda === idComanda);
+    if (!comanda) return;
+    const item = comanda.items?.find(i => i.idDetalleComanda === idDetalle);
+    if (!item) return;
+
+    localStorage.setItem(`gastro_bar_item_status_${idComanda}_${item.nombre}`, 'PREPARANDO');
+
+    if (comanda.estadoPreparacion === 'PENDIENTE') {
+      this.comandaService.iniciarDetalle(idComanda).subscribe({
+        next: () => {
+          this.actualizarEstadoItem(idComanda, idDetalle, 'PREPARANDO' as const);
+          this.evaluarEstadoComanda(idComanda);
+        },
+        error: (err: { message?: string; error?: string }) => this.mostrarError('Error al iniciar bebida: ' + (err.message || err.error || ''))
+      });
+    } else {
+      this.actualizarEstadoItem(idComanda, idDetalle, 'PREPARANDO' as const);
+      this.evaluarEstadoComanda(idComanda);
+    }
   }
 
   onFinalizarPlato(idDetalle: string, idComanda: string) {
-    this.comandaService.finalizarDetalle(idDetalle).subscribe({
-      next: () => {
-        this.actualizarEstadoItem(idComanda, idDetalle, 'LISTO' as const);
-        this.evaluarEstadoComanda(idComanda);
-      },
-      error: (err) => this.mostrarError('Error al finalizar bebida: ' + err.message)
-    });
+    const comanda = this.comandas().find(c => c.idComanda === idComanda);
+    if (!comanda || !comanda.items) return;
+    const item = comanda.items.find(i => i.idDetalleComanda === idDetalle);
+    if (!item) return;
+
+    localStorage.setItem(`gastro_bar_item_status_${idComanda}_${item.nombre}`, 'LISTO');
+
+    const otherNotListos = comanda.items.filter(i => i.idDetalleComanda !== idDetalle && i.estado !== 'LISTO');
+
+    if (otherNotListos.length === 0) {
+      this.comandaService.finalizarDetalle(idComanda).subscribe({
+        next: () => {
+          this.actualizarEstadoItem(idComanda, idDetalle, 'LISTO' as const);
+          this.evaluarEstadoComanda(idComanda);
+        },
+        error: (err: { message?: string; error?: string }) => this.mostrarError('Error al finalizar comanda: ' + (err.message || err.error || ''))
+      });
+    } else {
+      this.actualizarEstadoItem(idComanda, idDetalle, 'LISTO' as const);
+      this.evaluarEstadoComanda(idComanda);
+    }
   }
 
   private actualizarEstadoItem(idComanda: string, idDetalle: string, nuevoEstado: 'PREPARANDO' | 'LISTO') {
@@ -103,11 +129,11 @@ export class ComandasComponent implements OnInit {
         const items = c.items.map(i => {
           if (i.idDetalleComanda === idDetalle) {
             const horaFin = nuevoEstado === 'LISTO' ? new Date().toISOString() : i.horaFinPreparacion;
-            const duracion = nuevoEstado === 'LISTO' && i.horaInicioPreparacion 
-                             ? Math.floor((new Date().getTime() - new Date(i.horaInicioPreparacion).getTime()) / 60000) 
-                             : i.duracionMinutos;
-            return { 
-              ...i, 
+            const duracion = nuevoEstado === 'LISTO' && i.horaInicioPreparacion
+              ? Math.floor((new Date().getTime() - new Date(i.horaInicioPreparacion).getTime()) / 60000)
+              : i.duracionMinutos;
+            return {
+              ...i,
               estado: nuevoEstado,
               horaInicioPreparacion: nuevoEstado === 'PREPARANDO' ? new Date().toISOString() : i.horaInicioPreparacion,
               horaFinPreparacion: horaFin,
@@ -127,7 +153,7 @@ export class ComandasComponent implements OnInit {
       if (c.idComanda === idComanda && c.items) {
         const todosListos = c.items.every(i => i.estado === 'LISTO');
         const algunoPreparandoOlisto = c.items.some(i => i.estado === 'PREPARANDO' || i.estado === 'LISTO');
-        
+
         let nuevoEstado = c.estadoPreparacion;
         if (todosListos) {
           nuevoEstado = 'LISTO';
@@ -144,9 +170,9 @@ export class ComandasComponent implements OnInit {
 
   comandasFiltradas = computed(() => {
     const filtrados = this.comandas().filter(c => {
-      const matchBusqueda = c.numeroMesa.toString().includes(this.searchTerm()) || 
-                            (c.mesero && c.mesero.toLowerCase().includes(this.searchTerm().toLowerCase())) ||
-                            (c.preparacion && c.preparacion.toLowerCase().includes(this.searchTerm().toLowerCase()));
+      const matchBusqueda = c.numeroMesa.toString().includes(this.searchTerm()) ||
+        (c.mesero && c.mesero.toLowerCase().includes(this.searchTerm().toLowerCase())) ||
+        (c.preparacion && c.preparacion.toLowerCase().includes(this.searchTerm().toLowerCase()));
       const matchEstado = this.filtroEstado() === 'Todos los estados' || c.estadoPreparacion === this.filtroEstado();
       const matchPrioridad = this.filtroPrioridad() === 'Todas las prioridades' || c.prioridad === this.filtroPrioridad();
       return matchBusqueda && matchEstado && matchPrioridad;
@@ -166,6 +192,6 @@ export class ComandasComponent implements OnInit {
   });
 
   enEspera = computed(() => this.comandasFiltradas().filter(c => c.estadoPreparacion === 'PENDIENTE'));
-  preparando = computed(() => this.comandasFiltradas().filter(c => c.estadoPreparacion === 'EN_PREPARACION'));
+  preparando = computed(() => this.comandasFiltradas().filter(c => c.estadoPreparacion === 'PREPARANDO' || c.estadoPreparacion === 'EN_PREPARACION'));
   listos = computed(() => this.comandasFiltradas().filter(c => c.estadoPreparacion === 'LISTO'));
 }
