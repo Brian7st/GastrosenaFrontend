@@ -77,7 +77,7 @@
         <th>ACCIÓN</th>
       </tr>
     </thead>
-    @for (reporte of reportesRecientes(); track reporte.nombre) {
+    @for (reporte of reportesRecientes(); track reporte.id) {
       <tr>
         <td>{{ reporte.nombre }}</td>
         <td>{{ reporte.fecha }}</td>
@@ -88,7 +88,7 @@
           />
         </td>
         <td>
-          <restaurant-button variant="surface" (click)="descargarReporte(reporte.nombre)">
+          <restaurant-button variant="surface" (click)="descargarReporte(reporte.id)">
             <lucide-icon name="download" [size]="14"></lucide-icon>
             Descargar
           </restaurant-button>
