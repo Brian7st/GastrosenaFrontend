@@ -1,12 +1,10 @@
 import { Routes } from '@angular/router';
-import { Rol } from '@restaurant/shared/models';
 import { authGuard } from './guards/auth.guard';
-import { roleGuard } from './guards/role.guard';
+import { permissionGuard } from './guards/permission.guard';
 import { ShellLayoutComponent } from './shell-layout/shell-layout.component';
 import { PublicLayoutComponent } from './public-layout/public-layout.component';
 
 export const shellRoutes: Routes = [
-  // ── Ruta pública: landing page ──────────────────────────────────────────
   {
     path: '',
     component: PublicLayoutComponent,
@@ -19,18 +17,15 @@ export const shellRoutes: Routes = [
     ],
   },
 
-  // ── Auth: login, recuperar contraseña ───────────────────────────────────
   {
     path: 'auth',
     loadChildren: () => import('@restaurant/auth').then(m => m.AUTH_ROUTES),
   },
 
-  // ── Shell autenticado: todos los módulos de negocio ──────────────────────
   {
     path: 'app',
     component: ShellLayoutComponent,
-    // TODO: Restaurar authGuard cuando se conecte la autenticación real
-    // canActivate: [authGuard],
+    canActivate: [authGuard],
     children: [
       {
         path: '',
@@ -39,34 +34,34 @@ export const shellRoutes: Routes = [
       },
       {
         path: 'cocina',
-        // TODO: Restaurar el roleGuard cuando se conecte la autenticación real
-        // canActivate: [roleGuard([Rol.CHEF, Rol.ADMIN_COCINA, Rol.AUXILIAR_COCINA])],
+        canActivate: [permissionGuard(['RECETAS_GESTIONAR', 'RECETAS_CONSULTAR', 'COMANDAS_CONSULTAR', 'PEDIDOS_ACTIVOS_VISUALIZAR'])],
         loadChildren: () => import('@restaurant/cocina').then(m => m.COCINA_ROUTES),
       },
       {
         path: 'bar',
-        // TODO: Restaurar el roleGuard cuando se conecte la autenticación real
-        // canActivate: [roleGuard([Rol.LIDER_BAR, Rol.ADMIN_BAR, Rol.BARTENDER])],
+        canActivate: [permissionGuard(['COMANDAS_CONSULTAR', 'RECETAS_CONSULTAR', 'PEDIDOS_ACTIVOS_VISUALIZAR'])],
         loadChildren: () => import('@restaurant/bar').then(m => m.BAR_ROUTES),
       },
       {
         path: 'restaurante',
+        canActivate: [permissionGuard(['MODULO_MESAS_VER', 'MESAS_CONSULTAR', 'COMANDAS_CREAR', 'PEDIDOS_ACTIVOS_VISUALIZAR', 'FACTURAS_GENERAR'])],
         loadChildren: () =>
           import('@restaurant/restaurante').then(m => m.RESTAURANTE_ROUTES),
       },
       {
         path: 'inventario',
-        // TODO: Restaurar el roleGuard cuando se conecte la autenticación real
-        // canActivate: [roleGuard([Rol.ADMINISTRADOR, Rol.CONTADORA])],
+        canActivate: [permissionGuard(['bienes:ver', 'facturas:ver', 'consolidado:ver', 'alertas:ver', 'FACTURAS_GENERAR'])],
         loadChildren: () =>
           import('@restaurant/inventario').then(m => m.INVENTARIO_ROUTES),
       },
       {
         path: 'usuarios',
+        canActivate: [permissionGuard(['USUARIOS_LISTAR', 'USUARIOS_VER'])],
         loadChildren: () => import('@restaurant/usuarios').then(m => m.USUARIOS_ROUTES),
       },
       {
         path: 'reportes',
+        canActivate: [permissionGuard(['MODULO_REPORTES_VER', 'REPORTES_GESTIONAR', 'REPORTES_PEDIDOS_COCINA', 'REPORTES_VENTAS_MESERO'])],
         loadChildren: () => import('@restaurant/reportes').then(m => m.REPORTES_ROUTES),
       },
       {
@@ -82,7 +77,6 @@ export const shellRoutes: Routes = [
     ],
   },
 
-  // ── Showcase — herramienta de revisión del sistema de diseño (sin auth) ──
   {
     path: 'showcase',
     loadComponent: () =>
