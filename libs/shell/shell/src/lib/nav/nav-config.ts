@@ -42,6 +42,21 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
           icono: 'coffee',
           permisos: ['COMANDAS_CONSULTAR', 'RECETAS_CONSULTAR'],
           children: [
+            {
+              label: 'Inicio',
+              ruta: '/app/bar/inicio',
+              icono: 'layout-dashboard',
+            },
+            {
+              label: 'Comandas',
+              ruta: '/app/bar/comandas',
+              icono: 'clipboard-list',
+            },
+            {
+              label: 'Recetas',
+              ruta: '/app/bar/recetas',
+              icono: 'book-open',
+            },
             { label: 'Inicio',       ruta: '/app/bar/inicio',       icono: 'layout-dashboard' },
             { label: 'Comandas',     ruta: '/app/bar/comandas',     icono: 'clipboard-list'   },
             { label: 'Estadísticas', ruta: '/app/bar/estadisticas', icono: 'bar-chart-2'      },
@@ -105,6 +120,26 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
           icono: 'pie-chart',
           permisos: ['MODULO_REPORTES_VER', 'REPORTES_GESTIONAR', 'generar_reporte_facturacion'],
           children: [
+            {
+              label: 'Ventas',
+              ruta: '/app/reportes/ventas',
+              icono: 'trending-up',
+            },
+            {
+              label: 'Inventario',
+              ruta: '/app/reportes/inventario',
+              icono: 'warehouse',
+            },
+            {
+              label: 'Estadísticas cocina',
+              ruta: '/app/reportes/estadisticas-cocina',
+              icono: 'bar-chart-2',
+            },
+            {
+              label: 'Estadísticas bar',
+              ruta: '/app/bar/estadisticas',
+              icono: 'bar-chart-2',
+            },
             { label: 'Ventas',              ruta: '/app/reportes/ventas',              icono: 'trending-up' },
             { label: 'Inventario',          ruta: '/app/reportes/inventario',          icono: 'warehouse'   },
             { label: 'Estadísticas cocina', ruta: '/app/reportes/estadisticas-cocina', icono: 'bar-chart-2' },

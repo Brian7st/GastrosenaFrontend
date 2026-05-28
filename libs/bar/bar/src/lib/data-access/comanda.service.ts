@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { ComandaBarYBarismo } from '../models/comanda.model';
 
 @Injectable({
@@ -49,8 +49,26 @@ finalizarDetalle(idDetalle: string): Observable<unknown> {
 
     private baseUrlEstadisticas = '/api/barybarismo/estadisticas';
 
+    private parseTiempoPromedioToMinutos(tiempo: string): number {
+        if (!tiempo) return 0;
+        const minMatch = tiempo.match(/(\d+)\s*min/);
+        const segMatch = tiempo.match(/(\d+)\s*seg/);
+        const mins = minMatch ? parseInt(minMatch[1], 10) : 0;
+        const segs = segMatch ? parseInt(segMatch[1], 10) : 0;
+        return mins + (segs / 60);
+    }
+
     getEstadisticasPromedios(): Observable<PromedioBebida[]> {
-        return this.http.get<PromedioBebida[]>(`${this.baseUrlEstadisticas}/promedio`);
+        interface PromedioPreparacionDTO {
+            bebida: string;
+            tiempoPromedio: string;
+        }
+        return this.http.get<PromedioPreparacionDTO[]>(`${this.baseUrlEstadisticas}/promedio`).pipe(
+            map(data => (data || []).map(d => ({
+                nombreReceta: d.bebida || '—',
+                promedioMinutos: this.parseTiempoPromedioToMinutos(d.tiempoPromedio)
+            })))
+        );
     }
 
     getEstadisticasDiarias(): Observable<CargaTrabajoDiaria[]> {
@@ -59,7 +77,20 @@ finalizarDetalle(idDetalle: string): Observable<unknown> {
         const month = String(hoy.getMonth() + 1).padStart(2, '0');
         const day = String(hoy.getDate()).padStart(2, '0');
         const fechaLocal = `${year}-${month}-${day}`;
-        return this.http.get<CargaTrabajoDiaria[]>(`${this.baseUrlEstadisticas}/diarias?fecha=${fechaLocal}`);
+        interface EstadisticasDiariasDTO {
+            fecha: string;
+            totalComandas: number;
+            tiempoPromedio: string;
+        }
+        return this.http.get<EstadisticasDiariasDTO>(`${this.baseUrlEstadisticas}/diarias?fecha=${fechaLocal}`).pipe(
+            map(data => {
+                if (!data) return [];
+                return [{
+                    hora: data.fecha || fechaLocal,
+                    totalBebidas: data.totalComandas || 0
+                }];
+            })
+        );
     }
 
     getKpis(): Observable<EstadisticasKpi> {
