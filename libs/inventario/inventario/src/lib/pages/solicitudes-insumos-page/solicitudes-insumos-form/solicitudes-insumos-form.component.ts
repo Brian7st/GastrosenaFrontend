@@ -4,6 +4,7 @@ import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import { ConfirmarEnvioSolicitudModalComponent } from '../../../components/confirmar-envio-solicitud-modal/confirmar-envio-solicitud-modal.component';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { SolicitudSesionItem } from '../../../models/solicitud-sesion.model';
@@ -12,7 +13,7 @@ import { Bien } from '../../../models/inventario.model';
 @Component({
   selector: 'restaurant-solicitudes-insumos-form',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ButtonComponent, BackButtonComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ButtonComponent, BackButtonComponent, ConfirmarEnvioSolicitudModalComponent],
   templateUrl: './solicitudes-insumos-form.component.html',
   styleUrl: './solicitudes-insumos-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,31 +24,32 @@ export class SolicitudesInsumosFormComponent implements OnInit {
   readonly facade        = inject(SolicitudesFacade);
   readonly inventario    = inject(InventarioFacade);
 
-  isEdit         = signal(false);
-  solicitudId    = signal<string | null>(null);
+  isEdit          = signal(false);
+  solicitudId     = signal<string | null>(null);
   solicitudCodigo = signal<string | null>(null);
+  isModalOpen     = signal(false);
 
   // ── Campos del formulario ──────────────────────────────────────────────────
-  fechaSolicitud            = signal(new Date().toISOString().split('T')[0]);
-  fichaId                   = signal('');
-  programaId                = signal('');
-  instructorId              = signal('');
-  identificacionInstructor  = signal('');
-  resultadoAprendizaje      = signal('');
-  actividades               = signal('');
-  voceroId                  = signal('');
-  items                     = signal<SolicitudSesionItem[]>([]);
+  fechaSolicitud           = signal(new Date().toISOString().split('T')[0]);
+  fichaId                  = signal('');
+  programaId               = signal('');
+  instructorId             = signal('');
+  identificacionInstructor = signal('');
+  resultadoAprendizaje     = signal('');
+  actividades              = signal('');
+  voceroId                 = signal('');
+  items                    = signal<SolicitudSesionItem[]>([]);
 
   valorTotalDeSolicitud = computed(() =>
     this.items().reduce((acc, i) => acc + (i.cantidad * (i.valorUnitario ?? 0)), 0)
   );
 
   // ── Selector del catálogo ──────────────────────────────────────────────────
-  mostrarSelectorBien  = signal(false);
-  catalogoBienes       = this.inventario.bienes;
-  catalogoPaginacion   = this.inventario.paginacion;
-  catalogoLoading      = this.inventario.loading;
-  paginasSelectorBien  = computed(() =>
+  mostrarSelectorBien = signal(false);
+  catalogoBienes      = this.inventario.bienes;
+  catalogoPaginacion  = this.inventario.paginacion;
+  catalogoLoading     = this.inventario.loading;
+  paginasSelectorBien = computed(() =>
     Array.from({ length: this.catalogoPaginacion().totalPages }, (_, i) => i)
   );
 
@@ -145,20 +147,27 @@ export class SolicitudesInsumosFormComponent implements OnInit {
   onSave(): void {
     this.submitAttempted.set(true);
     if (!this.formularioValido()) return;
+    this.isModalOpen.set(true);
+  }
 
+  cerrarModalConfirmacion(): void {
+    this.isModalOpen.set(false);
+  }
+
+  confirmarEnvio(): void {
+    this.isModalOpen.set(false);
     this.facade.crearSolicitudSesion({
-      fechaSolicitud:            this.fechaSolicitud(),
-      fichaId:                   this.fichaId(),
-      programaId:                this.programaId(),
-      instructorId:              this.instructorId(),
-      identificacionInstructor:  this.identificacionInstructor() || undefined,
-      resultadoAprendizaje:      this.resultadoAprendizaje(),
-      actividades:               this.actividades(),
-      voceroId:                  this.voceroId(),
-      valorTotalDeSolicitud:     this.valorTotalDeSolicitud(),
-      items:                     this.items(),
+      fechaSolicitud:           this.fechaSolicitud(),
+      fichaId:                  this.fichaId(),
+      programaId:               this.programaId(),
+      instructorId:             this.instructorId(),
+      identificacionInstructor: this.identificacionInstructor() || undefined,
+      resultadoAprendizaje:     this.resultadoAprendizaje(),
+      actividades:              this.actividades(),
+      voceroId:                 this.voceroId(),
+      valorTotalDeSolicitud:    this.valorTotalDeSolicitud(),
+      items:                    this.items(),
     });
-
     this.router.navigate(['/app/inventario/solicitudes-insumos-page']);
   }
 }
