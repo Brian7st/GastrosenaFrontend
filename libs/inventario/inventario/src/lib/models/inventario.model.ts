@@ -41,9 +41,9 @@ export interface Bien extends Omit<SharedBien, 'id' | 'codigo'> {
   codigoProveedor: string;
   descripcion: string;
   categoriaColor?: CategoriaColor;
-  valor: number;
-  valorNeto?: number;
-  iva?: number;
+  valor: number | null;
+  valorNeto: number | null;
+  iva: number | null;
   estado: EstadoBien;
   imagenUrl?: string;
   tieneHistorial?: boolean;
@@ -104,10 +104,13 @@ export interface BienImportRow {
   categoria?: string;
   unidadMedida: string;
   codigoProveedor?: string;
+  urlImagen?: string;
+  vrlAdjudicado?: number;
+  vrlAntes?: number;
+  iva?: number;
   validacion?: 'Correcto' | 'Código duplicado' | 'Falta campo' | string;
   error?: string;
 }
-
 export interface ProductoCatalogo {
   id: string | number;
   codigoSena: string;
@@ -141,4 +144,8 @@ export interface BienFormDto {
   categoria: string;
   unidadMedida: string;
   imagenUrl?: string;
-}
+  vrlAdjudicado?: number | null;
+  vrlAntes?: number | null;
+  iva?: number | null;
+}
+

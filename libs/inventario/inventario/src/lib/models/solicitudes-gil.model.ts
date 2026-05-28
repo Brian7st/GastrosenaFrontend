@@ -33,6 +33,8 @@ export interface SolicitudGil {
   estado: EstadoGil;
   observaciones?: string;
   bienes?: BienSolicitud[];
+  creadoEn?: string;
+  actualizadoEn?: string;
   // Campos opcionales heredados del módulo training/sesiones
   programaId?: string;
   emitidoPor?: string;
@@ -61,7 +63,7 @@ export interface SolicitudesPaginacion {
   size: number;
 }
 
-/** Payload completo para POST /api/v1/procurement/giles — todos los campos son REQUIRED en backend */
+/** Payload para POST /api/v1/procurement/giles */
 export interface CrearSolicitudData {
   fechaSolicitud: string;
   regionalCodigo: number;
@@ -75,12 +77,28 @@ export interface CrearSolicitudData {
   solicitante: string;
   codigoGrupo: string;
   fichaCaracterizacion: string;
+  solicitudesOrigenIds?: string[];
   bienes: { codigoSena: string; descripcion: string; unidadMedida: string; cantidad: number; valorUnitario: number; subtotal: number }[];
   observaciones?: string;
 }
 
-/**
- * Payload para PATCH /api/v1/procurement/giles/{id}
- * NOTA: endpoint aún no existe en backend (pendiente tarea BACKEND #3).
- */
+/** Payload para PATCH /api/v1/procurement/giles/{id} */
 export type ActualizarSolicitudData = Partial<CrearSolicitudData>;
+
+/** Payload para POST /api/v1/procurement/giles/generar */
+export interface GenerarGilData {
+  solicitudSesionIds: string[];
+  fechaSolicitud: string;
+  regionalCodigo: number;
+  regionalNombre: string;
+  centroCostosCodigo: number;
+  centroCostosNombre: string;
+  area: string;
+  destinoBienes: string;
+  jefeOficinaCoordinador: string;
+  cuentadantes: { nombre: string; cedula: string }[];
+  solicitante: string;
+  codigoGrupo: string;
+  fichaCaracterizacion: string;
+  observaciones?: string;
+}
