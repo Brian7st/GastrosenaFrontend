@@ -6,7 +6,6 @@ import {
   DataTableComponent,
   KpiCardComponent,
   StatusBadgeComponent,
-  LucideIconComponent
 } from '@restaurant/shared/ui';
 import { AprobarSolicitudModalComponent } from '../../../components/aprobar-solicitud-modal/aprobar-solicitud-modal.component';
 
@@ -31,7 +30,6 @@ interface SolicitudInsumo {
     DataTableComponent,
     KpiCardComponent,
     StatusBadgeComponent,
-    LucideIconComponent,
     AprobarSolicitudModalComponent
   ],
   templateUrl: './solicitudes-insumos-list.component.html',
@@ -118,17 +116,17 @@ export class SolicitudesInsumosListComponent {
 
   // ─── KPIs calculados (4 tarjetas del prototipo) ────────────────────
   totalEnviadasPendientes = computed(() => this.solicitudes().filter(s => s.estado === 'ENVIADA').length);
-  totalAprobadasHoy       = computed(() => this.solicitudes().filter(s => s.estado === 'APROBADA').length);
-  totalCerradas           = computed(() => this.solicitudes().filter(s => s.estado === 'CERRADA').length);
-  totalLibres             = computed(() => 3); // Valor estático por el momento, según la imagen
+  totalAprobadasHoy = computed(() => this.solicitudes().filter(s => s.estado === 'APROBADA').length);
+  totalCerradas = computed(() => this.solicitudes().filter(s => s.estado === 'CERRADA').length);
+  totalLibres = computed(() => 3); // Valor estático por el momento, según la imagen
 
   // ─── Opciones filtros ──────────────────────────────────────────────
   estadoOptions = [
     { value: '', label: 'Todos los estados' },
-    { value: 'ENVIADA',  label: 'Enviada'  },
+    { value: 'ENVIADA', label: 'Enviada' },
     { value: 'APROBADA', label: 'Aprobada' },
-    { value: 'CERRADA',  label: 'Cerrada'  },
-    { value: 'BORRADOR',  label: 'Borrador' },
+    { value: 'CERRADA', label: 'Cerrada' },
+    { value: 'BORRADOR', label: 'Borrador' },
   ];
 
   fechaOptions = [
@@ -159,16 +157,16 @@ export class SolicitudesInsumosListComponent {
 
   solicitudSeleccionada = signal<SolicitudInsumo | null>(null);
 
-  onSearch(term: string): void    { console.log('Buscar:', term);    }
-  onFilterEstado(v: string): void { console.log('Estado:', v);       }
-  onFilterFecha(v: string): void  { console.log('Fecha:', v);        }
-  onClearFilters(): void          { console.log('Limpiar filtros');  }
+  onSearch(term: string): void { console.log('Buscar:', term); }
+  onFilterEstado(v: string): void { console.log('Estado:', v); }
+  onFilterFecha(v: string): void { console.log('Fecha:', v); }
+  onClearFilters(): void { console.log('Limpiar filtros'); }
 
   getSolicitudVariant(estado: string): 'warning' | 'success' | 'neutral' {
     const map: Record<string, 'warning' | 'success' | 'neutral'> = {
-      'ENVIADA':  'warning',
+      'ENVIADA': 'warning',
       'APROBADA': 'success',
-      'CERRADA':  'neutral',
+      'CERRADA': 'neutral',
       'BORRADOR': 'neutral'
     };
     return map[estado] ?? 'neutral';
@@ -181,7 +179,7 @@ export class SolicitudesInsumosListComponent {
   onEdit(id: string | number): void {
     this.router.navigate(['/app/inventario/solicitudes-insumos-page', id, 'editar']);
   }
-  
+
   onApprove(id: number): void {
     const sol = this.solicitudes().find(s => s.id === id);
     if (sol) {

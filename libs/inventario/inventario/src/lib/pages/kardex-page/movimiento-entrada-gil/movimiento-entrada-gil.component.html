@@ -65,20 +65,6 @@
           @if (bienesActuales().length === 0) {
             <p class="hint-text">Este GIL no tiene bienes registrados.</p>
           } @else {
-            <!-- Aviso backend pendiente B-01 -->
-            @if (hayBienSinProducto()) {
-              <div class="error-summary">
-                <lucide-icon name="alert-triangle" [size]="20" class="error-icon"></lucide-icon>
-                <div>
-                  <h4>Ítems sin productoId en el catálogo</h4>
-                  <p>
-                    Uno o más ítems de este GIL no tienen productoId en el backend (tarea B-01 pendiente).
-                    Solo se registrarán los ítems que sí tienen producto vinculado.
-                  </p>
-                </div>
-              </div>
-            }
-
             <div class="items-table-container">
               <div style="overflow-x: auto;">
                 <table class="items-table">
@@ -89,23 +75,18 @@
                       <th class="text-center">Cant. GIL</th>
                       <th class="text-center" style="width: 8rem;">Cant. Recibida</th>
                       <th class="text-right" style="width: 9rem;">Precio Unitario</th>
-                      <th class="text-right">Estado</th>
                     </tr>
                   </thead>
                   <tbody>
                     @for (bien of bienesActuales(); track bien.codigoSena; let i = $index) {
-                      <tr class="table-row" [class.table-row--error]="!bien.productoId">
+                      <tr class="table-row">
                         <td>
-                          <div class="item-name" [class.item-name--error]="!bien.productoId">
-                            @if (!bien.productoId) {
-                              <lucide-icon name="alert-circle" [size]="16" class="error-icon"></lucide-icon>
-                            }
-                            {{ bien.descripcion ?? '—' }}
+                          <div class="item-name">{{ bien.descripcion ?? '—' }}</div>
+                          <div class="item-desc" style="font-family: monospace; font-size: 0.7rem;">
+                            {{ bien.productoId }}
                           </div>
                         </td>
-                        <td class="code-text" [class.code-text--error]="!bien.productoId">
-                          {{ bien.codigoSena ?? '—' }}
-                        </td>
+                        <td class="code-text">{{ bien.codigoSena ?? '—' }}</td>
                         <td class="text-center">{{ bien.cantidad ?? 0 }}</td>
                         <td>
                           <input
@@ -113,28 +94,14 @@
                             class="qty-input"
                             [formControl]="getBienGroup(i).get('cantidadRecibida')!"
                             [max]="bien.cantidad ?? 9999"
-                            min="0"
-                            [disabled]="!bien.productoId">
+                            min="0">
                         </td>
                         <td>
                           <input
                             type="number"
                             class="qty-input"
                             [formControl]="getBienGroup(i).get('precioUnitario')!"
-                            min="0"
-                            [disabled]="!bien.productoId">
-                        </td>
-                        <td class="text-right">
-                          @if (bien.productoId) {
-                            <span class="status-ok">
-                              <span class="dot"></span> OK
-                            </span>
-                          } @else {
-                            <span class="status-error">
-                              <span class="err-title">SIN PRODUCTO ID</span>
-                              <span class="err-link">Pendiente backend B-01</span>
-                            </span>
-                          }
+                            min="0">
                         </td>
                       </tr>
                     }

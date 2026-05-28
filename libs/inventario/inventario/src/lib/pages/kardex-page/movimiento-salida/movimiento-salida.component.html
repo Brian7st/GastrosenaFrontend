@@ -12,7 +12,7 @@
             <h3 class="modal-title">Registrar Salida de Producto</h3>
             <span class="req-badge">REQ-45-S</span>
           </div>
-          <p class="modal-subtitle">La salida debe estar vinculada a una Requisición DESPACHADA.</p>
+          <p class="modal-subtitle">Solo requisiciones en estado ENVIADA habilitan salida.</p>
         </div>
       </div>
       <button class="close-btn" (click)="closeModal()">
@@ -21,7 +21,7 @@
     </div>
 
     <!-- Body -->
-    <form [formGroup]="salidaForm" (ngSubmit)="onSubmit()" class="modal-body">
+    <form (ngSubmit)="onSubmit()" class="modal-body">
       <div class="form-grid">
 
         <!-- Selector de requisición -->
@@ -31,17 +31,17 @@
             <select class="form-select full-select" disabled>
               <option>Cargando requisiciones...</option>
             </select>
-          } @else if (requisicionesDespachadas().length === 0) {
+          } @else if (requisicionesEnviadas().length === 0) {
             <div class="empty-notice">
               <lucide-icon name="inbox" [size]="16"></lucide-icon>
-              No hay requisiciones en estado DESPACHADA disponibles.
+              No hay requisiciones en estado ENVIADA disponibles.
             </div>
           } @else {
             <select class="form-select full-select" (change)="onRequisicionChange($event)">
-              <option value="">Seleccione una requisición despachada...</option>
-              @for (req of requisicionesDespachadas(); track req.id) {
+              <option value="">Seleccione una requisición enviada...</option>
+              @for (req of requisicionesEnviadas(); track req.id) {
                 <option [value]="req.id">
-                  {{ req.numero }} — {{ req.instructorNombre }} — {{ req.fecha }} ({{ req.programa }})
+                  {{ req.numero }} — {{ req.instructorNombre }} — {{ req.fecha }}
                 </option>
               }
             </select>
@@ -65,71 +65,68 @@
             </div>
           </div>
 
-          <!-- Ítems de la requisición (referencia visual) -->
-          @if (req.items.length > 0) {
-            <div class="items-ref full-width">
-              <p class="items-ref-title">
-                <lucide-icon name="list" [size]="14"></lucide-icon>
-                Ítems de la requisición (referencia):
-              </p>
-              <ul class="items-ref-list">
-                @for (item of req.items; track item.codigo) {
-                  <li>
-                    <span class="item-code">{{ item.codigo }}</span>
-                    {{ item.descripcion }} — {{ item.cantidad }} {{ item.unidad }}
-                  </li>
-                }
-              </ul>
-              <p class="hint-text">
-                <lucide-icon name="info" [size]="13"></lucide-icon>
-                Pendiente backend B-02: cuando los ítems expongan productoId, el formulario se pre-llenará automáticamente.
-              </p>
+          <!-- Tabla de ítems pre-llenada -->
+          @if (itemsActuales().length > 0) {
+            <div class="full-width">
+              <div class="items-header">
+                <h3 class="items-title">Ítems de la Requisición</h3>
+                <span class="items-badge">{{ itemsActuales().length }} ítems</span>
+              </div>
+
+              <div class="items-table-container">
+                <div style="overflow-x: auto;">
+                  <table class="items-table">
+                    <thead>
+                      <tr>
+                        <th>Producto</th>
+                        <th>Unidad</th>
+                        <th class="text-center" style="width: 8rem;">Cantidad</th>
+                        <th style="width: 12rem;">Categoría</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (item of itemsActuales(); track item.productoId; let i = $index) {
+                        <tr class="table-row">
+                          <td>
+                            <div class="item-name">{{ item.productoNombre }}</div>
+                            <div class="item-desc" style="font-family: monospace; font-size: 0.7rem;">
+                              {{ item.productoId }}
+                            </div>
+                          </td>
+                          <td class="code-text">{{ item.unidadMedida }}</td>
+                          <td>
+                            <input
+                              type="number"
+                              class="qty-input"
+                              [formControl]="getItemGroup(i).get('cantidad')!"
+                              [max]="item.cantidad"
+                              min="1">
+                          </td>
+                          <td>
+                            <select
+                              class="form-select"
+                              style="font-size: 0.8rem; padding: 0.4rem 0.75rem;"
+                              [formControl]="getItemGroup(i).get('categoria')!">
+                              <option value="ABARROTES">Abarrotes</option>
+                              <option value="LACTEOS">Lácteos</option>
+                              <option value="FRUTAS_Y_VEGETALES">Frutas y Vegetales</option>
+                              <option value="CARNES_PESCADOS_MARISCOS">Carnes / Pescados</option>
+                            </select>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          } @else {
+            <div class="empty-notice full-width">
+              <lucide-icon name="inbox" [size]="16"></lucide-icon>
+              Esta requisición no tiene ítems registrados.
             </div>
           }
         }
-
-        <!-- Separador -->
-        <div class="separator full-width"></div>
-
-        <!-- Producto + Cantidad -->
-        <div class="form-group product-col">
-          <label>ID DEL PRODUCTO <span class="required">*</span></label>
-          <div class="input-wrapper">
-            <lucide-icon name="scan-barcode" class="input-icon" [size]="18"></lucide-icon>
-            <input
-              type="text"
-              formControlName="productoId"
-              placeholder="UUID del producto"
-              class="form-input"
-              style="font-family: monospace;">
-          </div>
-          @if (salidaForm.get('productoId')?.invalid && salidaForm.get('productoId')?.touched) {
-            <p class="error-hint">El ID del producto es obligatorio.</p>
-          }
-        </div>
-
-        <div class="form-group qty-col">
-          <label>CANTIDAD <span class="required">*</span></label>
-          <div class="input-wrapper">
-            <input type="number" formControlName="cantidad" placeholder="0" class="form-input qty-input">
-            <span class="suffix">uds</span>
-          </div>
-        </div>
-
-        <!-- Categoría -->
-        <div class="form-group full-width">
-          <label>CATEGORÍA <span class="required">*</span></label>
-          <select formControlName="categoria" class="form-select full-select">
-            <option value="" disabled selected>Seleccione una categoría</option>
-            <option value="abarrotes">Abarrotes</option>
-            <option value="lacteos">Lácteos</option>
-            <option value="frutas">Frutas y Vegetales</option>
-            <option value="carnes">Carnes y Pescados</option>
-            <option value="bebidas">Bebidas</option>
-            <option value="condimentos">Condimentos y Especias</option>
-            <option value="otros">Otros</option>
-          </select>
-        </div>
 
         <!-- Error de facade -->
         @if (kardexFacade.error()) {
@@ -147,7 +144,7 @@
         <restaurant-button
           variant="primary"
           type="submit"
-          [disabled]="salidaForm.invalid || kardexFacade.loading()">
+          [disabled]="!puedeRegistrar()">
           <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: bold;">
             <lucide-icon name="check-circle" [size]="18"></lucide-icon>
             Registrar Salida

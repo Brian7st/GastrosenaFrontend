@@ -7,17 +7,15 @@ export interface CuentadanteResponse {
 }
 
 /** Ítem de un GIL — BienGilResponse (Swagger).
- *  NOTA: el backend aún no expone productoId en este DTO (ver tarea B-01 backend).
- *  Se agrega como opcional para cuando el backend lo incorpore. */
+ *  productoId implementado en backend (B-01): usar directamente en RegistrarEntradaHttpRequest. */
 export interface BienGilResponse {
+  productoId?:    string;
   codigoSena?:    string;
   descripcion?:   string;
   unidadMedida?:  string;
   cantidad?:      number;
   valorUnitario?: number;
   subtotal?:      number;
-  /** Pendiente backend B-01: agregar productoId a BienGilResponse */
-  productoId?:    string;
 }
 
 /** GilResponse — estado: BORRADOR | EMITIDO | ENVIADO_PROVEEDOR | CERRADO */

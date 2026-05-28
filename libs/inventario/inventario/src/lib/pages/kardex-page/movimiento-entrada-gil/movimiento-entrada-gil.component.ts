@@ -25,13 +25,11 @@ export class MovimientoEntradaGilComponent {
   gilIdSeleccionado = signal<string>('');
 
   // ── Computed ──────────────────────────────────────────────────────────────
-  gilSeleccionado    = computed(() => this.gilesFacade.gilSeleccionado());
-  bienesActuales     = computed(() => this.gilSeleccionado()?.bienes ?? []);
-  bienesConProducto  = computed(() => this.bienesActuales().filter(b => !!b.productoId));
-  hayBienSinProducto = computed(() => this.bienesActuales().some(b => !b.productoId));
-  puedeRegistrar     = computed(() =>
+  gilSeleccionado = computed(() => this.gilesFacade.gilSeleccionado());
+  bienesActuales  = computed(() => this.gilSeleccionado()?.bienes ?? []);
+  puedeRegistrar  = computed(() =>
     this.gilIdSeleccionado() !== '' &&
-    this.bienesConProducto().length > 0 &&
+    this.bienesActuales().length > 0 &&
     this.bienesForm.valid &&
     !this.kardexFacade.loading()
   );
@@ -64,8 +62,6 @@ export class MovimientoEntradaGilComponent {
     if (!gil?.id) return;
 
     this.bienesActuales().forEach((bien, i) => {
-      if (!bien.productoId) return; // pendiente backend B-01
-
       const grupo = this.getBienGroup(i);
       if (!grupo.valid) return;
 
@@ -73,7 +69,7 @@ export class MovimientoEntradaGilComponent {
       if (cantidadRecibida <= 0) return;
 
       const entrada: EntradaMovimientoData = {
-        productoId:     bien.productoId,
+        productoId:     bien.productoId ?? '',
         cantidad:       cantidadRecibida,
         precioUnitario: grupo.get('precioUnitario')?.value ?? 0,
         gilId:          gil.id,

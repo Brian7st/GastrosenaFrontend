@@ -1,18 +1,18 @@
-import { Component, inject, ChangeDetectionStrategy, computed } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, inject, ChangeDetectionStrategy, computed, signal, effect } from '@angular/core';
+import { ReactiveFormsModule, FormBuilder, FormArray, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 import { KardexFacade } from '../../../data-access/kardex.facade';
 import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
-import { Requisicion } from '../../../models/requisicion.model';
+import { Requisicion, RequisicionItem } from '../../../models/requisicion.model';
 import { SalidaMovimientoData } from '../../../models/movimiento.model';
 
 /**
  * Registro de salida de inventario.
- * REGLA DE NEGOCIO: toda salida debe estar vinculada a una Requisición DESPACHADA.
- * requisicionId e instructorId se auto-rellenan al seleccionar la requisición.
- * Pendiente backend B-02/B-03: cuando el backend exponga items en RequisicionResponse,
- * la tabla de ítems pre-llenará productoId y cantidad automáticamente.
+ * REGLA DE NEGOCIO: toda salida debe estar vinculada a una Requisición en estado ENVIADA.
+ *   ENVIADA   → habilita registrar Salida (B-04).
+ *   DESPACHADA → salida ya registrada, no aparece en este selector.
+ * Los ítems de la requisición pre-llenan productoId, cantidad y categoria (B-02).
  */
 @Component({
   selector: 'restaurant-movimiento-salida',
@@ -23,66 +23,102 @@ import { SalidaMovimientoData } from '../../../models/movimiento.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MovimientoSalidaComponent {
-  private fb                    = inject(FormBuilder);
-  private router                = inject(Router);
-  readonly kardexFacade         = inject(KardexFacade);
-  readonly requisicionesFacade  = inject(RequisicionesFacade);
+  private fb                   = inject(FormBuilder);
+  private router               = inject(Router);
+  readonly kardexFacade        = inject(KardexFacade);
+  readonly requisicionesFacade = inject(RequisicionesFacade);
 
-  // Requisiciones en estado DESPACHADA (habilitadas para generar salida)
-  requisicionesDespachadas = computed(() =>
-    this.requisicionesFacade.requisiciones().filter(r => r.estado === 'DESPACHADA')
+  // ── Estado del selector ───────────────────────────────────────────────────
+  requisicionIdSeleccionada = signal<string>('');
+
+  // ── Computed ──────────────────────────────────────────────────────────────
+  /** Solo requisiciones ENVIADA habilitan salida (B-04). */
+  requisicionesEnviadas = computed(() =>
+    this.requisicionesFacade.requisiciones().filter(r => r.estado === 'ENVIADA')
   );
 
   requisicionSeleccionada = computed<Requisicion | null>(() => {
-    const id = this.salidaForm.get('requisicionId')?.value;
+    const id = this.requisicionIdSeleccionada();
     if (!id) return null;
-    return this.requisicionesDespachadas().find(r => r.id === id) ?? null;
+    return this.requisicionesEnviadas().find(r => r.id === id) ?? null;
   });
 
-  salidaForm: FormGroup = this.fb.group({
-    // Auto-rellenados al seleccionar la requisición
-    requisicionId: ['', Validators.required],
-    instructorId:  ['', Validators.required],
-    // Ingresados manualmente (pendiente B-02: vendrán pre-llenados desde los items)
-    productoId:    ['', Validators.required],
-    cantidad:      [null, [Validators.required, Validators.min(1)]],
-    categoria:     ['', Validators.required],
-  });
+  itemsActuales = computed(() => this.requisicionSeleccionada()?.items ?? []);
+
+  puedeRegistrar = computed(() =>
+    this.requisicionIdSeleccionada() !== '' &&
+    this.itemsActuales().length > 0 &&
+    this.itemsForm.valid &&
+    !this.kardexFacade.loading()
+  );
+
+  // ── FormArray: un FormGroup por ítem ──────────────────────────────────────
+  itemsForm: FormArray = this.fb.array([]);
 
   constructor() {
-    // Carga solo requisiciones DESPACHADA al abrir el modal
-    this.requisicionesFacade.cargarPorEstado('DESPACHADA');
+    // Carga solo requisiciones ENVIADA al abrir el modal
+    this.requisicionesFacade.cargarPorEstado('ENVIADA');
+
+    // Reconstruye el FormArray cada vez que cambia la requisición seleccionada
+    effect(() => {
+      this.reconstruirFormArray(this.itemsActuales());
+    });
   }
+
+  // ── Handlers ─────────────────────────────────────────────────────────────
 
   onRequisicionChange(event: Event): void {
     const id = (event.target as HTMLSelectElement).value;
-    const req = this.requisicionesDespachadas().find(r => r.id === id);
-    if (req) {
-      this.salidaForm.patchValue({
-        requisicionId: req.id,
-        instructorId:  req.instructorId,
-      });
-    } else {
-      this.salidaForm.patchValue({ requisicionId: '', instructorId: '' });
-    }
+    this.requisicionIdSeleccionada.set(id);
   }
 
   onSubmit(): void {
-    if (this.salidaForm.invalid) return;
+    if (!this.puedeRegistrar()) return;
 
-    const payload: SalidaMovimientoData = {
-      productoId:    this.salidaForm.get('productoId')!.value,
-      cantidad:      this.salidaForm.get('cantidad')!.value,
-      requisicionId: this.salidaForm.get('requisicionId')!.value,
-      instructorId:  this.salidaForm.get('instructorId')!.value,
-      categoria:     this.salidaForm.get('categoria')!.value,
-    };
+    const req = this.requisicionSeleccionada();
+    if (!req?.id) return;
 
-    this.kardexFacade.registrarSalida(payload);
+    this.itemsActuales().forEach((item, i) => {
+      const grupo = this.getItemGroup(i);
+      if (!grupo.valid) return;
+
+      const cantidad: number = grupo.get('cantidad')?.value ?? 0;
+      if (cantidad <= 0) return;
+
+      const payload: SalidaMovimientoData = {
+        productoId:    item.productoId,
+        cantidad,
+        requisicionId: req.id,
+        instructorId:  req.instructorId,
+        categoria:     grupo.get('categoria')?.value ?? item.categoria,
+      };
+
+      this.kardexFacade.registrarSalida(payload);
+    });
+
     this.closeModal();
   }
 
   closeModal(): void {
     this.router.navigate(['/app/inventario/movimientos']);
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+
+  getItemGroup(index: number): FormGroup {
+    return this.itemsForm.at(index) as FormGroup;
+  }
+
+  private reconstruirFormArray(items: RequisicionItem[]): void {
+    const grupos = items.map(item =>
+      this.fb.group({
+        cantidad: [
+          item.cantidad,
+          [Validators.required, Validators.min(1), Validators.max(item.cantidad)],
+        ],
+        categoria: [item.categoria, Validators.required],
+      })
+    );
+    this.itemsForm = this.fb.array(grupos);
   }
 }
