@@ -6,7 +6,6 @@ import {
   DataTableComponent,
   KpiCardComponent,
   StatusBadgeComponent,
-  LucideIconComponent
 } from '@restaurant/shared/ui';
 import { AprobarSolicitudModalComponent } from '../../../components/aprobar-solicitud-modal/aprobar-solicitud-modal.component';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
@@ -22,7 +21,6 @@ import { SolicitudSesion } from '../../../models/solicitud-sesion.model';
     DataTableComponent,
     KpiCardComponent,
     StatusBadgeComponent,
-    LucideIconComponent,
     AprobarSolicitudModalComponent
   ],
   templateUrl: './solicitudes-insumos-list.component.html',
@@ -104,7 +102,7 @@ export class SolicitudesInsumosListComponent implements OnInit {
   onSearch(): void                 { this.facade.cargarSolicitudesSesion(); }
   onFilterEstado(v: string): void  { this.facade.cargarSolicitudesSesion(v ? { estado: v } : undefined); }
   onFilterFecha(): void            { /* date range — pendiente */ }
-  onClearFilters(): void          { this.facade.cargarSolicitudesSesion(); }
+  onClearFilters(): void           { this.facade.cargarSolicitudesSesion(); }
 
   onView(id: string): void {
     this.router.navigate(['/app/inventario/solicitudes-insumos-page', id, 'consolidacion']);
