@@ -51,36 +51,21 @@ export class LoginPageComponent {
     this.errorMsg.set('');
     try {
       const { email, contrasena } = this.form.getRawValue();
-      await this.authService.login(email!, contrasena!);
-      await this.router.navigateByUrl('/app/inventario');
+      const user = await this.authService.login(email!, contrasena!);
+      const rol = user?.rol;
+      let destino = '/app/usuarios';
+      if (rol === 'ADMINISTRADOR') {
+        destino = '/app/usuarios';
+      } else if (rol === 'INSTRUCTOR' || rol === 'CHEF') {
+        destino = '/app/cocina';
+      } else {
+        destino = '/app/perfil';
+      }
+      await this.router.navigateByUrl(destino);
     } catch (err) {
       this.errorMsg.set('Credenciales inválidas. Verificá tu correo y contraseña.');
     } finally {
       this.loading.set(false);
     }
   }
-  this.loading.set(true);
-  this.errorMsg.set('');
-  try {
-    const { email, contrasena } = this.form.getRawValue();
-    const user = await this.authService.login(email!, contrasena!);
-    // Redirige según el rol
-    const rol = user.rol;
-    let destino = '/app/usuarios'; // por defecto
-    if (rol === 'ADMINISTRADOR') {
-      destino = '/app/usuarios';
-    } else if (rol === 'INSTRUCTOR') {
-      destino = '/app/cocina'; // o la ruta que tenga permiso
-    } else if (rol === 'CHEF') {
-      destino = '/app/cocina';
-    } else {
-      destino = '/app/perfil'; // página genérica
-    }
-    await this.router.navigateByUrl(destino);
-  } catch (err) {
-    this.errorMsg.set('Credenciales inválidas.');
-  } finally {
-    this.loading.set(false);
-  }
-}
-}
+}
