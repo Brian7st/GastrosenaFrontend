@@ -1,0 +1,641 @@
+/* ==========================================================================
+   Nueva Solicitud de Insumos — Estilos basados en Mockup
+   ========================================================================== */
+
+.form-page-container {
+  padding: 2rem;
+  max-width: 72rem;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ── Breadcrumbs & Cabecera ────────────────────────────────────────────── */
+.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.header-nav-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.header-titles-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex-grow: 1;
+}
+
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  .breadcrumb-link {
+    color: var(--color-text-secondary, #666);
+    text-decoration: none;
+    cursor: pointer;
+    &:hover { color: var(--color-primario); }
+  }
+
+  .separator {
+    font-size: 14px;
+    color: #cbd5e1;
+  }
+
+  .current {
+    color: var(--color-text-primary, #191c1d);
+  }
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.page-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--color-text-primary, #191c1d);
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+
+/* Badge de Estado Borrador */
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  white-space: nowrap;
+
+  &--borrador {
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+  }
+
+  &--edicion {
+    background: rgba(37, 99, 235, 0.08);
+    color: #2563eb;
+    border: 1px solid rgba(37, 99, 235, 0.2);
+  }
+
+  &--codigo {
+    background: #f8fafc;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 700;
+  }
+}
+
+/* ── Tarjetas / Contenedores ──────────────────────────────────────────────── */
+.form-card {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  border: 1px solid #f1f5f9;
+}
+
+.section-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-text-primary, #191c1d);
+  display: flex;
+  align-items: center;
+  margin: 0 0 1.5rem 0;
+
+  .section-icon {
+    color: var(--color-primario);
+    margin-right: 0.5rem;
+    font-size: 20px;
+  }
+}
+
+.m-0 { margin: 0 !important; }
+
+/* ── Grid Layout ─────────────────────────────────────────────────────────── */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 1.5rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 2.5rem;
+  }
+}
+
+.form-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ── Form Controls / Inputs ──────────────────────────────────────────────── */
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+}
+
+.form-control {
+  width: 100%;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  outline: none;
+  transition: all 0.2s;
+
+  &::placeholder {
+    color: #94a3b8;
+  }
+
+  &:focus {
+    background: white;
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 3px rgba(57, 169, 0, 0.15);
+  }
+}
+
+/* Textarea style */
+textarea.form-control {
+  resize: vertical;
+}
+
+.mt-6 { margin-top: 1.5rem; }
+
+/* Readonly Input Simulado */
+.readonly-input {
+  display: flex;
+  align-items: center;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem 0.875rem;
+  border-radius: 0.5rem;
+  height: 38px;
+}
+
+.readonly-text {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+}
+
+.instructor-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.5rem;
+  
+  .material-symbols-outlined {
+    font-size: 16px;
+  }
+}
+
+.icon-locked {
+  margin-left: auto;
+  color: #94a3b8;
+  font-size: 16px;
+}
+
+/* ── Helpers de campo ──────────────────────────────────────────────────── */
+.required-mark {
+  color: #ba1a1a;
+}
+
+.field-error {
+  color: #ba1a1a;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0;
+}
+
+.field-hint {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0;
+}
+
+/* ── Tabla de Ítems Solicitados ──────────────────────────────────────────── */
+.table-container {
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  background: #fafafa;
+}
+
+.items-table {
+  width: 100%;
+  table-layout: fixed;
+  text-align: left;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+
+  // Insumo 22% | Cant 6% | Unidad 7% | V.Unit 10% | Total 10% | Justif 38% | Acc 7%
+  col.col-insumo  { width: 15%; }
+  col.col-qty     { width: 0%; }
+  col.col-unit    { width: 0%; }
+  col.col-price   { width: 0%; }
+  col.col-just    { width: 0%; }
+  col.col-actions { width: 0%; }
+
+  thead {
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+
+    th {
+      padding: 0.5rem 0.5rem;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #e2e8f0;
+    &:last-child { border-bottom: none; }
+
+    td {
+      padding: 0.375rem 0.5rem;
+      vertical-align: middle;
+      overflow: hidden;
+    }
+  }
+
+  tfoot .total-row {
+    background: #f8fafc;
+    border-top: 2px solid #e2e8f0;
+
+    td {
+      padding: 0.75rem 1rem;
+    }
+
+    .total-label {
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: #475569;
+    }
+
+    .total-value {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--color-primario, #39a900);
+      text-align: right;
+    }
+  }
+}
+
+/* Item cell helpers */
+.item-name {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+}
+
+.item-code {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #64748b;
+  font-family: monospace;
+}
+
+.unit-label {
+  font-size: 0.8125rem;
+  color: #475569;
+  font-weight: 500;
+}
+
+.price-value {
+  font-size: 0.8125rem;
+  color: #64748b;
+  font-variant-numeric: tabular-nums;
+}
+
+.price-total {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Empty state inside table */
+.empty-state-cell {
+  text-align: center;
+  padding: 2rem !important;
+  color: #94a3b8;
+}
+
+.empty-icon {
+  display: block;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Table inputs */
+.form-control-table {
+  width: 100%;
+  background: white;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  padding: 0.375rem 0.625rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  outline: none;
+  transition: all 0.2s;
+
+  &:focus {
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 2px rgba(57, 169, 0, 0.1);
+  }
+}
+
+.w-24 { width: 6rem; }
+.w-20 { width: 5rem; }
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+
+/* ── Botones de Icono y Acción ────────────────────────────────────────────── */
+.btn-icon {
+  background: none;
+  border: none;
+  padding: 0.375rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &--danger {
+    color: #ba1a1a;
+    &:hover { background-color: rgba(186, 26, 26, 0.08); }
+  }
+
+  .material-symbols-outlined { font-size: 18px; }
+}
+
+/* Add Item Button customized */
+.btn-add-item {
+  ::ng-deep button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem 0.875rem;
+    font-size: 0.8125rem;
+    
+    .material-symbols-outlined {
+      font-size: 16px;
+    }
+  }
+}
+
+/* ── Modal Selector de Catálogo ──────────────────────────────────────────── */
+.catalog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.catalog-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+}
+
+.catalog-modal {
+  position: relative;
+  background: white;
+  border-radius: 0.75rem;
+  width: min(900px, 95vw);
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.catalog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.catalog-title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Manrope', sans-serif;
+}
+
+.catalog-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 50%;
+  display: flex;
+  color: #64748b;
+  transition: background 0.2s;
+  &:hover { background: #f1f5f9; }
+}
+
+.catalog-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  margin: 1rem 1.5rem;
+}
+
+.search-icon {
+  color: #94a3b8;
+  font-size: 18px;
+}
+
+.catalog-search-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.875rem;
+  width: 100%;
+  color: var(--color-text-primary);
+
+  &::placeholder { color: #94a3b8; }
+}
+
+.catalog-body {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.catalog-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+
+  thead {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 1;
+
+    tr { border-bottom: 1px solid #e2e8f0; }
+
+    th {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #f1f5f9;
+    &:hover { background: #f8fafc; }
+  }
+
+  td { padding: 0.625rem 1rem; }
+}
+
+.catalog-code  { font-family: monospace; font-weight: 600; color: #475569; }
+.catalog-unit  { color: #64748b; }
+.catalog-price { font-weight: 700; color: var(--color-text-primary); font-variant-numeric: tabular-nums; }
+
+.catalog-empty {
+  text-align: center;
+  padding: 3rem;
+  color: #94a3b8;
+}
+
+.catalog-empty-icon {
+  display: block;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.catalog-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.page-btn {
+  background: none;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  min-width: 2rem;
+  font-size: 0.8125rem;
+  transition: all 0.15s;
+
+  &:hover:not(:disabled) { background: #f1f5f9; }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  &--active {
+    background: var(--color-primario, #39a900);
+    color: white;
+    border-color: var(--color-primario, #39a900);
+  }
+}
+
+.btn-catalog-add {
+  background: var(--color-primario, #39a900);
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: opacity 0.15s;
+
+  &:hover { opacity: 0.85; }
+}
+
+/* ── Pie de Página (Footer) ───────────────────────────────────────────────── */
+.actions-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+  margin-bottom: 4rem;
+
+  restaurant-button {
+    ::ng-deep button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+
+      .right-icon {
+        font-size: 16px;
+      }
+    }
+  }
+}

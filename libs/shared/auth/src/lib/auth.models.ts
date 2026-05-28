@@ -16,4 +16,5 @@ export interface AuthenticatedUser {
   nombre: string;
   email: string;
   rol: Rol;
+  permisos: string[];
 }
