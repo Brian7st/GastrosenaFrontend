@@ -30,7 +30,9 @@ export function bienFromCatalogo(dto: ProductoResponse): Bien {
     categoria: dto.categoria ?? '',
     unidadMedida: dto.unidadMedida,
     imagenUrl: dto.urlImagen ?? undefined,
-    valor: 0,
+    valor: dto.vrlAdjudicado ?? null,
+    valorNeto: dto.vrlAntes ?? null,
+    iva: dto.iva ?? null,
     estado: (dto.activo ? 'Activo' : 'Inactivo') as EstadoBien,
     stockActual: 0,
     stockMinimo: 0,
@@ -76,5 +78,8 @@ export function bienFormToRequest(form: BienFormDto): CrearProductoRequest {
     categoria: form.categoria,
     unidadMedida: form.unidadMedida,
     urlImagen: form.imagenUrl,
+    vrlAdjudicado: form.vrlAdjudicado ?? null,
+    vrlAntes: form.vrlAntes ?? null,
+    iva: form.iva ?? null,
   };
 }

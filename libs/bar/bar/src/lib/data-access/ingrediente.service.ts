@@ -5,7 +5,7 @@ import { Ingrediente } from '../models/receta.model';
 @Injectable({ providedIn: 'root' })
 export class IngredienteService {
   private http = inject(HttpClient);
-  private apiUrl = '/api/ingredientes';
+  private apiUrl = '/api/barybarismo/ingredientes';
 
   private _ingredientes = signal<Ingrediente[]>([]);
   public ingredientes = this._ingredientes.asReadonly();

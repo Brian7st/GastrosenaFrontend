@@ -79,13 +79,16 @@ export const INVENTARIO_ROUTES: Routes = [
     path: 'solicitudes-insumos-page/nueva',
     loadComponent: () => import('./pages/solicitudes-insumos-page/solicitudes-insumos-form/solicitudes-insumos-form.component').then(m => m.SolicitudesInsumosFormComponent)
   },
-  {
-    path: 'solicitudes-insumos-page/:id/editar',
-    loadComponent: () => import('./pages/solicitudes-insumos-page/solicitudes-insumos-form/solicitudes-insumos-form.component').then(m => m.SolicitudesInsumosFormComponent)
-  },
+
+
   {
     path: 'solicitudes-insumos-page/:id/consolidacion',
     loadComponent: () => import('./pages/solicitudes-insumos-page/solicitudes-insumos-consolidacion/solicitudes-insumos-consolidacion.component').then(m => m.SolicitudesInsumosConsolidacionComponent)
+  },
+
+  {
+    path: 'solicitudes-insumos-page/:id/editar',
+    loadComponent: () => import('./pages/solicitudes-insumos-page/solicitudes-insumos-form/solicitudes-insumos-form.component').then(m => m.SolicitudesInsumosFormComponent)
   },
 
   // ── FE: Facturas Electrónicas ────────────────────────────────────────────

@@ -9,6 +9,7 @@ import {
   EstadoGil,
   CrearSolicitudData,
   ActualizarSolicitudData,
+  GenerarGilData,
 } from '../../models/solicitudes-gil.model';
 import {
   SolicitudSesion,
@@ -16,9 +17,10 @@ import {
   AprobarSesionData,
   RechazarSesionData,
 } from '../../models/solicitud-sesion.model';
-import { GilResponse, EnviarProveedorRequest } from '../api/sourcing.api';
+import { GilResponse, EnviarProveedorRequest, GenerarGilRequest } from '../api/sourcing.api';
 import {
   SolicitudSesionResponse,
+  SolicitudesSesionFiltros,
   CrearSolicitudSesionRequest,
   AprobarSolicitudSesionRequest,
   RechazarSolicitudSesionRequest,
@@ -143,30 +145,76 @@ export class SolicitudesService {
       );
   }
 
-  /** Generar GILs desde solicitudes aprobadas — endpoint NO disponible en backend */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  generarGils(_ids: (string | number)[]): Observable<boolean> {
-    return throwError(() => new Error('generarGils: endpoint no disponible — revisar con backend'));
+  /** POST /procurement/giles/generar — genera un GIL desde solicitudes de sesión aprobadas */
+  generarGils(data: GenerarGilData): Observable<SolicitudGil> {
+    const body: GenerarGilRequest = {
+      solicitudSesionIds:     data.solicitudSesionIds,
+      fechaSolicitud:         data.fechaSolicitud,
+      regionalCodigo:         data.regionalCodigo,
+      regionalNombre:         data.regionalNombre,
+      centroCostosCodigo:     data.centroCostosCodigo,
+      centroCostosNombre:     data.centroCostosNombre,
+      area:                   data.area,
+      destinoBienes:          data.destinoBienes,
+      jefeOficinaCoordinador: data.jefeOficinaCoordinador,
+      cuentadantes:           data.cuentadantes,
+      solicitante:            data.solicitante,
+      codigoGrupo:            data.codigoGrupo,
+      fichaCaracterizacion:   data.fichaCaracterizacion,
+      observaciones:          data.observaciones,
+    };
+    return this.http
+      .post<GilResponse>(`${API}/procurement/giles/generar`, body)
+      .pipe(
+        map(gilFromApi),
+        catchError(err => throwError(() => err))
+      );
   }
 
   // ─────────────────────────────────────────────────────────────────────────
   // Training — /api/v1/training/solicitudes
   // ─────────────────────────────────────────────────────────────────────────
 
+  /** GET /training/solicitudes — lista solicitudes de sesión (filtros: instructorId, estado) */
+  getSolicitudesSesion(filtros?: SolicitudesSesionFiltros): Observable<SolicitudSesion[]> {
+    let params = new HttpParams();
+    if (filtros?.instructorId) params = params.set('instructorId', filtros.instructorId);
+    if (filtros?.estado)       params = params.set('estado', filtros.estado);
+
+    return this.http
+      .get<SolicitudSesionResponse[]>(`${API}/training/solicitudes`, { params })
+      .pipe(
+        map(list => list.map(solicitudSesionFromApi)),
+        catchError(err => throwError(() => err))
+      );
+  }
+
   /** POST /training/solicitudes — crea una solicitud de sesión — 201 Created */
   crearSolicitudSesion(data: CrearSolicitudSesionData): Observable<SolicitudSesion> {
     const body: CrearSolicitudSesionRequest = {
-      fichaId:              data.fichaId,
-      programaId:           data.programaId,
-      instructorId:         data.instructorId,
-      resultadoAprendizaje: data.resultadoAprendizaje,
-      actividades:          data.actividades,
-      voceroId:             data.voceroId,
+      fechaSolicitud:           data.fechaSolicitud,
+      numeroSolicitud:          data.numeroSolicitud,
+      fichaId:                  data.fichaId,
+      programaId:               data.programaId,
+      instructorId:             data.instructorId,
+      identificacionInstructor: data.identificacionInstructor,
+      resultadoAprendizaje:     data.resultadoAprendizaje,
+      actividades:              data.actividades,
+      voceroId:                 data.voceroId,
+      valorTotalDeSolicitud:    data.valorTotalDeSolicitud,
       items: data.items.map(i => ({
-        productoId:    i.productoId,
-        cantidad:      i.cantidad,
-        unidadMedida:  i.unidadMedida,
-        justificacion: i.justificacion,
+        productoId:              i.productoId,
+        codigoSena:              i.codigoSena,
+        nombreBien:              i.nombreBien,
+        descripcion:             i.descripcion,
+        cantidad:                i.cantidad,
+        valorUnitarioAdjudicado: i.valorUnitarioAdjudicado,
+        codigoAlmacen:           i.codigoAlmacen,
+        unidadMedida:            i.unidadMedida,
+        justificacion:           i.justificacion,
+        valorUnitario:           i.valorUnitario,
+        total:                   i.total,
+        iva:                     i.iva,
       })),
     };
     return this.http
