@@ -1,38 +1,54 @@
 // ─── Modelo UI del módulo Training — Solicitudes de Sesión (RF-5.x) ─────────
 
 export type EstadoSolicitudSesion =
-  | 'PENDIENTE'
+  | 'CREADA'
   | 'APROBADA'
   | 'RECHAZADA'
   | 'COMPROMETIDA';
 
 export interface SolicitudSesionItem {
-  productoId:    string;
-  cantidad:      number;
-  unidadMedida:  string;
-  justificacion: string;
+  productoId:               string;
+  codigoSena?:              string;
+  nombreBien?:              string;
+  descripcion?:             string;
+  cantidad:                 number;
+  valorUnitarioAdjudicado?: number;
+  codigoAlmacen?:           string;
+  unidadMedida:             string;
+  justificacion:            string;
+  valorUnitario?:           number;
+  total?:                   number;
+  iva?:                     number;
 }
 
 export interface SolicitudSesion {
-  id:                   string;
-  fichaId:              string;
-  programaId:           string;
-  instructorId:         string;
-  resultadoAprendizaje: string;
-  actividades:          string;
-  voceroId:             string;
-  estado:               string;
-  items:                SolicitudSesionItem[];
+  id:                       string;
+  fechaSolicitud?:          string;
+  numeroSolicitud?:         number;
+  fichaId:                  string;
+  programaId:               string;
+  instructorId:             string;
+  identificacionInstructor?: string;
+  resultadoAprendizaje:     string;
+  actividades:              string;
+  voceroId:                 string;
+  estado:                   string;
+  items:                    SolicitudSesionItem[];
+  valorTotalDeSolicitud?:   number;
 }
 
 /** Payload para crear una solicitud de sesión (POST /training/solicitudes) */
 export interface CrearSolicitudSesionData {
-  fichaId:              string;
-  programaId:           string;
-  instructorId:         string;
-  resultadoAprendizaje: string;
-  actividades:          string;
-  voceroId:             string;
+  fechaSolicitud?:          string;
+  numeroSolicitud?:         number;
+  fichaId:                  string;
+  programaId:               string;
+  instructorId:             string;
+  identificacionInstructor?: string;
+  resultadoAprendizaje:     string;
+  actividades:              string;
+  voceroId:                 string;
+  valorTotalDeSolicitud?:   number;
   items: SolicitudSesionItem[];
 }
 

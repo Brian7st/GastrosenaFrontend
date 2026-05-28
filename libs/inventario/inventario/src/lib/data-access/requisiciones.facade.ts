@@ -47,6 +47,21 @@ export class RequisicionesFacade {
       .subscribe(data => this._requisiciones.set(data));
   }
 
+  /** Carga requisiciones filtradas por estado (ej: 'DESPACHADA' para habilitar salidas). */
+  cargarPorEstado(estado: string): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this.requisicionesService.getRequisicionesByEstado(estado)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al cargar requisiciones');
+          return of([]);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(data => this._requisiciones.set(data));
+  }
+
   /** Carga una requisición específica por ID. */
   cargarRequisicion(id: string): void {
     this._loading.set(true);

@@ -10,11 +10,21 @@ export type RequisicionEstado =
   | 'FIRMADA'
   | 'LEGALIZADA';
 
+/** Categorías de insumo — enum Swagger (B-04) */
+export type CategoriaInsumo =
+  | 'ABARROTES'
+  | 'LACTEOS'
+  | 'FRUTAS_Y_VEGETALES'
+  | 'CARNES_PESCADOS_MARISCOS';
+
+/** Ítem de requisición — Swagger actualizado (B-02).
+ *  productoId = codigoSena del catálogo; usar como productoId en RegistrarSalidaHttpRequest. */
 export interface RequisicionItem {
-  codigo:      string;
-  descripcion: string;
-  cantidad:    number;
-  unidad:      string;
+  productoId:     string;
+  productoNombre: string;
+  cantidad:       number;
+  unidadMedida:   string;
+  categoria:      CategoriaInsumo;
 }
 
 export interface Requisicion {
@@ -46,8 +56,8 @@ export const MOCK_REQUISICIONES: Requisicion[] = [
     fecha: '10/04/2026',
     estado: 'BORRADOR',
     items: [
-      { codigo: 'INS-001', descripcion: 'Harina de Trigo', cantidad: 5, unidad: 'kg' },
-      { codigo: 'INS-002', descripcion: 'Aceite de Oliva', cantidad: 2, unidad: 'L' },
+      { productoId: 'SENA-INS-001', productoNombre: 'Harina de Trigo', cantidad: 5, unidadMedida: 'kg', categoria: 'ABARROTES' },
+      { productoId: 'SENA-INS-002', productoNombre: 'Aceite de Oliva', cantidad: 2, unidadMedida: 'L', categoria: 'ABARROTES' },
     ],
   },
   {
@@ -62,7 +72,7 @@ export const MOCK_REQUISICIONES: Requisicion[] = [
     fecha: '08/04/2026',
     estado: 'ENVIADA',
     items: [
-      { codigo: 'INS-003', descripcion: 'Mantequilla sin sal', cantidad: 3, unidad: 'kg' },
+      { productoId: 'SENA-INS-003', productoNombre: 'Mantequilla sin sal', cantidad: 3, unidadMedida: 'kg', categoria: 'LACTEOS' },
     ],
   },
   {
@@ -77,7 +87,7 @@ export const MOCK_REQUISICIONES: Requisicion[] = [
     fecha: '05/04/2026',
     estado: 'DESPACHADA',
     items: [
-      { codigo: 'INS-004', descripcion: 'Azúcar Glass', cantidad: 4, unidad: 'kg' },
+      { productoId: 'SENA-INS-004', productoNombre: 'Azúcar Glass', cantidad: 4, unidadMedida: 'kg', categoria: 'ABARROTES' },
     ],
   },
   {
@@ -92,7 +102,7 @@ export const MOCK_REQUISICIONES: Requisicion[] = [
     fecha: '01/04/2026',
     estado: 'FIRMADA',
     items: [
-      { codigo: 'INS-005', descripcion: 'Vino Tinto Selección', cantidad: 2, unidad: 'botella' },
+      { productoId: 'SENA-INS-005', productoNombre: 'Vino Tinto Selección', cantidad: 2, unidadMedida: 'botella', categoria: 'ABARROTES' },
     ],
   },
 ];

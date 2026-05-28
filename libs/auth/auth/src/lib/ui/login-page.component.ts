@@ -22,8 +22,9 @@ export class LoginPageComponent {
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
 
-  readonly loading  = signal(false);
-  readonly errorMsg = signal('');
+  readonly loading           = signal(false);
+  readonly errorMsg          = signal('');
+  readonly mostrarContrasena = signal(false);
 
   readonly form = this.fb.group({
     email:      ['', [Validators.required, Validators.email]],
@@ -41,10 +42,22 @@ export class LoginPageComponent {
   get emailCtrl() { return this.form.get('email')!; }
   get passCtrl()  { return this.form.get('contrasena')!; }
 
-async onSubmit(): Promise<void> {
-  if (this.form.invalid) {
-    this.form.markAllAsTouched();
-    return;
+  async onSubmit(): Promise<void> {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+    this.loading.set(true);
+    this.errorMsg.set('');
+    try {
+      const { email, contrasena } = this.form.getRawValue();
+      await this.authService.login(email!, contrasena!);
+      await this.router.navigateByUrl('/app/inventario');
+    } catch (err) {
+      this.errorMsg.set('Credenciales inválidas. Verificá tu correo y contraseña.');
+    } finally {
+      this.loading.set(false);
+    }
   }
   this.loading.set(true);
   this.errorMsg.set('');

@@ -95,15 +95,22 @@ export class BienImportModalComponent {
       'categoria',
       'unidadMedida',
       'codigoProveedor',
+      'urlImagen',
+      'vrlAdjudicado',
+      'vrlAntes',
+      'iva'
     ];
-
     const sampleRow = [
-      '96-201-0022',
-      'Computador port�til HP EliteBook',
-      'Equipo para formaci�n',
-      'Tecnolog�a',
-      'Und',
-      'HP-001',
+      'SENA-002',                      // codigoSena
+      'Tomate chonto premium',         // nombre
+      'Tomate fresco de ensalada',     // descripcion
+      'Alimentos',                     // categoria
+      'Kilogramo',                     // unidadMedida
+      'PROV-002',                      // codigoProveedor
+      'https://link-a-la-imagen.com',  // urlImagen
+      '4200.00',                         // vrlAdjudicado
+      '3800.00',                         // vrlAntes
+      '0.00'                             // iva (Exento en Colombia)
     ];
 
     const csvLines = [
@@ -183,6 +190,10 @@ export class BienImportModalComponent {
         categoria: record['categoria'] || undefined,
         unidadMedida: record['unidadMedida'] || '',
         codigoProveedor: record['codigoProveedor'] || undefined,
+        urlImagen: record['urlImagen'] || undefined,
+        vrlAdjudicado: record['vrlAdjudicado'] !== undefined ? Number(record['vrlAdjudicado']) : 0,
+        vrlAntes: record['vrlAntes'] !== undefined ? Number(record['vrlAntes']) : 0,
+        iva: record['iva'] !== undefined ? Number(record['iva']) : 0,
         validacion: 'Correcto',
       };
 

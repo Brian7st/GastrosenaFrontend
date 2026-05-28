@@ -15,6 +15,9 @@ export interface ProductoResponse {
   categoria: string;
   unidadMedida: string;
   urlImagen?: string | null;
+  vrlAdjudicado: number | null;
+  vrlAntes: number | null;
+  iva: number | null;
   activo: boolean;
 }
 
@@ -26,6 +29,9 @@ export interface CrearProductoRequest {
   categoria: string;
   unidadMedida: string;
   urlImagen?: string;
+  vrlAdjudicado?: number | null;
+  vrlAntes?: number | null;
+  iva?: number | null;
 }
 
 export interface ActualizarProductoRequest {
