@@ -41,7 +41,9 @@
             <div class="select-wrapper">
               <select class="field-select" [ngModel]="categoria()" (ngModelChange)="categoria.set($event)">
                 <option value="">Todas las categorías</option>
-                <option *ngFor="let cat of CATEGORIAS" [value]="cat">{{ cat }}</option>
+                @for (cat of CATEGORIAS; track cat) {
+<option [value]="cat">{{ cat }}</option>
+}
               </select>
               <span class="material-symbols-outlined select-icon">expand_more</span>
             </div>
@@ -68,7 +70,9 @@
             <div class="select-wrapper">
               <select class="field-select" [ngModel]="almacen()" (ngModelChange)="almacen.set($event)">
                 <option value="">Todos los almacenes</option>
-                <option *ngFor="let alm of ALMACENES" [value]="alm">{{ alm }}</option>
+                @for (alm of ALMACENES; track alm) {
+<option [value]="alm">{{ alm }}</option>
+}
               </select>
               <span class="material-symbols-outlined select-icon">expand_more</span>
             </div>
@@ -84,13 +88,16 @@
         </div>
 
         <div class="format-cards">
-          <button class="format-card" 
-                  *ngFor="let f of FORMATOS" 
+          @for (f of FORMATOS; track f) {
+<button class="format-card" 
+                  
                   [class.format-card--selected]="selectedFormato() === f.id"
                   (click)="onSelectFormato(f.id)">
             
             <div class="radio-circle">
-              <div class="radio-dot" *ngIf="selectedFormato() === f.id"></div>
+              @if (selectedFormato() === f.id) {
+<div class="radio-dot"></div>
+}
             </div>
             
             <div class="format-icon" [style.color]="f.iconColor">
@@ -101,6 +108,7 @@
             <span class="format-label">{{ f.label }}</span>
             <span class="format-sub">{{ f.sub }}</span>
           </button>
+}
         </div>
       </div>
       
@@ -117,7 +125,7 @@
         <div class="summary-stats">
           <div class="stat-row">
             <span class="stat-label">Registros totales</span>
-            <span class="stat-value highlight-green">{{ resumenReporte().registros | number }}</span>
+            <span class="stat-value text-white">{{ resumenReporte().registros | number }}</span>
           </div>
           <div class="stat-row">
             <span class="stat-label">Valor estimado</span>
@@ -145,8 +153,12 @@
 
       <!-- Main Action Button -->
       <button class="btn-generate" (click)="onGenerar()" [disabled]="isGenerating()">
-        <span class="material-symbols-outlined" *ngIf="!isGenerating()">cloud_download</span>
-        <span class="material-symbols-outlined spin" *ngIf="isGenerating()">sync</span>
+        @if (!isGenerating()) {
+<span class="material-symbols-outlined">cloud_download</span>
+}
+        @if (isGenerating()) {
+<span class="material-symbols-outlined spin">sync</span>
+}
         <div class="btn-text">
           <span class="btn-main-text">{{ isGenerating() ? 'Generando...' : 'Generar y Descargar' }}</span>
           <span class="btn-sub-text">PROCESAR REPORTE AHORA</span>
@@ -157,7 +169,8 @@
       <div class="recent-card">
         <h4 class="recent-title">EXPORTACIONES RECIENTES</h4>
         <div class="recent-list">
-          <div class="recent-item" *ngFor="let item of EXPORTACIONES_RECIENTES">
+          @for (item of EXPORTACIONES_RECIENTES; track item) {
+<div class="recent-item">
             <div class="recent-icon-wrap" [style.background]="item.color + '15'" [style.color]="item.color">
               <span class="material-symbols-outlined">{{ item.icono === 'table_chart' ? 'table' : item.icono }}</span>
             </div>
@@ -169,6 +182,7 @@
               <span class="material-symbols-outlined">download</span>
             </button>
           </div>
+}
         </div>
       </div>
 

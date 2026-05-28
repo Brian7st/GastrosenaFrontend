@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Requisicion } from '../../models/requisicion.model';
@@ -15,6 +15,19 @@ export class RequisicionesService {
   getRequisiciones(): Observable<Requisicion[]> {
     return this.http
       .get<RequisicionResponse[]>(`${API}/legalization/requisiciones`)
+      .pipe(
+        map(list => list.map(requisicionFromApi)),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** GET /legalization/requisiciones?estado=X
+   *  Para salidas de Kardex usar estado 'DESPACHADA'.
+   *  Pendiente backend B-04: confirmar el enum de estados válidos. */
+  getRequisicionesByEstado(estado: string): Observable<Requisicion[]> {
+    const params = new HttpParams().set('estado', estado);
+    return this.http
+      .get<RequisicionResponse[]>(`${API}/legalization/requisiciones`, { params })
       .pipe(
         map(list => list.map(requisicionFromApi)),
         catchError(err => throwError(() => err))
@@ -39,22 +52,27 @@ export class RequisicionesService {
       );
   }
 
-  cambiarEstado(id: string, estado: Requisicion['estado']): Observable<boolean> {
-    const accionMap: Partial<Record<Requisicion['estado'], string>> = {
-      DESPACHADA: 'despachar',
-      FIRMADA:    'firmar',
-    };
-    const accion = accionMap[estado];
-    if (!accion) return throwError(() => new Error(`Estado ${estado} sin endpoint de transición`));
-
+  /** PATCH /legalization/requisiciones/{id}/despachar — economoId es @NotBlank en backend */
+  despacharRequisicion(id: string, economoId: string): Observable<boolean> {
     return this.http
-      .patch<void>(`${API}/legalization/requisiciones/${id}/${accion}`, {})
+      .patch<void>(`${API}/legalization/requisiciones/${id}/despachar`, { economoId })
       .pipe(
         map(() => true),
         catchError(err => throwError(() => err))
       );
   }
 
+  /** PATCH /legalization/requisiciones/{id}/firmar — voceroId es @NotBlank en backend */
+  firmarRequisicion(id: string, voceroId: string): Observable<boolean> {
+    return this.http
+      .patch<void>(`${API}/legalization/requisiciones/${id}/firmar`, { voceroId })
+      .pipe(
+        map(() => true),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   eliminarRequisicion(_id: string): Observable<boolean> {
     return throwError(() => new Error('eliminarRequisicion: endpoint DELETE no disponible en backend'));
   }

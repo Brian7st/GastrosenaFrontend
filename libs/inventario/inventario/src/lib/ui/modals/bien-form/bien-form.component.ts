@@ -2,14 +2,15 @@ import {
   ChangeDetectionStrategy, Component, EventEmitter, Input,
   OnInit, Output, inject, computed
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Bien, BienFormDto } from '../../../models/inventario.model';
+import { CATEGORIAS_BIEN } from '../../../models/categorias.model';
 
 @Component({
   selector: 'restaurant-bien-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './bien-form.component.html',
   styleUrl: './bien-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,30 +21,43 @@ export class BienFormComponent implements OnInit {
   @Input() mode: 'create' | 'edit' = 'create';
   @Input() bien?: Bien;
 
+  // eslint-disable-next-line @angular-eslint/no-output-native
   @Output() save = new EventEmitter<BienFormDto>();
+  // eslint-disable-next-line @angular-eslint/no-output-native
   @Output() cancel = new EventEmitter<void>();
 
   form!: FormGroup;
 
-  readonly CATEGORIAS = [
-    'Equipos de Cómputo', 'Mobiliario', 'Papelería', 'Cocina',
-    'Audiovisuales', 'Herramientas', 'Electrodomésticos', 'Otro',
-  ];
+  readonly CATEGORIAS = CATEGORIAS_BIEN;
 
   readonly isEdit = computed(() => this.mode === 'edit');
   readonly umBloqueada = computed(() => this.mode === 'edit' && !!this.bien?.tieneHistorial);
 
   ngOnInit(): void {
     this.initForm();
+
     if (this.mode === 'edit' && this.bien) {
+      const bien = this.bien as Bien & {
+        vrlAdjudicado?: number | null;
+        vrlAntes?: number | null;
+        urlImagen?: string | null;
+      };
+
       this.form.patchValue({
-        codigoSena:      this.bien.codigoSena,
-        codigoProveedor: this.bien.codigoProveedor,
-        nombre:          this.bien.nombre,
-        descripcion:     this.bien.descripcion ?? '',
-        categoria:       this.bien.categoria,
-        unidadMedida:    this.bien.unidadMedida,
+        codigoSena:      bien.codigoSena,
+        codigoProveedor: bien.codigoProveedor,
+        nombre:          bien.nombre,
+        descripcion:     bien.descripcion ?? '',
+        categoria:       bien.categoria,
+        unidadMedida:    bien.unidadMedida,
+        imagenUrl:       bien.imagenUrl ?? bien.urlImagen ?? '',
+        vrlAdjudicado:   bien.vrlAdjudicado ?? bien.valor ?? null,
+        vrlAntes:        bien.vrlAntes ?? bien.valorNeto ?? null,
+        iva:             bien.iva ?? null,
       });
+
+      // En edicion el codigo SENA es inmutable - no se puede cambiar
+      this.form.get('codigoSena')?.disable();
       if (this.umBloqueada()) {
         this.form.get('unidadMedida')?.disable();
       }
@@ -52,12 +66,16 @@ export class BienFormComponent implements OnInit {
 
   private initForm(): void {
     this.form = this.fb.group({
-      codigoSena:      [{ value: '', disabled: true }],
+      codigoSena:      ['', Validators.required],   // habilitado en create; se deshabilita en edit
       codigoProveedor: [''],
       nombre:          ['', [Validators.required, Validators.minLength(3)]],
       descripcion:     [''],
       categoria:       ['', Validators.required],
       unidadMedida:    ['', Validators.required],
+      imagenUrl:       [''],
+      vrlAdjudicado:   this.fb.control<number | null>(null),
+      vrlAntes:        this.fb.control<number | null>(null),
+      iva:             this.fb.control<number | null>(null),
     });
   }
 
@@ -71,6 +89,16 @@ export class BienFormComponent implements OnInit {
 
   onCancel(): void {
     this.cancel.emit();
+  }
+
+  onImagenSeleccionada(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.form.patchValue({ imagenUrl: reader.result as string });
+    };
+    reader.readAsDataURL(file);
   }
 
   hasError(field: string): boolean {

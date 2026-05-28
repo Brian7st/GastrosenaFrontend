@@ -1,7 +1,5 @@
 <div class="modal-overlay" (click)="onOverlayClick($event)">
   <div class="modal-dialog modal-dialog--slide-over" (click)="$event.stopPropagation()">
-
-    <!-- Modal Left: Illustration/Info (Visual Anchor) -->
     <div class="modal-left">
       <div class="modal-left__bg">
         <img
@@ -16,96 +14,61 @@
         </div>
         <h3 class="modal-left__title">Registro de Comprobante FEL</h3>
         <p class="modal-left__subtitle">
-          Cargue sus archivos XML y PDF para la validación automática ante la DIAN.
-        </p>
-      </div>
-      <div class="modal-left__footer">
-        <div class="system-secure-badge">
-          <span class="system-secure-badge__dot"></span>
-          Sistema Seguro
-        </div>
-        <p class="modal-left__legal">
-          Este módulo cumple con el estándar UBL 2.1 para facturación electrónica en Colombia.
+          Complete el contrato mínimo que hoy exige el backend para registrar la factura.
         </p>
       </div>
     </div>
 
-    <!-- Modal Right: Form Canvas -->
     <div class="modal-right">
       <div class="modal-right__header">
         <div>
           <h2 class="modal-right__title">Detalles de la Factura</h2>
-          <p class="modal-right__subtitle">Complete los campos obligatorios para procesar el registro.</p>
+          <p class="modal-right__subtitle">Campos alineados con el contrato del backend.</p>
         </div>
         <button class="close-btn" type="button" (click)="close.emit()">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
 
-      <form class="modal-form" (ngSubmit)="onSubmit()" #formDir="ngForm">
-        
-        <!-- SECTION: Identificación -->
+      <form class="modal-form" (ngSubmit)="onSubmit()">
         <div class="form-section">
           <h3 class="form-section__title">Identificación</h3>
-          
+
           <div class="form-grid">
             <div class="field-group">
               <label class="field-label" for="field-numero-fel">Número FEL</label>
-              <input
-                id="field-numero-fel"
-                class="field-input"
-                type="text"
-                placeholder="Ej. FEL-12345"
-                [(ngModel)]="numeroFactura"
-                name="numeroFactura"
-              />
+              <input id="field-numero-fel" class="field-input" type="text" [(ngModel)]="numeroFactura" name="numeroFactura" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="field-cufe">CUFE</label>
+              <input id="field-cufe" class="field-input" type="text" maxlength="64" minlength="64" [(ngModel)]="cufe" name="cufe" />
             </div>
             <div class="field-group">
               <label class="field-label" for="field-fecha-emision">Fecha de Emisión</label>
-              <input
-                id="field-fecha-emision"
-                class="field-input"
-                type="date"
-                [(ngModel)]="fechaEmision"
-                name="fechaEmision"
-              />
+              <input id="field-fecha-emision" class="field-input" type="date" [(ngModel)]="fechaEmision" name="fechaEmision" />
             </div>
             <div class="field-group">
-              <label class="field-label" for="field-fecha-vencimiento">Fecha de Vencimiento</label>
-              <input
-                id="field-fecha-vencimiento"
-                class="field-input"
-                type="date"
-                [(ngModel)]="fechaVencimiento"
-                name="fechaVencimiento"
-              />
+              <label class="field-label" for="field-fecha-recepcion">Fecha de Recepción</label>
+              <input id="field-fecha-recepcion" class="field-input" type="date" [(ngModel)]="fechaRecepcion" name="fechaRecepcion" />
             </div>
             <div class="field-group">
               <label class="field-label" for="field-nit-emisor">NIT Emisor</label>
-              <input
-                id="field-nit-emisor"
-                class="field-input"
-                type="text"
-                placeholder="Ej. 900.123.456-7"
-                [(ngModel)]="proveedorNit"
-                name="proveedorNit"
-              />
+              <input id="field-nit-emisor" class="field-input" type="text" [(ngModel)]="proveedorNit" name="proveedorNit" />
             </div>
             <div class="field-group col-span-2">
-              <label class="field-label" for="field-nit-receptor">NIT Receptor</label>
-              <input
-                id="field-nit-receptor"
-                class="field-input"
-                type="text"
-                placeholder="Ej. 899.999.034-1"
-                [(ngModel)]="nitReceptor"
-                name="nitReceptor"
-              />
+              <label class="field-label" for="field-proveedor-nombre">Nombre del proveedor</label>
+              <input id="field-proveedor-nombre" class="field-input" type="text" [(ngModel)]="proveedorNombre" name="proveedorNombre" />
+            </div>
+            <div class="field-group col-span-2">
+              <label class="field-label" for="field-beneficiario-zese">Beneficiario ZESE</label>
+              <div class="input-icon-wrapper">
+                <input id="field-beneficiario-zese" type="checkbox" [(ngModel)]="proveedorBeneficiarioZese" name="proveedorBeneficiarioZese" />
+                <span>Sí</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Drag & Drop Area -->
         <div
           class="drop-zone"
           [class.drop-zone--active]="isDragOver()"
@@ -117,75 +80,56 @@
           <div class="drop-zone__icon-wrapper">
             <span class="material-symbols-outlined drop-zone__icon">upload_file</span>
           </div>
-          <p class="drop-zone__primary">Arrastra y suelta tus archivos aquí</p>
-          <p class="drop-zone__secondary">Soporta formatos XML y PDF (Máx. 10MB)</p>
-          <input
-            #fileInput
-            type="file"
-            accept=".xml,.pdf"
-            multiple
-            hidden
-            (change)="onFileInput($event)"
-          />
+          <p class="drop-zone__primary">Arrastrá XML y PDF</p>
+          <p class="drop-zone__secondary">El backend todavía no lee estos archivos desde este formulario.</p>
+          <input #fileInput type="file" accept=".xml,.pdf" multiple hidden (change)="onFileInput($event)" />
         </div>
 
-        <!-- Archivos adjuntos chips (dynamic display based on actual files added) -->
-        <div class="file-chips" *ngIf="archivosNombres().length > 0">
-          <div class="file-chip" *ngFor="let name of archivosNombres()">
-            <span class="material-symbols-outlined">attach_file</span>
-            <span>{{ name }}</span>
-            <button type="button" (click)="removeFile(name)">
-              <span class="material-symbols-outlined">close</span>
-            </button>
+        @if (archivosNombres().length > 0) {
+          <div class="file-chips">
+            @for (name of archivosNombres(); track name) {
+              <div class="file-chip">
+                <span class="material-symbols-outlined">attach_file</span>
+                <span>{{ name }}</span>
+                <button type="button" (click)="removeFile(name)">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              </div>
+            }
+          </div>
+        }
+
+        <div class="form-section">
+          <h3 class="form-section__title">Línea mínima requerida</h3>
+
+          <div class="form-grid grid-cols-2">
+            <div class="field-group">
+              <label class="field-label" for="field-producto-id">Producto ID</label>
+              <input id="field-producto-id" class="field-input" type="text" [(ngModel)]="productoId" name="productoId" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="field-descripcion-linea">Descripción</label>
+              <input id="field-descripcion-linea" class="field-input" type="text" [(ngModel)]="descripcionLinea" name="descripcionLinea" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="field-cantidad-linea">Cantidad</label>
+              <input id="field-cantidad-linea" class="field-input" type="number" min="1" [(ngModel)]="cantidadLinea" name="cantidadLinea" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="field-precio-linea">Precio unitario</label>
+              <input id="field-precio-linea" class="field-input" type="number" min="0" step="0.01" [(ngModel)]="precioLinea" name="precioLinea" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="field-iva-linea">Porcentaje IVA</label>
+              <input id="field-iva-linea" class="field-input" type="number" min="0" step="0.01" [(ngModel)]="porcentajeIvaLinea" name="porcentajeIvaLinea" />
+            </div>
           </div>
         </div>
 
-        <!-- SECTION: Vínculos y Responsables -->
         <div class="form-section">
-          <h3 class="form-section__title">Vínculos y Responsables</h3>
-          
+          <h3 class="form-section__title">Vínculos</h3>
+
           <div class="form-grid grid-cols-2">
-            <div class="field-group">
-              <label class="field-label" for="field-gil-vinculado">GIL-F-014 Vinculado (Aprobados)</label>
-              <div class="select-wrapper">
-                <select class="field-select" id="field-gil-vinculado" [(ngModel)]="gilVinculado" name="gilVinculado">
-                  <option value="">Seleccione un formulario...</option>
-                  <option value="GIL-2024-101">GIL-2024-101 (Mantenimiento)</option>
-                  <option value="GIL-2024-105">GIL-2024-105 (Equipos de Computo)</option>
-                  <option value="GIL-2024-112">GIL-2024-112 (Material de Formación)</option>
-                </select>
-                <span class="material-symbols-outlined select-icon">expand_more</span>
-              </div>
-            </div>
-            <div class="field-group">
-              <label class="field-label" for="field-instructor">Instructor Cuentadante</label>
-              <div class="input-icon-wrapper">
-                <input
-                  class="field-input field-input--readonly"
-                  id="field-instructor"
-                  type="text"
-                  [value]="instructorId()"
-                  readonly
-                />
-                <span class="material-symbols-outlined input-icon">person</span>
-              </div>
-            </div>
-
-            <div class="field-group">
-              <label class="field-label" for="field-retencion">Retención ZESE (%)</label>
-              <div class="input-icon-wrapper">
-                <input
-                  id="field-retencion"
-                  class="field-input field-input--readonly text-primary font-bold"
-                  type="text"
-                  [value]="valorRetencionZese() + '%'"
-                  readonly
-                  name="valorRetencionZese"
-                />
-                <span class="material-symbols-outlined input-icon text-primary">verified</span>
-              </div>
-            </div>
-
             <div class="field-group">
               <label class="field-label" for="field-orden">Orden de Compra</label>
               <div class="select-wrapper">
@@ -201,7 +145,6 @@
           </div>
         </div>
 
-        <!-- SECTION: Datos Bancarios -->
         <details class="bank-details-accordion">
           <summary class="bank-details-accordion__summary">
             <h3 class="bank-details-accordion__title">Datos Bancarios</h3>
@@ -210,38 +153,31 @@
           <div class="bank-details-accordion__content form-grid grid-cols-3">
             <div class="field-group">
               <label class="field-label" for="field-banco">Banco</label>
-              <input class="field-input field-input--white" id="field-banco" type="text" placeholder="Ej. Bancolombia" [(ngModel)]="banco" name="banco" />
+              <input class="field-input field-input--white" id="field-banco" type="text" [(ngModel)]="banco" name="banco" />
             </div>
             <div class="field-group">
               <label class="field-label" for="field-tipo-cuenta">Tipo de Cuenta</label>
               <div class="select-wrapper">
                 <select class="field-select field-input--white" id="field-tipo-cuenta" [(ngModel)]="tipoCuenta" name="tipoCuenta">
                   <option value="">Seleccione...</option>
-                  <option value="Ahorros">Ahorros</option>
-                  <option value="Corriente">Corriente</option>
+                  <option value="AHORROS">Ahorros</option>
+                  <option value="CORRIENTE">Corriente</option>
                 </select>
                 <span class="material-symbols-outlined select-icon">expand_more</span>
               </div>
             </div>
             <div class="field-group">
               <label class="field-label" for="field-numero-cuenta">Número de Cuenta</label>
-              <input class="field-input field-input--white" id="field-numero-cuenta" type="text" placeholder="000-000000-00" [(ngModel)]="numeroCuenta" name="numeroCuenta" />
+              <input class="field-input field-input--white" id="field-numero-cuenta" type="text" [(ngModel)]="numeroCuenta" name="numeroCuenta" />
             </div>
           </div>
         </details>
 
-        <!-- Action Footer -->
         <div class="modal-form-footer">
-          <button class="btn btn--ghost" type="button" (click)="close.emit()">
-            Cancelar
-          </button>
-          <button class="btn btn--primary" type="submit" id="btn-guardar-factura">
-            Registrar Factura
-          </button>
+          <button class="btn btn--ghost" type="button" (click)="close.emit()">Cancelar</button>
+          <button class="btn btn--primary" type="submit" id="btn-guardar-factura">Registrar Factura</button>
         </div>
-
       </form>
     </div>
-
   </div>
 </div>

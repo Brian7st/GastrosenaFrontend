@@ -5,7 +5,7 @@ import { Categoria } from "../models/receta.model";
 @Injectable({ providedIn: 'root'})
 export class CategoriaService {
     private http = inject(HttpClient);
-    private url = 'http://localhost:8080/api/categorias';
+    private url = 'http://localhost:8082/api/categorias';
 
     categorias = signal<Categoria[]>([]);
 

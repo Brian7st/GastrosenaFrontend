@@ -6,18 +6,18 @@ import {
   inject,
   OnInit,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { ButtonComponent } from '@restaurant/shared/ui';
-import { Alerta, AccionResolver } from '../../../../models/alerta.model';
+import { AccionResolver } from '../../../../models/alerta.model';
 import { AlertasFacade } from '../../../../data-access/alertas.facade';
 
 @Component({
   selector: 'restaurant-alerta-resolver',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, ButtonComponent],
+  imports: [ReactiveFormsModule, RouterModule, ButtonComponent],
   templateUrl: './alerta-resolver.component.html',
   styleUrl: './alerta-resolver.component.scss',
 })

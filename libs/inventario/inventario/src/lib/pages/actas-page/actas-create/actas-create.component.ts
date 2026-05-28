@@ -5,7 +5,7 @@ import {
   signal,
   inject,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import {
   StatusBadgeComponent,
@@ -25,11 +25,10 @@ interface Firmante {
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     StatusBadgeComponent,
     LucideIconComponent,
-    BackButtonComponent,
-  ],
+    BackButtonComponent
+],
   templateUrl: './actas-create.component.html',
   styleUrl: './actas-create.component.scss',
 })

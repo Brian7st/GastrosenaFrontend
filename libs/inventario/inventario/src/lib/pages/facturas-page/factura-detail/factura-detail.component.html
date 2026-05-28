@@ -1,127 +1,131 @@
 <div class="factura-detail-page">
-  <ng-container *ngIf="factura() as f; else loadingTpl">
-  <!-- Header Section -->
-  <header class="page-header">
-    <div class="page-header__left">
-      <inventario-back-button (clicked)="goBack()" />
-      <nav class="breadcrumb">
-        <ol>
-          <li><a routerLink="/app/inventario/facturas">Facturas</a></li>
-          <li class="separator"><span class="material-symbols-outlined">chevron_right</span></li>
-          <li class="current">{{ f.numeroFactura }}</li>
-        </ol>
-      </nav>
-      <div class="page-header__title-row">
-        <h1 class="page-header__title">Factura Electrónica {{ f.numeroFactura }}</h1>
-        <span class="badge" [ngClass]="'badge--' + (f.estado === 'VERIFICADA' ? 'verificada' : (f.estado === 'ANULADA' ? 'error' : 'primary-soft'))">{{ f.estado }}</span>
+  @if (factura(); as f) {
+
+    <!-- ── HEADER ── -->
+    <header class="page-header">
+      <div class="page-header__left">
+        <inventario-back-button (clicked)="goBack()" />
+        <nav class="breadcrumb">
+          <ol>
+            <li><a routerLink="/app/inventario/facturas">Facturas</a></li>
+            <li class="separator"><span class="material-symbols-outlined">chevron_right</span></li>
+            <li class="current">{{ f.numeroFactura }}</li>
+          </ol>
+        </nav>
+        <div class="page-header__title-row">
+          <h1 class="page-header__title">Factura Electrónica {{ f.numeroFactura }}</h1>
+          <span class="badge" [ngClass]="'badge--' + (f.estado === 'VERIFICADA' ? 'verificada' : (f.estado === 'ANULADA' ? 'error' : 'primary-soft'))">{{ f.estado }}</span>
+        </div>
       </div>
-    </div>
 
-    <div class="page-header__actions">
-      <restaurant-button variant="surface" icon="picture_as_pdf">Descargar PDF</restaurant-button>
-      <restaurant-button variant="surface" icon="print">Imprimir</restaurant-button>
-      <restaurant-button variant="primary" icon="check_circle">Marcar como Pagada</restaurant-button>
-    </div>
-  </header>
+      <div class="page-header__actions">
+        <restaurant-button variant="surface" icon="picture_as_pdf">Descargar PDF</restaurant-button>
+        <restaurant-button variant="surface" icon="print">Imprimir</restaurant-button>
+        <restaurant-button variant="primary" icon="check_circle">Marcar como Pagada</restaurant-button>
+      </div>
+    </header>
 
-  <!-- Bento Grid Layout -->
-  <div class="bento-grid">
-    <!-- Main Left Column -->
-    <div class="bento-main">
+    <!-- ── CONTENIDO PRINCIPAL ── -->
+    <div class="detail-layout">
 
-      <!-- SECCIÓN 1 & 2: Emisor, Receptor & Metadatos -->
+      <!-- Proveedor + metadata -->
       <section class="bento-card bento-card--accent">
         <div class="bento-card__accent-bg"></div>
 
         <div class="parties-grid">
-          <!-- Emisor -->
           <div class="party-info">
-            <span class="party-info__label">Emisor</span>
-            <h3 class="party-info__name">{{ f.razonSocial || f.proveedorNombre }}</h3>
+            <span class="party-info__label">Proveedor</span>
+            <h3 class="party-info__name">{{ f.proveedorNombre }}</h3>
             <p class="party-info__doc">NIT {{ f.proveedorNit }}</p>
             <p class="party-info__location">
               <span class="material-symbols-outlined">location_on</span> Armenia
             </p>
           </div>
-          <!-- Receptor -->
           <div class="party-info">
-            <span class="party-info__label">Receptor</span>
-            <h3 class="party-info__name">SERVICIO NACIONAL DE APRENDIZAJE</h3>
-            <p class="party-info__doc">NIT {{ f.nitReceptor }}</p>
+            <span class="party-info__label">Recepción</span>
+            <h3 class="party-info__name">Documento recibido</h3>
+            <p class="party-info__doc">{{ f.fechaRecepcion | date:'dd MMM yyyy' }}</p>
             <p class="party-info__location">
-              <span class="material-symbols-outlined">location_on</span> Armenia
+              <span class="material-symbols-outlined">person</span> {{ f.instructorId || 'Sin instructor vinculado' }}
             </p>
           </div>
         </div>
 
         <div class="divider"></div>
 
-        <!-- Metadatos -->
         <div class="metadata-grid">
           <div class="metadata-item">
             <span class="metadata-item__label">Fecha Emisión</span>
             <p class="metadata-item__value">{{ f.fechaEmision | date:'dd MMM yyyy' }}</p>
           </div>
           <div class="metadata-item">
-            <span class="metadata-item__label">Vencimiento</span>
-            <p class="metadata-item__value">{{ (f.fechaVencimiento | date:'dd MMM yyyy') || 'N/A' }}</p>
+            <span class="metadata-item__label">Fecha Recepción</span>
+            <p class="metadata-item__value">{{ f.fechaRecepcion | date:'dd MMM yyyy' }}</p>
           </div>
           <div class="metadata-item">
-            <span class="metadata-item__label">Forma Pago</span>
-            <p class="metadata-item__value">Crédito 30 días</p>
+            <span class="metadata-item__label">Beneficiario ZESE</span>
+            <p class="metadata-item__value">{{ f.proveedorBeneficiarioZese ? 'Sí' : 'No' }}</p>
           </div>
           <div class="metadata-item">
             <span class="metadata-item__label">Orden Compra</span>
-            <a href="#" class="metadata-item__link group">
-              {{ f.ordenCompra || 'N/A' }}
-              <span class="material-symbols-outlined icon-arrow">arrow_forward</span>
-            </a>
+            <p class="metadata-item__value">{{ f.ordenCompra || 'N/A' }}</p>
           </div>
         </div>
       </section>
 
-      <!-- SECCIÓN 3: Tabla Detalle (Reutilizando Data Table) -->
-      <section class="bento-card p-0">
-        <restaurant-data-table tableTitle="Detalle de Artículos" tableIcon="list_alt">
-          <thead>
-            <tr>
-              <th class="w-12 text-center">#</th>
-              <th>Descripción</th>
-              <th>UM</th>
-              <th class="text-right">Cantidad</th>
-              <th class="text-right">Precio Unitario</th>
-              <th class="text-right">IVA%</th>
-              <th class="text-right">Subtotal</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of f.lineas; let i = index">
-              <td class="text-center font-medium text-secondary">{{ i + 1 }}</td>
-              <td class="font-medium">{{ item.descripcion }}</td>
-              <td class="text-secondary">UND</td>
-              <td class="text-right">{{ item.cantidad }}</td>
-              <td class="text-right">{{ item.precioUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
-              <td class="text-right text-secondary">{{ item.iva }}%</td>
-              <td class="text-right font-semibold">{{ item.total | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
-            </tr>
-            <tr *ngIf="!f.lineas || f.lineas.length === 0">
-              <td colspan="7" class="text-center text-secondary py-4">No hay artículos registrados.</td>
-            </tr>
-          </tbody>
-        </restaurant-data-table>
+      <!-- Tabla de artículos -->
+      <section class="bento-card p-0 detail-table-card">
+        <div class="detail-table-scroll">
+          <restaurant-data-table tableTitle="Detalle de Artículos" tableIcon="list_alt">
+            <thead>
+              <tr>
+                <th class="col-idx text-center">#</th>
+                <th class="col-desc">Descripción</th>
+                <th class="col-prod">Producto</th>
+                <th class="col-num text-right">Cant.</th>
+                <th class="col-num text-right">Precio Unit.</th>
+                <th class="col-num text-right">IVA %</th>
+                <th class="col-num text-right">Subtotal</th>
+                <th class="col-num text-right">IVA</th>
+                <th class="col-num text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of f.lineas; track item; let i = $index) {
+                <tr>
+                  <td class="text-center text-secondary">{{ i + 1 }}</td>
+                  <td class="font-medium">{{ item.descripcion }}</td>
+                  <td class="text-secondary">{{ item.productoId || '—' }}</td>
+                  <td class="text-right">{{ item.cantidad }}</td>
+                  <td class="text-right">{{ item.precioUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                  <td class="text-right text-secondary">{{ item.porcentajeIva ?? item.iva }}%</td>
+                  <td class="text-right">{{ (item.subtotal ?? 0) | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                  <td class="text-right">{{ (item.valorIva ?? 0) | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                  <td class="text-right font-semibold">{{ item.total | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                </tr>
+              }
+              @if (!f.lineas || f.lineas.length === 0) {
+                <tr>
+                  <td colspan="9" class="text-center text-secondary empty-row">No hay artículos registrados.</td>
+                </tr>
+              }
+            </tbody>
+          </restaurant-data-table>
+        </div>
       </section>
 
-      <!-- SECCIÓN 5, 6, 7 Grid -->
+      <!-- Tarjetas inferiores: DIAN + Orden Compra + Resumen Fiscal -->
       <div class="bottom-cards-grid">
-        <!-- SECCIÓN 5: Estado DIAN & Bancos -->
+
+        <!-- DIAN + Banco -->
         <section class="bento-card">
           <div class="card-section">
             <h4 class="card-section__title">
               <span class="material-symbols-outlined text-primary">verified_user</span> Validación DIAN
             </h4>
             <div class="status-tags">
-              <span class="badge badge--success-soft">Validado Exitosamente</span>
-              <span class="badge badge--surface">Régimen ZESE</span>
+              <span class="badge badge--success-soft">CUFE registrado</span>
+              <span class="badge badge--surface">{{ f.proveedorBeneficiarioZese ? 'ZESE' : 'Régimen estándar' }}</span>
             </div>
             <div class="cufe-box">
               <div class="cufe-box__text">
@@ -145,37 +149,30 @@
                 <span class="material-symbols-outlined">account_balance</span>
               </div>
               <div class="bank-info__text">
-                <p class="bank-info__name">Bancolombia</p>
-                <p class="bank-info__type">Cta Cte/Ah • Convenio</p>
+                <p class="bank-info__name">{{ f.infoBancariaBanco || 'Sin banco registrado' }}</p>
+                <p class="bank-info__type">{{ f.infoBancariaTipo || 'Tipo no reportado' }} • {{ f.infoBancariaCuenta || 'Sin cuenta' }}</p>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- SECCIÓN 6 & 7 Stack -->
+        <!-- Orden de compra + Documentos -->
         <div class="cards-stack">
-          <!-- SECCIÓN 7: GIL Vinculado -->
           <section class="bento-card bento-card--linked">
             <div class="linked-header">
               <div>
-                <span class="linked-header__label">Documento Vinculado</span>
-                <h4 class="linked-header__title">{{ f.gilVinculado || 'Sin vincular' }}</h4>
+                <span class="linked-header__label">Orden de compra</span>
+                <h4 class="linked-header__title">{{ f.ordenCompra || 'Sin orden vinculada' }}</h4>
               </div>
-              <span class="badge badge--primary-soft text-[10px]" *ngIf="f.gilVinculado">VINCULADO</span>
+              <span class="badge badge--primary-soft">{{ f.instructorId ? 'CON INSTRUCTOR' : 'SIN INSTRUCTOR' }}</span>
             </div>
 
-            <div class="linked-details" *ngIf="f.gilVinculado">
-              <p><span class="material-symbols-outlined">person</span> {{ f.instructorId || 'Responsable' }}</p>
+            <div class="linked-details">
+              <p><span class="material-symbols-outlined">person</span> {{ f.instructorId || 'Sin instructor vinculado' }}</p>
               <p class="font-bold"><span class="material-symbols-outlined">payments</span> {{ f.total | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
             </div>
-
-            <button class="linked-btn group" *ngIf="f.gilVinculado" (click)="onVerGil(f.gilVinculado)">
-              Ver GIL completo
-              <span class="material-symbols-outlined group-hover-translate">arrow_right_alt</span>
-            </button>
           </section>
 
-          <!-- SECCIÓN 6: Documentos Soporte -->
           <section class="bento-card p-5">
             <h4 class="card-section__title mb-3">Documentos Soporte</h4>
             <div class="docs-grid">
@@ -190,84 +187,151 @@
             </div>
           </section>
         </div>
-      </div>
-    </div>
 
-    <!-- Right Column (SECCIÓN 4: Resumen Fiscal) -->
-    <div class="bento-sidebar">
-      <section class="bento-card bento-card--summary sticky-summary">
-        <h3 class="summary__title">Resumen Fiscal</h3>
+        <!-- Resumen Fiscal -->
+        <section class="bento-card bento-card--summary">
+          <h3 class="summary__title">Resumen Fiscal</h3>
 
-        <div class="summary__body">
-          <div class="summary-row">
-            <span class="summary-row__label">Valor Bruto</span>
-            <span class="summary-row__value font-medium">{{ f.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-          </div>
-          <div class="summary-row text-tertiary">
-            <span class="summary-row__label">Descuento</span>
-            <span class="summary-row__value font-medium">-$0.00</span>
-          </div>
-
-          <div class="divider my-2"></div>
-
-          <div class="summary-row">
-            <span class="summary-row__label font-semibold">Subtotal Base</span>
-            <span class="summary-row__value font-bold">{{ f.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-          </div>
-
-          <!-- Desglose IVA -->
-          <div class="tax-box">
-            <span class="tax-box__title">Desglose Impuestos</span>
-            <div class="summary-row summary-row--sm">
-              <span class="summary-row__label">IVA 0% (Bienes Exentos)</span>
-              <span class="summary-row__value">$0.00</span>
-            </div>
-            <div class="summary-row summary-row--sm">
-              <span class="summary-row__label">IVA 5%</span>
-              <span class="summary-row__value">$0.00</span>
-            </div>
-            <div class="summary-row summary-row--sm">
-              <span class="summary-row__label">IVA 19%</span>
-              <span class="summary-row__value">$0.00</span>
-            </div>
-
-            <div class="divider my-2"></div>
-
+          <div class="summary__body">
             <div class="summary-row">
-              <span class="summary-row__label font-semibold">Total IVA</span>
-              <span class="summary-row__value font-bold">{{ f.totalIva | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+              <span class="summary-row__label">Subtotal</span>
+              <span class="summary-row__value font-medium">{{ f.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
             </div>
-          </div>
-
-          <!-- Retenciones -->
-          <div class="summary-row mt-2 tooltip-container">
-            <div class="flex items-center gap-1">
+            <div class="summary-row">
+              <span class="summary-row__label">Total IVA</span>
+              <span class="summary-row__value font-medium">{{ f.totalIva | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+            </div>
+            <div class="summary-row">
               <span class="summary-row__label">Retención ZESE</span>
-              <span class="material-symbols-outlined text-[14px] text-outline">info</span>
+              <span class="summary-row__value font-medium">{{ (f.valorRetencionZese || 0) | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
             </div>
-            <span class="summary-row__value font-medium">{{ f.valorRetencionZese || 0 }}%</span>
-
-            <div class="tooltip">Aplica tarifa {{ f.valorRetencionZese || 0 }}% por régimen especial ZESE registrado.</div>
           </div>
-        </div>
 
-        <!-- Gran Total -->
-        <div class="summary__footer">
-          <span class="summary__footer-label">Total a Pagar</span>
-          <div class="text-right">
-            <span class="summary__footer-total">{{ f.total | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-            <p class="summary__footer-currency">COP • Pesos Colombianos</p>
+          <div class="summary__footer">
+            <span class="summary__footer-label">Total a Pagar</span>
+            <div class="text-right">
+              <span class="summary__footer-total">{{ f.total | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+              <p class="summary__footer-currency">COP • Pesos Colombianos</p>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
+
+      <!-- Conciliación GIL -->
+      @if (conciliacionGil(); as c) {
+        <section class="bento-card gil-conciliacion">
+          <div class="gil-conciliacion__header">
+            <div class="card-section__title">
+              <span class="material-symbols-outlined text-primary">compare_arrows</span>
+              Conciliación con GIL
+            </div>
+            <span class="gil-estado-badge"
+              [class.gil-estado-badge--ok]="estaConciliada(c.diferencias)">
+              {{ estaConciliada(c.diferencias) ? 'Conciliada' : countPendientes(c.diferencias) + ' diferencia(s) pendiente(s)' }}
+            </span>
+          </div>
+
+          @if (c.diferencias.length === 0) {
+            <p class="gil-conciliacion__empty">Todos los ítems coinciden con el GIL.</p>
+          } @else {
+            <div class="gil-table-wrapper">
+              <table class="gil-table">
+                <thead>
+                  <tr>
+                    <th>Descripción</th>
+                    <th class="text-right">Cant. GIL</th>
+                    <th class="text-right">Cant. FEL</th>
+                    <th class="text-right">Precio GIL</th>
+                    <th class="text-right">Precio FEL</th>
+                    <th class="text-right">Diferencia</th>
+                    <th class="text-center">Estado</th>
+                    <th>Observación / Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (dif of c.diferencias; track dif.gilItemId) {
+                    <tr [class.gil-table__row--alerta]="!dif.resuelta && dif.diferencia !== 0">
+                      <td>{{ dif.descripcion }}</td>
+                      <td class="text-right">{{ dif.cantidadGil }}</td>
+                      <td class="text-right">{{ dif.cantidadFactura }}</td>
+                      <td class="text-right">{{ dif.precioUnitarioGil | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                      <td class="text-right">{{ dif.precioUnitarioFactura | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                      <td class="text-right" [class.text-danger]="dif.diferencia !== 0">
+                        {{ dif.diferencia | currency:'COP':'symbol-narrow':'1.0-0' }}
+                      </td>
+                      <td class="text-center">
+                        @if (dif.resuelta) {
+                          <span class="badge badge--success-soft">Resuelta</span>
+                        } @else {
+                          <span class="badge badge--tertiary">Pendiente</span>
+                        }
+                      </td>
+                      <td>
+                        @if (dif.resuelta) {
+                          <span class="gil-obs-text">{{ dif.observacion || '—' }}</span>
+                        } @else {
+                          <div class="gil-resolve-row">
+                            <input
+                              class="gil-obs-input"
+                              type="text"
+                              placeholder="Observación"
+                              [value]="observaciones()[dif.gilItemId] ?? ''"
+                              (input)="setObservacion(dif.gilItemId, $event)"
+                            />
+                            <button
+                              class="gil-resolve-btn"
+                              [disabled]="!(observaciones()[dif.gilItemId])"
+                              (click)="resolverDiferencia(dif.gilItemId)"
+                            >
+                              Resolver
+                            </button>
+                          </div>
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </section>
+      } @else if (conciliacionCargada()) {
+        <section class="bento-card gil-conciliacion">
+          <div class="gil-conciliacion__header">
+            <div class="card-section__title">
+              <span class="material-symbols-outlined text-primary">link</span>
+              Vincular GIL
+            </div>
+          </div>
+          <p class="gil-conciliacion__empty">Esta factura no tiene un GIL vinculado aún.</p>
+          <div class="gil-vincular-row">
+            <select
+              class="gil-obs-input"
+              [value]="gilParaVincular()"
+              (change)="onGilVincularChange($event)"
+            >
+              <option value="">Seleccioná un GIL...</option>
+              @for (gil of gilesDisponibles(); track gil.id) {
+                <option [value]="gil.id">{{ gil.numeroGil }} — {{ gil.destino }}</option>
+              }
+            </select>
+            <button
+              class="gil-resolve-btn"
+              [disabled]="!gilParaVincular()"
+              (click)="vincularGil()"
+            >
+              Vincular
+            </button>
+          </div>
+        </section>
+      }
+
     </div>
-  </div>
-  </ng-container>
 
-  <ng-template #loadingTpl>
+  } @else {
     <div class="flex flex-col items-center justify-center p-12 text-secondary">
       <span class="material-symbols-outlined animate-spin text-4xl mb-4">sync</span>
       <p>Cargando información de la factura...</p>
     </div>
-  </ng-template>
+  }
 </div>

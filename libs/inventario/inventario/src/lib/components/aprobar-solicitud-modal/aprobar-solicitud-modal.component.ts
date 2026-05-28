@@ -1,19 +1,21 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'restaurant-aprobar-solicitud-modal',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './aprobar-solicitud-modal.component.html',
   styleUrls: ['./aprobar-solicitud-modal.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AprobarSolicitudModalComponent {
   @Input() isOpen = false;
-  @Input() solicitud: any = null;
+  @Input() solicitud: { id: string } | null = null;
 
-  @Output() confirm = new EventEmitter<number>();
+  // eslint-disable-next-line @angular-eslint/no-output-native
+  @Output() confirm = new EventEmitter<string>();
+  // eslint-disable-next-line @angular-eslint/no-output-native
   @Output() cancel = new EventEmitter<void>();
 
   onConfirm(): void {

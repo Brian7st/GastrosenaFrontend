@@ -22,8 +22,9 @@ export class LoginPageComponent {
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
 
-  readonly loading  = signal(false);
-  readonly errorMsg = signal('');
+  readonly loading           = signal(false);
+  readonly errorMsg          = signal('');
+  readonly mostrarContrasena = signal(false);
 
   readonly form = this.fb.group({
     email:      ['', [Validators.required, Validators.email]],
@@ -50,11 +51,36 @@ export class LoginPageComponent {
     this.errorMsg.set('');
     try {
       const { email, contrasena } = this.form.getRawValue();
-      this.authService.login(email!, contrasena!);
+      await this.authService.login(email!, contrasena!);
       await this.router.navigateByUrl('/app/inventario');
-    } catch {
+    } catch (err) {
       this.errorMsg.set('Credenciales inválidas. Verificá tu correo y contraseña.');
+    } finally {
       this.loading.set(false);
     }
   }
+  this.loading.set(true);
+  this.errorMsg.set('');
+  try {
+    const { email, contrasena } = this.form.getRawValue();
+    const user = await this.authService.login(email!, contrasena!);
+    // Redirige según el rol
+    const rol = user.rol;
+    let destino = '/app/usuarios'; // por defecto
+    if (rol === 'ADMINISTRADOR') {
+      destino = '/app/usuarios';
+    } else if (rol === 'INSTRUCTOR') {
+      destino = '/app/cocina'; // o la ruta que tenga permiso
+    } else if (rol === 'CHEF') {
+      destino = '/app/cocina';
+    } else {
+      destino = '/app/perfil'; // página genérica
+    }
+    await this.router.navigateByUrl(destino);
+  } catch (err) {
+    this.errorMsg.set('Credenciales inválidas.');
+  } finally {
+    this.loading.set(false);
+  }
+}
 }

@@ -1,5 +1,11 @@
 import { createFeature, createReducer, on } from '@ngrx/store';
-import { HistorialItem, ImportarUsuariosResponse, RolDetalle, RolOpcion, UsuarioDetalle } from '../../../models/usuarios.model';
+import {
+  HistorialItem,
+  ImportarUsuariosResponse,
+  RolDetalle,
+  RolOpcion,
+  UsuarioDetalle,
+} from '../../../models/usuarios.model';
 import { UsuariosActions } from '../actions/usuarios.actions';
 
 export interface MensajeExport {
@@ -24,6 +30,7 @@ export interface UsuariosState {
   loadingHistorial:    boolean;
   rolesDetalle:        RolDetalle[];
   loadingRolesDetalle: boolean;
+  loadingAsignacion:   boolean;
 }
 
 const initialState: UsuariosState = {
@@ -43,6 +50,7 @@ const initialState: UsuariosState = {
   loadingHistorial:    false,
   rolesDetalle:        [],
   loadingRolesDetalle: false,
+  loadingAsignacion:   false,
 };
 
 export const usuariosFeature = createFeature({
@@ -50,7 +58,6 @@ export const usuariosFeature = createFeature({
   reducer: createReducer(
     initialState,
 
-    // ── Cargar lista ──────────────────────────────────────────────────────────
     on(UsuariosActions.cargarUsuarios, state => ({
       ...state, loading: true, error: null,
     })),
@@ -66,11 +73,9 @@ export const usuariosFeature = createFeature({
       ...state, loading: false, error,
     })),
 
-    // ── Cargar roles ──────────────────────────────────────────────────────────
     on(UsuariosActions.cargarRolesExitoso, (state, { roles }) => ({ ...state, roles })),
     on(UsuariosActions.cargarRolesFallido, (state, { error }) => ({ ...state, error })),
 
-    // ── Crear ─────────────────────────────────────────────────────────────────
     on(UsuariosActions.crearUsuario, state => ({
       ...state, loadingAccion: true, error: null,
     })),
@@ -84,7 +89,6 @@ export const usuariosFeature = createFeature({
       ...state, loadingAccion: false, error,
     })),
 
-    // ── Actualizar ────────────────────────────────────────────────────────────
     on(UsuariosActions.actualizarUsuario, state => ({
       ...state, loadingAccion: true, error: null,
     })),
@@ -97,7 +101,6 @@ export const usuariosFeature = createFeature({
       ...state, loadingAccion: false, error,
     })),
 
-    // ── Eliminar ──────────────────────────────────────────────────────────────
     on(UsuariosActions.eliminarUsuario, state => ({
       ...state, loadingAccion: true, error: null,
     })),
@@ -111,7 +114,6 @@ export const usuariosFeature = createFeature({
       ...state, loadingAccion: false, error,
     })),
 
-    // ── Activar ───────────────────────────────────────────────────────────────
     on(UsuariosActions.activarUsuario, state => ({
       ...state, loadingAccion: true, error: null,
     })),
@@ -124,7 +126,6 @@ export const usuariosFeature = createFeature({
       ...state, loadingAccion: false, error,
     })),
 
-    // ── Desactivar ────────────────────────────────────────────────────────────
     on(UsuariosActions.desactivarUsuario, state => ({
       ...state, loadingAccion: true, error: null,
     })),
@@ -137,7 +138,6 @@ export const usuariosFeature = createFeature({
       ...state, loadingAccion: false, error,
     })),
 
-    // ── Desbloquear cuenta ────────────────────────────────────────────────────
     on(UsuariosActions.desbloquearCuenta, state => ({
       ...state, loadingAccion: true, error: null,
     })),
@@ -150,7 +150,6 @@ export const usuariosFeature = createFeature({
       ...state, loadingAccion: false, error,
     })),
 
-    // ── Importar masivo ───────────────────────────────────────────────────────
     on(UsuariosActions.importarMasivo, state => ({
       ...state, importando: true, error: null, resultadoImport: null,
     })),
@@ -161,7 +160,6 @@ export const usuariosFeature = createFeature({
       ...state, importando: false, error,
     })),
 
-    // ── Exportar ──────────────────────────────────────────────────────────────
     on(UsuariosActions.exportarUsuarios, state => ({
       ...state, loadingAccion: true, mensajeExport: null,
     })),
@@ -177,7 +175,6 @@ export const usuariosFeature = createFeature({
       mensajeExport: { texto: error, tipo: 'error' as const },
     })),
 
-    // ── Roles detalle ─────────────────────────────────────────────────────────
     on(UsuariosActions.cargarRolesDetalle, state => ({
       ...state, loadingRolesDetalle: true,
     })),
@@ -188,7 +185,16 @@ export const usuariosFeature = createFeature({
       ...state, loadingRolesDetalle: false, error,
     })),
 
-    // ── Historial ─────────────────────────────────────────────────────────────
+    on(UsuariosActions.asignarRolMasivo, state => ({
+      ...state, loadingAsignacion: true, error: null,
+    })),
+    on(UsuariosActions.asignarRolMasivoExitoso, state => ({
+      ...state, loadingAsignacion: false,
+    })),
+    on(UsuariosActions.asignarRolMasivoFallido, (state, { error }) => ({
+      ...state, loadingAsignacion: false, error,
+    })),
+
     on(UsuariosActions.cargarHistorial, state => ({
       ...state, loadingHistorial: true,
     })),
@@ -199,7 +205,6 @@ export const usuariosFeature = createFeature({
       ...state, loadingHistorial: false, error,
     })),
 
-    // ── Selección local ───────────────────────────────────────────────────────
     on(UsuariosActions.seleccionarUsuario, (state, { usuario }) => ({
       ...state, usuarioSeleccionado: usuario,
     })),

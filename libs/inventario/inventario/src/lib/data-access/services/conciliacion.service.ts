@@ -12,6 +12,7 @@ import {
   ConciliacionListItemResponse,
   ConciliacionDetailResponse,
   DiferenciaResponse,
+  IniciarConciliacionRequest,
   RegistrarConteoRequest,
   ResolverDiferenciaRequest,
 } from '../api/reconciliation.api';
@@ -55,9 +56,10 @@ export class ConciliacionService {
       );
   }
 
-  iniciarTomaFisica(): Observable<{ sesionId: string }> {
+  /** POST /reconciliation/conciliaciones — responsableId, responsableNombre, tipo y fecha son obligatorios */
+  iniciarTomaFisica(data: IniciarConciliacionRequest): Observable<{ sesionId: string }> {
     return this.http
-      .post<{ sesionId: string }>(`${API}/reconciliation/conciliaciones`, {})
+      .post<{ sesionId: string }>(`${API}/reconciliation/conciliaciones`, data)
       .pipe(catchError(err => throwError(() => err)));
   }
 

@@ -8,6 +8,7 @@ import {
   TomaFisicaItem,
   ConteoItemData,
 } from '../models/conciliacion.model';
+import { IniciarConciliacionRequest } from './api/reconciliation.api';
 
 @Injectable({
   providedIn: 'root',
@@ -100,12 +101,13 @@ export class ConciliacionFacade {
 
   /**
    * Inicia una nueva toma física de inventario.
+   * responsableId, responsableNombre, tipo y fecha son @NotNull en backend.
    */
-  iniciarTomaFisica(): void {
+  iniciarTomaFisica(data: IniciarConciliacionRequest): void {
     this._loading.set(true);
     this._error.set(null);
     this.conciliacionService
-      .iniciarTomaFisica()
+      .iniciarTomaFisica(data)
       .pipe(
         catchError(() => {
           this._error.set('Error al iniciar la toma física');
@@ -114,7 +116,6 @@ export class ConciliacionFacade {
         finalize(() => this._loading.set(false))
       )
       .subscribe(() => {
-        // Refresca la lista tras iniciar la toma
         this.loadAll();
       });
   }

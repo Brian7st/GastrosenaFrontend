@@ -28,10 +28,18 @@
 
         <div class="field-row">
           <div class="field-group">
-            <label class="field-label">CÓD. INTERNO SENA</label>
-            <input class="field-input field-input--disabled" formControlName="codigoSena"
-                   [placeholder]="mode === 'create' ? 'Autogenerado' : ''" />
-            <p class="field-hint" *ngIf="mode === 'create'">Se generará automáticamente al guardar</p>
+            <label class="field-label">CÓD. INTERNO SENA <span class="required">*</span></label>
+            <input class="field-input"
+                   formControlName="codigoSena"
+                   [class.field-input--disabled]="mode === 'edit'"
+                   [class.field-input--error]="hasError('codigoSena')"
+                   [placeholder]="mode === 'create' ? 'Ej. SENA-00123' : ''" />
+            @if (hasError('codigoSena')) {
+              <p class="field-error">El código SENA es obligatorio</p>
+            }
+            @if (mode === 'edit') {
+              <p class="field-hint">El código SENA no puede modificarse una vez creado</p>
+            }
           </div>
           <div class="field-group">
             <label class="field-label">CÓD. PROVEEDOR</label>
@@ -54,7 +62,9 @@
           <input class="field-input" formControlName="nombre"
                  placeholder="Descripción clara del activo"
                  [class.field-input--error]="hasError('nombre')" />
-          <p class="field-error" *ngIf="hasError('nombre')">El nombre es obligatorio (mín. 3 caracteres)</p>
+          @if (hasError('nombre')) {
+<p class="field-error">El nombre es obligatorio (mín. 3 caracteres)</p>
+}
         </div>
 
         <div class="field-group">
@@ -68,17 +78,21 @@
             <select class="field-select" formControlName="categoria"
                     [class.field-input--error]="hasError('categoria')">
               <option value="" disabled>Seleccione una categoría</option>
-              <option *ngFor="let cat of CATEGORIAS" [value]="cat">{{ cat }}</option>
+              @for (cat of CATEGORIAS; track cat) {
+<option [value]="cat">{{ cat }}</option>
+}
             </select>
           </div>
 
           <div class="field-group">
             <label class="field-label">
               UNIDAD DE MEDIDA (UM) <span class="required">*</span>
-              <span class="um-lock-badge" *ngIf="umBloqueada()">
+              @if (umBloqueada()) {
+<span class="um-lock-badge">
                 <span class="material-symbols-outlined">lock</span>
                 Bloqueada — tiene historial
               </span>
+}
             </label>
             <select class="field-select" formControlName="unidadMedida"
                     [class.field-input--disabled]="umBloqueada()">
@@ -91,6 +105,66 @@
               <option value="CAJA">CAJA – Caja</option>
             </select>
           </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">IMAGEN DEL BIEN</label>
+          <label class="file-upload-label">
+            <input type="file" accept="image/*" class="file-input-hidden"
+                   (change)="onImagenSeleccionada($event)" />
+            <span class="material-symbols-outlined">upload_file</span>
+            <span>{{ form.get('imagenUrl')?.value ? 'Cambiar imagen' : 'Seleccionar archivo' }}</span>
+          </label>
+          @if (form.get('imagenUrl')?.value) {
+            <img [src]="form.get('imagenUrl')?.value"
+                 alt="Vista previa"
+                 class="imagen-preview" />
+          }
+        </div>
+      </div>
+
+      <!-- 3. Precios -->
+      <div class="form-section">
+        <div class="form-section__header">
+          <div class="section-icon section-icon--blue">
+            <span class="material-symbols-outlined filled">payments</span>
+          </div>
+          <span class="form-section__title">Precios</span>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label" for="vrlAdjudicado">Valor adjudicado (opcional)</label>
+            <input id="vrlAdjudicado"
+                   class="field-input"
+                   type="number"
+                   min="0"
+                   step="0.01"
+                   formControlName="vrlAdjudicado"
+                   placeholder="Ej. 3500" />
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="vrlAntes">Valor anterior (opcional)</label>
+            <input id="vrlAntes"
+                   class="field-input"
+                   type="number"
+                   min="0"
+                   step="0.01"
+                   formControlName="vrlAntes"
+                   placeholder="Ej. 3000" />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="iva">IVA (%) (opcional)</label>
+          <input id="iva"
+                 class="field-input"
+                 type="number"
+                 min="0"
+                 step="0.01"
+                 formControlName="iva"
+                 placeholder="Ej. 19" />
         </div>
       </div>
 

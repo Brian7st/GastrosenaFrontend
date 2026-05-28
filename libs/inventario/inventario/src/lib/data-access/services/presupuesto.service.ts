@@ -3,7 +3,6 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import {
-  PresupuestoResumen,
   PresupuestoDetalle,
   ResumenPresupuestosGlobal,
   Rubro,
@@ -144,11 +143,13 @@ export class PresupuestoService {
   }
 
   /** TODO FE-06 — sin endpoint de traslado */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   trasladarRubro(_data: TrasladarRubroData): Observable<{ success: boolean }> {
     return throwError(() => new Error('trasladarRubro: endpoint no disponible — pendiente FE-06'));
   }
 
   /** TODO FE-06 — sin endpoint de exportación */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   exportar(_formato: string): Observable<Blob> {
     return throwError(() => new Error('exportar: endpoint no disponible — pendiente FE-06'));
   }

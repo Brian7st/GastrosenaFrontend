@@ -7,10 +7,6 @@
     <p class="page-subtitle">Gestión de bienes y servicios — Centro de Servicios y Gestión Empresarial</p>
   </div>
   <div style="display: flex; gap: 1rem;">
-    <restaurant-button variant="ghost" routerLink="generar">
-      <span class="material-symbols-outlined">library_add_check</span>
-      Generar GIL
-    </restaurant-button>
     <restaurant-button variant="primary" routerLink="nueva">
       <span class="material-symbols-outlined">add</span>
       Nueva Solicitud
@@ -65,7 +61,9 @@
       <!-- Filtro Estado -->
       <div class="select-box">
         <select #estadoSelect (change)="onFilterEstado(estadoSelect.value)">
-          <option *ngFor="let opt of estadoOptions" [value]="opt.value">{{ opt.label }}</option>
+          @for (opt of estadoOptions; track opt) {
+<option [value]="opt.value">{{ opt.label }}</option>
+}
         </select>
         <span class="material-symbols-outlined dropdown-icon">expand_more</span>
       </div>
@@ -73,7 +71,9 @@
       <!-- Filtro Fecha -->
       <div class="select-box">
         <select #fechaSelect (change)="onFilterFecha(fechaSelect.value)">
-          <option *ngFor="let opt of fechaOptions" [value]="opt.value">{{ opt.label }}</option>
+          @for (opt of fechaOptions; track opt) {
+<option [value]="opt.value">{{ opt.label }}</option>
+}
         </select>
         <span class="material-symbols-outlined dropdown-icon">calendar_month</span>
       </div>
@@ -104,7 +104,8 @@
 
   <!-- Filas de datos -->
   <tbody>
-    <tr *ngFor="let s of solicitudes()">
+    @for (s of solicitudes(); track s) {
+<tr>
 
       <!-- Código -->
       <td>
@@ -112,7 +113,7 @@
       </td>
 
       <!-- Fecha -->
-      <td class="text-secondary">{{ s.fecha }}</td>
+      <td class="text-secondary">{{ s.fechaSolicitud }}</td>
 
       <!-- Solicitante con avatar -->
       <td>
@@ -125,7 +126,7 @@
       </td>
 
       <!-- Ficha / Grupo -->
-      <td class="text-secondary">{{ s.fichaId }}</td>
+      <td class="text-secondary">{{ s.fichaCaracterizacion }}</td>
 
       <!-- Estado badge -->
       <td>
@@ -169,15 +170,32 @@
         </div>
       </td>
     </tr>
+}
   </tbody>
 
   <!-- Paginación -->
   <div dtFooter class="pagination-footer">
-    <p class="results-count">Mostrando 1–{{ solicitudes().length }} de {{ totalSolicitudes() }} resultados</p>
+    <p class="results-count">
+      MOSTRANDO {{ solicitudes().length }} DE {{ paginacion().totalElements }} SOLICITUDES
+    </p>
     <div class="page-numbers">
-      <button class="page-btn page-btn--active">1</button>
-      <button class="page-btn">2</button>
-      <button class="page-btn">3</button>
+      <button class="page-btn"
+        [disabled]="paginacion().page === 0"
+        (click)="onIrAPagina(paginacion().page - 1)">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      @for (p of paginas(); track p) {
+        <button class="page-btn"
+          [class.page-btn--active]="p === paginacion().page"
+          (click)="onIrAPagina(p)">
+          {{ p + 1 }}
+        </button>
+      }
+      <button class="page-btn"
+        [disabled]="paginacion().page >= paginacion().totalPages - 1"
+        (click)="onIrAPagina(paginacion().page + 1)">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
     </div>
   </div>
 

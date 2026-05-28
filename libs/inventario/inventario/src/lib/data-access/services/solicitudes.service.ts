@@ -5,9 +5,11 @@ import { catchError, map } from 'rxjs/operators';
 import {
   SolicitudGil,
   SolicitudesGilFiltros,
+  SolicitudesPaginacion,
   EstadoGil,
   CrearSolicitudData,
   ActualizarSolicitudData,
+  GenerarGilData,
 } from '../../models/solicitudes-gil.model';
 import {
   SolicitudSesion,
@@ -15,9 +17,10 @@ import {
   AprobarSesionData,
   RechazarSesionData,
 } from '../../models/solicitud-sesion.model';
-import { GilResponse, EnviarProveedorRequest } from '../api/sourcing.api';
+import { GilResponse, EnviarProveedorRequest, GenerarGilRequest } from '../api/sourcing.api';
 import {
   SolicitudSesionResponse,
+  SolicitudesSesionFiltros,
   CrearSolicitudSesionRequest,
   AprobarSolicitudSesionRequest,
   RechazarSolicitudSesionRequest,
@@ -25,27 +28,46 @@ import {
 import { gilFromApi } from '../mappers/sourcing.mapper';
 import { solicitudSesionFromApi } from '../mappers/training.mapper';
 
+
 const API = '/api/v1';
 
 @Injectable({ providedIn: 'root' })
 export class SolicitudesService {
   private http = inject(HttpClient);
 
-  getSolicitudes(filtros?: SolicitudesGilFiltros): Observable<SolicitudGil[]> {
+  // ─────────────────────────────────────────────────────────────────────────
+  // Procurement — /api/v1/procurement/giles
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /** GET /procurement/giles — solo se envían los filtros que el backend admite */
+  getSolicitudes(filtros?: SolicitudesGilFiltros): Observable<{ solicitudes: SolicitudGil[]; paginacion: SolicitudesPaginacion }> {
     let params = new HttpParams();
-    if (filtros?.busqueda)   params = params.set('q', filtros.busqueda);
-    if (filtros?.estado)     params = params.set('estado', filtros.estado);
-    if (filtros?.instructor) params = params.set('instructor', filtros.instructor);
-    if (filtros?.fechaRango) params = params.set('fechaRango', filtros.fechaRango);
+    // Parámetros soportados por el backend:
+    if (filtros?.estado)               params = params.set('estado', filtros.estado);
+    if (filtros?.fichaCaracterizacion) params = params.set('fichaCaracterizacion', filtros.fichaCaracterizacion);
+    params = params.set('page', String(filtros?.page ?? 0));
+    params = params.set('size', String(filtros?.size ?? 10));
+    // Nota: busqueda, instructor y fechaRango NO existen en el backend — se omiten.
 
     return this.http
-      .get<GilResponse[]>(`${API}/procurement/giles`, { params })
+      .get<{ content: GilResponse[]; totalElements: number; totalPages: number; number: number; size: number }>(
+        `${API}/procurement/giles`, { params }
+      )
       .pipe(
-        map(list => list.map(gilFromApi)),
+        map(res => ({
+          solicitudes: res.content.map(gilFromApi),
+          paginacion: {
+            totalElements: res.totalElements,
+            totalPages:    res.totalPages,
+            page:          res.number,
+            size:          res.size,
+          },
+        })),
         catchError(err => throwError(() => err))
       );
   }
 
+  /** GET /procurement/giles/{id} */
   getSolicitudById(id: string | number): Observable<SolicitudGil | undefined> {
     return this.http
       .get<GilResponse>(`${API}/procurement/giles/${id}`)
@@ -55,6 +77,7 @@ export class SolicitudesService {
       );
   }
 
+  /** POST /procurement/giles — crea un GIL en estado BORRADOR */
   crearSolicitud(data: CrearSolicitudData): Observable<{ success: boolean }> {
     return this.http
       .post<GilResponse>(`${API}/procurement/giles`, data)
@@ -64,6 +87,7 @@ export class SolicitudesService {
       );
   }
 
+  /** PATCH /procurement/giles/{id} — actualiza un GIL en estado BORRADOR */
   actualizarSolicitud(id: string, data: ActualizarSolicitudData): Observable<{ success: boolean }> {
     return this.http
       .patch<GilResponse>(`${API}/procurement/giles/${id}`, data)
@@ -73,11 +97,22 @@ export class SolicitudesService {
       );
   }
 
+  /** PATCH /procurement/giles/{id} — alias usado por facturas facade */
+  updateSolicitud(id: string | number, payload: Partial<SolicitudGil>): Observable<SolicitudGil> {
+    return this.http
+      .patch<GilResponse>(`${API}/procurement/giles/${id}`, payload)
+      .pipe(
+        map(gilFromApi),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** PATCH /procurement/giles/{id}/emitir o /cerrar */
   cambiarEstado(id: string, estado: EstadoGil): Observable<boolean> {
     const accionMap: Record<EstadoGil, string> = {
       BORRADOR:          '',
       EMITIDO:           'emitir',
-      ENVIADO_PROVEEDOR: '', // usa enviarAProveedor() — requiere PUT con body
+      ENVIADO_PROVEEDOR: '', // usa enviarAProveedor() — requiere PATCH con body
       CERRADO:           'cerrar',
     };
     const accion = accionMap[estado];
@@ -91,42 +126,95 @@ export class SolicitudesService {
       );
   }
 
-  /** PUT /procurement/giles/{id}/enviar-proveedor — requiere body con proveedorDestinatarioId y fechaEnvio */
+  /** PATCH /procurement/giles/{id}/enviar-proveedor — requiere body con proveedorDestinatarioId y fechaEnvio */
   enviarAProveedor(id: string, data: EnviarProveedorRequest): Observable<boolean> {
     return this.http
-      .put<GilResponse>(`${API}/procurement/giles/${id}/enviar-proveedor`, data)
+      .patch<GilResponse>(`${API}/procurement/giles/${id}/enviar-proveedor`, data) // era: http.put — corregido a PATCH
       .pipe(
         map(() => true),
         catchError(err => throwError(() => err))
       );
   }
 
-  deleteSolicitud(_codigo: string): Observable<boolean> {
-    return throwError(() => new Error('deleteSolicitud: endpoint DELETE no disponible en backend'));
+  /** DELETE /procurement/giles/{id} — elimina un GIL en estado BORRADOR */
+  deleteSolicitud(id: string): Observable<void> {
+    return this.http
+      .delete<void>(`${API}/procurement/giles/${id}`)
+      .pipe(
+        catchError(err => throwError(() => err))
+      );
   }
 
-  generarGils(_ids: (string | number)[]): Observable<boolean> {
-    return throwError(() => new Error('generarGils: endpoint no disponible — revisar con backend'));
+  /** POST /procurement/giles/generar — genera un GIL desde solicitudes de sesión aprobadas */
+  generarGils(data: GenerarGilData): Observable<SolicitudGil> {
+    const body: GenerarGilRequest = {
+      solicitudSesionIds:     data.solicitudSesionIds,
+      fechaSolicitud:         data.fechaSolicitud,
+      regionalCodigo:         data.regionalCodigo,
+      regionalNombre:         data.regionalNombre,
+      centroCostosCodigo:     data.centroCostosCodigo,
+      centroCostosNombre:     data.centroCostosNombre,
+      area:                   data.area,
+      destinoBienes:          data.destinoBienes,
+      jefeOficinaCoordinador: data.jefeOficinaCoordinador,
+      cuentadantes:           data.cuentadantes,
+      solicitante:            data.solicitante,
+      codigoGrupo:            data.codigoGrupo,
+      fichaCaracterizacion:   data.fichaCaracterizacion,
+      observaciones:          data.observaciones,
+    };
+    return this.http
+      .post<GilResponse>(`${API}/procurement/giles/generar`, body)
+      .pipe(
+        map(gilFromApi),
+        catchError(err => throwError(() => err))
+      );
   }
 
   // ─────────────────────────────────────────────────────────────────────────
   // Training — /api/v1/training/solicitudes
   // ─────────────────────────────────────────────────────────────────────────
 
+  /** GET /training/solicitudes — lista solicitudes de sesión (filtros: instructorId, estado) */
+  getSolicitudesSesion(filtros?: SolicitudesSesionFiltros): Observable<SolicitudSesion[]> {
+    let params = new HttpParams();
+    if (filtros?.instructorId) params = params.set('instructorId', filtros.instructorId);
+    if (filtros?.estado)       params = params.set('estado', filtros.estado);
+
+    return this.http
+      .get<SolicitudSesionResponse[]>(`${API}/training/solicitudes`, { params })
+      .pipe(
+        map(list => list.map(solicitudSesionFromApi)),
+        catchError(err => throwError(() => err))
+      );
+  }
+
   /** POST /training/solicitudes — crea una solicitud de sesión — 201 Created */
   crearSolicitudSesion(data: CrearSolicitudSesionData): Observable<SolicitudSesion> {
     const body: CrearSolicitudSesionRequest = {
-      fichaId:              data.fichaId,
-      programaId:           data.programaId,
-      instructorId:         data.instructorId,
-      resultadoAprendizaje: data.resultadoAprendizaje,
-      actividades:          data.actividades,
-      voceroId:             data.voceroId,
+      fechaSolicitud:           data.fechaSolicitud,
+      numeroSolicitud:          data.numeroSolicitud,
+      fichaId:                  data.fichaId,
+      programaId:               data.programaId,
+      instructorId:             data.instructorId,
+      identificacionInstructor: data.identificacionInstructor,
+      resultadoAprendizaje:     data.resultadoAprendizaje,
+      actividades:              data.actividades,
+      voceroId:                 data.voceroId,
+      valorTotalDeSolicitud:    data.valorTotalDeSolicitud,
       items: data.items.map(i => ({
-        productoId:    i.productoId,
-        cantidad:      i.cantidad,
-        unidadMedida:  i.unidadMedida,
-        justificacion: i.justificacion,
+        productoId:              i.productoId,
+        codigoSena:              i.codigoSena,
+        nombreBien:              i.nombreBien,
+        descripcion:             i.descripcion,
+        cantidad:                i.cantidad,
+        valorUnitarioAdjudicado: i.valorUnitarioAdjudicado,
+        codigoAlmacen:           i.codigoAlmacen,
+        unidadMedida:            i.unidadMedida,
+        justificacion:           i.justificacion,
+        valorUnitario:           i.valorUnitario,
+        total:                   i.total,
+        iva:                     i.iva,
       })),
     };
     return this.http
