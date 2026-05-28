@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Requisicion } from '../../models/requisicion.model';
@@ -15,6 +15,19 @@ export class RequisicionesService {
   getRequisiciones(): Observable<Requisicion[]> {
     return this.http
       .get<RequisicionResponse[]>(`${API}/legalization/requisiciones`)
+      .pipe(
+        map(list => list.map(requisicionFromApi)),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** GET /legalization/requisiciones?estado=X
+   *  Para salidas de Kardex usar estado 'DESPACHADA'.
+   *  Pendiente backend B-04: confirmar el enum de estados válidos. */
+  getRequisicionesByEstado(estado: string): Observable<Requisicion[]> {
+    const params = new HttpParams().set('estado', estado);
+    return this.http
+      .get<RequisicionResponse[]>(`${API}/legalization/requisiciones`, { params })
       .pipe(
         map(list => list.map(requisicionFromApi)),
         catchError(err => throwError(() => err))

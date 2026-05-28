@@ -6,6 +6,7 @@ import {
   OnChanges,
   Output,
   inject,
+  signal,
 } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Rol } from '@restaurant/shared/models';
@@ -28,6 +29,7 @@ export class UsuarioFormComponent implements OnChanges {
   private readonly fb = inject(FormBuilder);
 
   readonly rolOptions = Object.values(Rol);
+  readonly mostrarContrasena = signal(false);
 
   readonly form = this.fb.nonNullable.group({
     nombre:    ['', Validators.required],

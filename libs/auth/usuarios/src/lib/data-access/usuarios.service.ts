@@ -68,6 +68,7 @@ export class UsuariosService extends BaseHttpService {
   }
 
   crearUsuario(data: CrearUsuarioRequest): Observable<UsuarioDetalle> {
+    console.log('📤 Enviando POST /api/usuarios:', data);
     return this.http.post<UsuarioDetalle>(this.buildUrl(this.resource), data);
   }
 

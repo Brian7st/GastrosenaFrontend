@@ -11,10 +11,10 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 })
 export class AprobarSolicitudModalComponent {
   @Input() isOpen = false;
-  @Input() solicitud: { id: number } | null = null;
+  @Input() solicitud: { id: string } | null = null;
 
   // eslint-disable-next-line @angular-eslint/no-output-native
-  @Output() confirm = new EventEmitter<number>();
+  @Output() confirm = new EventEmitter<string>();
   // eslint-disable-next-line @angular-eslint/no-output-native
   @Output() cancel = new EventEmitter<void>();
 
