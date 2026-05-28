@@ -5,36 +5,47 @@
     subtitle="Administra tu información personal y preferencias"
   />
 
+  <!-- Alertas -->
+  @if (error()) {
+    <restaurant-alert type="error" [message]="error()!" />
+  }
+  @if (exito()) {
+    <restaurant-alert type="success" [message]="exito()!" />
+  }
+
   <!-- Header de perfil -->
   <div class="perfil-header">
     <div class="perfil-header__avatar-wrapper">
-  <div class="perfil-header__avatar" (click)="triggerFileInput()">
-    @if (fotoUrl()) {
-      <img [src]="fotoUrl()" alt="Foto de perfil" class="perfil-header__foto"/>
-    } @else {
-      {{ iniciales() }}
-    }
-    <div class="perfil-header__avatar-overlay">
-      <lucide-icon name="camera" [size]="20"></lucide-icon>
+      <div class="perfil-header__avatar" (click)="triggerFileInput()">
+        @if (fotoUrl()) {
+          <img [src]="fotoUrl()" alt="Foto de perfil" class="perfil-header__foto"/>
+        } @else {
+          {{ iniciales() }}
+        }
+        <div class="perfil-header__avatar-overlay">
+          <lucide-icon name="camera" [size]="20"></lucide-icon>
+        </div>
+      </div>
+      <input
+        #fileInput
+        type="file"
+        accept="image/*"
+        class="perfil-header__file-input"
+        (change)="onFotoChange($event)"
+      />
     </div>
-  </div>
-  <input
-    #fileInput
-    type="file"
-    accept="image/*"
-    class="perfil-header__file-input"
-    (change)="onFotoChange($event)"
-  />
-</div>
     <div class="perfil-header__info">
-      <h2 class="perfil-header__nombre">{{ usuario?.nombre }}</h2>
+      <h2 class="perfil-header__nombre">{{ perfil()?.nombre ?? usuario?.nombre }}</h2>
       <div class="perfil-header__meta">
         <lucide-icon name="user" [size]="14"></lucide-icon>
-        <span>{{ usuario?.rol }}</span>
+        <span>{{ perfil()?.rol ?? usuario?.rol }}</span>
         <span class="perfil-header__dot">•</span>
-        <restaurant-status-badge label="Activo" variant="success"/>
+        <restaurant-status-badge
+          [label]="perfil()?.estado ? 'Activo' : 'Inactivo'"
+          [variant]="perfil()?.estado ? 'success' : 'danger'"
+        />
       </div>
-      <p class="perfil-header__email">{{ usuario?.email }}</p>
+      <p class="perfil-header__email">{{ perfil()?.email ?? usuario?.email }}</p>
     </div>
   </div>
 
@@ -123,6 +134,18 @@
           icon="lock"
           formControlName="confirmar"
         />
+        <restaurant-button
+          variant="primary"
+          (click)="onCambiarContrasena()"
+          [disabled]="cambiandoContrasena()"
+        >
+          @if (!cambiandoContrasena()) {
+            <lucide-icon name="lock" [size]="16"></lucide-icon>
+            Cambiar Contraseña
+          } @else {
+            <span class="perfil-spinner"></span>
+          }
+        </restaurant-button>
       </form>
     </div>
 
@@ -133,16 +156,22 @@
         <h3>Actividad Reciente</h3>
       </div>
       <div class="perfil-actividad">
-        @for (item of actividadReciente; track item.fecha) {
-          <div class="perfil-actividad__item">
-            <p class="perfil-actividad__accion">{{ item.accion }}</p>
-            <div class="perfil-actividad__meta">
-              <lucide-icon name="calendar" [size]="12"></lucide-icon>
-              <span>{{ item.fecha }}</span>
-              <lucide-icon name="file-text" [size]="12"></lucide-icon>
-              <span>{{ item.modulo }}</span>
+        @if (cargando()) {
+          <p class="perfil-actividad__cargando">Cargando actividad...</p>
+        } @else if (actividad().length === 0) {
+          <p class="perfil-actividad__vacio">No hay actividad reciente</p>
+        } @else {
+          @for (item of actividad(); track item.id) {
+            <div class="perfil-actividad__item">
+              <p class="perfil-actividad__accion">{{ item.accion }}</p>
+              <div class="perfil-actividad__meta">
+                <lucide-icon name="calendar" [size]="12"></lucide-icon>
+                <span>{{ item.fecha }}</span>
+                <lucide-icon name="file-text" [size]="12"></lucide-icon>
+                <span>{{ item.modulo }}</span>
+              </div>
             </div>
-          </div>
+          }
         }
       </div>
     </div>
