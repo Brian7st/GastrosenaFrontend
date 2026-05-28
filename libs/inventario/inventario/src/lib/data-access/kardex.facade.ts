@@ -1,5 +1,5 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
-import { catchError, finalize, of } from 'rxjs';
+import { catchError, EMPTY, finalize, of } from 'rxjs';
 import {
   Movimiento,
   EntradaMovimientoData,
@@ -120,66 +120,71 @@ export class KardexFacade {
 
   registrarEntrada(data: EntradaMovimientoData): void {
     this._loading.set(true);
+    this._error.set(null);
     this.movimientosService.registrarEntrada(data)
       .pipe(
         catchError(() => {
           this._error.set('Error al registrar entrada');
-          return of(null);
+          return EMPTY;
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe(res => { if (res) this.cargarKardex(data.productoId); });
+      .subscribe(() => this.cargarKardex(data.productoId));
   }
 
   registrarSalida(data: SalidaMovimientoData): void {
     this._loading.set(true);
+    this._error.set(null);
     this.movimientosService.registrarSalida(data)
       .pipe(
         catchError(() => {
           this._error.set('Error al registrar salida');
-          return of(null);
+          return EMPTY;
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe(res => { if (res) this.cargarKardex(data.productoId); });
+      .subscribe(() => this.cargarKardex(data.productoId));
   }
 
   registrarReserva(data: ReservaMovimientoData): void {
     this._loading.set(true);
+    this._error.set(null);
     this.movimientosService.registrarReserva(data)
       .pipe(
         catchError(() => {
           this._error.set('Error al registrar reserva');
-          return of(null);
+          return EMPTY;
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe(res => { if (res) this.cargarKardex(data.producto); });
+      .subscribe(() => this.cargarKardex(data.producto));
   }
 
   registrarLiberacion(data: LiberacionMovimientoData): void {
     this._loading.set(true);
+    this._error.set(null);
     this.movimientosService.registrarLiberacion(data)
       .pipe(
         catchError(() => {
           this._error.set('Error al registrar liberación');
-          return of(null);
+          return EMPTY;
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe(res => { if (res) this.cargarKardex(data.producto); });
+      .subscribe(() => this.cargarKardex(data.producto));
   }
 
   registrarAjuste(data: AjusteMovimientoData): void {
     this._loading.set(true);
+    this._error.set(null);
     this.movimientosService.registrarAjuste(data)
       .pipe(
         catchError(() => {
           this._error.set('Error al registrar ajuste');
-          return of(null);
+          return EMPTY;
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe(res => { if (res) this.cargarKardex(data.producto); });
+      .subscribe(() => this.cargarKardex(data.producto));
   }
 }

@@ -76,35 +76,37 @@ export class MovimientosService {
 
   // ── Movimientos de entrada / salida ─────────────────────────────────────────
 
-  registrarEntrada(data: EntradaMovimientoData): Observable<{ success: boolean }> {
+  /** POST /inventory/movimientos/entrada — 201 No Content */
+  registrarEntrada(data: EntradaMovimientoData): Observable<void> {
     return this.http
-      .post<{ success: boolean }>(`${API}/inventory/movimientos/entrada`, entradaToRequest(data))
+      .post<void>(`${API}/inventory/movimientos/entrada`, entradaToRequest(data))
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  registrarSalida(data: SalidaMovimientoData): Observable<{ success: boolean }> {
+  /** POST /inventory/movimientos/salida — 201 No Content */
+  registrarSalida(data: SalidaMovimientoData): Observable<void> {
     return this.http
-      .post<{ success: boolean }>(`${API}/inventory/movimientos/salida`, salidaToRequest(data))
+      .post<void>(`${API}/inventory/movimientos/salida`, salidaToRequest(data))
       .pipe(catchError(err => throwError(() => err)));
   }
 
   // ── Reserva / Liberación / Ajuste ───────────────────────────────────────────
 
-  registrarReserva(data: ReservaMovimientoData): Observable<{ success: boolean }> {
+  registrarReserva(data: ReservaMovimientoData): Observable<void> {
     return this.http
-      .post<{ success: boolean }>(`${API}/inventory/movimientos/reserva`, reservaToRequest(data))
+      .post<void>(`${API}/inventory/movimientos/reserva`, reservaToRequest(data))
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  registrarLiberacion(data: LiberacionMovimientoData): Observable<{ success: boolean }> {
+  registrarLiberacion(data: LiberacionMovimientoData): Observable<void> {
     return this.http
-      .post<{ success: boolean }>(`${API}/inventory/movimientos/liberacion`, liberacionToRequest(data))
+      .post<void>(`${API}/inventory/movimientos/liberacion`, liberacionToRequest(data))
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  registrarAjuste(data: AjusteMovimientoData): Observable<{ success: boolean }> {
+  registrarAjuste(data: AjusteMovimientoData): Observable<void> {
     return this.http
-      .post<{ success: boolean }>(`${API}/inventory/movimientos/ajuste`, ajusteToRequest(data))
+      .post<void>(`${API}/inventory/movimientos/ajuste`, ajusteToRequest(data))
       .pipe(catchError(err => throwError(() => err)));
   }
 
