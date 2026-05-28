@@ -9,6 +9,7 @@ import {
 import { ExistenciaProducto } from '../../models/inventario.model';
 import {
   MovimientoResponse,
+  MovimientoPageResponse,
   ExistenciaResponse,
   EntradaRequest,
   SalidaRequest,
@@ -16,6 +17,25 @@ import {
   LiberacionRequest,
   AjusteRequest,
 } from '../api/inventory.api';
+
+/**
+ * Normaliza la respuesta paginada de GET /inventory/movimientos/{productoId}.
+ * El backend no documenta el schema en Swagger (type: object genérico) y puede
+ * usar convención inglés (content/totalElements) o español (contenido/totalElementos).
+ */
+export function movimientoPageFromApi(resp: MovimientoPageResponse): {
+  movimientos:    Movimiento[];
+  totalPaginas:   number;
+  totalElementos: number;
+} {
+  const dtos: MovimientoResponse[] =
+    resp.content ?? resp.contenido ?? [];
+  return {
+    movimientos:    dtos.map(movimientoFromApi),
+    totalPaginas:   resp.totalPages   ?? resp.totalPaginas   ?? 0,
+    totalElementos: resp.totalElements ?? resp.totalElementos ?? 0,
+  };
+}
 
 export function movimientoFromApi(dto: MovimientoResponse): Movimiento {
   return {
@@ -34,40 +54,34 @@ export function movimientoFromApi(dto: MovimientoResponse): Movimiento {
 
 export function existenciaFromApi(dto: ExistenciaResponse): ExistenciaProducto {
   return {
-    productoId: dto.productoId,
-    codigoSena: dto.codigoSena,
-    nombre: dto.nombre,
-    categoria: dto.categoria,
-    unidadMedida: dto.unidadMedida,
+    productoId:    dto.productoId,
+    stockFisico:   dto.stockFisico,
+    stockReservado: dto.stockReservado,
     stockDisponible: dto.stockDisponible,
-    stockMinimo: dto.stockMinimo,
+    stockMinimo:   dto.stockMinimo,
+    bajoMinimo:    dto.bajoMinimo,
   };
 }
 
 export function entradaToRequest(data: EntradaMovimientoData): EntradaRequest {
   return {
-    productoId: data.producto,
-    cantidad: data.cantidad,
-    fecha: data.fecha,
-    proveedorId: data.proveedor,
-    facturaId: data.factura,
-    ubicacion: data.ubicacion,
-    valorUnitario: data.valorUnitario,
-    observaciones: data.observaciones,
+    productoId:      data.productoId,
+    cantidad:        data.cantidad,
+    precioUnitario:  data.precioUnitario,
+    facturaId:       data.facturaId,
+    proveedorNit:    data.proveedorNit,
+    gilId:           data.gilId,
+    conciliacionId:  data.conciliacionId,
   };
 }
 
 export function salidaToRequest(data: SalidaMovimientoData): SalidaRequest {
   return {
-    productoId: data.producto,
-    cantidad: data.cantidad,
-    fecha: data.fecha,
-    areaDestino: data.areaDestino,
-    instructorId: data.instructor,
-    fichaId: data.ficha,
-    categoria: data.categoria,
-    proposito: data.proposito,
-    observaciones: data.observaciones,
+    productoId:    data.productoId,
+    cantidad:      data.cantidad,
+    requisicionId: data.requisicionId,
+    instructorId:  data.instructorId,
+    categoria:     data.categoria,
   };
 }
 

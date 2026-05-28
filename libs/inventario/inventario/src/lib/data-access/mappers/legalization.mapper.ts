@@ -41,21 +41,22 @@ export function paqueteFromApi(dto: PaqueteResponse): PaqueteProbatorio {
 
 export function requisicionFromApi(dto: RequisicionResponse): Requisicion {
   return {
-    id: dto.id,
-    numero: dto.numero,
-    programa: dto.programa,
-    fichaId: dto.fichaId,
-    instructorId: dto.instructorId,
-    instructorNombre: dto.instructorNombre,
-    diaSemana: dto.diaSemana,
-    horaSesion: dto.horaSesion,
-    fecha: dto.fecha,
-    estado: dto.estado,
-    items: dto.items.map((i): RequisicionItem => ({
-      codigo: i.codigo,
-      descripcion: i.descripcion,
-      cantidad: i.cantidad,
-      unidad: i.unidad,
+    id:               dto.id               ?? '',
+    numero:           dto.numero           ?? '',
+    programa:         '',
+    fichaId:          dto.fichaId          ?? '',
+    instructorId:     dto.instructorId     ?? '',
+    instructorNombre: dto.instructorNombre ?? '',
+    diaSemana:        dto.diaSemana        ?? '',
+    horaSesion:       dto.horaSesion       ?? '',
+    fecha:            dto.fecha            ?? '',
+    estado:           dto.estado           ?? 'BORRADOR',
+    items: (dto.items ?? []).map((i): RequisicionItem => ({
+      productoId:     i.productoId     ?? '',
+      productoNombre: i.productoNombre ?? '',
+      cantidad:       i.cantidad       ?? 0,
+      unidadMedida:   i.unidadMedida   ?? '',
+      categoria:      i.categoria      ?? 'ABARROTES',
     })),
   };
 }

@@ -11,7 +11,7 @@ import {
   AjusteMovimientoData,
 } from '../../models/movimiento.model';
 import { ExistenciaProducto } from '../../models/inventario.model';
-import { MovimientoResponse, ExistenciaResponse } from '../api/inventory.api';
+import { MovimientoResponse, MovimientoPageResponse, ExistenciaResponse } from '../api/inventory.api';
 import { KardexValorizadoItemResponse } from '../api/reporting.api';
 import { KardexValorizadoItem } from '../../models/reporting.model';
 import {
@@ -22,6 +22,7 @@ import {
   reservaToRequest,
   liberacionToRequest,
   ajusteToRequest,
+  movimientoPageFromApi,
 } from '../mappers/inventory.mapper';
 import { kardexValorizadoFromApi } from '../mappers/reporting.mapper';
 
@@ -33,12 +34,23 @@ export class MovimientosService {
 
   // ── Kardex ──────────────────────────────────────────────────────────────────
 
-  /** Historial de movimientos de un producto (GET /inventory/movimientos/{productoId}) */
-  getKardex(productoId: string): Observable<Movimiento[]> {
+  /**
+   * GET /inventory/movimientos/{productoId}?pagina=0&tamano=10
+   * El Swagger declara params `pagina`/`tamano` (español) y respuesta genérica `object`.
+   * El mapper `movimientoPageFromApi` normaliza ambas convenciones de campo.
+   */
+  getKardex(
+    productoId: string,
+    pagina = 0,
+    tamano = 10,
+  ): Observable<{ movimientos: Movimiento[]; totalPaginas: number; totalElementos: number }> {
+    const params = new HttpParams()
+      .set('pagina', String(pagina))
+      .set('tamano', String(tamano));
     return this.http
-      .get<MovimientoResponse[]>(`${API}/inventory/movimientos/${productoId}`)
+      .get<MovimientoPageResponse>(`${API}/inventory/movimientos/${productoId}`, { params })
       .pipe(
-        map(list => list.map(movimientoFromApi)),
+        map(resp => movimientoPageFromApi(resp)),
         catchError(err => throwError(() => err))
       );
   }
@@ -76,35 +88,37 @@ export class MovimientosService {
 
   // ── Movimientos de entrada / salida ─────────────────────────────────────────
 
-  registrarEntrada(data: EntradaMovimientoData): Observable<{ success: boolean }> {
+  /** POST /inventory/movimientos/entrada — 201 No Content */
+  registrarEntrada(data: EntradaMovimientoData): Observable<void> {
     return this.http
-      .post<{ success: boolean }>(`${API}/inventory/movimientos/entrada`, entradaToRequest(data))
+      .post<void>(`${API}/inventory/movimientos/entrada`, entradaToRequest(data))
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  registrarSalida(data: SalidaMovimientoData): Observable<{ success: boolean }> {
+  /** POST /inventory/movimientos/salida — 201 No Content */
+  registrarSalida(data: SalidaMovimientoData): Observable<void> {
     return this.http
-      .post<{ success: boolean }>(`${API}/inventory/movimientos/salida`, salidaToRequest(data))
+      .post<void>(`${API}/inventory/movimientos/salida`, salidaToRequest(data))
       .pipe(catchError(err => throwError(() => err)));
   }
 
   // ── Reserva / Liberación / Ajuste ───────────────────────────────────────────
 
-  registrarReserva(data: ReservaMovimientoData): Observable<{ success: boolean }> {
+  registrarReserva(data: ReservaMovimientoData): Observable<void> {
     return this.http
-      .post<{ success: boolean }>(`${API}/inventory/movimientos/reserva`, reservaToRequest(data))
+      .post<void>(`${API}/inventory/movimientos/reserva`, reservaToRequest(data))
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  registrarLiberacion(data: LiberacionMovimientoData): Observable<{ success: boolean }> {
+  registrarLiberacion(data: LiberacionMovimientoData): Observable<void> {
     return this.http
-      .post<{ success: boolean }>(`${API}/inventory/movimientos/liberacion`, liberacionToRequest(data))
+      .post<void>(`${API}/inventory/movimientos/liberacion`, liberacionToRequest(data))
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  registrarAjuste(data: AjusteMovimientoData): Observable<{ success: boolean }> {
+  registrarAjuste(data: AjusteMovimientoData): Observable<void> {
     return this.http
-      .post<{ success: boolean }>(`${API}/inventory/movimientos/ajuste`, ajusteToRequest(data))
+      .post<void>(`${API}/inventory/movimientos/ajuste`, ajusteToRequest(data))
       .pipe(catchError(err => throwError(() => err)));
   }
 

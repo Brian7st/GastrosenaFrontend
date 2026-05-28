@@ -363,3 +363,25 @@
     transform: rotate(360deg);
   }
 }
+
+.auth-input-wrap {
+  position: relative;
+}
+
+.auth-input-toggle {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  z-index: 2;
+
+  &:hover {
+    color: #000;
+  }
+}
