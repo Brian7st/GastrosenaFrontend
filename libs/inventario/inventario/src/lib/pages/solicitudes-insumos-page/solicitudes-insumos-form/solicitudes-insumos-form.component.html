@@ -171,3 +171,12 @@
   </div>
 
 </div>
+
+<!-- Modal Confirmación -->
+@if (isModalOpen()) {
+  <restaurant-confirmar-envio-solicitud-modal
+    [isOpen]="true"
+    (cancelled)="cerrarModalConfirmacion()"
+    (confirmed)="confirmarEnvio()">
+  </restaurant-confirmar-envio-solicitud-modal>
+}

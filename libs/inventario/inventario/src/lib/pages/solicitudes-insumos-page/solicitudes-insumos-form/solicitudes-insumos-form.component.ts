@@ -4,6 +4,7 @@ import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import { ConfirmarEnvioSolicitudModalComponent } from '../../../components/confirmar-envio-solicitud-modal/confirmar-envio-solicitud-modal.component';
 
 interface BienInsumo {
   nombre: string;
@@ -14,7 +15,7 @@ interface BienInsumo {
 @Component({
   selector: 'restaurant-solicitudes-insumos-form',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ButtonComponent, BackButtonComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ButtonComponent, BackButtonComponent, ConfirmarEnvioSolicitudModalComponent],
   templateUrl: './solicitudes-insumos-form.component.html',
   styleUrl: './solicitudes-insumos-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -26,6 +27,7 @@ export class SolicitudesInsumosFormComponent implements OnInit {
   isEdit = signal(false);
   solicitudId = signal<string | null>(null);
   solicitudCodigo = signal<string | null>(null);
+  isModalOpen = signal(false);
 
   // ── Estado Reactivo Formulario ──────────────────────────────────────────
   instructor    = signal('Chef Sebastian Betancourt');
@@ -85,7 +87,16 @@ export class SolicitudesInsumosFormComponent implements OnInit {
   }
 
   onSave(): void {
-    // Aquí se guardaría el borrador o se enviaría la solicitud
+    this.isModalOpen.set(true);
+  }
+
+  cerrarModalConfirmacion(): void {
+    this.isModalOpen.set(false);
+  }
+
+  confirmarEnvio(): void {
+    this.isModalOpen.set(false);
+    // Aquí se enviaría la solicitud al backend
     this.router.navigate(['/app/inventario/solicitudes-insumos-page']);
   }
 
