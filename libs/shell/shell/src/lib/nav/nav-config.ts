@@ -1,11 +1,11 @@
-import { BarraLateralConfig, TopNavLink } from './nav.models';
+  import { BarraLateralConfig, TopNavLink } from './nav.models';
 
-export const TOP_MENU_CONFIG: TopNavLink[] = [];
+  export const TOP_MENU_CONFIG: TopNavLink[] = [];
 
-export const SIDEBAR_CONFIG: BarraLateralConfig = {
-  titulo: 'GastroSena',
-  subtitulo: 'MONOREPO ANGULAR 20',
-  logoUrl: '',
+  export const SIDEBAR_CONFIG: BarraLateralConfig = {
+    titulo: 'GastroSena',
+    subtitulo: 'MONOREPO ANGULAR 20',
+    logoUrl: '',
 
   grupos: [
     {
