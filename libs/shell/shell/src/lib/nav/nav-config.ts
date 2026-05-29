@@ -81,7 +81,7 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
           label: 'Inventario',
           ruta: '/app/inventario',
           icono: 'warehouse',
-          permisos: ['bienes:ver', 'facturas:ver', 'consolidado:ver', 'alertas:ver'],
+          permisos: ['MODULO_INVENTARIO_VER'],
           children: [
             { label: 'Gestión de Bienes',           ruta: '/app/inventario/bienes',                   icono: 'package-open'     },
             { label: 'Facturas Electrónicas',       ruta: '/app/inventario/facturas',                 icono: 'file-spreadsheet' },
