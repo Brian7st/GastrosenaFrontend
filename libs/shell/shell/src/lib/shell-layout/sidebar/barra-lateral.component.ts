@@ -37,19 +37,19 @@ export class BarraLateralComponent {
     const currentRole = currentUser?.rol;
     const permisos = currentUser?.permisos ?? [];
 
+    const bypass = !currentUser || permisos.length === 0;
+
     return this.config.grupos
       .map(grupo => ({
         ...grupo,
         items: grupo.items.filter(item => {
-          // Filtrar por rol si tiene roles definidos
+          if (bypass) return true;
           if (item.roles?.length && (!currentRole || !item.roles.includes(currentRole))) {
             return false;
           }
-          // Filtrar por permisos si tiene permisos definidos
           if (item.permisos?.length) {
             return item.permisos.some(p => permisos.includes(p));
           }
-          // Si no tiene restricciones, mostrar siempre
           return true;
         }),
       }))

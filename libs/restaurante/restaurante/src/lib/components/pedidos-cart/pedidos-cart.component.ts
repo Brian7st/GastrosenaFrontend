@@ -29,7 +29,7 @@ export class PedidosCartComponent {
   }
 
   confirmarPedido() {
-    this.facade.confirmarPedidoActivo();
+    this.facade.confirmarPedidoActivo(this.observacionesGenerales());
     this.router.navigate(['/restaurante/mesas']);
   }
 }

@@ -267,20 +267,17 @@ export class SolicitudesFacade {
   }
 
   /** POST /training/solicitudes — crea la solicitud y la deja seleccionada */
-  crearSolicitudSesion(data: CrearSolicitudSesionData): void {
+  crearSolicitudSesion(data: CrearSolicitudSesionData): Observable<SolicitudSesion | null> {
     this._loading.set(true);
     this._error.set(null);
-    this.solicitudesService.crearSolicitudSesion(data)
+    return this.solicitudesService.crearSolicitudSesion(data)
       .pipe(
         catchError(() => {
           this._error.set('Error al crear la solicitud de sesión');
           return of(null);
         }),
         finalize(() => this._loading.set(false))
-      )
-      .subscribe(res => {
-        if (res !== null) this._solicitudSesionSeleccionada.set(res);
-      });
+      );
   }
 
   /** PATCH /training/solicitudes/{id}/aprobar */
