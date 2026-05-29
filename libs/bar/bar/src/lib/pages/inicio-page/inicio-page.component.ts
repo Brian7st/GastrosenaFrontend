@@ -1,6 +1,7 @@
 import { Component, inject, signal, computed, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { IncidenciaService } from '../../data-access/incidencia.service';
 import { ComandaService } from '../../data-access/comanda.service';
 import { AuditoriaIncidencia } from '../../models/incidencia.model';
@@ -20,6 +21,7 @@ import {
   imports: [
     CommonModule,
     RouterModule,
+    FormsModule,
     LucideIconComponent,
     PageHeaderComponent,
     KpiCardComponent,
@@ -95,6 +97,28 @@ export class InicioPageComponent implements OnInit {
   incidencias = signal<AuditoriaIncidencia[]>([]);
   cargando = signal(false);
 
+  // Modal Comandas Listas
+  modalListasAbierto = signal(false);
+  cargandoListas = signal(false);
+  busquedaListas = signal('');
+  fechaEliminarDesde = signal('');
+  fechaEliminarHasta = signal('');
+
+  comandasListas = computed(() =>
+    this.comandas().filter(c => c.estadoPreparacion === 'LISTO')
+  );
+
+  comandasListasFiltradas = computed(() => {
+    const q = this.busquedaListas().toLowerCase().trim();
+    if (!q) return this.comandasListas();
+    return this.comandasListas().filter(c =>
+      String(c.idComanda).toLowerCase().includes(q) ||
+      String(c.numeroMesa).includes(q) ||
+      (c.mesero || '').toLowerCase().includes(q) ||
+      (c.preparacion || '').toLowerCase().includes(q)
+    );
+  });
+
   ngOnInit(): void {
     this.cargarComandas();
     this.cargarIncidenciasCounts();
@@ -163,6 +187,59 @@ export class InicioPageComponent implements OnInit {
     if ((event.target as HTMLElement).classList.contains('modal-overlay')) {
       this.cerrarModal();
     }
+  }
+
+  abrirModalListas() {
+    this.busquedaListas.set('');
+    this.fechaEliminarDesde.set('');
+    this.fechaEliminarHasta.set('');
+    this.modalListasAbierto.set(true);
+    // Refrescar datos reales
+    this.cargandoListas.set(true);
+    this.comandaService.listarComandas().subscribe({
+      next: (data) => {
+        this.comandas.set(data);
+        this.cargandoListas.set(false);
+      },
+      error: (err) => {
+        console.error('Error refreshing comandas for listas modal:', err);
+        this.cargandoListas.set(false);
+      }
+    });
+  }
+
+  cerrarModalListas() {
+    this.modalListasAbierto.set(false);
+  }
+
+  cerrarListasConOverlay(event: MouseEvent) {
+    if ((event.target as HTMLElement).classList.contains('modal-overlay')) {
+      this.cerrarModalListas();
+    }
+  }
+
+  eliminarPorRango() {
+    const desde = this.fechaEliminarDesde();
+    const hasta = this.fechaEliminarHasta();
+    if (!desde || !hasta) return;
+
+    const desdeDate = new Date(desde);
+    const hastaDate = new Date(hasta);
+    hastaDate.setHours(23, 59, 59, 999);
+
+    // Filtramos del listado local las que NO están en ese rango (simulamos eliminación visual)
+    // El backend no expone endpoint de borrado masivo en el contrato actual
+    const restantes = this.comandas().filter(c => {
+      const fecha = new Date(c.horaEntrada);
+      return !(fecha >= desdeDate && fecha <= hastaDate && c.estadoPreparacion === 'LISTO');
+    });
+    this.comandas.set(restantes);
+    this.fechaEliminarDesde.set('');
+    this.fechaEliminarHasta.set('');
+  }
+
+  getIdCorto(idComanda: string): string {
+    return String(idComanda).slice(-6).toUpperCase();
   }
 
   formatHora(fecha: string): string {
