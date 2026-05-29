@@ -147,40 +147,6 @@ export class MesasPageComponent {
       else this.showEditZonaDropdown.set(false);
     }, 150);
   }
-
-  // ── Opciones de Zona (Autocomplete) ──────────────────────────────────────────
-  opcionesZonas = ['Salón Principal', 'Terraza', 'Salón VIP', 'Barra'];
-  
-  showNuevaZonaDropdown = signal(false);
-  filteredNuevaZonas = computed(() => {
-    const q = this.nuevaZona().toLowerCase();
-    if (!q) return this.opcionesZonas;
-    return this.opcionesZonas.filter(z => z.toLowerCase().includes(q));
-  });
-
-  showEditZonaDropdown = signal(false);
-  filteredEditZonas = computed(() => {
-    const q = this.editZona().toLowerCase();
-    if (!q) return this.opcionesZonas;
-    return this.opcionesZonas.filter(z => z.toLowerCase().includes(q));
-  });
-
-  selectZona(zona: string, tipo: 'nueva' | 'editar') {
-    if (tipo === 'nueva') {
-      this.nuevaZona.set(zona);
-      this.showNuevaZonaDropdown.set(false);
-    } else {
-      this.editZona.set(zona);
-      this.showEditZonaDropdown.set(false);
-    }
-  }
-
-  onBlurZona(tipo: 'nueva' | 'editar') {
-    setTimeout(() => {
-      if (tipo === 'nueva') this.showNuevaZonaDropdown.set(false);
-      else this.showEditZonaDropdown.set(false);
-    }, 150);
-  }
   // ── Signals para ABRIR mesa ──────────────────────────────────────────────────
   comensales    = signal<number>(1);
 
@@ -222,7 +188,16 @@ export class MesasPageComponent {
   }
 
   // ── Modal de alertas y notificaciones ────────────────────────────────────────
-  alertDialog = signal<{open: boolean, title: string, message: string, type: 'success' | 'error'}>({
+  alertDialog = signal<{
+    open: boolean,
+    title: string,
+    message: string,
+    type: 'success' | 'error' | 'confirm',
+    confirmText?: string,
+    cancelText?: string,
+    onConfirm?: () => void,
+    onCancel?: () => void
+  }>({
     open: false,
     title: '',
     message: '',
@@ -230,7 +205,19 @@ export class MesasPageComponent {
   });
   
   cerrarAlertDialog() {
-    this.alertDialog.update(state => ({...state, open: false}));
+    const state = this.alertDialog();
+    if (state.onCancel) {
+      state.onCancel();
+    }
+    this.alertDialog.update(s => ({...s, open: false}));
+  }
+
+  confirmAlertDialog() {
+    const state = this.alertDialog();
+    if (state.onConfirm) {
+      state.onConfirm();
+    }
+    this.alertDialog.update(s => ({...s, open: false}));
   }
 
   mostrarExito(mensaje: string) {
@@ -239,6 +226,18 @@ export class MesasPageComponent {
 
   mostrarError(mensaje: string) {
     this.alertDialog.set({ open: true, title: 'Atención', message: mensaje, type: 'error' });
+  }
+
+  pedirConfirmacion(title: string, message: string, onConfirm: () => void) {
+    this.alertDialog.set({
+      open: true,
+      title,
+      message,
+      type: 'confirm',
+      confirmText: 'Aceptar',
+      cancelText: 'Cancelar',
+      onConfirm
+    });
   }
 
   // ── CREAR ────────────────────────────────────────────────────────────────────
@@ -280,11 +279,11 @@ export class MesasPageComponent {
     const zona = this.editZona().trim();
 
     if (!rawNombre) {
-      alert('El número o identificador de la mesa es obligatorio.');
+      this.mostrarError('El número o identificador de la mesa es obligatorio.');
       return;
     }
     if (capacidad < 1 || capacidad > 20) {
-      alert('La capacidad debe ser entre 1 y 20 personas.');
+      this.mostrarError('La capacidad debe ser entre 1 y 20 personas.');
       return;
     }
 
@@ -339,16 +338,18 @@ export class MesasPageComponent {
   }
 
   // ── ACTIVAR / DESACTIVAR ─────────────────────────────────────────────────────
-  /**
-   * Llama a /activar o /desactivar según el flag.
-   * Para la acción de desactivar se pide confirmación antes de llamar al backend.
-   */
   cambiarEstadoMesa(id: string, activo: boolean) {
     if (!activo) {
-      const ok = confirm('¿Desactivar esta mesa? Quedará oculta del salón.');
-      if (!ok) return;
+      this.pedirConfirmacion(
+        'Desactivar mesa',
+        '¿Desactivar esta mesa? Quedará oculta del salón.',
+        () => {
+          this.facade.cambiarEstadoActivoMesa(id, activo);
+        }
+      );
+    } else {
+      this.facade.cambiarEstadoActivoMesa(id, activo);
     }
-    this.facade.cambiarEstadoActivoMesa(id, activo);
   }
 
   /** Alias para el flujo de "eliminar" de la tarjeta (mapea a desactivar). */
