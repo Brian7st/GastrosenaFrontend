@@ -133,4 +133,21 @@ export class UsuariosService extends BaseHttpService {
       { params, responseType: 'blob' },
     );
   }
+
+  // ==================== PERFIL ====================
+obtenerPerfil(): Observable<UsuarioDetalle> {
+  return this.http.get<UsuarioDetalle>(this.buildUrl('perfil'));
+}
+
+actualizarPerfil(data: Partial<UsuarioDetalle>): Observable<UsuarioDetalle> {
+  return this.http.put<UsuarioDetalle>(this.buildUrl('perfil'), data);
+}
+
+cambiarContrasena(oldPassword: string, newPassword: string): Observable<void> {
+  return this.http.post<void>(this.buildUrl('perfil/cambiar-contrasena'), {
+    passwordActual: oldPassword,
+    passwordNueva: newPassword
+  });
+}
+
 }
