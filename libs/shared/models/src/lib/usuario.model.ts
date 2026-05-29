@@ -3,15 +3,12 @@ export enum Rol {
   CONTADORA = 'CONTADORA',
   INSTRUCTOR = 'INSTRUCTOR',
   CHEF = 'CHEF',
-  LIDER_BAR = 'LIDER_BAR',
   MESERO = 'MESERO',
   BARTENDER = 'BARTENDER',
   AUXILIAR_COCINA = 'AUXILIAR_COCINA',
   CAJERO = 'CAJERO',
-  ADMIN_COCINA = 'ADMIN_COCINA',
-  ADMIN_BAR = 'ADMIN_BAR',
+  APRENDIZ = 'APRENDIZ',
 }
-
 export interface Usuario {
   id: string;
   nombre: string;

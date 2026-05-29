@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { catchError, concatMap, map, of, switchMap } from 'rxjs';
+import { catchError, concatMap, map, of, switchMap, interval, startWith, take, filter } from 'rxjs';
 import { UsuariosActions } from '../actions/usuarios.actions';
 import { UsuariosService } from '../../usuarios.service';
 
@@ -137,13 +137,23 @@ export const desbloquearCuenta$ = createEffect(
   { functional: true },
 );
 
+// ─── IMPORTAR MASIVO CON POLLING (CORREGIDO) ──────────────────────────────────
 export const importarMasivo$ = createEffect(
   (actions$ = inject(Actions), svc = inject(UsuariosService)) =>
     actions$.pipe(
       ofType(UsuariosActions.importarMasivo),
       concatMap(({ request }) =>
         svc.importarMasivo(request).pipe(
-          map(resultado => UsuariosActions.importarMasivoExitoso({ resultado })),
+          map(resultado => {
+            const tareaId = (resultado as any)?.tareaId;
+            if (!tareaId) {
+              return UsuariosActions.importarMasivoExitoso({ resultado });
+            }
+            return UsuariosActions.importarMasivoIniciado({
+              tareaId,
+              tipo: request.tipo,
+            });
+          }),
           catchError((err: unknown) =>
             of(UsuariosActions.importarMasivoFallido({ error: extractErrorMessage(err) })),
           ),
@@ -153,7 +163,60 @@ export const importarMasivo$ = createEffect(
   { functional: true },
 );
 
-// Corrección 1 — exportarUsuarios con parámetros
+export const iniciarPollingImportacion$ = createEffect(
+  (actions$ = inject(Actions), svc = inject(UsuariosService)) =>
+    actions$.pipe(
+      ofType(UsuariosActions.importarMasivoIniciado),
+      switchMap(({ tareaId, tipo }) =>
+        interval(2000).pipe(
+          startWith(0 as number),
+          switchMap(() =>
+            svc.obtenerEstadoImportacion(tareaId, tipo).pipe(
+              map(response => ({
+                estado: response.estado,
+                tareaId,
+                tipo,
+                errores: response.errores || []
+              })),
+              catchError((err) =>
+                of({
+                  estado: 'FALLIDO',
+                  tareaId,
+                  tipo,
+                  errores: [{ mensaje: 'Error al consultar estado: ' + extractErrorMessage(err) }]
+                })
+              )
+            )
+          ),
+          take(150),
+          filter(({ estado }) => estado !== 'EN_PROCESO'),
+          map(({ estado, tareaId, errores }) => {
+            if (estado === 'COMPLETADO') {
+              return UsuariosActions.importarMasivoCompletado({ tareaId });
+            } else {
+              return UsuariosActions.importarMasivoFallidoPorEstado({
+                tareaId,
+                error: errores[0]?.mensaje || 'Error desconocido',
+              });
+            }
+          })
+        )
+      ),
+    ),
+  { functional: true },
+);
+
+export const recargarTrasImportacionCompletada$ = createEffect(
+  (actions$ = inject(Actions)) =>
+    actions$.pipe(
+      ofType(UsuariosActions.importarMasivoCompletado),
+      map(() => UsuariosActions.cargarUsuarios({})),
+    ),
+  { functional: true },
+);
+
+// ──────────────────────────────────────────────────────────────────────────────
+
 export const exportarUsuarios$ = createEffect(
   (actions$ = inject(Actions), svc = inject(UsuariosService)) =>
     actions$.pipe(
@@ -227,7 +290,6 @@ export const cargarHistorial$ = createEffect(
   { functional: true },
 );
 
-// Corrección 4 — recargar lista tras crear/eliminar
 export const recargarTrasCrear$ = createEffect(
   (actions$ = inject(Actions)) =>
     actions$.pipe(

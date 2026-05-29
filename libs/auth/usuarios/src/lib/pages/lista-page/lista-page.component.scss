@@ -4,6 +4,19 @@
   gap: var(--space-6);
   padding: var(--space-6);
 
+  &__toast {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-success-bg);
+    color: var(--color-success-text);
+    border: 1px solid var(--color-success-text);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+  }
+
   &__header {
     display: flex;
     align-items: flex-start;
@@ -183,6 +196,8 @@
     display: flex;
     align-items: center;
     gap: var(--space-3);
+    min-width: 0;
+    max-width: 260px;
   }
 
   &__user-name {
@@ -190,12 +205,18 @@
     font-weight: var(--font-weight-medium);
     color: var(--color-text-primary);
     margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   &__user-email {
     font-size: var(--font-size-xs);
     color: var(--color-text-secondary);
     margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   &__badge {
@@ -206,6 +227,16 @@
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-medium);
     white-space: nowrap;
+    border: none;
+    font-family: var(--font-family-base);
+    cursor: default;
+
+    &--toggle {
+      cursor: pointer;
+      transition: filter var(--duration-fast) var(--ease-standard);
+
+      &:hover { filter: brightness(0.92); }
+    }
 
     &--activo {
       background: var(--color-success-bg);

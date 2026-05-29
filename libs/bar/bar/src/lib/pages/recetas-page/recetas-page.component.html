@@ -6,13 +6,25 @@
     </restaurant-button>
   </div>
   
-  <div class="actions-header" style="margin-bottom: var(--space-6);">
-    <restaurant-search-filter 
-      label="Buscar recetas" 
-      placeholder="Buscar por nombre, categoría..." 
-      [value]="searchTerm()" 
-      (valueChange)="searchTerm.set($event)"
-    ></restaurant-search-filter>
+  <!-- Filtros: Buscador y Categorías alineados al lado -->
+  <div class="recetas-filters">
+    <div class="filter-search">
+      <restaurant-search-filter 
+        label="Buscar recetas" 
+        placeholder="Buscar por nombre, categoría..." 
+        [value]="searchTerm()" 
+        (valueChange)="searchTerm.set($event)"
+      ></restaurant-search-filter>
+    </div>
+    
+    <div class="filter-category">
+      <restaurant-select-filter
+        label="Categoría"
+        [value]="categoriaSeleccionada()"
+        [options]="opcionesCategoria()"
+        (valueChange)="categoriaSeleccionada.set($event)"
+      ></restaurant-select-filter>
+    </div>
   </div>
 
   <div class="showcase__grid-3 recetas-grid">

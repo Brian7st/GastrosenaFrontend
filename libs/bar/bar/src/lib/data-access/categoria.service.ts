@@ -12,22 +12,12 @@ export class CategoriaService {
   listar() {
     this.http.get<Categoria[]>(this.url).subscribe({
       next: (data) => {
-        this.categorias.set(data && data.length > 0 ? data : this.getMockCategories());
+        this.categorias.set(data ?? []);
       },
       error: (err) => {
-        console.error('Error al cargar categorías desde backend. Usando mocks:', err);
-        this.categorias.set(this.getMockCategories());
+        console.error('Error al cargar categorías desde el backend:', err);
+        this.categorias.set([]);
       }
     });
-  }
-
-  private getMockCategories(): Categoria[] {
-    return [
-      { idCategoria: '1', nombreCategoria: 'Cócteles' },
-      { idCategoria: '2', nombreCategoria: 'Cócteles de Café' },
-      { idCategoria: '3', nombreCategoria: 'Bebidas Calientes' },
-      { idCategoria: '4', nombreCategoria: 'Bebidas Frías' },
-      { idCategoria: '5', nombreCategoria: 'Licores' }
-    ];
   }
 }

@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Output, signal } from
 
 import { FormsModule } from '@angular/forms';
 import { FacturaFormDto } from '../../../models/facturas.model';
+import type { InfoBancariaTipo } from '../../../data-access/api/sourcing.api';
 
 @Component({
   selector: 'restaurant-factura-form',
@@ -19,18 +20,22 @@ export class FacturaFormComponent {
 
   // Form model
   numeroFactura    = signal('');
+  cufe             = signal('');
   fechaEmision     = signal('');
-  fechaVencimiento = signal('');
+  fechaRecepcion   = signal('');
   proveedorNit     = signal('');
-  nitReceptor      = signal('');
-  gilVinculado     = signal('');
-  instructorId     = signal('Carlos Ruiz (Autocompletado)');
-  valorRetencionZese = signal(0.625);
+  proveedorNombre  = signal('');
+  proveedorBeneficiarioZese = signal(false);
   ordenCompra      = signal('');
+  productoId       = signal('');
+  descripcionLinea = signal('');
+  cantidadLinea    = signal(1);
+  precioLinea      = signal(0);
+  porcentajeIvaLinea = signal(19);
   
   // Datos Bancarios
   banco = signal('');
-  tipoCuenta = signal('');
+  tipoCuenta = signal<InfoBancariaTipo | ''>('');
   numeroCuenta = signal('');
 
   archivosNombres = signal<string[]>([]);
@@ -65,14 +70,25 @@ export class FacturaFormComponent {
   onSubmit(): void {
     this.save.emit({
       numeroFactura: this.numeroFactura(),
+      cufe: this.cufe().trim(),
       fechaEmision: this.fechaEmision(),
-      fechaVencimiento: this.fechaVencimiento() || undefined,
+      fechaRecepcion: this.fechaRecepcion(),
       proveedorNit: this.proveedorNit(),
-      nitReceptor: this.nitReceptor(),
-      gilVinculado: this.gilVinculado() || undefined,
-      instructorId: this.instructorId(),
-      valorRetencionZese: this.valorRetencionZese(),
+      proveedorNombre: this.proveedorNombre(),
+      proveedorBeneficiarioZese: this.proveedorBeneficiarioZese(),
       ordenCompra: this.ordenCompra() || undefined,
+      infoBancariaBanco: this.banco() || undefined,
+      infoBancariaCuenta: this.numeroCuenta() || undefined,
+      infoBancariaTipo: this.tipoCuenta() || undefined,
+      lineas: [
+        {
+          productoId: this.productoId() || undefined,
+          descripcion: this.descripcionLinea(),
+          cantidad: this.cantidadLinea(),
+          precioUnitario: this.precioLinea(),
+          porcentajeIva: this.porcentajeIvaLinea(),
+        },
+      ],
     });
   }
 

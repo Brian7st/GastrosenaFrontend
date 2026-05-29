@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   OnInit,
   computed,
   inject,
@@ -50,7 +51,9 @@ import {
   styleUrl:    './lista-page.component.scss',
 })
 export class ListaPageComponent implements OnInit {
-  private readonly facade = inject(UsuariosFacade);
+  private readonly facade     = inject(UsuariosFacade);
+  private readonly destroyRef = inject(DestroyRef);
+  private toastTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly usuarios = toSignal(
     this.facade.usuarios$.pipe(
@@ -66,6 +69,9 @@ export class ListaPageComponent implements OnInit {
   readonly importando      = toSignal(this.facade.importando$,      { initialValue: false });
   readonly resultadoImport = toSignal(this.facade.resultadoImport$, { initialValue: null });
   readonly mensajeExport   = toSignal(this.facade.mensajeExport$,   { initialValue: null });
+
+  readonly error        = toSignal(this.facade.error$, { initialValue: null as string | null });
+  readonly mensajeExito = signal<string | null>(null);
 
   readonly rolesDisponibles = Object.values(Rol);
 
@@ -105,6 +111,18 @@ export class ListaPageComponent implements OnInit {
   ngOnInit(): void {
     this.facade.cargarUsuarios();
     this.facade.cargarRoles();
+    this.destroyRef.onDestroy(() => {
+      if (this.toastTimer !== null) { clearTimeout(this.toastTimer); }
+    });
+  }
+
+  private mostrarToast(mensaje: string): void {
+    if (this.toastTimer !== null) { clearTimeout(this.toastTimer); }
+    this.mensajeExito.set(mensaje);
+    this.toastTimer = setTimeout(() => {
+      this.mensajeExito.set(null);
+      this.toastTimer = null;
+    }, 4000);
   }
 
   onCrearUsuario(): void {
@@ -123,20 +141,21 @@ export class ListaPageComponent implements OnInit {
   }
 
   onGuardarUsuario(data: CrearUsuarioRequest): void {
-    const editando = this.usuarioEditando();
-    if (editando) {
-      const payload: ActualizarUsuarioRequest = {
-        nombre:    data.nombre,
-        apellidos: data.apellidos,
-        telefono:  data.telefono,
-        idRol:     data.nombreRol,
-      };
-      this.facade.actualizarUsuario(editando.id, payload);
-    } else {
-      this.facade.crearUsuario(data);
-    }
-    this.onCerrarFormulario();
+  const editando = this.usuarioEditando();
+  if (editando) {
+    const payload: ActualizarUsuarioRequest = {
+      nombre:    data.nombre,
+      apellidos: data.apellidos,
+      telefono:  data.telefono,
+      idRol:     data.nombreRol,
+    };
+    this.facade.actualizarUsuario(editando.id, payload);
+  } else {
+    this.facade.crearUsuario(data);
+    this.mostrarToast('Usuario creado exitosamente. Revisá tu correo para más información.');
   }
+  this.onCerrarFormulario();
+}
 
   onExportar(config: ExportarConfig): void {
     this.facade.exportarUsuarios(config);
@@ -147,7 +166,16 @@ export class ListaPageComponent implements OnInit {
     this.facade.importarMasivo(req);
   }
 
+  onCambiarEstado(u: UsuarioDetalle): void {
+    if (u.activo) {
+      this.facade.desactivarUsuario(u.id);
+    } else {
+      this.facade.activarUsuario(u.id);
+    }
+  }
+
   onEliminar(id: string): void {
+    if (!confirm('¿Estás seguro de que querés eliminar este usuario?')) { return; }
     this.facade.eliminarUsuario(id);
   }
 }

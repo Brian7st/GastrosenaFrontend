@@ -1,66 +1,247 @@
 <div class="dashboard">
 
-  <!-- Encabezado -->
-  <div class="dashboard__header">
-    <h1 class="dashboard__title">Panel General</h1>
-    <p class="dashboard__subtitle">Vista general del sistema GastroSENA en tiempo real.</p>
-  </div>
-
-  <!-- KPIs -->
-  <div class="dashboard__kpis">
-    @for (kpi of dashboard.kpis(); track kpi.label) {
-      <div class="kpi-card kpi-card--{{ kpi.trendType }}">
-        <div class="kpi-card__icon">
-          <svg [lucideIcon]="kpi.icon" [size]="20"></svg>
-        </div>
-        <div class="kpi-card__body">
-          <p class="kpi-card__label">{{ kpi.label }}</p>
-          <h3 class="kpi-card__value">{{ kpi.value }}</h3>
-          <span class="kpi-card__trend">{{ kpi.trend }}</span>
-        </div>
+  <div class="dashboard-hero">
+    <div class="dashboard-hero__accent"></div>
+    <div class="dashboard-hero__content">
+      <div class="dashboard-hero__badge">
+        <svg lucideIcon="layout-dashboard" [size]="16"></svg>
+        <span>Panel General</span>
       </div>
-    }
+      <h1 class="dashboard-hero__title">Bienvenido a <span class="dashboard-hero__brand">GastroSENA</span></h1>
+      <p class="dashboard-hero__subtitle">Vista general del sistema en tiempo real.</p>
+    </div>
   </div>
 
-  <!-- Módulos del sistema -->
-  <section class="dashboard__section">
-    <h2 class="dashboard__section-title">Módulos del sistema</h2>
-    <div class="modules-grid">
-      @for (mod of dashboard.modulos; track mod.label) {
-        <a class="module-card" [routerLink]="mod.ruta">
-          <div class="module-card__icon-wrap">
-            <svg [lucideIcon]="mod.icon" [size]="22"></svg>
-          </div>
-          <div class="module-card__info">
-            <span class="module-card__label">{{ mod.label }}</span>
-            <span class="module-card__desc">{{ mod.description }}</span>
-          </div>
-          @if (mod.badgeCount) {
-            <span class="module-card__badge module-card__badge--{{ mod.badgeType }}">
-              {{ mod.badgeCount }}
-            </span>
-          }
-          <svg lucideIcon="chevron-right" [size]="16" class="module-card__arrow"></svg>
-        </a>
-      }
+  @if (dashboard.loading()) {
+    <div class="dashboard__loading">
+      <svg lucideIcon="loader" [size]="24" class="spin"></svg>
+      <span>Cargando datos del sistema...</span>
     </div>
-  </section>
+  } @else {
 
-  <!-- Actividad reciente -->
-  <section class="dashboard__section">
-    <h2 class="dashboard__section-title">Actividad reciente</h2>
-    <div class="activity-list">
-      @for (item of dashboard.actividadReciente; track item.id) {
-        <div class="activity-item">
-          <div class="activity-item__dot activity-item__dot--{{ item.tipo }}"></div>
-          <div class="activity-item__body">
-            <p class="activity-item__desc">{{ item.descripcion }}</p>
-            <p class="activity-item__meta">{{ item.modulo }} · {{ item.usuario }}</p>
+    <div class="dashboard__kpis">
+      @for (kpi of dashboard.kpis(); track kpi.label) {
+        <div class="kpi-card kpi-card--{{ kpi.trendType }}">
+          <div class="kpi-card__icon">
+            <svg [lucideIcon]="kpi.icon" [size]="20"></svg>
           </div>
-          <span class="activity-item__time">{{ item.hace }}</span>
+          <div class="kpi-card__body">
+            <p class="kpi-card__label">{{ kpi.label }}</p>
+            <h3 class="kpi-card__value">{{ kpi.value }}</h3>
+            <span class="kpi-card__trend">{{ kpi.trend }}</span>
+          </div>
         </div>
       }
     </div>
-  </section>
+
+    <section class="dashboard__section">
+      <h2 class="dashboard__section-title">
+        <svg lucideIcon="activity" [size]="18"></svg>
+        Operaciones en tiempo real
+      </h2>
+      <div class="operations-grid">
+        <a class="operation-card operation-card--cocina" routerLink="/app/cocina">
+          <div class="operation-card__header">
+            <svg lucideIcon="chef-hat" [size]="20"></svg>
+            <span>Cocina</span>
+          </div>
+          @if (dashboard.operaciones().cocina; as cocina) {
+            <div class="operation-card__metrics">
+              <div class="operation-card__metric">
+                <svg lucideIcon="flame" [size]="14"></svg>
+                <span class="operation-card__metric-value">{{ cocina.totalPlatosDespachadosHoy }}</span>
+                <span class="operation-card__metric-label">platos hoy</span>
+              </div>
+              <div class="operation-card__metric">
+                <svg lucideIcon="clock" [size]="14"></svg>
+                <span class="operation-card__metric-value">{{ cocina.promedioDemoraGeneral | number:'1.0-1' }} min</span>
+                <span class="operation-card__metric-label">promedio</span>
+              </div>
+              <div class="operation-card__metric">
+                <svg lucideIcon="trending-up" [size]="14"></svg>
+                <span class="operation-card__metric-value">{{ cocina.platoMasRapido }}</span>
+                <span class="operation-card__metric-label">más rápido</span>
+              </div>
+            </div>
+          } @else {
+            <p class="operation-card__empty">Sin conexión con cocina</p>
+          }
+        </a>
+
+        <a class="operation-card operation-card--bar" routerLink="/app/bar">
+          <div class="operation-card__header">
+            <svg lucideIcon="wine" [size]="20"></svg>
+            <span>Bar & Barismo</span>
+          </div>
+          @if (dashboard.operaciones().bar; as bar) {
+            <div class="operation-card__metrics">
+              <div class="operation-card__metric">
+                <svg lucideIcon="flame" [size]="14"></svg>
+                <span class="operation-card__metric-value">{{ bar.totalBebidasDespachadosHoy }}</span>
+                <span class="operation-card__metric-label">bebidas hoy</span>
+              </div>
+              <div class="operation-card__metric">
+                <svg lucideIcon="clock" [size]="14"></svg>
+                <span class="operation-card__metric-value">{{ bar.promedioDemoraGeneral | number:'1.0-1' }} min</span>
+                <span class="operation-card__metric-label">promedio</span>
+              </div>
+              <div class="operation-card__metric">
+                <svg lucideIcon="trending-up" [size]="14"></svg>
+                <span class="operation-card__metric-value">{{ bar.bebidaMasRapida }}</span>
+                <span class="operation-card__metric-label">más rápida</span>
+              </div>
+            </div>
+          } @else {
+            <p class="operation-card__empty">Sin conexión con bar</p>
+          }
+        </a>
+      </div>
+    </section>
+
+    <section class="dashboard__section">
+      <h2 class="dashboard__section-title">
+        <svg lucideIcon="package" [size]="18"></svg>
+        Inventario y Presupuesto
+      </h2>
+      <div class="inventory-grid">
+        @if (dashboard.inventario().kpis; as inv) {
+          <div class="summary-card">
+            <div class="summary-card__header">
+              <svg lucideIcon="package" [size]="16"></svg>
+              <span>Stock General</span>
+            </div>
+            <div class="summary-card__body">
+              <div class="summary-card__stat">
+                <span class="summary-card__stat-value">{{ inv.valorTotal | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                <span class="summary-card__stat-label">Valor total en inventario</span>
+              </div>
+              <div class="summary-card__stat">
+                <span class="summary-card__stat-value">{{ inv.movimientosHoy }}</span>
+                <span class="summary-card__stat-label">Movimientos hoy</span>
+              </div>
+            </div>
+          </div>
+        }
+
+        @if (dashboard.inventario().presupuesto; as pres) {
+          <div class="summary-card">
+            <div class="summary-card__header">
+              <svg lucideIcon="dollar-sign" [size]="16"></svg>
+              <span>Presupuesto</span>
+            </div>
+            <div class="summary-card__body">
+              <div class="summary-card__stat">
+                <span class="summary-card__stat-value">{{ pres.porcentajeEjecucion | number:'1.0-1' }}%</span>
+                <span class="summary-card__stat-label">Ejecución presupuestal</span>
+              </div>
+              <div class="summary-card__stat">
+                <span class="summary-card__stat-value">{{ pres.saldoGlobal | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                <span class="summary-card__stat-label">Saldo disponible</span>
+              </div>
+            </div>
+            <div class="summary-card__progress">
+              <div class="summary-card__progress-bar" [style.width.%]="pres.porcentajeEjecucion"></div>
+            </div>
+          </div>
+        }
+
+        @if (dashboard.inventario().facturas; as fact) {
+          <div class="summary-card">
+            <div class="summary-card__header">
+              <svg lucideIcon="file-text" [size]="16"></svg>
+              <span>Facturas</span>
+            </div>
+            <div class="summary-card__body">
+              <div class="summary-card__stat">
+                <span class="summary-card__stat-value">{{ fact.totalGeneral }}</span>
+                <span class="summary-card__stat-label">Total facturas</span>
+              </div>
+              <div class="summary-card__stat">
+                <span class="summary-card__stat-value">{{ fact.totalPagadas }}</span>
+                <span class="summary-card__stat-label">Pagadas</span>
+              </div>
+            </div>
+            <div class="summary-card__tags">
+              <span class="summary-card__tag summary-card__tag--info">{{ fact.totalRegistradas }} registradas</span>
+              <span class="summary-card__tag summary-card__tag--success">{{ fact.totalVerificadas }} verificadas</span>
+              @if (fact.totalAnuladas > 0) {
+                <span class="summary-card__tag summary-card__tag--danger">{{ fact.totalAnuladas }} anuladas</span>
+              }
+            </div>
+          </div>
+        }
+
+        @if (dashboard.inventario().alertas; as alrt) {
+          <div class="summary-card summary-card--alert">
+            <div class="summary-card__header">
+              <svg lucideIcon="triangle-alert" [size]="16"></svg>
+              <span>Alertas Activas</span>
+            </div>
+            <div class="summary-card__body">
+              <div class="summary-card__stat">
+                <span class="summary-card__stat-value summary-card__stat-value--danger">{{ alrt.alertasPendientes }}</span>
+                <span class="summary-card__stat-label">Pendientes</span>
+              </div>
+              <div class="summary-card__stat">
+                <span class="summary-card__stat-value">{{ alrt.alertasResueltas }}</span>
+                <span class="summary-card__stat-label">Resueltas</span>
+              </div>
+            </div>
+          </div>
+        }
+
+        @if (!dashboard.inventario().kpis && !dashboard.inventario().presupuesto && !dashboard.inventario().facturas && !dashboard.inventario().alertas) {
+          <div class="empty-state">
+            <svg lucideIcon="wifi-off" [size]="20"></svg>
+            <span>Sin datos de inventario disponibles</span>
+          </div>
+        }
+      </div>
+    </section>
+
+    <section class="dashboard__section">
+      <h2 class="dashboard__section-title">Módulos del sistema</h2>
+      <div class="modules-grid">
+        @for (mod of dashboard.modulos(); track mod.label) {
+          <a class="module-card" [routerLink]="mod.ruta">
+            <div class="module-card__icon-wrap">
+              <svg [lucideIcon]="mod.icon" [size]="22"></svg>
+            </div>
+            <div class="module-card__info">
+              <span class="module-card__label">{{ mod.label }}</span>
+              <span class="module-card__desc">{{ mod.description }}</span>
+            </div>
+            @if (mod.badgeCount) {
+              <span class="module-card__badge module-card__badge--{{ mod.badgeType }}">
+                {{ mod.badgeCount }}
+              </span>
+            }
+            <svg lucideIcon="chevron-right" [size]="16" class="module-card__arrow"></svg>
+          </a>
+        }
+      </div>
+    </section>
+
+    <section class="dashboard__section">
+      <h2 class="dashboard__section-title">Actividad reciente</h2>
+      <div class="activity-list">
+        @for (item of dashboard.actividadReciente; track item.id) {
+          <div class="activity-item">
+            <div class="activity-item__dot activity-item__dot--{{ item.tipo }}"></div>
+            <div class="activity-item__body">
+              <p class="activity-item__desc">{{ item.descripcion }}</p>
+              <p class="activity-item__meta">{{ item.modulo }} · {{ item.usuario }}</p>
+            </div>
+            <span class="activity-item__time">{{ item.hace }}</span>
+          </div>
+        } @empty {
+          <div class="empty-state">
+            <svg lucideIcon="inbox" [size]="20"></svg>
+            <span>No hay actividad reciente</span>
+          </div>
+        }
+      </div>
+    </section>
+  }
 
 </div>

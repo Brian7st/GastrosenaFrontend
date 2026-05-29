@@ -1,16 +1,15 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmModalComponent } from '@restaurant/shared/ui';
 import { FacturasFacade } from '../../../data-access/facturas.facade';
 import { Factura, EstadoFactura } from '../../../models/facturas.model';
-import { FacturaFormComponent } from '../../../ui/modals/factura-form/factura-form.component';
 import { ExportarComponent } from '../../../components/exportar/exportar.component';
 
 @Component({
   selector: 'restaurant-facturas-list',
   standalone: true,
-  imports: [CommonModule, ButtonComponent, DataTableComponent, KpiCardComponent, FacturaFormComponent, KeywordConfirmModalComponent, ExportarComponent],
+  imports: [CommonModule, ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmModalComponent, ExportarComponent],
   templateUrl: './facturas-list.component.html',
   styleUrl: './facturas-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,12 +19,13 @@ export class FacturasListPageComponent implements OnInit {
   private router = inject(Router);
 
   // State
-  facturas = this.facade.facturas;
-  kpis = this.facade.kpis;
-  loading = this.facade.loading;
+  facturas   = this.facade.facturas;
+  kpis       = this.facade.kpis;
+  loading    = this.facade.loading;
+  paginacion = this.facade.paginacion;
+  paginas    = computed(() => Array.from({ length: this.paginacion().totalPages }, (_, i) => i));
 
   // Modal controls
-  showFormModal      = signal(false);
   showAnularModal    = signal(false);
   showExportarModal  = signal(false);
   facturaParaAnular  = signal<Factura | null>(null);
@@ -40,17 +40,8 @@ export class FacturasListPageComponent implements OnInit {
     this.facade.setFiltros({ busqueda: query });
   }
 
-  onNuevaFactura(): void {
-    this.showFormModal.set(true);
-  }
-
-  onCloseForm(): void {
-    this.showFormModal.set(false);
-  }
-
-  onSaveFactura(data: Partial<Factura>): void {
-    this.facade.crearFactura(data);
-    this.showFormModal.set(false);
+  onIrAPagina(page: number): void {
+    this.facade.irAPagina(page);
   }
 
   onVerFactura(factura: Factura): void {

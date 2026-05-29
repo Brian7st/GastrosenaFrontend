@@ -1,41 +1,46 @@
-import { Component, ChangeDetectionStrategy, input, output, signal, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, signal, OnInit, OnDestroy, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ComandaBarYBarismo, ComandaItem } from '../../models/comanda.model';
+import { ComandaBarYBarismo } from '../../models/comanda.model';
 import { ComandaService } from '../../data-access/comanda.service';
 import { RecetaService } from '../../data-access/receta.service';
 import { Receta } from '../../models/receta.model';
+import { ButtonComponent, LucideIconComponent } from '@restaurant/shared/ui';
 
 @Component({
   selector: 'restaurant-comanda-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonComponent, LucideIconComponent],
   templateUrl: './comanda-card.component.html',
   styleUrl: './comanda-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ComandaCardComponent implements OnInit, OnDestroy {
   comanda = input.required<ComandaBarYBarismo>();
-  
-  
+
   iniciarPlato = output<string>();
   finalizarPlato = output<string>();
+  comandaActualizada = output<void>();
 
-  isExpanded = signal(true);
   now = signal(new Date().getTime());
-  showDetalles = signal(false);
-  
-  mostrarReceta = signal(false);
+  vistaActual = signal<'platos' | 'detalles' | 'receta'>('platos');
   recetaActiva = signal<Receta | null>(null);
+  expandedPlates = signal<Set<string>>(new Set());
 
   comandaService = inject(ComandaService);
   recetaService = inject(RecetaService);
-  
+
   private intervalId: ReturnType<typeof setInterval> | null = null;
+
+  constructor() {
+    effect(() => {
+      this.expandedPlates.set(new Set([this.comanda().idComanda]));
+    });
+  }
 
   ngOnInit() {
     this.intervalId = setInterval(() => {
       this.now.set(new Date().getTime());
-    }, 60000); // Actualiza cada minuto
+    }, 60000);
   }
 
   ngOnDestroy() {
@@ -44,108 +49,62 @@ export class ComandaCardComponent implements OnInit, OnDestroy {
     }
   }
 
-  alternarReceta(idReceta?: string) {
-    if (!idReceta) return;
-    // Cargar recetas si no se han cargado
+  alternarReceta(nombreBebida?: string) {
+    if (!nombreBebida) return;
+
     if (this.recetaService.recetas().length === 0) {
       this.recetaService.listar();
     }
-    
-    // Buscar la receta en el listado local del servicio
-    const receta = this.recetaService.recetas().find(r => r.idReceta === idReceta);
-    if (receta) {
-      this.recetaActiva.set(receta);
-      this.mostrarReceta.set(true);
+
+    this.recetaActiva.set(null);
+    this.vistaActual.set('receta');
+
+    const recetasList = this.recetaService.recetas();
+    const recetaLocal = recetasList.find(
+      (r) => r.nombreReceta.toLowerCase().trim() === nombreBebida.toLowerCase().trim()
+    );
+
+    if (recetaLocal) {
+      this.recetaActiva.set(recetaLocal);
     } else {
-      // Fallback a mock data
-      const mockRecetas: Receta[] = [
-        {
-          idReceta: 'RB-001',
-          nombreReceta: 'Margarita Tradicional',
-          nombreCategoria: 'Cócteles',
-          temperatura: 'Fría',
-          tiempoPreparacion: 5,
-          precioUnitario: 25000,
-          ingredientes: [
-            { nombreIngrediente: 'Tequila Blanco', cantidadRequerida: 50, unidadMedida: 'ml' },
-            { nombreIngrediente: 'Licor de Naranja', cantidadRequerida: 25, unidadMedida: 'ml' },
-            { nombreIngrediente: 'Zumo de Limón', cantidadRequerida: 25, unidadMedida: 'ml' },
-            { nombreIngrediente: 'Sal (para escarchar)', cantidadRequerida: 5, unidadMedida: 'g' }
-          ],
-          pasos: [
-            { orden: 1, descripcionPaso: 'Escarchar el borde de la copa con limón y sal.' },
-            { orden: 2, descripcionPaso: 'Agitar todos los ingredientes líquidos en una coctelera con hielo.' },
-            { orden: 3, descripcionPaso: 'Servir colando sobre la copa preparada.' }
-          ]
-        },
-        {
-          idReceta: 'RB-002',
-          nombreReceta: 'Mojito Cubano',
-          nombreCategoria: 'Cócteles',
-          temperatura: 'Fría',
-          tiempoPreparacion: 6,
-          precioUnitario: 22000,
-          ingredientes: [
-            { nombreIngrediente: 'Ron Blanco', cantidadRequerida: 50, unidadMedida: 'ml' },
-            { nombreIngrediente: 'Hojas de Menta Fresca', cantidadRequerida: 8, unidadMedida: 'und' },
-            { nombreIngrediente: 'Azúcar Blanco', cantidadRequerida: 2, unidadMedida: 'cdtas' },
-            { nombreIngrediente: 'Zumo de Lima', cantidadRequerida: 25, unidadMedida: 'ml' },
-            { nombreIngrediente: 'Agua con Gas / Soda', cantidadRequerida: 100, unidadMedida: 'ml' }
-          ],
-          pasos: [
-            { orden: 1, descripcionPaso: 'Macerar suavemente las hojas de menta con el azúcar y zumo de lima en el vaso.' },
-            { orden: 2, descripcionPaso: 'Añadir hielo picado y el ron blanco.' },
-            { orden: 3, descripcionPaso: 'Completar con agua con gas y remover suavemente de abajo hacia arriba.' }
-          ]
-        },
-        {
-          idReceta: 'RB-003',
-          nombreReceta: 'Cerveza IPA Artesanal',
-          nombreCategoria: 'Cervezas',
-          temperatura: 'Muy Fría',
-          tiempoPreparacion: 2,
-          precioUnitario: 15000,
-          ingredientes: [
-            { nombreIngrediente: 'Cerveza IPA en Barril', cantidadRequerida: 350, unidadMedida: 'ml' }
-          ],
-          pasos: [
-            { orden: 1, descripcionPaso: 'Enfriar el vaso cervecero previamente.' },
-            { orden: 2, descripcionPaso: 'Servir la cerveza de grifo inclinando el vaso a 45 grados.' },
-            { orden: 3, descripcionPaso: 'Enderezar el vaso al final para generar 2 dedos de espuma perfecta.' }
-          ]
-        },
-        {
-          idReceta: 'RB-004',
-          nombreReceta: 'Piña Colada',
-          nombreCategoria: 'Cócteles',
-          temperatura: 'Fría (Frappé)',
-          tiempoPreparacion: 7,
-          precioUnitario: 24000,
-          ingredientes: [
-            { nombreIngrediente: 'Ron Blanco', cantidadRequerida: 50, unidadMedida: 'ml' },
-            { nombreIngrediente: 'Crema de Coco', cantidadRequerida: 50, unidadMedida: 'ml' },
-            { nombreIngrediente: 'Zumo de Piña Natural', cantidadRequerida: 100, unidadMedida: 'ml' },
-            { nombreIngrediente: 'Hielo', cantidadRequerida: 1, unidadMedida: 'taza' }
-          ],
-          pasos: [
-            { orden: 1, descripcionPaso: 'Añadir todos los ingredientes en una licuadora.' },
-            { orden: 2, descripcionPaso: 'Licuar a alta velocidad hasta obtener una consistencia suave y cremosa.' },
-            { orden: 3, descripcionPaso: 'Servir en copa tipo huracán y decorar con un trozo de piña fresca.' }
-          ]
-        }
-      ];
-      const found = mockRecetas.find(r => r.idReceta === idReceta) || mockRecetas[0];
-      this.recetaActiva.set(found);
-      this.mostrarReceta.set(true);
+      const recetaAproximada = recetasList.find(
+        (r) => r.nombreReceta.toLowerCase().includes(nombreBebida.toLowerCase())
+      );
+      if (recetaAproximada) {
+        this.recetaActiva.set(recetaAproximada);
+      } else {
+        this.mostrarErrorPlaceholder(nombreBebida);
+      }
     }
   }
 
-  cerrarReceta() {
-    this.mostrarReceta.set(false);
+  mostrarErrorPlaceholder(nombreBebida: string) {
+    this.recetaActiva.set({
+      idReceta: 'ERROR',
+      nombreReceta: nombreBebida || 'Receta no disponible',
+      nombreCategoria: 'Bebidas',
+      temperatura: 'Frío',
+      tiempoPreparacion: 0,
+      precioUnitario: 0,
+      ingredientes: [],
+      pasos: [
+        {
+          orden: 1,
+          descripcionPaso: `No se pudo encontrar la receta para "${nombreBebida}" en el servidor.`,
+          notasAdicionales: 'Verifique si existe la receta registrada para esta bebida.'
+        }
+      ]
+    });
+  }
+
+  cerrarVista() {
+    this.vistaActual.set('platos');
     this.recetaActiva.set(null);
   }
 
-  expandedPlates = signal<Set<string>>(new Set());
+  verDetalles() {
+    this.vistaActual.set('detalles');
+  }
 
   togglePlate(idDetalle: string) {
     const current = new Set(this.expandedPlates());
@@ -161,16 +120,12 @@ export class ComandaCardComponent implements OnInit, OnDestroy {
     return this.expandedPlates().has(idDetalle);
   }
 
-  iniciar(item: ComandaItem) {
-    if (item.estado === 'ESPERA') {
-      this.iniciarPlato.emit(item.idDetalleComanda);
-    }
+  iniciar() {
+    this.iniciarPlato.emit(this.comanda().idComanda);
   }
 
-  finalizar(item: ComandaItem) {
-    if (item.estado === 'PREPARANDO') {
-      this.finalizarPlato.emit(item.idDetalleComanda);
-    }
+  finalizar() {
+    this.finalizarPlato.emit(this.comanda().idComanda);
   }
 
   getTiempoTranscurrido(horaIso?: string): number {
@@ -178,26 +133,5 @@ export class ComandaCardComponent implements OnInit, OnDestroy {
     const start = new Date(horaIso).getTime();
     return Math.floor((this.now() - start) / 60000);
   }
-
-  comandaActualizada = output<void>();
-
-empezarTodo() {
-  const comanda = this.comanda();
-  if (comanda.estadoPreparacion === 'PENDIENTE') {
-    this.comandaService.actualizarEstado(comanda.idComanda.toString(), 'EN_PREPARACION').subscribe({
-      next: () => this.comandaActualizada.emit(),
-      error: (err) => console.error('Error al iniciar:', err)
-    });
-  }
 }
-
-finalizarTodo() {
-  const comanda = this.comanda();
-  if (comanda.estadoPreparacion === 'EN_PREPARACION') {
-    this.comandaService.actualizarEstado(comanda.idComanda.toString(), 'LISTO').subscribe({
-      next: () => this.comandaActualizada.emit(),
-      error: (err) => console.error('Error al finalizar:', err)
-    });
-  }
-}
-}
+

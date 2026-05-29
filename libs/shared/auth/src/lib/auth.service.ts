@@ -8,13 +8,9 @@ import { Rol } from '@restaurant/shared/models';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
-
-  // ✅ Ruta relativa para que el proxy la intercepte
   private readonly authUrl = '/api/auth';
 
-  constructor() {
-    // ❌ Elimina cualquier asignación de usuario por defecto
-  }
+  constructor() {}
 
   currentUser(): AuthenticatedUser | null {
     return currentUserSignal();
@@ -24,23 +20,31 @@ export class AuthService {
     return !!currentUserSignal();
   }
 
-  // ✅ Método login REAL que llama al backend
   async login(email: string, password: string): Promise<AuthenticatedUser> {
     try {
       const response = await firstValueFrom(
-        this.http.post<{ token: string; idUsuario: string; nombreCompleto: string; email: string; rol: string }>(
+        this.http.post<{
+          token: string;
+          idUsuario: string;
+          nombreCompleto: string;
+          email: string;
+          rol: string;
+          permisos: string[];
+        }>(
           `${this.authUrl}/login`,
           { email, contrasena: password }
         )
       );
       if (response && response.token) {
         const usuario: AuthenticatedUser = {
-          id: response.idUsuario,
-          nombre: response.nombreCompleto,
-          email: response.email,
-          rol: response.rol as Rol
+          id:       response.idUsuario,
+          nombre:   response.nombreCompleto,
+          email:    response.email,
+          rol:      response.rol as Rol,
+          permisos: response.permisos ?? [],
         };
         localStorage.setItem('auth_token', response.token);
+        localStorage.setItem('auth_permisos', JSON.stringify(response.permisos ?? []));
         currentUserSignal.set(usuario);
         return usuario;
       } else {
@@ -60,11 +64,19 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_permisos');
     currentUserSignal.set(null);
   }
 
-  // ✅ NUEVO MÉTODO: obtiene el token del localStorage
   getToken(): string | null {
     return localStorage.getItem('auth_token');
+  }
+
+  hasPermiso(permiso: string): boolean {
+    return this.currentUser()?.permisos.includes(permiso) ?? false;
+  }
+
+  hasAlgunPermiso(permisos: string[]): boolean {
+    return permisos.some(p => this.hasPermiso(p));
   }
 }
