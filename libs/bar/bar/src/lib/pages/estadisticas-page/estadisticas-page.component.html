@@ -14,16 +14,18 @@
       <div class="kpi-info">
         <h3>PROMEDIO GENERAL</h3>
         <p class="kpi-value">{{ promedioFormateado() || '00:00' }}</p>
+        <span class="kpi-sub">tiempo por bebida</span>
       </div>
     </div>
 
     <div class="kpi-card shadow-sm kpi-green">
       <div class="kpi-icon-wrapper">
-        <lucide-icon name="check-circle" [size]="24"></lucide-icon>
+        <lucide-icon name="zap" [size]="24"></lucide-icon>
       </div>
       <div class="kpi-info">
         <h3>BEBIDA MÁS RÁPIDA</h3>
-        <p class="kpi-value">{{ kpis()?.bebidaMasRapida || '—' }}</p>
+        <p class="kpi-value kpi-value--sm">{{ kpis()?.bebidaMasRapida || '—' }}</p>
+        <span class="kpi-sub">menor tiempo de prep.</span>
       </div>
     </div>
 
@@ -32,19 +34,62 @@
         <lucide-icon name="clipboard-list" [size]="24"></lucide-icon>
       </div>
       <div class="kpi-info">
-        <h3>BEBIDAS PREPARADAS</h3>
+        <h3>BEBIDAS COMPLETADAS</h3>
         <p class="kpi-value">{{ kpis()?.totalBebidasDespachadosHoy || 0 }}</p>
+        <span class="kpi-sub">comandas en estado LISTO</span>
+      </div>
+    </div>
+
+    <div class="kpi-card shadow-sm kpi-red">
+      <div class="kpi-icon-wrapper">
+        <lucide-icon name="alert-triangle" [size]="24"></lucide-icon>
+      </div>
+      <div class="kpi-info">
+        <h3>INCIDENCIAS</h3>
+        <p class="kpi-value">{{ totalIncidencias() }}</p>
+        <span class="kpi-sub">cancelaciones y devoluciones</span>
       </div>
     </div>
   </div>
 
-  <!-- Gráficos -->
-  <div class="charts-grid">
-    <div class="chart-card shadow-sm full-width">
-      <h3>DEMORA PROMEDIO POR BEBIDA</h3>
+  <!-- Gráficos - fila 1 -->
+  <div class="charts-row">
+
+    <!-- Tiempo promedio por bebida -->
+    <div class="chart-card shadow-sm chart-wide">
+      <h3>⏱ DEMORA PROMEDIO POR BEBIDA</h3>
       <div class="chart-wrapper">
         <canvas #graficoPromedios></canvas>
       </div>
+    </div>
+
+    <!-- Distribución de estados -->
+    <div class="chart-card shadow-sm chart-narrow">
+      <h3>📊 COMANDAS POR ESTADO</h3>
+      <div class="chart-wrapper chart-wrapper--donut">
+        <canvas #graficoCarga></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Top bebidas más pedidas -->
+  <div class="chart-card shadow-sm top-bebidas-card">
+    <h3>🏆 TOP BEBIDAS MÁS PEDIDAS</h3>
+    <div class="top-list">
+      @for (bebida of topBebidas(); track bebida.nombre; let i = $index) {
+        <div class="top-item">
+          <span class="top-rank">{{ i + 1 }}</span>
+          <div class="top-info">
+            <span class="top-name">{{ bebida.nombre }}</span>
+            <div class="top-bar-wrapper">
+              <div class="top-bar-fill" [style.width.%]="bebida.porcentaje"></div>
+            </div>
+          </div>
+          <span class="top-count">{{ bebida.cantidad }} uds</span>
+          <span class="top-pct">{{ bebida.porcentaje }}%</span>
+        </div>
+      }
     </div>
   </div>
 
