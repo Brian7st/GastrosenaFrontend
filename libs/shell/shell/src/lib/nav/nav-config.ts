@@ -57,6 +57,11 @@
               ruta: '/app/bar/recetas',
               icono: 'book-open',
             },
+            {
+              label: 'Estadísticas',
+              ruta: '/app/bar/estadisticas',
+              icono: 'bar-chart-2',
+            },
           ],
         },
       ],
@@ -129,11 +134,6 @@
             {
               label: 'Estadísticas cocina',
               ruta: '/app/reportes/estadisticas-cocina',
-              icono: 'bar-chart-2',
-            },
-            {
-              label: 'Estadísticas bar',
-              ruta: '/app/bar/estadisticas',
               icono: 'bar-chart-2',
             },
           ],
