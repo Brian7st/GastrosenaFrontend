@@ -1,14 +1,15 @@
-import { Component, ChangeDetectionStrategy, input, output, signal, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, signal, OnInit, OnDestroy, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ComandaBarYBarismo, ComandaItem } from '../../models/comanda.model';
+import { ComandaBarYBarismo } from '../../models/comanda.model';
 import { ComandaService } from '../../data-access/comanda.service';
 import { RecetaService } from '../../data-access/receta.service';
 import { Receta } from '../../models/receta.model';
+import { ButtonComponent, LucideIconComponent } from '@restaurant/shared/ui';
 
 @Component({
   selector: 'restaurant-comanda-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonComponent, LucideIconComponent],
   templateUrl: './comanda-card.component.html',
   styleUrl: './comanda-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,8 +22,7 @@ export class ComandaCardComponent implements OnInit, OnDestroy {
   comandaActualizada = output<void>();
 
   now = signal(new Date().getTime());
-  showDetalles = signal(false);
-  mostrarReceta = signal(false);
+  vistaActual = signal<'platos' | 'detalles' | 'receta'>('platos');
   recetaActiva = signal<Receta | null>(null);
   expandedPlates = signal<Set<string>>(new Set());
 
@@ -30,6 +30,12 @@ export class ComandaCardComponent implements OnInit, OnDestroy {
   recetaService = inject(RecetaService);
 
   private intervalId: ReturnType<typeof setInterval> | null = null;
+
+  constructor() {
+    effect(() => {
+      this.expandedPlates.set(new Set([this.comanda().idComanda]));
+    });
+  }
 
   ngOnInit() {
     this.intervalId = setInterval(() => {
@@ -43,44 +49,56 @@ export class ComandaCardComponent implements OnInit, OnDestroy {
     }
   }
 
-  alternarReceta(idReceta?: string) {
-    if (!idReceta) return;
+  alternarReceta(nombreBebida?: string) {
+    if (!nombreBebida) return;
 
     if (this.recetaService.recetas().length === 0) {
       this.recetaService.listar();
     }
 
-    const receta = this.recetaService.recetas().find(r => r.idReceta === idReceta);
-    if (receta) {
-      this.recetaActiva.set(receta);
-      this.mostrarReceta.set(true);
+    this.recetaActiva.set(null);
+    this.vistaActual.set('receta');
+
+    const recetasList = this.recetaService.recetas();
+    const recetaLocal = recetasList.find(
+      (r) => r.nombreReceta.toLowerCase().trim() === nombreBebida.toLowerCase().trim()
+    );
+
+    if (recetaLocal) {
+      this.recetaActiva.set(recetaLocal);
     } else {
-      // Fallback: intentar cargar del backend
-      this.recetaActiva.set(null);
-      this.mostrarReceta.set(true);
-      this.recetaService.buscarPorId(idReceta).subscribe({
-        next: (recetaReal) => {
-          this.recetaActiva.set(recetaReal);
-        },
-        error: (err) => {
-          console.error('Error al cargar receta desde backend:', err);
-          this.recetaActiva.set({
-            idReceta: 'ERROR',
-            nombreReceta: 'Receta no disponible',
-            nombreCategoria: '',
-            temperatura: '',
-            tiempoPreparacion: 0,
-            precioUnitario: 0,
-            ingredientes: [],
-            pasos: [{ orden: 1, descripcionPaso: 'No se pudo conectar con el servidor para obtener la receta de esta bebida.' }]
-          });
-        }
-      });
+      const recetaAproximada = recetasList.find(
+        (r) => r.nombreReceta.toLowerCase().includes(nombreBebida.toLowerCase())
+      );
+      if (recetaAproximada) {
+        this.recetaActiva.set(recetaAproximada);
+      } else {
+        this.mostrarErrorPlaceholder(nombreBebida);
+      }
     }
   }
 
-  cerrarReceta() {
-    this.mostrarReceta.set(false);
+  mostrarErrorPlaceholder(nombreBebida: string) {
+    this.recetaActiva.set({
+      idReceta: 'ERROR',
+      nombreReceta: nombreBebida || 'Receta no disponible',
+      nombreCategoria: 'Bebidas',
+      temperatura: 'Frío',
+      tiempoPreparacion: 0,
+      precioUnitario: 0,
+      ingredientes: [],
+      pasos: [
+        {
+          orden: 1,
+          descripcionPaso: `No se pudo encontrar la receta para "${nombreBebida}" en el servidor.`,
+          notasAdicionales: 'Verifique si existe la receta registrada para esta bebida.'
+        }
+      ]
+    });
+  }
+
+  cerrarVista() {
+    this.vistaActual.set('platos');
     this.recetaActiva.set(null);
   }
 
@@ -98,44 +116,12 @@ export class ComandaCardComponent implements OnInit, OnDestroy {
     return this.expandedPlates().has(idDetalle);
   }
 
-  iniciar(item: ComandaItem) {
-    if (item.estado === 'ESPERA') {
-      this.iniciarPlato.emit(item.idDetalleComanda);
-    }
+  iniciar() {
+    this.iniciarPlato.emit(this.comanda().idComanda);
   }
 
-  finalizar(item: ComandaItem) {
-    if (item.estado === 'PREPARANDO') {
-      this.finalizarPlato.emit(item.idDetalleComanda);
-    }
-  }
-
-  iniciarTodos() {
-    this.comanda().items?.forEach(item => {
-      if (item.estado === 'ESPERA') {
-        this.iniciarPlato.emit(item.idDetalleComanda);
-      }
-    });
-  }
-
-  empezarTodo() {
-    const comanda = this.comanda();
-    if (comanda.estadoPreparacion === 'PENDIENTE') {
-      this.comandaService.actualizarEstado(comanda.idComanda.toString(), 'EN_PREPARACION').subscribe({
-        next: () => this.comandaActualizada.emit(),
-        error: (err) => console.error('Error al iniciar:', err)
-      });
-    }
-  }
-
-  finalizarTodo() {
-    const comanda = this.comanda();
-    if (comanda.estadoPreparacion === 'EN_PREPARACION') {
-      this.comandaService.actualizarEstado(comanda.idComanda.toString(), 'LISTO').subscribe({
-        next: () => this.comandaActualizada.emit(),
-        error: (err) => console.error('Error al finalizar:', err)
-      });
-    }
+  finalizar() {
+    this.finalizarPlato.emit(this.comanda().idComanda);
   }
 
   getTiempoTranscurrido(horaIso?: string): number {
