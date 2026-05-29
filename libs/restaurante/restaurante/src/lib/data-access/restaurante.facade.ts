@@ -7,6 +7,7 @@ import {
   FacturarPedidoRequest, MetodoPago
 } from '../models/restaurante.model';
 import { RestauranteService } from './restaurante.service';
+import { AuthService } from './auth.service';
 import { catchError, of } from 'rxjs';
 
 export interface ItemCarrito {
@@ -32,6 +33,7 @@ export interface PedidoCarrito {
 @Injectable({ providedIn: 'root' })
 export class RestauranteFacade {
   private restauranteService = inject(RestauranteService);
+  private authService = inject(AuthService);
 
   private _mesas          = signal<Mesa[]>([]);
   private _mesasCargando  = signal<boolean>(false);
@@ -186,7 +188,6 @@ export class RestauranteFacade {
   }
 
   actualizarEstado(mesaId: string, nuevoEstado: EstadoMesa): void {
-    // Actualización optimista para reactividad instantánea en la UI
     this._mesas.update(lista =>
       lista.map(m => m.id === mesaId ? { ...m, estado: nuevoEstado } : m)
     );
@@ -211,10 +212,12 @@ export class RestauranteFacade {
   }
 
   private iniciarCarrito(mesaId: string, numeroComensales: number): void {
+    const usuarioId = this.authService.getUsuarioId();
+
     this._pedidoActivo.set({
       id: `LOCAL-${Date.now()}`,
       mesaId,
-      meseroId: '00000000-0000-0000-0000-000000000000',
+      meseroId: usuarioId,
       numeroComensales: numeroComensales || 1,
       estado: 'BORRADOR',
       fechaCreacion: new Date().toISOString(),
