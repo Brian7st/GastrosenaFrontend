@@ -11,53 +11,39 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ComandaService, EstadisticasKpi, PromedioBebida } from '../../data-access/comanda.service';
-import { IncidenciaService } from '../../data-access/incidencia.service';
 import { ComandaBarYBarismo } from '../../models/comanda.model';
 import { Chart, registerables, ChartConfiguration } from 'chart.js';
 import {
-  LucideIconComponent,
-  PageHeaderComponent
+  LucideIconComponent
 } from '@restaurant/shared/ui';
-
-interface TopBebida {
-  nombre: string;
-  cantidad: number;
-  porcentaje: number;
-}
 
 @Component({
   selector: 'restaurant-bar-estadisticas-page',
   standalone: true,
-  imports: [CommonModule, LucideIconComponent, PageHeaderComponent],
+  imports: [CommonModule, LucideIconComponent],
   templateUrl: './estadisticas-page.component.html',
   styleUrl: './estadisticas-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private comandaService = inject(ComandaService);
-  private incidenciaService = inject(IncidenciaService);
 
   // ── KPIs ──────────────────────────────────────────────────────────────────
   kpis = signal<EstadisticasKpi | null>(null);
   promedioFormateado = signal('');
-  totalIncidencias = signal(0);
-  topBebidas = signal<TopBebida[]>([]);
 
   // ── Charts ────────────────────────────────────────────────────────────────
   @ViewChild('graficoPromedios') graficoPromedios!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('graficoCarga')     graficoCarga!: ElementRef<HTMLCanvasElement>;
 
   private chartPromedios: Chart | null = null;
-  private chartCarga: Chart | null = null;
-
   private promediosData: ChartConfiguration<'bar'>['data'] = { labels: [], datasets: [] };
-  private cargaData: ChartConfiguration<'doughnut'>['data'] = { labels: [], datasets: [] };
 
   // ── Helpers ───────────────────────────────────────────────────────────────
-  private minutosAHHMM(mins: number): string {
-    const h = Math.floor(mins / 60);
-    const m = Math.round(mins % 60);
-    return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
+  private minutosAMMSS(mins: number): string {
+    if (!mins || isNaN(mins)) return '00:00';
+    const m = Math.floor(mins);
+    const s = Math.round((mins - m) * 60);
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   }
 
   constructor() {
@@ -94,6 +80,7 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
           { nombreReceta: 'Mojito Tradicional', promedioMinutos: 5.8 },
           { nombreReceta: 'Limonada de Coco',   promedioMinutos: 3.5 },
           { nombreReceta: 'Café Espresso',       promedioMinutos: 2.1 },
+          { nombreReceta: 'Cold Brew Latte',     promedioMinutos: 4.9 },
         ];
         this.actualizarKpisPromedios(stats);
         this.promediosData = this.buildPromediosChartData(stats);
@@ -101,91 +88,19 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
       }
     });
 
-    // ── 2. Comandas reales → top bebidas + carga por estado ───────────────
+    // ── 2. Comandas reales → Bebidas preparadas ────────────────────────────
     this.comandaService.listarComandas().subscribe({
       next: (comandas: ComandaBarYBarismo[]) => {
-        const listos    = comandas.filter(c => c.estadoPreparacion === 'LISTO').length;
-        const preparando = comandas.filter(c => c.estadoPreparacion === 'PREPARANDO').length;
-        const pendientes = comandas.filter(c => c.estadoPreparacion === 'PENDIENTE').length;
+        const listos = comandas.filter(c => c.estadoPreparacion === 'LISTO').length;
 
         this.kpis.update(k => k
           ? { ...k, totalBebidasDespachadosHoy: listos }
           : { promedioDemoraGeneral: 0, bebidaMasRapida: '—', totalBebidasDespachadosHoy: listos }
         );
-
-        // Top bebidas
-        const conteo: Record<string, number> = {};
-        comandas.forEach(c => {
-          (c.items || []).forEach(item => {
-            conteo[item.nombre] = (conteo[item.nombre] || 0) + item.cantidad;
-          });
-        });
-        const total = Object.values(conteo).reduce((a, b) => a + b, 0) || 1;
-        const sorted = Object.entries(conteo)
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 5)
-          .map(([nombre, cantidad]) => ({
-            nombre,
-            cantidad,
-            porcentaje: Math.round((cantidad / total) * 100)
-          }));
-
-        // Fallback si no hay items reales
-        this.topBebidas.set(sorted.length > 0 ? sorted : [
-          { nombre: 'Mojito Tradicional',  cantidad: 24, porcentaje: 30 },
-          { nombre: 'Capuchino Italiano',  cantidad: 19, porcentaje: 24 },
-          { nombre: 'Limonada de Coco',    cantidad: 15, porcentaje: 19 },
-          { nombre: 'Café Espresso',        cantidad: 12, porcentaje: 15 },
-          { nombre: 'Cold Brew Latte',      cantidad: 9,  porcentaje: 11 },
-        ]);
-
-        // Gráfico de carga por estado
-        const hasData = listos + preparando + pendientes > 0;
-        this.cargaData = {
-          labels: ['Completadas', 'En preparación', 'Pendientes'],
-          datasets: [{
-            data: hasData
-              ? [listos, preparando, pendientes]
-              : [42, 18, 22],
-            backgroundColor: ['#39a900', '#f97316', '#94a3b8'],
-            borderWidth: 0,
-            hoverOffset: 8
-          }]
-        };
-        this.renderChartCarga();
       },
       error: () => {
-        this.topBebidas.set([
-          { nombre: 'Mojito Tradicional', cantidad: 24, porcentaje: 30 },
-          { nombre: 'Capuchino Italiano', cantidad: 19, porcentaje: 24 },
-          { nombre: 'Limonada de Coco',   cantidad: 15, porcentaje: 19 },
-          { nombre: 'Café Espresso',       cantidad: 12, porcentaje: 15 },
-          { nombre: 'Cold Brew Latte',     cantidad: 9,  porcentaje: 11 },
-        ]);
-        this.cargaData = {
-          labels: ['Completadas', 'En preparación', 'Pendientes'],
-          datasets: [{
-            data: [42, 18, 22],
-            backgroundColor: ['#39a900', '#f97316', '#94a3b8'],
-            borderWidth: 0,
-            hoverOffset: 8
-          }]
-        };
-        this.renderChartCarga();
+        // no-op
       }
-    });
-
-    // ── 3. Incidencias (cancelaciones + devoluciones) ─────────────────────
-    this.incidenciaService.obtenerPorTipo('CANCELACION').subscribe({
-      next: cancelaciones => {
-        this.incidenciaService.obtenerPorTipo('DEVOLUCION').subscribe({
-          next: devoluciones => {
-            this.totalIncidencias.set(cancelaciones.length + devoluciones.length);
-          },
-          error: () => { /* no-op */ }
-        });
-      },
-      error: () => { /* no-op */ }
     });
   }
 
@@ -196,7 +111,7 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
     const minTiempo = Math.min(...tiempos);
     const bebidaMasRapida = stats.find(d => d.promedioMinutos === minTiempo)?.nombreReceta || '—';
 
-    this.promedioFormateado.set(this.minutosAHHMM(promedioGeneral));
+    this.promedioFormateado.set(this.minutosAMMSS(promedioGeneral));
     const currentKpis = this.kpis();
     this.kpis.set({
       promedioDemoraGeneral: promedioGeneral,
@@ -212,7 +127,7 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
         label: 'Tiempo Promedio (min)',
         data: stats.map(d => Math.min(d.promedioMinutos, 60)),
         backgroundColor: '#39a900',
-        borderRadius: 6,
+        borderRadius: 4,
         maxBarThickness: 32
       }]
     };
@@ -221,12 +136,12 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
   // ── Lifecycle ─────────────────────────────────────────────────────────────
   ngAfterViewInit(): void {
     this.renderChartPromedios();
-    this.renderChartCarga();
   }
 
   ngOnDestroy(): void {
-    this.chartPromedios?.destroy();
-    this.chartCarga?.destroy();
+    if (this.chartPromedios) {
+      this.chartPromedios.destroy();
+    }
   }
 
   // ── Render charts ─────────────────────────────────────────────────────────
@@ -266,42 +181,6 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
         }
       };
       this.chartPromedios = new Chart(this.graficoPromedios.nativeElement, config);
-    }
-  }
-
-  private renderChartCarga() {
-    if (!this.graficoCarga?.nativeElement) return;
-
-    if (this.chartCarga) {
-      this.chartCarga.data = this.cargaData;
-      this.chartCarga.update();
-    } else {
-      const config: ChartConfiguration<'doughnut'> = {
-        type: 'doughnut',
-        data: this.cargaData,
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: '70%',
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: {
-                padding: 16,
-                usePointStyle: true,
-                pointStyle: 'circle',
-                font: { size: 12 }
-              }
-            },
-            tooltip: {
-              callbacks: {
-                label: (ctx) => ` ${ctx.label}: ${ctx.parsed} comandas`
-              }
-            }
-          }
-        }
-      };
-      this.chartCarga = new Chart(this.graficoCarga.nativeElement, config);
     }
   }
 }
