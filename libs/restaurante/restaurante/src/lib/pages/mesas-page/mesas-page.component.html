@@ -221,7 +221,6 @@
             </button>
           </div>
           <div class="modal-body-custom">
-            <p class="modal-note">El comensal y número de personas se registrarán al crear el pedido (próxima fase).</p>
             <div class="form-group">
               <label>Número de Comensales</label>
               <input
@@ -279,8 +278,8 @@
                         <td>{{ mesa.meseroAsignado }}</td>
                         <td>
                           <restaurant-status-badge 
-                            [status]="mesa.estado === 'OCUPADA' ? 'warning' : 'info'"
-                            [text]="mesa.estado === 'OCUPADA' ? 'Ocupada' : 'Por Pagar'">
+                            [label]="mesa.estado"
+                            [variant]="getBadgeType(mesa.estado)">
                           </restaurant-status-badge>
                         </td>
                       </tr>

@@ -36,8 +36,8 @@ import { Mesa } from '../../models/restaurante.model';
 })
 export class MesasPageComponent {
   private facade = inject(RestauranteFacade);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private router  = inject(Router);
+  private route   = inject(ActivatedRoute);
 
   // ── Signals del Facade ──────────────────────────────────────────────────────
   mesas = this.facade.mesas;
@@ -73,12 +73,9 @@ export class MesasPageComponent {
     if (!q) return true;
 
     const nombre = nombreMesa.toLowerCase();
-
-    // Limpiar 'mesa ' del principio tanto en nombre como en query
     const cleanNombre = nombre.replace(/^mesa\s*/, '');
     const cleanQuery = q.replace(/^mesa\s*/, '');
 
-    // Si ambos parecen ser números (tienen dígitos), compararlos sin ceros a la izquierda
     const esNumeroNombre = /^\d+$/.test(cleanNombre);
     const esNumeroQuery = /^\d+$/.test(cleanQuery);
 
@@ -88,7 +85,6 @@ export class MesasPageComponent {
       return numNombre.includes(numQuery);
     }
 
-    // Búsqueda de texto parcial normal
     return cleanNombre.includes(cleanQuery) || nombre.includes(q);
   }
 
@@ -98,7 +94,6 @@ export class MesasPageComponent {
     return this.mesasActivas()
       .filter(m => m.estado === 'OCUPADA' || m.estado === 'POR_PAGAR')
       .map(m => {
-        // Generador determinista simple basado en id para asignar mesero mock
         const index = m.id.charCodeAt(0) % meseros.length;
         return { ...m, meseroAsignado: meseros[index] };
       });
@@ -147,8 +142,9 @@ export class MesasPageComponent {
       else this.showEditZonaDropdown.set(false);
     }, 150);
   }
+
   // ── Signals para ABRIR mesa ──────────────────────────────────────────────────
-  comensales    = signal<number>(1);
+  comensales = signal<number>(1);
 
   // ── Apertura / cierre de modales ─────────────────────────────────────────────
   abrirModal(nombre: string, mesa: Mesa | null = null) {
@@ -156,12 +152,10 @@ export class MesasPageComponent {
     this.mesaSeleccionada.set(mesa);
 
     if (nombre === 'agregar') {
-      // Resetear formulario de creación
       this.nuevoNombre.set('');
       this.nuevaCapacidad.set(1);
       this.nuevaZona.set('');
     } else if (nombre === 'editar' && mesa) {
-      // Pre-llenar formulario de edición con los datos actuales de la mesa
       this.mesaSeleccionada.set(mesa);
       const nombreLimpio = mesa.nombre.toUpperCase().startsWith('MESA ') 
         ? mesa.nombre.substring(5) 
@@ -181,7 +175,6 @@ export class MesasPageComponent {
     this.modalActivo.set(null);
     this.mesaSeleccionada.set(null);
     
-    // Limpiar estados de autocompletado y búsqueda
     this.showNuevaZonaDropdown.set(false);
     this.showEditZonaDropdown.set(false);
     this.searchQueryGestionMesas.set('');
@@ -247,7 +240,6 @@ export class MesasPageComponent {
     let capacidad   = this.nuevaCapacidad();
     const zona      = this.nuevaZona().trim();
 
-    // Si no se llena la capacidad, por defecto será 1
     if (capacidad === null || capacidad === undefined || capacidad.toString().trim() === '') {
       capacidad = 1;
     }
@@ -352,7 +344,6 @@ export class MesasPageComponent {
     }
   }
 
-  /** Alias para el flujo de "eliminar" de la tarjeta (mapea a desactivar). */
   eliminarMesa(id: string) {
     this.cambiarEstadoMesa(id, false);
     this.cerrarModales();
@@ -365,7 +356,6 @@ export class MesasPageComponent {
   // ── Helpers de UI ────────────────────────────────────────────────────────────
   soloNumeros(event: KeyboardEvent) {
     const charCode = event.which ? event.which : event.keyCode;
-    // Solo permitir números (códigos 48 a 57)
     if (charCode < 48 || charCode > 57) {
       event.preventDefault();
     }
@@ -373,11 +363,11 @@ export class MesasPageComponent {
 
   getBadgeType(estado: string): 'info' | 'success' | 'warning' | 'danger' {
     switch (estado) {
-      case 'LIBRE': return 'success';
-      case 'OCUPADA': return 'danger';
+      case 'LIBRE':     return 'success';
+      case 'OCUPADA':   return 'danger';
       case 'POR_PAGAR': return 'warning';
-      case 'INACTIVA': return 'info';
-      default: return 'info';
+      case 'INACTIVA':  return 'info';
+      default:          return 'info';
     }
   }
 }
