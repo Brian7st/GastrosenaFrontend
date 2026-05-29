@@ -58,30 +58,15 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
     // ── 1. Promedios por bebida ────────────────────────────────────────────
     this.comandaService.getEstadisticasPromedios().subscribe({
       next: data => {
-        let stats: PromedioBebida[] = [...(data || [])];
-
-        if (stats.length === 0) {
-          stats = [
-            { nombreReceta: 'Capuchino Italiano',  promedioMinutos: 4.2 },
-            { nombreReceta: 'Mojito Tradicional',  promedioMinutos: 5.8 },
-            { nombreReceta: 'Limonada de Coco',    promedioMinutos: 3.5 },
-            { nombreReceta: 'Café Espresso',        promedioMinutos: 2.1 },
-            { nombreReceta: 'Cold Brew Latte',      promedioMinutos: 4.9 },
-          ];
-        }
+        // Datos 100% reales consumidos directamente desde la API del backend
+        const stats: PromedioBebida[] = [...(data || [])];
 
         this.actualizarKpisPromedios(stats);
         this.promediosData = this.buildPromediosChartData(stats);
         this.renderChartPromedios();
       },
       error: () => {
-        const stats: PromedioBebida[] = [
-          { nombreReceta: 'Capuchino Italiano', promedioMinutos: 4.2 },
-          { nombreReceta: 'Mojito Tradicional', promedioMinutos: 5.8 },
-          { nombreReceta: 'Limonada de Coco',   promedioMinutos: 3.5 },
-          { nombreReceta: 'Café Espresso',       promedioMinutos: 2.1 },
-          { nombreReceta: 'Cold Brew Latte',     promedioMinutos: 4.9 },
-        ];
+        const stats: PromedioBebida[] = [];
         this.actualizarKpisPromedios(stats);
         this.promediosData = this.buildPromediosChartData(stats);
         this.renderChartPromedios();
@@ -107,8 +92,9 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
   // ── Helpers internos ──────────────────────────────────────────────────────
   private actualizarKpisPromedios(stats: PromedioBebida[]) {
     const tiempos = stats.map(d => d.promedioMinutos);
-    const promedioGeneral = Math.round(tiempos.reduce((a, b) => a + b, 0) / tiempos.length * 10) / 10;
-    const minTiempo = Math.min(...tiempos);
+    // Sin redondeo prematuro para poder formatear los segundos reales en minutosAMMSS
+    const promedioGeneral = tiempos.length > 0 ? (tiempos.reduce((a, b) => a + b, 0) / tiempos.length) : 0;
+    const minTiempo = tiempos.length > 0 ? Math.min(...tiempos) : 0;
     const bebidaMasRapida = stats.find(d => d.promedioMinutos === minTiempo)?.nombreReceta || '—';
 
     this.promedioFormateado.set(this.minutosAMMSS(promedioGeneral));
@@ -125,7 +111,7 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
       labels: stats.map(d => d.nombreReceta),
       datasets: [{
         label: 'Tiempo Promedio (min)',
-        data: stats.map(d => Math.min(d.promedioMinutos, 60)),
+        data: stats.map(d => d.promedioMinutos),
         backgroundColor: '#39a900',
         borderRadius: 4,
         maxBarThickness: 32
@@ -169,9 +155,7 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
           scales: {
             y: {
               beginAtZero: true,
-              max: 60,
               ticks: {
-                stepSize: 10,
                 callback: (val) => `${val} min`
               },
               grid: { color: 'rgba(0,0,0,0.05)' }
