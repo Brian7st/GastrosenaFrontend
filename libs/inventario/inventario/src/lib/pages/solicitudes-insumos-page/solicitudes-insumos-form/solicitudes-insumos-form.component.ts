@@ -71,6 +71,10 @@ export class SolicitudesInsumosFormComponent implements OnInit {
       e['programaId'] = 'El programa de formación es requerido.';
     if (!this.instructorId().trim())
       e['instructorId'] = 'El ID del instructor es requerido.';
+    if (!this.resultadoAprendizaje().trim())
+      e['resultadoAprendizaje'] = 'El resultado de aprendizaje es requerido.';
+    if (!this.actividades().trim())
+      e['actividades'] = 'Las actividades son requeridas.';
     if (this.items().length === 0)
       e['items'] = 'Debe agregar al menos un ítem.';
     return e;
@@ -179,7 +183,10 @@ export class SolicitudesInsumosFormComponent implements OnInit {
       voceroId:                 this.voceroId(),
       valorTotalDeSolicitud:    this.valorTotalDeSolicitud(),
       items:                    this.items(),
+    }).subscribe(res => {
+      if (res !== null) {
+        this.router.navigate(['/app/inventario/solicitudes-insumos-page']);
+      }
     });
-    this.router.navigate(['/app/inventario/solicitudes-insumos-page']);
   }
 }
