@@ -24,6 +24,13 @@
 
     <div class="card-body d-flex flex-column flex-grow-1" style="overflow-y: auto;">
       
+      @if (comanda().notasEspeciales) {
+        <div class="nota-especial">
+          <div class="nota-titulo">NOTA ESPECIAL</div>
+          <div class="nota-texto">{{ comanda().notasEspeciales }}</div>
+        </div>
+      }
+
       <!-- Platos/Bebidas (En Bar es una sola preparación representada como item de lista) -->
       <div class="platos-list">
         
