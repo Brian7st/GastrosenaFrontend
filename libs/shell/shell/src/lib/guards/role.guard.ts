@@ -12,5 +12,6 @@ export const roleGuard = (allowedRoles: Rol[]): CanActivateFn => () => {
     return true;
   }
 
-  return router.createUrlTree(['/']);
+  // Redirige a una página de "No autorizado" en lugar de home
+  return router.createUrlTree(['/auth/unauthorized']);
 };

@@ -25,6 +25,22 @@ export class FacturasListPageComponent implements OnInit {
   paginacion = this.facade.paginacion;
   paginas    = computed(() => Array.from({ length: this.paginacion().totalPages }, (_, i) => i));
 
+  // Filter panel
+  showFilters       = signal(false);
+  filtroEstado      = signal<EstadoFactura | ''>('');
+  filtroProveedor   = signal('');
+  filtroFechaDesde  = signal('');
+  filtroFechaHasta  = signal('');
+
+  filtrosActivos = computed(() => {
+    let count = 0;
+    if (this.filtroEstado())     count++;
+    if (this.filtroProveedor())  count++;
+    if (this.filtroFechaDesde()) count++;
+    if (this.filtroFechaHasta()) count++;
+    return count;
+  });
+
   // Modal controls
   showAnularModal    = signal(false);
   showExportarModal  = signal(false);
@@ -38,6 +54,41 @@ export class FacturasListPageComponent implements OnInit {
   onSearch(query: string): void {
     this.searchQuery.set(query);
     this.facade.setFiltros({ busqueda: query });
+  }
+
+  onToggleFilters(): void {
+    this.showFilters.update(v => !v);
+  }
+
+  onFiltroEstadoChange(estado: string): void {
+    this.filtroEstado.set(estado as EstadoFactura | '');
+    this.facade.setFiltros({ estado: (estado as EstadoFactura) || undefined });
+  }
+
+  onFiltroProveedorChange(value: string): void {
+    this.filtroProveedor.set(value);
+    this.facade.setFiltros({ proveedor: value || undefined });
+  }
+
+  onFiltroFechaChange(): void {
+    this.facade.setFiltros({
+      fechaDesde: this.filtroFechaDesde() || undefined,
+      fechaHasta: this.filtroFechaHasta() || undefined,
+    });
+  }
+
+  onLimpiarFiltros(): void {
+    this.filtroEstado.set('');
+    this.filtroProveedor.set('');
+    this.filtroFechaDesde.set('');
+    this.filtroFechaHasta.set('');
+    this.facade.setFiltros({
+      busqueda:   undefined,
+      estado:     undefined,
+      proveedor:  undefined,
+      fechaDesde: undefined,
+      fechaHasta: undefined,
+    });
   }
 
   onIrAPagina(page: number): void {

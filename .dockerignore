@@ -1,0 +1,10 @@
+node_modules/
+.git/
+.angular/
+.nx/
+coverage/
+*.log
+.env
+.env.*
+.claude/
+.atl/
