@@ -1,4 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
+import { ActividadService, ActividadDTO } from './actividad.service';
+import { EvaluacionService } from './evaluacion.service';
 
 export interface AprendizMock {
   id: number;
@@ -10,15 +12,7 @@ export interface AprendizMock {
   inactivo?: boolean;
 }
 
-export interface ActividadMock {
-  id: number;
-  nombre: string;
-  fecha: string;
-  jornada: string;
-  ficha: string;
-  trimestre: string;
-  estado: 'Activa' | 'Finalizada' | 'Pendiente';
-}
+export type ActividadMock = ActividadDTO;
 
 const APRENDICES_MOCK: AprendizMock[] = [
   { id: 1, nombreCompleto: 'Camila Rodriguez Torres',  inicial: 'C', ficha: '2561234', jornada: 'Diurna',   estado: 'Pendiente' },
@@ -30,18 +24,24 @@ const APRENDICES_MOCK: AprendizMock[] = [
   { id: 7, nombreCompleto: 'Ana López Inactiva',       inicial: 'A', ficha: '0000000', jornada: 'Nocturna', estado: 'Pendiente', inactivo: true }
 ];
 
-const ACTIVIDADES_MOCK: ActividadMock[] = [
-  { id: 1, nombre: 'Fundamentos de Cocina',       fecha: '2026-05-10', jornada: 'Diurna',   ficha: '2561234', trimestre: 'Trimestre 1', estado: 'Activa' },
-  { id: 2, nombre: 'Técnicas de Corte',           fecha: '2026-05-08', jornada: 'Mixta',     ficha: '2489012', trimestre: 'Trimestre 1', estado: 'Activa' },
-  { id: 3, nombre: 'Preparación de Salsas',       fecha: '2026-05-05', jornada: 'Diurna',    ficha: '2561234', trimestre: 'Trimestre 2', estado: 'Pendiente' },
-  { id: 4, nombre: 'Repostería Básica',           fecha: '2026-04-28', jornada: 'Nocturna',  ficha: '2632456', trimestre: 'Trimestre 1', estado: 'Finalizada' },
-  { id: 5, nombre: 'Higiene y Manipulación',      fecha: '2026-04-20', jornada: 'Diurna',    ficha: '2561234', trimestre: 'Trimestre 2', estado: 'Finalizada' },
-];
-
 @Injectable({ providedIn: 'root' })
 export class CocinaFacade {
+  private actividadService = inject(ActividadService);
+  private evaluacionService = inject(EvaluacionService);
+
   readonly aprendices = signal<AprendizMock[]>(APRENDICES_MOCK);
-  readonly actividades = signal<ActividadMock[]>(ACTIVIDADES_MOCK);
+  readonly actividades = signal<ActividadMock[]>([]);
+
+  constructor() {
+    this.cargarActividades();
+  }
+
+  cargarActividades(): void {
+    this.actividadService.getAll().subscribe({
+      next: (data) => this.actividades.set(data || []),
+      error: (err) => console.error('Error cargando actividades:', err)
+    });
+  }
 
   actualizarEstado(id: number, estado: 'Aprobó' | 'No Aprobó'): void {
     this.aprendices.update(aprendices => 
@@ -50,18 +50,31 @@ export class CocinaFacade {
   }
 
   crearActividad(data: Omit<ActividadMock, 'id' | 'estado'>): void {
-    const nextId = Math.max(...this.actividades().map(a => a.id), 0) + 1;
-    const nueva: ActividadMock = { ...data, id: nextId, estado: 'Pendiente' };
-    this.actividades.update(list => [nueva, ...list]);
+    this.actividadService.create(data).subscribe({
+      next: (nueva) => {
+        this.actividades.update(list => [nueva, ...list]);
+      },
+      error: (err) => console.error('Error al crear actividad:', err)
+    });
   }
 
   actualizarEstadoActividad(id: number, estado: 'Activa' | 'Finalizada' | 'Pendiente'): void {
-    this.actividades.update(list =>
-      list.map(a => a.id === id ? { ...a, estado } : a)
-    );
+    this.actividadService.updateEstado(id, estado).subscribe({
+      next: (actualizada) => {
+        this.actividades.update(list =>
+          list.map(a => a.id === id ? actualizada : a)
+        );
+      },
+      error: (err) => console.error('Error al actualizar estado de actividad:', err)
+    });
   }
 
   eliminarActividad(id: number): void {
-    this.actividades.update(list => list.filter(a => a.id !== id));
+    this.actividadService.delete(id).subscribe({
+      next: () => {
+        this.actividades.update(list => list.filter(a => a.id !== id));
+      },
+      error: (err) => console.error('Error al eliminar actividad:', err)
+    });
   }
 }

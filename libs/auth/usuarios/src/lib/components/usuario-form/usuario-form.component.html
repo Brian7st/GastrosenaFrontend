@@ -105,9 +105,9 @@
           <select
             id="uf-rol"
             class="modal__select"
-            [class.modal__select--error]="form.controls.idRol.invalid && form.controls.idRol.touched"
-            formControlName="idRol"
-          >
+            [class.modal__select--error]="form.controls.nombreRol.invalid && form.controls.nombreRol.touched"
+            formControlName="nombreRol"
+          > 
             <option value="" disabled>Seleccioná un rol</option>
             @for (rol of rolOptions; track rol) {
               <option [value]="rol">{{ rol }}</option>
@@ -115,25 +115,8 @@
           </select>
           <lucide-icon name="chevron-down" [size]="16" class="modal__select-icon"></lucide-icon>
         </div>
-        @if (form.controls.idRol.invalid && form.controls.idRol.touched) {
+        @if (form.controls.nombreRol.invalid && form.controls.nombreRol.touched) {
           <span class="modal__error">Seleccioná un rol</span>
-        }
-      </div>
-
-      <div class="modal__field">
-        <label class="modal__label" for="uf-contrasena">
-          Contraseña {{ modoEdicion ? '(opcional)' : '*' }}
-        </label>
-        <input
-          id="uf-contrasena"
-          class="modal__input"
-          [class.modal__input--error]="form.controls.contrasena.invalid && form.controls.contrasena.touched"
-          type="password"
-          formControlName="contrasena"
-          [placeholder]="modoEdicion ? 'Dejá en blanco para no cambiarla' : 'Mínimo 8 caracteres'"
-        />
-        @if (form.controls.contrasena.invalid && form.controls.contrasena.touched) {
-          <span class="modal__error">Mínimo 8 caracteres</span>
         }
       </div>
 

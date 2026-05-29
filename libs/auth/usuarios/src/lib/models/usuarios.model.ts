@@ -7,6 +7,9 @@ export interface UsuarioDetalle extends Usuario {
   ultimoAcceso:     string | null;
   cuentaBloqueada:  boolean;
   intentosFallidos: number;
+  ficha?:           string;
+  programa?:        string;
+  totalPermisos?:   number;
 }
 
 export interface CrearUsuarioRequest {
@@ -15,8 +18,8 @@ export interface CrearUsuarioRequest {
   apellidos:  string;
   email:      string;
   telefono:   string;
-  contrasena: string;
-  idRol:      string;
+  // contrasena ya no se envía — la genera el backend
+  nombreRol:  string;  // ← cambio
 }
 
 /**
@@ -58,4 +61,34 @@ export interface ExportarConfig {
   formato:          'excel' | 'csv';
   incluirInactivos: boolean;
   rol:              string;
+}
+
+export interface PermisoItem {
+  id:          string;
+  nombre:      string;
+  descripcion: string;
+  activo:      boolean;
+}
+
+export interface RolDetalle {
+  id:            string;
+  nombre:        string;
+  descripcion:   string;
+  permisos:      PermisoItem[];
+  totalUsuarios: number;
+}
+
+export interface AsignacionMasivaRequest {
+  usuarioIds: string[];
+  idRol:      string;
+}
+
+export interface HistorialItem {
+  id:            string;
+  usuarioNombre: string;
+  usuarioEmail:  string;
+  accion:        'LOGIN' | 'LOGOUT' | 'CREAR' | 'EDITAR' | 'ELIMINAR' | 'BLOQUEO';
+  fecha:         string;
+  ip:            string;
+  detalles:      string;
 }

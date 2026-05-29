@@ -174,3 +174,42 @@
   justify-content: flex-end;
   gap: 1rem;
 }
+
+/* ── Aviso de uso ── */
+.notice-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: #3e4a3c;
+  padding: 0.75rem 2rem;
+  background-color: rgba(0, 110, 37, 0.06);
+  border-bottom: 1px solid rgba(0, 110, 37, 0.12);
+
+  a {
+    color: #006e25;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+
+.required {
+  color: #ba1a1a;
+  margin-left: 0.125rem;
+}
+
+.optional {
+  color: #94a3b8;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 0.75em;
+}
+
+.error-hint {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: #ba1a1a;
+  margin-top: 0.25rem;
+  padding-left: 0.25rem;
+}

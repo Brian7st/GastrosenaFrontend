@@ -22,7 +22,6 @@
     </div>
   </div>
 
-  <!-- Toast exportar (Corrección 5) -->
   @if (mensajeExport()) {
     <restaurant-alert
       [type]="mensajeExport()!.tipo"
@@ -54,18 +53,35 @@
 
   <!-- Filtros -->
   <div class="lista-page__filters">
-    <restaurant-search-filter
-      label="Buscar"
-      placeholder="Nombre, email o documento..."
-      [value]="busqueda()"
-      (valueChange)="busqueda.set($event)"
-    ></restaurant-search-filter>
-    <restaurant-select-filter
-      label="Rol"
-      [value]="rolFiltro()"
-      [options]="rolOpciones()"
-      (valueChange)="rolFiltro.set($event)"
-    ></restaurant-select-filter>
+    <div class="lista-page__search-wrapper">
+      <lucide-icon name="search" [size]="16" class="lista-page__search-icon"></lucide-icon>
+      <input
+        class="lista-page__search-input"
+        type="text"
+        placeholder="Buscar por nombre o email..."
+        [value]="busqueda()"
+        (input)="busqueda.set($any($event.target).value)"
+      >
+    </div>
+    <div class="lista-page__filter-selects">
+      <div class="lista-page__select-wrapper">
+        <select class="lista-page__select" (change)="rolFiltro.set($any($event.target).value)">
+          <option value="">Todos los roles</option>
+          @for (rol of rolesDisponibles; track rol) {
+            <option [value]="rol">{{ rol }}</option>
+          }
+        </select>
+        <lucide-icon name="filter" [size]="14" class="lista-page__select-icon"></lucide-icon>
+      </div>
+      <div class="lista-page__select-wrapper">
+        <select class="lista-page__select" (change)="estadoFiltro.set($any($event.target).value)">
+          <option value="todos">Todos</option>
+          <option value="activos">Activos</option>
+          <option value="inactivos">Inactivos</option>
+        </select>
+        <lucide-icon name="filter" [size]="14" class="lista-page__select-icon"></lucide-icon>
+      </div>
+    </div>
   </div>
 
   <!-- Tabla -->
@@ -96,7 +112,10 @@
           <tr>
             <td>
               <div class="lista-page__user">
-                <div class="lista-page__avatar">{{ getIniciales(u) }}</div>
+                <restaurant-usuario-avatar
+                  [nombre]="u.nombre"
+                  [apellidos]="u.apellidos"
+                ></restaurant-usuario-avatar>
                 <div>
                   <p class="lista-page__user-name">{{ u.nombre }} {{ u.apellidos }}</p>
                   <p class="lista-page__user-email">{{ u.email }}</p>
@@ -104,9 +123,7 @@
               </div>
             </td>
             <td>
-              <span class="lista-page__badge lista-page__badge--{{ getRolClass(u.rol) }}">
-                {{ u.rol }}
-              </span>
+              <restaurant-usuario-rol-badge [rol]="u.rol"></restaurant-usuario-rol-badge>
             </td>
             <td>
               <span
@@ -117,7 +134,6 @@
                 {{ u.activo ? 'Activo' : 'Inactivo' }}
               </span>
             </td>
-            <!-- Corrección 7 — DatePipe Angular -->
             <td class="lista-page__last-access">
               {{ (u.ultimoAcceso | date:'dd/MM/yyyy') || '—' }}
             </td>

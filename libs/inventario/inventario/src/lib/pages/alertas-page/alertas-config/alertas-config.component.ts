@@ -4,9 +4,8 @@ import {
   inject,
   OnInit,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
-import { UmbralConfig } from '../../../models/alerta.model';
 import { AlertasFacade } from '../../../data-access/alertas.facade';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 
@@ -14,7 +13,7 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
   selector: 'restaurant-alertas-config',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, BackButtonComponent],
+  imports: [BackButtonComponent],
   templateUrl: './alertas-config.component.html',
   styleUrl: './alertas-config.component.scss',
 })

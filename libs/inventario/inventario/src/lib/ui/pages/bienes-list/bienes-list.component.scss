@@ -172,7 +172,6 @@
 /* Nombre y descripción */
 .bien-nombre {
   font-size: 0.8125rem;
-  font-weight: 700;
   color: var(--color-en-fondo);
   margin: 0;
 }
@@ -202,7 +201,6 @@
 /* Stock */
 .stock-value {
   font-size: 0.8125rem;
-  font-weight: 700;
   color: var(--color-en-fondo);
 
   &--danger { color: var(--color-terciario); }
@@ -216,13 +214,11 @@
 
 .um-value {
   font-size: 0.8125rem;
-  font-weight: 700;
   color: var(--color-en-fondo);
 }
 
 .valor-text {
   font-size: 0.8125rem;
-  font-weight: 700;
   color: var(--color-en-fondo);
 }
 

@@ -1,12 +1,12 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ButtonComponent, KpiCardComponent, LoadingSkeletonComponent } from '@restaurant/shared/ui';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
-import { BienFormComponent } from '../../modals/bien-form/bien-form.component';
-import { BienImportModalComponent } from '../../modals/bien-import/bien-import.component';
+import { BienFormComponent } from '../../../ui/modals/bien-form/bien-form.component';
+import { BienImportModalComponent, BienImportPayload } from '../../modals/bien-import/bien-import.component';
 import { BienDeleteModalComponent } from '../../modals/bien-delete-modal/bien-delete-modal.component';
-import { Bien, BienFormDto, BienImportRow, EstadoBien } from '../../../models/inventario.model';
+import { Bien, BienFormDto, EstadoBien } from '../../../models/inventario.model';
 
 @Component({
   selector: 'restaurant-bienes-list',
@@ -29,9 +29,14 @@ export class BienesListPageComponent implements OnInit {
   private router = inject(Router);
 
   // State signals
-  bienes = this.facade.bienes;
-  kpis = this.facade.kpis;
-  loading = this.facade.loading;
+  bienes      = this.facade.bienes;
+  kpis        = this.facade.kpis;
+  loading     = this.facade.loading;
+  paginacion  = this.facade.paginacion;
+
+  paginas = computed(() =>
+    Array.from({ length: this.paginacion().totalPages }, (_, i) => i)
+  );
 
   // Modal controls
   showFormModal = signal(false);
@@ -45,16 +50,34 @@ export class BienesListPageComponent implements OnInit {
   }
 
   onSearch(query: string): void {
-    this.facade.setFiltros({ busqueda: query });
+    this.facade.cargarBienes({ busqueda: query });
+  }
+
+  onIrAPagina(page: number): void {
+    this.facade.irAPagina(page);
   }
 
   onImportBienes(): void {
     this.showImportModal.set(true);
   }
 
-  onProcessImport(data: BienImportRow[]): void {
+  onProcessImport(payload: BienImportPayload): void {
+    if (payload.tipo === 'excel') {
+      this.facade.importarBienesExcel(payload.archivo);
+      this.showImportModal.set(false);
+      return;
+    }
+
+    this.facade.importarBienes(payload.filas.map(row => ({
+      codigoSena: row.codigoSena,
+      nombre: row.nombre,
+      descripcion: row.descripcion,
+      categoria: row.categoria ?? 'General',
+      unidadMedida: row.unidadMedida,
+      codigoProveedor: row.codigoProveedor,
+      imagenUrl: undefined,
+    })));
     this.showImportModal.set(false);
-    this.facade.loadAll();
   }
 
   onExportBienes(): void {

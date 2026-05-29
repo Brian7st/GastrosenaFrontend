@@ -6,10 +6,12 @@
     <h1 class="page-title">Formato GIL-F-014</h1>
     <p class="page-subtitle">Gestión de bienes y servicios — Centro de Servicios y Gestión Empresarial</p>
   </div>
-  <restaurant-button variant="primary" routerLink="nueva">
-    <span class="material-symbols-outlined">add</span>
-    Nueva Solicitud
-  </restaurant-button>
+  <div style="display: flex; gap: 1rem;">
+    <restaurant-button variant="primary" routerLink="nueva">
+      <span class="material-symbols-outlined">add</span>
+      Nueva Solicitud
+    </restaurant-button>
+  </div>
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════════════
@@ -59,7 +61,9 @@
       <!-- Filtro Estado -->
       <div class="select-box">
         <select #estadoSelect (change)="onFilterEstado(estadoSelect.value)">
-          <option *ngFor="let opt of estadoOptions" [value]="opt.value">{{ opt.label }}</option>
+          @for (opt of estadoOptions; track opt) {
+<option [value]="opt.value">{{ opt.label }}</option>
+}
         </select>
         <span class="material-symbols-outlined dropdown-icon">expand_more</span>
       </div>
@@ -67,7 +71,9 @@
       <!-- Filtro Fecha -->
       <div class="select-box">
         <select #fechaSelect (change)="onFilterFecha(fechaSelect.value)">
-          <option *ngFor="let opt of fechaOptions" [value]="opt.value">{{ opt.label }}</option>
+          @for (opt of fechaOptions; track opt) {
+<option [value]="opt.value">{{ opt.label }}</option>
+}
         </select>
         <span class="material-symbols-outlined dropdown-icon">calendar_month</span>
       </div>
@@ -81,7 +87,6 @@
       </div>
     </div>
 
-    <p class="results-count">Mostrando 1–{{ solicitudes().length }} de {{ totalSolicitudes() }} resultados</p>
   </div>
 
   <!-- Cabecera de tabla -->
@@ -99,38 +104,38 @@
 
   <!-- Filas de datos -->
   <tbody>
-    <tr *ngFor="let s of solicitudes()">
+    @for (s of solicitudes(); track s) {
+<tr>
 
       <!-- Código -->
       <td>
-        <span class="code-bold">{{ s.codigo }}</span>
+        <span class="code-bold">{{ s.numeroGil }}</span>
       </td>
 
       <!-- Fecha -->
-      <td class="text-secondary">{{ s.fecha }}</td>
+      <td class="text-secondary">{{ s.fechaSolicitud }}</td>
 
       <!-- Solicitante con avatar -->
       <td>
         <div class="solicitante-cell">
-          <div class="avatar" [ngClass]="'avatar--' + (s.avatarColor ?? 'slate')">
-            {{ getInitials(s.cuentadante) }}
+          <div class="avatar" [ngClass]="'avatar--' + getAvatarColor(s.id)">
+            {{ getInitials(s.cuentadantes[0]?.nombre ?? '') }}
           </div>
-          <span class="solicitante-nombre">{{ s.cuentadante }}</span>
+          <span class="solicitante-nombre">{{ s.cuentadantes[0]?.nombre ?? '—' }}</span>
         </div>
       </td>
 
       <!-- Ficha / Grupo -->
-      <td class="text-secondary">{{ s.ficha }}</td>
+      <td class="text-secondary">{{ s.fichaCaracterizacion }}</td>
 
       <!-- Estado badge -->
       <td>
         <span class="estado-badge"
               [ngClass]="{
-                'estado-badge--borrador':  s.estado === 'Borrador',
-                'estado-badge--pendiente': s.estado === 'Pendiente',
-                'estado-badge--validado':  s.estado === 'Validado',
-                'estado-badge--aprobado':  s.estado === 'Aprobado',
-                'estado-badge--procesado': s.estado === 'Procesado'
+                'estado-badge--borrador':  s.estado === 'BORRADOR',
+                'estado-badge--pendiente': s.estado === 'EMITIDO',
+                'estado-badge--validado':  s.estado === 'ENVIADO_PROVEEDOR',
+                'estado-badge--procesado': s.estado === 'CERRADO'
               }">
           {{ s.estado }}
         </span>
@@ -138,17 +143,17 @@
 
       <!-- Total COP -->
       <td>
-        <span class="monto-text">{{ formatCOP(s.montoTotal ?? 0) }}</span>
+        <span class="monto-text">{{ formatCOP(getMontoTotal(s)) }}</span>
       </td>
 
       <!-- Acciones: Ver · Editar · PDF · Eliminar -->
       <td>
         <div class="actions-row">
-          <button class="action-icon" [routerLink]="[s.id]" title="Ver Detalle">
+          <button class="action-icon" (click)="onView(s.id)" title="Ver Detalle">
             <span class="material-symbols-outlined">visibility</span>
           </button>
           <button class="action-icon"
-                  [routerLink]="[s.id, 'editar']"
+                  (click)="onEdit(s.id)"
                   [disabled]="!canEdit(s.estado)"
                   title="Editar">
             <span class="material-symbols-outlined"
@@ -165,61 +170,37 @@
         </div>
       </td>
     </tr>
+}
   </tbody>
 
   <!-- Paginación -->
   <div dtFooter class="pagination-footer">
+    <p class="results-count">
+      MOSTRANDO {{ solicitudes().length }} DE {{ paginacion().totalElements }} SOLICITUDES
+    </p>
     <div class="page-numbers">
-      <button class="page-btn page-btn--active">1</button>
-      <button class="page-btn">2</button>
-      <button class="page-btn">3</button>
+      <button class="page-btn"
+        [disabled]="paginacion().page === 0"
+        (click)="onIrAPagina(paginacion().page - 1)">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      @for (p of paginas(); track p) {
+        <button class="page-btn"
+          [class.page-btn--active]="p === paginacion().page"
+          (click)="onIrAPagina(p)">
+          {{ p + 1 }}
+        </button>
+      }
+      <button class="page-btn"
+        [disabled]="paginacion().page >= paginacion().totalPages - 1"
+        (click)="onIrAPagina(paginacion().page + 1)">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
     </div>
   </div>
 
 </restaurant-data-table>
 
-<!-- ══════════════════════════════════════════════════════════════════════════
-     Cards inferiores: Notas del Formato + Resumen de Inversión
-══════════════════════════════════════════════════════════════════════════ -->
-<div class="bottom-cards">
-
-  <!-- Notas del Formato -->
-  <div class="info-card info-card--light">
-    <div class="info-card__bg-icon">
-      <span class="material-symbols-outlined">info</span>
-    </div>
-    <h3 class="info-card__title">Notas del Formato</h3>
-    <p class="info-card__body">
-      El formato GIL-F-014 es indispensable para el trámite de solicitudes de bienes o servicios.
-      Asegúrese de que el instructor y el coordinador técnico hayan revisado las cantidades antes
-      de registrar formalmente.
-    </p>
-    <button class="info-card__link">Ver Manual de Diligenciamiento</button>
-  </div>
-
-  <!-- Resumen de Inversión -->
-  <div class="info-card info-card--dark">
-    <h3 class="info-card__title">Resumen de Inversión</h3>
-    <div class="investment-rows">
-      <div class="investment-row">
-        <span class="investment-label">Presupuesto Ejecutado</span>
-        <span class="investment-value">$45.800.000</span>
-      </div>
-      <div class="investment-row">
-        <span class="investment-label">En Trámite</span>
-        <span class="investment-value">$12.350.000</span>
-      </div>
-    </div>
-    <!-- Barra de progreso -->
-    <div class="progress-wrap">
-      <div class="progress-track">
-        <div class="progress-fill" style="width: 75%"></div>
-      </div>
-      <p class="progress-label">75% del presupuesto anual asignado</p>
-    </div>
-  </div>
-
-</div>
 
 <!-- ── MODAL: Eliminar GIL ── -->
 <restaurant-keyword-confirm-modal
@@ -231,7 +212,7 @@
   confirmLabel="Sí, eliminar GIL"
   cancelLabel="Cancelar"
   [identifierLabel]="'GIL'"
-  [identifierValue]="itemToDelete()?.codigo ?? ''"
+  [identifierValue]="itemToDelete()?.numeroGil ?? ''"
   accent="danger"
   (confirm)="confirmDelete()"
   (cancel)="closeDeleteModal()"

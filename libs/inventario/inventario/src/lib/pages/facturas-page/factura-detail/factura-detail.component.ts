@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { ButtonComponent, DataTableComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { FacturasFacade } from '../../../data-access/facturas.facade';
+import { ConciliacionGilDiferencia } from '../../../models/facturas.model';
 
 @Component({
   selector: 'restaurant-factura-detail',
@@ -18,21 +19,58 @@ export class FacturaDetailPageComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private facade = inject(FacturasFacade);
 
-  factura = this.facade.facturaSeleccionada;
-  loading = this.facade.loading;
+  factura              = this.facade.facturaSeleccionada;
+  loading              = this.facade.loading;
+  conciliacionGil      = this.facade.conciliacionGil;
+  conciliacionCargada  = this.facade.conciliacionCargada;
+  gilesDisponibles     = this.facade.gilesDisponibles;
+
+  observaciones   = signal<Record<string, string>>({});
+  gilParaVincular = signal('');
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.facade.cargarFactura(id);
+      this.facade.intentarCargarConciliacion(id);
+      this.facade.cargarGilesDisponibles();
     }
+  }
+
+  setObservacion(gilItemId: string, event: Event): void {
+    const val = (event.target as HTMLInputElement).value;
+    this.observaciones.update(o => ({ ...o, [gilItemId]: val }));
+  }
+
+  resolverDiferencia(gilItemId: string): void {
+    const c = this.conciliacionGil();
+    if (!c) return;
+    const obs = this.observaciones()[gilItemId] ?? '';
+    this.facade.resolverDiferenciaGil(c.id, gilItemId, obs);
+    this.observaciones.update(o => { const next = { ...o }; delete next[gilItemId]; return next; });
+  }
+
+  onGilVincularChange(event: Event): void {
+    this.gilParaVincular.set((event.target as HTMLSelectElement).value);
+  }
+
+  vincularGil(): void {
+    const factura = this.factura();
+    const gilId   = this.gilParaVincular();
+    if (!factura || !gilId) return;
+    this.facade.conciliarFacturaGil(String(factura.id), gilId);
+    this.gilParaVincular.set('');
+  }
+
+  estaConciliada(diferencias: ConciliacionGilDiferencia[]): boolean {
+    return diferencias.length === 0 || diferencias.every(d => d.resuelta);
+  }
+
+  countPendientes(diferencias: ConciliacionGilDiferencia[]): number {
+    return diferencias.filter(d => !d.resuelta).length;
   }
 
   goBack(): void {
     this.router.navigate(['/app/inventario/facturas']);
-  }
-
-  onVerGil(gilId: string): void {
-    this.router.navigate(['/app/inventario/facturas/gil', gilId]);
   }
 }

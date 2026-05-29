@@ -1,4 +1,4 @@
-<div class="modal-backdrop" (click)="cerrarModal($event)">
+<div class="modal-backdrop" (click)="cerrarModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     
     <div class="detalle-header">
@@ -70,6 +70,11 @@
           </section>
         </div>
       </div> 
+    </div>
+    
+    <!-- Footer -->
+    <div class="modal-footer-custom">
+      <button class="btn-aceptar" (click)="cerrar()">Cerrar Receta</button>
     </div>
   </div>
 </div>

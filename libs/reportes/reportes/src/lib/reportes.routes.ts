@@ -6,4 +6,8 @@ export const REPORTES_ROUTES: Routes = [
     path: '',
     component: ReportesPageComponent,
   },
+  {
+    path: 'estadisticas-cocina',
+    loadComponent: () => import('../estadisticas-cocina/estadisticas-page.component').then(m => m.EstadisticasPageComponent)
+  }
 ];

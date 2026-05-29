@@ -1,11 +1,11 @@
-import { Component, OnInit, inject, Input, Output, EventEmitter } from "@angular/core";
+import { Component, OnInit, inject, Input, Output, EventEmitter, signal } from "@angular/core";
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, ValidatorFn } from "@angular/forms";
 import { CommonModule } from "@angular/common";
 import { CategoriaService } from "../../data-access/categoria.service";
 import { RecetaService } from "../../data-access/receta.service";
 import { IngredienteService } from "../../data-access/ingrediente.service";
 import { Receta } from "../../models/receta.model";
-import { LucideIconComponent, ButtonComponent, InputComponent } from "@restaurant/shared/ui";
+import { LucideIconComponent, ButtonComponent, InputComponent, ConfirmDialogComponent } from "@restaurant/shared/ui";
 import { soloLetrasValidator } from "../../validators/solo-letras.validator";
 
 export function noDuplicatesValidator(fieldName: string): ValidatorFn {
@@ -22,7 +22,7 @@ export function noDuplicatesValidator(fieldName: string): ValidatorFn {
 @Component({
   selector: 'restaurant-gestion-receta',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, LucideIconComponent, ButtonComponent, InputComponent],
+  imports: [ReactiveFormsModule, CommonModule, LucideIconComponent, ButtonComponent, InputComponent, ConfirmDialogComponent],
   templateUrl: './gestion-receta.component.html',
   styleUrl: './gestion-receta.component.scss'
 })
@@ -36,6 +36,9 @@ export class GestionRecetaComponent implements OnInit {
   private recetaService = inject(RecetaService);
 
   isSaving = false;
+  mostrarExitoModal = signal<boolean>(false);
+  exitoModalTitulo = signal<string>('');
+  exitoModalMensaje = signal<string>('');
 
   recipeForm = this.fb.group({
     idCategoria: ['', Validators.required],        
@@ -167,8 +170,9 @@ export class GestionRecetaComponent implements OnInit {
 
       observable.subscribe({
         next: () => {
-          alert(this.receta ? '¡Receta actualizada con éxito!' : '¡Receta guardada con éxito!');
-          this.close.emit(true);
+          this.exitoModalTitulo.set(this.receta ? 'Receta actualizada correctamente' : 'Receta guardada correctamente');
+          this.exitoModalMensaje.set(this.receta ? 'Los cambios han sido guardados en el sistema.' : 'La nueva receta ha sido registrada en el sistema.');
+          this.mostrarExitoModal.set(true);
         },
         error: (err) => {
           console.error('Error al guardar:', err);
@@ -189,6 +193,11 @@ export class GestionRecetaComponent implements OnInit {
     } else {
       this.recipeForm.markAllAsTouched();
     }
+  }
+
+  cerrarExitoModal() {
+    this.mostrarExitoModal.set(false);
+    this.close.emit(true);
   }
 
   onFileSelected(event: Event) {

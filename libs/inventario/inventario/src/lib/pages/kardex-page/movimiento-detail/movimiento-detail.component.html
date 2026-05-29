@@ -18,7 +18,7 @@
           Imprimir Comprobante
         </div>
       </restaurant-button>
-      <restaurant-button variant="primary">
+      <restaurant-button variant="primary" (click)="openExportModal()">
         <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: bold;">
           <lucide-icon name="file-text" [size]="18"></lucide-icon>
           Exportar PDF
@@ -137,3 +137,14 @@
 
   </div>
 </main>
+
+<!-- Modal de exportación -->
+@if (showExportModal()) {
+<inventario-exportar
+ 
+  titulo="Exportar Movimiento"
+  subtitulo="Seleccione el formato de salida para este movimiento"
+  (exportar)="onExport($event)"
+  (cerrar)="closeExportModal()">
+</inventario-exportar>
+}

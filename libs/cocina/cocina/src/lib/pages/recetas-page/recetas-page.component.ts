@@ -8,6 +8,7 @@ import {
   LucideIconComponent,
   PageHeaderComponent,
   SearchFilterComponent,
+  SelectFilterComponent,
   ButtonComponent,
   EmptyStateComponent,
   CardComponent,
@@ -25,6 +26,7 @@ import {
     LucideIconComponent,
     PageHeaderComponent,
     SearchFilterComponent,
+    SelectFilterComponent,
     ButtonComponent,
     EmptyStateComponent,
     CardComponent,
@@ -39,6 +41,7 @@ export class RecetasPageComponent implements OnInit {
   public recetaService = inject(RecetaService);
 
   searchTerm = signal<string>('');
+  categoriaSeleccionada = signal<string>('');
   
   // Estado para los modales
   recetaSeleccionada = signal<Receta | null>(null);
@@ -51,11 +54,37 @@ export class RecetasPageComponent implements OnInit {
   alertMessage = signal<string>('');
   alertType = signal<'success' | 'error' | 'warning' | 'info'>('info');
 
+  opcionesCategoria = [
+    { label: 'Todas las categorías', value: '' },
+    { label: 'Platos Fuertes', value: 'platos fuertes' },
+    { label: 'Entradas', value: 'entradas' },
+    { label: 'Postres', value: 'postres' }
+  ];
+
   recetasFiltradas = computed(() => {
     const term = this.searchTerm().toLowerCase();
-    return this.recetaService.recetas().filter(r => 
-      r.nombreReceta.toLowerCase().includes(term)
-    );
+    const cat = this.categoriaSeleccionada().toLowerCase().trim();
+    
+    return this.recetaService.recetas().filter(r => {
+      const matchSearch = r.nombreReceta.toLowerCase().includes(term) || 
+                          (r.nombreCategoria && r.nombreCategoria.toLowerCase().includes(term));
+      
+      let matchCategory = !cat;
+      if (cat && r.nombreCategoria) {
+        const rc = r.nombreCategoria.toLowerCase().trim();
+        // Mapeo inteligente en español para consistencia con mock y base de datos
+        if (cat === 'platos fuertes') {
+          matchCategory = rc === 'platos fuertes' || rc === 'plato fuerte' || rc === 'plato principal' || rc === 'platos principales' || rc === 'sopas' || rc === 'sopa';
+        } else if (cat === 'entradas') {
+          matchCategory = rc === 'entradas' || rc === 'entrada';
+        } else if (cat === 'postres') {
+          matchCategory = rc === 'postres' || rc === 'postre';
+        } else {
+          matchCategory = rc.includes(cat) || cat.includes(rc);
+        }
+      }
+      return matchSearch && matchCategory;
+    });
   });
 
   constructor() {
@@ -111,7 +140,13 @@ export class RecetasPageComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error al eliminar:', err);
-          this.mostrarAlerta('error', 'No se pudo eliminar la receta.');
+          // Fallback: si es un ID de prueba o el backend está apagado (status 0)
+          if (id.startsWith('R-') || err.status === 0) {
+            this.recetaService.recetas.update(recetas => recetas.filter(r => r.idReceta !== id));
+            this.mostrarAlerta('success', 'Receta eliminada localmente (Modo de prueba)');
+          } else {
+            this.mostrarAlerta('error', 'No se pudo eliminar la receta.');
+          }
         }
       });
     }
