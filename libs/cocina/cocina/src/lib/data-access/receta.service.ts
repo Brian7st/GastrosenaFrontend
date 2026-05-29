@@ -7,7 +7,6 @@ export class RecetaService {
   private http = inject(HttpClient);
   // URL base para el backend de recetas
   private url = 'http://localhost:8082/api/recetas';
-
   recetas = signal<Receta[]>([]);
 
   listar() {

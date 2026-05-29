@@ -106,7 +106,7 @@ export class ComandaService {
   }
 
   getRecetaById(idReceta: string): Observable<Receta> {
-    return this.http.get<Receta>(`http://localhost:8080/api/recetas/${idReceta}`);
+    return this.http.get<Receta>(`http://localhost:8082/api/recetas/${idReceta}`);
   }
 
   limpiarComandas(fechaInicio: string, fechaFin: string): Observable<void> {
