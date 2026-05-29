@@ -18,50 +18,42 @@ import {
   UsuarioDetalle,
 } from '../models/usuarios.model';
 
+export interface EstadoImportacion {
+  estado: 'EN_PROCESO' | 'COMPLETADO' | 'FALLIDO';
+  errores?: Array<{ fila?: number; campo?: string; mensaje: string }>;
+  registrosGuardados?: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class UsuariosService extends BaseHttpService {
   private readonly resource = 'usuarios';
 
+  getUsuarios(filtros?: Partial<FiltrosUsuarios>): Observable<PaginatedResponse<UsuarioDetalle>> {
+    let params = new HttpParams();
+    if (filtros?.busqueda) params = params.set('busqueda', filtros.busqueda);
+    if (filtros?.rol)      params = params.set('rol',      filtros.rol);
+    if (filtros?.pagina  !== undefined) params = params.set('pagina',  String(filtros.pagina));
+    if (filtros?.tamano  !== undefined) params = params.set('tamano',  String(filtros.tamano));
 
-getUsuarios(filtros?: Partial<FiltrosUsuarios>): Observable<PaginatedResponse<UsuarioDetalle>> {
-  let params = new HttpParams();
-  if (filtros?.busqueda) params = params.set('busqueda', filtros.busqueda);
-  if (filtros?.rol)      params = params.set('rol',      filtros.rol);
-  if (filtros?.pagina  !== undefined) params = params.set('pagina',  String(filtros.pagina));
-  if (filtros?.tamano  !== undefined) params = params.set('tamano',  String(filtros.tamano));
-
-  return this.http.get<any>(this.buildUrl(this.resource), { params }).pipe(
-    map((res: any) => {
-      console.log('📦 Respuesta backend /api/usuarios:', res);
-
-      // 1. Extraer la lista de usuarios (puede ser array plano o paginado)
-      let usuarios: any[] = [];
-      if (Array.isArray(res)) {
-        usuarios = res;
-      } else if (res.content) {
-        usuarios = res.content;
-      }
-
-      // 2. Transformar cada usuario
-      const usuariosTransformados = usuarios.map((u: any) => ({
-        ...u,
-        // Si el rol viene como objeto con nombreRol, lo extraemos; si es string, lo dejamos
-        rol: u.rol?.nombreRol ?? u.rol,
-        // Convertir estado (1/0, true/false, '0x01') a booleano
-        activo: u.estado === 1 || u.estado === true || u.estado === '0x01'
-      }));
-
-      // 3. Devolver objeto paginado
-      return {
-        content: usuariosTransformados,
-        totalElements: Array.isArray(res) ? res.length : (res.totalElements ?? usuariosTransformados.length),
-        totalPages: Array.isArray(res) ? 1 : (res.totalPages ?? 0),
-        currentPage: 0,
-        size: usuariosTransformados.length
-      };
-    })
-  );
-}
+    return this.http.get<any>(this.buildUrl(this.resource), { params }).pipe(
+      map(res => {
+        const raw = Array.isArray(res) ? res : (res.content ?? []);
+        const content = raw.map((u: any) => ({
+          ...u,
+          id:     u.idUsuario  ?? u.id,
+          activo: u.estado     ?? u.activo,
+          rol:    u.rol?.nombreRol ?? u.rol,
+        }));
+        return {
+          content,
+          totalElements: res.totalElements ?? content.length,
+          totalPages:    res.totalPages    ?? 1,
+          currentPage:   res.currentPage   ?? res.page ?? 0,
+          size:          res.size          ?? content.length,
+        };
+      })
+    );
+  }
 
   getUsuarioPorId(id: string): Observable<UsuarioDetalle> {
     return this.http.get<UsuarioDetalle>(this.buildUrl(`${this.resource}/${id}`));
@@ -103,11 +95,21 @@ getUsuarios(filtros?: Partial<FiltrosUsuarios>): Observable<PaginatedResponse<Us
   importarMasivo(request: ImportarUsuariosRequest): Observable<ImportarUsuariosResponse> {
     const formData = new FormData();
     formData.append('archivo', request.archivo);
-    formData.append('tipo',    request.tipo);
-    return this.http.post<ImportarUsuariosResponse>(
-      this.buildUrl(`${this.resource}/importar`),
-      formData,
-    );
+
+    const url = request.tipo === 'APRENDIZ'
+      ? this.buildUrl('usuarios/masivo/aprendices')
+      : this.buildUrl('usuarios/masivo/instructores');
+
+    return this.http.post<ImportarUsuariosResponse>(url, formData);
+  }
+
+  // ─── NUEVO: Obtener estado de importación (para polling) ────────────────────
+  obtenerEstadoImportacion(tareaId: string, tipo: 'APRENDIZ' | 'INSTRUCTOR'): Observable<EstadoImportacion> {
+    const url = tipo === 'APRENDIZ'
+      ? this.buildUrl(`usuarios/masivo/estado-aprendices/${tareaId}`)
+      : this.buildUrl(`usuarios/masivo/estado-instructores/${tareaId}`);
+
+    return this.http.get<EstadoImportacion>(url);
   }
 
   asignarRolMasivo(request: AsignacionMasivaRequest): Observable<void> {
@@ -117,6 +119,9 @@ getUsuarios(filtros?: Partial<FiltrosUsuarios>): Observable<PaginatedResponse<Us
   getHistorial(): Observable<HistorialItem[]> {
     return this.http.get<HistorialItem[]>(this.buildUrl(`${this.resource}/historial`));
   }
+
+
+
 
   exportarUsuarios(config: ExportarConfig): Observable<Blob> {
     const params = new HttpParams()

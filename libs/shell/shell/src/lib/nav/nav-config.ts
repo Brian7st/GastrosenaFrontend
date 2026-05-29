@@ -7,167 +7,138 @@
     subtitulo: 'MONOREPO ANGULAR 20',
     logoUrl: '',
 
-    grupos: [
-      {
-        etiqueta: 'Principal',
-        items: [
-          {
-            label: 'Dashboard',
-            ruta: '/app',
-            exact: true,
-            icono: 'layout-dashboard',
-          },
-        ],
-      },
+  grupos: [
+    {
+      etiqueta: 'Principal',
+      items: [
+        {
+          label: 'Dashboard',
+          ruta: '/app/dashboard',
+          exact: true,
+          icono: 'layout-dashboard',
+        },
+      ],
+    },
 
-      {
-        etiqueta: 'Operación',
-        items: [
-          {
-            label: 'Cocina',
-            ruta: '/app/cocina',
-            icono: 'chef-hat',
+    {
+      etiqueta: 'Operación',
+      items: [
+        {
+          label: 'Cocina',
+          ruta: '/app/cocina',
+          icono: 'chef-hat',
+          permisos: ['RECETAS_GESTIONAR', 'RECETAS_CONSULTAR', 'COMANDAS_CONSULTAR'],
+          children: [
+            { label: 'Inicio',       ruta: '/app/cocina/inicio',       icono: 'layout-dashboard' },
+            { label: 'Comandas',     ruta: '/app/cocina/comandas',     icono: 'clipboard-list'   },
+            { label: 'Recetas',      ruta: '/app/cocina/recetas',      icono: 'book-open'        },
+            { label: 'Evaluar',      ruta: '/app/cocina/actividad',    icono: 'graduation-cap'   },
+          ],
+        },
 
-            children: [
-              { label: 'Inicio',       ruta: '/app/cocina/inicio',       icono: 'layout-dashboard' },
-              { label: 'Comandas',     ruta: '/app/cocina/comandas',     icono: 'clipboard-list'   },
-              { label: 'Recetas',      ruta: '/app/cocina/recetas',      icono: 'book-open'        },
-              { label: 'Evaluar',      ruta: '/app/cocina/actividad',    icono: 'graduation-cap'   },
-            ],
-          },
+        {
+          label: 'Bar y barismo',
+          ruta: '/app/bar',
+          icono: 'coffee',
+          permisos: ['COMANDAS_CONSULTAR', 'RECETAS_CONSULTAR'],
+          children: [
+            {
+              label: 'Inicio',
+              ruta: '/app/bar/inicio',
+              icono: 'layout-dashboard',
+            },
+            {
+              label: 'Comandas',
+              ruta: '/app/bar/comandas',
+              icono: 'clipboard-list',
+            },
+            {
+              label: 'Recetas',
+              ruta: '/app/bar/recetas',
+              icono: 'book-open',
+            },
+          ],
+        },
+      ],
+    },
 
-          {
-            label: 'Bar y barismo',
-            ruta: '/app/bar',
-            icono: 'coffee',
+    {
+      etiqueta: 'Administración',
+      items: [
+        {
+          label: 'Usuarios',
+          ruta: '/app/usuarios',
+          icono: 'users',
+          permisos: ['USUARIOS_LISTAR', 'USUARIOS_VER'],
+          children: [
+            { label: 'Lista',              ruta: '/app/usuarios/lista',    icono: 'list'         },
+            { label: 'Roles',              ruta: '/app/usuarios/roles',    icono: 'shield-check' },
+            { label: 'Gestión de Cuentas', ruta: '/app/usuarios/cuentas',  icono: 'user-cog'     },
+          ],
+        },
 
-            children: [
-              {
-                label: 'Inicio',
-                ruta: '/app/bar/inicio',
-                icono: 'layout-dashboard',
-              },
-              {
-                label: 'Comandas',
-                ruta: '/app/bar/comandas',
-                icono: 'clipboard-list',
-              },
-              {
-                label: 'Estadísticas',
-                ruta: '/app/bar/estadisticas',
-                icono: 'bar-chart-2',
-              },
-              {
-                label: 'Recetas',
-                ruta: '/app/bar/recetas',
-                icono: 'book-open',
-              },
-            ],
-          },
-        ],
-      },
+        {
+          label: 'Restaurante',
+          ruta: '/app/restaurante',
+          icono: 'utensils',
+          permisos: ['MODULO_MESAS_VER', 'MODULO_PEDIDOS_VER', 'MESAS_CONSULTAR'],
+          children: [
+            { label: 'Mesas',   ruta: '/app/restaurante/mesas',   icono: 'layout-grid' },
+            { label: 'Pedidos', ruta: '/app/restaurante/pedidos', icono: 'receipt'     },
+            { label: 'Caja',    ruta: '/app/restaurante/caja',    icono: 'banknote'    },
+          ],
+        },
 
-      {
-        etiqueta: 'Administración',
-        items: [
-          {
-            label: 'Usuarios',
-            ruta: '/app/usuarios',
-            icono: 'users',
+        {
+          label: 'Inventario',
+          ruta: '/app/inventario',
+          icono: 'warehouse',
+          permisos: ['MODULO_INVENTARIO_VER'],
+          children: [
+            { label: 'Gestión de Bienes',           ruta: '/app/inventario/bienes',                   icono: 'package-open'     },
+            { label: 'Facturas Electrónicas',       ruta: '/app/inventario/facturas',                 icono: 'file-spreadsheet' },
+            { label: 'Solicitudes GIL-F-014',       ruta: '/app/inventario/solicitudes-gil',          icono: 'clipboard-check'  },
+            { label: 'Solicitudes Insumos',         ruta: '/app/inventario/solicitudes-insumos-page', icono: 'clipboard-list'   },
+            { label: 'Consolidado de Ejecución',    ruta: '/app/inventario/consolidado',              icono: 'bar-chart-2'      },
+            { label: 'Entradas y Salidas (Kardex)', ruta: '/app/inventario/movimientos',              icono: 'arrow-left-right' },
+            { label: 'Alertas de Stock',            ruta: '/app/inventario/alertas',                  icono: 'alert-circle'     },
+            { label: 'Presupuesto General',         ruta: '/app/inventario/presupuesto',              icono: 'wallet'           },
+            { label: 'Conciliación',                ruta: '/app/inventario/conciliacion',             icono: 'scale'            },
+            { label: 'Requisiciones Diarias',       ruta: '/app/inventario/requisiciones',            icono: 'calendar'         },
+            { label: 'Actas de Legalización',       ruta: '/app/inventario/actas',                    icono: 'file-check'       },
+            { label: 'Paquete Probatorio',          ruta: '/app/inventario/paquete-probatorio',       icono: 'file-stack'       },
+          ],
+        },
 
-            children: [
-              {
-                label: 'Lista',
-                ruta: '/app/usuarios/lista',
-                icono: 'list',
-              },
-              {
-                label: 'Roles',
-                ruta: '/app/usuarios/roles',
-                icono: 'shield-check',
-              },
-              {
-                label: 'Gestión de Cuentas',
-                ruta: '/app/usuarios/cuentas',
-                icono: 'user-cog',
-              },
-              {
-                label: 'Fichas',
-                ruta: '/app/usuarios/fichas',
-                icono: 'book-marked',
-              },
-            ],
-          },
-
-          {
-            label: 'Restaurante',
-            ruta: '/app/restaurante',
-            icono: 'utensils',
-
-            children: [
-              {
-                label: 'Mesas',
-                ruta: '/app/restaurante/mesas',
-                icono: 'layout-grid',
-              },
-              {
-                label: 'Pedidos',
-                ruta: '/app/restaurante/pedidos',
-                icono: 'receipt',
-              },
-              {
-                label: 'Caja',
-                ruta: '/app/restaurante/caja',
-                icono: 'banknote',
-              },
-            ],
-          },
-
-          {
-            label: 'Inventario',
-            ruta: '/app/inventario',
-            icono: 'warehouse',
-
-            children: [
-              { label: 'Gestión de Bienes',           ruta: '/app/inventario/bienes',             icono: 'package-open'     },
-              { label: 'Facturas Electrónicas',       ruta: '/app/inventario/facturas',           icono: 'file-spreadsheet' },
-              { label: 'Solicitudes GIL-F-014',       ruta: '/app/inventario/solicitudes-gil',    icono: 'clipboard-check'  },
-              { label: 'Solicitudes Insumos',         ruta: '/app/inventario/solicitudes-insumos-page', icono: 'clipboard-list' },
-              { label: 'Consolidado de Ejecución',    ruta: '/app/inventario/consolidado',        icono: 'bar-chart-2'      },
-              { label: 'Entradas y Salidas (Kardex)', ruta: '/app/inventario/movimientos',        icono: 'arrow-left-right' },
-              { label: 'Alertas de Stock',            ruta: '/app/inventario/alertas',            icono: 'alert-circle'     },
-              { label: 'Presupuesto General',         ruta: '/app/inventario/presupuesto',        icono: 'wallet'           },
-              { label: 'Conciliación',                ruta: '/app/inventario/conciliacion',       icono: 'scale'            },
-              { label: 'Requisiciones Diarias',       ruta: '/app/inventario/requisiciones',      icono: 'calendar'         },
-              { label: 'Actas de Legalización',       ruta: '/app/inventario/actas',              icono: 'file-check'       },
-              { label: 'Paquete Probatorio',          ruta: '/app/inventario/paquete-probatorio', icono: 'file-stack'       },
-            ],
-          },
-
-          {
-            label: 'Reportes y estadísticas',
-            ruta: '/app/reportes',
-            icono: 'pie-chart',
-
-            children: [
-              {
-                label: 'Ventas',
-                ruta: '/app/reportes/ventas',
-                icono: 'trending-up',
-              },
-              {
-                label: 'Inventario',
-                ruta: '/app/reportes/inventario',
-                icono: 'warehouse',
-              },
-              {
-                label: 'Estadísticas cocina',
-                ruta: '/app/reportes/estadisticas-cocina',
-                icono: 'bar-chart-2',
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  };
+        {
+          label: 'Reportes y estadísticas',
+          ruta: '/app/reportes',
+          icono: 'pie-chart',
+          permisos: ['MODULO_REPORTES_VER', 'REPORTES_GESTIONAR', 'generar_reporte_facturacion'],
+          children: [
+            {
+              label: 'Ventas',
+              ruta: '/app/reportes/ventas',
+              icono: 'trending-up',
+            },
+            {
+              label: 'Inventario',
+              ruta: '/app/reportes/inventario',
+              icono: 'warehouse',
+            },
+            {
+              label: 'Estadísticas cocina',
+              ruta: '/app/reportes/estadisticas-cocina',
+              icono: 'bar-chart-2',
+            },
+            {
+              label: 'Estadísticas bar',
+              ruta: '/app/bar/estadisticas',
+              icono: 'bar-chart-2',
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};

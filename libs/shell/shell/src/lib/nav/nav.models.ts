@@ -8,6 +8,7 @@ export interface NavItem {
   insignia?: number;
   insigniaAlerta?: boolean;
   roles?: Rol[];
+  permisos?: string[];
   children?: NavItem[];
 }
 

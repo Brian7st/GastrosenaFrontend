@@ -5,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
+import { GenerarGilData } from '../../../models/solicitudes-gil.model';
+import { GIL_DEFAULTS } from '../../../util/gil-defaults.config';
 
 interface SolicitudRow {
   id: string;
@@ -30,6 +32,20 @@ export class SolicitudesGenerarComponent implements OnInit {
   // Cargamos los datos reales de la API (Facade)
   solicitudesReales = this.facade.solicitudes;
   isSaving = this.facade.loading;
+
+  // Campos del GIL resultado — pre-llenados con defaults institucionales
+  fechaSolicitud          = signal(new Date().toISOString().split('T')[0]);
+  regionalCodigo          = signal<number>(GIL_DEFAULTS.regionalCodigo);
+  regionalNombre          = signal<string>(GIL_DEFAULTS.regionalNombre);
+  centroCostosCodigo      = signal<number>(GIL_DEFAULTS.centroCostosCodigo);
+  centroCostosNombre      = signal<string>(GIL_DEFAULTS.centroCostosNombre);
+  area                    = signal<string>(GIL_DEFAULTS.area);
+  destinoBienes           = signal('FORMACION');
+  jefeOficinaCoordinador  = signal('');
+  cuentadantes            = signal<{ nombre: string; cedula: string }[]>([]);
+  solicitante             = signal('');
+  codigoGrupo             = signal('');
+  fichaCaracterizacion    = signal('');
 
   // Transformamos los datos al formato visual que ya tenías
   solicitudes = computed<SolicitudRow[]>(() => {
@@ -106,13 +122,23 @@ export class SolicitudesGenerarComponent implements OnInit {
   }
 
   confirmarGeneracion(): void {
-    const ids = Array.from(this.selectedIds());
-    // Consumo API a través del facade que creamos antes
-    this.facade.generarGils(ids);
+    const data: GenerarGilData = {
+      solicitudSesionIds:     Array.from(this.selectedIds()),
+      fechaSolicitud:         this.fechaSolicitud(),
+      regionalCodigo:         this.regionalCodigo(),
+      regionalNombre:         this.regionalNombre(),
+      centroCostosCodigo:     this.centroCostosCodigo(),
+      centroCostosNombre:     this.centroCostosNombre(),
+      area:                   this.area(),
+      destinoBienes:          this.destinoBienes(),
+      jefeOficinaCoordinador: this.jefeOficinaCoordinador(),
+      cuentadantes:           this.cuentadantes(),
+      solicitante:            this.solicitante(),
+      codigoGrupo:            this.codigoGrupo(),
+      fichaCaracterizacion:   this.fichaCaracterizacion(),
+    };
+    this.facade.generarGils(data);
     this.showModal.set(false);
-    
-    // Resultado: Navegar de vuelta con un mensaje o a consolidado
-    // Como no hay consolidado/nuevo real, volveremos a la lista
     this.router.navigate(['/app/inventario/solicitudes-gil']);
   }
 

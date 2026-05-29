@@ -4,11 +4,11 @@
 
 <div class="cart-items">
   @if (pedidoActivo(); as pedido) {
-    @for (item of pedido.items; track item.productoId; let i = $index) {
+    @for (item of pedido.detalles; track item.productoId; let i = $index) {
       <div class="item-row">
         <div class="item-details">
-          <h4 class="name">{{ item.nombre }}</h4>
-          <span class="category">{{ item.observacion || 'Sin observaciones' }}</span>
+          <h4 class="name">{{ item.nombreProducto }}</h4>
+          <span class="category">{{ item.observaciones || 'Sin observaciones' }}</span>
           
           <div class="quantity-controls">
             <button class="btn-minus" (click)="decrementar(i)">
@@ -23,7 +23,7 @@
         
         <div class="item-pricing">
           <div class="prices">
-            <span class="current">${{ item.precioUnit | number:'1.2-2' }}</span>
+            <span class="current">${{ item.precioUnitario | number:'1.2-2' }}</span>
           </div>
         </div>
       </div>
@@ -50,7 +50,7 @@
   @if (pedidoActivo(); as pedido) {
     <div class="summary-total">
       <span class="label">Total</span>
-      <span class="value">${{ pedido.total | number:'1.2-2' }}</span>
+      <span class="value">${{ pedido.subtotal | number:'1.2-2' }}</span>
     </div>
   }
 </div>
@@ -58,7 +58,7 @@
 <restaurant-button 
   class="full-width-btn" 
   variant="primary" 
-  [disabled]="!pedidoActivo()?.items?.length" 
+  [disabled]="!pedidoActivo()?.detalles?.length" 
   (click)="confirmarPedido()">
   <span>Confirmar Pedido</span>
 </restaurant-button>

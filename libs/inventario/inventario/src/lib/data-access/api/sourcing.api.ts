@@ -109,10 +109,7 @@ export interface BienGilRequest {
   subtotal: number;
 }
 
-/**
- * Payload de creación: POST /api/v1/procurement/giles
- * Todos los campos son REQUIRED según validaciones del backend.
- */
+/** POST /api/v1/procurement/giles */
 export interface CrearGilRequest {
   fechaSolicitud: string;
   regionalCodigo: number;
@@ -126,7 +123,26 @@ export interface CrearGilRequest {
   solicitante: string;
   codigoGrupo: string;
   fichaCaracterizacion: string;
+  solicitudesOrigenIds?: string[];
   bienes: BienGilRequest[];
+  observaciones?: string;
+}
+
+/** POST /api/v1/procurement/giles/generar — genera un GIL desde solicitudes de sesión aprobadas */
+export interface GenerarGilRequest {
+  solicitudSesionIds: string[];
+  fechaSolicitud: string;
+  regionalCodigo: number;
+  regionalNombre: string;
+  centroCostosCodigo: number;
+  centroCostosNombre: string;
+  area: string;
+  destinoBienes: string;
+  jefeOficinaCoordinador: string;
+  cuentadantes: CuentadanteGilRequest[];
+  solicitante: string;
+  codigoGrupo: string;
+  fichaCaracterizacion: string;
   observaciones?: string;
 }
 
@@ -141,6 +157,7 @@ export interface CuentadanteGilResponse {
 
 /** Ítem de bien en responses */
 export interface BienGilResponse {
+  productoId?: string;
   codigoSena: string;
   descripcion: string;
   unidadMedida: string;
@@ -149,12 +166,6 @@ export interface BienGilResponse {
   subtotal: number;
 }
 
-/**
- * Response del backend para GET /procurement/giles y GET /procurement/giles/{id}.
- * NOTA: el backend documenta el response como `type: object` sin schema explícito
- * (tarea BACKEND #2). Esta interface refleja los nombres esperados basados en el
- * contrato de request. Verificar y ajustar cuando el backend exponga GilResponse.
- */
 export interface GilResponse {
   id: string;
   numeroGil: string;
@@ -173,7 +184,9 @@ export interface GilResponse {
   estado: 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'CERRADO';
   observaciones?: string;
   bienes?: BienGilResponse[];
-  // Campos opcionales del módulo training (si el backend los incluye)
+  creadoEn?: string;
+  actualizadoEn?: string;
+  // Campos opcionales del módulo training
   programaId?: string;
   emitidoPor?: string;
   resultadoAprendizaje?: string;

@@ -1,102 +1,192 @@
-import { Component, ChangeDetectionStrategy, signal, inject, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, inject, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
-
-interface BienInsumo {
-  nombre: string;
-  cantidad: number;
-  unidad: string;
-}
+import { ConfirmarEnvioSolicitudModalComponent } from '../../../components/confirmar-envio-solicitud-modal/confirmar-envio-solicitud-modal.component';
+import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
+import { InventarioFacade } from '../../../data-access/inventario.facade';
+import { SolicitudSesionItem } from '../../../models/solicitud-sesion.model';
+import { Bien } from '../../../models/inventario.model';
 
 @Component({
   selector: 'restaurant-solicitudes-insumos-form',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ButtonComponent, BackButtonComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ButtonComponent, BackButtonComponent, ConfirmarEnvioSolicitudModalComponent],
   templateUrl: './solicitudes-insumos-form.component.html',
   styleUrl: './solicitudes-insumos-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SolicitudesInsumosFormComponent implements OnInit {
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private router         = inject(Router);
+  private route          = inject(ActivatedRoute);
+  readonly facade        = inject(SolicitudesFacade);
+  readonly inventario    = inject(InventarioFacade);
 
-  isEdit = signal(false);
-  solicitudId = signal<string | null>(null);
+  isEdit          = signal(false);
+  solicitudId     = signal<string | null>(null);
   solicitudCodigo = signal<string | null>(null);
+  isModalOpen     = signal(false);
 
-  // ── Estado Reactivo Formulario ──────────────────────────────────────────
-  instructor    = signal('Chef Sebastian Betancourt');
-  fecha         = signal('12/10/2026');
-  ambiente      = signal('Cocina Laboratorio A');
-  ficha         = signal('2560892');
-  observaciones = signal('');
+  // ── Campos del formulario ──────────────────────────────────────────────────
+  fechaSolicitud           = signal(new Date().toISOString().split('T')[0]);
+  fichaId                  = signal('');
+  programaId               = signal('');
+  instructorId             = signal('');
+  identificacionInstructor = signal('');
+  resultadoAprendizaje     = signal('');
+  actividades              = signal('');
+  voceroId                 = signal('');
+  items                    = signal<SolicitudSesionItem[]>([]);
 
-  bienes = signal<BienInsumo[]>([
-    { nombre: 'Harina de Trigo', cantidad: 10, unidad: 'kg' }
-  ]);
+  valorTotalDeSolicitud = computed(() =>
+    this.items().reduce((acc, i) => acc + (i.cantidad * (i.valorUnitario ?? 0)), 0)
+  );
+
+  // ── Selector del catálogo ──────────────────────────────────────────────────
+  mostrarSelectorBien = signal(false);
+  catalogoBienes      = this.inventario.bienes;
+  catalogoPaginacion  = this.inventario.paginacion;
+  catalogoLoading     = this.inventario.loading;
+  paginasSelectorBien = computed(() =>
+    Array.from({ length: this.catalogoPaginacion().totalPages }, (_, i) => i)
+  );
+
+  catalogoRangoInfo = computed(() => {
+    const { page, size, totalElements } = this.catalogoPaginacion();
+    const desde = totalElements === 0 ? 0 : page * size + 1;
+    const hasta = Math.min((page + 1) * size, totalElements);
+    return { desde, hasta, total: totalElements };
+  });
+
+  // ── Validación ────────────────────────────────────────────────────────────
+  submitAttempted = signal(false);
+
+  errores = computed<Record<string, string>>(() => {
+    const e: Record<string, string> = {};
+    if (!this.fichaId().trim())
+      e['fichaId'] = 'La ficha de caracterización es requerida.';
+    if (!this.programaId().trim())
+      e['programaId'] = 'El programa de formación es requerido.';
+    if (!this.instructorId().trim())
+      e['instructorId'] = 'El ID del instructor es requerido.';
+    if (!this.resultadoAprendizaje().trim())
+      e['resultadoAprendizaje'] = 'El resultado de aprendizaje es requerido.';
+    if (!this.actividades().trim())
+      e['actividades'] = 'Las actividades son requeridas.';
+    if (this.items().length === 0)
+      e['items'] = 'Debe agregar al menos un ítem.';
+    return e;
+  });
+
+  formularioValido = computed(() => Object.keys(this.errores()).length === 0);
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.isEdit.set(true);
       this.solicitudId.set(id);
-      
-      if (id === '6') {
-        this.solicitudCodigo.set('SOL-2024-006');
-        this.instructor.set('Chef Sebastian Betancourt');
-        this.fecha.set('15 Oct');
-        this.ambiente.set('Cocina Panadería B');
-        this.ficha.set('2560892');
-        this.observaciones.set('Solicitud en borrador para insumos de panadería de la Ficha 2560892.');
-        this.bienes.set([
-          { nombre: 'Harina de Trigo', cantidad: 10, unidad: 'kg' }
-        ]);
-      } else if (id === '7') {
-        this.solicitudCodigo.set('SOL-2024-007');
-        this.instructor.set('Lic. Martha Lucía Peña');
-        this.fecha.set('16 Oct');
-        this.ambiente.set('Aula de Bar y Coctelería');
-        this.ficha.set('2339810');
-        this.observaciones.set('Material de cristalería e insumos de coctelería clásica para taller evaluativo.');
-        this.bienes.set([
-          { nombre: 'Jarabe de Goma', cantidad: 4, unidad: 'botellas' },
-          { nombre: 'Limón Tahití', cantidad: 5, unidad: 'kg' },
-          { nombre: 'Hielo en cubos', cantidad: 3, unidad: 'bolsas' }
-        ]);
-      }
-    } else {
-      // Valores por defecto para Nueva Solicitud
-      this.instructor.set('Chef Sebastian Betancourt');
-      this.fecha.set('12/10/2026');
-      this.ambiente.set('Cocina Laboratorio A');
-      this.ficha.set('2560892');
-      this.observaciones.set('');
-      this.bienes.set([
-        { nombre: 'Harina de Trigo', cantidad: 10, unidad: 'kg' }
-      ]);
     }
+    this.inventario.cargarBienes({ page: 0, size: 8 });
   }
 
+  // ── Handlers del catálogo ──────────────────────────────────────────────────
+  onAbrirSelectorBien(): void {
+    this.mostrarSelectorBien.set(true);
+    this.inventario.cargarBienes({ page: 0, size: 8 });
+  }
+
+  onBuscarBienCatalogo(term: string): void {
+    this.inventario.cargarBienes({ busqueda: term, page: 0, size: 8 });
+  }
+
+  onSelectorIrAPagina(page: number): void {
+    this.inventario.irAPagina(page);
+  }
+
+  estaEnLista(id: string | number): boolean {
+    return this.items().some(i => i.productoId === String(id));
+  }
+
+  onSeleccionarBien(bien: Bien): void {
+    const yaAgregado = this.items().some(i => i.productoId === String(bien.id));
+    if (yaAgregado) return;
+
+    this.items.update(list => [...list, {
+      productoId:              String(bien.id),
+      codigoSena:              bien.codigoSena ?? '',
+      nombreBien:              bien.nombre,
+      descripcion:             bien.descripcion ?? '',
+      unidadMedida:            bien.unidadMedida,
+      cantidad:                1,
+      justificacion:           '',
+      valorUnitario:           bien.valor ?? 0,
+      valorUnitarioAdjudicado: bien.valor ?? 0,
+      total:                   bien.valor ?? 0,
+      iva:                     0,
+    }]);
+    this.mostrarSelectorBien.set(false);
+  }
+
+  onCantidadChange(index: number, cantidad: number): void {
+    this.items.update(list =>
+      list.map((item, i) =>
+        i === index
+          ? { ...item, cantidad, total: cantidad * (item.valorUnitario ?? 0) }
+          : item
+      )
+    );
+  }
+
+  onCodigoAlmacenChange(index: number, codigoAlmacen: string): void {
+    this.items.update(list =>
+      list.map((item, i) => i === index ? { ...item, codigoAlmacen } : item)
+    );
+  }
+
+  onIvaChange(index: number, iva: number): void {
+    this.items.update(list =>
+      list.map((item, i) => i === index ? { ...item, iva } : item)
+    );
+  }
+
+  onRemoveItem(index: number): void {
+    this.items.update(list => list.filter((_, i) => i !== index));
+  }
+
+  // ── Acciones ──────────────────────────────────────────────────────────────
   onCancel(): void {
     this.router.navigate(['/app/inventario/solicitudes-insumos-page']);
   }
 
   onSave(): void {
-    // Aquí se guardaría el borrador o se enviaría la solicitud
-    this.router.navigate(['/app/inventario/solicitudes-insumos-page']);
+    this.submitAttempted.set(true);
+    if (!this.formularioValido()) return;
+    this.isModalOpen.set(true);
   }
 
-  onAddBien(): void {
-    this.bienes.update(items => [
-      ...items,
-      { nombre: '', cantidad: 1, unidad: 'kg' }
-    ]);
+  cerrarModalConfirmacion(): void {
+    this.isModalOpen.set(false);
   }
 
-  onRemoveBien(index: number): void {
-    this.bienes.update(items => items.filter((_, i) => i !== index));
+  confirmarEnvio(): void {
+    this.isModalOpen.set(false);
+    this.facade.crearSolicitudSesion({
+      fechaSolicitud:           this.fechaSolicitud(),
+      fichaId:                  this.fichaId(),
+      programaId:               this.programaId(),
+      instructorId:             this.instructorId(),
+      identificacionInstructor: this.identificacionInstructor() || undefined,
+      resultadoAprendizaje:     this.resultadoAprendizaje(),
+      actividades:              this.actividades(),
+      voceroId:                 this.voceroId(),
+      valorTotalDeSolicitud:    this.valorTotalDeSolicitud(),
+      items:                    this.items(),
+    }).subscribe(res => {
+      if (res !== null) {
+        this.router.navigate(['/app/inventario/solicitudes-insumos-page']);
+      }
+    });
   }
 }

@@ -15,31 +15,31 @@
       <div class="upload-row">
         <div class="upload-card">
           @if (!file()) {
-            <div class="drop-zone" [class.is-dragging]="isDragging()"
-                 (dragover)="onDragOver($event)" (dragleave)="onDragLeave()" (drop)="onDrop($event)">
-              <div class="drop-icon">
-                <span class="material-symbols-outlined">upload_file</span>
-              </div>
-              <h3>Arrastre su archivo aquí</h3>
-              <p>Solo archivos <strong>.csv</strong> generados desde la plantilla.</p>
-              <label class="btn-select-file">
-                Seleccionar Archivo
-                <input type="file" accept=".csv,.xlsx,.xls" (change)="onFileSelected($event)" />
-              </label>
+          <div class="drop-zone" [class.is-dragging]="isDragging()" (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave()" (drop)="onDrop($event)">
+            <div class="drop-icon">
+              <span class="material-symbols-outlined">upload_file</span>
             </div>
+            <h3>Arrastre su archivo aquí</h3>
+            <p>Solo archivos <strong>.csv</strong> generados desde la plantilla.</p>
+            <label class="btn-select-file">
+              Seleccionar Archivo
+              <input type="file" accept=".csv,.xlsx,.xls" (change)="onFileSelected($event)" />
+            </label>
+          </div>
           } @else {
-            <div class="file-card">
-              <div class="file-icon">
-                <span class="material-symbols-outlined">description</span>
-              </div>
-              <div class="file-info">
-                <p class="file-name">{{ file()?.name }}</p>
-                <p class="file-size">{{ getFileSize() }}</p>
-              </div>
-              <button class="remove-btn" (click)="removeFile()">
-                <span class="material-symbols-outlined">close</span>
-              </button>
+          <div class="file-card">
+            <div class="file-icon">
+              <span class="material-symbols-outlined">description</span>
             </div>
+            <div class="file-info">
+              <p class="file-name">{{ file()?.name }}</p>
+              <p class="file-size">{{ getFileSize() }}</p>
+            </div>
+            <button class="remove-btn" (click)="removeFile()">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
           }
         </div>
 
@@ -50,10 +50,10 @@
           </div>
           <ol class="instr-list">
             @for (item of INSTRUCCIONES; track item; let i = $index) {
-              <li>
-                <span class="instr-num">{{ i + 1 }}</span>
-                <span>{{ item }}</span>
-              </li>
+            <li>
+              <span class="instr-num">{{ i + 1 }}</span>
+              <span>{{ item }}</span>
+            </li>
             }
           </ol>
           <div class="server-status">
@@ -67,75 +67,77 @@
       </div>
 
       @if (statusMessage()) {
-        <div class="preview-card">
-          <div class="processing-indicator">{{ statusMessage() }}</div>
-        </div>
+      <div class="preview-card">
+        <div class="processing-indicator">{{ statusMessage() }}</div>
+      </div>
       }
 
       @if (previewData().length > 0 || isProcessing()) {
-        <div class="preview-card">
-          <div class="preview-header">
-            <div class="preview-title">
-              <span class="material-symbols-outlined">visibility</span>
-              <h3>Vista Previa de Datos</h3>
-            </div>
-            @if (!isProcessing()) {
-              <span class="preview-count">{{ previewData().length }} FILAS ENCONTRADAS</span>
-            }
-            @if (isProcessing()) {
-              <span class="preview-count">Procesando...</span>
-            }
+      <div class="preview-card">
+        <div class="preview-header">
+          <div class="preview-title">
+            <span class="material-symbols-outlined">visibility</span>
+            <h3>Vista Previa de Datos</h3>
           </div>
-
-          @if (isProcessing()) {
-            <div class="processing-indicator">
-              <span class="material-symbols-outlined spin">sync</span>
-              Analizando archivo...
-            </div>
-          }
-
           @if (!isProcessing()) {
-            <div class="preview-table-wrap">
-              <table class="preview-table">
-                <thead>
-                  <tr>
-                    <th>CÓD. SENA</th>
-                    <th>NOMBRE</th>
-                    <th>DESCRIPCIÓN</th>
-                    <th>CATEGORÍA</th>
-                    <th>UM</th>
-                    <th>CÓD. PROVEEDOR</th>
-                    <th>VALIDACIÓN</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (row of previewData(); track row) {
-                    <tr>
-                      <td class="code-mono">{{ row.codigoSena || '-' }}</td>
-                      <td class="row-nombre">{{ row.nombre }}</td>
-                      <td>{{ row.descripcion || '-' }}</td>
-                      <td>{{ row.categoria || '-' }}</td>
-                      <td>{{ row.unidadMedida }}</td>
-                      <td class="code-mono text-muted">{{ row.codigoProveedor || '-' }}</td>
-                      <td>
-                        <span class="valid-badge" [ngClass]="getValidacionClass(row.validacion)">
-                          {{ row.error || row.validacion }}
-                        </span>
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
+          <span class="preview-count">{{ previewData().length }} FILAS ENCONTRADAS</span>
+          }
+          @if (isProcessing()) {
+          <span class="preview-count">Procesando...</span>
           }
         </div>
+
+        @if (isProcessing()) {
+        <div class="processing-indicator">
+          <span class="material-symbols-outlined spin">sync</span>
+          Analizando archivo...
+        </div>
+        }
+
+        @if (!isProcessing()) {
+        <div class="preview-table-wrap">
+          <table class="preview-table">
+            <thead>
+              <tr>
+                <th>CÓD. SENA</th>
+                <th>NOMBRE</th>
+                <th>DESCRIPCIÓN</th>
+                <th>UM</th>
+                <th>VLR ADJUDICADO</th>
+                <th>VLR ANTES</th>
+                <th>IVA</th>
+                <th>VALIDACIÓN</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of previewData(); track row) {
+              <tr>
+                <td class="code-mono">{{ row.codigoSena || '-' }}</td>
+                <td class="row-nombre">{{ row.nombre }}</td>
+                <td>{{ row.descripcion || '-' }}</td>
+                <td>{{ row.unidadMedida }}</td>
+                <td class="text-end">{{ row.vrlAdjudicado | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                <td class="text-end">{{ row.vrlAntes | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                <td class="text-end">{{ row.iva ? (row.iva | percent) : '0%' }}</td>
+                <td>
+                  <span class="valid-badge" [ngClass]="getValidacionClass(row.validacion)">
+                    {{ row.error || row.validacion }}
+                  </span>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        }
+      </div>
       }
     </div>
 
     <div class="import-footer">
       <button class="btn-cancel" (click)="cancelar.emit()">Cancelar</button>
       <button class="btn-procesar" [disabled]="!file() || isProcessing() || previewData().length === 0 || hasErrors()"
-              (click)="onProcesar()">
+        (click)="onProcesar()">
         <span class="material-symbols-outlined">check_circle</span>
         Importar Bienes
       </button>

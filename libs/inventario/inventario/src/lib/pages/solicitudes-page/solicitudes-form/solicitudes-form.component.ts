@@ -4,7 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
-import { BienSolicitud } from '../../../models/solicitudes-gil.model';
+import { BienSolicitud, GenerarGilData } from '../../../models/solicitudes-gil.model';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { Bien } from '../../../models/inventario.model';
@@ -175,7 +175,23 @@ export class SolicitudesFormComponent implements OnInit {
   }
 
   confirmarGeneracion(): void {
-    this.facade.generarGils(Array.from(this.selectedIds()));
+    const data: GenerarGilData = {
+      solicitudSesionIds:     Array.from(this.selectedIds()),
+      fechaSolicitud:         this.fechaSolicitud(),
+      regionalCodigo:         this.regionalCodigo() ?? 0,
+      regionalNombre:         this.regionalNombre(),
+      centroCostosCodigo:     this.centroCostosCodigo() ?? 0,
+      centroCostosNombre:     this.centroCostosNombre(),
+      area:                   this.area(),
+      destinoBienes:          this.destinoBienes(),
+      jefeOficinaCoordinador: this.jefeOficinaCoordinador(),
+      cuentadantes:           this.cuentadantes(),
+      solicitante:            this.solicitante(),
+      codigoGrupo:            this.codigoGrupo(),
+      fichaCaracterizacion:   this.fichaCaracterizacion(),
+      observaciones:          this.observaciones() || undefined,
+    };
+    this.facade.generarGils(data);
     this.showModal.set(false);
     this.router.navigate(['/app/inventario/solicitudes-gil']);
   }

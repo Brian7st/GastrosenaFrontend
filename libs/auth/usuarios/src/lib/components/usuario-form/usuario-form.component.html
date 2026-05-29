@@ -120,23 +120,6 @@
         }
       </div>
 
-      <div class="modal__field">
-        <label class="modal__label" for="uf-contrasena">
-          Contraseña {{ modoEdicion ? '(opcional)' : '*' }}
-        </label>
-        <input
-          id="uf-contrasena"
-          class="modal__input"
-          [class.modal__input--error]="form.controls.contrasena.invalid && form.controls.contrasena.touched"
-          type="password"
-          formControlName="contrasena"
-          [placeholder]="modoEdicion ? 'Dejá en blanco para no cambiarla' : 'Mínimo 8 caracteres'"
-        />
-        @if (form.controls.contrasena.invalid && form.controls.contrasena.touched) {
-          <span class="modal__error">Mínimo 8 caracteres</span>
-        }
-      </div>
-
     </div>
 
     <!-- Footer -->

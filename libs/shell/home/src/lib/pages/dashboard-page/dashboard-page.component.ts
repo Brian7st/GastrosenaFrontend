@@ -1,9 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { DecimalPipe, CurrencyPipe } from '@angular/common';
 import {
   LucideDynamicIcon,
   LucideUtensils,
   LucideLayoutGrid,
+  LucideLayoutDashboard,
   LucideTriangleAlert,
   LucideReceipt,
   LucideChefHat,
@@ -17,6 +19,15 @@ import {
   LucideUsers,
   LucideBell,
   LucideChevronRight,
+  LucideClock,
+  LucideFlame,
+  LucideTrendingUp,
+  LucideActivity,
+  LucideDollarSign,
+  LucidePieChart,
+  LucideLoader,
+  LucideInbox,
+  LucideWifiOff,
   provideLucideIcons,
 } from '@lucide/angular';
 import { DashboardService } from '../../data-access/dashboard.service';
@@ -25,11 +36,12 @@ import { DashboardService } from '../../data-access/dashboard.service';
   selector: 'app-dashboard-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, LucideDynamicIcon],
+  imports: [RouterLink, LucideDynamicIcon, DecimalPipe, CurrencyPipe],
   providers: [
     provideLucideIcons(
       LucideUtensils,
       LucideLayoutGrid,
+      LucideLayoutDashboard,
       LucideTriangleAlert,
       LucideReceipt,
       LucideChefHat,
@@ -43,11 +55,24 @@ import { DashboardService } from '../../data-access/dashboard.service';
       LucideUsers,
       LucideBell,
       LucideChevronRight,
+      LucideClock,
+      LucideFlame,
+      LucideTrendingUp,
+      LucideActivity,
+      LucideDollarSign,
+      LucidePieChart,
+      LucideLoader,
+      LucideInbox,
+      LucideWifiOff,
     ),
   ],
   templateUrl: './dashboard-page.component.html',
   styleUrl: './dashboard-page.component.scss',
 })
-export class DashboardPageComponent {
+export class DashboardPageComponent implements OnInit {
   protected readonly dashboard = inject(DashboardService);
+
+  ngOnInit(): void {
+    this.dashboard.loadDashboard();
+  }
 }

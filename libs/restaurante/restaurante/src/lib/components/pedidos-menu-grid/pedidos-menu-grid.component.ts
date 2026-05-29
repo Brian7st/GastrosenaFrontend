@@ -64,11 +64,14 @@ export class PedidosMenuGridComponent {
       return;
     }
 
+    const categoriaMapped = product.category === 'bebidas' ? 'BEBIDA' : 'COMIDA';
+
     // Cuando integras con el backend, agregarías un modal para pedir 'observaciones' si es necesario
     this.facade.agregarProductoAlPedido(
       product.id,
       product.name,
       product.price,
+      categoriaMapped,
       '' // Observación vacía por defecto
     );
   }
