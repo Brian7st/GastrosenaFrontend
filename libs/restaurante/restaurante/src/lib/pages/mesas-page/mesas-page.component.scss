@@ -43,7 +43,6 @@
     .clickable-card {
       cursor: pointer;
       transition: transform var(--duration-fast) var(--ease-standard);
-
       &:hover {
         transform: translateY(-2px);
       }
@@ -359,7 +358,7 @@
 
     &.modal-body--no-padding {
       padding: 0 !important;
-
+      
       .empty-state-container {
         padding: var(--space-8);
       }
@@ -372,15 +371,14 @@
       .restaurant-table {
         width: 100%;
         border-collapse: collapse;
-
-        th,
-        td {
+        
+        th, td {
           padding: var(--space-4) var(--space-6);
           text-align: left;
           border-bottom: 1px solid var(--color-border);
           font-size: var(--font-size-sm);
         }
-
+    
         th {
           font-weight: 600;
           color: var(--color-text-secondary);
@@ -389,19 +387,18 @@
           letter-spacing: 0.5px;
           font-size: var(--font-size-xs);
         }
-
+    
         tbody tr {
           transition: background-color var(--duration-fast);
-
           &:hover {
             background-color: var(--color-surface-hover);
           }
-
+          
           &:last-child td {
             border-bottom: none;
           }
         }
-
+    
         .fw-bold {
           font-weight: 600;
           color: var(--color-text-primary);
@@ -582,7 +579,6 @@
 
       &.no-spin {
         -moz-appearance: textfield;
-
         &::-webkit-outer-spin-button,
         &::-webkit-inner-spin-button {
           -webkit-appearance: none;
@@ -645,7 +641,7 @@
         border-right: 1px solid var(--color-border);
         text-align: center;
         -moz-appearance: textfield;
-
+        
         &::-webkit-outer-spin-button,
         &::-webkit-inner-spin-button {
           -webkit-appearance: none;
@@ -661,7 +657,7 @@
     .autocomplete-wrapper {
       position: relative;
       width: 100%;
-
+  
       .autocomplete-dropdown {
         position: absolute;
         bottom: 100%;
@@ -677,14 +673,14 @@
         z-index: 10;
         max-height: 200px;
         overflow-y: auto;
-
+  
         li {
           padding: var(--space-2) var(--space-3);
           cursor: pointer;
           font-size: var(--font-size-sm);
           color: var(--color-text-primary);
           transition: background-color var(--duration-fast) var(--ease-standard);
-
+  
           &:hover {
             background-color: var(--color-brand-light);
             color: var(--color-brand-primary);
@@ -761,8 +757,33 @@
     padding: 0 var(--space-6);
     margin-bottom: var(--space-4);
 
-    .search-input-group {
-      width: 100%;
+    .search-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      .search-icon {
+        position: absolute;
+        left: var(--space-3);
+        color: var(--color-text-secondary);
+      }
+
+      .form-control {
+        width: 100%;
+        padding: var(--space-3) var(--space-3) var(--space-3) var(--space-10);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        font-family: inherit;
+        font-size: var(--font-size-sm);
+        background-color: var(--color-surface-primary);
+        outline: none;
+        transition: border-color var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast) var(--ease-standard);
+
+        &:focus {
+          border-color: var(--color-brand-primary);
+          box-shadow: var(--focus-ring);
+        }
+      }
     }
   }
 

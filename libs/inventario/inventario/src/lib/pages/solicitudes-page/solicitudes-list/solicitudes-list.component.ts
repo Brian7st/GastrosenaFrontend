@@ -122,9 +122,9 @@ export class SolicitudesListComponent implements OnInit {
   }
 
   confirmDelete(): void {
-    const id = this.itemToDelete()?.numeroGil;
+    const id = this.itemToDelete()?.id;
     if (id) {
-      this.facade.eliminarSolicitud(id);
+      this.facade.eliminarSolicitud(String(id));
     }
     this.closeDeleteModal();
   }

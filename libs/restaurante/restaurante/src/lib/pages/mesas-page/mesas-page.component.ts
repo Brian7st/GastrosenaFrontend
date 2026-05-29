@@ -50,9 +50,9 @@ export class MesasPageComponent {
   // ── Estado local del modal ───────────────────────────────────────────────────
   modalActivo = signal<string | null>(null);
   mesaSeleccionada = signal<Mesa | null>(null);
-  tabActivo = signal<'desactivar' | 'activar'>('desactivar');
+  tabActivo        = signal<'desactivar' | 'activar'>('desactivar');
   searchQueryGestionMesas = signal<string>('');
-
+  
   // ── Estado local de la vista principal ───────────────────────────────────────
   searchQueryMain = signal<string>('');
 
@@ -148,6 +148,42 @@ export class MesasPageComponent {
     }, 150);
   }
 
+  // ── Opciones de Zona (Autocomplete) ──────────────────────────────────────────
+  opcionesZonas = ['Salón Principal', 'Terraza', 'Salón VIP', 'Barra'];
+  
+  showNuevaZonaDropdown = signal(false);
+  filteredNuevaZonas = computed(() => {
+    const q = this.nuevaZona().toLowerCase();
+    if (!q) return this.opcionesZonas;
+    return this.opcionesZonas.filter(z => z.toLowerCase().includes(q));
+  });
+
+  showEditZonaDropdown = signal(false);
+  filteredEditZonas = computed(() => {
+    const q = this.editZona().toLowerCase();
+    if (!q) return this.opcionesZonas;
+    return this.opcionesZonas.filter(z => z.toLowerCase().includes(q));
+  });
+
+  selectZona(zona: string, tipo: 'nueva' | 'editar') {
+    if (tipo === 'nueva') {
+      this.nuevaZona.set(zona);
+      this.showNuevaZonaDropdown.set(false);
+    } else {
+      this.editZona.set(zona);
+      this.showEditZonaDropdown.set(false);
+    }
+  }
+
+  onBlurZona(tipo: 'nueva' | 'editar') {
+    setTimeout(() => {
+      if (tipo === 'nueva') this.showNuevaZonaDropdown.set(false);
+      else this.showEditZonaDropdown.set(false);
+    }, 150);
+  }
+  // ── Signals para ABRIR mesa ──────────────────────────────────────────────────
+  comensales    = signal<number>(1);
+
   // ── Apertura / cierre de modales ─────────────────────────────────────────────
   abrirModal(nombre: string, mesa: Mesa | null = null) {
     this.modalActivo.set(nombre);
@@ -161,12 +197,14 @@ export class MesasPageComponent {
     } else if (nombre === 'editar' && mesa) {
       // Pre-llenar formulario de edición con los datos actuales de la mesa
       this.mesaSeleccionada.set(mesa);
-      const nombreLimpio = mesa.nombre.toUpperCase().startsWith('MESA ')
-        ? mesa.nombre.substring(5)
+      const nombreLimpio = mesa.nombre.toUpperCase().startsWith('MESA ') 
+        ? mesa.nombre.substring(5) 
         : mesa.nombre;
       this.editNombre.set(nombreLimpio);
       this.editCapacidad.set(mesa.capacidad);
       this.editZona.set(mesa.zona || '');
+    } else if (nombre === 'abrir' && mesa) {
+      this.comensales.set(1);
     } else if (nombre === 'gestion-mesas') {
       this.tabActivo.set('desactivar');
       this.searchQueryGestionMesas.set('');
@@ -176,7 +214,7 @@ export class MesasPageComponent {
   cerrarModales() {
     this.modalActivo.set(null);
     this.mesaSeleccionada.set(null);
-
+    
     // Limpiar estados de autocompletado y búsqueda
     this.showNuevaZonaDropdown.set(false);
     this.showEditZonaDropdown.set(false);
@@ -184,15 +222,15 @@ export class MesasPageComponent {
   }
 
   // ── Modal de alertas y notificaciones ────────────────────────────────────────
-  alertDialog = signal<{ open: boolean, title: string, message: string, type: 'success' | 'error' }>({
+  alertDialog = signal<{open: boolean, title: string, message: string, type: 'success' | 'error'}>({
     open: false,
     title: '',
     message: '',
     type: 'error'
   });
-
+  
   cerrarAlertDialog() {
-    this.alertDialog.update(state => ({ ...state, open: false }));
+    this.alertDialog.update(state => ({...state, open: false}));
   }
 
   mostrarExito(mensaje: string) {
@@ -206,15 +244,15 @@ export class MesasPageComponent {
   // ── CREAR ────────────────────────────────────────────────────────────────────
   crearMesa() {
     const rawNombre = this.nuevoNombre().trim();
-    const nombre = rawNombre ? `MESA ${rawNombre}` : '';
-    let capacidad = this.nuevaCapacidad();
-    const zona = this.nuevaZona().trim();
+    const nombre    = rawNombre ? `MESA ${rawNombre}` : '';
+    let capacidad   = this.nuevaCapacidad();
+    const zona      = this.nuevaZona().trim();
 
     // Si no se llena la capacidad, por defecto será 1
     if (capacidad === null || capacidad === undefined || capacidad.toString().trim() === '') {
       capacidad = 1;
     }
-
+    
     capacidad = Number(capacidad);
 
     if (!rawNombre) {
@@ -237,7 +275,7 @@ export class MesasPageComponent {
     if (!mesa) return;
 
     const rawNombre = this.editNombre().trim();
-    const nombre = rawNombre ? `MESA ${rawNombre}` : '';
+    const nombre    = rawNombre ? `MESA ${rawNombre}` : '';
     const capacidad = this.editCapacidad();
     const zona = this.editZona().trim();
 
@@ -281,9 +319,13 @@ export class MesasPageComponent {
 
   // ── ACCIONES DE ESTADO ───────────────────────────────────────────────────────
   abrirMesa(id: string) {
-    this.facade.abrirMesa(id, '', 1);
+    const comensales = this.comensales();
+    this.facade.abrirMesa(id, '', comensales);
     this.cerrarModales();
-    this.router.navigate(['../pedidos'], { relativeTo: this.route });
+    this.router.navigate(['../pedidos'], { 
+      relativeTo: this.route,
+      state: { comensales: comensales, mesaId: id }
+    });
   }
 
   verPedido(id: string) {

@@ -191,4 +191,24 @@
   --color-kpi-red:        #dc2626;
   --color-kpi-orange-bg:  #fff7ed;
   --color-kpi-orange:     #ea580c;
+
+  /* Chart.js — colores para gráficos */
+  --color-chart-bar:          #3A76D2;
+  --color-chart-line:         #DCA543;
+  --color-chart-line-fill:    rgba(220, 165, 67, 0.2);
+
+  /* Prioridad — texto legible sobre fondos claros */
+  --color-prioridad-alta-text: #d39e00;
+
+  /* Estado plato — variantes interactivas */
+  --color-estado-espera-bg:   rgba(253, 203, 110, 0.30);
+  --color-estado-espera-text: #d97a00;
+  --color-estado-preparando-solid: rgba(9, 132, 227, 1);
+  --color-estado-listo-bg-soft: rgba(57, 169, 0, 0.15);
+
+  /* Prioridad badges — fondos con opacidad */
+  --color-prioridad-normal-bg: rgba(9, 132, 227, 0.15);
+  --color-prioridad-urgente-bg: rgba(214, 48, 49, 0.15);
+  --color-prioridad-alta-bg: rgba(253, 203, 110, 0.25);
 }
+

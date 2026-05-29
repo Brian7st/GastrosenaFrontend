@@ -42,17 +42,19 @@
   }
 }
 
-.bien-name {
+.bien-name,
+.name-cell {
   display: flex;
   flex-direction: column;
   gap: 2px;
 
   .name {
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-regular);
     color: var(--color-text-primary);
   }
 
-  .code {
+  .code,
+  .description {
     font-size: var(--font-size-xs);
     color: var(--color-text-secondary);
   }
@@ -75,8 +77,14 @@
 }
 
 .value-cell {
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-regular);
   color: var(--color-text-primary);
+}
+
+.stock-value,
+.min-stock,
+.um-badge {
+  font-weight: var(--font-weight-regular);
 }
 
 .actions-cell {

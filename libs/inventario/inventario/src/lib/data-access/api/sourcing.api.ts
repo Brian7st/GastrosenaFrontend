@@ -1,8 +1,17 @@
+export type BackendDateArray = [number, number, number];
+export type InfoBancariaTipo = 'AHORROS' | 'CORRIENTE';
+
+// ─── Facturas Proveedor (/api/v1/sourcing/facturas) ────────────────────────
+
 export interface FacturaLineaResponse {
+  productoId?: string;
   descripcion: string;
   cantidad: number;
   precioUnitario: number;
-  iva: number;
+  iva?: number;
+  porcentajeIva?: number;
+  subtotal?: number;
+  valorIva?: number;
   total: number;
 }
 
@@ -11,55 +20,69 @@ export interface FacturaResponse {
   numeroFactura: string;
   cufe: string;
   proveedorNit: string;
-  nitReceptor: string;
   proveedorNombre: string;
-  razonSocial: string;
-  tipoDocumento: string;
-  fechaEmision: string;
-  fechaVencimiento?: string;
-  fechaRecepcion?: string;
+  proveedorBeneficiarioZese?: boolean;
+  fechaEmision: BackendDateArray;
+  fechaRecepcion: BackendDateArray;
+  ordenCompra?: string | null;
+  infoBancariaBanco?: string | null;
+  infoBancariaCuenta?: string | null;
+  infoBancariaTipo?: InfoBancariaTipo | null;
   estado: 'REGISTRADA' | 'VERIFICADA' | 'PAGADA' | 'ANULADA';
   lineas: FacturaLineaResponse[];
   subtotal: number;
   totalIva: number;
-  total: number;
-  ordenCompra?: string;
-  gilVinculado?: string;
-  instructorId?: string;
   valorRetencionZese?: number;
-  motivoAnulacion?: string;
+  total: number;
+  instructorId?: string;
+  motivoAnulacion?: string | null;
+}
+
+export interface FacturaPagedResponse {
+  contenido: FacturaResponse[];
+  paginaActual: number;
+  totalPaginas: number;
+  totalElementos: number;
+  tamano: number;
 }
 
 export interface FacturaResumenResponse {
-  totalFacturas: number;
-  tendenciaTotalFacturas: number;
-  montoMensual: number;
-  tendenciaMonto: number;
-  registradas: number;
-  verificadas: number;
-  pagadas: number;
-  anuladas: number;
+  montoRegistradas: number;
+  totalGeneral: number;
+  montoGeneral: number;
+  totalRegistradas: number;
+  totalVerificadas: number;
+  montoVerificadas: number;
+  totalPagadas: number;
+  montoPagadas: number;
+  totalAnuladas: number;
 }
 
 export interface RegistrarFacturaRequest {
   numeroFactura: string;
   cufe: string;
   proveedorNit: string;
-  nitReceptor: string;
+  proveedorNombre: string;
+  proveedorBeneficiarioZese?: boolean;
   fechaEmision: string;
-  fechaVencimiento?: string;
-  fechaRecepcion?: string;
-  lineas: Pick<FacturaLineaResponse, 'descripcion' | 'cantidad' | 'precioUnitario' | 'iva'>[];
+  fechaRecepcion: string;
+  infoBancariaBanco?: string;
+  infoBancariaCuenta?: string;
+  infoBancariaTipo?: InfoBancariaTipo;
+  lineas: Array<{
+    productoId?: string;
+    descripcion: string;
+    cantidad: number;
+    precioUnitario: number;
+    porcentajeIva: number;
+  }>;
   ordenCompra?: string;
-  gilVinculado?: string;
-  instructorId?: string;
-  valorRetencionZese?: number;
 }
 
-export type ActualizarFacturaRequest = Partial<RegistrarFacturaRequest>;
+export type ActualizarFacturaRequest = RegistrarFacturaRequest;
 
 export interface AnularFacturaRequest {
-  motivoAnulacion: string;
+  motivo: string;
 }
 
 export interface InfoBancariaRequest {
@@ -68,16 +91,76 @@ export interface InfoBancariaRequest {
   tipoCuenta: string;
 }
 
+// ─── GIL — Request types (alineados con CrearGilHttpRequest del backend) ───
+
+/** Cuentadante en requests — sin id, cedula obligatoria */
+export interface CuentadanteGilRequest {
+  nombre: string;
+  cedula: string;
+}
+
+/** Ítem de bien en requests — nombres de campo del backend */
+export interface BienGilRequest {
+  codigoSena: string;
+  descripcion: string;
+  unidadMedida: string;
+  cantidad: number;
+  valorUnitario: number;
+  subtotal: number;
+}
+
+/** POST /api/v1/procurement/giles */
+export interface CrearGilRequest {
+  fechaSolicitud: string;
+  regionalCodigo: number;
+  regionalNombre: string;
+  centroCostosCodigo: number;
+  centroCostosNombre: string;
+  area: string;
+  destinoBienes: string;
+  jefeOficinaCoordinador: string;
+  cuentadantes: CuentadanteGilRequest[];
+  solicitante: string;
+  codigoGrupo: string;
+  fichaCaracterizacion: string;
+  solicitudesOrigenIds?: string[];
+  bienes: BienGilRequest[];
+  observaciones?: string;
+}
+
+/** POST /api/v1/procurement/giles/generar — genera un GIL desde solicitudes de sesión aprobadas */
+export interface GenerarGilRequest {
+  solicitudSesionIds: string[];
+  fechaSolicitud: string;
+  regionalCodigo: number;
+  regionalNombre: string;
+  centroCostosCodigo: number;
+  centroCostosNombre: string;
+  area: string;
+  destinoBienes: string;
+  jefeOficinaCoordinador: string;
+  cuentadantes: CuentadanteGilRequest[];
+  solicitante: string;
+  codigoGrupo: string;
+  fichaCaracterizacion: string;
+  observaciones?: string;
+}
+
+// ─── GIL — Response types (esperados del backend — verificar cuando haya datos) ──
+
+/** Cuentadante en responses — incluye id y cedula */
 export interface CuentadanteGilResponse {
   id: string;
   nombre: string;
-  documento?: string;
+  cedula: string;
 }
 
+/** Ítem de bien en responses */
 export interface BienGilResponse {
-  codigo: string;
+  productoId?: string;
+  codigoSena: string;
   descripcion: string;
-  um: string;
+  unidadMedida: string;
   cantidad: number;
   valorUnitario: number;
   subtotal: number;
@@ -86,13 +169,24 @@ export interface BienGilResponse {
 export interface GilResponse {
   id: string;
   numeroGil: string;
-  fecha: string;
-  centroFormacionId: string;
+  fechaSolicitud: string;
+  regionalCodigo: number;
+  regionalNombre: string;
+  centroCostosCodigo: number;
+  centroCostosNombre: string;
   area: string;
+  destinoBienes: string;
+  jefeOficinaCoordinador: string;
   cuentadantes: CuentadanteGilResponse[];
-  destino: string;
-  fichaId: string;
+  solicitante: string;
+  codigoGrupo: string;
+  fichaCaracterizacion: string;
   estado: 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'CERRADO';
+  observaciones?: string;
+  bienes?: BienGilResponse[];
+  creadoEn?: string;
+  actualizadoEn?: string;
+  // Campos opcionales del módulo training
   programaId?: string;
   emitidoPor?: string;
   resultadoAprendizaje?: string;
@@ -100,29 +194,16 @@ export interface GilResponse {
   voceroNombre?: string;
   voceroDocumento?: string;
   solicitudesOrigenIds?: string[];
-  observaciones?: string;
-  bienes?: BienGilResponse[];
 }
 
-export interface CrearGilRequest {
-  fecha: string;
-  centroFormacionId?: string;
-  area?: string;
-  cuentadantes?: CuentadanteGilResponse[];
-  destino?: string;
-  fichaId?: string;
-}
-
-export type ActualizarGilRequest = Partial<CrearGilRequest>;
-
-export interface VincularInstructorRequest {
-  instructorId: string;
-}
-
-/** PUT /procurement/giles/{id}/enviar-proveedor */
+/** PUT → PATCH /api/v1/procurement/giles/{id}/enviar-proveedor */
 export interface EnviarProveedorRequest {
   proveedorDestinatarioId: string;
   fechaEnvio: string;
+}
+
+export interface VincularInstructorRequest {
+  instructorId: string;
 }
 
 // ─── Sourcing — Conciliación Factura-GIL (/api/v1/sourcing/conciliaciones-gil) ─

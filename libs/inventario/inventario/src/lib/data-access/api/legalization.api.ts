@@ -57,25 +57,37 @@ export interface TrazabilidadRequest {
   cufeFuenteId?: string;
 }
 
+/** Categorías de insumo — enum Swagger (B-04) */
+export type CategoriaInsumo =
+  | 'ABARROTES'
+  | 'LACTEOS'
+  | 'FRUTAS_Y_VEGETALES'
+  | 'CARNES_PESCADOS_MARISCOS';
+
+/** RequisicionItemResponse — Swagger actualizado (B-02).
+ *  productoId = codigoSena del catálogo; usar como productoId en RegistrarSalidaHttpRequest. */
 export interface RequisicionItemResponse {
-  codigo: string;
-  descripcion: string;
-  cantidad: number;
-  unidad: string;
+  productoId?:     string;
+  productoNombre?: string;
+  cantidad?:       number;
+  unidadMedida?:   string;
+  categoria?:      CategoriaInsumo;
 }
 
+/** RequisicionResponse — Swagger actualizado (B-02, B-04).
+ *  ENVIADA   → habilitada para generar Salida de inventario.
+ *  DESPACHADA → salida ya registrada. */
 export interface RequisicionResponse {
-  id: string;
-  numero: string;
-  programa: string;
-  fichaId: string;
-  instructorId: string;
-  instructorNombre: string;
-  diaSemana: string;
-  horaSesion: string;
-  fecha: string;
-  estado: 'BORRADOR' | 'ENVIADA' | 'DESPACHADA' | 'FIRMADA' | 'LEGALIZADA';
-  items: RequisicionItemResponse[];
+  id?:               string;
+  numero?:           string;
+  fecha?:            string;
+  diaSemana?:        string;
+  horaSesion?:       string;
+  fichaId?:          string;
+  instructorId?:     string;
+  instructorNombre?: string;
+  estado?:           'BORRADOR' | 'ENVIADA' | 'DESPACHADA' | 'FIRMADA' | 'LEGALIZADA';
+  items?:            RequisicionItemResponse[];
 }
 
 export interface CrearRequisicionRequest {

@@ -341,6 +341,54 @@
   }
 }
 
+/* ── Paginación del selector GIL ── */
+.pagination-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.page-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.35rem 0.875rem;
+  background-color: #f3f4f5;
+  border: 1px solid rgba(189, 202, 185, 0.4);
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #3e4a3c;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+
+  &:hover:not(:disabled) {
+    background-color: #e7e8e9;
+    border-color: rgba(0, 110, 37, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.page-info {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #575f67;
+  flex: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.page-total {
+  color: #9ea3a8;
+  font-weight: 400;
+}
+
 /* ── Modal Footer ── */
 .modal-footer {
   padding: 1.25rem 2rem;

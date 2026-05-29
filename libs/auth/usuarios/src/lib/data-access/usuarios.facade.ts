@@ -3,6 +3,7 @@ import { Store } from '@ngrx/store';
 import { AppState } from '@restaurant/shared/state';
 import {
   ActualizarUsuarioRequest,
+  AsignacionMasivaRequest,
   CrearUsuarioRequest,
   ExportarConfig,
   FiltrosUsuarios,
@@ -18,6 +19,7 @@ import {
   selectImportando,
   selectLoading,
   selectLoadingAccion,
+  selectLoadingAsignacion,
   selectLoadingHistorial,
   selectLoadingRolesDetalle,
   selectMensajeExport,
@@ -37,7 +39,6 @@ type LocalState = AppState & { readonly usuarios: UsuariosState };
 export class UsuariosFacade {
   private readonly store = inject<Store<LocalState>>(Store);
 
-  // ── Observables ───────────────────────────────────────────────────────────
   readonly usuarios$            = this.store.select(selectUsuarios);
   readonly roles$               = this.store.select(selectRoles);
   readonly usuarioSeleccionado$ = this.store.select(selectUsuarioSeleccionado);
@@ -55,8 +56,8 @@ export class UsuariosFacade {
   readonly loadingHistorial$    = this.store.select(selectLoadingHistorial);
   readonly rolesDetalle$        = this.store.select(selectRolesDetalle);
   readonly loadingRolesDetalle$ = this.store.select(selectLoadingRolesDetalle);
+  readonly loadingAsignacion$   = this.store.select(selectLoadingAsignacion);
 
-  // ── Comandos ──────────────────────────────────────────────────────────────
   cargarUsuarios(filtros?: Partial<FiltrosUsuarios>): void {
     this.store.dispatch(UsuariosActions.cargarUsuarios({ filtros }));
   }
@@ -111,5 +112,9 @@ export class UsuariosFacade {
 
   cargarRolesDetalle(): void {
     this.store.dispatch(UsuariosActions.cargarRolesDetalle());
+  }
+
+  asignarRolMasivo(request: AsignacionMasivaRequest): void {
+    this.store.dispatch(UsuariosActions.asignarRolMasivo({ request }));
   }
 }

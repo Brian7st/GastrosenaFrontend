@@ -220,6 +220,19 @@ export class InventarioFacade {
       .subscribe(res => { if (res !== null) this.loadAll(); });
   }
 
+  importarBienesExcel(archivo: File): void {
+    this._loading.set(true);
+    this.bienesService.importarBienesExcel(archivo)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al importar el archivo Excel');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => { if (res !== null) this.loadAll(); });
+  }
+
   /** POST /catalog/productos/exportaciones (202 Accepted — async) */
   solicitarExportacion(formato: 'CSV' | 'EXCEL'): void {
     this._loading.set(true);
