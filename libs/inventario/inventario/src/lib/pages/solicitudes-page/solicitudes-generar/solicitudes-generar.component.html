@@ -12,8 +12,96 @@
     </div>
   </div>
 
+  <!-- ══════════════════════════════════════════════════════════════════════════
+       Datos del GIL
+  ══════════════════════════════════════════════════════════════════════════ -->
+  <div class="form-card">
+    <h3 class="section-title">
+      <span class="material-symbols-outlined section-icon">description</span>
+      Datos del GIL
+    </h3>
+
+    <div class="form-grid">
+      <div class="form-col">
+        <div class="form-group">
+          <label class="form-label">Ficha de Caracterización <span class="required-mark">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Ej. 2560892"
+            [value]="fichaCaracterizacion()"
+            (input)="fichaCaracterizacion.set($any($event.target).value)"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Jefe de Oficina / Coordinador <span class="required-mark">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Nombre del jefe de oficina"
+            [value]="jefeOficinaCoordinador()"
+            (input)="jefeOficinaCoordinador.set($any($event.target).value)"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Solicitante <span class="required-mark">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Nombre del solicitante"
+            [value]="solicitante()"
+            (input)="solicitante.set($any($event.target).value)"
+          />
+        </div>
+      </div>
+
+      <div class="form-col">
+        <div class="form-group">
+          <label class="form-label">Código de Grupo <span class="required-mark">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Ej. SGBP-01"
+            [value]="codigoGrupo()"
+            (input)="codigoGrupo.set($any($event.target).value)"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cuentadante — Nombre <span class="required-mark">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Nombre del cuentadante"
+            [value]="cuentadanteNombre()"
+            (input)="cuentadanteNombre.set($any($event.target).value)"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cuentadante — Cédula <span class="required-mark">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Cédula del cuentadante"
+            [value]="cuentadanteCedula()"
+            (input)="cuentadanteCedula.set($any($event.target).value)"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Observaciones</label>
+          <textarea
+            class="form-control"
+            rows="3"
+            placeholder="Notas adicionales (opcional)"
+            [value]="observaciones()"
+            (input)="observaciones.set($any($event.target).value)">
+          </textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="generar-grid">
-    
+
     <!-- ══════════════════════════════════════════════════════════════════════════
          Columna Principal (Tabla)
     ══════════════════════════════════════════════════════════════════════════ -->
@@ -108,10 +196,10 @@
         </div>
         
         <div class="summary-footer">
-          <restaurant-button 
-            variant="primary" 
+          <restaurant-button
+            variant="primary"
             class="w-full"
-            [disabled]="solicitudesSeleccionadas() === 0"
+            [disabled]="!canGenerar()"
             (click)="onGenerar()">
             Vista previa de consolidación
             <span class="material-symbols-outlined right-icon">arrow_forward</span>

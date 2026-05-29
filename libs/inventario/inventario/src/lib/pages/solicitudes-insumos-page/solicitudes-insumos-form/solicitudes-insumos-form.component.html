@@ -109,34 +109,6 @@
       </div>
     </div>
 
-    <div class="form-group">
-      <label class="form-label">Resultado de Aprendizaje <span class="required-mark">*</span></label>
-      <textarea
-        class="form-control"
-        rows="2"
-        placeholder="Ej. Preparar recetas de cocina colombiana aplicando técnicas culinarias básicas"
-        [value]="resultadoAprendizaje()"
-        (input)="resultadoAprendizaje.set($any($event.target).value)"
-      ></textarea>
-      @if (submitAttempted() && errores()['resultadoAprendizaje']) {
-        <p class="field-error">{{ errores()['resultadoAprendizaje'] }}</p>
-      }
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">Actividades <span class="required-mark">*</span></label>
-      <textarea
-        class="form-control"
-        rows="2"
-        placeholder="Ej. Práctica de cocina en taller, elaboración de recetas y presentación de platos"
-        [value]="actividades()"
-        (input)="actividades.set($any($event.target).value)"
-      ></textarea>
-      @if (submitAttempted() && errores()['actividades']) {
-        <p class="field-error">{{ errores()['actividades'] }}</p>
-      }
-    </div>
-
   </div>
 
   <!-- ══════════════════════════════════════════════════════════════

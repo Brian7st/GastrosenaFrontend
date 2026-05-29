@@ -7,6 +7,13 @@
       <p class="page-header__subtitle">Supervisión y control de documentos electrónicos en tiempo real.</p>
     </div>
     <div class="page-header__actions">
+      <restaurant-button variant="surface" (click)="onToggleFilters()">
+        <span class="material-symbols-outlined">filter_list</span>
+        Filtros
+        @if (filtrosActivos() > 0) {
+          <span class="filter-badge">{{ filtrosActivos() }}</span>
+        }
+      </restaurant-button>
       <restaurant-button variant="ghost" (click)="onImportar()">
         <span class="material-symbols-outlined">upload</span>
         Importar
@@ -17,6 +24,42 @@
       </restaurant-button>
     </div>
   </div>
+
+  <!-- ── FILTER PANEL ── -->
+  @if (showFilters()) {
+    <div class="filter-panel">
+      <div class="filter-panel__row">
+        <div class="filter-group">
+          <label class="filter-label">Estado</label>
+          <select class="filter-select" [value]="filtroEstado()" (change)="onFiltroEstadoChange($any($event.target).value)">
+            <option value="">Todos</option>
+            <option value="REGISTRADA">Registrada</option>
+            <option value="VERIFICADA">Verificada</option>
+            <option value="PAGADA">Pagada</option>
+            <option value="ANULADA">Anulada</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Proveedor (NIT)</label>
+          <input type="text" class="filter-input" placeholder="Ej. 900000001" [value]="filtroProveedor()" (input)="onFiltroProveedorChange($any($event.target).value)" />
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Desde</label>
+          <input type="date" class="filter-input" [value]="filtroFechaDesde()" (change)="filtroFechaDesde.set($any($event.target).value); onFiltroFechaChange()" />
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Hasta</label>
+          <input type="date" class="filter-input" [value]="filtroFechaHasta()" (change)="filtroFechaHasta.set($any($event.target).value); onFiltroFechaChange()" />
+        </div>
+        <div class="filter-group filter-group--actions">
+          <button class="filter-clear-btn" (click)="onLimpiarFiltros()" [disabled]="filtrosActivos() === 0">
+            <span class="material-symbols-outlined">clear_all</span>
+            Limpiar
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 
   <!-- ── KPI CARDS ── -->
   @if (kpis(); as k) {

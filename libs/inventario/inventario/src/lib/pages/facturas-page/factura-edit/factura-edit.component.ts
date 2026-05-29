@@ -44,7 +44,7 @@ export class FacturaEditPageComponent implements OnInit {
     return f?.estado === 'VERIFICADA' || f?.estado === 'PAGADA' || f?.estado === 'ANULADA';
   });
 
-  hasConciliacion = computed(() => (this.factura()?.conciliacion?.length ?? 0) > 0);
+  hasConciliacion = computed(() => false);
 
   constructor() {
     effect(() => {

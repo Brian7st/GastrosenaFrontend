@@ -144,20 +144,6 @@ export class SolicitudesEditComponent implements OnInit {
     });
   }
 
-  onAddBien(): void {
-    this.bienes.update(items => [
-      ...items,
-      {
-        codigoSena:    'ALM-' + String(items.length + 1).padStart(3, '0'),
-        descripcion:   'Nuevo Bien Solicitado',
-        unidadMedida:  'Und',
-        cantidad:      1,
-        valorUnitario: 0,
-        subtotal:      0,
-      },
-    ]);
-  }
-
   onRemoveCuentadante(index: number): void {
     this.cuentadantes.update(list => list.filter((_, i) => i !== index));
   }
