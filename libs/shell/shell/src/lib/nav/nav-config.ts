@@ -13,7 +13,7 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
       items: [
         {
           label: 'Dashboard',
-          ruta: '/app',
+          ruta: '/app/dashboard',
           exact: true,
           icono: 'layout-dashboard',
         },
