@@ -106,59 +106,8 @@
           <p class="field-hint">Cédula o número de identificación (opcional)</p>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">ID Vocero <span class="required-mark">*</span></label>
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Ej. USR-042"
-            [value]="voceroId()"
-            (input)="voceroId.set($any($event.target).value)"
-          />
-          @if (submitAttempted() && errores()['voceroId']) {
-            <p class="field-error">{{ errores()['voceroId'] }}</p>
-          }
-        </div>
 
       </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════════════════════
-       Tarjeta 2: Contexto Académico
-  ══════════════════════════════════════════════════════════════ -->
-  <div class="form-card">
-    <h3 class="section-title">
-      <span class="material-symbols-outlined section-icon">school</span>
-      Contexto Académico
-    </h3>
-
-    <div class="form-group">
-      <label class="form-label">Resultado de Aprendizaje <span class="required-mark">*</span></label>
-      <textarea
-        class="form-control"
-        rows="3"
-        placeholder="Describa el resultado de aprendizaje asociado a esta solicitud..."
-        [value]="resultadoAprendizaje()"
-        (input)="resultadoAprendizaje.set($any($event.target).value)"
-      ></textarea>
-      @if (submitAttempted() && errores()['resultadoAprendizaje']) {
-        <p class="field-error">{{ errores()['resultadoAprendizaje'] }}</p>
-      }
-    </div>
-
-    <div class="form-group mt-6">
-      <label class="form-label">Actividades <span class="required-mark">*</span></label>
-      <textarea
-        class="form-control"
-        rows="3"
-        placeholder="Describa las actividades de formación para las que se requieren los insumos..."
-        [value]="actividades()"
-        (input)="actividades.set($any($event.target).value)"
-      ></textarea>
-      @if (submitAttempted() && errores()['actividades']) {
-        <p class="field-error">{{ errores()['actividades'] }}</p>
-      }
     </div>
   </div>
 
@@ -180,9 +129,6 @@
     @if (submitAttempted() && errores()['items']) {
       <p class="field-error" style="margin-bottom:0.75rem">{{ errores()['items'] }}</p>
     }
-    @if (submitAttempted() && errores()['justificacion']) {
-      <p class="field-error" style="margin-bottom:0.75rem">{{ errores()['justificacion'] }}</p>
-    }
 
     <div class="table-container">
       <table class="items-table">
@@ -192,7 +138,8 @@
           <col class="col-unit" />
           <col class="col-price" />
           <col class="col-price" />
-          <col class="col-just" />
+          <col class="col-almacen" />
+          <col class="col-iva" />
           <col class="col-actions" />
         </colgroup>
         <thead>
@@ -202,12 +149,13 @@
             <th>Unidad</th>
             <th class="text-right">Valor Unit.</th>
             <th class="text-right">Total</th>
-            <th>Justificación <span class="required-mark">*</span></th>
+            <th>Cód. Almacén</th>
+            <th class="text-right">IVA (%)</th>
             <th class="text-center">Acciones</th>
           </tr>
         </thead>
         <tbody>
-          @for (item of items(); track item.productoId; let i = $index) {
+          @for (item of items(); track $index; let i = $index) {
             <tr>
               <td>
                 <p class="item-name">{{ item.nombreBien }}</p>
@@ -237,9 +185,20 @@
                 <input
                   type="text"
                   class="form-control-table"
-                  placeholder="Ej. Necesario para práctica de panadería..."
-                  [value]="item.justificacion"
-                  (input)="onJustificacionChange(i, $any($event.target).value)"
+                  placeholder="Ej. ALM-01"
+                  [value]="item.codigoAlmacen ?? ''"
+                  (input)="onCodigoAlmacenChange(i, $any($event.target).value)"
+                />
+              </td>
+              <td>
+                <input
+                  type="number"
+                  class="form-control-table text-right"
+                  style="width:100%"
+                  placeholder="0"
+                  min="0"
+                  [value]="item.iva ?? 0"
+                  (input)="onIvaChange(i, +$any($event.target).value)"
                 />
               </td>
               <td class="text-center">
@@ -251,7 +210,7 @@
           }
           @if (items().length === 0) {
             <tr>
-              <td colspan="7" class="empty-state-cell">
+              <td colspan="8" class="empty-state-cell">
                 <span class="material-symbols-outlined empty-icon">shopping_cart</span>
                 No hay ítems. Usá el botón "Agregar desde catálogo".
               </td>
@@ -269,7 +228,7 @@
               <td class="text-right total-value">
                 {{ valorTotalDeSolicitud() | currency:'COP':'symbol-narrow':'1.0-0' }}
               </td>
-              <td colspan="2"></td>
+              <td colspan="3"></td>
             </tr>
           </tfoot>
         }
@@ -347,10 +306,17 @@
                     {{ (bien.valor ?? 0) | currency:'COP':'symbol-narrow':'1.0-0' }}
                   </td>
                   <td class="text-center">
-                    <button type="button" class="btn-catalog-add" (click)="onSeleccionarBien(bien)">
-                      <span class="material-symbols-outlined" style="font-size:14px">add</span>
-                      Agregar
-                    </button>
+                    @if (estaEnLista(bien.id)) {
+                      <span class="catalog-added-label">
+                        <span class="material-symbols-outlined" style="font-size:14px">check</span>
+                        Agregado
+                      </span>
+                    } @else {
+                      <button type="button" class="btn-catalog-add" (click)="onSeleccionarBien(bien)">
+                        <span class="material-symbols-outlined" style="font-size:14px">add</span>
+                        Agregar
+                      </button>
+                    }
                   </td>
                 </tr>
               }
@@ -367,34 +333,44 @@
         }
       </div>
 
-      @if (catalogoPaginacion().totalPages > 1) {
+      @if (catalogoRangoInfo().total > 0) {
         <div class="catalog-pagination">
-          <button
-            type="button"
-            class="page-btn"
-            [disabled]="catalogoPaginacion().page === 0"
-            (click)="onSelectorIrAPagina(catalogoPaginacion().page - 1)"
-          >
-            <span class="material-symbols-outlined" style="font-size:16px;display:block">chevron_left</span>
-          </button>
-          @for (p of paginasSelectorBien(); track p) {
+          <span class="catalog-pagination__info">
+            {{ catalogoRangoInfo().desde }}–{{ catalogoRangoInfo().hasta }} de {{ catalogoRangoInfo().total }} productos
+          </span>
+
+          <div class="catalog-pagination__controls">
             <button
               type="button"
               class="page-btn"
-              [class.page-btn--active]="p === catalogoPaginacion().page"
-              (click)="onSelectorIrAPagina(p)"
+              [disabled]="catalogoPaginacion().page === 0"
+              (click)="onSelectorIrAPagina(catalogoPaginacion().page - 1)"
+              title="Página anterior"
             >
-              {{ p + 1 }}
+              <span class="material-symbols-outlined" style="font-size:16px;display:block">chevron_left</span>
             </button>
-          }
-          <button
-            type="button"
-            class="page-btn"
-            [disabled]="catalogoPaginacion().page >= catalogoPaginacion().totalPages - 1"
-            (click)="onSelectorIrAPagina(catalogoPaginacion().page + 1)"
-          >
-            <span class="material-symbols-outlined" style="font-size:16px;display:block">chevron_right</span>
-          </button>
+
+            @for (p of paginasSelectorBien(); track p) {
+              <button
+                type="button"
+                class="page-btn"
+                [class.page-btn--active]="p === catalogoPaginacion().page"
+                (click)="onSelectorIrAPagina(p)"
+              >
+                {{ p + 1 }}
+              </button>
+            }
+
+            <button
+              type="button"
+              class="page-btn"
+              [disabled]="catalogoPaginacion().page >= catalogoPaginacion().totalPages - 1"
+              (click)="onSelectorIrAPagina(catalogoPaginacion().page + 1)"
+              title="Página siguiente"
+            >
+              <span class="material-symbols-outlined" style="font-size:16px;display:block">chevron_right</span>
+            </button>
+          </div>
         </div>
       }
 
