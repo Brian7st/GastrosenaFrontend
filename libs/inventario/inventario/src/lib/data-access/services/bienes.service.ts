@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of, throwError, forkJoin } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { Bien, BienFiltros, BienKpis, BienFormDto, BienPaginacion } from '../../models/inventario.model';
 import {
   PagedResponse,
@@ -27,27 +27,47 @@ export class BienesService {
 
   // ── Listado ──────────────────────────────────────────────────────────────────
 
-  /** GET /catalog/productos — lista paginada (page 0-based, size por defecto 10). */
+  /** GET /catalog/productos — lista paginada (page 0-based, size por defecto 20). */
   getBienes(filtros?: BienFiltros): Observable<{ bienes: Bien[]; paginacion: BienPaginacion }> {
     let params = new HttpParams();
-    if (filtros?.busqueda)  params = params.set('q', filtros.busqueda);
-    if (filtros?.categoria) params = params.set('categoria', filtros.categoria);
-    if (filtros?.estado)    params = params.set('estado', filtros.estado);
-    params = params.set('page', String(filtros?.page ?? 0));
-    params = params.set('size', String(filtros?.size ?? 10));
+    if (filtros?.busqueda)              params = params.set('nombre', filtros.busqueda);
+    if (filtros?.categoria)             params = params.set('categoria', filtros.categoria);
+    if (filtros?.estado === 'Activo')   params = params.set('activo', 'true');
+    if (filtros?.estado === 'Inactivo') params = params.set('activo', 'false');
+    params = params
+      .set('page', String(filtros?.page ?? 0))
+      .set('size', String(filtros?.size ?? 10))
+      .set('sort', 'id')
+      .set('direction', 'DESC');
 
     return this.http
       .get<PagedResponse<ProductoResponse>>(`${API}/catalog/productos`, { params })
       .pipe(
         map(res => ({
-          bienes: res.content.map(bienFromCatalogo),
+          productos: res.content,
           paginacion: {
             totalElements: res.totalElements,
             totalPages:    res.totalPages,
             page:          res.page,
             size:          res.size,
-          },
+          } as BienPaginacion,
         })),
+        switchMap(({ productos, paginacion }) => {
+          if (!productos.length) return of({ bienes: [] as Bien[], paginacion });
+          const existencias$ = productos.map(p =>
+            this.http
+              .get<ExistenciaResponse>(`${API}/inventory/existencias/${p.id}`)
+              .pipe(catchError(() => of(null)))
+          );
+          return forkJoin(existencias$).pipe(
+            map(existencias => ({
+              bienes: productos.map((p, i) =>
+                existencias[i] ? bienFromCatalogoYExistencia(p, existencias[i]) : bienFromCatalogo(p)
+              ),
+              paginacion,
+            }))
+          );
+        }),
         catchError(err => throwError(() => err))
       );
   }
@@ -76,9 +96,11 @@ export class BienesService {
 
   // ── KPIs ─────────────────────────────────────────────────────────────────────
 
-  /** TODO: endpoint dedicado pendiente en backend. */
+  /** GET /inventory/kpis */
   getKpis(): Observable<BienKpis> {
-    return of({ valorTotal: 0, totalAlertas: 0, movimientosHoy: 0 });
+    return this.http
+      .get<BienKpis>(`${API}/inventory/kpis`)
+      .pipe(catchError(err => throwError(() => err)));
   }
 
   // ── CRUD ─────────────────────────────────────────────────────────────────────
@@ -101,9 +123,9 @@ export class BienesService {
       );
   }
 
-  /** DELETE /catalog/productos/{id}?confirmacion=ELIMINAR — @RequestParam requerido en backend */
+  /** DELETE /catalog/productos/{id}?confirmacion={id} */
   deleteBien(id: string | number): Observable<void> {
-    const params = new HttpParams().set('confirmacion', 'ELIMINAR');
+    const params = new HttpParams().set('confirmacion', String(id));
     return this.http
       .delete<void>(`${API}/catalog/productos/${id}`, { params })
       .pipe(catchError(err => throwError(() => err)));
@@ -134,6 +156,16 @@ export class BienesService {
     const body: ImportarProductosRequest = { productos: productos.map(bienFormToRequest) };
     return this.http
       .post<{ success: boolean }>(`${API}/catalog/productos/importar`, body)
+      .pipe(catchError(err => throwError(() => err)));
+  }
+
+  /** POST /catalog/productos/importar-excel */
+  importarBienesExcel(archivo: File): Observable<{ success: boolean }> {
+    const formData = new FormData();
+    formData.append('archivo', archivo);
+
+    return this.http
+      .post<{ success: boolean }>(`${API}/catalog/productos/importar-excel`, formData)
       .pipe(catchError(err => throwError(() => err)));
   }
 

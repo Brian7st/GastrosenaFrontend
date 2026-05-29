@@ -1,5 +1,12 @@
 <div class="lista-page">
 
+  @if (mensajeExito()) {
+    <div class="lista-page__toast" role="status" aria-live="polite">
+      <lucide-icon name="check-circle" [size]="16"></lucide-icon>
+      {{ mensajeExito() }}
+    </div>
+  }
+
   <!-- Page Header -->
   <div class="lista-page__header">
     <div class="lista-page__header-text">
@@ -29,6 +36,13 @@
     ></restaurant-alert>
   }
 
+  @if (error()) {
+    <restaurant-alert
+      type="error"
+      [message]="error()!"
+    ></restaurant-alert>
+  }
+
   <!-- KPI Cards -->
   <div class="lista-page__kpis">
     <restaurant-kpi-card
@@ -53,18 +67,35 @@
 
   <!-- Filtros -->
   <div class="lista-page__filters">
-    <restaurant-search-filter
-      label="Buscar"
-      placeholder="Nombre, email o documento..."
-      [value]="busqueda()"
-      (valueChange)="busqueda.set($event)"
-    ></restaurant-search-filter>
-    <restaurant-select-filter
-      label="Rol"
-      [value]="rolFiltro()"
-      [options]="rolOpciones()"
-      (valueChange)="rolFiltro.set($event)"
-    ></restaurant-select-filter>
+    <div class="lista-page__search-wrapper">
+      <lucide-icon name="search" [size]="16" class="lista-page__search-icon"></lucide-icon>
+      <input
+        class="lista-page__search-input"
+        type="text"
+        placeholder="Buscar por nombre o email..."
+        [value]="busqueda()"
+        (input)="busqueda.set($any($event.target).value)"
+      >
+    </div>
+    <div class="lista-page__filter-selects">
+      <div class="lista-page__select-wrapper">
+        <select class="lista-page__select" (change)="rolFiltro.set($any($event.target).value)">
+          <option value="">Todos los roles</option>
+          @for (rol of rolesDisponibles; track rol) {
+            <option [value]="rol">{{ rol }}</option>
+          }
+        </select>
+        <lucide-icon name="filter" [size]="14" class="lista-page__select-icon"></lucide-icon>
+      </div>
+      <div class="lista-page__select-wrapper">
+        <select class="lista-page__select" (change)="estadoFiltro.set($any($event.target).value)">
+          <option value="todos">Todos</option>
+          <option value="activos">Activos</option>
+          <option value="inactivos">Inactivos</option>
+        </select>
+        <lucide-icon name="filter" [size]="14" class="lista-page__select-icon"></lucide-icon>
+      </div>
+    </div>
   </div>
 
   <!-- Tabla -->
@@ -109,13 +140,16 @@
               <restaurant-usuario-rol-badge [rol]="u.rol"></restaurant-usuario-rol-badge>
             </td>
             <td>
-              <span
-                class="lista-page__badge"
+              <button
+                class="lista-page__badge lista-page__badge--toggle"
                 [class.lista-page__badge--activo]="u.activo"
                 [class.lista-page__badge--inactivo]="!u.activo"
+                type="button"
+                (click)="onCambiarEstado(u)"
+                [attr.aria-label]="(u.activo ? 'Desactivar' : 'Activar') + ' usuario'"
               >
                 {{ u.activo ? 'Activo' : 'Inactivo' }}
-              </span>
+              </button>
             </td>
             <td class="lista-page__last-access">
               {{ (u.ultimoAcceso | date:'dd/MM/yyyy') || '—' }}

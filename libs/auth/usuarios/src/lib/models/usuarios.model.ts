@@ -7,6 +7,9 @@ export interface UsuarioDetalle extends Usuario {
   ultimoAcceso:     string | null;
   cuentaBloqueada:  boolean;
   intentosFallidos: number;
+  ficha?:           string;
+  programa?:        string;
+  totalPermisos?:   number;
 }
 
 export interface CrearUsuarioRequest {
@@ -15,8 +18,8 @@ export interface CrearUsuarioRequest {
   apellidos:  string;
   email:      string;
   telefono:   string;
-  contrasena: string;
-  idRol:      string;
+  // contrasena ya no se envía — la genera el backend
+  nombreRol:  string;  // ← cambio
 }
 
 /**
@@ -73,6 +76,11 @@ export interface RolDetalle {
   descripcion:   string;
   permisos:      PermisoItem[];
   totalUsuarios: number;
+}
+
+export interface AsignacionMasivaRequest {
+  usuarioIds: string[];
+  idRol:      string;
 }
 
 export interface HistorialItem {

@@ -2,6 +2,7 @@ import { createActionGroup, emptyProps, props } from '@ngrx/store';
 import { PaginatedResponse } from '@restaurant/shared/models';
 import {
   ActualizarUsuarioRequest,
+  AsignacionMasivaRequest,
   CrearUsuarioRequest,
   ExportarConfig,
   FiltrosUsuarios,
@@ -60,6 +61,11 @@ export const UsuariosActions = createActionGroup({
     'Importar Masivo':              props<{ request: ImportarUsuariosRequest }>(),
     'Importar Masivo Exitoso':      props<{ resultado: ImportarUsuariosResponse }>(),
     'Importar Masivo Fallido':      props<{ error: string }>(),
+    
+    // ── IMPORTAR MASIVO CON POLLING (NUEVAS) ──────────────────────────────────
+    'Importar Masivo Iniciado':     props<{ tareaId: string; tipo: 'APRENDIZ' | 'INSTRUCTOR' }>(),
+    'Importar Masivo Completado':   props<{ tareaId: string }>(),
+    'Importar Masivo Fallido Por Estado': props<{ tareaId: string; error: string }>(),
 
     // ── Exportar ──────────────────────────────────────────────────────────────
     'Exportar Usuarios':            props<{ config: ExportarConfig }>(),
@@ -70,6 +76,11 @@ export const UsuariosActions = createActionGroup({
     'Cargar Roles Detalle':         emptyProps(),
     'Cargar Roles Detalle Exitoso': props<{ roles: RolDetalle[] }>(),
     'Cargar Roles Detalle Fallido': props<{ error: string }>(),
+
+    // ── Asignación masiva de rol ──────────────────────────────────────────────
+    'Asignar Rol Masivo':           props<{ request: AsignacionMasivaRequest }>(),
+    'Asignar Rol Masivo Exitoso':   emptyProps(),
+    'Asignar Rol Masivo Fallido':   props<{ error: string }>(),
 
     // ── Historial ─────────────────────────────────────────────────────────────
     'Cargar Historial':             emptyProps(),

@@ -1,21 +1,41 @@
 export type EstadoGil = 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'CERRADO';
 
 export interface CuentadanteGil {
-  id: string | number;
+  id?: string | number;
   nombre: string;
-  documento?: string;
+  cedula?: string;        // era: documento — alineado con backend CuentadanteHttpRequest
+}
+
+export interface BienSolicitud {
+  codigoSena: string;     // era: codigo
+  descripcion: string;
+  unidadMedida: string;   // era: um
+  cantidad: number;
+  valorUnitario: number;
+  subtotal: number;
 }
 
 export interface SolicitudGil {
   id: string | number;
-  numeroGil: string;           // Consecutivo GIL-F-014-YYYY-NNN
-  fecha: string;               // Fecha de emisión o creación
-  centroFormacionId: string;
+  numeroGil: string;                  // Consecutivo GIL-F-014-YYYY-NNN
+  fechaSolicitud: string;             // era: fecha
+  regionalCodigo: number;             // era: centroFormacionId (parte 1)
+  regionalNombre: string;             // era: centroFormacionId (parte 2)
+  centroCostosCodigo: number;         // nuevo — requerido por backend
+  centroCostosNombre: string;         // nuevo — requerido por backend
   area: string;
+  destinoBienes: string;              // era: destino
+  jefeOficinaCoordinador: string;     // nuevo — requerido por backend
   cuentadantes: CuentadanteGil[];
-  destino: string;
-  fichaId: string;             // Código tipo ADSO-2670687
+  solicitante: string;                // nuevo — requerido por backend
+  codigoGrupo: string;                // nuevo — requerido por backend
+  fichaCaracterizacion: string;       // era: fichaId
   estado: EstadoGil;
+  observaciones?: string;
+  bienes?: BienSolicitud[];
+  creadoEn?: string;
+  actualizadoEn?: string;
+  // Campos opcionales heredados del módulo training/sesiones
   programaId?: string;
   emitidoPor?: string;
   resultadoAprendizaje?: string;
@@ -23,26 +43,17 @@ export interface SolicitudGil {
   voceroNombre?: string;
   voceroDocumento?: string;
   solicitudesOrigenIds?: string[];
-  observaciones?: string;
-  bienes?: BienSolicitud[];
-}
-
-export interface BienSolicitud {
-  codigo: string;
-  descripcion: string;
-  um: string;
-  cantidad: number;
-  valorUnitario: number;
-  subtotal: number;
 }
 
 export interface SolicitudesGilFiltros {
-  busqueda?: string;
-  instructor?: string;
   estado?: EstadoGil;
-  fechaRango?: string;
+  fichaCaracterizacion?: string;  // filtro real del backend
   page?: number;
   size?: number;
+  // Campos de UI sin soporte backend aún (no se envían como HTTP params):
+  busqueda?: string;
+  instructor?: string;
+  fechaRango?: string;
 }
 
 export interface SolicitudesPaginacion {
@@ -52,19 +63,42 @@ export interface SolicitudesPaginacion {
   size: number;
 }
 
+/** Payload para POST /api/v1/procurement/giles */
 export interface CrearSolicitudData {
-  fecha: string;
-  centroFormacionId?: string;
-  area?: string;
-  cuentadantes?: CuentadanteGil[];
-  destino?: string;
-  fichaId?: string;
+  fechaSolicitud: string;
+  regionalCodigo: number;
+  regionalNombre: string;
+  centroCostosCodigo: number;
+  centroCostosNombre: string;
+  area: string;
+  destinoBienes: string;
+  jefeOficinaCoordinador: string;
+  cuentadantes: { nombre: string; cedula: string }[];
+  solicitante: string;
+  codigoGrupo: string;
+  fichaCaracterizacion: string;
+  solicitudesOrigenIds?: string[];
+  bienes: { codigoSena: string; descripcion: string; unidadMedida: string; cantidad: number; valorUnitario: number; subtotal: number }[];
+  observaciones?: string;
 }
 
-export interface ActualizarSolicitudData {
-  centroFormacionId?: string;
-  area?: string;
-  cuentadantes?: CuentadanteGil[];
-  destino?: string;
-  fichaId?: string;
+/** Payload para PATCH /api/v1/procurement/giles/{id} */
+export type ActualizarSolicitudData = Partial<CrearSolicitudData>;
+
+/** Payload para POST /api/v1/procurement/giles/generar */
+export interface GenerarGilData {
+  solicitudSesionIds: string[];
+  fechaSolicitud: string;
+  regionalCodigo: number;
+  regionalNombre: string;
+  centroCostosCodigo: number;
+  centroCostosNombre: string;
+  area: string;
+  destinoBienes: string;
+  jefeOficinaCoordinador: string;
+  cuentadantes: { nombre: string; cedula: string }[];
+  solicitante: string;
+  codigoGrupo: string;
+  fichaCaracterizacion: string;
+  observaciones?: string;
 }

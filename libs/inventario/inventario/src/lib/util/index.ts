@@ -1,1 +1,2 @@
-export const inventario_util_placeholder = true;
+export { GIL_DEFAULTS } from './gil-defaults.config';
+

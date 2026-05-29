@@ -78,20 +78,18 @@ export class ComandasComponent implements OnInit {
   }
 
   onIniciarPlato(idDetalle: string, idComanda: string) {
-    this.comandaService.iniciarDetalle(idDetalle).subscribe({
+    this.comandaService.actualizarEstado(idComanda, 'EN_PREPARACION').subscribe({
       next: () => {
-        this.actualizarEstadoItem(idComanda, idDetalle, 'PREPARANDO' as const);
-        this.evaluarEstadoComanda(idComanda);
+        this.cargarComandas();
       },
       error: (err) => this.mostrarError('Error al iniciar bebida: ' + err.message)
     });
   }
 
   onFinalizarPlato(idDetalle: string, idComanda: string) {
-    this.comandaService.finalizarDetalle(idDetalle).subscribe({
+    this.comandaService.actualizarEstado(idComanda, 'LISTO').subscribe({
       next: () => {
-        this.actualizarEstadoItem(idComanda, idDetalle, 'LISTO' as const);
-        this.evaluarEstadoComanda(idComanda);
+        this.cargarComandas();
       },
       error: (err) => this.mostrarError('Error al finalizar bebida: ' + err.message)
     });
@@ -166,6 +164,6 @@ export class ComandasComponent implements OnInit {
   });
 
   enEspera = computed(() => this.comandasFiltradas().filter(c => c.estadoPreparacion === 'PENDIENTE'));
-  preparando = computed(() => this.comandasFiltradas().filter(c => c.estadoPreparacion === 'PREPARANDO'));
+  preparando = computed(() => this.comandasFiltradas().filter(c => c.estadoPreparacion === 'EN_PREPARACION'));
   listos = computed(() => this.comandasFiltradas().filter(c => c.estadoPreparacion === 'LISTO'));
 }

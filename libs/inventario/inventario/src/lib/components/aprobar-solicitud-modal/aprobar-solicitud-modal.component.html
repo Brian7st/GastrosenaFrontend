@@ -5,7 +5,7 @@
     <header class="modal-header">
       <div class="modal-title-wrapper">
         <span class="material-symbols-outlined check-icon">check_circle</span>
-        <h2 class="modal-title">Aprobar solicitud {{ solicitud?.codigo }}</h2>
+        <h2 class="modal-title">Aprobar solicitud #{{ solicitud?.numeroSolicitud }}</h2>
       </div>
       <button type="button" class="close-btn" (click)="onCancel()">
         <span class="material-symbols-outlined">close</span>
@@ -22,8 +22,8 @@
             <span class="material-symbols-outlined">person</span>
           </div>
           <div class="instructor-details">
-            <p class="instructor-name">Instructor {{ solicitud?.instructor }}</p>
-            <p class="instructor-meta">{{ solicitud?.itemsCount }} ítems &middot; Ficha {{ solicitud?.ficha }}</p>
+            <p class="instructor-name">Instructor {{ solicitud?.instructorId }}</p>
+            <p class="instructor-meta">{{ solicitud?.items?.length }} ítems &middot; Ficha {{ solicitud?.fichaId }}</p>
           </div>
         </div>
       </section>
@@ -44,8 +44,8 @@
 <tr>
                 <td>
                   <div class="product-cell">
-                    <span class="material-symbols-outlined item-icon">{{ item.icon || 'inventory_2' }}</span>
-                    <span>{{ item.nombre }}</span>
+                    <span class="material-symbols-outlined item-icon">inventory_2</span>
+                    <span>{{ item.nombreBien }}</span>
                   </div>
                 </td>
                 <td class="text-right">{{ item.cantidad }}</td>

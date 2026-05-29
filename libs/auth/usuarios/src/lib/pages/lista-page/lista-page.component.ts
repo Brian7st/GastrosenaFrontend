@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   OnInit,
   computed,
   inject,
@@ -8,14 +9,13 @@ import {
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
+import { map } from 'rxjs';
 import { Rol } from '@restaurant/shared/models';
 import {
   AlertComponent,
   DataTableComponent,
   KpiCardComponent,
   LucideIconComponent,
-  SearchFilterComponent,
-  SelectFilterComponent,
 } from '@restaurant/shared/ui';
 import { ExportarUsuariosComponent } from '../../components/exportar-usuarios/exportar-usuarios.component';
 import { ImportarUsuariosComponent } from '../../components/importar-usuarios/importar-usuarios.component';
@@ -28,32 +28,8 @@ import {
   CrearUsuarioRequest,
   ExportarConfig,
   ImportarUsuariosRequest,
-  RolOpcion,
   UsuarioDetalle,
 } from '../../models/usuarios.model';
-
-const MOCK_USUARIOS: UsuarioDetalle[] = [
-  { id: '1', nombre: 'María',  apellidos: 'González', email: 'maria@gastrosena.edu.co',
-    documento: '1234567890', telefono: '+57 301 234 5678', rol: Rol.ADMINISTRADOR,
-    activo: true,  creadoEn: new Date('2024-01-15'), ultimoAcceso: '2024-01-15',
-    cuentaBloqueada: false, intentosFallidos: 0 },
-  { id: '2', nombre: 'Carlos', apellidos: 'Ramírez',  email: 'carlos@gastrosena.edu.co',
-    documento: '0987654321', telefono: '+57 300 123 4567', rol: Rol.CHEF,
-    activo: true,  creadoEn: new Date('2024-01-14'), ultimoAcceso: '2024-01-14',
-    cuentaBloqueada: false, intentosFallidos: 0 },
-  { id: '3', nombre: 'Ana',    apellidos: 'López',    email: 'ana@gastrosena.edu.co',
-    documento: '1122334455', telefono: '+57 302 345 6789', rol: Rol.MESERO,
-    activo: true,  creadoEn: new Date('2024-01-19'), ultimoAcceso: '2024-01-19',
-    cuentaBloqueada: false, intentosFallidos: 0 },
-  { id: '4', nombre: 'José',   apellidos: 'Martín',   email: 'jose@gastrosena.edu.co',
-    documento: '5566778899', telefono: '+57 303 456 7890', rol: Rol.BARTENDER,
-    activo: false, creadoEn: new Date('2024-01-14'), ultimoAcceso: '2024-01-14',
-    cuentaBloqueada: true, intentosFallidos: 3 },
-  { id: '5', nombre: 'Laura',  apellidos: 'Silva',    email: 'laura@gastrosena.edu.co',
-    documento: '9988776655', telefono: '+57 304 567 8901', rol: Rol.CAJERO,
-    activo: true,  creadoEn: new Date('2024-01-15'), ultimoAcceso: '2024-01-15',
-    cuentaBloqueada: false, intentosFallidos: 0 },
-];
 
 @Component({
   selector: 'restaurant-lista-page',
@@ -65,8 +41,6 @@ const MOCK_USUARIOS: UsuarioDetalle[] = [
     DataTableComponent,
     KpiCardComponent,
     LucideIconComponent,
-    SearchFilterComponent,
-    SelectFilterComponent,
     ExportarUsuariosComponent,
     ImportarUsuariosComponent,
     UsuarioFormComponent,
@@ -77,9 +51,17 @@ const MOCK_USUARIOS: UsuarioDetalle[] = [
   styleUrl:    './lista-page.component.scss',
 })
 export class ListaPageComponent implements OnInit {
-  private readonly facade = inject(UsuariosFacade);
+  private readonly facade     = inject(UsuariosFacade);
+  private readonly destroyRef = inject(DestroyRef);
+  private toastTimer: ReturnType<typeof setTimeout> | null = null;
 
-  readonly usuarios        = toSignal(this.facade.usuarios$,        { initialValue: [] as UsuarioDetalle[] });
+  readonly usuarios = toSignal(
+    this.facade.usuarios$.pipe(
+      map((u): UsuarioDetalle[] => u ?? [])
+    ),
+    { initialValue: [] as UsuarioDetalle[] }
+  );
+
   readonly totalElements   = toSignal(this.facade.totalElements$,   { initialValue: 0 });
   readonly totalActivos    = toSignal(this.facade.totalActivos$,    { initialValue: 0 });
   readonly totalInactivos  = toSignal(this.facade.totalInactivos$,  { initialValue: 0 });
@@ -88,64 +70,59 @@ export class ListaPageComponent implements OnInit {
   readonly resultadoImport = toSignal(this.facade.resultadoImport$, { initialValue: null });
   readonly mensajeExport   = toSignal(this.facade.mensajeExport$,   { initialValue: null });
 
-  private readonly roles = toSignal(this.facade.roles$, { initialValue: [] as RolOpcion[] });
-  readonly rolOpciones   = computed(() => [
-    { value: '', label: 'Todos los roles' },
-    ...this.roles().map(r => ({ value: r.idRol, label: r.nombreRol })),
-  ]);
+  readonly error        = toSignal(this.facade.error$, { initialValue: null as string | null });
+  readonly mensajeExito = signal<string | null>(null);
 
-  readonly busqueda          = signal('');
-  readonly rolFiltro         = signal('');
+  readonly rolesDisponibles = Object.values(Rol);
+
+  readonly busqueda     = signal('');
+  readonly rolFiltro    = signal('');
+  readonly estadoFiltro = signal<'todos' | 'activos' | 'inactivos'>('todos');
   readonly mostrarExportar   = signal(false);
   readonly mostrarImportar   = signal(false);
   readonly mostrarFormulario = signal(false);
 
-  private readonly mockUsuarios    = signal<UsuarioDetalle[]>(MOCK_USUARIOS);
-  readonly usuarioEditando         = signal<UsuarioDetalle | null>(null);
-  private readonly usandoMock      = computed(() => this.usuarios().length === 0);
+  readonly usuarioEditando = signal<UsuarioDetalle | null>(null);
 
+  // Sin mock — siempre usa el backend
   readonly usuariosFiltrados = computed(() => {
-    const q   = this.busqueda().toLowerCase();
-    const rol = this.rolFiltro();
-    return this.usuarios().filter(u => {
-      const matchBusq = !q ||
+    const lista  = this.usuarios() ?? [];
+    const q      = this.busqueda().toLowerCase();
+    const rol    = this.rolFiltro();
+    const estado = this.estadoFiltro();
+    return lista.filter(u => {
+      const matchBusq   = !q ||
         u.nombre.toLowerCase().includes(q) ||
         u.apellidos.toLowerCase().includes(q) ||
         u.email.toLowerCase().includes(q);
-      const matchRol = !rol || u.rol === rol;
-      return matchBusq && matchRol;
+      const matchRol    = !rol || u.rol === rol;
+      const matchEstado = estado === 'todos' ||
+        (estado === 'activos'   &&  u.activo) ||
+        (estado === 'inactivos' && !u.activo);
+      return matchBusq && matchRol && matchEstado;
     });
   });
 
-  readonly usuariosMostrar = computed(() => {
-    if (this.usandoMock()) {
-      const q   = this.busqueda().toLowerCase();
-      const rol = this.rolFiltro();
-      return this.mockUsuarios().filter(u => {
-        const matchBusq = !q ||
-          u.nombre.toLowerCase().includes(q) ||
-          u.apellidos.toLowerCase().includes(q) ||
-          u.email.toLowerCase().includes(q);
-        const matchRol = !rol || u.rol === rol;
-        return matchBusq && matchRol;
-      });
-    }
-    return this.usuariosFiltrados();
-  });
-
-  readonly totalMostrar     = computed(() =>
-    this.usandoMock() ? this.mockUsuarios().length : this.totalElements()
-  );
-  readonly activosMostrar   = computed(() =>
-    this.usandoMock() ? this.mockUsuarios().filter(u => u.activo).length : this.totalActivos()
-  );
-  readonly inactivosMostrar = computed(() =>
-    this.usandoMock() ? this.mockUsuarios().filter(u => !u.activo).length : this.totalInactivos()
-  );
+  readonly usuariosMostrar  = computed(() => this.usuariosFiltrados());
+  readonly totalMostrar     = computed(() => this.totalElements());
+  readonly activosMostrar   = computed(() => this.totalActivos());
+  readonly inactivosMostrar = computed(() => this.totalInactivos());
 
   ngOnInit(): void {
     this.facade.cargarUsuarios();
     this.facade.cargarRoles();
+    this.destroyRef.onDestroy(() => {
+      if (this.toastTimer !== null) { clearTimeout(this.toastTimer); }
+    });
+  }
+
+  private mostrarToast(mensaje: string): void {
+    if (this.toastTimer !== null) { clearTimeout(this.toastTimer); }
+    this.mensajeExito.set(mensaje);
+    this.toastTimer = setTimeout(() => {
+      this.mensajeExito.set(null);
+      this.toastTimer = null;
+    }, 4000);
   }
 
   onCrearUsuario(): void {
@@ -164,41 +141,21 @@ export class ListaPageComponent implements OnInit {
   }
 
   onGuardarUsuario(data: CrearUsuarioRequest): void {
-    const editando = this.usuarioEditando();
-    if (this.usandoMock()) {
-      const { idRol, contrasena: _pw, ...rest } = data;
-      if (editando) {
-        this.mockUsuarios.update(list =>
-          list.map(u => u.id === editando.id ? { ...u, ...rest, rol: idRol as Rol } : u)
-        );
-      } else {
-        const nuevo: UsuarioDetalle = {
-          id: Date.now().toString(),
-          ...rest,
-          rol: idRol as Rol,
-          activo: true,
-          creadoEn: new Date(),
-          ultimoAcceso: null,
-          cuentaBloqueada: false,
-          intentosFallidos: 0,
-        };
-        this.mockUsuarios.update(list => [...list, nuevo]);
-      }
-    } else {
-      if (editando) {
-        const payload: ActualizarUsuarioRequest = {
-          nombre:    data.nombre,
-          apellidos: data.apellidos,
-          telefono:  data.telefono,
-          idRol:     data.idRol,
-        };
-        this.facade.actualizarUsuario(editando.id, payload);
-      } else {
-        this.facade.crearUsuario(data);
-      }
-    }
-    this.onCerrarFormulario();
+  const editando = this.usuarioEditando();
+  if (editando) {
+    const payload: ActualizarUsuarioRequest = {
+      nombre:    data.nombre,
+      apellidos: data.apellidos,
+      telefono:  data.telefono,
+      idRol:     data.nombreRol,
+    };
+    this.facade.actualizarUsuario(editando.id, payload);
+  } else {
+    this.facade.crearUsuario(data);
+    this.mostrarToast('Usuario creado exitosamente. Revisá tu correo para más información.');
   }
+  this.onCerrarFormulario();
+}
 
   onExportar(config: ExportarConfig): void {
     this.facade.exportarUsuarios(config);
@@ -209,11 +166,16 @@ export class ListaPageComponent implements OnInit {
     this.facade.importarMasivo(req);
   }
 
-  onEliminar(id: string): void {
-    if (this.usandoMock()) {
-      this.mockUsuarios.update(list => list.filter(u => u.id !== id));
+  onCambiarEstado(u: UsuarioDetalle): void {
+    if (u.activo) {
+      this.facade.desactivarUsuario(u.id);
     } else {
-      this.facade.eliminarUsuario(id);
+      this.facade.activarUsuario(u.id);
     }
+  }
+
+  onEliminar(id: string): void {
+    if (!confirm('¿Estás seguro de que querés eliminar este usuario?')) { return; }
+    this.facade.eliminarUsuario(id);
   }
 }

@@ -1,5 +1,6 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
-import { SolicitudGil, SolicitudesGilFiltros, SolicitudesPaginacion, EstadoGil, CrearSolicitudData, ActualizarSolicitudData } from '../models/solicitudes-gil.model';
+import { Observable } from 'rxjs';
+import { SolicitudGil, SolicitudesGilFiltros, SolicitudesPaginacion, EstadoGil, CrearSolicitudData, ActualizarSolicitudData, GenerarGilData } from '../models/solicitudes-gil.model';
 import {
   SolicitudSesion,
   CrearSolicitudSesionData,
@@ -8,7 +9,7 @@ import {
 } from '../models/solicitud-sesion.model';
 import { SolicitudesService } from './services/solicitudes.service';
 import { EnviarProveedorRequest } from './api/sourcing.api';
-import { finalize, catchError, of } from 'rxjs';
+import { finalize, catchError, of, map, EMPTY } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -25,6 +26,9 @@ export class SolicitudesFacade {
   private _error                 = signal<string | null>(null);
 
   // ── Estado Training/Solicitudes ────────────────────────────────────────────
+  private _solicitudesSesion           = signal<SolicitudSesion[]>([]);
+  private _loadingSesion               = signal<boolean>(false);
+  private _errorSesion                 = signal<string | null>(null);
   private _solicitudSesionSeleccionada = signal<SolicitudSesion | undefined>(undefined);
 
   // ── Exposición pública ─────────────────────────────────────────────────────
@@ -34,6 +38,9 @@ export class SolicitudesFacade {
   public paginacion                   = computed(() => this._paginacion());
   public solicitudSeleccionada        = computed(() => this._solicitudSeleccionada());
   public error                        = computed(() => this._error());
+  public solicitudesSesion            = computed(() => this._solicitudesSesion());
+  public loadingSesion                = computed(() => this._loadingSesion());
+  public errorSesion                  = computed(() => this._errorSesion());
   public solicitudSesionSeleccionada  = computed(() => this._solicitudSesionSeleccionada());
 
   /**
@@ -130,21 +137,40 @@ export class SolicitudesFacade {
   }
 
   /**
-   * Actualiza una solicitud existente y recarga el detalle.
+   * Actualiza un GIL en estado BORRADOR vía PATCH.
+   * Retorna Observable<boolean> para que el componente pueda reaccionar al resultado.
+   * 200 → true | 400/404/409/422 → false (y setea _error con mensaje legible).
    */
-  actualizarSolicitud(id: string, data: ActualizarSolicitudData): void {
+  actualizarSolicitud(id: string, data: ActualizarSolicitudData): Observable<boolean> {
     this._loading.set(true);
-    this.solicitudesService.actualizarSolicitud(id, data)
+    this._error.set(null);
+    return this.solicitudesService.actualizarSolicitud(id, data)
       .pipe(
-        catchError(() => {
-          this._error.set('Error al actualizar la solicitud');
-          return of(null);
+        map(() => {
+          this.cargarSolicitudById(id);
+          return true;
+        }),
+        catchError((err: unknown) => {
+          const httpErr = err as { status?: number; error?: { violations?: { message: string }[]; detail?: string } };
+          if (httpErr.status === 404) {
+            this._error.set('GIL no encontrado');
+          } else if (httpErr.status === 409) {
+            this._error.set('Solo se pueden editar GILes en estado Borrador');
+          } else if (httpErr.status === 400) {
+            const violations = httpErr.error?.violations ?? [];
+            const msg = violations.length > 0
+              ? violations.map(v => v.message).join('. ')
+              : 'Datos inválidos — revisá los campos del formulario';
+            this._error.set(msg);
+          } else if (httpErr.status === 422) {
+            this._error.set(httpErr.error?.detail ?? 'Error de validación semántica');
+          } else {
+            this._error.set('Error al actualizar la solicitud');
+          }
+          return of(false);
         }),
         finalize(() => this._loading.set(false))
-      )
-      .subscribe(result => {
-        if (result) this.cargarSolicitudById(id);
-      });
+      );
   }
 
   /**
@@ -166,23 +192,28 @@ export class SolicitudesFacade {
   }
 
   /**
-   * Elimina una solicitud y refresca los datos.
+   * Elimina un GIL por su UUID y refresca el listado.
+   * Solo GILes en estado BORRADOR pueden eliminarse (backend devuelve 409 si no).
    */
-  eliminarSolicitud(codigo: string): void {
+  eliminarSolicitud(id: string): void {
     this._loading.set(true);
-    this.solicitudesService.deleteSolicitud(codigo)
+    this._error.set(null);
+    this.solicitudesService.deleteSolicitud(id)
       .pipe(
-        catchError(() => {
-          this._error.set('Error al eliminar la solicitud');
-          return of(false);
+        catchError((err: unknown) => {
+          const httpErr = err as { status?: number };
+          if (httpErr.status === 404) {
+            this._error.set('GIL no encontrado');
+          } else if (httpErr.status === 409) {
+            this._error.set('Solo se pueden eliminar GILes en estado Borrador');
+          } else {
+            this._error.set('Error al eliminar la solicitud');
+          }
+          return EMPTY;
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe((success) => {
-        if (success) {
-          this.cargarSolicitudes();
-        }
-      });
+      .subscribe(() => this.cargarSolicitudes());
   }
 
   /** PUT /procurement/giles/{id}/enviar-proveedor con proveedorDestinatarioId y fechaEnvio */
@@ -199,18 +230,18 @@ export class SolicitudesFacade {
       .subscribe(ok => { if (ok) this.cargarSolicitudById(id); });
   }
 
-  generarGils(ids: (string | number)[]): void {
+  generarGils(data: GenerarGilData): void {
     this._loading.set(true);
-    this.solicitudesService.generarGils(ids)
+    this.solicitudesService.generarGils(data)
       .pipe(
         catchError(() => {
-          this._error.set('Error al generar los GIL');
-          return of(false);
+          this._error.set('Error al generar el GIL');
+          return of(null);
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe((success) => {
-        if (success) {
+      .subscribe(gil => {
+        if (gil) {
           this.cargarSolicitudes();
         }
       });
@@ -220,21 +251,33 @@ export class SolicitudesFacade {
   // Training — /api/v1/training/solicitudes
   // ─────────────────────────────────────────────────────────────────────────
 
+  /** GET /training/solicitudes — carga la lista de solicitudes de sesión */
+  cargarSolicitudesSesion(filtros?: { instructorId?: string; estado?: string }): void {
+    this._loadingSesion.set(true);
+    this._errorSesion.set(null);
+    this.solicitudesService.getSolicitudesSesion(filtros)
+      .pipe(
+        catchError(() => {
+          this._errorSesion.set('Error al cargar las solicitudes de sesión');
+          return of([]);
+        }),
+        finalize(() => this._loadingSesion.set(false))
+      )
+      .subscribe(list => this._solicitudesSesion.set(list));
+  }
+
   /** POST /training/solicitudes — crea la solicitud y la deja seleccionada */
-  crearSolicitudSesion(data: CrearSolicitudSesionData): void {
+  crearSolicitudSesion(data: CrearSolicitudSesionData): Observable<SolicitudSesion | null> {
     this._loading.set(true);
     this._error.set(null);
-    this.solicitudesService.crearSolicitudSesion(data)
+    return this.solicitudesService.crearSolicitudSesion(data)
       .pipe(
         catchError(() => {
           this._error.set('Error al crear la solicitud de sesión');
           return of(null);
         }),
         finalize(() => this._loading.set(false))
-      )
-      .subscribe(res => {
-        if (res !== null) this._solicitudSesionSeleccionada.set(res);
-      });
+      );
   }
 
   /** PATCH /training/solicitudes/{id}/aprobar */

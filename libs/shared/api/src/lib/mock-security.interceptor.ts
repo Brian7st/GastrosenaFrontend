@@ -1,24 +1,21 @@
 import { HttpInterceptorFn } from '@angular/common/http';
-
-/**
- * Interceptor de seguridad para el perfil de desarrollo.
- *
- * Inyecta los headers que consume MockSecurityFilter.java en el backend
- * (activo con @Profile("dev")):
- *   - X-Mock-User-Id:   UUID del usuario simulado (por defecto: el UUID de seed)
- *   - X-Mock-User-Role: Rol del usuario simulado   (por defecto: MESERO)
- *
- * Para probar con un rol diferente (ej. INSTRUCTOR), cambia los valores
- * de las constantes o inyéctalos desde un servicio de contexto de usuario.
- */
-const MOCK_USER_ID   = '00000000-0000-0000-0000-000000000001';
-const MOCK_USER_ROLE = 'MESERO';
+import { inject } from '@angular/core';
+import { AuthService } from '@restaurant/shared/auth';
 
 export const mockSecurityInterceptor: HttpInterceptorFn = (req, next) => {
+  const authService = inject(AuthService);
+  const user = authService.currentUser();
+
+  // Se asume que el usuario siempre tendrá un ID si está logueado en la aplicación.
+  // En este punto, no usaremos fallbacks quemados, si no hay user, se usa null temporalmente 
+  // o se deja fallar la petición para detectar errores en el ciclo de autenticación real.
+  const userId   = user?.id || '';
+  const userRole = user?.rol || 'MESERO';
+
   const secureReq = req.clone({
     setHeaders: {
-      'X-Mock-User-Id':   MOCK_USER_ID,
-      'X-Mock-User-Role': MOCK_USER_ROLE,
+      'X-Mock-User-Id':   userId,
+      'X-Mock-User-Role': userRole,
     },
   });
 
