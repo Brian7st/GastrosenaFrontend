@@ -44,7 +44,6 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
           children: [
             { label: 'Inicio',       ruta: '/app/bar/inicio',       icono: 'layout-dashboard' },
             { label: 'Comandas',     ruta: '/app/bar/comandas',     icono: 'clipboard-list'   },
-            { label: 'Estadísticas', ruta: '/app/bar/estadisticas', icono: 'bar-chart-2'      },
             { label: 'Recetas',      ruta: '/app/bar/recetas',      icono: 'book-open'        },
           ],
         },

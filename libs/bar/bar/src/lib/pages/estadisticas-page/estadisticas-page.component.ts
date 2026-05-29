@@ -61,26 +61,15 @@ export class EstadisticasPageComponent implements OnInit, OnDestroy {
 
     this.comandaService.getKpis().pipe(timeout(2500)).subscribe({
       next: data => {
-        if (!data || typeof data !== 'object') {
-          this.kpis.set({
-            promedioDemoraGeneral: 8,
-            bebidaMasRapida: 'Margarita',
-            totalBebidasDespachadosHoy: 28
-          });
-        } else {
+        if (data && typeof data === 'object') {
           this.kpis.set(data);
         }
         this.cargandoKpis.set(false);
         this.cdr.markForCheck();
       },
       error: () => {
-        // Fallback mock data in case backend is down or not exposing KPIs
-        this.kpis.set({
-          promedioDemoraGeneral: 8,
-          bebidaMasRapida: 'Margarita',
-          totalBebidasDespachadosHoy: 28
-        });
-        this.errorKpis.set(false); // Evitamos mostrar el bloque de error rojo invasivo
+        this.kpis.set(null);
+        this.errorKpis.set(true);
         this.cargandoKpis.set(false);
         this.cdr.markForCheck();
       }
@@ -94,16 +83,7 @@ export class EstadisticasPageComponent implements OnInit, OnDestroy {
 
     this.comandaService.getEstadisticasPromedios().pipe(timeout(2500)).subscribe({
       next: data => {
-        if (!Array.isArray(data) || data.length === 0) {
-          this.promediosData = {
-            labels: ['Margarita', 'Café Espresso', 'Mojito', 'Frappé de Café', 'Cerveza Club'],
-            datasets: [{
-              data: [7, 3, 6, 5, 2],
-              backgroundColor: '#0ea5e9',
-              borderRadius: 4
-            }]
-          };
-        } else {
+        if (Array.isArray(data) && data.length > 0) {
           this.promediosData = {
             labels: data.map(d => d.nombreReceta),
             datasets: [{
@@ -112,20 +92,15 @@ export class EstadisticasPageComponent implements OnInit, OnDestroy {
               borderRadius: 4
             }]
           };
+        } else {
+          this.promediosData = { labels: [], datasets: [] };
         }
         this.graficosListos.promedios = true;
         this.verificarGraficosCompletos();
       },
       error: () => {
-        // Fallback mock data in case backend is down
-        this.promediosData = {
-          labels: ['Margarita', 'Café Espresso', 'Mojito', 'Frappé de Café', 'Cerveza Club'],
-          datasets: [{
-            data: [7, 3, 6, 5, 2],
-            backgroundColor: '#0ea5e9',
-            borderRadius: 4
-          }]
-        };
+        console.error('Error al cargar estadísticas de promedios.');
+        this.promediosData = { labels: [], datasets: [] };
         this.graficosListos.promedios = true;
         this.verificarGraficosCompletos();
       }
@@ -133,18 +108,7 @@ export class EstadisticasPageComponent implements OnInit, OnDestroy {
 
     this.comandaService.getEstadisticasDiarias().pipe(timeout(2500)).subscribe({
       next: data => {
-        if (!Array.isArray(data) || data.length === 0) {
-          this.diariaData = {
-            labels: ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'],
-            datasets: [{
-              data: [3, 8, 15, 22, 18, 12, 9, 14],
-              borderColor: '#f59e0b',
-              backgroundColor: 'rgba(245, 158, 11, 0.2)',
-              fill: true,
-              tension: 0.4
-            }]
-          };
-        } else {
+        if (Array.isArray(data) && data.length > 0) {
           this.diariaData = {
             labels: data.map(d => d.hora),
             datasets: [{
@@ -155,22 +119,15 @@ export class EstadisticasPageComponent implements OnInit, OnDestroy {
               tension: 0.4
             }]
           };
+        } else {
+          this.diariaData = { labels: [], datasets: [] };
         }
         this.graficosListos.diaria = true;
         this.verificarGraficosCompletos();
       },
       error: () => {
-        // Fallback mock data in case backend is down
-        this.diariaData = {
-          labels: ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'],
-          datasets: [{
-            data: [3, 8, 15, 22, 18, 12, 9, 14],
-            borderColor: '#f59e0b',
-            backgroundColor: 'rgba(245, 158, 11, 0.2)',
-            fill: true,
-            tension: 0.4
-          }]
-        };
+        console.error('Error al cargar estadísticas diarias.');
+        this.diariaData = { labels: [], datasets: [] };
         this.graficosListos.diaria = true;
         this.verificarGraficosCompletos();
       }
@@ -181,7 +138,7 @@ export class EstadisticasPageComponent implements OnInit, OnDestroy {
     if (this.graficosListos.promedios && this.graficosListos.diaria) {
       this.cargandoGraficos.set(false);
       this.cdr.markForCheck();
-      
+
       // Renderizar los gráficos después de que se actualice la vista y los canvas sean visibles en el DOM
       setTimeout(() => {
         this.renderChartPromedios();
@@ -189,8 +146,6 @@ export class EstadisticasPageComponent implements OnInit, OnDestroy {
       }, 50);
     }
   }
-
-
 
   ngOnDestroy(): void {
     if (this.chartPromedios) this.chartPromedios.destroy();

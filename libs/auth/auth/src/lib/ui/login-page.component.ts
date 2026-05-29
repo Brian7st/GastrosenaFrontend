@@ -52,7 +52,6 @@ export class LoginPageComponent {
       this.form.markAllAsTouched();
       return;
     }
-
     this.loading.set(true);
     this.errorMsg.set('');
 
@@ -61,19 +60,16 @@ export class LoginPageComponent {
       const user = await this.authService.login(email!, contrasena!);
 
       // Redirige según el rol del usuario
-      const rol = user.rol;
+      const rol = user?.rol;
       let destino = '/app/usuarios'; // por defecto
 
       if (rol === 'ADMINISTRADOR') {
         destino = '/app/usuarios';
-      } else if (rol === 'INSTRUCTOR') {
-        destino = '/app/cocina';
-      } else if (rol === 'CHEF') {
+      } else if (rol === 'INSTRUCTOR' || rol === 'CHEF') {
         destino = '/app/cocina';
       } else {
         destino = '/app/perfil';
       }
-
       await this.router.navigateByUrl(destino);
     } catch (err) {
       this.errorMsg.set('Credenciales inválidas. Verificá tu correo y contraseña.');
