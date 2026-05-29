@@ -132,7 +132,7 @@ services:
     volumes:
       - usuarios_db_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "usuario_app", "-pclave_segura"]
       interval: 10s
       timeout: 5s
       retries: 6
