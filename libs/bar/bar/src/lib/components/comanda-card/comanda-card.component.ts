@@ -102,6 +102,10 @@ export class ComandaCardComponent implements OnInit, OnDestroy {
     this.recetaActiva.set(null);
   }
 
+  verDetalles() {
+    this.vistaActual.set('detalles');
+  }
+
   togglePlate(idDetalle: string) {
     const current = new Set(this.expandedPlates());
     if (current.has(idDetalle)) {

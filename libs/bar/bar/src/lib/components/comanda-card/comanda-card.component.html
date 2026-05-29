@@ -135,15 +135,11 @@
             }
           </div>
           <div class="item-status-group">
-            <span class="item-time">
-              @if (comanda().estadoPreparacion === 'PENDIENTE') { 5min }
-              @else { {{ getTiempoTranscurrido(comanda().horaInicioPreparacion) }}min }
-            </span>
-            <span class="comanda-estado-badge text-uppercase" 
-                  [ngClass]="comanda().estadoPreparacion === 'PENDIENTE' ? 'estado-espera' : (comanda().estadoPreparacion === 'EN_PREPARACION' ? 'estado-preparando' : 'estado-listo')">
-              @if (comanda().estadoPreparacion === 'PENDIENTE') { ESPERA }
-              @else if (comanda().estadoPreparacion === 'EN_PREPARACION') { PREPARANDO }
-              @else { LISTO }
+            @if (comanda().tiempoEstimado) {
+              <span class="item-time">{{ comanda().tiempoEstimado }} min</span>
+            }
+            <span class="comanda-estado-badge" [ngClass]="'estado-' + (comanda().estadoPreparacion || 'PENDIENTE').toLowerCase()">
+              {{ comanda().estadoPreparacion }}
             </span>
           </div>
         </div>
@@ -152,6 +148,7 @@
       <div class="mt-5 pt-3" style="border-top: 1px solid var(--color-pizarra-100); margin-top: 32px !important;">
         <restaurant-button (click)="cerrarVista()" class="btn-override-warning" style="display: block; width: 100%;">Cerrar Detalles</restaurant-button>
       </div>
+
     </div>
   </div>
 }
