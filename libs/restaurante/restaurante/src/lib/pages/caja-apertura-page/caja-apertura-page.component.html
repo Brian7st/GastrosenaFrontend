@@ -34,7 +34,7 @@
           Cancelar
         </restaurant-button>
         <restaurant-button variant="primary" (click)="confirmarApertura()" [disabled]="baseInicialCtrl.invalid || facade.turnoCaja()?.estado === 'ABIERTA'">
-          <lucide-icon name="unlock" [size]="18"></lucide-icon>
+          <lucide-icon name="log-in" [size]="18"></lucide-icon>
           <span>Abrir Caja</span>
         </restaurant-button>
       </div>

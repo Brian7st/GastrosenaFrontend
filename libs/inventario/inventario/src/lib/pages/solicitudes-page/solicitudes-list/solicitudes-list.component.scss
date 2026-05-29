@@ -45,6 +45,16 @@
   }
 }
 
+/* ── Contenedor tabla con altura limitada ───────────────────────────────────── */
+:host ::ng-deep restaurant-data-table {
+  .table-wrapper,
+  table,
+  .data-table__body {
+    max-height: 420px;
+    overflow-y: auto;
+  }
+}
+
 /* ── Barra de filtros (slot [dtHeader]) ─────────────────────────────────────── */
 .table-controls {
   padding: 1.25rem 1.5rem;
@@ -257,7 +267,7 @@
   background: var(--color-surface-secondary);
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
 }
 
 .page-numbers {

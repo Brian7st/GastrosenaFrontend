@@ -1,6 +1,12 @@
 <div class="comanda-container">
   <restaurant-page-header title="Tablero de Comandas" subtitle="Gestión de pedidos en tiempo real"></restaurant-page-header>
 
+  @if (errorToast()) {
+  <div class="toast-error shadow">
+    <i class="bi bi-exclamation-triangle-fill"></i> {{ errorToast() }}
+  </div>
+  }
+
   <!-- Filtros -->
   <div class="filters-container showcase__row" style="margin-bottom: var(--space-6);">
     <div style="flex: 1; min-width: 250px;">
@@ -40,89 +46,44 @@
     </div>
   </div>
 
-  <div class="comandas-grid">
-    
-    <div class="column col-espera">
+  <div class="comandas-grid kanban-board-container">
+
+    <div class="column col-espera kanban-column">
       <div class="col-header showcase__row" style="justify-content: space-between; margin-bottom: var(--space-4);">
-        <restaurant-section-title title="En Espera" align="left"></restaurant-section-title>
+        <h5 class="m-0 fw-bold">En Espera</h5>
         <span class="showcase__value">{{ enEspera().length }}</span>
       </div>
-      @for (c of enEspera(); track c.id) {
-        <restaurant-card [title]="c.mesa" style="margin-bottom: var(--space-4); display: block;">
-          <div style="display: flex; flex-direction: column; height: 100%; justify-content: space-between;">
-            <div>
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2); margin-top: var(--space-2);">
-                <span class="mesero" style="font-size: var(--font-size-sm); color: var(--color-text-secondary);"><b>Mesero:</b> {{ c.mesero }}</span>
-                <restaurant-status-badge [label]="c.prioridad" [variant]="getBadgeVariant(c.prioridad)"></restaurant-status-badge>
-              </div>
-              <ul class="platos-list" style="margin: 0 0 var(--space-4) 0; padding-left: var(--space-4); font-size: var(--font-size-sm);">
-                @for (plato of c.platos; track plato) {
-                  <li>{{ plato }}</li>
-                }
-              </ul>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: var(--space-4); border-top: 1px solid var(--color-border);">
-              <span class="tiempo" style="font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-text-primary);"><lucide-icon name="clock" size="14"></lucide-icon> {{ c.tiempo }} min</span>
-              <restaurant-button variant="primary" (click)="cambiarEstado(c, 'Preparando')">Preparar</restaurant-button>
-            </div>
-          </div>
-        </restaurant-card>
+      @for (c of enEspera(); track c.idComanda) {
+      <restaurant-comanda-card class="comanda-card-wrapper shadow-sm" [comanda]="c"
+        (onIniciarPlato)="onIniciarPlato($event, c.idComanda)"
+        (onFinalizarPlato)="onFinalizarPlato($event, c.idComanda)">
+      </restaurant-comanda-card>
       }
     </div>
 
-    <div class="column col-preparando">
+    <div class="column col-preparando kanban-column">
       <div class="col-header showcase__row" style="justify-content: space-between; margin-bottom: var(--space-4);">
-        <restaurant-section-title title="Preparando" align="left"></restaurant-section-title>
+        <h5 class="m-0 fw-bold">Preparando</h5>
         <span class="showcase__value">{{ preparando().length }}</span>
       </div>
-      @for (c of preparando(); track c.id) {
-        <restaurant-card [title]="c.mesa" style="margin-bottom: var(--space-4); display: block;">
-          <div style="display: flex; flex-direction: column; height: 100%; justify-content: space-between;">
-            <div>
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2); margin-top: var(--space-2);">
-                <span class="mesero" style="font-size: var(--font-size-sm); color: var(--color-text-secondary);"><b>Mesero:</b> {{ c.mesero }}</span>
-                <restaurant-status-badge [label]="c.prioridad" [variant]="getBadgeVariant(c.prioridad)"></restaurant-status-badge>
-              </div>
-              <ul class="platos-list" style="margin: 0 0 var(--space-4) 0; padding-left: var(--space-4); font-size: var(--font-size-sm);">
-                @for (plato of c.platos; track plato) {
-                  <li>{{ plato }}</li>
-                }
-              </ul>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: var(--space-4); border-top: 1px solid var(--color-border);">
-              <span class="tiempo" style="font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-warning);"><lucide-icon name="clock" size="14"></lucide-icon> {{ c.tiempo }} min</span>
-              <restaurant-button variant="success" (click)="cambiarEstado(c, 'Listo')">Listo</restaurant-button>
-            </div>
-          </div>
-        </restaurant-card>
+      @for (c of preparando(); track c.idComanda) {
+      <restaurant-comanda-card class="comanda-card-wrapper shadow-sm" [comanda]="c"
+        (onIniciarPlato)="onIniciarPlato($event, c.idComanda)"
+        (onFinalizarPlato)="onFinalizarPlato($event, c.idComanda)">
+      </restaurant-comanda-card>
       }
     </div>
 
-    <div class="column col-listo">
+    <div class="column col-listo kanban-column">
       <div class="col-header showcase__row" style="justify-content: space-between; margin-bottom: var(--space-4);">
-        <restaurant-section-title title="Listo" align="left"></restaurant-section-title>
+        <h5 class="m-0 fw-bold">Listo</h5>
         <span class="showcase__value">{{ listos().length }}</span>
       </div>
-      @for (c of listos(); track c.id) {
-        <restaurant-card [title]="c.mesa" style="margin-bottom: var(--space-4); display: block; opacity: 0.8;">
-          <div style="display: flex; flex-direction: column; height: 100%; justify-content: space-between;">
-            <div>
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2); margin-top: var(--space-2);">
-                <span class="mesero" style="font-size: var(--font-size-sm); color: var(--color-text-secondary);"><b>Mesero:</b> {{ c.mesero }}</span>
-                <restaurant-status-badge label="Completado" variant="success"></restaurant-status-badge>
-              </div>
-              <ul class="platos-list" style="margin: 0 0 var(--space-4) 0; padding-left: var(--space-4); font-size: var(--font-size-sm);">
-                @for (plato of c.platos; track plato) {
-                  <li style="text-decoration: line-through; color: var(--color-text-muted);">{{ plato }}</li>
-                }
-              </ul>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: var(--space-4); border-top: 1px solid var(--color-border);">
-              <span class="finalizado" style="font-size: var(--font-size-sm); color: var(--color-success); font-weight: var(--font-weight-medium);">Esperando entrega</span>
-              <lucide-icon name="check-check" size="20" style="color: var(--color-success);"></lucide-icon>
-            </div>
-          </div>
-        </restaurant-card>
+      @for (c of listos(); track c.idComanda) {
+      <restaurant-comanda-card class="comanda-card-wrapper shadow-sm card-completed" [comanda]="c"
+        (onIniciarPlato)="onIniciarPlato($event, c.idComanda)"
+        (onFinalizarPlato)="onFinalizarPlato($event, c.idComanda)">
+      </restaurant-comanda-card>
       }
     </div>
 

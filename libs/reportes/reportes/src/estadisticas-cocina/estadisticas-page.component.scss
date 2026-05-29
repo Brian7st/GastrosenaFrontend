@@ -1,0 +1,101 @@
+.stats-container {
+  padding: var(--space-5, 25px);
+  background-color: var(--color-surface-secondary);
+  min-height: 100%;
+}
+
+.kpis-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4, 20px);
+  margin-bottom: var(--space-5, 25px);
+}
+
+.kpi-card {
+  background: var(--color-surface-primary);
+  border-radius: var(--radius-md, 8px);
+  padding: var(--space-4, 20px);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-left-width: 4px;
+
+  &.kpi-blue {
+    border-left-color: var(--color-info, #0984e3);
+    .kpi-icon-wrapper {
+      background: var(--color-info-bg, #eff6ff);
+      color: var(--color-info, #0984e3);
+    }
+  }
+
+  &.kpi-green {
+    border-left-color: var(--color-brand-primary, #39a900);
+    .kpi-icon-wrapper {
+      background: var(--color-estado-activo-bg, #e6f6eb);
+      color: var(--color-brand-primary, #39a900);
+    }
+  }
+
+  &.kpi-orange {
+    border-left-color: var(--color-warning, #f97316);
+    .kpi-icon-wrapper {
+      background: var(--color-warning-bg, #fefce8);
+      color: var(--color-warning, #f97316);
+    }
+  }
+
+  .kpi-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .kpi-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    h3 {
+      font-size: 0.75rem;
+      color: var(--color-text-secondary, #64748b);
+      margin: 0 0 2px 0;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .kpi-value {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--color-text-primary, #1e293b);
+      margin: 0;
+    }
+  }
+}
+
+.charts-grid {
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-card {
+  background: var(--color-surface-primary);
+  border-radius: var(--radius-lg, 12px);
+  padding: var(--space-4, 20px);
+  border: 1px solid var(--color-border, #e2e8f0);
+
+  h3 {
+    font-size: 1.1rem;
+    color: var(--color-text-primary, #1e293b);
+    margin-bottom: 20px;
+    font-weight: 700;
+  }
+
+  .chart-wrapper {
+    height: 300px;
+    width: 100%;
+  }
+}

@@ -11,9 +11,10 @@ export const COCINA_ROUTES: Routes = [
       { path: 'comandas', loadComponent: () => import('./pages/comandas-page/comandas-page.component').then(m => m.ComandasPageComponent) },
       { path: 'recetas', loadComponent: () => import('./pages/recetas-page/recetas-page.component').then(m => m.RecetasPageComponent) },
       { path: 'actividad', loadComponent: () => import('./pages/actividad-page/actividad-page.component').then(m => m.ActividadPageComponent) },
-      { path: 'evaluacion-masiva',    loadComponent: () => import('./pages/evaluacion-masiva-page/evaluacion-masiva-page.component').then(m => m.EvaluacionMasivaPageComponent) },
+      { path: 'evaluacion-masiva', loadComponent: () => import('./pages/evaluacion-masiva-page/evaluacion-masiva-page.component').then(m => m.EvaluacionMasivaPageComponent) },
       { path: 'evaluacion-individual', loadComponent: () => import('./pages/evaluacion-individual-page/evaluacion-individual-page.component').then(m => m.EvaluacionIndividualPageComponent) },
-      { path: 'actividades',           loadComponent: () => import('./pages/actividades-list-page/actividades-list-page.component').then(m => m.ActividadesListPageComponent) }
+      { path: 'estadisticas', loadComponent: () => import('../../../../reportes/reportes/src/estadisticas-cocina/estadisticas-page.component').then(m => m.EstadisticasPageComponent) },
+      { path: 'actividades', loadComponent: () => import('./pages/actividades-list-page/actividades-list-page.component').then(m => m.ActividadesListPageComponent) }
     ]
   },
 ];

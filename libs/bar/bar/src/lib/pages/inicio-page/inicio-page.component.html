@@ -1,0 +1,252 @@
+<div class="dashboard-container">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-4);">
+    <restaurant-page-header
+      title="Panel Principal"
+      subtitle="Gestión integral de Gastro SENA - Módulo Bar y Barismo"
+      style="margin-bottom: 0;"
+    ></restaurant-page-header>
+    
+    <div class="date-badge">{{ fechaActual }}</div>
+  </div>
+
+  <div class="showcase__grid-3 stats-grid">
+    <restaurant-kpi-card 
+      label="Comandas Activas" 
+      [value]="estadisticas().activos.toString()" 
+      icon="clock" 
+      iconColor="orange"
+    ></restaurant-kpi-card>
+
+    <div (click)="abrirModalListas()" style="cursor: pointer;">
+      <restaurant-kpi-card
+        label="Completadas Hoy"
+        [value]="estadisticas().completados.toString()"
+        icon="check-circle"
+        iconColor="green"
+      ></restaurant-kpi-card>
+    </div>
+
+    <div (click)="abrirModal('CANCELACION')" style="cursor: pointer;">
+      <restaurant-kpi-card 
+        label="Canceladas" 
+        [value]="estadisticas().cancelados.toString()" 
+        icon="x-circle" 
+        iconColor="red"
+      ></restaurant-kpi-card>
+    </div>
+
+    <div (click)="abrirModal('DEVOLUCION')" style="cursor: pointer;">
+      <restaurant-kpi-card 
+        label="Devueltas" 
+        [value]="estadisticas().devueltos.toString()" 
+        icon="arrow-left-right" 
+        iconColor="yellow"
+      ></restaurant-kpi-card>
+    </div>
+  </div>
+
+  <section class="recent-section showcase__section">
+    <restaurant-section-title 
+      title="Últimas comandas en bar y barismo" 
+      subtitle="Monitoreo rápido de actividad" 
+      align="left"
+    ></restaurant-section-title>
+
+    <div class="order-list showcase__stack">
+      @for (pedido of pedidosPendientes(); track pedido.platos) {
+        <div class="order-item showcase__row" style="justify-content: space-between; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-secondary);">
+          <div class="left showcase__row">
+            <span class="showcase__value">Mesa {{ pedido.mesa }}</span>
+            <restaurant-status-badge 
+              [label]="pedido.estado" 
+              [variant]="getBadgeVariant(pedido.estado)"
+            ></restaurant-status-badge>
+            <p class="order-details" style="margin: 0; font-size: var(--font-size-sm);">{{ pedido.platos }}</p>
+          </div>
+          <span class="time" style="font-size: var(--font-size-sm); color: var(--color-text-secondary);"><lucide-icon name="clock" size="14"></lucide-icon> {{ pedido.tiempo }}</span>
+        </div>
+      }
+    </div>
+
+    <div style="margin-top: var(--space-4);">
+      <restaurant-button routerLink="/app/bar/comandas" variant="primary" style="width: 100%; display: block;">Ir a Comandas →</restaurant-button>
+    </div>
+  </section>
+</div>
+
+<!-- ===== MODAL DE INCIDENCIAS ===== -->
+@if (modalAbierto()) {
+  <div class="modal-overlay" (click)="cerrarConOverlay($event)">
+    <div class="modal-incidencias">
+
+      <div class="modal-header">
+        <div class="modal-title-row">
+          <lucide-icon name="x-circle" size="24" class="modal-icon"></lucide-icon>
+          <div>
+            <h2>{{ modalTitulo() }}</h2>
+            <p class="modal-subtitle">Listado completo de pedidos cancelados con motivos y detalles</p>
+          </div>
+        </div>
+        <button class="modal-close" (click)="cerrarModal()">
+          <lucide-icon name="x" size="20"></lucide-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        @if (cargando()) {
+          <div class="modal-loading">
+            <div class="spinner"></div>
+            <p>Cargando incidencias...</p>
+          </div>
+        } @else if (incidencias().length === 0) {
+          <div class="modal-empty">
+            <lucide-icon name="package" size="48"></lucide-icon>
+            <p>No hay incidencias de este tipo registradas</p>
+          </div>
+        } @else {
+          @for (inc of incidencias(); track inc.idAuditoria) {
+            <div class="incidencia-card">
+              <div class="incidencia-left">
+                <div class="incidencia-meta">
+                  <span class="comanda-id">#{{ inc.comanda.idComanda | slice:0:6 | uppercase }}</span>
+                  <span class="mesa-badge">Mesa {{ inc.comanda.mesa?.numeroMesa ?? '—' }}</span>
+                </div>
+                <div class="incidencia-info">
+                  <span class="hora"><lucide-icon name="clock" size="14"></lucide-icon> {{ formatHora(inc.fechaRegistro) }}</span>
+                  <span class="mesero">Mesero: {{ inc.comanda.nombreMesero || 'No asignado' }}</span>
+                </div>
+              </div>
+
+              <div class="incidencia-right">
+                @if (inc.detalleModificado) {
+                  <p class="platos-label">Bebidas / Preparaciones:</p>
+                  <p class="platos-text">{{ inc.detalleModificado }}</p>
+                }
+                <div class="motivo-box">
+                  <p class="motivo-label">{{ getEtiquetaTipo(inc.tipoIncidencia) }}</p>
+                  <p class="motivo-text">{{ inc.motivo }}</p>
+                </div>
+              </div>
+            </div>
+          }
+        }
+      </div>
+
+      <div class="modal-footer">
+        Total incidencias hoy: <strong>{{ incidencias().length }} pedidos</strong>
+      </div>
+
+    </div>
+  </div>
+}
+
+<!-- ===== MODAL TODAS LAS COMANDAS LISTAS ===== -->
+@if (modalListasAbierto()) {
+  <div class="modal-overlay" (click)="cerrarListasConOverlay($event)">
+    <div class="modal-listas">
+
+      <!-- Header -->
+      <div class="modal-header">
+        <div class="modal-title-row">
+          <lucide-icon name="check-circle-2" size="24" class="modal-icon-listas"></lucide-icon>
+          <div>
+            <h2>Todas las Comandas Listas</h2>
+          </div>
+        </div>
+        <button class="modal-close" (click)="cerrarModalListas()">
+          <lucide-icon name="x" size="20"></lucide-icon>
+        </button>
+      </div>
+
+      <!-- Search -->
+      <div class="modal-search-bar">
+        <lucide-icon name="search" size="16" class="search-icon"></lucide-icon>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Buscar por fecha, mesero o #comanda..."
+          [ngModel]="busquedaListas()"
+          (ngModelChange)="busquedaListas.set($event)"
+        />
+      </div>
+
+      <!-- Date range filter -->
+      <div class="modal-date-range">
+        <span class="range-label">Eliminar entre:</span>
+        <input
+          type="date"
+          class="date-input"
+          [ngModel]="fechaEliminarDesde()"
+          (ngModelChange)="fechaEliminarDesde.set($event)"
+        />
+        <span class="range-separator">–</span>
+        <input
+          type="date"
+          class="date-input"
+          [ngModel]="fechaEliminarHasta()"
+          (ngModelChange)="fechaEliminarHasta.set($event)"
+        />
+        <button
+          class="btn-eliminar"
+          (click)="eliminarPorRango()"
+          [disabled]="!fechaEliminarDesde() || !fechaEliminarHasta()"
+        >Eliminar</button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body">
+        @if (cargandoListas()) {
+          <div class="modal-loading">
+            <div class="spinner"></div>
+            <p>Cargando comandas...</p>
+          </div>
+        } @else if (comandasListasFiltradas().length === 0) {
+          <div class="modal-empty">
+            <lucide-icon name="inbox" size="48"></lucide-icon>
+            <p>No hay comandas listas</p>
+          </div>
+        } @else {
+          @for (c of comandasListasFiltradas(); track c.idComanda) {
+            <div class="comanda-lista-card">
+              <!-- Columna izquierda -->
+              <div class="cl-left">
+                <div class="cl-meta">
+                  <span class="cl-id">#{{ getIdCorto(c.idComanda) }}</span>
+                  <span class="cl-mesa">Mesa {{ c.numeroMesa }}</span>
+                </div>
+                <div class="cl-info">
+                  <span class="cl-hora">
+                    <lucide-icon name="clock" size="13"></lucide-icon>
+                    {{ formatHora(c.horaEntrada) }}
+                  </span>
+                  <span class="cl-mesero">Mesero: {{ c.mesero || 'No asignado' }}</span>
+                </div>
+              </div>
+
+              <!-- Columna derecha -->
+              <div class="cl-right">
+                <p class="cl-platos-label">Platos:</p>
+                <p class="cl-platos-text">{{ c.preparacion }}</p>
+                <div class="cl-estado-box">
+                  <p class="cl-estado-label">Estado actual:</p>
+                  <p class="cl-estado-text">Comanda procesada y entregada correctamente.</p>
+                </div>
+              </div>
+
+              <!-- Icono eliminar individual -->
+              <button class="btn-delete-single" title="Eliminar comanda">
+                <lucide-icon name="trash-2" size="16"></lucide-icon>
+              </button>
+            </div>
+          }
+        }
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer">
+        Total mostrado: <strong>{{ comandasListasFiltradas().length }} pedidos</strong>
+      </div>
+
+    </div>
+  </div>
+}

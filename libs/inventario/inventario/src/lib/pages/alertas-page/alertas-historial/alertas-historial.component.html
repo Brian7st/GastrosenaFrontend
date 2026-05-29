@@ -10,7 +10,7 @@
       </div>
     </div>
     <div class="header-right">
-      <restaurant-button variant="primary" (click)="exportarCSV()">
+      <restaurant-button variant="surface" (click)="openExportModal()">
         <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: bold;">
           <lucide-icon name="download" [size]="18"></lucide-icon>
           Exportar
@@ -144,3 +144,13 @@
   </div>
 
 </div>
+
+@if (showExportModal()) {
+<inventario-exportar
+ 
+  titulo="Exportar Historial de Alertas"
+  subtitulo="Seleccione el formato de salida para el historial de gestión de alertas"
+  (exportar)="onExport($event)"
+  (cerrar)="closeExportModal()"
+></inventario-exportar>
+}

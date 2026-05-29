@@ -1,14 +1,15 @@
 import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { 
-  PageHeaderComponent, 
-  KpiCardComponent, 
-  CardComponent, 
-  StatusBadgeComponent, 
+import {
+  PageHeaderComponent,
+  KpiCardComponent,
+  CardComponent,
+  StatusBadgeComponent,
   ButtonComponent,
   LucideIconComponent,
   EmptyStateComponent,
+  ConfirmDialogComponent
 } from '@restaurant/shared/ui';
 import { Router, ActivatedRoute } from '@angular/router';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
@@ -18,15 +19,16 @@ import { Mesa } from '../../models/restaurante.model';
   selector: 'restaurant-mesas-page',
   standalone: true,
   imports: [
-    CommonModule, 
-    FormsModule, 
-    PageHeaderComponent, 
-    KpiCardComponent, 
-    CardComponent, 
-    StatusBadgeComponent, 
+    CommonModule,
+    FormsModule,
+    PageHeaderComponent,
+    KpiCardComponent,
+    CardComponent,
+    StatusBadgeComponent,
     ButtonComponent,
     LucideIconComponent,
-    EmptyStateComponent
+    EmptyStateComponent,
+    ConfirmDialogComponent
   ],
   templateUrl: './mesas-page.component.html',
   styleUrl: './mesas-page.component.scss',
@@ -34,114 +36,338 @@ import { Mesa } from '../../models/restaurante.model';
 })
 export class MesasPageComponent {
   private facade = inject(RestauranteFacade);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private router  = inject(Router);
+  private route   = inject(ActivatedRoute);
 
-  // Signals del Facade
+  // ── Signals del Facade ──────────────────────────────────────────────────────
   mesas = this.facade.mesas;
-  mesasActivas = computed(() => this.mesas().filter(m => m.isActive !== false));
-  mesasInactivas = computed(() => this.mesas().filter(m => m.isActive === false));
+  mesasCargando = this.facade.mesasCargando;
+  mesasError = this.facade.mesasError;
+  mesasActivas = computed(() => this.mesas().filter(m => m.activo));
+  mesasInactivas = computed(() => this.mesas().filter(m => !m.activo));
   stats = this.facade.stats;
 
-  // Estado local reactivo (Signals)
+  // ── Estado local del modal ───────────────────────────────────────────────────
   modalActivo = signal<string | null>(null);
   mesaSeleccionada = signal<Mesa | null>(null);
-  tabActivo = signal<'desactivar' | 'activar'>('desactivar');
+  tabActivo        = signal<'desactivar' | 'activar'>('desactivar');
+  searchQueryGestionMesas = signal<string>('');
   
-  // Signals para crear mesa
-  nuevoNumero = signal<number>(1);
-  nuevoAsientos = signal<number>(4);
+  // ── Estado local de la vista principal ───────────────────────────────────────
+  searchQueryMain = signal<string>('');
+
+  filteredMesasActivasMain = computed(() => {
+    return this.mesasActivas().filter(m => this._matchMesa(m.nombre, this.searchQueryMain()));
+  });
+
+  filteredMesasActivasModal = computed(() => {
+    return this.mesasActivas().filter(m => this._matchMesa(m.nombre, this.searchQueryGestionMesas()));
+  });
+
+  filteredMesasInactivasModal = computed(() => {
+    return this.mesasInactivas().filter(m => this._matchMesa(m.nombre, this.searchQueryGestionMesas()));
+  });
+
+  private _matchMesa(nombreMesa: string, query: string): boolean {
+    const q = query.toLowerCase().trim();
+    if (!q) return true;
+
+    const nombre = nombreMesa.toLowerCase();
+    const cleanNombre = nombre.replace(/^mesa\s*/, '');
+    const cleanQuery = q.replace(/^mesa\s*/, '');
+
+    const esNumeroNombre = /^\d+$/.test(cleanNombre);
+    const esNumeroQuery = /^\d+$/.test(cleanQuery);
+
+    if (esNumeroNombre && esNumeroQuery) {
+      const numNombre = parseInt(cleanNombre, 10).toString();
+      const numQuery = parseInt(cleanQuery, 10).toString();
+      return numNombre.includes(numQuery);
+    }
+
+    return cleanNombre.includes(cleanQuery) || nombre.includes(q);
+  }
+
+  // ── Mesas en servicio (Ocupadas / Por pagar) ──────────────────────────────────
+  mesasEnServicio = computed(() => {
+    const meseros = ['Juan Pérez', 'Ana Gómez', 'Carlos Ruiz', 'María López', 'Luisa Fernanda'];
+    return this.mesasActivas()
+      .filter(m => m.estado === 'OCUPADA' || m.estado === 'POR_PAGAR')
+      .map(m => {
+        const index = m.id.charCodeAt(0) % meseros.length;
+        return { ...m, meseroAsignado: meseros[index] };
+      });
+  });
+
+  // ── Signals para CREAR mesa (MesaCreateRequest) ──────────────────────────────
+  nuevoNombre = signal<string>('');
+  nuevaCapacidad = signal<number | null>(1);
   nuevaZona = signal<string>('');
-  nuevoActivo = signal<boolean>(true);
 
-  // Eliminamos mesaIdParaEliminar ya que no usaremos eliminar-global
-  
-  // Signals para abrir mesa
-  nuevoComensal = signal<string>('');
-  nuevaNota = signal<string>('');
-  nuevaCantidadComensales = signal<number>(1);
+  // ── Signals para EDITAR mesa (MesaUpdateRequest) — se pre-llenan al abrir ──
+  editNombre = signal<string>('');
+  editCapacidad = signal<number>(4);
+  editZona = signal<string>('');
 
+  // ── Opciones de Zona (Autocomplete) ──────────────────────────────────────────
+  opcionesZonas = ['Salón Principal', 'Terraza', 'Salón VIP', 'Barra'];
+
+  showNuevaZonaDropdown = signal(false);
+  filteredNuevaZonas = computed(() => {
+    const q = this.nuevaZona().toLowerCase();
+    if (!q) return this.opcionesZonas;
+    return this.opcionesZonas.filter(z => z.toLowerCase().includes(q));
+  });
+
+  showEditZonaDropdown = signal(false);
+  filteredEditZonas = computed(() => {
+    const q = this.editZona().toLowerCase();
+    if (!q) return this.opcionesZonas;
+    return this.opcionesZonas.filter(z => z.toLowerCase().includes(q));
+  });
+
+  selectZona(zona: string, tipo: 'nueva' | 'editar') {
+    if (tipo === 'nueva') {
+      this.nuevaZona.set(zona);
+      this.showNuevaZonaDropdown.set(false);
+    } else {
+      this.editZona.set(zona);
+      this.showEditZonaDropdown.set(false);
+    }
+  }
+
+  onBlurZona(tipo: 'nueva' | 'editar') {
+    setTimeout(() => {
+      if (tipo === 'nueva') this.showNuevaZonaDropdown.set(false);
+      else this.showEditZonaDropdown.set(false);
+    }, 150);
+  }
+
+  // ── Signals para ABRIR mesa ──────────────────────────────────────────────────
+  comensales = signal<number>(1);
+
+  // ── Apertura / cierre de modales ─────────────────────────────────────────────
   abrirModal(nombre: string, mesa: Mesa | null = null) {
     this.modalActivo.set(nombre);
     this.mesaSeleccionada.set(mesa);
-    
+
     if (nombre === 'agregar') {
-      const mesas = this.facade.mesas();
-      const nextNum = mesas.length > 0 ? Math.max(...mesas.map(m => m.numero)) + 1 : 1;
-      this.nuevoNumero.set(nextNum);
-      this.nuevoAsientos.set(1);
+      this.nuevoNombre.set('');
+      this.nuevaCapacidad.set(1);
       this.nuevaZona.set('');
-      this.nuevoActivo.set(true);
+    } else if (nombre === 'editar' && mesa) {
+      this.mesaSeleccionada.set(mesa);
+      const nombreLimpio = mesa.nombre.toUpperCase().startsWith('MESA ') 
+        ? mesa.nombre.substring(5) 
+        : mesa.nombre;
+      this.editNombre.set(nombreLimpio);
+      this.editCapacidad.set(mesa.capacidad);
+      this.editZona.set(mesa.zona || '');
+    } else if (nombre === 'abrir' && mesa) {
+      this.comensales.set(1);
     } else if (nombre === 'gestion-mesas') {
       this.tabActivo.set('desactivar');
-    } else if (mesa) {
-      this.nuevoComensal.set(mesa.comensal || '');
-      this.nuevaNota.set(mesa.notas || '');
-      this.nuevaCantidadComensales.set(mesa.cantidadComensales || 1);
-    } else {
-      this.nuevoComensal.set('');
-      this.nuevaNota.set('');
-      this.nuevaCantidadComensales.set(1);
+      this.searchQueryGestionMesas.set('');
     }
   }
 
   cerrarModales() {
     this.modalActivo.set(null);
     this.mesaSeleccionada.set(null);
+    
+    this.showNuevaZonaDropdown.set(false);
+    this.showEditZonaDropdown.set(false);
+    this.searchQueryGestionMesas.set('');
   }
 
+  // ── Modal de alertas y notificaciones ────────────────────────────────────────
+  alertDialog = signal<{
+    open: boolean,
+    title: string,
+    message: string,
+    type: 'success' | 'error' | 'confirm',
+    confirmText?: string,
+    cancelText?: string,
+    onConfirm?: () => void,
+    onCancel?: () => void
+  }>({
+    open: false,
+    title: '',
+    message: '',
+    type: 'error'
+  });
+  
+  cerrarAlertDialog() {
+    const state = this.alertDialog();
+    if (state.onCancel) {
+      state.onCancel();
+    }
+    this.alertDialog.update(s => ({...s, open: false}));
+  }
+
+  confirmAlertDialog() {
+    const state = this.alertDialog();
+    if (state.onConfirm) {
+      state.onConfirm();
+    }
+    this.alertDialog.update(s => ({...s, open: false}));
+  }
+
+  mostrarExito(mensaje: string) {
+    this.alertDialog.set({ open: true, title: '¡Éxito!', message: mensaje, type: 'success' });
+  }
+
+  mostrarError(mensaje: string) {
+    this.alertDialog.set({ open: true, title: 'Atención', message: mensaje, type: 'error' });
+  }
+
+  pedirConfirmacion(title: string, message: string, onConfirm: () => void) {
+    this.alertDialog.set({
+      open: true,
+      title,
+      message,
+      type: 'confirm',
+      confirmText: 'Aceptar',
+      cancelText: 'Cancelar',
+      onConfirm
+    });
+  }
+
+  // ── CREAR ────────────────────────────────────────────────────────────────────
   crearMesa() {
-    this.facade.agregarMesa(
-      this.nuevoNumero(),
-      this.nuevoAsientos(),
-      this.nuevaZona(),
-      this.nuevoActivo()
-    );
+    const rawNombre = this.nuevoNombre().trim();
+    const nombre    = rawNombre ? `MESA ${rawNombre}` : '';
+    let capacidad   = this.nuevaCapacidad();
+    const zona      = this.nuevaZona().trim();
+
+    if (capacidad === null || capacidad === undefined || capacidad.toString().trim() === '') {
+      capacidad = 1;
+    }
+    
+    capacidad = Number(capacidad);
+
+    if (!rawNombre) {
+      this.mostrarError('El número o identificador de la mesa es obligatorio.');
+      return;
+    }
+    if (capacidad < 1 || capacidad > 20 || isNaN(capacidad)) {
+      this.mostrarError('La capacidad debe ser entre 1 y 20 personas.');
+      return;
+    }
+
+    this.facade.agregarMesa(nombre, capacidad, zona);
     this.cerrarModales();
+    this.mostrarExito(`La mesa "${nombre}" ha sido creada correctamente.`);
   }
 
-  abrirMesa(id: number) {
-    if (this.nuevoComensal().trim()) {
-      this.facade.abrirMesa(id, this.nuevoComensal(), this.nuevaCantidadComensales());
-      this.facade.seleccionarMesaParaPedido(id);
-      this.cerrarModales();
-      this.router.navigate(['../pedidos'], { relativeTo: this.route });
+  // ── EDITAR ───────────────────────────────────────────────────────────────────
+  guardarEdicion() {
+    const mesa = this.mesaSeleccionada();
+    if (!mesa) return;
+
+    const rawNombre = this.editNombre().trim();
+    const nombre    = rawNombre ? `MESA ${rawNombre}` : '';
+    const capacidad = this.editCapacidad();
+    const zona = this.editZona().trim();
+
+    if (!rawNombre) {
+      this.mostrarError('El número o identificador de la mesa es obligatorio.');
+      return;
+    }
+    if (capacidad < 1 || capacidad > 20) {
+      this.mostrarError('La capacidad debe ser entre 1 y 20 personas.');
+      return;
+    }
+
+    this.cerrarModales();
+    this.facade.editarMesa(mesa.id, {
+      nombre,
+      capacidad,
+      zona: zona || null,
+    });
+  }
+
+  // ── CONTROLES DE CAPACIDAD ───────────────────────────────────────────────────
+  incrementarCapacidad(tipo: 'nueva' | 'editar') {
+    if (tipo === 'nueva') {
+      const actual = this.nuevaCapacidad() || 1;
+      if (actual < 20) this.nuevaCapacidad.set(actual + 1);
+    } else {
+      const actual = this.editCapacidad() || 1;
+      if (actual < 20) this.editCapacidad.set(actual + 1);
     }
   }
 
-  verPedido(id: number) {
+  decrementarCapacidad(tipo: 'nueva' | 'editar') {
+    if (tipo === 'nueva') {
+      const actual = this.nuevaCapacidad() || 1;
+      if (actual > 1) this.nuevaCapacidad.set(actual - 1);
+    } else {
+      const actual = this.editCapacidad() || 1;
+      if (actual > 1) this.editCapacidad.set(actual - 1);
+    }
+  }
+
+  // ── ACCIONES DE ESTADO ───────────────────────────────────────────────────────
+  abrirMesa(id: string) {
+    const comensales = this.comensales();
+    this.facade.abrirMesa(id, '', comensales);
+    this.cerrarModales();
+    this.router.navigate(['../pedidos'], { 
+      relativeTo: this.route,
+      state: { comensales: comensales, mesaId: id }
+    });
+  }
+
+  verPedido(id: string) {
     this.facade.seleccionarMesaParaPedido(id);
     this.router.navigate(['../pedidos'], { relativeTo: this.route });
   }
 
-  guardarNotas() {
-    const mesa = this.mesaSeleccionada();
-    if (mesa) {
-      this.facade.actualizarNotas(mesa.id, this.nuevaNota());
-      this.cerrarModales();
+  liberarMesa(id: string) {
+    this.cerrarModales();
+    this.facade.liberarMesa(id);
+  }
+
+  // ── ACTIVAR / DESACTIVAR ─────────────────────────────────────────────────────
+  cambiarEstadoMesa(id: string, activo: boolean) {
+    if (!activo) {
+      this.pedirConfirmacion(
+        'Desactivar mesa',
+        '¿Desactivar esta mesa? Quedará oculta del salón.',
+        () => {
+          this.facade.cambiarEstadoActivoMesa(id, activo);
+        }
+      );
+    } else {
+      this.facade.cambiarEstadoActivoMesa(id, activo);
     }
   }
 
-  eliminarMesa(id: number) {
-    this.facade.eliminarMesa(id);
+  eliminarMesa(id: string) {
+    this.cambiarEstadoMesa(id, false);
     this.cerrarModales();
   }
 
-  cambiarEstadoMesa(id: number, isActive: boolean) {
-    this.facade.cambiarEstadoActivoMesa(id, isActive);
+  recargarMesas() {
+    this.facade.cargarMesas();
   }
 
-  liberarMesa(id: number) {
-    this.facade.liberarMesa(id);
-    this.cerrarModales();
+  // ── Helpers de UI ────────────────────────────────────────────────────────────
+  soloNumeros(event: KeyboardEvent) {
+    const charCode = event.which ? event.which : event.keyCode;
+    if (charCode < 48 || charCode > 57) {
+      event.preventDefault();
+    }
   }
 
   getBadgeType(estado: string): 'info' | 'success' | 'warning' | 'danger' {
     switch (estado) {
-      case 'libre': return 'success';
-      case 'ocupada': return 'danger';
-      case 'por_pagar': return 'warning';
-      default: return 'info';
+      case 'LIBRE':     return 'success';
+      case 'OCUPADA':   return 'danger';
+      case 'POR_PAGAR': return 'warning';
+      case 'INACTIVA':  return 'info';
+      default:          return 'info';
     }
   }
 }

@@ -77,6 +77,20 @@ export class PaqueteFacade {
       });
   }
 
+  /** Archiva el paquete y recarga su detalle. */
+  archivarPaquete(id: string): void {
+    this._loading.set(true);
+    this.paqueteService.archivarPaquete(id)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al archivar el paquete');
+          return of(false);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(ok => { if (ok) this.cargarPaquete(id); });
+  }
+
   /** Incluye una requisición en el paquete y recarga su detalle. */
   incluirRequisicion(paqueteId: string, reqId: string): void {
     this.paqueteService.incluirRequisicion(paqueteId, reqId)

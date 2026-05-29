@@ -1,0 +1,78 @@
+@if (isOpen) {
+<div class="modal-overlay" (click)="onCancel()">
+  <div class="modal-dialog" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <header class="modal-header">
+      <div class="modal-title-wrapper">
+        <span class="material-symbols-outlined check-icon">check_circle</span>
+        <h2 class="modal-title">Aprobar solicitud #{{ solicitud?.numeroSolicitud }}</h2>
+      </div>
+      <button type="button" class="close-btn" (click)="onCancel()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </header>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <!-- Section: Resumen de solicitud -->
+      <section class="info-section">
+        <h3 class="section-title">RESUMEN DE SOLICITUD</h3>
+        <div class="instructor-card">
+          <div class="instructor-avatar">
+            <span class="material-symbols-outlined">person</span>
+          </div>
+          <div class="instructor-details">
+            <p class="instructor-name">Instructor {{ solicitud?.instructorId }}</p>
+            <p class="instructor-meta">{{ solicitud?.items?.length }} ítems &middot; Ficha {{ solicitud?.fichaId }}</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Items a aprobar -->
+      <section class="info-section">
+        <h3 class="section-title">ÍTEMS A APROBAR</h3>
+        <div class="table-container">
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th class="text-right">Cantidad</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of solicitud?.items; track item) {
+<tr>
+                <td>
+                  <div class="product-cell">
+                    <span class="material-symbols-outlined item-icon">inventory_2</span>
+                    <span>{{ item.nombreBien }}</span>
+                  </div>
+                </td>
+                <td class="text-right">{{ item.cantidad }}</td>
+              </tr>
+}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Alert -->
+      <div class="info-alert">
+        <span class="material-symbols-outlined alert-icon">info</span>
+        <p class="alert-text">
+          Una vez aprobada, la solicitud podrá ser incluida en un formato <strong>GIL-F-014</strong> para el proceso de alistamiento.
+        </p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="modal-footer">
+      <button type="button" class="btn btn-cancel" (click)="onCancel()">Cancelar</button>
+      <button type="button" class="btn btn-confirm" (click)="onConfirm()">
+        Confirmar aprobación
+        <span class="material-symbols-outlined">check</span>
+      </button>
+    </footer>
+  </div>
+</div>
+}

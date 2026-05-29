@@ -1,35 +1,41 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
-import { Factura } from '../../../models/facturas.model';
+import { FacturaFormDto } from '../../../models/facturas.model';
+import type { InfoBancariaTipo } from '../../../data-access/api/sourcing.api';
 
 @Component({
   selector: 'restaurant-factura-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './factura-form.component.html',
   styleUrl: './factura-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FacturaFormComponent {
+  // eslint-disable-next-line @angular-eslint/no-output-native
   @Output() close = new EventEmitter<void>();
-  @Output() save  = new EventEmitter<Partial<Factura>>();
+  // eslint-disable-next-line @angular-eslint/no-output-native
+  @Output() save  = new EventEmitter<FacturaFormDto>();
 
   // Form model
-  numeroFEL      = signal('');
-  fechaEmision   = signal('');
-  fechaVencimiento = signal('');
-  nitEmisor      = signal('');
-  nitReceptor    = signal('');
-  gilVinculado   = signal('');
-  instructorCuentadante = signal('Carlos Ruiz (Autocompletado)');
-  codigoCufe     = signal('');
-  retencionZESE  = signal(0.625);
-  ordenCompra    = signal('');
+  numeroFactura    = signal('');
+  cufe             = signal('');
+  fechaEmision     = signal('');
+  fechaRecepcion   = signal('');
+  proveedorNit     = signal('');
+  proveedorNombre  = signal('');
+  proveedorBeneficiarioZese = signal(false);
+  ordenCompra      = signal('');
+  productoId       = signal('');
+  descripcionLinea = signal('');
+  cantidadLinea    = signal(1);
+  precioLinea      = signal(0);
+  porcentajeIvaLinea = signal(19);
   
   // Datos Bancarios
   banco = signal('');
-  tipoCuenta = signal('');
+  tipoCuenta = signal<InfoBancariaTipo | ''>('');
   numeroCuenta = signal('');
 
   archivosNombres = signal<string[]>([]);
@@ -62,21 +68,27 @@ export class FacturaFormComponent {
   }
 
   onSubmit(): void {
-    // Note: The model `Factura` or `FacturaFormDto` might need to be updated to accept bank details later
     this.save.emit({
-      numeroFEL: this.numeroFEL(),
+      numeroFactura: this.numeroFactura(),
+      cufe: this.cufe().trim(),
       fechaEmision: this.fechaEmision(),
-      fechaVencimiento: this.fechaVencimiento() || undefined,
-      nitEmisor: this.nitEmisor(),
-      nitReceptor: this.nitReceptor(),
-      gilVinculado: this.gilVinculado() || undefined,
-      instructorCuentadante: this.instructorCuentadante(),
-      codigoCufe: this.codigoCufe() || undefined,
-      retencionZESE: this.retencionZESE(),
+      fechaRecepcion: this.fechaRecepcion(),
+      proveedorNit: this.proveedorNit(),
+      proveedorNombre: this.proveedorNombre(),
+      proveedorBeneficiarioZese: this.proveedorBeneficiarioZese(),
       ordenCompra: this.ordenCompra() || undefined,
-      // banco: this.banco(),
-      // tipoCuenta: this.tipoCuenta(),
-      // numeroCuenta: this.numeroCuenta(),
+      infoBancariaBanco: this.banco() || undefined,
+      infoBancariaCuenta: this.numeroCuenta() || undefined,
+      infoBancariaTipo: this.tipoCuenta() || undefined,
+      lineas: [
+        {
+          productoId: this.productoId() || undefined,
+          descripcion: this.descripcionLinea(),
+          cantidad: this.cantidadLinea(),
+          precioUnitario: this.precioLinea(),
+          porcentajeIva: this.porcentajeIvaLinea(),
+        },
+      ],
     });
   }
 

@@ -2,7 +2,7 @@
      Contenedor Principal de la Vista Formulario
 ══════════════════════════════════════════════════════════════════════════ -->
 <div class="form-page-container">
-  
+
   <div class="page-header">
     <inventario-back-button (clicked)="onCancel()" />
     <div>
@@ -19,117 +19,249 @@
         <div class="form-group">
           <label class="form-label">Código de Solicitud</label>
           <div class="readonly-input">
-            <span class="readonly-text">GIL-F-014-2024-XXX</span>
+            <span class="readonly-text">GIL-F-014-YYYY-XXX</span>
             <span class="material-symbols-outlined icon-locked">lock</span>
+          </div>
+          <p class="form-hint">Generado automáticamente por el sistema.</p>
+        </div>
+
+        <!-- Regional: código numérico + nombre -->
+        <div class="form-group">
+          <label class="form-label">Regional (Código) <span class="required-asterisk">*</span></label>
+          <input
+            type="number"
+            class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['regionalCodigo']"
+            placeholder="Ej. 63"
+            min="1"
+            [value]="regionalCodigo() ?? ''"
+            (input)="regionalCodigo.set(+$any($event.target).value || null)"
+          />
+          @if (submitAttempted() && errores()['regionalCodigo']) {
+            <p class="field-error">{{ errores()['regionalCodigo'] }}</p>
+          }
+          <p class="form-hint">Código numérico de la regional SENA.</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Nombre de la Regional <span class="required-asterisk">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['regionalNombre']"
+            placeholder="Ej. Quindío"
+            [value]="regionalNombre()"
+            (input)="regionalNombre.set($any($event.target).value)"
+          />
+          @if (submitAttempted() && errores()['regionalNombre']) {
+            <p class="field-error">{{ errores()['regionalNombre'] }}</p>
+          }
+        </div>
+
+        <!-- Cuentadante con cédula -->
+        <div class="form-group">
+          <label class="form-label">Cuentadante(s) <span class="required-asterisk">*</span></label>
+
+          @if (submitAttempted() && errores()['cuentadantes']) {
+            <p class="field-error">{{ errores()['cuentadantes'] }}</p>
+          }
+          <!-- Lista de cuentadantes confirmados -->
+          @if (cuentadantes().length > 0) {
+            <div class="cuentadantes-list">
+              @for (c of cuentadantes(); track c; let i = $index) {
+                <div class="cuentadante-chip">
+                  <span class="material-symbols-outlined">person</span>
+                  <span class="cuentadante-nombre">{{ c.nombre }}</span>
+                  <span class="cuentadante-cedula">CC {{ c.cedula }}</span>
+                  <button class="btn-chip-remove" type="button" (click)="onRemoveCuentadante(i)" title="Quitar">
+                    <span class="material-symbols-outlined">close</span>
+                  </button>
+                </div>
+              }
+            </div>
+          }
+
+          <button class="btn-link btn-link--add mt-2" type="button" (click)="onAddCuentadante()">
+            <span class="material-symbols-outlined">{{ mostrarNuevaCuenta() ? 'remove' : 'add' }}</span>
+            {{ mostrarNuevaCuenta() ? 'Cancelar' : 'Agregar cuentadante' }}
+          </button>
+
+          <div class="nueva-cuenta-panel" [class.nueva-cuenta-panel--visible]="mostrarNuevaCuenta()">
+            <div class="form-group mt-2">
+              <label class="form-label">Nombre del cuentadante</label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Ej. Juan Pablo Gómez"
+                [value]="nuevaCuenta()"
+                (input)="nuevaCuenta.set($any($event.target).value)"
+              />
+            </div>
+            <div class="form-group mt-2">
+              <label class="form-label">Cédula del cuentadante <span class="required-asterisk">*</span></label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Ej. 1001234567"
+                [value]="nuevaCuentaCedula()"
+                (input)="nuevaCuentaCedula.set($any($event.target).value)"
+              />
+            </div>
+            <button
+              class="btn-link btn-link--add mt-2"
+              type="button"
+              [disabled]="!nuevaCuenta().trim() || !nuevaCuentaCedula().trim()"
+              (click)="onConfirmarCuentadante()">
+              <span class="material-symbols-outlined">check_circle</span>
+              Confirmar cuentadante
+            </button>
           </div>
         </div>
 
+        <!-- Código de Grupo -->
         <div class="form-group">
-          <label class="form-label">Regional</label>
-          <select class="form-control">
-            <option>Seleccione Regional</option>
-            <option selected>Distrito Capital</option>
-            <option>Antioquia</option>
-            <option>Valle del Cauca</option>
-          </select>
+          <label class="form-label">Código de Grupo <span class="required-asterisk">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['codigoGrupo']"
+            placeholder="Ej. ADSO-2670687"
+            [value]="codigoGrupo()"
+            (input)="codigoGrupo.set($any($event.target).value)"
+          />
+          @if (submitAttempted() && errores()['codigoGrupo']) {
+            <p class="field-error">{{ errores()['codigoGrupo'] }}</p>
+          }
+        </div>
+
+        <!-- Ficha de Caracterización -->
+        <div class="form-group">
+          <label class="form-label">Ficha de Caracterización <span class="required-asterisk">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['fichaCaracterizacion']"
+            maxlength="7"
+            pattern="\d{7}"
+            placeholder="Ej. 2471532"
+            [value]="fichaCaracterizacion()"
+            (input)="fichaCaracterizacion.set($any($event.target).value)"
+          />
+          @if (submitAttempted() && errores()['fichaCaracterizacion']) {
+            <p class="field-error">{{ errores()['fichaCaracterizacion'] }}</p>
+          } @else {
+            <p class="form-hint">Debe contener exactamente 7 dígitos.</p>
+          }
         </div>
 
         <div class="form-group">
-          <label class="form-label">Cuentadante</label>
-          <select class="form-control">
-            <option>Seleccione Cuentadante</option>
-            <option selected>Carlos Mario Estrada</option>
-            <option>Jorge Eduardo Londoño</option>
-          </select>
-          <button class="btn-link btn-link--add mt-2" type="button" (click)="onAddCuentadante()">
-            <span class="material-symbols-outlined">add</span>
-            Agregar otro cuentadante
-          </button>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Ficha de Caracterización</label>
-          <input type="text" class="form-control" maxlength="7" pattern="\d{7}" placeholder="Ej. 2471532" />
-          <p class="form-hint">Debe contener exactamente 7 dígitos.</p>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Fecha de Solicitud</label>
-          <input type="date" class="form-control" [value]="fechaSolicitud()" />
+          <label class="form-label">Fecha de Solicitud <span class="required-asterisk">*</span></label>
+          <input
+            type="date"
+            class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['fechaSolicitud']"
+            [value]="fechaSolicitud()"
+            (input)="fechaSolicitud.set($any($event.target).value)"
+          />
+          @if (submitAttempted() && errores()['fechaSolicitud']) {
+            <p class="field-error">{{ errores()['fechaSolicitud'] }}</p>
+          }
         </div>
       </div>
 
       <!-- Columna 2 -->
       <div class="form-col">
         <div class="form-group">
-          <label class="form-label">Fecha Requerida</label>
-          <input type="date" class="form-control" />
+          <label class="form-label">Área <span class="required-asterisk">*</span></label>
+          <select
+            class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['area']"
+            [value]="area()"
+            (change)="area.set($any($event.target).value)">
+            <option value="">Seleccione Área</option>
+            @for (a of AREAS; track a) {
+              <option [value]="a">{{ a }}</option>
+            }
+          </select>
+          @if (submitAttempted() && errores()['area']) {
+            <p class="field-error">{{ errores()['area'] }}</p>
+          }
+        </div>
+
+        <!-- Centro de Costos: código numérico + nombre -->
+        <div class="form-group">
+          <label class="form-label">Centro de Costos (Código) <span class="required-asterisk">*</span></label>
+          <input
+            type="number"
+            class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['centroCostosCodigo']"
+            placeholder="Ej. 953810"
+            min="1"
+            [value]="centroCostosCodigo() ?? ''"
+            (input)="centroCostosCodigo.set(+$any($event.target).value || null)"
+          />
+          @if (submitAttempted() && errores()['centroCostosCodigo']) {
+            <p class="field-error">{{ errores()['centroCostosCodigo'] }}</p>
+          } @else {
+            <p class="form-hint">Código numérico del centro de costos.</p>
+          }
         </div>
 
         <div class="form-group">
-          <label class="form-label">Área</label>
-          <select class="form-control">
-            <option>Seleccione Área</option>
-            <option selected>Tecnología y Logística</option>
-            <option>Centro de Comercio y Servicios</option>
+          <label class="form-label">Nombre del Centro <span class="required-asterisk">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['centroCostosNombre']"
+            placeholder="Ej. Comercio y Turismo"
+            [value]="centroCostosNombre()"
+            (input)="centroCostosNombre.set($any($event.target).value)"
+          />
+          @if (submitAttempted() && errores()['centroCostosNombre']) {
+            <p class="field-error">{{ errores()['centroCostosNombre'] }}</p>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Destino de Bienes <span class="required-asterisk">*</span></label>
+          <select
+            class="form-control"
+            [value]="destinoBienes()"
+            (change)="destinoBienes.set($any($event.target).value)">
+            @for (d of DESTINOS; track d.value) {
+              <option [value]="d.value">{{ d.label }}</option>
+            }
           </select>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Centro de Costos</label>
-          <select class="form-control">
-            <option>Seleccione Centro de Costo</option>
-            <option selected>CC-9201-450 - Bogotá</option>
-            <option>CC-1102-120 - Medellin</option>
-          </select>
+          <label class="form-label">Jefe de Oficina / Coordinador de Área <span class="required-asterisk">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['jefeOficinaCoordinador']"
+            placeholder="Ej. María García Rincón"
+            [value]="jefeOficinaCoordinador()"
+            (input)="jefeOficinaCoordinador.set($any($event.target).value)"
+          />
+          @if (submitAttempted() && errores()['jefeOficinaCoordinador']) {
+            <p class="field-error">{{ errores()['jefeOficinaCoordinador'] }}</p>
+          }
         </div>
 
         <div class="form-group">
-          <label class="form-label">Destino de Bienes</label>
-          <select class="form-control">
-            <option>Seleccione Destino</option>
-            <option selected>Laboratorio 402 - Computo Avanzado</option>
-            <option>Aula 101 - Gastronomía</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Solicitante</label>
-          <select class="form-control">
-            <option>Nombre del instructor solicitante</option>
-            <option selected>Ing. Ricardo Sarmiento</option>
-            <option>Lic. Martha Lucía Peña</option>
-          </select>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Trazabilidad Académica Section -->
-  <div class="form-card form-card--bordered">
-    <h3 class="section-title">
-      <span class="material-symbols-outlined section-icon">school</span>
-      Trazabilidad Académica <span class="required-asterisk">*</span>
-    </h3>
-    <div class="form-grid">
-      <div class="form-col">
-        <div class="form-group">
-          <label class="form-label">Vocero de Aprendices (Nombre Completo)</label>
-          <input type="text" class="form-control" placeholder="Ingrese nombre completo" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Cédula del Vocero</label>
-          <input type="text" class="form-control" placeholder="Ingrese número de documento" />
-        </div>
-      </div>
-      <div class="form-col">
-        <div class="form-group">
-          <label class="form-label">Resultado de Aprendizaje (RA)</label>
-          <textarea class="form-control" rows="2" placeholder="Especifique el resultado de aprendizaje asociado"></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Franja Horaria</label>
-          <input type="time" class="form-control" />
+          <label class="form-label">Solicitante <span class="required-asterisk">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['solicitante']"
+            placeholder="Ej. Ing. Ricardo Sarmiento"
+            [value]="solicitante()"
+            (input)="solicitante.set($any($event.target).value)"
+          />
+          @if (submitAttempted() && errores()['solicitante']) {
+            <p class="field-error">{{ errores()['solicitante'] }}</p>
+          }
         </div>
       </div>
     </div>
@@ -141,7 +273,7 @@
       <span class="material-symbols-outlined section-icon">category</span>
       Bienes Solicitados <span class="required-asterisk">*</span>
     </h3>
-    
+
     <div class="table-container">
       <table class="bienes-table">
         <thead>
@@ -156,44 +288,311 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let bien of bienes(); let i = index">
-            <td class="font-medium">{{ bien.codigo }}</td>
-            <td class="text-secondary">{{ bien.descripcion }}</td>
-            <td class="text-secondary">{{ bien.um }}</td>
-            <td class="text-right font-medium">{{ bien.cantidad }}</td>
-            <td class="text-right text-secondary">{{ bien.valorUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
-            <td class="text-right font-bold">{{ bien.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
-            <td class="text-center">
-              <button class="btn-icon btn-icon--danger" type="button" (click)="onRemoveBien(i)" title="Eliminar bien">
-                <span class="material-symbols-outlined">delete</span>
-              </button>
-            </td>
-          </tr>
+          @for (bien of bienes(); track bien; let i = $index) {
+            <tr>
+              <td class="font-medium">{{ bien.codigoSena }}</td>
+              <td class="text-secondary">{{ bien.descripcion }}</td>
+              <td class="text-secondary">{{ bien.unidadMedida }}</td>
+              <td class="text-right">
+                <input
+                  type="number"
+                  class="qty-input"
+                  [value]="bien.cantidad"
+                  min="1"
+                  (change)="onCantidadChange(i, +$any($event.target).value)"
+                />
+              </td>
+              <td class="text-right text-secondary">{{ bien.valorUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+              <td class="text-right font-bold">{{ bien.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+              <td class="text-center">
+                <button class="btn-icon btn-icon--danger" type="button" (click)="onRemoveBien(i)" title="Eliminar bien">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
+              </td>
+            </tr>
+          }
+          @if (bienes().length === 0) {
+            <tr>
+              <td colspan="7" class="empty-bienes-row">
+                <span class="material-symbols-outlined">category</span>
+                Sin bienes agregados — usá el botón de abajo para buscar del catálogo
+              </td>
+            </tr>
+          }
         </tbody>
       </table>
     </div>
-    <button class="btn-link btn-link--add mt-4" type="button" (click)="onAddBien()">
+    <button class="btn-link btn-link--add mt-4" type="button" (click)="onAbrirSelectorBien()">
       <span class="material-symbols-outlined">add_circle</span>
-      Agregar bien
+      Agregar bien del catálogo
     </button>
+    @if (submitAttempted() && errores()['bienes']) {
+      <p class="field-error mt-2">{{ errores()['bienes'] }}</p>
+    }
+  </div>
+
+  <!-- Consolidar Solicitudes Aprobadas (Generar GIL) Section -->
+  <div class="form-card form-card--bordered">
+    <h3 class="section-title">
+      <span class="material-symbols-outlined section-icon">library_add_check</span>
+      Consolidar Solicitudes Aprobadas (Generar GIL)
+    </h3>
+    <p class="form-hint mb-4" style="margin-top: -0.5rem; color: var(--color-text-secondary, #666);">
+      Seleccione las solicitudes aprobadas para consolidar en una Guía de Ingreso Local (GIL).
+    </p>
+
+    <div class="consolidar-container">
+      <!-- Columna Izquierda: Tabla Compacta de Solicitudes -->
+      <div class="consolidar-main">
+        <div class="toolbar-compact">
+          <div class="search-box-compact">
+            <span class="material-symbols-outlined search-icon">search</span>
+            <input
+              type="text"
+              placeholder="Buscar por código o solicitante..."
+              [value]="searchTerm()"
+              (input)="searchTerm.set($any($event.target).value)"
+            />
+          </div>
+        </div>
+
+        <div class="table-container-compact">
+          <table class="styled-table-compact">
+            <thead>
+              <tr>
+                <th class="w-checkbox"></th>
+                <th>Código / Ficha</th>
+                <th>Solicitante</th>
+                <th>Resumen</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of filteredSolicitudes(); track row) {
+                <tr [class.row-disabled]="!isAprobada(row.estado)">
+                  <td class="td-checkbox">
+                    @if (isAprobada(row.estado)) {
+                      <label class="custom-checkbox">
+                        <input
+                          type="checkbox"
+                          [checked]="isSelected(row.id)"
+                          (change)="toggleSelection(row.id)"
+                        />
+                        <span class="checkmark">
+                          <span class="material-symbols-outlined icon">check</span>
+                        </span>
+                      </label>
+                    }
+                  </td>
+                  <td class="font-medium text-dark line-clamp">{{ row.codigoFicha }}</td>
+                  <td class="text-dark">{{ row.solicitante }}</td>
+                  <td class="text-muted">{{ row.totalBienes }} ítems</td>
+                  <td>
+                    <span class="estado-badge estado-badge--{{ row.estado | lowercase }}">
+                      {{ row.estado }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Columna Derecha: Panel de Acciones -->
+      <div class="consolidar-sidebar">
+        <div class="summary-box-compact">
+          <div class="summary-item-compact">
+            <span>Seleccionadas</span>
+            <span class="value">{{ solicitudesSeleccionadas() }}</span>
+          </div>
+          <div class="summary-item-compact">
+            <span>Ítems a consolidar</span>
+            <span class="value">{{ itemsTotalesConsolidar() }}</span>
+          </div>
+
+          <restaurant-button
+            variant="primary"
+            class="w-full mt-4"
+            [disabled]="solicitudesSeleccionadas() === 0"
+            (click)="onGenerar()">
+            Generar GIL
+            <span class="material-symbols-outlined right-icon" style="margin-left: 0.25rem;">arrow_forward</span>
+          </restaurant-button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Observaciones -->
   <div class="form-card mb-12">
     <label class="form-label mb-4">Observaciones</label>
-    <textarea class="form-control" rows="4" placeholder="Ingrese detalles adicionales de la solicitud, justificación técnica o notas de despacho..."></textarea>
+    <textarea
+      class="form-control"
+      rows="4"
+      placeholder="Ingrese detalles adicionales de la solicitud, justificación técnica o notas de despacho..."
+      [value]="observaciones()"
+      (input)="observaciones.set($any($event.target).value)">
+    </textarea>
   </div>
 
   <!-- Action Buttons -->
   <div class="actions-footer">
     <restaurant-button variant="ghost" (click)="onCancel()">Cancelar</restaurant-button>
-    <restaurant-button variant="primary" (click)="onSave()">
+    <restaurant-button
+      variant="primary"
+      [disabled]="!formularioValido()"
+      (click)="onSave()">
       <span class="material-symbols-outlined">save</span>
       Crear Solicitud
     </restaurant-button>
   </div>
 
 </div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     MODAL DE CONFIRMACIÓN
+══════════════════════════════════════════════════════════════════════════ -->
+@if (showModal()) {
+<div class="modal-overlay">
+  <div class="modal-backdrop" (click)="cerrarModal()"></div>
+  <div class="modal-container">
+    <div class="modal-header-strip modal-header-strip--primary"></div>
+    <div class="modal-body">
+      <div class="modal-icon-container modal-icon-container--primary">
+        <span class="material-symbols-outlined modal-icon">library_add_check</span>
+      </div>
+      <div class="modal-text-center">
+        <h3 class="modal-title">Confirmar Consolidación</h3>
+        <p class="modal-desc">
+          ¿Estás seguro de generar la Guía de Ingreso Local (GIL) con
+          <span class="font-bold">{{ solicitudesSeleccionadas() }}</span>
+          solicitudes seleccionadas y un total de
+          <span class="font-bold">{{ itemsTotalesConsolidar() }}</span> ítems?
+        </p>
+      </div>
+      <div class="modal-actions-col">
+        <restaurant-button variant="primary" (click)="confirmarGeneracion()">
+          Confirmar y Generar GIL
+        </restaurant-button>
+        <restaurant-button variant="surface" (click)="cerrarModal()">
+          Cancelar
+        </restaurant-button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     MODAL SELECTOR DE BIENES DEL CATÁLOGO
+══════════════════════════════════════════════════════════════════════════ -->
+@if (mostrarSelectorBien()) {
+<div class="selector-overlay">
+  <div class="selector-backdrop" (click)="mostrarSelectorBien.set(false)"></div>
+
+  <div class="selector-panel">
+
+    <div class="selector-header">
+      <h3>
+        <span class="material-symbols-outlined">inventory_2</span>
+        Catálogo de Bienes
+      </h3>
+      <button class="btn-close" type="button" (click)="mostrarSelectorBien.set(false)">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <div class="selector-search">
+      <div class="search-box-compact">
+        <span class="material-symbols-outlined search-icon">search</span>
+        <input
+          type="text"
+          placeholder="Buscar por nombre o código SENA..."
+          (input)="onBuscarBienCatalogo($any($event.target).value)"
+        />
+      </div>
+    </div>
+
+    <div class="selector-table-wrap">
+      @if (catalogoLoading()) {
+        <div class="selector-loading">
+          <span class="material-symbols-outlined" style="display:block;font-size:2rem;margin-bottom:0.5rem;color:#cbd5e1">hourglass_empty</span>
+          Cargando catálogo...
+        </div>
+      } @else {
+        <table>
+          <thead>
+            <tr>
+              <th>Cód. SENA</th>
+              <th>Nombre del Bien</th>
+              <th>Categoría</th>
+              <th class="text-center">Stock</th>
+              <th>UM</th>
+              <th class="text-right">Valor Unit.</th>
+              <th class="text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (bien of catalogoBienes(); track bien.id) {
+              <tr>
+                <td><span style="font-family:monospace;font-size:0.8125rem;font-weight:600">{{ bien.codigoSena }}</span></td>
+                <td>
+                  <p style="margin:0;font-weight:600">{{ bien.nombre }}</p>
+                  <p style="margin:0;font-size:0.75rem;color:#64748b">{{ bien.descripcion }}</p>
+                </td>
+                <td class="text-muted">{{ bien.categoria }}</td>
+                <td class="text-center">
+                  <span [style.color]="bien.stockActual < bien.stockMinimo ? '#ba1a1a' : 'inherit'" style="font-weight:600">
+                    {{ bien.stockActual }}
+                  </span>
+                </td>
+                <td class="text-muted">{{ bien.unidadMedida }}</td>
+                <td class="text-right" style="font-weight:600">{{ bien.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                <td class="text-center">
+                  <button class="btn-agregar" type="button" (click)="onSeleccionarBien(bien)">
+                    <span class="material-symbols-outlined">add</span>
+                    Agregar
+                  </button>
+                </td>
+              </tr>
+            }
+            @if (catalogoBienes().length === 0) {
+              <tr>
+                <td colspan="7" class="empty-bienes-row">
+                  <span class="material-symbols-outlined">search_off</span>
+                  No se encontraron bienes en el catálogo
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+
+    <div class="selector-footer">
+      <button class="selector-page-btn"
+        [disabled]="catalogoPaginacion().page === 0"
+        (click)="onSelectorIrAPagina(catalogoPaginacion().page - 1)">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      @for (p of paginasSelectorBien(); track p) {
+        <button class="selector-page-btn"
+          [class.selector-page-btn--active]="p === catalogoPaginacion().page"
+          (click)="onSelectorIrAPagina(p)">
+          {{ p + 1 }}
+        </button>
+      }
+      <button class="selector-page-btn"
+        [disabled]="catalogoPaginacion().page >= catalogoPaginacion().totalPages - 1"
+        (click)="onSelectorIrAPagina(catalogoPaginacion().page + 1)">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+}
 
 <!-- Footer -->
 <footer class="page-footer">

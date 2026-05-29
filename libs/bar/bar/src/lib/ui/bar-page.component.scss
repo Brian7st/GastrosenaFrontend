@@ -1,0 +1,10 @@
+.bar-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.bar-content {
+  flex: 1;
+  overflow-y: auto;
+}

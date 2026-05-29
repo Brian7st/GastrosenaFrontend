@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-import { LucideIconComponent, ButtonComponent, KpiCardComponent } from '@restaurant/shared/ui';
+import { LucideIconComponent, KpiCardComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { ConciliacionFacade } from '../../../data-access/conciliacion.facade';
 
@@ -12,7 +12,6 @@ import { ConciliacionFacade } from '../../../data-access/conciliacion.facade';
     CommonModule,
     RouterModule,
     LucideIconComponent,
-    ButtonComponent,
     KpiCardComponent,
     BackButtonComponent,
   ],
@@ -22,14 +21,14 @@ import { ConciliacionFacade } from '../../../data-access/conciliacion.facade';
 })
 export class ConciliacionDetalleComponent implements OnInit {
   private location = inject(Location);
-  private router   = inject(Router);
-  private route    = inject(ActivatedRoute);
-  private facade   = inject(ConciliacionFacade);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private facade = inject(ConciliacionFacade);
 
   // ── Estado reactivo desde facade ─────────────────────────────────────────
-  detalle         = this.facade.conciliacionSeleccionada;
+  detalle = this.facade.conciliacionSeleccionada;
   diferenciasList = this.facade.diferenciasList;
-  loading         = this.facade.loading;
+  loading = this.facade.loading;
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');

@@ -1,159 +1,163 @@
 <div class="modal-overlay">
-  <!-- Modal Container -->
   <div class="modal-content">
-    
-    <!-- Modal Header -->
+
+    <!-- Header -->
     <div class="modal-header">
       <div>
-        <h2 class="modal-title">Registrar Entrada</h2>
-        <p class="modal-subtitle">Basado en Formulario GIL-F-014</p>
+        <h2 class="modal-title">Registrar Entrada por GIL</h2>
+        <p class="modal-subtitle">Formulario GIL-F-014 — solo GILes en estado Emitido, Enviado o Cerrado</p>
       </div>
       <button class="close-btn" (click)="closeModal()" aria-label="Cerrar modal">
         <lucide-icon name="x" [size]="20"></lucide-icon>
       </button>
     </div>
 
-    <!-- Modal Body -->
+    <!-- Body -->
     <div class="modal-body">
-      
-      <!-- Form Info Section -->
+
+      <!-- Selector de GIL -->
       <section class="info-section">
-        <!-- GIL Selector -->
         <div class="form-group">
-          <label>CÓDIGO DE GIL-F-014 ORIGEN</label>
+          <label>GIL ORIGEN</label>
           <div class="select-wrapper">
-            <select class="form-select">
-              <option value="" disabled>Seleccione un formulario aprobado...</option>
-              <option value="GIL-2023-089" selected>GIL-2023-089 - Traslado Sede Central (Aprobado)</option>
-              <option value="GIL-2023-091">GIL-2023-091 - Dotación Laboratorio (Procesado)</option>
-              <option value="GIL-2023-095">GIL-2023-095 - Equipos Cómputo (Aprobado)</option>
-            </select>
+            @if (gilesFacade.loading()) {
+              <select class="form-select" disabled>
+                <option>Cargando GILes...</option>
+              </select>
+            } @else {
+              <select class="form-select" (change)="onGilChange($event)">
+                <option value="">Seleccione un GIL validado...</option>
+                @for (gil of gilesFacade.giles(); track gil.id) {
+                  <option [value]="gil.id">
+                    {{ gil.numeroGil ?? gil.id }} — {{ gil.destinoBienes ?? gil.area }} ({{ gil.estado }})
+                  </option>
+                }
+              </select>
+            }
             <lucide-icon name="chevron-down" [size]="18" class="icon-right"></lucide-icon>
           </div>
+
+          <!-- Paginación del selector de GIL -->
+          @if (!gilesFacade.loading() && gilesFacade.paginacion().totalPages > 1) {
+            <div class="pagination-row">
+              <button
+                class="page-btn"
+                type="button"
+                [disabled]="gilesFacade.paginacion().page === 0"
+                (click)="gilesFacade.irAPagina(gilesFacade.paginacion().page - 1)">
+                <lucide-icon name="chevron-left" [size]="14"></lucide-icon>
+                Anterior
+              </button>
+              <span class="page-info">
+                Página {{ gilesFacade.paginacion().page + 1 }}
+                de {{ gilesFacade.paginacion().totalPages }}
+                <span class="page-total">({{ gilesFacade.paginacion().totalElements }} GILes)</span>
+              </span>
+              <button
+                class="page-btn"
+                type="button"
+                [disabled]="gilesFacade.paginacion().page >= gilesFacade.paginacion().totalPages - 1"
+                (click)="gilesFacade.irAPagina(gilesFacade.paginacion().page + 1)">
+                Siguiente
+                <lucide-icon name="chevron-right" [size]="14"></lucide-icon>
+              </button>
+            </div>
+          }
+
           <p class="hint-text">
             <lucide-icon name="info" [size]="14"></lucide-icon>
-            Solo se listan formularios en estado Aprobado o Procesado.
+            Solo GILes en estado EMITIDO, ENVIADO_PROVEEDOR o CERRADO.
           </p>
         </div>
 
-        <!-- Date -->
-        <div class="form-group">
-          <label>FECHA DE ENTRADA</label>
-          <input type="date" class="form-input">
-        </div>
-
-        <!-- Receiver -->
-        <div class="form-group">
-          <label>RESPONSABLE DE RECEPCIÓN</label>
-          <input type="text" class="form-input" placeholder="Nombre completo">
-        </div>
+        @if (gilSeleccionado(); as gil) {
+          <div class="form-group">
+            <label>SOLICITANTE</label>
+            <input type="text" class="form-input" [value]="gil.solicitante ?? '—'" readonly>
+          </div>
+          <div class="form-group">
+            <label>FICHA</label>
+            <input type="text" class="form-input" [value]="gil.fichaCaracterizacion ?? '—'" readonly>
+          </div>
+        }
       </section>
 
-      <!-- Items Table Section -->
-      <section>
-        <div class="items-header">
-          <h3>Ítems a Ingresar</h3>
-          <span class="items-badge">3 Ítems Encontrados</span>
-        </div>
-
-        <div class="items-table-container">
-          <div style="overflow-x: auto;">
-            <table class="items-table">
-              <thead>
-                <tr>
-                  <th>Nombre del Bien</th>
-                  <th>Código SENA</th>
-                  <th class="text-center">Cant. Solicitada</th>
-                  <th class="text-center" style="width: 10rem;">Cant. Recibida</th>
-                  <th class="text-right">Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Valid Row 1 -->
-                <tr class="table-row">
-                  <td>
-                    <div class="item-name">Monitor Dell 24"</div>
-                    <div class="item-desc">P2419H</div>
-                  </td>
-                  <td class="code-text">SENA-EQ-1042</td>
-                  <td class="text-center">15</td>
-                  <td>
-                    <input type="number" class="qty-input" value="15" min="0" max="15">
-                  </td>
-                  <td class="text-right">
-                    <span class="status-ok">
-                      <span class="dot"></span> OK
-                    </span>
-                  </td>
-                </tr>
-
-                <!-- Invalid Row -->
-                <tr class="table-row table-row--error">
-                  <td>
-                    <div class="item-name item-name--error">
-                      <lucide-icon name="alert-circle" [size]="18" class="error-icon"></lucide-icon>
-                      Teclado Mecánico RGB
-                    </div>
-                    <div class="item-desc item-desc--error">K95 Platinum</div>
-                  </td>
-                  <td class="code-text code-text--error">--</td>
-                  <td class="text-center" style="color: #ba1a1a;">5</td>
-                  <td>
-                    <input type="number" class="qty-input" value="0" disabled>
-                  </td>
-                  <td class="text-right">
-                    <span class="status-error">
-                      <span class="err-title">NO EXISTE EN CATÁLOGO</span>
-                      <a href="javascript:void(0)" class="err-link">Crear producto faltante &rarr;</a>
-                    </span>
-                  </td>
-                </tr>
-
-                <!-- Valid Row 2 -->
-                <tr class="table-row">
-                  <td>
-                    <div class="item-name">Mouse Inalámbrico Logitech</div>
-                    <div class="item-desc">M330 Silent</div>
-                  </td>
-                  <td class="code-text">SENA-AC-4091</td>
-                  <td class="text-center">20</td>
-                  <td>
-                    <input type="number" class="qty-input" value="20" min="0" max="20">
-                  </td>
-                  <td class="text-right">
-                    <span class="status-ok">
-                      <span class="dot"></span> OK
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+      <!-- Tabla de bienes -->
+      @if (gilIdSeleccionado() !== '') {
+        <section>
+          <div class="items-header">
+            <h3>Ítems del GIL</h3>
+            <span class="items-badge">{{ bienesActuales().length }} ítems</span>
           </div>
-        </div>
 
-        <!-- Error Summary -->
+          @if (bienesActuales().length === 0) {
+            <p class="hint-text">Este GIL no tiene bienes registrados.</p>
+          } @else {
+            <div class="items-table-container">
+              <div style="overflow-x: auto;">
+                <table class="items-table">
+                  <thead>
+                    <tr>
+                      <th>Descripción</th>
+                      <th>Código SENA</th>
+                      <th class="text-center">Cant. GIL</th>
+                      <th class="text-center" style="width: 8rem;">Cant. Recibida</th>
+                      <th class="text-right" style="width: 9rem;">Precio Unitario</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (bien of bienesActuales(); track bien.codigoSena; let i = $index) {
+                      <tr class="table-row">
+                        <td>
+                          <div class="item-name">{{ bien.descripcion ?? '—' }}</div>
+                          <div class="item-desc" style="font-family: monospace; font-size: 0.7rem;">
+                            {{ bien.productoId }}
+                          </div>
+                        </td>
+                        <td class="code-text">{{ bien.codigoSena ?? '—' }}</td>
+                        <td class="text-center">{{ bien.cantidad ?? 0 }}</td>
+                        <td>
+                          <input
+                            type="number"
+                            class="qty-input"
+                            [formControl]="getBienGroup(i).get('cantidadRecibida')!"
+                            [max]="bien.cantidad ?? 9999"
+                            min="0">
+                        </td>
+                        <td>
+                          <input
+                            type="number"
+                            class="qty-input"
+                            [formControl]="getBienGroup(i).get('precioUnitario')!"
+                            min="0">
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          }
+        </section>
+      }
+
+      <!-- Error de facade -->
+      @if (kardexFacade.error()) {
         <div class="error-summary">
           <lucide-icon name="alert-triangle" [size]="20" class="error-icon"></lucide-icon>
-          <div>
-            <h4>Errores en la validación del catálogo</h4>
-            <p>Existen ítems en el formulario GIL que no están registrados en el catálogo maestro. Debe solicitar la creación de estos bienes antes de poder procesar la entrada.</p>
-          </div>
+          <p>{{ kardexFacade.error() }}</p>
         </div>
-      </section>
-
-      <!-- Observations -->
-      <section class="form-group">
-        <label>OBSERVACIONES DE ENTRADA (OPCIONAL)</label>
-        <textarea class="form-textarea" rows="2" placeholder="Añada notas sobre el estado físico de los bienes recibidos..."></textarea>
-      </section>
+      }
 
     </div>
 
-    <!-- Modal Footer -->
+    <!-- Footer -->
     <div class="modal-footer">
       <restaurant-button variant="surface" (click)="closeModal()">Cancelar</restaurant-button>
-      <!-- Disabled Primary CTA -->
-      <restaurant-button variant="surface" [disabled]="true" style="opacity: 0.6;">
+      <restaurant-button
+        variant="primary"
+        (click)="onSubmit()"
+        [disabled]="!puedeRegistrar()">
         <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: bold;">
           <lucide-icon name="save" [size]="18"></lucide-icon>
           Registrar Entrada por GIL

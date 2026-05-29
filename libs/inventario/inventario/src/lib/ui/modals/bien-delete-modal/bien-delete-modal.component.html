@@ -1,5 +1,6 @@
 <!-- Modo: BLOQUEADO POR STOCK -->
-<ng-container *ngIf="isBloqueado(); else confirmMode">
+@if (isBloqueado()) {
+
   <div class="modal-overlay" (click)="cancel.emit()">
     <div class="delete-dialog" (click)="$event.stopPropagation()">
 
@@ -23,10 +24,9 @@
 
     </div>
   </div>
-</ng-container>
 
-<!-- Modo: CONFIRMACIÓN CON PALABRA CLAVE -->
-<ng-template #confirmMode>
+} @else {
+
   <div class="modal-overlay" (click)="cancel.emit()">
     <div class="delete-dialog" (click)="$event.stopPropagation()">
 
@@ -61,4 +61,8 @@
 
     </div>
   </div>
-</ng-template>
+
+}
+
+<!-- Modo: CONFIRMACIÓN CON PALABRA CLAVE -->
+

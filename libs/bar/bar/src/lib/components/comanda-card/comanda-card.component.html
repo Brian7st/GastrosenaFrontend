@@ -1,0 +1,231 @@
+@if (vistaActual() === 'platos') {
+  <div class="comanda-card h-100 d-flex flex-column">
+    
+    <div class="card-header">
+      <div class="header-left">
+        <div class="header-title">
+          <h4 class="mesa-text">Mesa {{ comanda().numeroMesa }}</h4>
+          <span class="hora-text">{{ comanda().horaEntrada | date:'HH:mm' }}</span>
+        </div>
+        <span class="prioridad-badge" [ngClass]="'badge-' + (comanda().prioridad || 'normal').toLowerCase()">
+          {{ comanda().prioridad || 'NORMAL' }}
+        </span>
+      </div>
+      <div class="header-right">
+        <span class="comanda-estado-badge" [ngClass]="'estado-' + (comanda().estadoPreparacion || 'PENDIENTE').toLowerCase()">
+          {{ comanda().estadoPreparacion || 'PENDIENTE' }}
+        </span>
+        <div class="mesero-text">
+          <span class="mesero-label">Mesero: </span>
+          <span class="mesero-name">{{ comanda().mesero || 'No asignado' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body d-flex flex-column flex-grow-1" style="overflow-y: auto;">
+      
+      @if (comanda().notasEspeciales) {
+        <div class="nota-especial">
+          <div class="nota-titulo">NOTA ESPECIAL</div>
+          <div class="nota-texto">{{ comanda().notasEspeciales }}</div>
+        </div>
+      }
+
+      <!-- Platos/Bebidas (En Bar es una sola preparación representada como item de lista) -->
+      <div class="platos-list">
+        
+        <div class="plato-card" [ngClass]="{'plato-listo': comanda().estadoPreparacion === 'LISTO'}">
+          
+          <div class="plato-main-row">
+            <div class="plato-info">
+              <div class="plato-title-row">
+                <span class="plato-qty">1x</span>
+                <span class="plato-name">{{ comanda().preparacion }}</span>
+                <span class="comanda-estado-badge" 
+                      [ngClass]="comanda().estadoPreparacion === 'PENDIENTE' ? 'estado-espera' : (comanda().estadoPreparacion === 'EN_PREPARACION' ? 'estado-preparando' : 'estado-listo')" 
+                      style="font-size: 0.6rem; padding: 2px 8px; margin-left: 4px;">
+                  @if (comanda().estadoPreparacion === 'PENDIENTE') { ESPERA }
+                  @else if (comanda().estadoPreparacion === 'EN_PREPARACION') { PREPARANDO }
+                  @else { LISTO }
+                </span>
+              </div>
+            </div>
+
+            <div class="plato-actions">
+              @if (comanda().estadoPreparacion === 'PENDIENTE') {
+                <restaurant-button (click)="iniciar()" class="btn-override-warning">Preparar</restaurant-button>
+              }
+              @if (comanda().estadoPreparacion === 'EN_PREPARACION') {
+                <restaurant-button (click)="finalizar()" class="btn-override-success">Terminado</restaurant-button>
+              }
+              
+              <button class="btn-round btn-detalle" (click)="verDetalles()" title="Ver Detalles">
+                <lucide-icon name="eye" style="width: 18px;"></lucide-icon>
+              </button>
+              
+              <button class="btn-round btn-receta" (click)="alternarReceta(comanda().preparacion)" title="Ver Receta">
+                <lucide-icon name="book-open" style="width: 18px;"></lucide-icon>
+              </button>
+            </div>
+          </div>
+
+          @if (comanda().notasEspeciales) {
+            <div class="plato-nota">
+              <lucide-icon name="info" class="flex-shrink-0" style="width: 16px; height: 16px;"></lucide-icon>
+              <span>Nota: {{ comanda().notasEspeciales }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+  </div>
+}
+
+<!-- Vista Detalles -->
+@if (vistaActual() === 'detalles') {
+  <div class="modal-overlay" (click)="cerrarVista()">
+    <div class="modal-content modal-detalles-content" (click)="$event.stopPropagation()">
+      
+      <!-- Header -->
+      <div class="modal-header-custom">
+        <div class="modal-header-titles">
+          <h4 class="modal-title">Detalles del Pedido - Mesa {{ comanda().numeroMesa }}</h4>
+          <p class="modal-subtitle">Información completa del pedido #{{ comanda().idComanda }}</p>
+        </div>
+      </div>
+
+      <!-- Info Grid -->
+      <div class="modal-info-grid">
+        <div class="info-item">
+          <strong>Mesa:</strong> <span>{{ comanda().numeroMesa }}</span>
+        </div>
+        <div class="info-item">
+          <strong>Estado:</strong> 
+          <span class="comanda-estado-badge" [ngClass]="'estado-' + (comanda().estadoPreparacion || 'PENDIENTE').toLowerCase()">{{ comanda().estadoPreparacion }}</span>
+        </div>
+        <div class="info-item">
+          <strong>Prioridad:</strong> 
+          <span class="prioridad-badge" [ngClass]="'badge-' + (comanda().prioridad || 'normal').toLowerCase()">{{ comanda().prioridad || 'normal' | lowercase }}</span>
+        </div>
+        <div class="info-item">
+          <strong>Mesero:</strong> <span>{{ comanda().mesero || 'No asignado' }}</span>
+        </div>
+        <div class="info-item">
+          <strong>Hora de pedido:</strong> <span>{{ comanda().horaEntrada | date:'HH:mm' }}</span>
+        </div>
+      </div>
+
+      @if (comanda().notasEspeciales) {
+        <div class="modal-section-title">Notas especiales:</div>
+        <div class="modal-nota-caja">
+          <span>{{ comanda().notasEspeciales }}</span>
+        </div>
+      }
+
+      <div class="modal-section-title mt-4">Items del pedido:</div>
+      <div class="modal-items-list">
+        <div class="modal-item-row">
+          <div class="item-details">
+            <span class="item-name">1x {{ comanda().preparacion }}</span>
+            @if (comanda().notasEspeciales) {
+              <span class="item-note">Nota: {{ comanda().notasEspeciales }}</span>
+            } @else {
+              <span class="item-note">Nota: Sin especificaciones</span>
+            }
+          </div>
+          <div class="item-status-group">
+            @if (comanda().tiempoEstimado) {
+              <span class="item-time">{{ comanda().tiempoEstimado }} min</span>
+            }
+            <span class="comanda-estado-badge" [ngClass]="'estado-' + (comanda().estadoPreparacion || 'PENDIENTE').toLowerCase()">
+              {{ comanda().estadoPreparacion }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-5 pt-3" style="border-top: 1px solid var(--color-pizarra-100); margin-top: 32px !important;">
+        <restaurant-button (click)="cerrarVista()" class="btn-override-warning" style="display: block; width: 100%;">Cerrar Detalles</restaurant-button>
+      </div>
+
+    </div>
+  </div>
+}
+
+<!-- Vista Receta -->
+@if (vistaActual() === 'receta') {
+  <div class="modal-overlay" (click)="cerrarVista()">
+    <div class="modal-content modal-receta-content" (click)="$event.stopPropagation()">
+      
+      <!-- Header Receta -->
+      <div class="modal-header-custom">
+        <div class="modal-header-titles">
+          <h3 class="modal-receta-title">
+            <lucide-icon name="book" class="icon-title"></lucide-icon> 
+            <span>{{ recetaActiva()?.nombreReceta || 'Cargando...' }}</span>
+          </h3>
+          <p class="modal-subtitle">Receta completa con ingredientes y procedimiento paso a paso</p>
+        </div>
+      </div>
+
+      @if (recetaActiva(); as receta) {
+        <div class="modal-receta-body">
+          <!-- Columna Izquierda (Info General e Ingredientes) -->
+          <div class="receta-col-left">
+            <div class="modal-section-title">Información General</div>
+            <div class="receta-info-row">
+              <span>{{ receta.tiempoPreparacion }}min</span>
+            </div>
+            
+            <div class="modal-section-title">Ingredientes</div>
+            <div class="receta-ingredientes-list">
+              @for (ing of receta.ingredientes; track ing.nombreIngrediente) {
+                <div class="ingrediente-item">
+                  <span class="ing-name">{{ ing.nombreIngrediente }}</span>
+                  <span class="ing-qty">
+                    @if (ing.cantidadRequerida) {
+                      {{ ing.cantidadRequerida }} {{ ing.unidadMedida === 'UNIDAD' ? '' : ing.unidadMedida | lowercase }}
+                    }
+                  </span>
+                </div>
+              }
+            </div>
+          </div>
+          
+          <!-- Columna Derecha (Instrucciones) -->
+          <div class="receta-col-right">
+            <div class="modal-section-title">Instrucciones</div>
+            <div class="receta-pasos-list">
+              @if (receta.pasos && receta.pasos.length > 0) {
+                @for (paso of receta.pasos; track paso.orden) {
+                  <div class="paso-item">
+                    <div class="paso-num">{{ paso.orden }}</div>
+                    <div class="paso-content">
+                      <p class="paso-desc">{{ paso.descripcionPaso }}</p>
+                      @if (paso.notasAdicionales) {
+                        <div class="paso-nota">Nota: {{ paso.notasAdicionales }}</div>
+                      }
+                    </div>
+                  </div>
+                }
+              } @else {
+                <p class="text-muted small">No hay pasos descritos para esta receta.</p>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-5 pt-3" style="border-top: 1px solid var(--color-pizarra-100); margin-top: 32px !important;">
+          <restaurant-button (click)="cerrarVista()" class="btn-override-warning" style="display: block; width: 100%;">Cerrar Receta</restaurant-button>
+        </div>
+      } @else {
+        <!-- ESTADO DE CARGA -->
+        <div class="receta-loading">
+          <div class="spinner"></div>
+          <p>Cargando receta desde el servidor Java...</p>
+        </div>
+      }
+    </div>
+  </div>
+}

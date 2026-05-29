@@ -1,43 +1,62 @@
+// ── Movimiento de Almacén — Modelo (F-11) ──────────────────────────────────
+
 export interface Movimiento {
   id: string;
-  tipo: 'ENTRADA' | 'SALIDA';
+  tipo: 'ENTRADA' | 'SALIDA' | 'RESERVA' | 'LIBERACION' | 'AJUSTE';
   productoNombre: string;
-  productoSku: string;
   codigoSena: string;
   cantidad: number;
-  unidad: string;
-  fecha: string;
-  hora: string;
-  origenDestino: string;
-  docOrigen: string;
-  docUrl?: string;
+  unidadMedida: string;    // era: unidad
+  fechaMovimiento: string; // ISO datetime — e.g. "2023-10-15T09:45:00Z"
   responsableNombre: string;
-  responsableAvatar: string;
   valor: number;
   estado: 'Completado' | 'Pendiente' | 'Cancelado';
 }
 
-/** Payload del formulario de registro de entrada */
+/** Payload del formulario de registro de entrada.
+ *  Alineado con RegistrarEntradaHttpRequest (Swagger).
+ *  Las entradas deben originarse desde un GIL validado → gilId obligatorio en ese flujo. */
 export interface EntradaMovimientoData {
+  productoId:      string;
+  cantidad:        number;
+  precioUnitario:  number;
+  facturaId?:      string;
+  proveedorNit?:   string;
+  gilId?:          string;
+  conciliacionId?: string;
+}
+
+/** Payload del formulario de registro de salida.
+ *  Alineado con RegistrarSalidaHttpRequest (Swagger).
+ *  Las salidas DEBEN referenciar una requisición válida → requisicionId obligatorio. */
+export interface SalidaMovimientoData {
+  productoId:    string;
+  cantidad:      number;
+  requisicionId: string;
+  instructorId:  string;
+  categoria:     string;
+}
+
+/** Payload para reservar stock de un producto */
+export interface ReservaMovimientoData {
   producto: string;
   cantidad: number;
-  fecha: string;
-  proveedor: string;
-  factura?: string;
-  ubicacion: string;
-  valorUnitario: number;
+  fichaId: string;
+  instructorId: string;
   observaciones?: string;
 }
 
-/** Payload del formulario de registro de salida */
-export interface SalidaMovimientoData {
+/** Payload para liberar una reserva existente */
+export interface LiberacionMovimientoData {
   producto: string;
   cantidad: number;
-  fecha: string;
-  areaDestino: string;
-  instructor?: string;
-  ficha?: string;
-  categoria: string;
-  proposito: string;
-  observaciones?: string;
+  motivo: string;
+}
+
+/** Payload para ajustar el inventario físico de un producto */
+export interface AjusteMovimientoData {
+  producto: string;
+  cantidadNueva: number;
+  motivo: string;
+  responsableId: string;
 }
