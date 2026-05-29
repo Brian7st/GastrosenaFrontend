@@ -76,7 +76,7 @@ export class SolicitudesDetailComponent implements OnInit {
   }
 
   onEnviarAprobacion(): void {
-    const codigo = this.solicitud()?.numeroGil;
-    if (codigo) this.facade.cambiarEstado(codigo, 'EMITIDO');
+    const id = this.solicitud()?.id;
+    if (id) this.facade.cambiarEstado(String(id), 'EMITIDO');
   }
 }
