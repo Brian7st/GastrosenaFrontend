@@ -10,9 +10,6 @@ import { Receta } from '../models/receta.model';
 export class ComandaService {
     private http = inject(HttpClient);
     private url = '/api/barybarismo/comandas';
-
-    // Mock data temporal para la demo visual (similar a cocina)
-    private mockComandas: ComandaBarYBarismo[] = [];
     private parseListaPlatosToItems(idComanda: string, listaPlatos: string, estadoComanda: string, notasEspeciales?: string): ComandaItem[] {
         if (!listaPlatos) return [];
         const parts = listaPlatos.split(',');
