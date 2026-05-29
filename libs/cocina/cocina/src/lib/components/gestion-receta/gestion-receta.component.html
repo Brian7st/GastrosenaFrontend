@@ -144,3 +144,12 @@
     </form>
   </div>
 </div>
+
+<restaurant-confirm-dialog
+  [open]="mostrarExitoModal()"
+  [title]="exitoModalTitulo()"
+  [message]="exitoModalMensaje()"
+  confirmText="Aceptar"
+  [showCancel]="false"
+  (confirm)="cerrarExitoModal()"
+></restaurant-confirm-dialog>

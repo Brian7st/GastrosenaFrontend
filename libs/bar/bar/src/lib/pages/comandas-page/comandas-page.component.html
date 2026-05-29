@@ -1,132 +1,93 @@
 <div class="comanda-container">
+  <restaurant-page-header title="Tablero de Comandas - Bar y Barismo" subtitle="Gestión de bebidas en tiempo real"></restaurant-page-header>
 
-  <restaurant-page-header
-    title="Módulo de Bar y Barismo"
-    subtitle="Gestión integral de comandas y recetas de bar y barismo"
-  ></restaurant-page-header>
+  @if (errorToast()) {
+  <div class="toast-error shadow">
+    <i class="bi bi-exclamation-triangle-fill"></i> {{ errorToast() }}
+  </div>
+  }
 
   <!-- Filtros -->
-  <div class="filters-container">
-    <div class="search-wrapper">
-      <i class="bi bi-search"></i>
-      <input type="text" [(ngModel)]="terminoBusqueda" (keyup.enter)="buscarPorId()"
-             placeholder="Buscar por ID de comanda..." class="search-bar">
+  <div class="filters-container showcase__row" style="margin-bottom: var(--space-6);">
+    <div style="flex: 1; min-width: 250px;">
+      <restaurant-search-filter 
+        label="Buscar comanda" 
+        placeholder="Buscar por mesa, mesero o bebida..." 
+        [value]="searchTerm()" 
+        (valueChange)="searchTerm.set($event)"
+      ></restaurant-search-filter>
     </div>
 
-    <select class="filter-select">
-      <option>Todos los estados</option>
-      <option>En Espera</option>
-      <option>Preparando</option>
-      <option>Listo</option>
-    </select>
+    <div style="min-width: 180px;">
+      <restaurant-select-filter 
+        label="Estado" 
+        [value]="filtroEstado()" 
+        [options]="opcionesEstado" 
+        (valueChange)="filtroEstado.set($event)"
+      ></restaurant-select-filter>
+    </div>
 
-    <select class="filter-select">
-      <option>Todas las prioridades</option>
-      <option>Urgente</option>
-      <option>Alta</option>
-      <option>Normal</option>
-    </select>
+    <div style="min-width: 180px;">
+      <restaurant-select-filter 
+        label="Prioridad" 
+        [value]="filtroPrioridad()" 
+        [options]="opcionesPrioridad" 
+        (valueChange)="filtroPrioridad.set($event)"
+      ></restaurant-select-filter>
+    </div>
 
-    <select class="filter-select">
-      <option>Prioridad</option>
-      <option>Hora de llegada</option>
-      <option>Tiempo estimado</option>
-    </select>
+    <div style="min-width: 180px;">
+      <restaurant-select-filter 
+        label="Ordenar por" 
+        [value]="filtroOrden()" 
+        [options]="opcionesOrden" 
+        (valueChange)="filtroOrden.set($event)"
+      ></restaurant-select-filter>
+    </div>
   </div>
 
   <div class="comandas-grid">
-    
+
     <div class="column col-espera">
-      <div class="col-header">
-        <span><i class="bi bi-clock-history"></i> En Espera</span>
-        <span class="counter">{{ comandasEspera.length }}</span>
+      <div class="col-header showcase__row" style="justify-content: space-between; margin-bottom: var(--space-4);">
+        <restaurant-section-title title="En Espera" align="left"></restaurant-section-title>
+        <span class="showcase__value">{{ enEspera().length }}</span>
       </div>
-      @for (c of comandasEspera; track c.idComanda) {
-        <div class="comanda-card shadow-sm">
-          <div class="card-header">
-            <span class="mesa">Mesa {{ c.numeroMesa }}</span>
-            <span class="prioridad" [class]="c.prioridad ? c.prioridad.toLowerCase() : 'normal'">{{ labelPrioridad(c) | titlecase }}</span>
-          </div>
-          <div class="card-body">
-            <p class="mesero"><b>Mesero:</b> {{ c.mesero || 'No asignado' }}</p>
-            <ul class="platos-list">
-              @if (c.items && c.items.length > 0) {
-                @for (item of c.items; track item.nombre) {
-                  <li>{{ item.cantidad }}x {{ item.nombre }} <span *ngIf="item.nota">({{item.nota}})</span></li>
-                }
-              } @else {
-                <li>{{ c.cantidad }}x {{ c.preparacion }}</li>
-              }
-            </ul>
-          </div>
-          <div class="card-footer">
-            <span class="tiempo"><i class="bi bi-stopwatch"></i> {{ c.tiempoEstimado || 0 }} min</span>
-            <button class="btn-preparar" (click)="comenzarPreparacion(c.idComanda)">Preparar</button>
-          </div>
-        </div>
-      }
+      @for (c of enEspera(); track c.idComanda) {
+  <restaurant-comanda-card class="comanda-card-wrapper shadow-sm" [comanda]="c"
+    (iniciarPlato)="onIniciarPlato($event, c.idComanda)"
+    (finalizarPlato)="onFinalizarPlato($event, c.idComanda)"
+    (comandaActualizada)="cargarComandas()">
+  </restaurant-comanda-card>
+}
     </div>
 
     <div class="column col-preparando">
-      <div class="col-header">
-        <span><i class="bi bi-play-circle-fill"></i> Preparando</span>
-        <span class="counter">{{ comandasPreparando.length }}</span>
+      <div class="col-header showcase__row" style="justify-content: space-between; margin-bottom: var(--space-4);">
+        <restaurant-section-title title="Preparando" align="left"></restaurant-section-title>
+        <span class="showcase__value">{{ preparando().length }}</span>
       </div>
-      @for (c of comandasPreparando; track c.idComanda) {
-        <div class="comanda-card shadow-sm">
-          <div class="card-header">
-            <span class="mesa">Mesa {{ c.numeroMesa }}</span>
-            <span class="prioridad" [class]="c.prioridad ? c.prioridad.toLowerCase() : 'normal'">{{ labelPrioridad(c) | titlecase }}</span>
-          </div>
-          <div class="card-body">
-            <p class="mesero"><b>Mesero:</b> {{ c.mesero || 'No asignado' }}</p>
-            <ul class="platos-list">
-              @if (c.items && c.items.length > 0) {
-                @for (item of c.items; track item.nombre) {
-                  <li>{{ item.cantidad }}x {{ item.nombre }} <span *ngIf="item.nota">({{item.nota}})</span></li>
-                }
-              } @else {
-                <li>{{ c.cantidad }}x {{ c.preparacion }}</li>
-              }
-            </ul>
-          </div>
-          <div class="card-footer">
-            <span class="tiempo"><i class="bi bi-stopwatch"></i> {{ c.tiempoEstimado || 0 }} min</span>
-            <button class="btn-listo" (click)="marcarListo(c.idComanda)">Listo</button>
-          </div>
-        </div>
-      }
+      @for (c of preparando(); track c.idComanda) {
+  <restaurant-comanda-card class="comanda-card-wrapper shadow-sm" [comanda]="c"
+    (iniciarPlato)="onIniciarPlato($event, c.idComanda)"
+    (finalizarPlato)="onFinalizarPlato($event, c.idComanda)"
+    (comandaActualizada)="cargarComandas()">
+  </restaurant-comanda-card>
+}
     </div>
 
     <div class="column col-listo">
-      <div class="col-header">
-        <span><i class="bi bi-check-circle-fill"></i> Listo</span>
-        <span class="counter">{{ comandasListo.length }}</span>
+      <div class="col-header showcase__row" style="justify-content: space-between; margin-bottom: var(--space-4);">
+        <restaurant-section-title title="Listo" align="left"></restaurant-section-title>
+        <span class="showcase__value">{{ listos().length }}</span>
       </div>
-      @for (c of comandasListo; track c.idComanda) {
-        <div class="comanda-card card-completed shadow-sm">
-          <div class="card-header">
-            <span class="mesa">Mesa {{ c.numeroMesa }}</span>
-            <span class="prioridad done">Completado</span>
-          </div>
-          <div class="card-body">
-            <p class="mesero"><b>Mesero:</b> {{ c.mesero || 'No asignado' }}</p>
-            <ul class="platos-list">
-              @if (c.items && c.items.length > 0) {
-                @for (item of c.items; track item.nombre) {
-                  <li class="text-muted text-decoration-line-through">{{ item.cantidad }}x {{ item.nombre }} <span *ngIf="item.nota">({{item.nota}})</span></li>
-                }
-              } @else {
-                <li class="text-muted text-decoration-line-through">{{ c.cantidad }}x {{ c.preparacion }}</li>
-              }
-            </ul>
-          </div>
-          <div class="card-footer">
-            <span class="finalizado">Esperando entrega</span>
-            <i class="bi bi-check2-all text-success fs-4"></i>
-          </div>
-        </div>
-      }
+ @for (c of listos(); track c.idComanda) {
+  <restaurant-comanda-card class="comanda-card-wrapper shadow-sm" [comanda]="c"
+    (iniciarPlato)="onIniciarPlato($event, c.idComanda)"
+    (finalizarPlato)="onFinalizarPlato($event, c.idComanda)"
+    (comandaActualizada)="cargarComandas()">
+  </restaurant-comanda-card>
+}
     </div>
 
   </div>

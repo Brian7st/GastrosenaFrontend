@@ -63,7 +63,6 @@ export class RestauranteFacade {
 
   // KPIs computados
   readonly stats = computed<RestauranteStats>(() => {
-    // Mesa está activa cuando activo === true (campo del backend)
     const mesasActivas  = this._mesas().filter(m => m.activo);
     const totalMesas    = mesasActivas.length;
     const mesasOcupadas = mesasActivas.filter(m => m.estado !== 'LIBRE').length;
@@ -71,7 +70,6 @@ export class RestauranteFacade {
       ? Math.round((mesasOcupadas / totalMesas) * 100)
       : 0;
 
-    // TODO: pedidosPendientes requiere cruzar con el API de pedidos (fase siguiente)
     const pedidosPendientes = 0;
 
     return { totalMesas, mesasOcupadas, porcentajeOcupacion, pedidosPendientes };
@@ -95,10 +93,6 @@ export class RestauranteFacade {
 
   // --- Carga de Mesas (GET backend) ---
 
-  /**
-   * Llama a GET /api/mesas y actualiza el signal _mesas.
-   * Los headers de seguridad los inyecta mockSecurityInterceptor automáticamente.
-   */
   cargarMesas(): void {
     this._mesasCargando.set(true);
     this._mesasError.set(null);
@@ -117,7 +111,7 @@ export class RestauranteFacade {
     });
   }
 
-  // --- Estado local que NO viene del backend (turno de caja, historial de órdenes) ---
+  // --- Estado local que NO viene del backend ---
 
   private cargarEstadoLocalNoMesas(): void {
     const ordenesGuardadas = localStorage.getItem('gastro_ordenes');
@@ -134,15 +128,10 @@ export class RestauranteFacade {
   private guardarEstadoLocal(): void {
     localStorage.setItem('gastro_ordenes',     JSON.stringify(this._ordenesHistorial()));
     localStorage.setItem('gastro_turno_caja',  JSON.stringify(this._turnoCaja()));
-    // Nota: las mesas ya no se persisten en localStorage; vienen del backend.
   }
 
-  // --- Acciones de Mesas (TODO: conectar al backend en fases siguientes) ---
+  // --- Acciones de Mesas ---
 
-  /**
-   * POST /api/mesas — crea la mesa en el backend y la añade al signal local.
-   * El backend asigna estado=LIBRE y activo=true por defecto.
-   */
   agregarMesa(nombre: string, capacidad: number, zona: string): void {
     const request: MesaCreateRequest = { nombre, capacidad, zona: zona || null };
     this.restauranteService.crearMesa(request).subscribe({
@@ -156,28 +145,17 @@ export class RestauranteFacade {
   }
 
   /**
-   * Conectado a PATCH /api/mesas/{id}/estado?nuevoEstado=OCUPADA.
-   * Al confirmar el acceso a la mesa se cambia su estado en el backend
-   * y se inicializa el carrito (Pedido Activo) para esta mesa.
+   * Al confirmar el acceso a la mesa se inicializa el carrito.
+   * NO cambiamos el estado a OCUPADA aquí para evitar 422 al crear el pedido.
    */
   abrirMesa(mesaId: string, _comensal: string, cantidadComensales: number): void {
-    // this.actualizarEstado(mesaId, 'OCUPADA'); // Comentado para evitar 422 al crear el pedido
     this.iniciarCarrito(mesaId, cantidadComensales);
   }
 
-  /**
-   * Mapea a PATCH /api/mesas/{id}/desactivar (el backend no expone DELETE).
-   * La mesa queda con activo=false en lugar de eliminarse físicamente.
-   */
   eliminarMesa(mesaId: string): void {
     this.cambiarEstadoActivoMesa(mesaId, false);
   }
 
-  /**
-   * PATCH /api/mesas/{id}/activar  |  /desactivar
-   * Cambia la propiedad activo en el backend y actualiza el signal local
-   * con el MesaResponse devuelto (que refleja el nuevo valor de activo).
-   */
   cambiarEstadoActivoMesa(mesaId: string, activo: boolean): void {
     this.restauranteService.cambiarEstadoActivo(mesaId, activo).subscribe({
       next: (mesaActualizada) => {
@@ -194,27 +172,14 @@ export class RestauranteFacade {
     });
   }
 
-  /**
-   * Conectado a PATCH /api/mesas/{id}/estado?nuevoEstado=LIBRE.
-   */
   liberarMesa(mesaId: string): void {
     this.actualizarEstado(mesaId, 'LIBRE');
   }
 
-  /**
-   * TODO: El backend no tiene campo "notas" en Mesa. Evaluar si se agrega o si
-   * las notas viven solo en el pedido.
-   */
   actualizarNotas(_mesaId: string, _notas: string): void {
-    // TODO: decidir si las notas son parte de Mesa o del Pedido en el backend
     console.warn('[RestauranteFacade] actualizarNotas() aún no está conectado al backend.');
   }
 
-  /**
-   * PUT /api/mesas/{id} — actualiza nombre, capacidad y/o zona.
-   * Reemplaza la entrada correspondiente en el signal local al recibir
-   * el MesaResponse actualizado del backend.
-   */
   editarMesa(mesaId: string, cambios: MesaUpdateRequest): void {
     this.restauranteService.editarMesa(mesaId, cambios).subscribe({
       next: (mesaActualizada) => {
@@ -228,28 +193,23 @@ export class RestauranteFacade {
     });
   }
 
-  /**
-   * @deprecated — sustituido por editarMesa(id, MesaUpdateRequest).
-   * Mantenido temporalmente para no romper llamadas existentes.
-   */
+  /** @deprecated — sustituido por editarMesa(id, MesaUpdateRequest). */
   actualizarMesa(_mesa: Mesa): void {
     console.warn('[RestauranteFacade] Usa editarMesa(id, cambios) en su lugar.');
   }
 
   /**
-   * PATCH /api/mesas/{id}/estado?nuevoEstado=X
-   *
-   * Método central de cambio de estado. Llama al backend y, al recibir
-   * el MesaResponse actualizado, reemplaza la mesa en el signal _mesas
-   * para que la UI reaccione sin recargar toda la lista.
-   *
-   * Estrategia: "optimismo moderado" — esperamos la confirmación del backend
-   * antes de actualizar el estado local (evita inconsistencias si hay error).
+   * Actualización optimista — mutamos el signal local inmediatamente
+   * para dar feedback visual sin lag, y luego enlazamos con la respuesta del backend.
    */
   actualizarEstado(mesaId: string, nuevoEstado: EstadoMesa): void {
+    // Actualización optimista para reactividad instantánea en la UI
+    this._mesas.update(lista =>
+      lista.map(m => m.id === mesaId ? { ...m, estado: nuevoEstado } : m)
+    );
+
     this.restauranteService.cambiarEstadoMesa(mesaId, nuevoEstado).subscribe({
       next: (mesaActualizada) => {
-        // Reemplaza solo la mesa modificada en el array del signal
         this._mesas.update(lista =>
           lista.map(m => m.id === mesaActualizada.id ? mesaActualizada : m)
         );
@@ -265,25 +225,15 @@ export class RestauranteFacade {
 
   // --- Gestión de Pedido Activo ---
 
-  /**
-   * Se invoca cuando el usuario accede a una mesa ya OCUPADA para ver o agregar
-   * a su pedido actual. Por ahora (fase Pedidos), si no hay uno, lo inicializa.
-   */
   seleccionarMesaParaPedido(mesaId: string): void {
-    // TODO: A futuro debería hacer GET /api/pedidos/mesa/{mesaId} para cargar
-    // el pedido activo real del backend. Por ahora iniciamos uno vacío.
     this.iniciarCarrito(mesaId, 1);
   }
 
-  /**
-   * Helper para instanciar el carrito temporal en memoria (_pedidoActivo)
-   * que la UI usa para agregar productos. Evita el bloqueo de UI.
-   */
   private iniciarCarrito(mesaId: string, numeroComensales: number): void {
     this._pedidoActivo.set({
-      id: `LOCAL-${Date.now()}`, // UUID temporal
+      id: `LOCAL-${Date.now()}`,
       mesaId,
-      meseroId: '00000000-0000-0000-0000-000000000000', // El backend lo sobrescribe con el user autenticado
+      meseroId: '00000000-0000-0000-0000-000000000000',
       numeroComensales: numeroComensales || 1,
       estado: 'BORRADOR',
       fechaCreacion: new Date().toISOString(),
@@ -346,7 +296,6 @@ export class RestauranteFacade {
       mesaId: pedido.mesaId,
       numeroComensales: pedido.numeroComensales,
       notas: notas,
-      // Solo mapeamos los campos requeridos por DetallePedidoRequest (excluye id y subtotalLinea)
       detalles: pedido.detalles.map(d => ({
         productoId: d.productoId,
         nombreProducto: d.nombreProducto,
@@ -359,17 +308,14 @@ export class RestauranteFacade {
 
     this.restauranteService.crearPedido(request).subscribe({
       next: (pedidoResponse) => {
-        // En un flujo real, aquí llamaríamos a PATCH /api/pedidos/{id}/confirmar
-        // para pasarlo de BORRADOR a ENVIADO_COCINA. 
-        // Por compatibilidad con la UI actual, lo mapeamos localmente y limpiamos.
         const pedidoConfirmado: PedidoCarrito = {
           id: pedidoResponse.id,
           mesaId: pedidoResponse.mesaId,
           meseroId: pedidoResponse.meseroId,
           numeroComensales: pedidoResponse.numeroComensales,
-          estado: 'EN_PREPARACION', // Mock estado UI
+          estado: 'EN_PREPARACION',
           fechaCreacion: pedidoResponse.fechaCreacion,
-          detalles: pedido.detalles, // Mantenemos los de UI
+          detalles: pedido.detalles,
           subtotal: pedidoResponse.subtotal
         };
 
@@ -394,7 +340,6 @@ export class RestauranteFacade {
   enviarPedidoACocina(pedidoId: string): void {
     this.restauranteService.confirmarPedido(pedidoId).subscribe({
       next: (pedidoResponse) => {
-        // Actualizamos el estado del pedido en el historial local a ENVIADO_COCINA
         this._ordenesHistorial.update(historial =>
           historial.map(p => p.id === pedidoId ? { ...p, estado: pedidoResponse.estado } : p)
         );
@@ -413,12 +358,10 @@ export class RestauranteFacade {
   marcarPedidoComoEntregado(pedidoId: string): void {
     this.restauranteService.entregarPedido(pedidoId).subscribe({
       next: (pedidoResponse) => {
-        // Actualizamos el estado del pedido
         this._ordenesHistorial.update(historial =>
           historial.map(p => p.id === pedidoId ? { ...p, estado: 'ENTREGADO' } : p)
         );
         
-        // Actualizamos el estado de la mesa a POR_PAGAR
         this._mesas.update(mesas =>
           mesas.map(m => m.id.toString() === pedidoResponse.mesaId ? { ...m, estado: 'POR_PAGAR' } : m)
         );
@@ -454,46 +397,33 @@ export class RestauranteFacade {
   }
 
   cargarPedidosParaCobro() {
-    const mockPedidos: PedidoResumenResponse[] = [
-      { id: 'P-001', nombreMesa: 'Mesa 1', meseroId: 'Juan', numeroComensales: 2, estado: 'ENTREGADO', subtotal: 45000,  fechaCreacion: new Date().toISOString() },
-      { id: 'P-002', nombreMesa: 'Mesa 4', meseroId: 'Ana',  numeroComensales: 4, estado: 'ENTREGADO', subtotal: 120500, fechaCreacion: new Date().toISOString() }
-    ];
-
     this.restauranteService.pedidosPorEstado('ENTREGADO').subscribe({
-      next:  (pedidos) => this._pedidosParaCobro.set(pedidos.length ? pedidos : mockPedidos),
+      next:  (pedidos) => this._pedidosParaCobro.set(pedidos),
       error: (err) => {
-        console.error('Usando datos mockeados (error de API)', err);
-        this._pedidosParaCobro.set(mockPedidos);
+        console.error('[RestauranteFacade] Error al cargar pedidos para cobro:', err);
+        this._pedidosParaCobro.set([]);
       }
     });
   }
 
   cargarHistorialFacturas() {
-    const mockFacturas: PedidoResumenResponse[] = [
-      { id: 'F-100', nombreMesa: 'Mesa 2', meseroId: 'Juan',   numeroComensales: 1, estado: 'FACTURADO', subtotal: 25000, fechaCreacion: new Date().toISOString() },
-      { id: 'F-101', nombreMesa: 'Mesa 5', meseroId: 'Carlos', numeroComensales: 3, estado: 'FACTURADO', subtotal: 85000, fechaCreacion: new Date().toISOString() },
-      { id: 'F-102', nombreMesa: 'Mesa 7', meseroId: 'Ana',    numeroComensales: 2, estado: 'FACTURADO', subtotal: 55000, fechaCreacion: new Date().toISOString() }
-    ];
-
     this.restauranteService.pedidosPorEstado('FACTURADO').subscribe({
-      next:  (pedidos) => this._historialFacturas.set(pedidos.length ? pedidos : mockFacturas),
+      next:  (pedidos) => this._historialFacturas.set(pedidos),
       error: (err) => {
-        console.error('Usando facturas mockeadas', err);
-        this._historialFacturas.set(mockFacturas);
+        console.error('[RestauranteFacade] Error al cargar historial de facturas:', err);
+        this._historialFacturas.set([]);
       }
     });
   }
 
-  procesarPagoFinal(pedidoId: string, metodo: string) {
+  procesarPagoFinal(pedidoId: string, _metodo: string) {
     const pedidoPagado = this._pedidosParaCobro().find(p => p.id === pedidoId);
     if (pedidoPagado) {
       this._pedidosParaCobro.update(lista  => lista.filter(p => p.id !== pedidoId));
       this._historialFacturas.update(lista => [{ ...pedidoPagado, estado: 'FACTURADO' }, ...lista]);
     }
 
-    // TODO: El backend no tiene endpoint /facturar. El cambio a FACTURADO
-    // se realiza a través del flujo de facturación (fase siguiente).
-    // this.restauranteService.cancelarPedido(pedidoId) es el más próximo por ahora.
+    // TODO: Integrar con endpoint real de facturación
     console.log('[RestauranteFacade] procesarPagoFinal: integrar con endpoint de facturación (pendiente).');
   }
 }

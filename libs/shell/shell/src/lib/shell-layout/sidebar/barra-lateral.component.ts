@@ -33,12 +33,25 @@ export class BarraLateralComponent {
   readonly expandedItems = signal(new Set<string>());
 
   protected readonly visibleGroups = computed(() => {
-    const currentRole = this.authService.currentUser()?.rol;
+    const currentUser = this.authService.currentUser();
+    const currentRole = currentUser?.rol;
+    const permisos = currentUser?.permisos ?? [];
+
+    const bypass = !currentUser || permisos.length === 0;
 
     return this.config.grupos
       .map(grupo => ({
         ...grupo,
-        items: grupo.items.filter(item => !item.roles?.length || !!currentRole && item.roles.includes(currentRole)),
+        items: grupo.items.filter(item => {
+          if (bypass) return true;
+          if (item.roles?.length && (!currentRole || !item.roles.includes(currentRole))) {
+            return false;
+          }
+          if (item.permisos?.length) {
+            return item.permisos.some(p => permisos.includes(p));
+          }
+          return true;
+        }),
       }))
       .filter(grupo => grupo.items.length > 0);
   });

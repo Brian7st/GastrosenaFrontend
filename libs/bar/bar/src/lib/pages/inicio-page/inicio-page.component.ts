@@ -1,8 +1,10 @@
-import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { IncidenciaService } from '../../data-access/incidencia.service';
+import { ComandaService } from '../../data-access/comanda.service';
 import { AuditoriaIncidencia } from '../../models/incidencia.model';
+import { ComandaBarYBarismo } from '../../models/comanda.model';
 import {
   LucideIconComponent,
   PageHeaderComponent,
@@ -29,22 +31,58 @@ import {
   styleUrls: ['./inicio-page.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class InicioPageComponent {
+export class InicioPageComponent implements OnInit {
   private incidenciaService = inject(IncidenciaService);
+  private comandaService = inject(ComandaService);
 
-  // Datos simulados para el Dashboard de Bar y Barismo
-  estadisticas = {
-    activos: 5,
-    completados: 32,
-    cancelados: 2,
-    devueltos: 1
-  };
+  comandas = signal<ComandaBarYBarismo[]>([]);
+  totalCancelados = signal(0);
+  totalDevueltos = signal(0);
 
-  pedidosPendientes = [
-    { mesa: '5', estado: 'Preparando', platos: 'Espresso Colombiano, Limonada de Coco', tiempo: '10 min', clase: 'preparing' },
-    { mesa: '12', estado: 'En espera', platos: 'Cappuccino Artesanal, Mojito SENA', tiempo: '5 min', clase: 'waiting' },
-    { mesa: '3', estado: 'Listo', platos: 'Café de Filtro V60, Smoothie Tropical', tiempo: '18 min', clase: 'ready' }
-  ];
+  estadisticas = computed(() => {
+    const list = this.comandas();
+    const activos = list.filter(c => c.estadoPreparacion === 'PENDIENTE' || c.estadoPreparacion === 'EN_PREPARACION').length;
+    const completados = list.filter(c => c.estadoPreparacion === 'LISTO').length;
+    
+    return {
+      activos,
+      completados,
+      cancelados: this.totalCancelados(),
+      devueltos: this.totalDevueltos()
+    };
+  });
+
+  pedidosPendientes = computed(() => {
+    return this.comandas()
+      .slice()
+      .sort((a, b) => new Date(b.horaEntrada).getTime() - new Date(a.horaEntrada).getTime())
+      .map(c => {
+        let estado = 'En espera';
+        let clase = 'waiting';
+        if (c.estadoPreparacion === 'EN_PREPARACION') {
+          estado = 'Preparando';
+          clase = 'preparing';
+        } else if (c.estadoPreparacion === 'LISTO') {
+          estado = 'Listo';
+          clase = 'ready';
+        }
+
+        const platos = c.items && c.items.length > 0
+          ? c.items.map(i => `${i.cantidad}x ${i.nombre}`).join(', ')
+          : c.preparacion || 'Sin bebidas';
+
+        const tiempo = this.calcularTiempoTranscurrido(c.horaEntrada);
+
+        return {
+          mesa: c.numeroMesa.toString(),
+          estado,
+          platos,
+          tiempo,
+          clase
+        };
+      })
+      .slice(0, 5);
+  });
 
   fechaActual = new Date().toLocaleDateString('es-ES', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
@@ -56,6 +94,40 @@ export class InicioPageComponent {
   modalTipo = signal<'CANCELACION' | 'DEVOLUCION' | 'MODIFICACION'>('CANCELACION');
   incidencias = signal<AuditoriaIncidencia[]>([]);
   cargando = signal(false);
+
+  ngOnInit(): void {
+    this.cargarComandas();
+    this.cargarIncidenciasCounts();
+  }
+
+  cargarComandas(): void {
+    this.comandaService.listarComandas().subscribe({
+      next: (data) => this.comandas.set(data),
+      error: (err) => console.error('Error loading comandas for dashboard:', err)
+    });
+  }
+
+  cargarIncidenciasCounts(): void {
+    this.incidenciaService.obtenerPorTipo('CANCELACION').subscribe({
+      next: (data) => this.totalCancelados.set(data.length),
+      error: (err) => console.error('Error loading cancelaciones count:', err)
+    });
+    this.incidenciaService.obtenerPorTipo('DEVOLUCION').subscribe({
+      next: (data) => this.totalDevueltos.set(data.length),
+      error: (err) => console.error('Error loading devoluciones count:', err)
+    });
+  }
+
+  calcularTiempoTranscurrido(horaEntrada: string): string {
+    if (!horaEntrada) return '—';
+    const entrada = new Date(horaEntrada);
+    const ahora = new Date();
+    const diffMs = ahora.getTime() - entrada.getTime();
+    const diffMins = Math.max(0, Math.floor(diffMs / 60000));
+    
+    if (diffMins < 1) return 'Hace un momento';
+    return `${diffMins} min`;
+  }
 
   abrirModal(tipo: 'CANCELACION' | 'DEVOLUCION' | 'MODIFICACION') {
     const titulos: Record<string, string> = {
@@ -69,61 +141,17 @@ export class InicioPageComponent {
     this.modalAbierto.set(true);
     this.cargando.set(true);
 
-    // Datos quemados para previsualización (simulando respuesta del backend)
-    setTimeout(() => {
-      const mockData: AuditoriaIncidencia[] = [];
-      
-      if (tipo === 'CANCELACION') {
-        mockData.push(
-          {
-            idAuditoria: 'A-001',
-            comanda: { idComanda: 'CMD-20045', mesa: { numeroMesa: '5' }, nombreMesero: 'Carlos Ramírez' },
-            fechaRegistro: '2026-05-06T14:30:00',
-            detalleModificado: 'Mojito SENA, Limonada de Coco',
-            tipoIncidencia: 'CANCELACION',
-            motivo: 'El cliente cambió de opinión y decidió ordenar un café caliente en su lugar.'
-          },
-          {
-            idAuditoria: 'A-002',
-            comanda: { idComanda: 'CMD-20048', mesa: { numeroMesa: '12' }, nombreMesero: 'Laura G.' },
-            fechaRegistro: '2026-05-06T15:15:00',
-            detalleModificado: 'Cappuccino de Avena',
-            tipoIncidencia: 'CANCELACION',
-            motivo: 'Falta de ingrediente (leche de avena). Se ofreció leche de almendras pero el cliente no aceptó.'
-          },
-          {
-            idAuditoria: 'A-003',
-            comanda: { idComanda: 'CMD-20052', mesa: { numeroMesa: '3' }, nombreMesero: 'Pedro L.' },
-            fechaRegistro: '2026-05-05T19:40:00',
-            detalleModificado: 'Carajillo Tradicional',
-            tipoIncidencia: 'CANCELACION',
-            motivo: 'Error al ingresar el pedido, se marcó licor de café en lugar de crema de whisky.'
-          }
-        );
-      } else if (tipo === 'DEVOLUCION') {
-        mockData.push(
-          {
-            idAuditoria: 'D-001',
-            comanda: { idComanda: 'CMD-20030', mesa: { numeroMesa: '8' }, nombreMesero: 'Ana M.' },
-            fechaRegistro: '2026-05-06T13:20:00',
-            detalleModificado: 'Espresso Doble',
-            tipoIncidencia: 'DEVOLUCION',
-            motivo: 'El café se sirvió frío. Cliente solicitó extracción nueva de inmediato.'
-          },
-          {
-            idAuditoria: 'D-002',
-            comanda: { idComanda: 'CMD-20035', mesa: { numeroMesa: '2' }, nombreMesero: 'David R.' },
-            fechaRegistro: '2026-05-06T14:10:00',
-            detalleModificado: 'Limonada Cerezada',
-            tipoIncidencia: 'DEVOLUCION',
-            motivo: 'La bebida estaba excesivamente dulce y ácida, no tolerable para el cliente.'
-          }
-        );
+    this.incidenciaService.obtenerPorTipo(tipo).subscribe({
+      next: (data) => {
+        this.incidencias.set(data);
+        this.cargando.set(false);
+      },
+      error: (err) => {
+        console.error('Error fetching incidences:', err);
+        this.incidencias.set([]);
+        this.cargando.set(false);
       }
-
-      this.incidencias.set(mockData);
-      this.cargando.set(false);
-    }, 600);
+    });
   }
 
   cerrarModal() {

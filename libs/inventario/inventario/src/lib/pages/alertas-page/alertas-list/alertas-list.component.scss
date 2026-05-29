@@ -200,7 +200,7 @@ $yellow:        #eab308;
     &--critica { background: rgba($tertiary, 0.1);      color: $tertiary; }
     &--alta    { background: rgba($orange, 0.1);        color: $orange; }
     &--media   { background: rgba($yellow, 0.1);        color: #b08800; }
-    &--baja    { background: rgba($primary, 0.1);       color: $primary; }
+    &--baja    { background: rgba($primary, 0.1);       color: var(--color-primario); }
   }
 
   &__body { flex: 1; min-width: 0; }
@@ -255,7 +255,7 @@ $yellow:        #eab308;
   gap: 0.25rem;
   font-size: 0.625rem;
   font-weight: 600;
-  color: $primary;
+  color: var(--color-primario);
   background: rgba($primary, 0.1);
   padding: 0.125rem 0.5rem;
   border-radius: 9999px;
@@ -299,7 +299,7 @@ $yellow:        #eab308;
   white-space: nowrap;
 
   &:hover {
-    background: $primary;
+    background: var(--color-primario);
     color: white;
   }
 }

@@ -1,5 +1,6 @@
-import { Component, signal, computed, ChangeDetectionStrategy, inject, OnInit } from '@angular/core';
+import { Component, signal, computed, ChangeDetectionStrategy, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { interval, Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { ComandaCardComponent } from '../../components/comanda-card/comanda-card.component';
 import { ComandaService, Comanda } from '../../data-access/comanda.service';
@@ -7,7 +8,6 @@ import {
   PageHeaderComponent,
   SearchFilterComponent,
   SelectFilterComponent,
-  CardComponent,
   SectionTitleComponent
 } from '@restaurant/shared/ui';
 
@@ -20,16 +20,15 @@ import {
     ComandaCardComponent,
     PageHeaderComponent,
     SearchFilterComponent,
-    SelectFilterComponent,
-    CardComponent,
-    SectionTitleComponent
+    SelectFilterComponent
   ],
   templateUrl: './comandas-page.component.html',
   styleUrl: './comandas-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ComandasPageComponent implements OnInit {
+export class ComandasPageComponent implements OnInit, OnDestroy {
   private comandaService = inject(ComandaService);
+  private pollingSub?: Subscription;
 
   searchTerm = signal('');
   filtroEstado = signal('Todos los estados');
@@ -61,11 +60,30 @@ export class ComandasPageComponent implements OnInit {
 
   ngOnInit() {
     this.cargarComandas();
+    this.pollingSub = interval(5000).subscribe(() => this.cargarComandas());
+  }
+
+  ngOnDestroy() {
+    if (this.pollingSub) {
+      this.pollingSub.unsubscribe();
+    }
   }
 
   cargarComandas() {
     this.comandaService.getComandas().subscribe({
-      next: (data) => this.comandas.set(data),
+      next: (data) => {
+        const now = new Date();
+        const comandasFiltradas = data.filter(c => {
+          if (c.estado === 'LISTO') {
+            const fechaComanda = new Date(c.horaEntrada);
+            return fechaComanda.getDate() === now.getDate() &&
+                   fechaComanda.getMonth() === now.getMonth() &&
+                   fechaComanda.getFullYear() === now.getFullYear();
+          }
+          return true;
+        });
+        this.comandas.set(comandasFiltradas);
+      },
       error: (err) => {
         console.error('Error fetching comandas:', err);
         this.mostrarError('Error de conexión con el backend');
@@ -130,7 +148,7 @@ export class ComandasPageComponent implements OnInit {
         const algunoPreparandoOlisto = c.detalles.some(d => d.estado === 'PREPARANDO' || d.estado === 'LISTO');
         
         let nuevoEstado = c.estado;
-        if (todosListos) {
+        if (c.estado === 'LISTO' || (todosListos && c.detalles.length > 0)) {
           nuevoEstado = 'LISTO';
         } else if (algunoPreparandoOlisto) {
           nuevoEstado = 'PREPARANDO';
@@ -145,8 +163,10 @@ export class ComandasPageComponent implements OnInit {
 
   comandasFiltradas = computed(() => {
     let filtrados = this.comandas().filter(c => {
-      const matchBusqueda = c.numeroMesa.toString().includes(this.searchTerm()) || 
-                            c.nombreMesero.toLowerCase().includes(this.searchTerm().toLowerCase());
+      const term = this.searchTerm().toLowerCase();
+      const matchBusqueda = c.numeroMesa.toString().includes(term) || 
+                            c.nombreMesero.toLowerCase().includes(term) ||
+                            c.idComanda.toLowerCase().includes(term);
       const matchEstado = this.filtroEstado() === 'Todos los estados' || c.estado === this.filtroEstado();
       const matchPrioridad = this.filtroPrioridad() === 'Todas las prioridades' || c.prioridad === this.filtroPrioridad();
       return matchBusqueda && matchEstado && matchPrioridad;
@@ -161,9 +181,18 @@ export class ComandasPageComponent implements OnInit {
     return filtrados;
   });
 
-  enEspera = computed(() => this.comandasFiltradas().filter(c => c.estado === 'PENDIENTE'));
-  preparando = computed(() => this.comandasFiltradas().filter(c => c.estado === 'PREPARANDO'));
-  listos = computed(() => this.comandasFiltradas().filter(c => c.estado === 'LISTO'));
+  enEspera = computed(() => this.comandasFiltradas().filter(c => {
+    const s = c.estado?.toUpperCase() || '';
+    return s.includes('PENDIENTE') || s.includes('ESPERA');
+  }));
+  preparando = computed(() => this.comandasFiltradas().filter(c => {
+    const s = c.estado?.toUpperCase() || '';
+    return s.includes('PREPARAN') || s.includes('PROCESO');
+  }));
+  listos = computed(() => this.comandasFiltradas().filter(c => {
+    const s = c.estado?.toUpperCase() || '';
+    return s.includes('LISTO') || s.includes('TERMINAD');
+  }));
 
   getMockComandas(): Comanda[] {
     const now = new Date();

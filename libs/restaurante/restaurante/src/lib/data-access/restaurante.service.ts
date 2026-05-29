@@ -11,9 +11,11 @@ import {
 @Injectable({ providedIn: 'root' })
 export class RestauranteService {
   private http = inject(HttpClient);
-  /** URL base del microservicio de restaurante (dev: localhost:8080) */
-  private readonly mesasUrl   = 'http://localhost:8080/api/mesas';
-  private readonly pedidosUrl = 'http://localhost:8080/api/pedidos';
+  /** URL del microservicio de restaurante (interceptada por proxy) */
+  private readonly mesasUrl   = '/api/mesas';
+  private readonly pedidosUrl = '/api/pedidos';
+
+  // ── Mesas — lectura ─────────────────────────────────────────────────────────
 
   /**
    * GET /api/mesas  →  Lista todas las mesas activas del backend.
@@ -23,6 +25,8 @@ export class RestauranteService {
   obtenerMesas(): Observable<Mesa[]> {
     return this.http.get<Mesa[]>(this.mesasUrl);
   }
+
+  // ── Mesas — escritura ───────────────────────────────────────────────────────
 
   /**
    * PATCH /api/mesas/{id}/estado?nuevoEstado=X

@@ -1,21 +1,22 @@
-/**
- * Estados posibles de una Factura Electrónica (FEL).
- */
-export type EstadoFactura = 'Registrada' | 'Verificada' | 'Pagada' | 'Anulada';
+import type { InfoBancariaTipo } from '../data-access/api/sourcing.api';
 
 /**
- * Monedas soportadas.
+ * Estados posibles de una Factura Electrónica.
  */
-export type MonedaFEL = 'COP' | 'GTQ' | 'USD';
+export type EstadoFactura = 'REGISTRADA' | 'VERIFICADA' | 'PAGADA' | 'ANULADA';
 
 /**
- * Ítem de detalle dentro de una factura.
+ * Línea de detalle dentro de una factura.
  */
-export interface FacturaItem {
+export interface FacturaLinea {
+  productoId?: string;
   descripcion: string;
   cantidad: number;
   precioUnitario: number;
-  iva: number; // porcentaje, ej: 19
+  porcentajeIva?: number;
+  iva: number;
+  subtotal?: number;
+  valorIva?: number;
   total: number;
 }
 
@@ -39,37 +40,34 @@ export interface PreFactura {
   id: string;
   proveedor: string;
   subtotal: number;
-  items: FacturaItem[];
+  items: FacturaLinea[];
 }
 
 /**
- * Representa una Factura Electrónica (FEL).
+ * Representa una Factura Electrónica.
  */
 export interface Factura {
   id: string | number;
-  numeroFEL: string;
+  numeroFactura: string;
   cufe: string;
-  nitEmisor: string;
-  nitReceptor: string;
-  proveedor: string;
-  razonSocial: string;
-  tipoDocumento: string;
+  proveedorNit: string;
+  proveedorNombre: string;
   fechaEmision: string;
-  fechaVencimiento?: string;
-  moneda: MonedaFEL;
+  fechaRecepcion: string;
   estado: EstadoFactura;
-  items: FacturaItem[];
+  lineas: FacturaLinea[];
   conciliacion?: ConciliacionItem[];
   subtotal: number;
-  ivaTotal: number;
+  totalIva: number;
   total: number;
   ordenCompra?: string;
-  gilVinculado?: string; // ID del formulario GIL-F-014 vinculado
-  instructorCuentadante?: string;
-  codigoCufe?: string; // 64 caracteres
-  retencionZESE?: number; // porcentaje
-  notasInternas?: string;
-  archivosAdjuntos?: string[]; // nombres de archivos XML/PDF
+  instructorId?: string;
+  valorRetencionZese?: number;
+  motivoAnulacion?: string;
+  proveedorBeneficiarioZese?: boolean;
+  infoBancariaBanco?: string;
+  infoBancariaCuenta?: string;
+  infoBancariaTipo?: InfoBancariaTipo;
 }
 
 /**
@@ -95,29 +93,75 @@ export interface FacturaFiltros {
   proveedor?: string;
   fechaDesde?: string;
   fechaHasta?: string;
+  page?: number;
+  size?: number;
+}
+
+export interface FacturaPaginacion {
+  totalElements: number;
+  totalPages: number;
+  page: number;
+  size: number;
 }
 
 /**
- * DTO para crear o editar una factura.
+ * DTO para crear o editar una factura (POST/PUT /facturas).
  */
 export interface FacturaFormDto {
-  numeroFEL: string;
+  numeroFactura: string;
+  cufe: string;
   fechaEmision: string;
-  fechaVencimiento?: string;
-  nitEmisor: string;
-  nitReceptor: string;
-  gilVinculado?: string;
-  instructorCuentadante?: string;
-  codigoCufe?: string;
-  retencionZESE?: number;
+  fechaRecepcion: string;
+  proveedorNit: string;
+  proveedorNombre: string;
+  proveedorBeneficiarioZese?: boolean;
   ordenCompra?: string;
-  archivosAdjuntos?: File[];
+  infoBancariaBanco?: string;
+  infoBancariaCuenta?: string;
+  infoBancariaTipo?: InfoBancariaTipo;
+  lineas: Array<{
+    productoId?: string;
+    descripcion: string;
+    cantidad: number;
+    precioUnitario: number;
+    porcentajeIva: number;
+  }>;
 }
+
+// ─── Conciliación Factura-GIL ───────────────────────────────────────────────
+
+export interface ConciliacionGilDiferencia {
+  gilItemId:             string;
+  descripcion:           string;
+  cantidadGil:           number;
+  cantidadFactura:       number;
+  precioUnitarioGil:     number;
+  precioUnitarioFactura: number;
+  diferencia:            number;
+  observacion?:          string;
+  resuelta:              boolean;
+}
+
+export interface ConciliacionGil {
+  id:          string;
+  facturaId:   string;
+  gilId:       string;
+  estado:      string;
+  diferencias: ConciliacionGilDiferencia[];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * Estado de la solicitud GIL F-014.
  */
-export type EstadoGIL = 'Borrador' | 'Pendiente' | 'Validado' | 'Aprobado' | 'Procesado';
+export type EstadoGIL = 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'CERRADO';
+
+export interface GilPickerItem {
+  id: string;
+  numeroGil: string;
+  destino: string;
+}
 
 /**
  * Solicitud GIL F-014 completa con trazabilidad.

@@ -7,7 +7,7 @@
       <p class="page-header__subtitle">Supervisión y control de documentos electrónicos en tiempo real.</p>
     </div>
     <div class="page-header__actions">
-      <restaurant-button variant="surface" (click)="onImportar()">
+      <restaurant-button variant="ghost" (click)="onImportar()">
         <span class="material-symbols-outlined">upload</span>
         Importar
       </restaurant-button>
@@ -15,23 +15,20 @@
         <span class="material-symbols-outlined">download</span>
         Exportar
       </restaurant-button>
-      <restaurant-button variant="primary" id="btn-nueva-factura" (click)="onNuevaFactura()">
-        <span class="material-symbols-outlined">add</span>
-        Nueva Factura
-      </restaurant-button>
     </div>
   </div>
 
   <!-- ── KPI CARDS ── -->
-  <div class="kpi-grid" *ngIf="kpis() as k">
+  @if (kpis(); as k) {
+<div class="kpi-grid">
 
     <restaurant-kpi-card
       label="Total Facturas"
       [value]="k.totalFacturas | number"
       icon="file-text"
       iconColor="green"
-      [trend]="'+' + k.tendenciaTotalFacturas + '% este mes'"
-      [trendUp]="true"
+      [trend]="'Tendencia no disponible'"
+      [trendUp]="false"
     />
 
     <restaurant-kpi-card
@@ -39,8 +36,8 @@
       [value]="'$' + (k.montoMensual | number:'1.2-2')"
       icon="banknote"
       iconColor="blue"
-      [trend]="'+' + k.tendenciaMonto + '% vs periodo anterior'"
-      [trendUp]="true"
+      [trend]="'Tendencia no disponible'"
+      [trendUp]="false"
     />
 
     <restaurant-kpi-card variant="states">
@@ -65,6 +62,7 @@
     </restaurant-kpi-card>
 
   </div>
+}
 
   <!-- ── TABLE CARD ── -->
   <restaurant-data-table
@@ -75,8 +73,10 @@
   >
 
     <!-- Loading skeleton -->
-    <tbody *ngIf="loading()">
-      <tr *ngFor="let i of [1,2,3,4,5]">
+    @if (loading()) {
+<tbody>
+      @for (i of [1,2,3,4,5]; track i) {
+<tr>
         <td colspan="6">
           <div class="skeleton-row">
             <div class="skeleton skeleton--avatar"></div>
@@ -87,10 +87,13 @@
           </div>
         </td>
       </tr>
+}
     </tbody>
+}
 
     <!-- Table content -->
-    <thead *ngIf="!loading()">
+    @if (!loading()) {
+<thead>
       <tr>
         <th class="col-proveedor">Proveedor</th>
         <th class="col-orden">Orden de Compra</th>
@@ -100,20 +103,28 @@
         <th class="col-acciones cell--actions">Acciones</th>
       </tr>
     </thead>
-    <tbody *ngIf="!loading()">
-      <tr
-        *ngFor="let factura of facturas()"
+}
+    @if (!loading()) {
+<tbody>
+      @for (factura of facturas(); track factura) {
+<tr
+       
         (click)="onVerFactura(factura)"
         class="row-clickable"
       >
         <td>
           <div class="proveedor-cell">
             <div class="proveedor-avatar">
-              {{ getProveedorIniciales(factura.proveedor) }}
+              {{ getProveedorIniciales(factura.proveedorNombre) }}
             </div>
             <div>
-              <p class="proveedor-cell__name">{{ factura.proveedor }}</p>
-              <p class="proveedor-cell__id">{{ factura.nitEmisor }}</p>
+              <p class="proveedor-cell__name">
+                <span class="material-symbols-outlined doc-type-icon" title="Factura electrónica">
+                  {{ getDocumentoIcono('Factura Electrónica') }}
+                </span>
+                {{ factura.proveedorNombre }}
+              </p>
+              <p class="proveedor-cell__id">{{ factura.proveedorNit }}</p>
             </div>
           </div>
         </td>
@@ -134,47 +145,59 @@
               <span class="material-symbols-outlined">visibility</span>
             </button>
             <button class="action-icon action-icon--danger" (click)="$event.stopPropagation(); onAnularFactura(factura)" title="Anular">
-              <span class="material-symbols-outlined">delete</span>
+              <span class="material-symbols-outlined">block</span>
             </button>
           </div>
         </td>
       </tr>
+}
 
-      <tr *ngIf="facturas().length === 0">
+      @if (facturas().length === 0) {
+<tr>
         <td colspan="6" class="empty-state">
           <span class="material-symbols-outlined">receipt_long</span>
           <p>No se encontraron facturas</p>
           <span>Intenta ajustar los filtros de búsqueda</span>
         </td>
       </tr>
+}
     </tbody>
+}
 
     <!-- Pagination slot -->
-    <div dtFooter class="table-pagination" *ngIf="!loading() && facturas().length > 0">
-      <span class="table-pagination__info">Mostrando {{ facturas().length }} de {{ kpis()?.totalFacturas | number }} facturas</span>
+    @if (!loading() && facturas().length > 0) {
+<div dtFooter class="table-pagination">
+      <span class="table-pagination__info">
+        Mostrando {{ facturas().length }} de {{ paginacion().totalElements | number }} facturas
+      </span>
       <div class="pagination-btns">
-        <button class="pagination-btn" disabled>
+        <button class="pagination-btn" [disabled]="paginacion().page === 0" (click)="onIrAPagina(paginacion().page - 1)">
           <span class="material-symbols-outlined">chevron_left</span>
         </button>
-        <button class="pagination-btn pagination-btn--active">1</button>
-        <button class="pagination-btn">2</button>
-        <button class="pagination-btn">3</button>
-        <button class="pagination-btn">
+        @for (p of paginas(); track p) {
+          <button class="pagination-btn" [class.pagination-btn--active]="p === paginacion().page" (click)="onIrAPagina(p)">{{ p + 1 }}</button>
+        }
+        <button class="pagination-btn" [disabled]="paginacion().page >= paginacion().totalPages - 1" (click)="onIrAPagina(paginacion().page + 1)">
           <span class="material-symbols-outlined">chevron_right</span>
         </button>
       </div>
     </div>
+}
 
   </restaurant-data-table>
 
 </section>
 
-<!-- ── MODAL: Registrar Factura ── -->
-<restaurant-factura-form
-  *ngIf="showFormModal()"
-  (close)="onCloseForm()"
-  (save)="onSaveFactura($event)"
-></restaurant-factura-form>
+<!-- ── MODAL: Exportar Facturas ── -->
+@if (showExportarModal()) {
+<inventario-exportar
+ 
+  titulo="Exportar Panel de Facturación"
+  subtitulo="Seleccione el formato de salida para el reporte de facturas electrónicas"
+  (exportar)="onConfirmarExportar($event)"
+  (cerrar)="onCerrarExportar()"
+/>
+}
 
 <!-- ── MODAL: Anular Factura ── -->
 <restaurant-keyword-confirm-modal
@@ -186,7 +209,7 @@
   confirmLabel="Sí, anular factura"
   cancelLabel="Cancelar"
   [identifierLabel]="'Factura'"
-  [identifierValue]="facturaParaAnular()?.proveedor ?? ''"
+  [identifierValue]="facturaParaAnular()?.proveedorNombre ?? ''"
   accent="danger"
   (confirm)="onConfirmarAnular()"
   (cancel)="onCancelarAnular()"

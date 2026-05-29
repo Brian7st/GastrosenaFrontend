@@ -1,15 +1,15 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmModalComponent } from '@restaurant/shared/ui';
 import { FacturasFacade } from '../../../data-access/facturas.facade';
 import { Factura, EstadoFactura } from '../../../models/facturas.model';
-import { FacturaFormComponent } from '../../../ui/modals/factura-form/factura-form.component';
+import { ExportarComponent } from '../../../components/exportar/exportar.component';
 
 @Component({
   selector: 'restaurant-facturas-list',
   standalone: true,
-  imports: [CommonModule, ButtonComponent, DataTableComponent, KpiCardComponent, FacturaFormComponent, KeywordConfirmModalComponent],
+  imports: [CommonModule, ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmModalComponent, ExportarComponent],
   templateUrl: './facturas-list.component.html',
   styleUrl: './facturas-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -19,15 +19,17 @@ export class FacturasListPageComponent implements OnInit {
   private router = inject(Router);
 
   // State
-  facturas = this.facade.facturas;
-  kpis = this.facade.kpis;
-  loading = this.facade.loading;
+  facturas   = this.facade.facturas;
+  kpis       = this.facade.kpis;
+  loading    = this.facade.loading;
+  paginacion = this.facade.paginacion;
+  paginas    = computed(() => Array.from({ length: this.paginacion().totalPages }, (_, i) => i));
 
   // Modal controls
-  showFormModal    = signal(false);
-  showAnularModal  = signal(false);
-  facturaParaAnular = signal<Factura | null>(null);
-  searchQuery = signal('');
+  showAnularModal    = signal(false);
+  showExportarModal  = signal(false);
+  facturaParaAnular  = signal<Factura | null>(null);
+  searchQuery        = signal('');
 
   ngOnInit(): void {
     this.facade.loadAll();
@@ -38,17 +40,8 @@ export class FacturasListPageComponent implements OnInit {
     this.facade.setFiltros({ busqueda: query });
   }
 
-  onNuevaFactura(): void {
-    this.showFormModal.set(true);
-  }
-
-  onCloseForm(): void {
-    this.showFormModal.set(false);
-  }
-
-  onSaveFactura(data: Partial<Factura>): void {
-    this.facade.crearFactura(data);
-    this.showFormModal.set(false);
+  onIrAPagina(page: number): void {
+    this.facade.irAPagina(page);
   }
 
   onVerFactura(factura: Factura): void {
@@ -81,15 +74,25 @@ export class FacturasListPageComponent implements OnInit {
   }
 
   onExportar(): void {
-    // TODO: ruta de exportación pendiente
+    this.showExportarModal.set(true);
+  }
+
+  onConfirmarExportar(formato: string): void {
+    // TODO: integrar con servicio de descarga cuando backend confirme contrato
+    console.info('[FEL] Exportar en formato:', formato);
+    this.showExportarModal.set(false);
+  }
+
+  onCerrarExportar(): void {
+    this.showExportarModal.set(false);
   }
 
   getEstadoBadgeClass(estado: EstadoFactura): string {
     const map: Record<EstadoFactura, string> = {
-      Registrada: 'status-badge--registrada',
-      Verificada: 'status-badge--verificada',
-      Pagada:     'status-badge--pagada',
-      Anulada:    'status-badge--anulada',
+      REGISTRADA: 'status-badge--registrada',
+      VERIFICADA: 'status-badge--verificada',
+      PAGADA:     'status-badge--pagada',
+      ANULADA:    'status-badge--anulada',
     };
     return map[estado] ?? 'status-badge--default';
   }
@@ -101,6 +104,17 @@ export class FacturasListPageComponent implements OnInit {
       .map(w => w[0])
       .join('')
       .toUpperCase();
+  }
+
+  getDocumentoIcono(tipoDocumento: string): string {
+    const map: Record<string, string> = {
+      'Factura Electrónica': 'receipt_long',
+      'Factura':             'receipt_long',
+      'Nota Crédito':        'note_alt',
+      'Nota Débito':         'note_add',
+      'Orden de Compra':     'shopping_cart',
+    };
+    return map[tipoDocumento] ?? 'description';
   }
 
   formatCurrency(value: number, moneda = 'COP'): string {
