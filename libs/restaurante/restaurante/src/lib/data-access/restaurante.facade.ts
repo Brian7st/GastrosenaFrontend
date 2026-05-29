@@ -1,56 +1,48 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import {
   Mesa, EstadoMesa, MesaCreateRequest, MesaUpdateRequest,
-  RestauranteStats, PedidoResumenResponse, CajaStats, TurnoCaja,
-  EstadoPedido, PedidoResponse, PedidoCreateRequest
+  RestauranteStats, PedidoResumenResponse, CajaStats,
+  EstadoPedido, PedidoResponse, PedidoCreateRequest,
+  SesionCajaResponse, AbrirSesionRequest, CerrarSesionRequest,
+  FacturarPedidoRequest, MetodoPago
 } from '../models/restaurante.model';
 import { RestauranteService } from './restaurante.service';
+import { catchError, of } from 'rxjs';
 
-/**
- * Representa un ítem del carrito de pedidos en el frontend.
- * Campos alineados con DetallePedidoRequest + extras de UI (subtotal local).
- */
 export interface ItemCarrito {
   productoId: string;
-  nombreProducto: string;  // = DetallePedidoRequest.nombreProducto
+  nombreProducto: string;
   cantidad: number;
-  precioUnitario: number;  // = DetallePedidoRequest.precioUnitario
+  precioUnitario: number;
   categoria: string;
   observaciones?: string;
 }
 
-/**
- * Pedido en construcción en el frontend (borrador local).
- * Se convierte en PedidoCreateRequest al confirmar.
- */
 export interface PedidoCarrito {
   id: string;
-  mesaId: string;          // obligatorio — @NotNull en backend
+  mesaId: string;
   meseroId: string;
-  numeroComensales: number; // necesario para el POST
+  numeroComensales: number;
   estado: EstadoPedido;
-  fechaCreacion: string;   // ISO-8601
+  fechaCreacion: string;
   detalles: ItemCarrito[];
-  subtotal: number;        // calculado en frontend (suma precioUnitario * cantidad)
+  subtotal: number;
 }
 
 @Injectable({ providedIn: 'root' })
 export class RestauranteFacade {
   private restauranteService = inject(RestauranteService);
 
-  // Estado privado con Signals
   private _mesas          = signal<Mesa[]>([]);
   private _mesasCargando  = signal<boolean>(false);
   private _mesasError     = signal<string | null>(null);
   private _ordenesHistorial = signal<PedidoCarrito[]>([]);
   private _pedidoActivo   = signal<PedidoCarrito | null>(null);
 
-  // Estado de Caja
-  private _turnoCaja          = signal<TurnoCaja | null>(null);
+  private _turnoCaja          = signal<SesionCajaResponse | null>(null);
   private _pedidosParaCobro   = signal<PedidoResumenResponse[]>([]);
   private _historialFacturas  = signal<PedidoResumenResponse[]>([]);
 
-  // Selectores públicos (Signals)
   readonly mesas            = this._mesas.asReadonly();
   readonly mesasCargando    = this._mesasCargando.asReadonly();
   readonly mesasError       = this._mesasError.asReadonly();
@@ -61,7 +53,6 @@ export class RestauranteFacade {
   readonly pedidosParaCobro = this._pedidosParaCobro.asReadonly();
   readonly historialFacturas = this._historialFacturas.asReadonly();
 
-  // KPIs computados
   readonly stats = computed<RestauranteStats>(() => {
     const mesasActivas  = this._mesas().filter(m => m.activo);
     const totalMesas    = mesasActivas.length;
@@ -91,8 +82,6 @@ export class RestauranteFacade {
     this.cargarEstadoLocalNoMesas();
   }
 
-  // --- Carga de Mesas (GET backend) ---
-
   cargarMesas(): void {
     this._mesasCargando.set(true);
     this._mesasError.set(null);
@@ -111,8 +100,6 @@ export class RestauranteFacade {
     });
   }
 
-  // --- Estado local que NO viene del backend ---
-
   private cargarEstadoLocalNoMesas(): void {
     const ordenesGuardadas = localStorage.getItem('gastro_ordenes');
     const turnoGuardado    = localStorage.getItem('gastro_turno_caja');
@@ -120,17 +107,21 @@ export class RestauranteFacade {
     if (ordenesGuardadas) {
       this._ordenesHistorial.set(JSON.parse(ordenesGuardadas));
     }
-    if (turnoGuardado) {
-      this._turnoCaja.set(JSON.parse(turnoGuardado));
-    }
+
+    this.restauranteService.obtenerSesionActiva().pipe(
+      catchError((err) => {
+        if (err.status !== 404) {
+          console.error('[RestauranteFacade] Error al cargar sesión activa:', err);
+        }
+        return of(null);
+      })
+    ).subscribe((sesion) => this._turnoCaja.set(sesion));
   }
 
   private guardarEstadoLocal(): void {
     localStorage.setItem('gastro_ordenes',     JSON.stringify(this._ordenesHistorial()));
     localStorage.setItem('gastro_turno_caja',  JSON.stringify(this._turnoCaja()));
   }
-
-  // --- Acciones de Mesas ---
 
   agregarMesa(nombre: string, capacidad: number, zona: string): void {
     const request: MesaCreateRequest = { nombre, capacidad, zona: zona || null };
@@ -144,10 +135,6 @@ export class RestauranteFacade {
     });
   }
 
-  /**
-   * Al confirmar el acceso a la mesa se inicializa el carrito.
-   * NO cambiamos el estado a OCUPADA aquí para evitar 422 al crear el pedido.
-   */
   abrirMesa(mesaId: string, _comensal: string, cantidadComensales: number): void {
     this.iniciarCarrito(mesaId, cantidadComensales);
   }
@@ -198,10 +185,6 @@ export class RestauranteFacade {
     console.warn('[RestauranteFacade] Usa editarMesa(id, cambios) en su lugar.');
   }
 
-  /**
-   * Actualización optimista — mutamos el signal local inmediatamente
-   * para dar feedback visual sin lag, y luego enlazamos con la respuesta del backend.
-   */
   actualizarEstado(mesaId: string, nuevoEstado: EstadoMesa): void {
     // Actualización optimista para reactividad instantánea en la UI
     this._mesas.update(lista =>
@@ -222,8 +205,6 @@ export class RestauranteFacade {
       }
     });
   }
-
-  // --- Gestión de Pedido Activo ---
 
   seleccionarMesaParaPedido(mesaId: string): void {
     this.iniciarCarrito(mesaId, 1);
@@ -280,9 +261,6 @@ export class RestauranteFacade {
     this._pedidoActivo.set(null);
   }
 
-  /**
-   * Envía el Pedido Activo al backend (POST /api/pedidos).
-   */
   confirmarPedidoActivo(notas: string = ''): void {
     const pedido = this._pedidoActivo();
     if (!pedido) return;
@@ -323,7 +301,6 @@ export class RestauranteFacade {
         this.limpiarPedidoActivo();
         this.guardarEstadoLocal();
 
-        // Disparamos automáticamente el envío a cocina tras crearlo exitosamente
         this.enviarPedidoACocina(pedidoResponse.id);
       },
       error: (err) => {
@@ -333,10 +310,6 @@ export class RestauranteFacade {
     });
   }
 
-  /**
-   * PATCH /api/pedidos/{id}/confirmar
-   * Cambia el estado del pedido a ENVIADO_COCINA y dispara eventos RabbitMQ en el backend.
-   */
   enviarPedidoACocina(pedidoId: string): void {
     this.restauranteService.confirmarPedido(pedidoId).subscribe({
       next: (pedidoResponse) => {
@@ -351,10 +324,6 @@ export class RestauranteFacade {
     });
   }
 
-  /**
-   * PATCH /api/pedidos/{id}/entregar
-   * Cambia el estado del pedido a ENTREGADO. También cambia la mesa a POR_PAGAR.
-   */
   marcarPedidoComoEntregado(pedidoId: string): void {
     this.restauranteService.entregarPedido(pedidoId).subscribe({
       next: (pedidoResponse) => {
@@ -376,24 +345,27 @@ export class RestauranteFacade {
 
   // --- Módulo de Caja (Facturación y Pagos) ---
 
-  abrirCaja(baseInicial: number, responsable: string) {
-    const nuevoTurno: TurnoCaja = {
-      id: `T-${Date.now()}`,
-      estado: 'ABIERTA',
-      baseInicial,
-      responsable,
-      fechaApertura: new Date()
-    };
-    this._turnoCaja.set(nuevoTurno);
-    this.guardarEstadoLocal();
+  abrirCaja(baseEfectivo: number) {
+    const request: AbrirSesionRequest = { baseEfectivo };
+    this.restauranteService.abrirSesion(request).subscribe({
+      next: (sesion) => {
+        this._turnoCaja.set(sesion);
+      },
+      error: (err) => console.error('[RestauranteFacade] Error al abrir caja:', err)
+    });
   }
 
-  cerrarCaja() {
-    this._turnoCaja.update(turno => {
-      if (!turno) return null;
-      return { ...turno, estado: 'CERRADA', fechaCierre: new Date() };
+  cerrarCaja(efectivoReal: number) {
+    const session = this._turnoCaja();
+    if (!session) return;
+    
+    const request: CerrarSesionRequest = { efectivoReal };
+    this.restauranteService.cerrarSesion(session.id, request).subscribe({
+      next: (sesionCerrada) => {
+        this._turnoCaja.set(sesionCerrada);
+      },
+      error: (err) => console.error('[RestauranteFacade] Error al cerrar caja:', err)
     });
-    this.guardarEstadoLocal();
   }
 
   cargarPedidosParaCobro() {
@@ -416,14 +388,32 @@ export class RestauranteFacade {
     });
   }
 
-  procesarPagoFinal(pedidoId: string, _metodo: string) {
-    const pedidoPagado = this._pedidosParaCobro().find(p => p.id === pedidoId);
-    if (pedidoPagado) {
-      this._pedidosParaCobro.update(lista  => lista.filter(p => p.id !== pedidoId));
-      this._historialFacturas.update(lista => [{ ...pedidoPagado, estado: 'FACTURADO' }, ...lista]);
-    }
+  facturarPedido(pedidoId: string, metodoPago: MetodoPago, propina: number = 0): void {
+    const request: FacturarPedidoRequest = { pedidoId, metodoPago, propina };
+    this.restauranteService.facturarPedido(request).subscribe({
+      next: (factura) => {
+        this._pedidosParaCobro.update(lista => lista.filter(p => p.id !== pedidoId));
+        const pedidoOriginal = this._pedidosParaCobro().find(p => p.id === pedidoId);
+        if (pedidoOriginal) {
+          this._historialFacturas.update(lista => [{ ...pedidoOriginal, estado: 'FACTURADO' }, ...lista]);
+        }
+        this.cargarMesas();
+      },
+      error: (err) => {
+        console.error(`[RestauranteFacade] Error al facturar pedido ${pedidoId}:`, err);
+      }
+    });
+  }
 
-    // TODO: Integrar con endpoint real de facturación
-    console.log('[RestauranteFacade] procesarPagoFinal: integrar con endpoint de facturación (pendiente).');
+  /** @deprecated */
+  procesarPagoFinal(pedidoId: string, metodo: string) {
+    const metodoMap: Record<string, MetodoPago> = {
+      'Efectivo': 'EFECTIVO',
+      'Tarjeta': 'TARJETA',
+      'Transferencia': 'TRANSFERENCIA',
+      'Cortesía': 'CORTESIA'
+    };
+    const metodoPago: MetodoPago = metodoMap[metodo] || 'EFECTIVO';
+    this.facturarPedido(pedidoId, metodoPago, 0);
   }
 }

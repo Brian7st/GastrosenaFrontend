@@ -14,31 +14,31 @@
     <strong>¡Caja Cerrada!</strong> Debes realizar la apertura de caja para poder facturar o registrar pagos.
   </div>
 
-  <div class="caja-page__stats" *ngIf="facade.cajaStats() as stats">
+  <div class="caja-page__stats">
     <restaurant-kpi-card
       label="Pedidos Listos"
-      [value]="stats.pedidosListos.toString()"
+      [value]="facade.cajaStats().pedidosListos.toString()"
       icon="check-circle"
       iconColor="green"
     ></restaurant-kpi-card>
 
     <restaurant-kpi-card
       label="Mesas por Pagar"
-      [value]="stats.mesasPorPagar.toString()"
+      [value]="facade.cajaStats().mesasPorPagar.toString()"
       icon="credit-card"
       iconColor="blue"
     ></restaurant-kpi-card>
 
     <restaurant-kpi-card
       label="Facturas Hoy"
-      [value]="stats.facturasHoy.toString()"
+      [value]="facade.cajaStats().facturasHoy.toString()"
       icon="file-text"
       iconColor="red"
     ></restaurant-kpi-card>
 
     <restaurant-kpi-card
       label="Total Facturado"
-      [value]="(stats.totalFacturado | currency:'USD':'symbol':'1.0-0') || '$0'"
+      [value]="(facade.cajaStats().totalFacturado | currency:'USD':'symbol':'1.0-0') || '$0'"
       icon="wallet"
       iconColor="orange"
     ></restaurant-kpi-card>
