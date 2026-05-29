@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, Input, Output, EventEmitter, signal } from "@angular/core";
+import { Component, OnInit, inject, Input, Output, EventEmitter, signal, ChangeDetectorRef } from "@angular/core";
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, ValidatorFn } from "@angular/forms";
 import { CommonModule } from "@angular/common";
 import { CategoriaService } from "../../data-access/categoria.service";
@@ -34,6 +34,7 @@ export class GestionRecetaComponent implements OnInit {
   public catService = inject(CategoriaService);
   public ingService = inject(IngredienteService);
   private recetaService = inject(RecetaService);
+  private cdr = inject(ChangeDetectorRef);
 
   isSaving = false;
   mostrarExitoModal = signal<boolean>(false);
@@ -200,6 +201,12 @@ export class GestionRecetaComponent implements OnInit {
     this.close.emit(true);
   }
 
+  removerImagen() {
+    this.recipeForm.patchValue({ urlImagen: '' });
+    const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
+  }
+
   onFileSelected(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
@@ -242,6 +249,7 @@ export class GestionRecetaComponent implements OnInit {
           }
 
           this.recipeForm.patchValue({ urlImagen: dataUrl });
+          this.cdr.markForCheck();
         };
         img.src = e.target.result;
       };
