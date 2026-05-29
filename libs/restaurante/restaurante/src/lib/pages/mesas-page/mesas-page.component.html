@@ -1,20 +1,27 @@
 <div class="mesas-page">
   <!-- Header con botón de acción principal -->
   <div class="mesas-page__header">
-    <restaurant-page-header
-      title="Control de Mesas"
-      subtitle="Gestión de salón y pedidos en tiempo real"
-    ></restaurant-page-header>
-    
+    <restaurant-page-header title="Control de Mesas"
+      subtitle="Gestión de salón y pedidos en tiempo real"></restaurant-page-header>
+
     <div class="header-actions">
       <div class="main-search-wrapper">
-        <lucide-icon name="search" [size]="16" class="search-icon"></lucide-icon>
-        <input 
-          type="text" 
-          class="form-control" 
-          placeholder="Buscar mesa en salón..." 
-          [ngModel]="searchQueryMain()" 
-          (ngModelChange)="searchQueryMain.set($event)">
+        <div class="input-group search-input-group">
+          <span class="input-group-text search-icon-addon">
+            <lucide-icon name="search" [size]="16"></lucide-icon>
+            MESA
+          </span>
+          <input 
+            type="text" 
+            inputmode="numeric"
+            pattern="[0-9]*"
+            maxlength="3"
+            (keypress)="soloNumeros($event)"
+            class="form-control" 
+            placeholder="Ej: 7, 12..." 
+            [ngModel]="searchQueryMain()" 
+            (ngModelChange)="searchQueryMain.set($event)">
+        </div>
       </div>
       <restaurant-button variant="surface" (click)="abrirModal('gestion-mesas')">
         <lucide-icon name="layout-grid" [size]="18"></lucide-icon>
@@ -29,28 +36,14 @@
 
   <!-- KPIs de Dashboard migrados -->
   <div class="mesas-page__stats">
-    <restaurant-kpi-card
-      label="Mesas Totales"
-      [value]="stats().totalMesas.toString()"
-      icon="users"
-      iconColor="blue"
-    ></restaurant-kpi-card>
+    <restaurant-kpi-card label="Mesas Totales" [value]="stats().totalMesas.toString()" icon="users"
+      iconColor="blue"></restaurant-kpi-card>
 
-    <restaurant-kpi-card
-      label="Ocupación"
-      [value]="stats().porcentajeOcupacion + '%'"
-      icon="layout-grid"
-      iconColor="green"
-      [trend]="stats().mesasOcupadas + ' ocupadas'"
-    ></restaurant-kpi-card>
+    <restaurant-kpi-card label="Ocupación" [value]="stats().porcentajeOcupacion + '%'" icon="layout-grid"
+      iconColor="green" [trend]="stats().mesasOcupadas + ' ocupadas'"></restaurant-kpi-card>
 
-    <restaurant-kpi-card 
-      label="MESAS OCUPADAS" 
-      [value]="mesasEnServicio().length.toString()"
-      icon="users"
-      class="clickable-card"
-      (click)="abrirModal('lista-ocupadas')"
-    ></restaurant-kpi-card>
+    <restaurant-kpi-card label="Mesas en atención" [value]="mesasEnServicio().length.toString()" icon="users"
+      class="clickable-card" (click)="abrirModal('lista-ocupadas')"></restaurant-kpi-card>
   </div>
 
   <!-- Grid de Mesas -->
@@ -76,19 +69,27 @@
               </button>
             </div>
           </div>
+        </div>
 
-          <div class="mesa-card__body">
-            <div class="mesa-icon-wrapper">
-               <lucide-icon name="utensils" [size]="32"></lucide-icon>
-            </div>
-            <div class="mesa-card__info-row">
-              <div class="mesa-card__info">
-                <lucide-icon name="users" [size]="14"></lucide-icon>
-                <span>{{ mesa.capacidad }} cap.</span>
-              </div>
-              <!-- comensal / cantidadComensales eliminados del modelo (TODO: fase Pedidos) -->
-            </div>
+        <div class="mesa-card__body">
+          <div class="mesa-icon-wrapper">
+            <lucide-icon name="utensils" [size]="32"></lucide-icon>
           </div>
+          
+          @if (mesa.zona) {
+          <div class="mesa-card__zona">
+            <span>{{ mesa.zona }}</span>
+          </div>
+          }
+
+          <div class="mesa-card__info-row">
+            <div class="mesa-card__info">
+              <lucide-icon name="users" [size]="14"></lucide-icon>
+              <span>{{ mesa.capacidad }} cap.</span>
+            </div>
+            <!-- comensal / cantidadComensales eliminados del modelo (TODO: fase Pedidos) -->
+          </div>
+        </div>
 
           <div class="mesa-card__footer">
             @if (mesa.estado === 'LIBRE') {
@@ -131,33 +132,37 @@
               </div>
             }
           </div>
-        </restaurant-card>
-      } @empty {
-        <div class="empty-container">
-          <restaurant-empty-state
-            title="No hay mesas configuradas"
-            message="Comienza agregando una nueva mesa para el salón."
-          ></restaurant-empty-state>
+          } @else if (mesa.estado === 'POR_PAGAR') {
+          <restaurant-button class="full-width" variant="warning" (click)="abrirModal('cobrar', mesa)">
+            <span>Cobrar</span>
+          </restaurant-button>
+          }
         </div>
+      </restaurant-card>
+      } @empty {
+      <div class="empty-container">
+        <restaurant-empty-state title="No hay mesas configuradas"
+          message="Comienza agregando una nueva mesa para el salón."></restaurant-empty-state>
+      </div>
       }
     </div>
   </section>
 
   <!-- Banner de carga y error -->
   @if (mesasCargando()) {
-    <div class="loading-banner">
-      <lucide-icon name="loader" [size]="18"></lucide-icon>
-      <span>Cargando mesas desde el servidor...</span>
-    </div>
+  <div class="loading-banner">
+    <lucide-icon name="loader" [size]="18"></lucide-icon>
+    <span>Cargando mesas desde el servidor...</span>
+  </div>
   }
   @if (mesasError()) {
-    <div class="error-banner">
-      <lucide-icon name="alert-triangle" [size]="18"></lucide-icon>
-      <span>{{ mesasError() }}</span>
-      <restaurant-button variant="ghost" (click)="recargarMesas()">
-        <span>Reintentar</span>
-      </restaurant-button>
-    </div>
+  <div class="error-banner">
+    <lucide-icon name="alert-triangle" [size]="18"></lucide-icon>
+    <span>{{ mesasError() }}</span>
+    <restaurant-button variant="ghost" (click)="recargarMesas()">
+      <span>Reintentar</span>
+    </restaurant-button>
+  </div>
   }
 
   <!-- Modales -->
@@ -225,16 +230,9 @@
               </div>
             </div>
           </div>
-          
-          <restaurant-button class="full-width" variant="primary" (click)="crearMesa()">
-            <div class="btn-content-centered">
-              <lucide-icon name="check-circle" [size]="18"></lucide-icon>
-              <span>Guardar Mesa</span>
-            </div>
-          </restaurant-button>
-        }
+        </div>
 
-        @if (modalActivo() === 'abrir') {
+D        @if (modalActivo() === 'abrir') {
           <div class="modal-header-colored">
             <h3>Abrir {{ mesaSeleccionada()?.nombre }}</h3>
             <button class="close-btn" (click)="cerrarModales()">
@@ -262,7 +260,7 @@
               <span>Confirmar Asignación</span>
             </restaurant-button>
           </div>
-        }
+        </div>
 
         @if (modalActivo() === 'lista-ocupadas') {
           <div class="modal-header-colored">
@@ -389,35 +387,101 @@
               </div>
             </restaurant-button>
           </div>
-        }
+        </div>
+      </div>
 
-        @if (modalActivo() === 'liberar' || modalActivo() === 'cobrar') {
-          <h3>¿Liberar {{ mesaSeleccionada()?.nombre }}?</h3>
-          <p>Se cerrará la cuenta y la mesa quedará Libre.</p>
-          <div class="modal-actions">
-            <restaurant-button variant="ghost" (click)="cerrarModales()">
-              <span>Cancelar</span>
-            </restaurant-button>
-            <restaurant-button (click)="liberarMesa(mesaSeleccionada()!.id)">
-              <span>Liberar Mesa</span>
-            </restaurant-button>
-          </div>
-        }
+      <restaurant-button class="full-width" variant="primary" (click)="crearMesa()">
+        <div class="btn-content-centered">
+          <lucide-icon name="check-circle" [size]="18"></lucide-icon>
+          <span>Guardar Mesa</span>
+        </div>
+      </restaurant-button>
+      }
 
-        @if (modalActivo() === 'gestion-mesas') {
-          <div class="modal-header-colored">
-            <h3>Gestión de Mesas</h3>
-            <button class="close-btn" (click)="cerrarModales()">
-              <lucide-icon name="x" [size]="20"></lucide-icon>
-            </button>
+      @if (modalActivo() === 'abrir') {
+      <h3>Abrir {{ mesaSeleccionada()?.nombre }}</h3>
+      <p class="modal-note">El comensal y número de personas se registrarán al crear el pedido (próxima fase).</p>
+      <div class="modal-actions">
+        <restaurant-button variant="ghost" (click)="cerrarModales()">
+          <span>Cancelar</span>
+        </restaurant-button>
+        <restaurant-button (click)="abrirMesa(mesaSeleccionada()!.id)">
+          <span>Confirmar Asignación</span>
+        </restaurant-button>
+      </div>
+      }
+
+      @if (modalActivo() === 'lista-ocupadas') {
+      <div class="modal-header-colored">
+        <h3>Mesas en Servicio</h3>
+        <button class="close-btn" (click)="cerrarModales()">
+          <lucide-icon name="x" [size]="20"></lucide-icon>
+        </button>
+      </div>
+      <div class="modal-body-custom modal-body--no-padding">
+        @if (mesasEnServicio().length === 0) {
+        <div class="empty-state-container">
+          <restaurant-empty-state icon="check-circle" title="Todo despejado"
+            description="No hay mesas ocupadas ni por pagar en este momento."></restaurant-empty-state>
+        </div>
+        } @else {
+        <div class="table-responsive">
+          <table class="restaurant-table">
+            <thead>
+              <tr>
+                <th>Mesa</th>
+                <th>Ubicación</th>
+                <th>Mesero</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (mesa of mesasEnServicio(); track mesa.id) {
+              <tr>
+                <td class="fw-bold">{{ mesa.nombre }}</td>
+                <td>{{ mesa.zona || 'Sin zona' }}</td>
+                <td>{{ mesa.meseroAsignado }}</td>
+                <td>
+                  <restaurant-status-badge [status]="mesa.estado === 'OCUPADA' ? 'warning' : 'info'"
+                    [text]="mesa.estado === 'OCUPADA' ? 'Ocupada' : 'Por Pagar'">
+                  </restaurant-status-badge>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        }
+      </div>
+      }
+
+      @if (modalActivo() === 'editar') {
+      <div class="modal-header-colored">
+        <h3>Editar {{ mesaSeleccionada()?.nombre }}</h3>
+        <button class="close-btn" (click)="cerrarModales()">
+          <lucide-icon name="x" [size]="20"></lucide-icon>
+        </button>
+      </div>
+      <div class="modal-body-custom">
+        <div class="form-group">
+          <label>Nombre de la Mesa</label>
+          <div class="input-group">
+            <span class="input-group-text">MESA</span>
+            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" (keypress)="soloNumeros($event)"
+              [ngModel]="editNombre()" (ngModelChange)="editNombre.set($event)" class="form-control"
+              placeholder="Ej: 1, 2, 3...">
           </div>
-          
-          <div class="tabs-container">
-            <button class="tab-btn" [class.active]="tabActivo() === 'desactivar'" (click)="tabActivo.set('desactivar')">
-              Desactivar
+        </div>
+        <div class="form-group">
+          <label>Capacidad (personas)</label>
+          <div class="capacity-control">
+            <button type="button" class="capacity-btn" (click)="decrementarCapacidad('editar')">
+              <lucide-icon name="minus" [size]="16"></lucide-icon>
             </button>
-            <button class="tab-btn" [class.active]="tabActivo() === 'activar'" (click)="tabActivo.set('activar')">
-              Activar
+            <input type="number" min="1" max="20" [ngModel]="editCapacidad()"
+              (ngModelChange)="editCapacidad.set($event)" class="form-control text-center capacity-input">
+            <button type="button" class="capacity-btn" (click)="incrementarCapacidad('editar')">
+              <lucide-icon name="plus" [size]="16"></lucide-icon>
             </button>
           </div>
 
@@ -472,10 +536,111 @@
               </div>
             }
           </div>
-        }
-
+        </div>
       </div>
+      <div class="modal-actions">
+        <restaurant-button variant="ghost" (click)="cerrarModales()">
+          <span>Cancelar</span>
+        </restaurant-button>
+        <restaurant-button variant="primary" (click)="guardarEdicion()">
+          <div class="btn-content-centered">
+            <lucide-icon name="save" [size]="18"></lucide-icon>
+            <span>Guardar Cambios</span>
+          </div>
+        </restaurant-button>
+      </div>
+      }
+
+      @if (modalActivo() === 'liberar' || modalActivo() === 'cobrar') {
+      <h3>¿Liberar {{ mesaSeleccionada()?.nombre }}?</h3>
+      <p>Se cerrará la cuenta y la mesa quedará Libre.</p>
+      <div class="modal-actions">
+        <restaurant-button variant="ghost" (click)="cerrarModales()">
+          <span>Cancelar</span>
+        </restaurant-button>
+        <restaurant-button (click)="liberarMesa(mesaSeleccionada()!.id)">
+          <span>Liberar Mesa</span>
+        </restaurant-button>
+      </div>
+      }
+
+      @if (modalActivo() === 'gestion-mesas') {
+      <div class="modal-header-colored">
+        <h3>Gestión de Mesas</h3>
+        <button class="close-btn" (click)="cerrarModales()">
+          <lucide-icon name="x" [size]="20"></lucide-icon>
+        </button>
+      </div>
+
+      <div class="tabs-container">
+        <button class="tab-btn" [class.active]="tabActivo() === 'desactivar'" (click)="tabActivo.set('desactivar')">
+          Desactivar
+        </button>
+        <button class="tab-btn" [class.active]="tabActivo() === 'activar'" (click)="tabActivo.set('activar')">
+          Activar
+        </button>
+      </div>
+
+      <div class="gestion-mesas-search">
+        <div class="input-group search-input-group">
+          <span class="input-group-text search-icon-addon">
+            <lucide-icon name="search" [size]="16"></lucide-icon>
+            MESA
+          </span>
+          <input 
+            type="text" 
+            inputmode="numeric"
+            pattern="[0-9]*"
+            maxlength="3"
+            (keypress)="soloNumeros($event)"
+            class="form-control" 
+            placeholder="Ej: 7, 12..." 
+            [ngModel]="searchQueryGestionMesas()" 
+            (ngModelChange)="searchQueryGestionMesas.set($event)">
+        </div>
+      </div>
+
+      <div class="modal-body-custom modal-body-scrollable">
+        @if (tabActivo() === 'desactivar') {
+        <div class="mesa-list">
+          @for (m of filteredMesasActivasModal(); track m.id) {
+          <div class="mesa-list-item">
+            <div class="mesa-list-info">
+              <span class="mesa-list-number">{{ m.nombre }}</span>
+              <restaurant-status-badge [label]="m.estado" [variant]="getBadgeType(m.estado)"></restaurant-status-badge>
+            </div>
+            <restaurant-button variant="danger" [disabled]="m.estado !== 'LIBRE'"
+              (click)="cambiarEstadoMesa(m.id, false)"
+              [title]="m.estado !== 'LIBRE' ? 'No se puede desactivar una mesa ocupada' : ''">
+              <span>Desactivar</span>
+            </restaurant-button>
+          </div>
+          } @empty {
+          <p class="empty-msg">No hay mesas activas disponibles.</p>
+          }
+        </div>
+        } @else {
+        <div class="mesa-list">
+          @for (m of filteredMesasInactivasModal(); track m.id) {
+          <div class="mesa-list-item">
+            <div class="mesa-list-info">
+              <span class="mesa-list-number">{{ m.nombre }}</span>
+              <span class="badge-inactiva">Desactivada</span>
+            </div>
+            <restaurant-button variant="primary" (click)="cambiarEstadoMesa(m.id, true)">
+              <span>Activar</span>
+            </restaurant-button>
+          </div>
+          } @empty {
+          <p class="empty-msg">No hay mesas desactivadas.</p>
+          }
+        </div>
+        }
+      </div>
+      }
+
     </div>
+  </div>
   }
 </div>
 
