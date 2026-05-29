@@ -42,10 +42,12 @@ export class SolicitudesGenerarComponent implements OnInit {
   area                    = signal<string>(GIL_DEFAULTS.area);
   destinoBienes           = signal('FORMACION');
   jefeOficinaCoordinador  = signal('');
-  cuentadantes            = signal<{ nombre: string; cedula: string }[]>([]);
+  cuentadanteNombre       = signal('');
+  cuentadanteCedula       = signal('');
   solicitante             = signal('');
   codigoGrupo             = signal('');
   fichaCaracterizacion    = signal('');
+  observaciones           = signal('');
 
   // Transformamos los datos al formato visual que ya tenías
   solicitudes = computed<SolicitudRow[]>(() => {
@@ -79,6 +81,17 @@ export class SolicitudesGenerarComponent implements OnInit {
 
   // KPIs
   solicitudesSeleccionadas = computed(() => this.selectedIds().size);
+
+  requiredFieldsMissing = computed(() =>
+    !this.fichaCaracterizacion().trim() ||
+    !this.jefeOficinaCoordinador().trim() ||
+    !this.solicitante().trim() ||
+    !this.codigoGrupo().trim() ||
+    !this.cuentadanteNombre().trim() ||
+    !this.cuentadanteCedula().trim()
+  );
+
+  canGenerar = computed(() => this.selectedIds().size > 0 && !this.requiredFieldsMissing());
   
   itemsTotalesConsolidar = computed(() => {
     let total = 0;
@@ -132,7 +145,7 @@ export class SolicitudesGenerarComponent implements OnInit {
       area:                   this.area(),
       destinoBienes:          this.destinoBienes(),
       jefeOficinaCoordinador: this.jefeOficinaCoordinador(),
-      cuentadantes:           this.cuentadantes(),
+      cuentadantes:           [{ nombre: this.cuentadanteNombre(), cedula: this.cuentadanteCedula() }],
       solicitante:            this.solicitante(),
       codigoGrupo:            this.codigoGrupo(),
       fichaCaracterizacion:   this.fichaCaracterizacion(),

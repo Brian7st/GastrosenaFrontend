@@ -14,17 +14,17 @@
     "pathRewrite": { "^/api/barybarismo": "/api/barybarismo" }
   },
   "/api/v1/catalog": {
-    "target": "http://localhost:8080",
+    "target": "http://localhost:8081",
     "secure": false,
     "changeOrigin": true
   },
   "/api/v1/inventory": {
-    "target": "http://localhost:8080",
+    "target": "http://localhost:8081",
     "secure": false,
     "changeOrigin": true
   },
   "/api/v1": {
-    "target": "http://localhost:8080",
+    "target": "http://localhost:8081",
     "secure": false,
     "changeOrigin": true
   },
