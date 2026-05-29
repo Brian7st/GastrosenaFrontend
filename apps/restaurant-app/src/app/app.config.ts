@@ -7,7 +7,7 @@ import {
   errorInterceptor,
   jwtInterceptor,
   loadingInterceptor,
-  //mockSecurityInterceptor,
+  mockSecurityInterceptor,
 } from '@restaurant/shared/api';
 import { shellRoutes } from '@restaurant/shell';
 import { provideRestaurantUi } from '@restaurant/shared/ui';
@@ -17,7 +17,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(shellRoutes),
     provideHttpClient(withInterceptors([
-      //mockSecurityInterceptor,
+      mockSecurityInterceptor,
       jwtInterceptor,
       errorInterceptor,
       loadingInterceptor,

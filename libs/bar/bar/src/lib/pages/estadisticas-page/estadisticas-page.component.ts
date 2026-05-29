@@ -1,5 +1,16 @@
-import { Component, ChangeDetectionStrategy, inject, signal, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  inject,
+  signal,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  OnDestroy
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { timeout } from 'rxjs';
 import { ComandaService, EstadisticasKpi } from '../../data-access/comanda.service';
 import { Chart, registerables, ChartConfiguration } from 'chart.js';
 import {
@@ -15,130 +26,174 @@ import {
   styleUrl: './estadisticas-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestroy {
+export class EstadisticasPageComponent implements OnInit, OnDestroy {
   private comandaService = inject(ComandaService);
+  private cdr = inject(ChangeDetectorRef);
 
   kpis = signal<EstadisticasKpi | null>(null);
-  promedioFormateado = signal('');
+  cargandoKpis = signal(true);
+  errorKpis = signal(false);
+  cargandoGraficos = signal(true);
 
   @ViewChild('graficoPromedios') graficoPromedios!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('graficoDiario') graficoDiario!: ElementRef<HTMLCanvasElement>;
 
-  private chartPromedios: Chart | null = null;
+  private chartPromedios?: Chart<'bar'>;
+  private chartDiario?: Chart<'line'>;
+
   private promediosData: ChartConfiguration<'bar'>['data'] = { labels: [], datasets: [] };
+  private diariaData: ChartConfiguration<'line'>['data'] = { labels: [], datasets: [] };
 
-  private minutosAHHMM(mins: number): string {
-    const h = Math.floor(mins / 60);
-    const m = Math.round(mins % 60);
-    return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
-  }
+  private graficosListos = { promedios: false, diaria: false };
 
   constructor() {
     Chart.register(...registerables);
   }
 
-  ngOnInit() {
-    this.comandaService.getEstadisticasPromedios().subscribe({
+  ngOnInit(): void {
+    this.cargarKpis();
+    this.cargarGraficos();
+  }
+
+  private cargarKpis(): void {
+    this.cargandoKpis.set(true);
+    this.errorKpis.set(false);
+
+    this.comandaService.getKpis().pipe(timeout(2500)).subscribe({
       next: data => {
-        // Calcular KPIs reales desde los datos de promedios si el backend no los trae directamente
-        if (data.length > 0) {
-          const tiempos = data.map(d => d.promedioMinutos);
-          const promedioGeneral = Math.round(tiempos.reduce((a, b) => a + b, 0) / tiempos.length * 10) / 10;
-          const minTiempo = Math.min(...tiempos);
-          const bebidaMasRapida = data.find(d => d.promedioMinutos === minTiempo)?.nombreReceta || '—';
-          
-          this.promedioFormateado.set(this.minutosAHHMM(promedioGeneral));
-          this.kpis.set({
-            promedioDemoraGeneral: promedioGeneral,
-            bebidaMasRapida,
-            totalBebidasDespachadosHoy: 0
-          });
-        } else {
-          // Fallback en caso de que no haya datos aún en base de datos
-          this.promedioFormateado.set('00:00');
-          this.kpis.set({
-            promedioDemoraGeneral: 0,
-            bebidaMasRapida: '—',
-            totalBebidasDespachadosHoy: 0
-          });
+        if (data && typeof data === 'object') {
+          this.kpis.set(data);
         }
-
-        // Preparar datos de la gráfica
-        this.promediosData = {
-          labels: data.map(d => d.nombreReceta),
-          datasets: [{
-            data: data.map(d => Math.min(d.promedioMinutos, 60)),
-            backgroundColor: '#39a900',
-            borderRadius: 4,
-            maxBarThickness: 32
-          }]
-        };
-        this.renderChartPromedios();
+        this.cargandoKpis.set(false);
+        this.cdr.markForCheck();
       },
-      error: (err) => {
-        console.error('Error cargando estadísticas promedios:', err);
-        // Fallback visual
-        this.kpis.set({ promedioDemoraGeneral: 0, bebidaMasRapida: 'Sin datos', totalBebidasDespachadosHoy: 0 });
-      }
-    });
-
-    // Contar bebidas preparadas (en estado LISTO) desde las comandas reales
-    this.comandaService.listarComandas().subscribe({
-      next: (comandas) => {
-        const listos = comandas.filter(c => c.estadoPreparacion === 'LISTO').length;
-        this.kpis.update(k => k ? { ...k, totalBebidasDespachadosHoy: listos } : k);
+      error: () => {
+        this.kpis.set(null);
+        this.errorKpis.set(true);
+        this.cargandoKpis.set(false);
+        this.cdr.markForCheck();
       }
     });
   }
 
-  ngAfterViewInit(): void {
-    this.renderChartPromedios();
+  private cargarGraficos(): void {
+    this.cargandoGraficos.set(true);
+    this.graficosListos.promedios = false;
+    this.graficosListos.diaria = false;
+
+    this.comandaService.getEstadisticasPromedios().pipe(timeout(2500)).subscribe({
+      next: data => {
+        if (Array.isArray(data) && data.length > 0) {
+          this.promediosData = {
+            labels: data.map(d => d.nombreReceta),
+            datasets: [{
+              data: data.map(d => d.promedioMinutos),
+              backgroundColor: '#0ea5e9',
+              borderRadius: 4
+            }]
+          };
+        } else {
+          this.promediosData = { labels: [], datasets: [] };
+        }
+        this.graficosListos.promedios = true;
+        this.verificarGraficosCompletos();
+      },
+      error: () => {
+        console.error('Error al cargar estadísticas de promedios.');
+        this.promediosData = { labels: [], datasets: [] };
+        this.graficosListos.promedios = true;
+        this.verificarGraficosCompletos();
+      }
+    });
+
+    this.comandaService.getEstadisticasDiarias().pipe(timeout(2500)).subscribe({
+      next: data => {
+        if (Array.isArray(data) && data.length > 0) {
+          this.diariaData = {
+            labels: data.map(d => d.hora),
+            datasets: [{
+              data: data.map(d => d.totalBebidas),
+              borderColor: '#f59e0b',
+              backgroundColor: 'rgba(245, 158, 11, 0.2)',
+              fill: true,
+              tension: 0.4
+            }]
+          };
+        } else {
+          this.diariaData = { labels: [], datasets: [] };
+        }
+        this.graficosListos.diaria = true;
+        this.verificarGraficosCompletos();
+      },
+      error: () => {
+        console.error('Error al cargar estadísticas diarias.');
+        this.diariaData = { labels: [], datasets: [] };
+        this.graficosListos.diaria = true;
+        this.verificarGraficosCompletos();
+      }
+    });
+  }
+
+  private verificarGraficosCompletos(): void {
+    if (this.graficosListos.promedios && this.graficosListos.diaria) {
+      this.cargandoGraficos.set(false);
+      this.cdr.markForCheck();
+
+      // Renderizar los gráficos después de que se actualice la vista y los canvas sean visibles en el DOM
+      setTimeout(() => {
+        this.renderChartPromedios();
+        this.renderChartDiario();
+      }, 50);
+    }
   }
 
   ngOnDestroy(): void {
     if (this.chartPromedios) this.chartPromedios.destroy();
+    if (this.chartDiario) this.chartDiario.destroy();
   }
 
-  private renderChartPromedios() {
+  private renderChartPromedios(): void {
     if (!this.graficoPromedios?.nativeElement || this.promediosData.labels?.length === 0) return;
 
     if (this.chartPromedios) {
       this.chartPromedios.data = this.promediosData;
       this.chartPromedios.update();
     } else {
-      const config: ChartConfiguration<'bar'> = {
+      this.chartPromedios = new Chart(this.graficoPromedios.nativeElement, {
         type: 'bar',
         data: this.promediosData,
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            title: { display: true, text: 'Promedio de Demora por Bebida (min)' }
+          }
+        }
+      });
+    }
+  }
+
+  private renderChartDiario(): void {
+    if (!this.graficoDiario?.nativeElement || this.diariaData.labels?.length === 0) return;
+
+    if (this.chartDiario) {
+      this.chartDiario.data = this.diariaData;
+      this.chartDiario.update();
+    } else {
+      this.chartDiario = new Chart(this.graficoDiario.nativeElement, {
+        type: 'line',
+        data: this.diariaData,
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
             legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: (ctx) => `${ctx.parsed.y.toFixed(1)} min`
-              }
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              max: 60,
-              ticks: {
-                stepSize: 10,
-                callback: (val) => {
-                  // Manejar de forma segura el valor devuelto para evitar errores de firma
-                  return `${val} min`;
-                }
-              },
-              grid: { color: 'rgba(0,0,0,0.05)' }
-            },
-            x: {
-              grid: { display: false }
-            }
+            title: { display: true, text: 'Volumen de Bebidas Finalizadas (Hoy)' }
           }
         }
-      };
-      this.chartPromedios = new Chart(this.graficoPromedios.nativeElement, config);
+      });
     }
   }
 }

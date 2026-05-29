@@ -53,6 +53,13 @@ export class SolicitudesInsumosFormComponent implements OnInit {
     Array.from({ length: this.catalogoPaginacion().totalPages }, (_, i) => i)
   );
 
+  catalogoRangoInfo = computed(() => {
+    const { page, size, totalElements } = this.catalogoPaginacion();
+    const desde = totalElements === 0 ? 0 : page * size + 1;
+    const hasta = Math.min((page + 1) * size, totalElements);
+    return { desde, hasta, total: totalElements };
+  });
+
   // ── Validación ────────────────────────────────────────────────────────────
   submitAttempted = signal(false);
 
@@ -68,12 +75,8 @@ export class SolicitudesInsumosFormComponent implements OnInit {
       e['resultadoAprendizaje'] = 'El resultado de aprendizaje es requerido.';
     if (!this.actividades().trim())
       e['actividades'] = 'Las actividades son requeridas.';
-    if (!this.voceroId().trim())
-      e['voceroId'] = 'El ID del vocero es requerido.';
     if (this.items().length === 0)
       e['items'] = 'Debe agregar al menos un ítem.';
-    if (this.items().some(i => !i.justificacion.trim()))
-      e['justificacion'] = 'Todos los ítems requieren justificación.';
     return e;
   });
 
@@ -102,7 +105,14 @@ export class SolicitudesInsumosFormComponent implements OnInit {
     this.inventario.irAPagina(page);
   }
 
+  estaEnLista(id: string | number): boolean {
+    return this.items().some(i => i.productoId === String(id));
+  }
+
   onSeleccionarBien(bien: Bien): void {
+    const yaAgregado = this.items().some(i => i.productoId === String(bien.id));
+    if (yaAgregado) return;
+
     this.items.update(list => [...list, {
       productoId:              String(bien.id),
       codigoSena:              bien.codigoSena ?? '',
@@ -129,9 +139,15 @@ export class SolicitudesInsumosFormComponent implements OnInit {
     );
   }
 
-  onJustificacionChange(index: number, justificacion: string): void {
+  onCodigoAlmacenChange(index: number, codigoAlmacen: string): void {
     this.items.update(list =>
-      list.map((item, i) => i === index ? { ...item, justificacion } : item)
+      list.map((item, i) => i === index ? { ...item, codigoAlmacen } : item)
+    );
+  }
+
+  onIvaChange(index: number, iva: number): void {
+    this.items.update(list =>
+      list.map((item, i) => i === index ? { ...item, iva } : item)
     );
   }
 
@@ -167,7 +183,10 @@ export class SolicitudesInsumosFormComponent implements OnInit {
       voceroId:                 this.voceroId(),
       valorTotalDeSolicitud:    this.valorTotalDeSolicitud(),
       items:                    this.items(),
+    }).subscribe(res => {
+      if (res !== null) {
+        this.router.navigate(['/app/inventario/solicitudes-insumos-page']);
+      }
     });
-    this.router.navigate(['/app/inventario/solicitudes-insumos-page']);
   }
 }

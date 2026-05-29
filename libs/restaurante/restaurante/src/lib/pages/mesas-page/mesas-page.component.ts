@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { 
-  PageHeaderComponent, 
-  KpiCardComponent, 
-  CardComponent, 
-  StatusBadgeComponent, 
+import {
+  PageHeaderComponent,
+  KpiCardComponent,
+  CardComponent,
+  StatusBadgeComponent,
   ButtonComponent,
   LucideIconComponent,
   EmptyStateComponent,
@@ -19,12 +19,12 @@ import { Mesa } from '../../models/restaurante.model';
   selector: 'restaurant-mesas-page',
   standalone: true,
   imports: [
-    CommonModule, 
-    FormsModule, 
-    PageHeaderComponent, 
-    KpiCardComponent, 
-    CardComponent, 
-    StatusBadgeComponent, 
+    CommonModule,
+    FormsModule,
+    PageHeaderComponent,
+    KpiCardComponent,
+    CardComponent,
+    StatusBadgeComponent,
     ButtonComponent,
     LucideIconComponent,
     EmptyStateComponent,
@@ -40,15 +40,15 @@ export class MesasPageComponent {
   private route   = inject(ActivatedRoute);
 
   // ── Signals del Facade ──────────────────────────────────────────────────────
-  mesas          = this.facade.mesas;
-  mesasCargando  = this.facade.mesasCargando;
-  mesasError     = this.facade.mesasError;
-  mesasActivas   = computed(() => this.mesas().filter(m => m.activo));
+  mesas = this.facade.mesas;
+  mesasCargando = this.facade.mesasCargando;
+  mesasError = this.facade.mesasError;
+  mesasActivas = computed(() => this.mesas().filter(m => m.activo));
   mesasInactivas = computed(() => this.mesas().filter(m => !m.activo));
-  stats          = this.facade.stats;
+  stats = this.facade.stats;
 
   // ── Estado local del modal ───────────────────────────────────────────────────
-  modalActivo      = signal<string | null>(null);
+  modalActivo = signal<string | null>(null);
   mesaSeleccionada = signal<Mesa | null>(null);
   tabActivo        = signal<'desactivar' | 'activar'>('desactivar');
   searchQueryGestionMesas = signal<string>('');
@@ -57,19 +57,36 @@ export class MesasPageComponent {
   searchQueryMain = signal<string>('');
 
   filteredMesasActivasMain = computed(() => {
-    const q = this.searchQueryMain().toLowerCase();
-    return this.mesasActivas().filter(m => m.nombre.toLowerCase().includes(q));
+    return this.mesasActivas().filter(m => this._matchMesa(m.nombre, this.searchQueryMain()));
   });
 
   filteredMesasActivasModal = computed(() => {
-    const q = this.searchQueryGestionMesas().toLowerCase();
-    return this.mesasActivas().filter(m => m.nombre.toLowerCase().includes(q));
+    return this.mesasActivas().filter(m => this._matchMesa(m.nombre, this.searchQueryGestionMesas()));
   });
-  
+
   filteredMesasInactivasModal = computed(() => {
-    const q = this.searchQueryGestionMesas().toLowerCase();
-    return this.mesasInactivas().filter(m => m.nombre.toLowerCase().includes(q));
+    return this.mesasInactivas().filter(m => this._matchMesa(m.nombre, this.searchQueryGestionMesas()));
   });
+
+  private _matchMesa(nombreMesa: string, query: string): boolean {
+    const q = query.toLowerCase().trim();
+    if (!q) return true;
+
+    const nombre = nombreMesa.toLowerCase();
+    const cleanNombre = nombre.replace(/^mesa\s*/, '');
+    const cleanQuery = q.replace(/^mesa\s*/, '');
+
+    const esNumeroNombre = /^\d+$/.test(cleanNombre);
+    const esNumeroQuery = /^\d+$/.test(cleanQuery);
+
+    if (esNumeroNombre && esNumeroQuery) {
+      const numNombre = parseInt(cleanNombre, 10).toString();
+      const numQuery = parseInt(cleanQuery, 10).toString();
+      return numNombre.includes(numQuery);
+    }
+
+    return cleanNombre.includes(cleanQuery) || nombre.includes(q);
+  }
 
   // ── Mesas en servicio (Ocupadas / Por pagar) ──────────────────────────────────
   mesasEnServicio = computed(() => {
@@ -77,25 +94,24 @@ export class MesasPageComponent {
     return this.mesasActivas()
       .filter(m => m.estado === 'OCUPADA' || m.estado === 'POR_PAGAR')
       .map(m => {
-        // Generador determinista simple basado en id para asignar mesero mock
         const index = m.id.charCodeAt(0) % meseros.length;
         return { ...m, meseroAsignado: meseros[index] };
       });
   });
 
   // ── Signals para CREAR mesa (MesaCreateRequest) ──────────────────────────────
-  nuevoNombre    = signal<string>('');
-  nuevaCapacidad = signal<number | null>(null);
-  nuevaZona      = signal<string>('');
+  nuevoNombre = signal<string>('');
+  nuevaCapacidad = signal<number | null>(1);
+  nuevaZona = signal<string>('');
 
   // ── Signals para EDITAR mesa (MesaUpdateRequest) — se pre-llenan al abrir ──
-  editNombre    = signal<string>('');
+  editNombre = signal<string>('');
   editCapacidad = signal<number>(4);
-  editZona      = signal<string>('');
+  editZona = signal<string>('');
 
   // ── Opciones de Zona (Autocomplete) ──────────────────────────────────────────
   opcionesZonas = ['Salón Principal', 'Terraza', 'Salón VIP', 'Barra'];
-  
+
   showNuevaZonaDropdown = signal(false);
   filteredNuevaZonas = computed(() => {
     const q = this.nuevaZona().toLowerCase();
@@ -126,8 +142,9 @@ export class MesasPageComponent {
       else this.showEditZonaDropdown.set(false);
     }, 150);
   }
+
   // ── Signals para ABRIR mesa ──────────────────────────────────────────────────
-  comensales    = signal<number>(1);
+  comensales = signal<number>(1);
 
   // ── Apertura / cierre de modales ─────────────────────────────────────────────
   abrirModal(nombre: string, mesa: Mesa | null = null) {
@@ -135,12 +152,10 @@ export class MesasPageComponent {
     this.mesaSeleccionada.set(mesa);
 
     if (nombre === 'agregar') {
-      // Resetear formulario de creación
       this.nuevoNombre.set('');
-      this.nuevaCapacidad.set(null);
+      this.nuevaCapacidad.set(1);
       this.nuevaZona.set('');
     } else if (nombre === 'editar' && mesa) {
-      // Pre-llenar formulario de edición con los datos actuales de la mesa
       this.mesaSeleccionada.set(mesa);
       const nombreLimpio = mesa.nombre.toUpperCase().startsWith('MESA ') 
         ? mesa.nombre.substring(5) 
@@ -160,14 +175,22 @@ export class MesasPageComponent {
     this.modalActivo.set(null);
     this.mesaSeleccionada.set(null);
     
-    // Limpiar estados de autocompletado y búsqueda
     this.showNuevaZonaDropdown.set(false);
     this.showEditZonaDropdown.set(false);
     this.searchQueryGestionMesas.set('');
   }
 
   // ── Modal de alertas y notificaciones ────────────────────────────────────────
-  alertDialog = signal<{open: boolean, title: string, message: string, type: 'success' | 'error'}>({
+  alertDialog = signal<{
+    open: boolean,
+    title: string,
+    message: string,
+    type: 'success' | 'error' | 'confirm',
+    confirmText?: string,
+    cancelText?: string,
+    onConfirm?: () => void,
+    onCancel?: () => void
+  }>({
     open: false,
     title: '',
     message: '',
@@ -175,7 +198,19 @@ export class MesasPageComponent {
   });
   
   cerrarAlertDialog() {
-    this.alertDialog.update(state => ({...state, open: false}));
+    const state = this.alertDialog();
+    if (state.onCancel) {
+      state.onCancel();
+    }
+    this.alertDialog.update(s => ({...s, open: false}));
+  }
+
+  confirmAlertDialog() {
+    const state = this.alertDialog();
+    if (state.onConfirm) {
+      state.onConfirm();
+    }
+    this.alertDialog.update(s => ({...s, open: false}));
   }
 
   mostrarExito(mensaje: string) {
@@ -186,6 +221,18 @@ export class MesasPageComponent {
     this.alertDialog.set({ open: true, title: 'Atención', message: mensaje, type: 'error' });
   }
 
+  pedirConfirmacion(title: string, message: string, onConfirm: () => void) {
+    this.alertDialog.set({
+      open: true,
+      title,
+      message,
+      type: 'confirm',
+      confirmText: 'Aceptar',
+      cancelText: 'Cancelar',
+      onConfirm
+    });
+  }
+
   // ── CREAR ────────────────────────────────────────────────────────────────────
   crearMesa() {
     const rawNombre = this.nuevoNombre().trim();
@@ -193,7 +240,6 @@ export class MesasPageComponent {
     let capacidad   = this.nuevaCapacidad();
     const zona      = this.nuevaZona().trim();
 
-    // Si no se llena la capacidad, por defecto será 1
     if (capacidad === null || capacidad === undefined || capacidad.toString().trim() === '') {
       capacidad = 1;
     }
@@ -222,14 +268,14 @@ export class MesasPageComponent {
     const rawNombre = this.editNombre().trim();
     const nombre    = rawNombre ? `MESA ${rawNombre}` : '';
     const capacidad = this.editCapacidad();
-    const zona      = this.editZona().trim();
+    const zona = this.editZona().trim();
 
     if (!rawNombre) {
-      alert('El número o identificador de la mesa es obligatorio.');
+      this.mostrarError('El número o identificador de la mesa es obligatorio.');
       return;
     }
     if (capacidad < 1 || capacidad > 20) {
-      alert('La capacidad debe ser entre 1 y 20 personas.');
+      this.mostrarError('La capacidad debe ser entre 1 y 20 personas.');
       return;
     }
 
@@ -284,19 +330,20 @@ export class MesasPageComponent {
   }
 
   // ── ACTIVAR / DESACTIVAR ─────────────────────────────────────────────────────
-  /**
-   * Llama a /activar o /desactivar según el flag.
-   * Para la acción de desactivar se pide confirmación antes de llamar al backend.
-   */
   cambiarEstadoMesa(id: string, activo: boolean) {
     if (!activo) {
-      const ok = confirm('¿Desactivar esta mesa? Quedará oculta del salón.');
-      if (!ok) return;
+      this.pedirConfirmacion(
+        'Desactivar mesa',
+        '¿Desactivar esta mesa? Quedará oculta del salón.',
+        () => {
+          this.facade.cambiarEstadoActivoMesa(id, activo);
+        }
+      );
+    } else {
+      this.facade.cambiarEstadoActivoMesa(id, activo);
     }
-    this.facade.cambiarEstadoActivoMesa(id, activo);
   }
 
-  /** Alias para el flujo de "eliminar" de la tarjeta (mapea a desactivar). */
   eliminarMesa(id: string) {
     this.cambiarEstadoMesa(id, false);
     this.cerrarModales();
@@ -309,7 +356,6 @@ export class MesasPageComponent {
   // ── Helpers de UI ────────────────────────────────────────────────────────────
   soloNumeros(event: KeyboardEvent) {
     const charCode = event.which ? event.which : event.keyCode;
-    // Solo permitir números (códigos 48 a 57)
     if (charCode < 48 || charCode > 57) {
       event.preventDefault();
     }

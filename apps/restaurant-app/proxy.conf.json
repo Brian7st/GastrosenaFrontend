@@ -1,6 +1,10 @@
 {
   "/api/barybarismo": {
     "target": "http://localhost:8086",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": { "^/api/barybarismo": "/api/barybarismo" }
+  },
   "/api/v1/catalog": {
     "target": "http://localhost:8080",
     "secure": false,
@@ -14,13 +18,6 @@
   "/api/v1": {
     "target": "http://localhost:8080",
     "secure": false,
-    "changeOrigin": true
-  },
-  "/api/barybarismo": {
-    "target": "http://localhost:8086",
-    "secure": false,
-    "changeOrigin": true,
-    "pathRewrite": { "^/api/barybarismo": "/api/barybarismo" }
     "changeOrigin": true
   },
   "/api/bar": {
@@ -59,7 +56,7 @@
     "changeOrigin": true
   },
   "/api": {
-    "target": "http://localhost:8081",
+    "target": "http://localhost:8080",
     "secure": false,
     "changeOrigin": true
   }

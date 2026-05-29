@@ -1,5 +1,5 @@
 import { HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';  // ← cambiar esta línea
+import { inject } from '@angular/core';
 import { AuthService } from '@restaurant/shared/auth';
 
 export const mockSecurityInterceptor: HttpInterceptorFn = (req, next) => {

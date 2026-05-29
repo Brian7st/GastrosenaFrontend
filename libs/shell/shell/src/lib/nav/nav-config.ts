@@ -13,7 +13,7 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
       items: [
         {
           label: 'Dashboard',
-          ruta: '/app',
+          ruta: '/app/dashboard',
           exact: true,
           icono: 'layout-dashboard',
         },
@@ -42,24 +42,8 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
           icono: 'coffee',
           permisos: ['COMANDAS_CONSULTAR', 'RECETAS_CONSULTAR'],
           children: [
-            {
-              label: 'Inicio',
-              ruta: '/app/bar/inicio',
-              icono: 'layout-dashboard',
-            },
-            {
-              label: 'Comandas',
-              ruta: '/app/bar/comandas',
-              icono: 'clipboard-list',
-            },
-            {
-              label: 'Recetas',
-              ruta: '/app/bar/recetas',
-              icono: 'book-open',
-            },
             { label: 'Inicio',       ruta: '/app/bar/inicio',       icono: 'layout-dashboard' },
             { label: 'Comandas',     ruta: '/app/bar/comandas',     icono: 'clipboard-list'   },
-            { label: 'Estadísticas', ruta: '/app/bar/estadisticas', icono: 'bar-chart-2'      },
             { label: 'Recetas',      ruta: '/app/bar/recetas',      icono: 'book-open'        },
           ],
         },
@@ -97,7 +81,7 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
           label: 'Inventario',
           ruta: '/app/inventario',
           icono: 'warehouse',
-          permisos: ['bienes:ver', 'facturas:ver', 'consolidado:ver', 'alertas:ver'],
+          permisos: ['MODULO_INVENTARIO_VER'],
           children: [
             { label: 'Gestión de Bienes',           ruta: '/app/inventario/bienes',                   icono: 'package-open'     },
             { label: 'Facturas Electrónicas',       ruta: '/app/inventario/facturas',                 icono: 'file-spreadsheet' },
@@ -120,29 +104,10 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
           icono: 'pie-chart',
           permisos: ['MODULO_REPORTES_VER', 'REPORTES_GESTIONAR', 'generar_reporte_facturacion'],
           children: [
-            {
-              label: 'Ventas',
-              ruta: '/app/reportes/ventas',
-              icono: 'trending-up',
-            },
-            {
-              label: 'Inventario',
-              ruta: '/app/reportes/inventario',
-              icono: 'warehouse',
-            },
-            {
-              label: 'Estadísticas cocina',
-              ruta: '/app/reportes/estadisticas-cocina',
-              icono: 'bar-chart-2',
-            },
-            {
-              label: 'Estadísticas bar',
-              ruta: '/app/bar/estadisticas',
-              icono: 'bar-chart-2',
-            },
             { label: 'Ventas',              ruta: '/app/reportes/ventas',              icono: 'trending-up' },
             { label: 'Inventario',          ruta: '/app/reportes/inventario',          icono: 'warehouse'   },
             { label: 'Estadísticas cocina', ruta: '/app/reportes/estadisticas-cocina', icono: 'bar-chart-2' },
+            { label: 'Estadísticas bar',    ruta: '/app/bar/estadisticas',             icono: 'bar-chart-2' },
           ],
         },
       ],
