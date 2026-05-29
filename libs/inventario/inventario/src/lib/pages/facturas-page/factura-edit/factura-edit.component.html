@@ -1,300 +1,285 @@
 @if (factura(); as f) {
-<div class="factura-edit">
-
-  <!-- ── BLOCKED BANNER (Vista 4) ── -->
-  @if (isBlocked()) {
-<div class="blocked-banner">
-    <span class="material-symbols-outlined">lock</span>
-    <span>Factura bloqueada — estado: <strong>{{ f.estado }}</strong></span>
-  </div>
-}
-
-  <!-- ── PAGE HEADER ── -->
-  <div class="page-header">
-    <div class="page-header__left">
-      <inventario-back-button (clicked)="onVolver()" />
-      <div>
-        <div class="page-header__breadcrumb">
-          <span>SENA FEL</span>
-          <span class="page-header__breadcrumb-sep">|</span>
-          <span class="page-header__cufe">CUFE: {{ (f.cufe | slice:0:12) }}...{{ (f.cufe | slice:-8) }}</span>
-        </div>
-        <div class="page-header__title-row">
-          <span class="material-symbols-outlined page-header__icon">edit_document</span>
-          <h1>Editar Factura FEL</h1>
-        </div>
-        <p class="page-header__sub">
-          Modificando Documento: <strong class="page-header__doc-id">{{ f.numeroFactura }}</strong>
-        </p>
+  <div class="factura-edit">
+    @if (isBlocked()) {
+      <div class="blocked-banner">
+        <span class="material-symbols-outlined">lock</span>
+        <span>Factura bloqueada — estado: <strong>{{ f.estado }}</strong></span>
       </div>
+    }
+
+    <div class="page-header">
+      <div class="page-header__left">
+        <inventario-back-button (clicked)="onVolver()" />
+        <div>
+          <div class="page-header__breadcrumb">
+            <span>SENA FEL</span>
+            <span class="page-header__breadcrumb-sep">|</span>
+            <span class="page-header__cufe">CUFE: {{ (f.cufe | slice:0:12) }}...{{ (f.cufe | slice:-8) }}</span>
+          </div>
+          <div class="page-header__title-row">
+            <span class="material-symbols-outlined page-header__icon">edit_document</span>
+            <h1>Editar Factura FEL</h1>
+          </div>
+          <p class="page-header__sub">
+            Modificando Documento: <strong class="page-header__doc-id">{{ f.numeroFactura }}</strong>
+          </p>
+        </div>
+      </div>
+      <button class="btn btn--ghost" (click)="onExportar()">
+        <span class="material-symbols-outlined">download</span>
+        Exportar
+      </button>
     </div>
-    <button class="btn btn--ghost" (click)="onExportar()">
-      <span class="material-symbols-outlined">download</span>
-      Exportar
-    </button>
-  </div>
 
-  <!-- ── FORM CARD ── -->
-  <div class="edit-card">
-
-    <!-- Cliente -->
-    <div class="form-grid form-grid--2">
-      <div class="form-field">
-        <label>Identificación del Cliente (NIT/DPI)</label>
-        <div class="input-with-badge">
+    <div class="edit-card">
+      <div class="form-grid form-grid--2">
+        <div class="form-field">
+          <label>NIT proveedor</label>
+          <div class="input-with-badge">
+            <input
+              type="text"
+              id="field-nit-cliente"
+              [ngModel]="nitCliente()"
+              (ngModelChange)="nitCliente.set($event)"
+              [disabled]="isBlocked()"
+            />
+            <span class="material-symbols-outlined input-badge" [class.input-badge--ok]="nitCliente().length > 3">
+              {{ nitCliente().length > 3 ? 'check_circle' : 'radio_button_unchecked' }}
+            </span>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Proveedor</label>
           <input
             type="text"
-            id="field-nit-cliente"
-            [ngModel]="nitCliente()"
-            (ngModelChange)="nitCliente.set($event)"
+            id="field-proveedor-nombre"
+            [ngModel]="proveedorNombre()"
+            (ngModelChange)="proveedorNombre.set($event)"
             [disabled]="isBlocked()"
           />
-          <span class="material-symbols-outlined input-badge" [class.input-badge--ok]="nitCliente().length > 3">
-            {{ nitCliente().length > 3 ? 'check_circle' : 'radio_button_unchecked' }}
-          </span>
         </div>
       </div>
-      <div class="form-field">
-        <label>Razón Social</label>
-        <input
-          type="text"
-          id="field-razon-social"
-          [ngModel]="razonSocial()"
-          (ngModelChange)="razonSocial.set($event)"
-          [disabled]="isBlocked()"
-        />
-      </div>
-    </div>
 
-    <div class="form-grid form-grid--2">
-      <div class="form-field">
-        <label>Tipo de Documento</label>
-        <div class="select-wrapper">
-          <select id="field-tipo-doc" [ngModel]="tipoDoc()" (ngModelChange)="tipoDoc.set($event)" [disabled]="isBlocked()">
-            <option>Factura Electrónica</option>
-            <option>Nota Crédito</option>
-            <option>Nota Débito</option>
-          </select>
-          <span class="material-symbols-outlined">expand_more</span>
+      <div class="form-grid form-grid--2">
+        <div class="form-field">
+          <label>CUFE</label>
+          <input
+            type="text"
+            id="field-cufe"
+            [ngModel]="cufe()"
+            (ngModelChange)="cufe.set($event)"
+            [disabled]="isBlocked()"
+          />
+        </div>
+        <div class="form-field">
+          <label>Fecha de Emisión</label>
+          <input
+            type="date"
+            id="field-fecha"
+            [ngModel]="fechaEmision()"
+            (ngModelChange)="fechaEmision.set($event)"
+            [disabled]="isBlocked()"
+          />
         </div>
       </div>
-      <div class="form-field">
-        <label>Fecha de Emisión</label>
-        <input
-          type="date"
-          id="field-fecha"
-          [ngModel]="fechaEmision()"
-          (ngModelChange)="fechaEmision.set($event)"
-          [disabled]="isBlocked()"
-        />
+
+      <div class="form-grid form-grid--2">
+        <div class="form-field">
+          <label>Fecha de Recepción</label>
+          <input
+            type="date"
+            id="field-fecha-recepcion"
+            [ngModel]="fechaRecepcion()"
+            (ngModelChange)="fechaRecepcion.set($event)"
+            [disabled]="isBlocked()"
+          />
+        </div>
+        <div class="form-field">
+          <label>Orden de compra</label>
+          <input
+            type="text"
+            id="field-orden-compra"
+            [ngModel]="ordenCompra()"
+            (ngModelChange)="ordenCompra.set($event)"
+            [disabled]="isBlocked()"
+          />
+        </div>
       </div>
-    </div>
 
-    <!-- ── ITEMS TABLE ── -->
-    <div class="section-header">
-      <div class="section-header__left">
-        <span class="material-symbols-outlined">table_rows</span>
-        <h3>Detalle de Productos/Servicios</h3>
+      <div class="form-grid form-grid--2">
+        <div class="form-field">
+          <label>Banco</label>
+          <input
+            type="text"
+            id="field-banco"
+            [ngModel]="banco()"
+            (ngModelChange)="banco.set($event)"
+            [disabled]="isBlocked()"
+          />
+        </div>
+        <div class="form-field">
+          <label>Número de cuenta</label>
+          <input
+            type="text"
+            id="field-numero-cuenta"
+            [ngModel]="numeroCuenta()"
+            (ngModelChange)="numeroCuenta.set($event)"
+            [disabled]="isBlocked()"
+          />
+        </div>
       </div>
-      @if (!isBlocked()) {
-<button class="btn btn--add-item" (click)="onAgregarItem()">
-        <span class="material-symbols-outlined">add_circle</span>
-        Agregar Ítem
-      </button>
-}
-    </div>
 
-    <div class="items-table-wrapper">
-      <table class="items-table">
-        <thead>
-          <tr>
-            <th>Cant.</th>
-            <th>Descripción</th>
-            <th>Precio U.</th>
-            <th>IVA (%)</th>
-            <th>Total</th>
-            @if (!isBlocked()) {
-<th></th>
-}
-          </tr>
-        </thead>
-        <tbody>
-          @for (item of localItems(); track item; let i = $index) {
-<tr>
-            <td class="td--num">
-              @if (!isBlocked()) {
-<input
-                class="td-input td-input--num"
-                type="number" min="1"
-                [ngModel]="item.cantidad"
-                (ngModelChange)="onItemChange(i, 'cantidad', +$event)"
-              />
-} @else {
-{{ item.cantidad }}
-}
-              
-            </td>
-            <td>
-              @if (!isBlocked()) {
-<input
-                class="td-input td-input--desc"
-                type="text"
-                [ngModel]="item.descripcion"
-                (ngModelChange)="onItemChange(i, 'descripcion', $event)"
-                placeholder="Descripción del producto..."
-              />
-} @else {
-{{ item.descripcion }}
-}
-              
-            </td>
-            <td class="td--currency">
-              @if (!isBlocked()) {
-<input
-                class="td-input td-input--num"
-                type="number" min="0"
-                [ngModel]="item.precioUnitario"
-                (ngModelChange)="onItemChange(i, 'precioUnitario', +$event)"
-              />
-} @else {
-{{ formatMoney(item.precioUnitario) }}
-}
-              
-            </td>
-            <td class="td--iva">
-              @if (!isBlocked()) {
-<div class="iva-select">
-                <select
-                  [ngModel]="item.iva"
-                  (ngModelChange)="onItemChange(i, 'iva', +$event)"
-                >
-                  <option [value]="0">0%</option>
-                  <option [value]="5">5%</option>
-                  <option [value]="19">19%</option>
-                </select>
-                <span class="material-symbols-outlined">expand_more</span>
-              </div>
-} @else {
-{{ item.iva }}%
-}
-              
-            </td>
-            <td class="td--currency td--bold">{{ formatMoney(item.total) }}</td>
-            @if (!isBlocked()) {
-<td>
-              <button class="icon-btn icon-btn--danger" (click)="onEliminarItem(i)">
-                <span class="material-symbols-outlined">delete</span>
-              </button>
-            </td>
-}
-          </tr>
-}
-          @if (localItems().length === 0) {
-<tr>
-            <td [attr.colspan]="isBlocked() ? 5 : 6" class="empty-row">
-              Sin ítems registrados
-            </td>
-          </tr>
-}
-        </tbody>
-      </table>
-    </div>
+      <div class="form-grid form-grid--2">
+        <div class="form-field">
+          <label>Tipo de cuenta</label>
+          <div class="select-wrapper">
+            <select id="field-tipo-cuenta" [ngModel]="tipoCuenta()" (ngModelChange)="tipoCuenta.set($event)" [disabled]="isBlocked()">
+              <option value="">Seleccione...</option>
+              <option value="AHORROS">AHORROS</option>
+              <option value="CORRIENTE">CORRIENTE</option>
+            </select>
+            <span class="material-symbols-outlined">expand_more</span>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Beneficiario ZESE</label>
+          <input
+            type="checkbox"
+            id="field-zese"
+            [ngModel]="proveedorBeneficiarioZese()"
+            (ngModelChange)="proveedorBeneficiarioZese.set($event)"
+            [disabled]="isBlocked()"
+          />
+        </div>
+      </div>
 
-    <!-- ── CONCILIACIÓN GIL (Vista 4) ── -->
-    @if (hasConciliacion() && f.conciliacion) {
-<div class="conciliacion-section">
       <div class="section-header">
         <div class="section-header__left">
-          <span class="material-symbols-outlined">sync_alt</span>
-          <h3>Conciliación Técnica GIL vs Factura</h3>
+          <span class="material-symbols-outlined">table_rows</span>
+          <h3>Detalle de Productos/Servicios</h3>
         </div>
+        @if (!isBlocked()) {
+          <button class="btn btn--add-item" (click)="onAgregarItem()">
+            <span class="material-symbols-outlined">add_circle</span>
+            Agregar Ítem
+          </button>
+        }
       </div>
-      <div class="conciliacion-table-wrapper">
-        <table class="conciliacion-table">
+
+      <div class="items-table-wrapper">
+        <table class="items-table">
           <thead>
             <tr>
-              <th>Ítem</th>
-              <th>Cant. GIL</th>
-              <th>Cant. Factura</th>
-              <th>Diferencia Cant.</th>
-              <th>Precio GIL</th>
-              <th>Precio Factura</th>
-              <th>Diferencia Precio</th>
+              <th>Cant.</th>
+              <th>Descripción</th>
+              <th>Precio U.</th>
+              <th>IVA (%)</th>
+              <th>Total</th>
+              @if (!isBlocked()) {
+                <th></th>
+              }
             </tr>
           </thead>
           <tbody>
-            @for (c of f.conciliacion; track c) {
-<tr>
-              <td>{{ c.descripcion }}</td>
-              <td class="td--num">{{ c.cantidadGil }}</td>
-              <td class="td--num">{{ c.cantidadFactura }}</td>
-              <td class="td--num" [ngClass]="getDiffClass(c.diferenciaCantidad)">
-                {{ c.diferenciaCantidad === 0 ? '0' : c.diferenciaCantidad }}
-              </td>
-              <td class="td--currency">{{ formatMoney(c.precioGil) }}</td>
-              <td class="td--currency">{{ formatMoney(c.precioFactura) }}</td>
-              <td class="td--currency" [ngClass]="getDiffClass(c.diferenciaPrecio)">
-                {{ c.diferenciaPrecio > 0 ? '+' : '' }}{{ formatMoney(c.diferenciaPrecio) }}
-              </td>
-            </tr>
-}
+            @for (item of localItems(); track item; let i = $index) {
+              <tr>
+                <td class="td--num">
+                  @if (!isBlocked()) {
+                    <input class="td-input td-input--num" type="number" min="1" [ngModel]="item.cantidad" (ngModelChange)="onItemChange(i, 'cantidad', +$event)" />
+                  } @else {
+                    {{ item.cantidad }}
+                  }
+                </td>
+                <td>
+                  @if (!isBlocked()) {
+                    <input class="td-input td-input--desc" type="text" [ngModel]="item.descripcion" (ngModelChange)="onItemChange(i, 'descripcion', $event)" placeholder="Descripción del producto..." />
+                  } @else {
+                    {{ item.descripcion }}
+                  }
+                </td>
+                <td class="td--currency">
+                  @if (!isBlocked()) {
+                    <input class="td-input td-input--num" type="number" min="0" [ngModel]="item.precioUnitario" (ngModelChange)="onItemChange(i, 'precioUnitario', +$event)" />
+                  } @else {
+                    {{ formatMoney(item.precioUnitario) }}
+                  }
+                </td>
+                <td class="td--iva">
+                  @if (!isBlocked()) {
+                    <div class="iva-select">
+                      <select [ngModel]="item.porcentajeIva ?? item.iva" (ngModelChange)="onItemChange(i, 'porcentajeIva', +$event)">
+                        <option [value]="0">0%</option>
+                        <option [value]="5">5%</option>
+                        <option [value]="19">19%</option>
+                      </select>
+                      <span class="material-symbols-outlined">expand_more</span>
+                    </div>
+                  } @else {
+                    {{ item.porcentajeIva ?? item.iva }}%
+                  }
+                </td>
+                <td class="td--currency td--bold">{{ formatMoney(item.total) }}</td>
+                @if (!isBlocked()) {
+                  <td>
+                    <button class="icon-btn icon-btn--danger" (click)="onEliminarItem(i)">
+                      <span class="material-symbols-outlined">delete</span>
+                    </button>
+                  </td>
+                }
+              </tr>
+            }
+            @if (localItems().length === 0) {
+              <tr>
+                <td [attr.colspan]="isBlocked() ? 5 : 6" class="empty-row">
+                  Sin ítems registrados
+                </td>
+              </tr>
+            }
           </tbody>
         </table>
       </div>
-    </div>
-}
 
-    <!-- ── TOTALES ── -->
-    <div class="bottom-section">
-      <div class="totals-card">
-        <div class="totals-row">
-          <span>Subtotal:</span>
-          <span>{{ formatMoney(f.subtotal) }}</span>
-        </div>
-        <div class="totals-row">
-          <span>IVA ({{ f.totalIva > 0 ? '12' : '0' }}%):</span>
-          <span>{{ formatMoney(f.totalIva) }}</span>
-        </div>
-        <div class="totals-row totals-row--total">
-          <span>TOTAL FEL:</span>
-          <span class="totals-total-value">{{ formatMoney(f.total) }}</span>
+      <div class="bottom-section">
+        <div class="totals-card">
+          <div class="totals-row">
+            <span>Subtotal:</span>
+            <span>{{ formatMoney(f.subtotal) }}</span>
+          </div>
+          <div class="totals-row">
+            <span>Total IVA:</span>
+            <span>{{ formatMoney(f.totalIva) }}</span>
+          </div>
+          <div class="totals-row totals-row--total">
+            <span>TOTAL FEL:</span>
+            <span class="totals-total-value">{{ formatMoney(f.total) }}</span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- ── FOOTER ACTIONS ── -->
-  <div class="page-footer">
-    @if (!isBlocked()) {
-<button class="btn btn--anular" (click)="onAnular()">
-      <span class="material-symbols-outlined">cancel</span>
-      Anular Documento
-    </button>
-}
-    <div class="footer-right">
-      <button class="btn btn--ghost" (click)="onVolver()">Cancelar</button>
-      <button
-        class="btn btn--primary"
-        id="btn-guardar-factura"
-        [disabled]="isBlocked()"
-        (click)="onGuardar()"
-      >
-        <span class="material-symbols-outlined">save</span>
-        Guardar Cambios
-      </button>
+    <div class="page-footer">
+      @if (!isBlocked()) {
+        <button class="btn btn--anular" (click)="onAnular()">
+          <span class="material-symbols-outlined">cancel</span>
+          Anular Documento
+        </button>
+      }
+      <div class="footer-right">
+        <button class="btn btn--ghost" (click)="onVolver()">Cancelar</button>
+        <button class="btn btn--primary" id="btn-guardar-factura" [disabled]="isBlocked()" (click)="onGuardar()">
+          <span class="material-symbols-outlined">save</span>
+          Guardar Cambios
+        </button>
+      </div>
     </div>
   </div>
-</div>
 } @else {
-
   <div class="loading-state">
     <div class="loading-spinner"></div>
     <p>Cargando factura...</p>
   </div>
-
 }
 
-<!-- ── MODAL: Confirmar Anulación ── -->
 <restaurant-keyword-confirm-modal
   [open]="showAnularModal()"
   title="Anular edición de FEL"
@@ -309,6 +294,3 @@
   (confirm)="onConfirmarAnular()"
   (cancel)="onCancelarAnular()"
 />
-
-<!-- Loading -->
-

@@ -13,29 +13,28 @@ export interface Movimiento {
   estado: 'Completado' | 'Pendiente' | 'Cancelado';
 }
 
-/** Payload del formulario de registro de entrada */
+/** Payload del formulario de registro de entrada.
+ *  Alineado con RegistrarEntradaHttpRequest (Swagger).
+ *  Las entradas deben originarse desde un GIL validado → gilId obligatorio en ese flujo. */
 export interface EntradaMovimientoData {
-  producto: string;
-  cantidad: number;
-  fecha: string;
-  proveedor: string;
-  factura?: string;
-  ubicacion: string;
-  valorUnitario: number;
-  observaciones?: string;
+  productoId:      string;
+  cantidad:        number;
+  precioUnitario:  number;
+  facturaId?:      string;
+  proveedorNit?:   string;
+  gilId?:          string;
+  conciliacionId?: string;
 }
 
-/** Payload del formulario de registro de salida */
+/** Payload del formulario de registro de salida.
+ *  Alineado con RegistrarSalidaHttpRequest (Swagger).
+ *  Las salidas DEBEN referenciar una requisición válida → requisicionId obligatorio. */
 export interface SalidaMovimientoData {
-  producto: string;
-  cantidad: number;
-  fecha: string;
-  areaDestino: string;
-  instructor?: string;
-  ficha?: string;
-  categoria: string;
-  proposito: string;
-  observaciones?: string;
+  productoId:    string;
+  cantidad:      number;
+  requisicionId: string;
+  instructorId:  string;
+  categoria:     string;
 }
 
 /** Payload para reservar stock de un producto */

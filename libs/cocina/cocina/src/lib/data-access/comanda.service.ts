@@ -76,8 +76,8 @@ export class ComandaService {
   private http = inject(HttpClient);
   
   // Endpoints reales indicados por el usuario
-  private baseUrlComandas = 'http://localhost:8080/api/cocina/comandas';
-  private baseUrlEstadisticas = 'http://localhost:8080/api/cocina/estadisticas';
+  private baseUrlComandas = 'http://localhost:8082/api/cocina/comandas';
+  private baseUrlEstadisticas = 'http://localhost:8082/api/cocina/estadisticas';
 
   iniciarDetalle(idDetalle: string): Observable<any> {
     return this.http.patch(`${this.baseUrlComandas}/detalle/${idDetalle}/iniciar?idResponsable=550e8400-e29b-41d4-a716-446655440000`, {});

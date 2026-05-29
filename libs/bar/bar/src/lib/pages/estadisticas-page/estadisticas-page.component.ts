@@ -45,7 +45,7 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
           const promedioGeneral = Math.round(tiempos.reduce((a, b) => a + b, 0) / tiempos.length * 10) / 10;
           const minTiempo = Math.min(...tiempos);
           const bebidaMasRapida = data.find(d => d.promedioMinutos === minTiempo)?.nombreReceta || '—';
-          
+
           this.promedioFormateado.set(this.minutosAHHMM(promedioGeneral));
           this.kpis.set({
             promedioDemoraGeneral: promedioGeneral,
@@ -72,7 +72,6 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
             maxBarThickness: 32
           }]
         };
-        this.renderChartPromedios();
       },
       error: (err) => {
         console.error('Error cargando estadísticas promedios:', err);

@@ -1,6 +1,6 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
 import { Observable } from 'rxjs';
-import { SolicitudGil, SolicitudesGilFiltros, SolicitudesPaginacion, EstadoGil, CrearSolicitudData, ActualizarSolicitudData } from '../models/solicitudes-gil.model';
+import { SolicitudGil, SolicitudesGilFiltros, SolicitudesPaginacion, EstadoGil, CrearSolicitudData, ActualizarSolicitudData, GenerarGilData } from '../models/solicitudes-gil.model';
 import {
   SolicitudSesion,
   CrearSolicitudSesionData,
@@ -26,6 +26,9 @@ export class SolicitudesFacade {
   private _error                 = signal<string | null>(null);
 
   // ── Estado Training/Solicitudes ────────────────────────────────────────────
+  private _solicitudesSesion           = signal<SolicitudSesion[]>([]);
+  private _loadingSesion               = signal<boolean>(false);
+  private _errorSesion                 = signal<string | null>(null);
   private _solicitudSesionSeleccionada = signal<SolicitudSesion | undefined>(undefined);
 
   // ── Exposición pública ─────────────────────────────────────────────────────
@@ -35,6 +38,9 @@ export class SolicitudesFacade {
   public paginacion                   = computed(() => this._paginacion());
   public solicitudSeleccionada        = computed(() => this._solicitudSeleccionada());
   public error                        = computed(() => this._error());
+  public solicitudesSesion            = computed(() => this._solicitudesSesion());
+  public loadingSesion                = computed(() => this._loadingSesion());
+  public errorSesion                  = computed(() => this._errorSesion());
   public solicitudSesionSeleccionada  = computed(() => this._solicitudSesionSeleccionada());
 
   /**
@@ -224,18 +230,18 @@ export class SolicitudesFacade {
       .subscribe(ok => { if (ok) this.cargarSolicitudById(id); });
   }
 
-  generarGils(ids: (string | number)[]): void {
+  generarGils(data: GenerarGilData): void {
     this._loading.set(true);
-    this.solicitudesService.generarGils(ids)
+    this.solicitudesService.generarGils(data)
       .pipe(
         catchError(() => {
-          this._error.set('Error al generar los GIL');
-          return of(false);
+          this._error.set('Error al generar el GIL');
+          return of(null);
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe((success) => {
-        if (success) {
+      .subscribe(gil => {
+        if (gil) {
           this.cargarSolicitudes();
         }
       });
@@ -245,21 +251,33 @@ export class SolicitudesFacade {
   // Training — /api/v1/training/solicitudes
   // ─────────────────────────────────────────────────────────────────────────
 
+  /** GET /training/solicitudes — carga la lista de solicitudes de sesión */
+  cargarSolicitudesSesion(filtros?: { instructorId?: string; estado?: string }): void {
+    this._loadingSesion.set(true);
+    this._errorSesion.set(null);
+    this.solicitudesService.getSolicitudesSesion(filtros)
+      .pipe(
+        catchError(() => {
+          this._errorSesion.set('Error al cargar las solicitudes de sesión');
+          return of([]);
+        }),
+        finalize(() => this._loadingSesion.set(false))
+      )
+      .subscribe(list => this._solicitudesSesion.set(list));
+  }
+
   /** POST /training/solicitudes — crea la solicitud y la deja seleccionada */
-  crearSolicitudSesion(data: CrearSolicitudSesionData): void {
+  crearSolicitudSesion(data: CrearSolicitudSesionData): Observable<SolicitudSesion | null> {
     this._loading.set(true);
     this._error.set(null);
-    this.solicitudesService.crearSolicitudSesion(data)
+    return this.solicitudesService.crearSolicitudSesion(data)
       .pipe(
         catchError(() => {
           this._error.set('Error al crear la solicitud de sesión');
           return of(null);
         }),
         finalize(() => this._loading.set(false))
-      )
-      .subscribe(res => {
-        if (res !== null) this._solicitudSesionSeleccionada.set(res);
-      });
+      );
   }
 
   /** PATCH /training/solicitudes/{id}/aprobar */

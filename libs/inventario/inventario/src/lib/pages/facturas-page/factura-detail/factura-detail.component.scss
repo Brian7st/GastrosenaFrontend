@@ -125,32 +125,12 @@
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Bento Grid Layout
+// Detail Layout (full-width, single column)
 // ─────────────────────────────────────────────────────────────────────────────
-.bento-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-
-  @media (min-width: 1280px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.bento-main {
+.detail-layout {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-
-  @media (min-width: 1280px) {
-    grid-column: span 2 / span 2;
-  }
-}
-
-.bento-sidebar {
-  @media (min-width: 1280px) {
-    grid-column: span 1 / span 1;
-  }
 }
 
 .bento-card {
@@ -195,11 +175,6 @@
   }
 }
 
-.sticky-summary {
-  position: sticky;
-  top: 2rem;
-  height: max-content;
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Parties Grid & Metadata
@@ -323,15 +298,49 @@
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Table Adjustments
+// Article Detail Table
 // ─────────────────────────────────────────────────────────────────────────────
-
-// Centrar encabezados de columna dentro del bento-card de artículos
-.bento-card {
-  thead th {
-    text-align: center;
-  }
+.detail-table-card {
+  overflow: hidden;
 }
+
+.detail-table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+// Column widths for article table
+.col-idx   { width: 2.5rem; min-width: 2.5rem; }
+.col-desc  { min-width: 14rem; }
+.col-prod  { min-width: 9rem; }
+.col-num   { min-width: 7.5rem; white-space: nowrap; }
+
+// Table cell spacing inside the bento-card
+.detail-table-card {
+  thead th {
+    padding: 1rem 1.25rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-en-superficie-variante);
+    background: var(--color-superficie-contenedor-bajo);
+    white-space: nowrap;
+  }
+
+  tbody td {
+    padding: 0.875rem 1.25rem;
+    font-size: 0.8125rem;
+    border-bottom: 1px solid rgba(var(--color-contorno-variante-rgb, 189, 202, 185), 0.12);
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  tbody tr:hover { background-color: rgba(var(--color-primario-rgb, 0, 110, 37), 0.02); }
+}
+
+.empty-row { padding: 2.5rem 1rem; }
 
 .row-highlight-tertiary {
   background-color: rgba(var(--color-terciario-contenedor-rgb, 255, 85, 95), 0.05);
@@ -341,7 +350,6 @@
   background-color: rgba(var(--color-superficie-contenedor-bajo-rgb, 243, 244, 245), 0.5);
 }
 
-.w-12 { width: 3rem; }
 .text-center { text-align: center; }
 .text-right { text-align: right; }
 .font-medium { font-weight: 500; }
@@ -350,7 +358,7 @@
 .italic { font-style: italic; }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Bottom Cards Grid (SECCIÓN 5, 6, 7)
+// Bottom Cards Grid — 3 columnas: DIAN | Orden Compra | Resumen Fiscal
 // ─────────────────────────────────────────────────────────────────────────────
 .bottom-cards-grid {
   display: grid;
@@ -359,6 +367,10 @@
 
   @media (min-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -654,6 +666,126 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Conciliación GIL
+// ─────────────────────────────────────────────────────────────────────────────
+.gil-conciliacion {
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  &__empty {
+    font-size: 0.875rem;
+    color: var(--color-en-superficie-variante);
+    margin: 0;
+  }
+}
+
+.gil-estado-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.875rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background-color: rgba(186, 24, 48, 0.08);
+  color: var(--color-terciario);
+
+  &--ok {
+    background-color: rgba(0, 110, 37, 0.08);
+    color: var(--color-primario);
+  }
+}
+
+.gil-table-wrapper {
+  overflow-x: auto;
+}
+
+.gil-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+  font-size: 0.8125rem;
+
+  th {
+    padding: 0.75rem 1rem;
+    background: var(--color-superficie-contenedor-bajo);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-en-superficie-variante);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 1rem;
+    color: var(--color-en-superficie);
+    border-bottom: 1px solid rgba(var(--color-contorno-variante-rgb, 189, 202, 185), 0.15);
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  &__row--alerta {
+    background-color: rgba(186, 24, 48, 0.03);
+  }
+}
+
+.text-danger { color: var(--color-terciario); }
+
+.gil-obs-text {
+  font-size: 0.8125rem;
+  color: var(--color-en-superficie-variante);
+}
+
+.gil-resolve-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.gil-obs-input {
+  flex: 1;
+  min-width: 0;
+  background: var(--color-superficie-contenedor-bajo);
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.375rem 0.625rem;
+  font-size: 0.8125rem;
+  color: var(--color-en-superficie);
+  outline: none;
+
+  &:focus { box-shadow: 0 0 0 2px rgba(0, 110, 37, 0.2); }
+}
+
+.gil-vincular-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  max-width: 32rem;
+}
+
+.gil-resolve-btn {
+  flex-shrink: 0;
+  padding: 0.375rem 0.875rem;
+  border-radius: 0.5rem;
+  border: none;
+  background: var(--color-primario);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+  &:not(:disabled):hover { opacity: 0.85; }
 }
 
 .tooltip-container {

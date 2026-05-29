@@ -4,7 +4,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MovimientoBien } from '../../../models/inventario.model';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { ButtonComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
-import { BienFormComponent } from '../../modals/bien-form/bien-form.component';
+import { BienFormComponent } from '../../../ui/modals/bien-form/bien-form.component';
 import { BienFormDto, EstadoBien } from '../../../models/inventario.model';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 

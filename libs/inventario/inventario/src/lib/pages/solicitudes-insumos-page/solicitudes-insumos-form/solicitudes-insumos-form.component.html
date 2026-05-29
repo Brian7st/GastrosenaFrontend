@@ -1,0 +1,417 @@
+<div class="form-page-container">
+
+  <!-- Breadcrumbs & Header -->
+  <div class="page-header">
+    <div class="header-nav-wrapper">
+      <inventario-back-button (clicked)="onCancel()" />
+      <div class="header-titles-col">
+        <div class="breadcrumbs">
+          <a (click)="onCancel()" class="breadcrumb-link">Solicitudes</a>
+          <span class="material-symbols-outlined separator">chevron_right</span>
+          <span class="current">{{ isEdit() ? 'Editar' : 'Nueva' }}</span>
+        </div>
+        <div class="header-titles">
+          <div class="title-row">
+            <h2 class="page-title">{{ isEdit() ? 'Editar Solicitud de Insumos' : 'Nueva Solicitud de Insumos' }}</h2>
+            @if (isEdit()) {
+              <span class="status-badge status-badge--edicion">EN EDICIÓN</span>
+              <span class="status-badge status-badge--codigo">{{ solicitudCodigo() }}</span>
+            } @else {
+              <span class="status-badge status-badge--borrador">NUEVA</span>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       Tarjeta 1: Información General
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="form-card">
+    <h3 class="section-title">
+      <span class="material-symbols-outlined section-icon">info</span>
+      Información General
+    </h3>
+
+    <div class="form-grid">
+
+      <!-- Columna izquierda -->
+      <div class="form-col">
+
+        <div class="form-group">
+          <label class="form-label">Fecha de Solicitud</label>
+          <div class="readonly-input">
+            <span class="readonly-text">{{ fechaSolicitud() }}</span>
+            <span class="material-symbols-outlined icon-locked">lock</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Número de Ficha <span class="required-mark">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Ej. 2560892"
+            [value]="fichaId()"
+            (input)="fichaId.set($any($event.target).value)"
+          />
+          @if (submitAttempted() && errores()['fichaId']) {
+            <p class="field-error">{{ errores()['fichaId'] }}</p>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Programa de Formación <span class="required-mark">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Ej. GASTRONOMÍA"
+            [value]="programaId()"
+            (input)="programaId.set($any($event.target).value)"
+          />
+          @if (submitAttempted() && errores()['programaId']) {
+            <p class="field-error">{{ errores()['programaId'] }}</p>
+          }
+        </div>
+
+      </div>
+
+      <!-- Columna derecha -->
+      <div class="form-col">
+
+        <div class="form-group">
+          <label class="form-label">Nombre del Instructor <span class="required-mark">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Ej. Carlos Rodríguez"
+            [value]="instructorId()"
+            (input)="instructorId.set($any($event.target).value)"
+          />
+          @if (submitAttempted() && errores()['instructorId']) {
+            <p class="field-error">{{ errores()['instructorId'] }}</p>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Identificación del Instructor</label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Ej. 1234567890"
+            [value]="identificacionInstructor()"
+            (input)="identificacionInstructor.set($any($event.target).value)"
+          />
+          <p class="field-hint">Cédula o número de identificación (opcional)</p>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Resultado de Aprendizaje <span class="required-mark">*</span></label>
+      <textarea
+        class="form-control"
+        rows="2"
+        placeholder="Ej. Preparar recetas de cocina colombiana aplicando técnicas culinarias básicas"
+        [value]="resultadoAprendizaje()"
+        (input)="resultadoAprendizaje.set($any($event.target).value)"
+      ></textarea>
+      @if (submitAttempted() && errores()['resultadoAprendizaje']) {
+        <p class="field-error">{{ errores()['resultadoAprendizaje'] }}</p>
+      }
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Actividades <span class="required-mark">*</span></label>
+      <textarea
+        class="form-control"
+        rows="2"
+        placeholder="Ej. Práctica de cocina en taller, elaboración de recetas y presentación de platos"
+        [value]="actividades()"
+        (input)="actividades.set($any($event.target).value)"
+      ></textarea>
+      @if (submitAttempted() && errores()['actividades']) {
+        <p class="field-error">{{ errores()['actividades'] }}</p>
+      }
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       Tarjeta 3: Ítems Solicitados
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="form-card">
+    <div class="section-header-row">
+      <h3 class="section-title m-0">
+        <span class="material-symbols-outlined section-icon">shopping_cart</span>
+        Ítems Solicitados
+      </h3>
+      <restaurant-button variant="ghost" class="btn-add-item" (click)="onAbrirSelectorBien()">
+        <span class="material-symbols-outlined">add</span>
+        Agregar desde catálogo
+      </restaurant-button>
+    </div>
+
+    @if (submitAttempted() && errores()['items']) {
+      <p class="field-error" style="margin-bottom:0.75rem">{{ errores()['items'] }}</p>
+    }
+
+    <div class="table-container">
+      <table class="items-table">
+        <colgroup>
+          <col class="col-insumo" />
+          <col class="col-qty" />
+          <col class="col-unit" />
+          <col class="col-price" />
+          <col class="col-price" />
+          <col class="col-almacen" />
+          <col class="col-iva" />
+          <col class="col-actions" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Insumo</th>
+            <th class="text-center">Cant.</th>
+            <th>Unidad</th>
+            <th class="text-right">Valor Unit.</th>
+            <th class="text-right">Total</th>
+            <th>Cód. Almacén</th>
+            <th class="text-right">IVA (%)</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of items(); track $index; let i = $index) {
+            <tr>
+              <td>
+                <p class="item-name">{{ item.nombreBien }}</p>
+                <p class="item-code">{{ item.codigoSena }}</p>
+              </td>
+              <td>
+                <input
+                  type="number"
+                  class="form-control-table text-right"
+                  style="width:100%"
+                  placeholder="0"
+                  min="1"
+                  [value]="item.cantidad"
+                  (input)="onCantidadChange(i, +$any($event.target).value)"
+                />
+              </td>
+              <td>
+                <span class="unit-label">{{ item.unidadMedida }}</span>
+              </td>
+              <td class="text-right">
+                <span class="price-value">{{ (item.valorUnitario ?? 0) | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+              </td>
+              <td class="text-right">
+                <span class="price-total">{{ (item.cantidad * (item.valorUnitario ?? 0)) | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+              </td>
+              <td>
+                <input
+                  type="text"
+                  class="form-control-table"
+                  placeholder="Ej. ALM-01"
+                  [value]="item.codigoAlmacen ?? ''"
+                  (input)="onCodigoAlmacenChange(i, $any($event.target).value)"
+                />
+              </td>
+              <td>
+                <input
+                  type="number"
+                  class="form-control-table text-right"
+                  style="width:100%"
+                  placeholder="0"
+                  min="0"
+                  [value]="item.iva ?? 0"
+                  (input)="onIvaChange(i, +$any($event.target).value)"
+                />
+              </td>
+              <td class="text-center">
+                <button class="btn-icon btn-icon--danger" type="button" (click)="onRemoveItem(i)" title="Eliminar ítem">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
+              </td>
+            </tr>
+          }
+          @if (items().length === 0) {
+            <tr>
+              <td colspan="8" class="empty-state-cell">
+                <span class="material-symbols-outlined empty-icon">shopping_cart</span>
+                No hay ítems. Usá el botón "Agregar desde catálogo".
+              </td>
+            </tr>
+          }
+        </tbody>
+
+        @if (items().length > 0) {
+          <tfoot>
+            <tr class="total-row">
+              <td colspan="4" class="total-label">
+                <span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle;margin-right:0.25rem">calculate</span>
+                Total solicitud ({{ items().length }} {{ items().length === 1 ? 'ítem' : 'ítems' }})
+              </td>
+              <td class="text-right total-value">
+                {{ valorTotalDeSolicitud() | currency:'COP':'symbol-narrow':'1.0-0' }}
+              </td>
+              <td colspan="3"></td>
+            </tr>
+          </tfoot>
+        }
+      </table>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="actions-footer">
+    <restaurant-button variant="ghost" (click)="onCancel()">Cancelar</restaurant-button>
+    <restaurant-button variant="primary" (click)="onSave()" [disabled]="facade.loading()">
+      {{ facade.loading() ? 'Enviando...' : 'Enviar solicitud' }}
+      <span class="material-symbols-outlined right-icon">arrow_forward</span>
+    </restaurant-button>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     Selector de Bienes del Catálogo
+══════════════════════════════════════════════════════════════ -->
+@if (mostrarSelectorBien()) {
+  <div class="catalog-overlay">
+    <div class="catalog-backdrop" (click)="mostrarSelectorBien.set(false)"></div>
+
+    <div class="catalog-modal">
+
+      <div class="catalog-header">
+        <h3 class="catalog-title">
+          <span class="material-symbols-outlined" style="color:var(--color-primario)">inventory_2</span>
+          Catálogo de Bienes
+        </h3>
+        <button type="button" class="catalog-close" (click)="mostrarSelectorBien.set(false)">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="catalog-search">
+        <span class="material-symbols-outlined search-icon">search</span>
+        <input
+          type="text"
+          class="catalog-search-input"
+          placeholder="Buscar por nombre o código SENA..."
+          (input)="onBuscarBienCatalogo($any($event.target).value)"
+        />
+      </div>
+
+      <div class="catalog-body">
+        @if (catalogoLoading()) {
+          <div class="catalog-empty">
+            <span class="material-symbols-outlined catalog-empty-icon">hourglass_empty</span>
+            Cargando catálogo...
+          </div>
+        } @else {
+          <table class="catalog-table">
+            <thead>
+              <tr>
+                <th>Cód. SENA</th>
+                <th>Nombre del Bien</th>
+                <th>Unidad</th>
+                <th class="text-right">Precio</th>
+                <th class="text-center">Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (bien of catalogoBienes(); track bien.id) {
+                <tr>
+                  <td class="catalog-code">{{ bien.codigoSena }}</td>
+                  <td>
+                    <p class="item-name" style="margin:0">{{ bien.nombre }}</p>
+                    <p class="item-code" style="margin:0">{{ bien.descripcion }}</p>
+                  </td>
+                  <td class="catalog-unit">{{ bien.unidadMedida }}</td>
+                  <td class="text-right catalog-price">
+                    {{ (bien.valor ?? 0) | currency:'COP':'symbol-narrow':'1.0-0' }}
+                  </td>
+                  <td class="text-center">
+                    @if (estaEnLista(bien.id)) {
+                      <span class="catalog-added-label">
+                        <span class="material-symbols-outlined" style="font-size:14px">check</span>
+                        Agregado
+                      </span>
+                    } @else {
+                      <button type="button" class="btn-catalog-add" (click)="onSeleccionarBien(bien)">
+                        <span class="material-symbols-outlined" style="font-size:14px">add</span>
+                        Agregar
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+              @if (catalogoBienes().length === 0) {
+                <tr>
+                  <td colspan="5" class="catalog-empty">
+                    <span class="material-symbols-outlined catalog-empty-icon">search_off</span>
+                    No se encontraron bienes
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+
+      @if (catalogoRangoInfo().total > 0) {
+        <div class="catalog-pagination">
+          <span class="catalog-pagination__info">
+            {{ catalogoRangoInfo().desde }}–{{ catalogoRangoInfo().hasta }} de {{ catalogoRangoInfo().total }} productos
+          </span>
+
+          <div class="catalog-pagination__controls">
+            <button
+              type="button"
+              class="page-btn"
+              [disabled]="catalogoPaginacion().page === 0"
+              (click)="onSelectorIrAPagina(catalogoPaginacion().page - 1)"
+              title="Página anterior"
+            >
+              <span class="material-symbols-outlined" style="font-size:16px;display:block">chevron_left</span>
+            </button>
+
+            @for (p of paginasSelectorBien(); track p) {
+              <button
+                type="button"
+                class="page-btn"
+                [class.page-btn--active]="p === catalogoPaginacion().page"
+                (click)="onSelectorIrAPagina(p)"
+              >
+                {{ p + 1 }}
+              </button>
+            }
+
+            <button
+              type="button"
+              class="page-btn"
+              [disabled]="catalogoPaginacion().page >= catalogoPaginacion().totalPages - 1"
+              (click)="onSelectorIrAPagina(catalogoPaginacion().page + 1)"
+              title="Página siguiente"
+            >
+              <span class="material-symbols-outlined" style="font-size:16px;display:block">chevron_right</span>
+            </button>
+          </div>
+        </div>
+      }
+
+    </div>
+  </div>
+}
+
+<!-- Modal Confirmación -->
+@if (isModalOpen()) {
+  <restaurant-confirmar-envio-solicitud-modal
+    [isOpen]="true"
+    [isEdit]="isEdit()"
+    (cancelled)="cerrarModalConfirmacion()"
+    (confirmed)="confirmarEnvio()">
+  </restaurant-confirmar-envio-solicitud-modal>
+}
