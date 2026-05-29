@@ -11,9 +11,10 @@ export class RecetaService {
   recetas = signal<Receta[]>([]);
 
   listar() {
-    this.http.get<Receta[]>(this.url).subscribe({
+    this.http.get<Receta[] | { value: Receta[] }>(this.url).subscribe({
       next: (res) => {
-        this.recetas.set(res ?? []);
+        const list = Array.isArray(res) ? res : (res && Array.isArray(res.value) ? res.value : []);
+        this.recetas.set(list);
       },
       error: (err) => {
         console.error('Error al cargar recetas desde el backend:', err);

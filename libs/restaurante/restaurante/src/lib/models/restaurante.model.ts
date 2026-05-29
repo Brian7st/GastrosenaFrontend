@@ -38,14 +38,54 @@ export interface CajaStats {
   totalFacturado: number;
 }
 
-export interface TurnoCaja {
+// --- Enums de Caja y Facturación ---
+export type EstadoSesion = 'ABIERTA' | 'CERRADA';
+export type EstadoFacturaRestaurante = 'PENDIENTE' | 'PAGADA' | 'ANULADA';
+export type MetodoPago = 'EFECTIVO' | 'TARJETA' | 'TRANSFERENCIA' | 'CORTESIA';
+
+// --- Response DTOs de Caja ---
+export interface SesionCajaResponse {
   id: string;
-  estado: 'ABIERTA' | 'CERRADA';
-  baseInicial: number;
-  responsable: string;
-  fechaApertura: Date;
-  fechaCierre?: Date;
-  saldoFinal?: number;
+  cajeroId: string;
+  estado: EstadoSesion;
+  baseEfectivo: number;
+  totalVentasEfectivo: number;
+  totalVentasTarjeta: number;
+  totalVentasTransferencia: number;
+  efectivoReal: number;
+  diferencia: number;
+  fechaApertura: string;
+  fechaCierre: string | null;
+}
+
+export interface FacturaResponse {
+  id: string;
+  numeroFactura: string;
+  pedidoId: string;
+  nombreMesa: string;
+  sesionCajaId: string;
+  cajeroId: string;
+  subtotal: number;
+  propina: number;
+  total: number;
+  metodoPago: MetodoPago;
+  estado: EstadoFacturaRestaurante;
+  fechaEmision: string;
+}
+
+// --- Request DTOs de Caja ---
+export interface AbrirSesionRequest {
+  baseEfectivo: number;
+}
+
+export interface CerrarSesionRequest {
+  efectivoReal: number;
+}
+
+export interface FacturarPedidoRequest {
+  pedidoId: string;
+  metodoPago: MetodoPago;
+  propina: number;
 }
 
 /**

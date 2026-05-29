@@ -28,16 +28,15 @@ export class CajaAperturaPageComponent {
   private route = inject(ActivatedRoute);
   facade = inject(RestauranteFacade);
 
-  baseInicialCtrl = new FormControl<number | null>(null, [Validators.required, Validators.min(0)]);
-  responsable = 'Instructor Activo';
+  baseEfectivoCtrl = new FormControl<number | null>(null, [Validators.required, Validators.min(0)]);
 
   volver() {
     this.router.navigate(['..'], { relativeTo: this.route });
   }
 
   confirmarApertura() {
-    if (this.baseInicialCtrl.valid && this.baseInicialCtrl.value !== null) {
-      this.facade.abrirCaja(this.baseInicialCtrl.value, this.responsable);
+    if (this.baseEfectivoCtrl.valid && this.baseEfectivoCtrl.value !== null) {
+      this.facade.abrirCaja(this.baseEfectivoCtrl.value);
       this.volver();
     }
   }
