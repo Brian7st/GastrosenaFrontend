@@ -17,7 +17,7 @@ const MOCK_NOTIFICACIONES: Notificacion[] = [
     tipo: 'bloqueo_cuenta',
     estado: 'no_leida',
     fecha: new Date('2025-05-20T10:30:00'),
-    icono: 'shield-off',
+    icono: 'shield-check',
   },
   {
     id: '2',
@@ -26,7 +26,7 @@ const MOCK_NOTIFICACIONES: Notificacion[] = [
     tipo: 'restablecimiento_contrasena',
     estado: 'no_leida',
     fecha: new Date('2025-05-19T14:15:00'),
-    icono: 'key',
+    icono: 'refresh-cw',
   },
   {
     id: '3',
@@ -44,7 +44,7 @@ const MOCK_NOTIFICACIONES: Notificacion[] = [
     tipo: 'registro_usuario',
     estado: 'leida',
     fecha: new Date('2025-05-17T16:45:00'),
-    icono: 'user-plus',
+    icono: 'user-cog',
   },
   {
     id: '5',
