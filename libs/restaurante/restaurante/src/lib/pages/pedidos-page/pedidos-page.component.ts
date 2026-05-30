@@ -35,6 +35,13 @@ export class PedidosPageComponent {
   selectedCategory = signal('all');
   selectedSubcategory = signal('');
 
+  showMobileCart = signal(false);
+  totalItems = computed(() => {
+    const pedido = this.facade.pedidoActivo();
+    if (!pedido) return 0;
+    return pedido.detalles.reduce((sum, item) => sum + item.cantidad, 0);
+  });
+
   mesaActual = computed(() => {
     const pedido = this.facade.pedidoActivo();
     if (!pedido) return null;

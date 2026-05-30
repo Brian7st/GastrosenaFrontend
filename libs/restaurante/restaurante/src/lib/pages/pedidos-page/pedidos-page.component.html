@@ -53,8 +53,30 @@
     </section>
   </main>
 
-  <!-- Área del Carrito (Derecha) -->
-  <aside class="pedidos-sidebar">
+  <!-- Overlay para móvil -->
+  @if (showMobileCart()) {
+    <div class="mobile-cart-backdrop" (click)="showMobileCart.set(false)"></div>
+  }
+
+  <!-- Área del Carrito (Derecha / Drawer en móvil) -->
+  <aside class="pedidos-sidebar" [class.mobile-open]="showMobileCart()">
+    <div class="mobile-drawer-header">
+      <h3>Resumen del Pedido</h3>
+      <button class="close-drawer-btn" (click)="showMobileCart.set(false)">
+        <lucide-icon name="x" [size]="24"></lucide-icon>
+      </button>
+    </div>
     <lib-pedidos-cart></lib-pedidos-cart>
   </aside>
+
+  <!-- Botón flotante para abrir el carrito en móvil -->
+  <button class="mobile-cart-fab" (click)="showMobileCart.set(true)">
+    <div class="fab-content">
+      <lucide-icon name="clipboard-list" [size]="24"></lucide-icon>
+      <span>Ver Carrito</span>
+    </div>
+    @if (totalItems() > 0) {
+      <span class="fab-badge">{{ totalItems() }}</span>
+    }
+  </button>
 </div>
