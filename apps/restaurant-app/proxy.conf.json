@@ -1,4 +1,14 @@
 {
+  "/api/auth": {
+    "target": "http://localhost:8087",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/users": {
+    "target": "http://localhost:8087",
+    "secure": false,
+    "changeOrigin": true
+  },
   "/api/barybarismo": {
     "target": "http://localhost:8086",
     "secure": false,
@@ -6,12 +16,52 @@
     "pathRewrite": { "^/api/barybarismo": "/api/barybarismo" }
   },
   "/api/v1/catalog": {
-    "target": "http://localhost:8080",
+    "target": "http://localhost:8081",
     "secure": false,
     "changeOrigin": true
   },
   "/api/v1/inventory": {
-    "target": "http://localhost:8080",
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/v1/legalization": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/v1/procurement": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/v1/sourcing": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/v1/budget": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/v1/reconciliation": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/v1/alerts": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/v1/reporting": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/v1/training": {
+    "target": "http://localhost:8081",
     "secure": false,
     "changeOrigin": true
   },

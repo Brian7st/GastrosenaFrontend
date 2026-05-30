@@ -7,6 +7,7 @@ import {
   CompromisoActa,
   FirmanteActa,
 } from '../models/acta.model';
+import { CrearActaRequest } from './api/legalization.api';
 
 @Injectable({ providedIn: 'root' })
 export class ActasFacade {
@@ -68,8 +69,8 @@ export class ActasFacade {
       });
   }
 
-  /** Crea un nuevo acta y recarga el listado. */
-  crearActa(data: Partial<ActaLegalizacion>): void {
+  /** Crea un nuevo acta. Retorna el ID creado y recarga el listado. */
+  crearActa(data: CrearActaRequest): void {
     this._loading.set(true);
     this.actasService.crearActa(data)
       .pipe(
@@ -79,8 +80,8 @@ export class ActasFacade {
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe(res => {
-        if (res) this.loadAll();
+      .subscribe(id => {
+        if (id) this.loadAll();
       });
   }
 

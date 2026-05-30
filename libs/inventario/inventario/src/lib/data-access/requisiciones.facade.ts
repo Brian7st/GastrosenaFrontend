@@ -104,6 +104,23 @@ export class RequisicionesFacade {
       .subscribe(ok => { if (ok) this.loadAll(); });
   }
 
+  /** POST /legalization/requisiciones — crea una nueva requisición */
+  crearRequisicion(data: Partial<Requisicion>): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this.requisicionesService.crearRequisicion(data)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al crear la requisición');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => {
+        if (res) this.loadAll();
+      });
+  }
+
   /** Elimina una requisición y recarga el listado. */
   eliminarRequisicion(id: string): void {
     this._loading.set(true);
