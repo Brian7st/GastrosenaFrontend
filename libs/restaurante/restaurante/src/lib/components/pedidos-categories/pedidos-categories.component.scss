@@ -29,6 +29,7 @@
     align-items: center;
     justify-content: center;
     min-width: 90px;
+    flex-shrink: 0; /* Evita que se encojan en pantallas pequeñas */
     padding: var(--space-4);
     border-radius: var(--radius-lg);
     background-color: var(--color-surface-primary);
@@ -70,6 +71,20 @@
       font-weight: var(--font-weight-semibold);
       color: var(--color-text-primary);
       margin-bottom: var(--space-1);
+    }
+
+    @media (max-width: 768px) {
+      min-width: 80px;
+      padding: var(--space-3);
+      
+      .icon {
+        margin-bottom: var(--space-1);
+        transform: scale(0.85); /* Achicar el ícono un poco */
+      }
+      
+      .name {
+        font-size: var(--font-size-xs);
+      }
     }
   }
 }

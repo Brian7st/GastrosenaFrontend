@@ -19,6 +19,11 @@
   gap: var(--space-6);
   padding-bottom: var(--space-8);
 
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--space-4);
+  }
+
   .product-card {
     background-color: var(--color-surface-primary);
     border-radius: var(--radius-lg);
@@ -109,6 +114,29 @@
           font-size: var(--font-size-xs);
           color: var(--color-text-secondary);
           margin-bottom: var(--space-1);
+        }
+      }
+    }
+
+    @media (max-width: 768px) {
+      .image-container {
+        height: 110px; /* Reducir altura de la imagen */
+      }
+      
+      .info-container {
+        padding: var(--space-3); /* Reducir padding interno */
+        
+        .product-name {
+          font-size: var(--font-size-sm); /* Texto más pequeño */
+        }
+        
+        .stats {
+          font-size: var(--font-size-xs);
+          margin-bottom: var(--space-2);
+        }
+        
+        .price-row .prices .current-price {
+          font-size: var(--font-size-md); /* Precio más moderado */
         }
       }
     }
