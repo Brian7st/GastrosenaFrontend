@@ -52,6 +52,13 @@ export const USUARIOS_ROUTES: Routes = [
             m => m.RolesPageComponent,
           ),
       },
+      {
+        path: 'fichas',
+        loadComponent: () =>
+          import('./pages/fichas-page/fichas-page.component').then(
+            m => m.FichasPageComponent,
+          ),
+      },
     ],
   },
 ];

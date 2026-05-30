@@ -19,17 +19,18 @@
       [options]="periodicidadOpciones"
       (valueChange)="periodicidadSeleccionada.set($event)"
     />
-    <restaurant-button variant="primary">
+    <restaurant-button variant="primary" (click)="onGenerarReporte()">
       <lucide-icon name="trending-up" [size]="16"></lucide-icon>
-        Generar Reporte
-   </restaurant-button>
+      Generar Reporte
+    </restaurant-button>
+  </div>
 
   <!-- Secciones por rol -->
   @for (seccion of seccionesFiltradas(); track seccion.rol) {
     <div class="reportes-seccion">
       <div class="reportes-seccion__header">
         <div class="reportes-seccion__titulo">
-        <lucide-icon [name]="seccion.icono" [size]="20" class="reportes-seccion__icono"></lucide-icon>
+          <lucide-icon [name]="seccion.icono" [size]="20" class="reportes-seccion__icono"></lucide-icon>
           <h2 class="reportes-seccion__nombre" [class]="'reportes-seccion__nombre--' + seccion.color">
             {{ seccion.rol }}
           </h2>
@@ -48,14 +49,14 @@
               <p class="reporte-card__desc">{{ reporte.descripcion }}</p>
             </div>
             <div class="reporte-card__actions">
-             <restaurant-button variant="primary" (click)="generarReporte(reporte.id)">
-             <lucide-icon name="refresh-cw" [size]="14"></lucide-icon>
-              Generar
-            </restaurant-button>
-            <restaurant-button variant="surface" (click)="descargarPdf(reporte.id)">
-           <lucide-icon name="file-text" [size]="14"></lucide-icon>
-             PDF
-           </restaurant-button>
+              <restaurant-button variant="primary" (click)="generarReporte(reporte.id)">
+                <lucide-icon name="refresh-cw" [size]="14"></lucide-icon>
+                Generar
+              </restaurant-button>
+              <restaurant-button variant="surface" (click)="descargarPdf(reporte.id)">
+                <lucide-icon name="file-text" [size]="14"></lucide-icon>
+                PDF
+              </restaurant-button>
             </div>
           </div>
         }
@@ -76,7 +77,7 @@
         <th>ACCIÓN</th>
       </tr>
     </thead>
-    @for (reporte of reportesRecientes; track reporte.nombre) {
+    @for (reporte of reportesRecientes(); track reporte.id) {
       <tr>
         <td>{{ reporte.nombre }}</td>
         <td>{{ reporte.fecha }}</td>
@@ -87,10 +88,10 @@
           />
         </td>
         <td>
-          <restaurant-button variant="surface">
+          <restaurant-button variant="surface" (click)="descargarReporte(reporte.id)">
             <lucide-icon name="download" [size]="14"></lucide-icon>
-              Descargar
-         </restaurant-button>
+            Descargar
+          </restaurant-button>
         </td>
       </tr>
     }

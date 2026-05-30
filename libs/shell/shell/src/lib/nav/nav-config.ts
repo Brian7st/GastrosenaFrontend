@@ -1,11 +1,11 @@
-import { BarraLateralConfig, TopNavLink } from './nav.models';
+  import { BarraLateralConfig, TopNavLink } from './nav.models';
 
-export const TOP_MENU_CONFIG: TopNavLink[] = [];
+  export const TOP_MENU_CONFIG: TopNavLink[] = [];
 
-export const SIDEBAR_CONFIG: BarraLateralConfig = {
-  titulo: 'GastroSena',
-  subtitulo: 'MONOREPO ANGULAR 20',
-  logoUrl: '',
+  export const SIDEBAR_CONFIG: BarraLateralConfig = {
+    titulo: 'GastroSena',
+    subtitulo: 'MONOREPO ANGULAR 20',
+    logoUrl: '',
 
   grupos: [
     {
@@ -56,6 +56,11 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
               label: 'Recetas',
               ruta: '/app/bar/recetas',
               icono: 'book-open',
+            },
+            {
+              label: 'Estadísticas',
+              ruta: '/app/bar/estadisticas',
+              icono: 'bar-chart-2',
             },
           ],
         },
@@ -129,11 +134,6 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
             {
               label: 'Estadísticas cocina',
               ruta: '/app/reportes/estadisticas-cocina',
-              icono: 'bar-chart-2',
-            },
-            {
-              label: 'Estadísticas bar',
-              ruta: '/app/bar/estadisticas',
               icono: 'bar-chart-2',
             },
           ],

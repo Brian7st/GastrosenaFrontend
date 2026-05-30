@@ -1,0 +1,210 @@
+<div class="fichas-page">
+
+  <!-- Header -->
+  <div class="fichas-page__header">
+    <div class="fichas-page__header-text">
+      <h1 class="fichas-page__title">Gestión de Fichas</h1>
+      <p class="fichas-page__subtitle">Administrá las fichas y programas del SENA</p>
+    </div>
+    <div class="fichas-page__header-actions">
+      <button class="fichas-page__btn fichas-page__btn--primary" type="button" (click)="onNuevaFicha()">
+        <lucide-icon name="plus" [size]="16"></lucide-icon>
+        Nueva Ficha
+      </button>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="fichas-page__kpis">
+    <div class="fichas-page__kpi">
+      <span class="fichas-page__kpi-value">{{ totalFichas() }}</span>
+      <span class="fichas-page__kpi-label">Total Fichas</span>
+    </div>
+    <div class="fichas-page__kpi">
+      <span class="fichas-page__kpi-value fichas-page__kpi-value--activas">{{ totalActivas() }}</span>
+      <span class="fichas-page__kpi-label">Activas</span>
+    </div>
+    <div class="fichas-page__kpi">
+      <span class="fichas-page__kpi-value fichas-page__kpi-value--inactivas">{{ totalInactivas() }}</span>
+      <span class="fichas-page__kpi-label">Inactivas</span>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="fichas-page__filters">
+    <div class="fichas-page__search-wrapper">
+      <lucide-icon name="search" [size]="16" class="fichas-page__search-icon"></lucide-icon>
+      <input
+        class="fichas-page__search-input"
+        type="text"
+        placeholder="Buscar por número o programa..."
+        [value]="busqueda()"
+        (input)="busqueda.set($any($event.target).value)"
+      >
+    </div>
+    <div class="fichas-page__filter-selects">
+      <div class="fichas-page__select-wrapper">
+        <select class="fichas-page__select" (change)="estadoFiltro.set($any($event.target).value)">
+          <option value="todos">Todos</option>
+          <option value="activas">Activas</option>
+          <option value="inactivas">Inactivas</option>
+        </select>
+        <lucide-icon name="filter" [size]="14" class="fichas-page__select-icon"></lucide-icon>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <restaurant-data-table>
+    <thead>
+      <tr>
+        <th>Número</th>
+        <th>Programa</th>
+        <th>Fecha Inicio</th>
+        <th>Fecha Fin</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (fichasFiltradas().length === 0) {
+        <tr>
+          <td colspan="6" class="fichas-page__empty">
+            <lucide-icon name="folder-open" [size]="20"></lucide-icon>
+            Sin fichas registradas
+          </td>
+        </tr>
+      } @else {
+        @for (f of fichasFiltradas(); track f.id) {
+          <tr>
+            <td class="fichas-page__numero">{{ f.numero }}</td>
+            <td>{{ f.programa }}</td>
+            <td class="fichas-page__fecha">{{ f.fechaInicio | date:'dd/MM/yyyy' }}</td>
+            <td class="fichas-page__fecha">{{ f.fechaFin | date:'dd/MM/yyyy' }}</td>
+            <td>
+              <span
+                class="fichas-page__badge"
+                [class.fichas-page__badge--activa]="f.activa"
+                [class.fichas-page__badge--inactiva]="!f.activa"
+              >
+                {{ f.activa ? 'Activa' : 'Inactiva' }}
+              </span>
+            </td>
+            <td>
+              <div class="fichas-page__actions">
+                <button
+                  class="fichas-page__action-btn"
+                  type="button"
+                  (click)="onEditarFicha(f)"
+                  aria-label="Editar ficha"
+                >
+                  <lucide-icon name="pencil" [size]="16"></lucide-icon>
+                </button>
+                <button
+                  class="fichas-page__action-btn fichas-page__action-btn--danger"
+                  type="button"
+                  (click)="onEliminar(f.id)"
+                  aria-label="Eliminar ficha"
+                >
+                  <lucide-icon name="trash-2" [size]="16"></lucide-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+      }
+    </tbody>
+  </restaurant-data-table>
+
+</div>
+
+<!-- Modal crear / editar -->
+@if (mostrarModal()) {
+  <div class="fichas-modal-backdrop" (click)="onCerrarModal()">
+    <div class="fichas-modal" (click)="$event.stopPropagation()">
+
+      <div class="fichas-modal__header">
+        <h2 class="fichas-modal__title">
+          {{ fichaEditando() ? 'Editar Ficha' : 'Nueva Ficha' }}
+        </h2>
+        <button
+          class="fichas-modal__close"
+          type="button"
+          (click)="onCerrarModal()"
+          aria-label="Cerrar"
+        >
+          <lucide-icon name="x" [size]="18"></lucide-icon>
+        </button>
+      </div>
+
+      <div class="fichas-modal__body">
+
+        <div class="fichas-modal__field">
+          <label class="fichas-modal__label" for="ficha-numero">Número</label>
+          <input
+            id="ficha-numero"
+            class="fichas-modal__input"
+            type="text"
+            placeholder="Ej: 2887423"
+            [value]="formNumero()"
+            (input)="formNumero.set($any($event.target).value)"
+          >
+        </div>
+
+        <div class="fichas-modal__field">
+          <label class="fichas-modal__label" for="ficha-programa">Programa</label>
+          <input
+            id="ficha-programa"
+            class="fichas-modal__input"
+            type="text"
+            placeholder="Ej: Técnico en Cocina"
+            [value]="formPrograma()"
+            (input)="formPrograma.set($any($event.target).value)"
+          >
+        </div>
+
+        <div class="fichas-modal__row">
+          <div class="fichas-modal__field">
+            <label class="fichas-modal__label" for="ficha-inicio">Fecha Inicio</label>
+            <input
+              id="ficha-inicio"
+              class="fichas-modal__input"
+              type="date"
+              [value]="formFechaInicio()"
+              (input)="formFechaInicio.set($any($event.target).value)"
+            >
+          </div>
+          <div class="fichas-modal__field">
+            <label class="fichas-modal__label" for="ficha-fin">Fecha Fin</label>
+            <input
+              id="ficha-fin"
+              class="fichas-modal__input"
+              type="date"
+              [value]="formFechaFin()"
+              (input)="formFechaFin.set($any($event.target).value)"
+            >
+          </div>
+        </div>
+
+      </div>
+
+      <div class="fichas-modal__footer">
+        <button
+          class="fichas-page__btn fichas-page__btn--ghost"
+          type="button"
+          (click)="onCerrarModal()"
+        >
+          Cancelar
+        </button>
+        <button
+          class="fichas-page__btn fichas-page__btn--primary"
+          type="button"
+          (click)="onGuardar()"
+        >
+          {{ fichaEditando() ? 'Guardar cambios' : 'Crear ficha' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

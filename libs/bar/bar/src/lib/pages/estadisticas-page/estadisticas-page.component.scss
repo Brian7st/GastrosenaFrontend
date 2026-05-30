@@ -4,20 +4,17 @@
   min-height: 100%;
 }
 
-restaurant-page-header {
-  display: block;
-  margin-bottom: var(--space-5, 25px);
-}
-
+/* ══════════════════════════════════════════════════
+   KPIs
+   ══════════════════════════════════════════════════ */
 .kpis-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-4, 20px);
   margin-bottom: var(--space-5, 25px);
 
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
+  @media (max-width: 1024px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 540px)  { grid-template-columns: 1fr; }
 }
 
 .kpi-card {
@@ -82,11 +79,13 @@ restaurant-page-header {
       font-weight: 800;
       color: var(--color-text-primary, #1e293b);
       margin: 0;
-      word-break: break-word;
     }
   }
 }
 
+/* ══════════════════════════════════════════════════
+   Gráficos
+   ══════════════════════════════════════════════════ */
 .charts-grid {
   display: flex;
   flex-direction: column;
@@ -98,13 +97,8 @@ restaurant-page-header {
   padding: var(--space-4, 20px);
   border: 1px solid var(--color-border, #e2e8f0);
 
-  h3 {
-    font-size: 0.75rem;
-    color: var(--color-text-secondary, #64748b);
-    margin-bottom: 20px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
+  &.full-width {
+    width: 100%;
   }
 
   .chart-wrapper {

@@ -21,7 +21,7 @@
 
       <div class="input-group">
         <label>Base de Caja (Efectivo)</label>
-        <input type="number" class="form-control" placeholder="$ 0" [formControl]="baseInicialCtrl" />
+        <input type="number" class="form-control" placeholder="$ 0" [formControl]="baseEfectivoCtrl" />
       </div>
 
       <div class="input-group mt-4">
@@ -33,7 +33,7 @@
         <restaurant-button variant="surface" (click)="volver()">
           Cancelar
         </restaurant-button>
-        <restaurant-button variant="primary" (click)="confirmarApertura()" [disabled]="baseInicialCtrl.invalid || facade.turnoCaja()?.estado === 'ABIERTA'">
+        <restaurant-button variant="primary" (click)="confirmarApertura()" [disabled]="baseEfectivoCtrl.invalid || facade.turnoCaja()?.estado === 'ABIERTA'">
           <lucide-icon name="log-in" [size]="18"></lucide-icon>
           <span>Abrir Caja</span>
         </restaurant-button>

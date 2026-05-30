@@ -1,16 +1,26 @@
-import { Component, ChangeDetectionStrategy, inject, signal, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  inject,
+  signal,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+  OnDestroy
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ComandaService, EstadisticasKpi } from '../../data-access/comanda.service';
+import { ComandaService, EstadisticasKpi, PromedioBebida } from '../../data-access/comanda.service';
+import { ComandaBarYBarismo } from '../../models/comanda.model';
 import { Chart, registerables, ChartConfiguration } from 'chart.js';
 import {
-  LucideIconComponent,
-  PageHeaderComponent
+  LucideIconComponent
 } from '@restaurant/shared/ui';
 
 @Component({
   selector: 'restaurant-bar-estadisticas-page',
   standalone: true,
-  imports: [CommonModule, LucideIconComponent, PageHeaderComponent],
+  imports: [CommonModule, LucideIconComponent],
   templateUrl: './estadisticas-page.component.html',
   styleUrl: './estadisticas-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -18,18 +28,22 @@ import {
 export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private comandaService = inject(ComandaService);
 
+  // ── KPIs ──────────────────────────────────────────────────────────────────
   kpis = signal<EstadisticasKpi | null>(null);
   promedioFormateado = signal('');
 
+  // ── Charts ────────────────────────────────────────────────────────────────
   @ViewChild('graficoPromedios') graficoPromedios!: ElementRef<HTMLCanvasElement>;
 
   private chartPromedios: Chart | null = null;
   private promediosData: ChartConfiguration<'bar'>['data'] = { labels: [], datasets: [] };
 
-  private minutosAHHMM(mins: number): string {
-    const h = Math.floor(mins / 60);
-    const m = Math.round(mins % 60);
-    return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  private minutosAMMSS(mins: number): string {
+    if (!mins || isNaN(mins)) return '00:00';
+    const m = Math.floor(mins);
+    const s = Math.round((mins - m) * 60);
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   }
 
   constructor() {
@@ -37,68 +51,88 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   ngOnInit() {
+    this.cargarDatos();
+  }
+
+  cargarDatos() {
+    // ── 1. Promedios por bebida ────────────────────────────────────────────
     this.comandaService.getEstadisticasPromedios().subscribe({
       next: data => {
-        // Calcular KPIs reales desde los datos de promedios si el backend no los trae directamente
-        if (data.length > 0) {
-          const tiempos = data.map(d => d.promedioMinutos);
-          const promedioGeneral = Math.round(tiempos.reduce((a, b) => a + b, 0) / tiempos.length * 10) / 10;
-          const minTiempo = Math.min(...tiempos);
-          const bebidaMasRapida = data.find(d => d.promedioMinutos === minTiempo)?.nombreReceta || '—';
+        // Datos 100% reales consumidos directamente desde la API del backend
+        const stats: PromedioBebida[] = [...(data || [])];
 
-          this.promedioFormateado.set(this.minutosAHHMM(promedioGeneral));
-          this.kpis.set({
-            promedioDemoraGeneral: promedioGeneral,
-            bebidaMasRapida,
-            totalBebidasDespachadosHoy: 0
-          });
-        } else {
-          // Fallback en caso de que no haya datos aún en base de datos
-          this.promedioFormateado.set('00:00');
-          this.kpis.set({
-            promedioDemoraGeneral: 0,
-            bebidaMasRapida: '—',
-            totalBebidasDespachadosHoy: 0
-          });
-        }
-
-        // Preparar datos de la gráfica
-        this.promediosData = {
-          labels: data.map(d => d.nombreReceta),
-          datasets: [{
-            data: data.map(d => Math.min(d.promedioMinutos, 60)),
-            backgroundColor: '#39a900',
-            borderRadius: 4,
-            maxBarThickness: 32
-          }]
-        };
+        this.actualizarKpisPromedios(stats);
+        this.promediosData = this.buildPromediosChartData(stats);
+        this.renderChartPromedios();
       },
-      error: (err) => {
-        console.error('Error cargando estadísticas promedios:', err);
-        // Fallback visual
-        this.kpis.set({ promedioDemoraGeneral: 0, bebidaMasRapida: 'Sin datos', totalBebidasDespachadosHoy: 0 });
+      error: () => {
+        const stats: PromedioBebida[] = [];
+        this.actualizarKpisPromedios(stats);
+        this.promediosData = this.buildPromediosChartData(stats);
+        this.renderChartPromedios();
       }
     });
 
-    // Contar bebidas preparadas (en estado LISTO) desde las comandas reales
+    // ── 2. Comandas reales → Bebidas preparadas ────────────────────────────
     this.comandaService.listarComandas().subscribe({
-      next: (comandas) => {
+      next: (comandas: ComandaBarYBarismo[]) => {
         const listos = comandas.filter(c => c.estadoPreparacion === 'LISTO').length;
-        this.kpis.update(k => k ? { ...k, totalBebidasDespachadosHoy: listos } : k);
+
+        this.kpis.update(k => k
+          ? { ...k, totalBebidasDespachadosHoy: listos }
+          : { promedioDemoraGeneral: 0, bebidaMasRapida: '—', totalBebidasDespachadosHoy: listos }
+        );
+      },
+      error: () => {
+        // no-op
       }
     });
   }
 
+  // ── Helpers internos ──────────────────────────────────────────────────────
+  private actualizarKpisPromedios(stats: PromedioBebida[]) {
+    const tiempos = stats.map(d => d.promedioMinutos);
+    // Sin redondeo prematuro para poder formatear los segundos reales en minutosAMMSS
+    const promedioGeneral = tiempos.length > 0 ? (tiempos.reduce((a, b) => a + b, 0) / tiempos.length) : 0;
+    const minTiempo = tiempos.length > 0 ? Math.min(...tiempos) : 0;
+    const bebidaMasRapida = stats.find(d => d.promedioMinutos === minTiempo)?.nombreReceta || '—';
+
+    this.promedioFormateado.set(this.minutosAMMSS(promedioGeneral));
+    const currentKpis = this.kpis();
+    this.kpis.set({
+      promedioDemoraGeneral: promedioGeneral,
+      bebidaMasRapida,
+      totalBebidasDespachadosHoy: currentKpis?.totalBebidasDespachadosHoy || 0
+    });
+  }
+
+  private buildPromediosChartData(stats: PromedioBebida[]): ChartConfiguration<'bar'>['data'] {
+    return {
+      labels: stats.map(d => d.nombreReceta),
+      datasets: [{
+        label: 'Tiempo Promedio (min)',
+        data: stats.map(d => d.promedioMinutos),
+        backgroundColor: '#39a900',
+        borderRadius: 4,
+        maxBarThickness: 32
+      }]
+    };
+  }
+
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
   ngAfterViewInit(): void {
     this.renderChartPromedios();
   }
 
   ngOnDestroy(): void {
-    if (this.chartPromedios) this.chartPromedios.destroy();
+    if (this.chartPromedios) {
+      this.chartPromedios.destroy();
+    }
   }
 
+  // ── Render charts ─────────────────────────────────────────────────────────
   private renderChartPromedios() {
-    if (!this.graficoPromedios?.nativeElement || this.promediosData.labels?.length === 0) return;
+    if (!this.graficoPromedios?.nativeElement || (this.promediosData.labels as unknown[])?.length === 0) return;
 
     if (this.chartPromedios) {
       this.chartPromedios.data = this.promediosData;
@@ -121,19 +155,12 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
           scales: {
             y: {
               beginAtZero: true,
-              max: 60,
               ticks: {
-                stepSize: 10,
-                callback: (val) => {
-                  // Manejar de forma segura el valor devuelto para evitar errores de firma
-                  return `${val} min`;
-                }
+                callback: (val) => `${val} min`
               },
               grid: { color: 'rgba(0,0,0,0.05)' }
             },
-            x: {
-              grid: { display: false }
-            }
+            x: { grid: { display: false } }
           }
         }
       };

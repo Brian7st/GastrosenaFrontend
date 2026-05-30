@@ -31,7 +31,7 @@
       <restaurant-card 
         [title]="receta.nombreReceta" 
         [subtitle]="receta.nombreCategoria || 'Sin categoría'" 
-        [imageUrl]="receta.urlImagen || ''" 
+        [imageUrl]="receta.urlImagen || 'https://placehold.co/600x400/f8f9fa/a0aec0?text=Sin+Imagen'" 
         [price]="receta.precioUnitario || 0"
       >
         <div class="card-content" style="display: flex; flex-direction: column; flex: 1; justify-content: space-between;">

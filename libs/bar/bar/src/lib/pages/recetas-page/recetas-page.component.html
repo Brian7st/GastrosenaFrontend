@@ -21,7 +21,7 @@
       <restaurant-select-filter
         label="Categoría"
         [value]="categoriaSeleccionada()"
-        [options]="opcionesCategoria()"
+        [options]="opcionesCategoria"
         (valueChange)="categoriaSeleccionada.set($event)"
       ></restaurant-select-filter>
     </div>

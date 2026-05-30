@@ -6,8 +6,11 @@ export const mockSecurityInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const user = authService.currentUser();
 
-  const userId   = user?.id  ?? '00000000-0000-0000-0000-000000000001';
-  const userRole = user?.rol ?? 'MESERO';
+  // Se asume que el usuario siempre tendrá un ID si está logueado en la aplicación.
+  // En este punto, no usaremos fallbacks quemados, si no hay user, se usa null temporalmente 
+  // o se deja fallar la petición para detectar errores en el ciclo de autenticación real.
+  const userId   = user?.id || '';
+  const userRole = user?.rol || 'MESERO';
 
   const secureReq = req.clone({
     setHeaders: {
