@@ -47,7 +47,8 @@
         <svg lucideBell></svg>
       </button>
 
-      <div class="barra-superior__perfil">
+      <!-- CAMBIADO: routerLink ahora apunta a /app/perfil -->
+      <div class="barra-superior__perfil" routerLink="/app/perfil" style="cursor: pointer;">
         @if (perfil.avatarUrl) {
           <img
             [alt]="perfil.nombre || 'Usuario'"

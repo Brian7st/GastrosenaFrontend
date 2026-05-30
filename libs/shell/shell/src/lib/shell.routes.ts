@@ -25,7 +25,7 @@ export const shellRoutes: Routes = [
   {
     path: 'app',
     component: ShellLayoutComponent,
-    canActivate: [authGuard], // ← ACTIVADO
+    canActivate: [authGuard],
     children: [
       {
         path: '',
@@ -79,6 +79,11 @@ export const shellRoutes: Routes = [
         path: 'notificaciones',
         loadChildren: () =>
           import('@restaurant/notificaciones').then(m => m.NOTIFICACIONES_ROUTES),
+      },
+      // 👇 AGREGAR ESTA RUTA:
+      {
+        path: 'perfil',
+        loadComponent: () => import('@restaurant/usuarios').then(m => m.PerfilPageComponent),
       },
     ],
   },

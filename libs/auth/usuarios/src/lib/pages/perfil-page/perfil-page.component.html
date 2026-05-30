@@ -40,6 +40,7 @@
         <lucide-icon name="user" [size]="14"></lucide-icon>
         <span>{{ perfil()?.rol ?? usuario?.rol }}</span>
         <span class="perfil-header__dot">•</span>
+        <restaurant-status-badge label="Activo" variant="success" />
         <restaurant-status-badge
           [label]="perfil()?.estado ? 'Activo' : 'Inactivo'"
           [variant]="perfil()?.estado ? 'success' : 'danger'"
@@ -103,6 +104,43 @@
     </form>
   </div>
 
+  <!-- Seguridad (Cambio de contraseña) -->
+  <div class="perfil-card">
+    <div class="perfil-card__title">
+      <lucide-icon name="lock" [size]="18"></lucide-icon>
+      <h3>Cambiar Contraseña</h3>
+    </div>
+    <form [formGroup]="seguridadForm" class="perfil-form">
+      <restaurant-input
+        label="Contraseña Actual"
+        placeholder="••••••••"
+        type="password"
+        icon="lock"
+        formControlName="contrasenaActual"
+      />
+      <restaurant-input
+        label="Nueva Contraseña"
+        placeholder="••••••••"
+        type="password"
+        icon="lock"
+        formControlName="nuevaContrasena"
+      />
+      <restaurant-input
+        label="Confirmar Contraseña"
+        placeholder="••••••••"
+        type="password"
+        icon="lock"
+        formControlName="confirmar"
+      />
+      <div style="margin-top: 1rem;">
+        <restaurant-button variant="primary" (click)="onCambiarContrasena()" [disabled]="guardando()">
+          @if (!guardando()) {
+            <lucide-icon name="lock" [size]="16"></lucide-icon>
+            Cambiar Contraseña
+          } @else {
+            <span class="perfil-spinner"></span>
+          }
+        </restaurant-button>
   <!-- Seguridad y Actividad -->
   <div class="perfil-grid">
 
@@ -174,11 +212,15 @@
           }
         }
       </div>
-    </div>
-
+    </form>
   </div>
 
-  <!-- Botones -->
+  <!-- Mensaje de éxito -->
+  @if (exito()) {
+    <div class="perfil-exito">¡Cambios guardados exitosamente!</div>
+  }
+
+  <!-- Botones de acción -->
   <div class="perfil-actions">
     <restaurant-button variant="surface" (click)="onCancelar()">
       <lucide-icon name="x" [size]="16"></lucide-icon>
