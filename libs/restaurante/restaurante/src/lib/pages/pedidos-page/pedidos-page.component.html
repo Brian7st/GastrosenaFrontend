@@ -18,6 +18,13 @@
         <lucide-icon name="search" [size]="18" class="search-icon"></lucide-icon>
         <input type="text" placeholder="Buscar platillo..." [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" />
       </div>
+
+      <div class="historial-action">
+        <restaurant-button variant="surface" routerLink="../historial-pedidos">
+          <lucide-icon name="clipboard-list" [size]="18"></lucide-icon>
+          <span>Historial</span>
+        </restaurant-button>
+      </div>
       
       <div class="user-profile">
         <div class="user-info">

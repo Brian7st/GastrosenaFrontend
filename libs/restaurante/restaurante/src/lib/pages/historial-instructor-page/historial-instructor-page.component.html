@@ -1,0 +1,95 @@
+<div class="historial-instructor-page">
+  <div class="back-action">
+    <restaurant-button variant="ghost" routerLink="../historial-pedidos">
+      <lucide-icon name="arrow-left" [size]="18"></lucide-icon>
+      <span>Volver al Centro de Pedidos</span>
+    </restaurant-button>
+  </div>
+
+  <restaurant-page-header 
+    title="Supervisión de Pedidos (Instructor)"
+    subtitle="Vista general de todos los pedidos realizados en el salón.">
+  </restaurant-page-header>
+
+  <div class="filters-bar">
+    <label class="filters-label">Filtrar por Mesero:</label>
+    
+    <div class="custom-select-wrapper">
+      <div class="custom-select-trigger" (click)="toggleDropdown()" [class.is-open]="isDropdownOpen()">
+        <span>{{ meseroFiltrado() || 'Todos los meseros' }}</span>
+        <lucide-icon name="chevron-down" [size]="18" class="dropdown-icon"></lucide-icon>
+      </div>
+      
+      @if (isDropdownOpen()) {
+        <ul class="custom-select-menu">
+          <li class="custom-select-option" 
+              [class.selected]="meseroFiltrado() === ''" 
+              (click)="seleccionarMesero('')">
+            Todos los meseros
+          </li>
+          @for (mesero of meserosUnicos(); track mesero) {
+            <li class="custom-select-option" 
+                [class.selected]="meseroFiltrado() === mesero" 
+                (click)="seleccionarMesero(mesero)">
+              {{ mesero }}
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </div>
+
+  <div class="historial-grid">
+    @for (orden of ordenes(); track orden.id) {
+      <restaurant-card class="ticket-card">
+        <div class="ticket-card__header">
+          <div class="ticket-card__title">
+            <lucide-icon name="clipboard-list" [size]="20"></lucide-icon>
+            <h3>Pedido {{ orden.id ? orden.id.substring(0, 8) : 'N/A' }}</h3>
+          </div>
+          @if (orden.estado) {
+            <restaurant-status-badge [label]="orden.estado" [variant]="getBadgeType(orden.estado)"></restaurant-status-badge>
+          }
+        </div>
+        
+        <div class="ticket-card__body">
+          <div class="ticket-info-row">
+            <span class="ticket-label">Mesa:</span>
+            <span class="ticket-value">Mesa {{ orden.mesaId }}</span>
+          </div>
+          <div class="ticket-info-row">
+            <span class="ticket-label">Mesero:</span>
+            <span class="ticket-value">{{ orden.meseroId }}</span>
+          </div>
+          <div class="ticket-info-row">
+            <span class="ticket-label">Fecha:</span>
+            <span class="ticket-value">{{ orden.fechaCreacion | date:'medium' }}</span>
+          </div>
+          
+          <div class="ticket-items" *ngIf="orden.detalles && orden.detalles.length > 0">
+            <h4>Productos ({{ orden.detalles.length }})</h4>
+            <ul>
+              @for (item of orden.detalles; track item.productoId) {
+                <li>
+                  <span class="item-qty">{{ item.cantidad }}x</span>
+                  <span class="item-name">{{ item.nombreProducto }}</span>
+                  <span class="item-price">{{ item.precioUnitario | currency }}</span>
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+        
+        <div class="ticket-card__footer">
+          <span class="ticket-total-label">Total</span>
+          <span class="ticket-total-value">{{ orden.subtotal | currency }}</span>
+        </div>
+      </restaurant-card>
+    } @empty {
+      <div class="empty-state">
+        <lucide-icon name="clipboard-list" [size]="48" color="var(--color-text-tertiary)"></lucide-icon>
+        <p>No hay pedidos registrados en este turno.</p>
+      </div>
+    }
+  </div>
+</div>

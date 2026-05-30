@@ -11,7 +11,7 @@ import {
   EmptyStateComponent,
   ConfirmDialogComponent
 } from '@restaurant/shared/ui';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
 import { Mesa } from '../../models/restaurante.model';
 
