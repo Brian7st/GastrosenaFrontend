@@ -2,10 +2,10 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  OnInit,
   ViewChild,
   inject,
   signal,
-  computed,
 } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import {
@@ -14,14 +14,11 @@ import {
   ButtonComponent,
   LucideIconComponent,
   StatusBadgeComponent,
+  AlertComponent,
 } from '@restaurant/shared/ui';
 import { AuthService } from '@restaurant/shared/auth';
-
-interface ActividadReciente {
-  accion: string;
-  fecha: string;
-  modulo: string;
-}
+import { PerfilFacade } from '../../data-access/perfil.facade';
+import { ActualizarPerfilRequest, CambiarContrasenaRequest } from '../../models/perfil.model';
 
 @Component({
   selector: 'restaurant-perfil-page',
@@ -33,13 +30,15 @@ interface ActividadReciente {
     ButtonComponent,
     LucideIconComponent,
     StatusBadgeComponent,
+    AlertComponent,
   ],
   templateUrl: './perfil-page.component.html',
   styleUrl: './perfil-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PerfilPageComponent {
+export class PerfilPageComponent implements OnInit {
   private readonly authService = inject(AuthService);
+  private readonly facade = inject(PerfilFacade);
   private readonly fb = inject(FormBuilder);
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -47,13 +46,15 @@ export class PerfilPageComponent {
   readonly usuario = this.authService.currentUser();
   readonly fotoUrl = signal<string | null>(null);
 
-  readonly iniciales = computed(() => {
-    const nombre = this.usuario?.nombre ?? '';
-    const partes = nombre.split(' ');
-    return partes.length >= 2
-      ? partes[0][0] + partes[1][0]
-      : nombre.slice(0, 2);
-  });
+  // ── Estado del facade ─────────────────────────────────────────────────────
+  readonly perfil              = this.facade.perfil;
+  readonly actividad           = this.facade.actividad;
+  readonly cargando            = this.facade.cargando;
+  readonly guardando           = this.facade.guardando;
+  readonly cambiandoContrasena = this.facade.cambiandoContrasena;
+  readonly error               = this.facade.error;
+  readonly exito               = this.facade.exito;
+  readonly iniciales           = this.facade.iniciales;
 
   readonly infoForm = this.fb.group({
     nombre:    [this.usuario?.nombre ?? '',  [Validators.required]],
@@ -69,16 +70,13 @@ export class PerfilPageComponent {
     confirmar:        ['', [Validators.required]],
   });
 
-  readonly guardando = signal(false);
-  readonly exito     = signal(false);
-
-  readonly actividadReciente: ActividadReciente[] = [
-    { accion: 'Inició sesión',    fecha: '2026-05-24 14:32', modulo: 'Auth'    },
-    { accion: 'Creó nueva orden', fecha: '2026-05-24 14:32', modulo: 'Órdenes' },
-    { accion: 'Actualizó menú',   fecha: '2026-05-24 12:15', modulo: 'Menú'    },
-    { accion: 'Cerró turno',      fecha: '2026-05-23 18:45', modulo: 'Sistema' },
-    { accion: 'Modificó receta',  fecha: '2026-05-23 16:20', modulo: 'Recetas' },
-  ];
+  ngOnInit(): void {
+    const userId = this.usuario?.id;
+    if (userId) {
+      this.facade.cargarPerfil(userId);
+      this.facade.cargarActividad(userId);
+    }
+  }
 
   triggerFileInput(): void {
     this.fileInput.nativeElement.click();
@@ -92,6 +90,11 @@ export class PerfilPageComponent {
         this.fotoUrl.set(e.target?.result as string);
       };
       reader.readAsDataURL(file);
+
+      const userId = this.usuario?.id;
+      if (userId) {
+        this.facade.subirFoto(userId, file);
+      }
     }
   }
 
@@ -100,16 +103,37 @@ export class PerfilPageComponent {
       this.infoForm.markAllAsTouched();
       return;
     }
-    this.guardando.set(true);
-    setTimeout(() => {
-      this.guardando.set(false);
-      this.exito.set(true);
-      setTimeout(() => this.exito.set(false), 3000);
-    }, 1000);
+    const userId = this.usuario?.id;
+    if (!userId) return;
+
+    const data: ActualizarPerfilRequest = {
+      nombre:    this.infoForm.value.nombre!,
+      apellidos: this.infoForm.value.apellidos!,
+      email:     this.infoForm.value.email!,
+      telefono:  this.infoForm.value.telefono!,
+    };
+    this.facade.actualizarPerfil(userId, data);
+  }
+
+  onCambiarContrasena(): void {
+    if (this.seguridadForm.invalid) {
+      this.seguridadForm.markAllAsTouched();
+      return;
+    }
+    const userId = this.usuario?.id;
+    if (!userId) return;
+
+    const data: CambiarContrasenaRequest = {
+      contrasenaActual: this.seguridadForm.value.contrasenaActual!,
+      nuevaContrasena:  this.seguridadForm.value.nuevaContrasena!,
+      confirmar:        this.seguridadForm.value.confirmar!,
+    };
+    this.facade.cambiarContrasena(userId, data);
   }
 
   onCancelar(): void {
     this.infoForm.reset();
     this.seguridadForm.reset();
+    this.facade.limpiarMensajes();
   }
 }
