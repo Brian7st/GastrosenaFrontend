@@ -41,15 +41,8 @@ export class PedidosCartComponent {
 
   ejecutarCancelacion() {
     this.showCancelModal.set(false);
-    
-    const pedido = this.pedidoActivo();
-    if (pedido?.mesaId) {
-      // Liberar la mesa si se cancela el pedido en borrador
-      this.facade.liberarMesa(pedido.mesaId);
-    }
-    
-    this.facade.limpiarPedidoActivo();
-    this.router.navigate(['/restaurante/mesas']);
+    this.facade.vaciarCarrito();
+    this.observacionesGenerales.set('');
   }
 
   iniciarConfirmacion() {

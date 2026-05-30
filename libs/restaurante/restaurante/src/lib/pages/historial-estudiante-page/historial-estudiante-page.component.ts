@@ -26,7 +26,7 @@ import {
     StatusBadgeComponent
   ],
   templateUrl: './historial-estudiante-page.component.html',
-  styleUrls: ['../historial-instructor-page/historial-instructor-page.component.scss'], // Reusing the same styles as they are visually identical
+  styleUrls: ['../historial-instructor-page/historial-instructor-page.component.scss'], // Estilos compartidos
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HistorialEstudiantePageComponent {

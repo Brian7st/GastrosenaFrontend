@@ -4,13 +4,13 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
 import { ProductoMenu } from '../../data-access/restaurante.facade';
 
-import { CardComponent, LucideIconComponent, StatusBadgeComponent, ButtonComponent, ConfirmDialogComponent } from '@restaurant/shared/ui';
+import { CardComponent, StatusBadgeComponent, ConfirmDialogComponent } from '@restaurant/shared/ui';
 import { CurrencyCopPipe } from '@restaurant/shared/util';
 
 @Component({
   selector: 'lib-pedidos-menu-grid',
   standalone: true,
-  imports: [CommonModule, CardComponent, LucideIconComponent, StatusBadgeComponent, ButtonComponent, ConfirmDialogComponent, CurrencyCopPipe],
+  imports: [CommonModule, CardComponent, StatusBadgeComponent, ConfirmDialogComponent, CurrencyCopPipe],
   templateUrl: './pedidos-menu-grid.component.html',
   styleUrls: ['./pedidos-menu-grid.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
