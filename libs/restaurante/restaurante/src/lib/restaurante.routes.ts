@@ -8,17 +8,24 @@ import { CajaPagarPageComponent } from './pages/caja-pagar-page/caja-pagar-page.
 import { CajaAperturaPageComponent } from './pages/caja-apertura-page/caja-apertura-page.component';
 import { CajaCierrePageComponent } from './pages/caja-cierre-page/caja-cierre-page.component';
 import { CajaMovimientosPageComponent } from './pages/caja-movimientos-page/caja-movimientos-page.component';
+import { provideLucideIcons, LucideSalad, LucideBeef, LucideCake, LucideLayoutGrid, LucideCoffee } from '@lucide/angular';
 
 export const RESTAURANTE_ROUTES: Routes = [
   {
     path: '',
-    pathMatch: 'full',
-    redirectTo: 'mesas'
-  },
-  {
-    path: 'mesas',
-    component: MesasPageComponent,
-  },
+    providers: [
+      provideLucideIcons(LucideSalad, LucideBeef, LucideCake, LucideLayoutGrid, LucideCoffee)
+    ],
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'mesas'
+      },
+      {
+        path: 'mesas',
+        component: MesasPageComponent,
+      },
   {
     path: 'pedidos',
     component: PedidosPageComponent,
@@ -47,9 +54,11 @@ export const RESTAURANTE_ROUTES: Routes = [
     path: 'caja/cierre',
     component: CajaCierrePageComponent,
   },
-  {
-    path: 'caja/movimientos',
-    component: CajaMovimientosPageComponent,
-  },
+      {
+        path: 'caja/movimientos',
+        component: CajaMovimientosPageComponent,
+      },
+    ]
+  }
 ];
 
