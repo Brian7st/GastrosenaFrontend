@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
-import { ButtonComponent, LucideIconComponent } from '@restaurant/shared/ui';
+import { ButtonComponent, LucideIconComponent, ConfirmDialogComponent } from '@restaurant/shared/ui';
+import { CurrencyCopPipe } from '@restaurant/shared/util';
 
 @Component({
   selector: 'lib-pedidos-cart',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonComponent, LucideIconComponent],
+  imports: [CommonModule, FormsModule, ButtonComponent, LucideIconComponent, ConfirmDialogComponent, CurrencyCopPipe],
   templateUrl: './pedidos-cart.component.html',
   styleUrls: ['./pedidos-cart.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -19,6 +20,8 @@ export class PedidosCartComponent {
 
   pedidoActivo = this.facade.pedidoActivo;
   observacionesGenerales = signal('');
+  showCancelModal = signal(false);
+  showConfirmModal = signal(false);
 
   incrementar(index: number) {
     this.facade.actualizarCantidadProducto(index, 1);
@@ -28,7 +31,33 @@ export class PedidosCartComponent {
     this.facade.actualizarCantidadProducto(index, -1);
   }
 
-  confirmarPedido() {
+  eliminarItem(index: number) {
+    this.facade.eliminarProductoDelPedido(index);
+  }
+
+  iniciarCancelacion() {
+    this.showCancelModal.set(true);
+  }
+
+  ejecutarCancelacion() {
+    this.showCancelModal.set(false);
+    
+    const pedido = this.pedidoActivo();
+    if (pedido?.mesaId) {
+      // Liberar la mesa si se cancela el pedido en borrador
+      this.facade.liberarMesa(pedido.mesaId);
+    }
+    
+    this.facade.limpiarPedidoActivo();
+    this.router.navigate(['/restaurante/mesas']);
+  }
+
+  iniciarConfirmacion() {
+    this.showConfirmModal.set(true);
+  }
+
+  ejecutarConfirmacion() {
+    this.showConfirmModal.set(false);
     this.facade.confirmarPedidoActivo(this.observacionesGenerales());
     this.router.navigate(['/restaurante/mesas']);
   }

@@ -100,7 +100,6 @@
             border: 1px solid var(--color-success-border);
           }
         }
-
         .qty {
           font-family: var(--font-family-base);
           font-size: var(--font-size-md);
@@ -132,6 +131,27 @@
           font-size: var(--font-size-md);
           font-weight: var(--font-weight-semibold);
           color: var(--color-primario);
+        }
+      }
+
+      .btn-delete {
+        background-color: transparent;
+        color: var(--color-text-secondary);
+        border: 1px solid transparent;
+        border-radius: var(--radius-sm);
+        margin-top: var(--space-2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        cursor: pointer;
+        transition: all var(--transition-fast, 0.2s);
+
+        &:hover {
+          color: var(--color-error-text);
+          border-color: var(--color-error-border);
+          background-color: var(--color-background-soft);
         }
       }
     }
@@ -271,6 +291,23 @@
         span {
           color: var(--color-primary);
         }
+      }
+    }
+  }
+}
+
+.cart-actions {
+  display: flex;
+  gap: var(--space-4); /* Separación aumentada a pedido del usuario */
+  width: 100%;
+
+  ::ng-deep {
+    .action-btn {
+      display: block;
+      
+      &.flex-1 {
+        flex: 1;
+        width: 100%;
       }
     }
   }

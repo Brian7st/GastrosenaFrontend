@@ -4,12 +4,13 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
 import { ProductoMenu } from '../../data-access/restaurante.facade';
 
-import { CardComponent, LucideIconComponent, StatusBadgeComponent, ButtonComponent } from '@restaurant/shared/ui';
+import { CardComponent, LucideIconComponent, StatusBadgeComponent, ButtonComponent, ConfirmDialogComponent } from '@restaurant/shared/ui';
+import { CurrencyCopPipe } from '@restaurant/shared/util';
 
 @Component({
   selector: 'lib-pedidos-menu-grid',
   standalone: true,
-  imports: [CommonModule, CardComponent, LucideIconComponent, StatusBadgeComponent, ButtonComponent],
+  imports: [CommonModule, CardComponent, LucideIconComponent, StatusBadgeComponent, ButtonComponent, ConfirmDialogComponent, CurrencyCopPipe],
   templateUrl: './pedidos-menu-grid.component.html',
   styleUrls: ['./pedidos-menu-grid.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,6 +26,8 @@ export class PedidosMenuGridComponent {
   private facade = inject(RestauranteFacade);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+
+  public showNoTableModal = signal(false);
 
   get products() {
     let filtered = this.facade.productosMenu();
@@ -46,8 +49,7 @@ export class PedidosMenuGridComponent {
 
   agregarProducto(product: any) {
     if (!this.facade.pedidoActivo()) {
-      alert('Atención: Debes tener una mesa asignada para poder agregar productos al pedido.');
-      this.router.navigate(['../mesas'], { relativeTo: this.route });
+      this.showNoTableModal.set(true);
       return;
     }
 
@@ -60,6 +62,11 @@ export class PedidosMenuGridComponent {
       categoriaMapped,
       ''
     );
+  }
+
+  irAMesas() {
+    this.showNoTableModal.set(false);
+    this.router.navigate(['../mesas'], { relativeTo: this.route });
   }
 }
 

@@ -300,6 +300,18 @@ export class RestauranteFacade {
     });
   }
 
+  eliminarProductoDelPedido(index: number) {
+    this._pedidoActivo.update(pedido => {
+      if (!pedido) return null;
+
+      const detalles = [...pedido.detalles];
+      detalles.splice(index, 1);
+
+      const subtotal = detalles.reduce((sum, it) => sum + (it.precioUnitario * it.cantidad), 0);
+      return { ...pedido, detalles, subtotal };
+    });
+  }
+
   limpiarPedidoActivo() {
     this._pedidoActivo.set(null);
   }

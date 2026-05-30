@@ -23,8 +23,11 @@
         
         <div class="item-pricing">
           <div class="prices">
-            <span class="current">${{ item.precioUnitario | number:'1.2-2' }}</span>
+            <span class="current">{{ item.precioUnitario | currencyCop }}</span>
           </div>
+          <button class="btn-delete" (click)="eliminarItem(i)" title="Eliminar producto">
+            <lucide-icon name="trash-2" [size]="16"></lucide-icon>
+          </button>
         </div>
       </div>
     } @empty {
@@ -50,15 +53,48 @@
   @if (pedidoActivo(); as pedido) {
     <div class="summary-total">
       <span class="label">Total</span>
-      <span class="value">${{ pedido.subtotal | number:'1.2-2' }}</span>
+      <span class="value">{{ pedido.subtotal | currencyCop }}</span>
     </div>
   }
 </div>
 
-<restaurant-button 
-  class="full-width-btn" 
-  variant="primary" 
-  [disabled]="!pedidoActivo()?.detalles?.length" 
-  (click)="confirmarPedido()">
-  <span>Confirmar Pedido</span>
-</restaurant-button>
+<div class="cart-actions">
+  <restaurant-button 
+    class="action-btn" 
+    variant="ghost" 
+    [disabled]="!pedidoActivo()" 
+    (click)="iniciarCancelacion()">
+    <lucide-icon name="trash-2" [size]="18" class="text-error"></lucide-icon>
+    <span>Cancelar</span>
+  </restaurant-button>
+  
+  <restaurant-button 
+    class="action-btn flex-1" 
+    variant="primary" 
+    [disabled]="!pedidoActivo()?.detalles?.length" 
+    (click)="iniciarConfirmacion()">
+    <span>Confirmar Pedido</span>
+  </restaurant-button>
+</div>
+
+<restaurant-confirm-dialog
+  [open]="showCancelModal()"
+  title="Cancelar Pedido"
+  message="¿Estás seguro de que quieres cancelar este pedido? Se perderán todos los productos agregados y la mesa quedará libre."
+  confirmText="Sí, cancelar pedido"
+  cancelText="No, volver"
+  [showCancel]="true"
+  (confirm)="ejecutarCancelacion()"
+  (cancel)="showCancelModal.set(false)"
+></restaurant-confirm-dialog>
+
+<restaurant-confirm-dialog
+  [open]="showConfirmModal()"
+  title="Enviar a Cocina"
+  message="¿Estás seguro de enviar este pedido a cocina? Una vez enviado, no podrás modificarlo."
+  confirmText="Sí, enviar pedido"
+  cancelText="Revisar de nuevo"
+  [showCancel]="true"
+  (confirm)="ejecutarConfirmacion()"
+  (cancel)="showConfirmModal.set(false)"
+></restaurant-confirm-dialog>

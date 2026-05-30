@@ -11,13 +11,13 @@ import { CajaMovimientosPageComponent } from './pages/caja-movimientos-page/caja
 import { PedidosHubPageComponent } from './pages/pedidos-hub-page/pedidos-hub-page.component';
 import { HistorialInstructorPageComponent } from './pages/historial-instructor-page/historial-instructor-page.component';
 import { HistorialEstudiantePageComponent } from './pages/historial-estudiante-page/historial-estudiante-page.component';
-import { provideLucideIcons, LucideSalad, LucideBeef, LucideCake, LucideLayoutGrid, LucideCoffee, LucideMinus, LucidePlus, LucideClipboardList, LucideUser, LucideArrowLeft, LucideChevronDown, LucideSearch } from '@lucide/angular';
+import { provideLucideIcons, LucideSalad, LucideBeef, LucideCake, LucideLayoutGrid, LucideCoffee, LucideMinus, LucidePlus, LucideClipboardList, LucideUser, LucideArrowLeft, LucideChevronDown, LucideSearch, LucideTrash2 } from '@lucide/angular';
 
 export const RESTAURANTE_ROUTES: Routes = [
   {
     path: '',
     providers: [
-      provideLucideIcons(LucideSalad, LucideBeef, LucideCake, LucideLayoutGrid, LucideCoffee, LucideMinus, LucidePlus, LucideClipboardList, LucideUser, LucideArrowLeft, LucideChevronDown, LucideSearch)
+      provideLucideIcons(LucideSalad, LucideBeef, LucideCake, LucideLayoutGrid, LucideCoffee, LucideMinus, LucidePlus, LucideClipboardList, LucideUser, LucideArrowLeft, LucideChevronDown, LucideSearch, LucideTrash2)
     ],
     children: [
       {
