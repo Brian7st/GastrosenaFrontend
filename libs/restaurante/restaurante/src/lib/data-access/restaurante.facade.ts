@@ -265,8 +265,19 @@ export class RestauranteFacade {
     this._pedidoActivo.update(pedido => {
       if (!pedido) return null;
 
-      const nuevoItem: ItemCarrito = { productoId, nombreProducto, cantidad, precioUnitario, categoria, observaciones };
-      const detalles = [...pedido.detalles, nuevoItem];
+      const detalles = [...pedido.detalles];
+      const indexExistente = detalles.findIndex(d => d.productoId === productoId && d.observaciones === observaciones);
+
+      if (indexExistente >= 0) {
+        detalles[indexExistente] = {
+          ...detalles[indexExistente],
+          cantidad: detalles[indexExistente].cantidad + cantidad
+        };
+      } else {
+        const nuevoItem: ItemCarrito = { productoId, nombreProducto, cantidad, precioUnitario, categoria, observaciones };
+        detalles.push(nuevoItem);
+      }
+
       const subtotal = detalles.reduce((sum, it) => sum + (it.precioUnitario * it.cantidad), 0);
 
       return { ...pedido, detalles, subtotal };

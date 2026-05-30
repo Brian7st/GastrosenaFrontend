@@ -8,13 +8,13 @@ import { CajaPagarPageComponent } from './pages/caja-pagar-page/caja-pagar-page.
 import { CajaAperturaPageComponent } from './pages/caja-apertura-page/caja-apertura-page.component';
 import { CajaCierrePageComponent } from './pages/caja-cierre-page/caja-cierre-page.component';
 import { CajaMovimientosPageComponent } from './pages/caja-movimientos-page/caja-movimientos-page.component';
-import { provideLucideIcons, LucideSalad, LucideBeef, LucideCake, LucideLayoutGrid, LucideCoffee } from '@lucide/angular';
+import { provideLucideIcons, LucideSalad, LucideBeef, LucideCake, LucideLayoutGrid, LucideCoffee, LucideMinus, LucidePlus } from '@lucide/angular';
 
 export const RESTAURANTE_ROUTES: Routes = [
   {
     path: '',
     providers: [
-      provideLucideIcons(LucideSalad, LucideBeef, LucideCake, LucideLayoutGrid, LucideCoffee)
+      provideLucideIcons(LucideSalad, LucideBeef, LucideCake, LucideLayoutGrid, LucideCoffee, LucideMinus, LucidePlus)
     ],
     children: [
       {
