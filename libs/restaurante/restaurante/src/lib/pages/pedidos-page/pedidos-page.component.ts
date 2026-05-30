@@ -6,7 +6,8 @@ import { PedidosCategoriesComponent } from '../../components/pedidos-categories/
 import { PedidosMenuGridComponent } from '../../components/pedidos-menu-grid/pedidos-menu-grid.component';
 import { PedidosCartComponent } from '../../components/pedidos-cart/pedidos-cart.component';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
-import { LucideIconComponent } from '@restaurant/shared/ui';
+import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'lib-pedidos-page',
@@ -14,10 +15,12 @@ import { LucideIconComponent } from '@restaurant/shared/ui';
   imports: [
     CommonModule,
     FormsModule,
+    RouterLink,
     PedidosCategoriesComponent,
     PedidosMenuGridComponent,
     PedidosCartComponent,
-    LucideIconComponent
+    LucideIconComponent,
+    ButtonComponent
   ],
   templateUrl: './pedidos-page.component.html',
   styleUrls: ['./pedidos-page.component.scss'],

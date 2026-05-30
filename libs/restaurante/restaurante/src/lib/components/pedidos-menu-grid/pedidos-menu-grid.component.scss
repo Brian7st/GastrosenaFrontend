@@ -2,11 +2,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-6);
 
   h2 {
-    font-size: 1.25rem;
-    font-weight: 700;
+    font-family: var(--font-family-headline);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
     margin: 0;
   }
@@ -15,15 +16,16 @@
 .menu-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1.5rem;
-  padding-bottom: 2rem;
+  gap: var(--space-6);
+  padding-bottom: var(--space-8);
 
   .product-card {
-    background-color: var(--color-surface);
+    background-color: var(--color-surface-primary);
     border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow: var(--shadow-card);
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform var(--duration-fast) var(--ease-standard), 
+                box-shadow var(--duration-fast) var(--ease-standard);
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -53,25 +55,27 @@
     }
 
     .info-container {
-      padding: 1rem;
+      padding: var(--space-4);
       display: flex;
       flex-direction: column;
       flex: 1;
 
       .product-name {
-        font-size: 0.95rem;
-        font-weight: 700;
+        font-family: var(--font-family-base);
+        font-size: var(--font-size-md);
+        font-weight: var(--font-weight-semibold);
         color: var(--color-text-primary);
-        margin: 0 0 0.25rem 0;
+        margin: 0 0 var(--space-1) 0;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
       }
 
       .stats {
-        font-size: 0.75rem;
+        font-family: var(--font-family-base);
+        font-size: var(--font-size-sm);
         color: var(--color-text-secondary);
-        margin: 0 0 1rem 0;
+        margin: 0 0 var(--space-4) 0;
       }
 
       .price-row {
@@ -83,25 +87,28 @@
         .prices {
           display: flex;
           align-items: center;
-          gap: 0.5rem;
+          gap: var(--space-2);
 
           .original-price {
-            font-size: 0.75rem;
+            font-family: var(--font-family-base);
+            font-size: var(--font-size-sm);
             color: var(--color-text-secondary);
             text-decoration: line-through;
           }
 
           .current-price {
-            font-size: 1.1rem;
-            font-weight: 800;
+            font-family: var(--font-family-headline);
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
             color: var(--color-text-primary);
           }
         }
 
         .unit {
-          font-size: 0.7rem;
+          font-family: var(--font-family-base);
+          font-size: var(--font-size-xs);
           color: var(--color-text-secondary);
-          margin-bottom: 0.15rem;
+          margin-bottom: var(--space-1);
         }
       }
     }
