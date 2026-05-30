@@ -37,6 +37,11 @@
         </ul>
       }
     </div>
+    
+    <div class="search-bar">
+      <lucide-icon name="search" [size]="18"></lucide-icon>
+      <input type="text" placeholder="Buscar por ID de pedido..." [ngModel]="terminoBusqueda()" (ngModelChange)="terminoBusqueda.set($event)" />
+    </div>
   </div>
 
   <div class="historial-grid">

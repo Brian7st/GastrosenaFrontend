@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
 import { AuthService } from '../../data-access/auth.service';
@@ -16,6 +17,7 @@ import {
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     RouterLink,
     LucideIconComponent,
     CardComponent,
@@ -30,9 +32,21 @@ import {
 export class HistorialEstudiantePageComponent {
   private facade = inject(RestauranteFacade);
 
+  public terminoBusqueda = signal<string>('');
+
   // Prototipo: mostramos todos los pedidos pero en el futuro aquí se filtrará:
-  // public misOrdenes = computed(() => this.facade.ordenesHistorial().filter(o => o.meseroId === this.authService.getUsuarioId()));
-  public misOrdenes = this.facade.ordenesHistorial;
+  public todasMisOrdenes = this.facade.ordenesHistorial;
+
+  public misOrdenes = computed(() => {
+    const busqueda = this.terminoBusqueda().toLowerCase().trim();
+    let ordenes = this.todasMisOrdenes();
+
+    if (busqueda) {
+      ordenes = ordenes.filter(o => o.id.toLowerCase().includes(busqueda));
+    }
+
+    return ordenes;
+  });
 
   getBadgeType(estado: string): 'info' | 'success' | 'warning' | 'danger' {
     switch (estado) {

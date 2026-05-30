@@ -33,6 +33,7 @@ export class HistorialInstructorPageComponent {
   
   public todasLasOrdenes = this.facade.ordenesHistorial;
   public meseroFiltrado = signal<string>('');
+  public terminoBusqueda = signal<string>('');
   public isDropdownOpen = signal<boolean>(false);
 
   public meserosUnicos = computed(() => {
@@ -43,9 +44,18 @@ export class HistorialInstructorPageComponent {
 
   public ordenes = computed(() => {
     const filtro = this.meseroFiltrado();
-    const ordenes = this.todasLasOrdenes();
-    if (!filtro) return ordenes;
-    return ordenes.filter(o => o.meseroId === filtro);
+    const busqueda = this.terminoBusqueda().toLowerCase().trim();
+    let ordenes = this.todasLasOrdenes();
+
+    if (filtro) {
+      ordenes = ordenes.filter(o => o.meseroId === filtro);
+    }
+
+    if (busqueda) {
+      ordenes = ordenes.filter(o => o.id.toLowerCase().includes(busqueda));
+    }
+
+    return ordenes;
   });
 
   toggleDropdown() {

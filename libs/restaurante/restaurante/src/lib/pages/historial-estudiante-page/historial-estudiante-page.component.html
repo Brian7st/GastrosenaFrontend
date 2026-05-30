@@ -8,8 +8,15 @@
 
   <restaurant-page-header 
     title="Mis Pedidos (Estudiante)"
-    subtitle="Listado de los pedidos que has tomado durante tu turno.">
+    subtitle="Historial y estado actual de los pedidos que he tomado.">
   </restaurant-page-header>
+
+  <div class="filters-bar">
+    <div class="search-bar">
+      <lucide-icon name="search" [size]="18"></lucide-icon>
+      <input type="text" placeholder="Buscar por ID de pedido..." [ngModel]="terminoBusqueda()" (ngModelChange)="terminoBusqueda.set($event)" />
+    </div>
+  </div>
 
   <div class="historial-grid">
     @for (orden of misOrdenes(); track orden.id) {
