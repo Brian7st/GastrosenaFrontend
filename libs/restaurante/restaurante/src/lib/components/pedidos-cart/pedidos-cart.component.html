@@ -88,13 +88,57 @@
   (cancel)="showCancelModal.set(false)"
 ></restaurant-confirm-dialog>
 
-<restaurant-confirm-dialog
-  [open]="showConfirmModal()"
-  title="Enviar a Cocina"
-  message="¿Estás seguro de enviar este pedido a cocina? Una vez enviado, no podrás modificarlo."
-  confirmText="Sí, enviar pedido"
-  cancelText="Revisar de nuevo"
-  [showCancel]="true"
-  (confirm)="ejecutarConfirmacion()"
-  (cancel)="showConfirmModal.set(false)"
-></restaurant-confirm-dialog>
+@if (showConfirmModal()) {
+  <div class="custom-modal-backdrop" (click)="showConfirmModal.set(false)">
+    <section class="custom-modal-dialog" (click)="$event.stopPropagation()">
+      <strong class="modal-title">Enviar a Cocina</strong>
+      <p class="modal-message">Verifica los productos antes de enviar. Una vez enviado, no podrás modificarlo.</p>
+      
+      <div class="modal-order-summary">
+        @if (pedidoActivo(); as pedido) {
+          
+          @if (comidasPedido().length > 0) {
+            <h5 class="category-title">Comidas</h5>
+            <ul class="summary-list">
+              @for (item of comidasPedido(); track item.productoId) {
+                <li>
+                  <span class="qty">{{ item.cantidad }}x</span>
+                  <span class="name">{{ item.nombreProducto }}</span>
+                  <span class="price">{{ (item.cantidad * item.precioUnitario) | currencyCop }}</span>
+                </li>
+              }
+            </ul>
+          }
+
+          @if (bebidasPedido().length > 0) {
+            <h5 class="category-title mt-3">Bebidas</h5>
+            <ul class="summary-list">
+              @for (item of bebidasPedido(); track item.productoId) {
+                <li>
+                  <span class="qty">{{ item.cantidad }}x</span>
+                  <span class="name">{{ item.nombreProducto }}</span>
+                  <span class="price">{{ (item.cantidad * item.precioUnitario) | currencyCop }}</span>
+                </li>
+              }
+            </ul>
+          }
+
+          @if (observacionesGenerales()) {
+            <div class="summary-notes">
+              <strong>Notas:</strong> {{ observacionesGenerales() }}
+            </div>
+          }
+          <div class="summary-total-row">
+            <span>Total:</span>
+            <strong>{{ pedido.subtotal | currencyCop }}</strong>
+          </div>
+        }
+      </div>
+
+      <div class="modal-actions">
+        <restaurant-button variant="ghost" (click)="showConfirmModal.set(false)">Revisar de nuevo</restaurant-button>
+        <restaurant-button variant="primary" (click)="ejecutarConfirmacion()">Sí, enviar pedido</restaurant-button>
+      </div>
+    </section>
+  </div>
+}

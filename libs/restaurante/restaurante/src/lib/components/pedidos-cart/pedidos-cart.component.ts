@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -19,6 +19,23 @@ export class PedidosCartComponent {
   private router = inject(Router);
 
   pedidoActivo = this.facade.pedidoActivo;
+  
+  comidasPedido = computed(() => {
+    const pedido = this.pedidoActivo();
+    return pedido ? pedido.detalles.filter(d => {
+      const cat = (d.categoria || '').toLowerCase();
+      return cat !== 'bebidas' && cat !== 'bebida';
+    }) : [];
+  });
+
+  bebidasPedido = computed(() => {
+    const pedido = this.pedidoActivo();
+    return pedido ? pedido.detalles.filter(d => {
+      const cat = (d.categoria || '').toLowerCase();
+      return cat === 'bebidas' || cat === 'bebida';
+    }) : [];
+  });
+
   observacionesGenerales = signal('');
   showCancelModal = signal(false);
   showConfirmModal = signal(false);
