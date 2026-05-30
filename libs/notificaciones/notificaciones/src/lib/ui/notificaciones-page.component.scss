@@ -23,14 +23,14 @@
   gap: var(--space-2);
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-pill);
-  background: rgba(9, 132, 227, 0.1);
-  color: #0984e3;
+  background: rgba(57, 169, 0, 0.1);
+  color: #39A900;
   font-size: 0.875rem;
   font-weight: 600;
 
   &--vacio {
-    background: rgba(0, 184, 148, 0.1);
-    color: var(--color-success);
+    background: rgba(57, 169, 0, 0.1);
+    color: #39A900;
   }
 }
 
@@ -90,17 +90,17 @@
   transition: all 0.2s;
 
   &:hover {
-    border-color: var(--color-info);
-    background: rgba(9, 132, 227, 0.04);
+    border-color: #39A900;
+    background: rgba(57, 169, 0, 0.04);
   }
 
   &--no-leida {
-    border-left: 3px solid var(--color-info);
-    background: rgba(9, 132, 227, 0.04);
+    border-left: 3px solid #39A900;
+    background: rgba(57, 169, 0, 0.04);
   }
 
   &--activa {
-    border-color: var(--color-info);
+    border-color: #39A900;
     box-shadow: var(--shadow-sm);
   }
 }
@@ -109,8 +109,8 @@
   width: 40px;
   height: 40px;
   border-radius: var(--radius-md);
-  background: rgba(9, 132, 227, 0.1);
-  color: #0984e3;
+  background: rgba(57, 169, 0, 0.1);
+  color: #39A900;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -142,7 +142,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--color-info);
+  background: #39A900;
   flex-shrink: 0;
 }
 
@@ -204,8 +204,8 @@
   width: 64px;
   height: 64px;
   border-radius: var(--radius-lg);
-  background: rgba(9, 132, 227, 0.1);
-  color: #0984e3;
+  background: rgba(57, 169, 0, 0.1);
+  color: #39A900;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -228,4 +228,13 @@
 .notificacion-detalle__fecha {
   font-size: 0.875rem;
   color: var(--color-text-secondary);
+}
+
+// ── Override badge info solo en notificaciones ────────────────────────────────
+
+.notificacion-item__meta,
+.notificacion-detalle__info {
+  ::ng-deep .status-badge--info {
+    color: #39A900;
+  }
 }
