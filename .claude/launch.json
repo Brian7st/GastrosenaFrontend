@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "gastrosena-app",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["nx", "serve", "restaurant-app"],
+      "port": 4200
+    }
+  ]
+}
