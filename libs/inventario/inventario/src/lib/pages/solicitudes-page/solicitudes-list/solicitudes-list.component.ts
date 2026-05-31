@@ -31,10 +31,13 @@ export class SolicitudesListComponent implements OnInit {
   }
 
   // ─── KPIs calculados ─────────────────────────────────────────────────────
-  totalSolicitudes   = computed(() => this.paginacion().totalElements);
-  totalBorradores    = computed(() => this.solicitudes().filter(s => s.estado === 'BORRADOR').length);
-  enTramite          = computed(() => this.solicitudes().filter(s => s.estado === 'EMITIDO' || s.estado === 'ENVIADO_PROVEEDOR').length);
-  finalizadas        = computed(() => this.solicitudes().filter(s => s.estado === 'CERRADO').length);
+  totalSolicitudes = computed(() => this.paginacion().totalElements);
+  // Page-scoped — counts only current page, not total (backend does not expose per-estado aggregates)
+  borradorPagina   = computed(() => this.solicitudes().filter(s => s.estado === 'BORRADOR').length);
+  // Page-scoped — counts only current page, not total
+  enTramitePagina  = computed(() => this.solicitudes().filter(s => s.estado === 'EMITIDO' || s.estado === 'ENVIADO_PROVEEDOR' || s.estado === 'VERIFICADO').length);
+  // Page-scoped — counts only current page, not total
+  finalizadasPagina = computed(() => this.solicitudes().filter(s => s.estado === 'CERRADO').length);
 
   // ─── Opciones filtros ──────────────────────────────────────────────────────
   estadoOptions = [
@@ -42,6 +45,7 @@ export class SolicitudesListComponent implements OnInit {
     { value: 'BORRADOR',          label: 'Borrador'            },
     { value: 'EMITIDO',           label: 'Emitido'             },
     { value: 'ENVIADO_PROVEEDOR', label: 'Enviado a Proveedor' },
+    { value: 'VERIFICADO',        label: 'Verificado'          },
     { value: 'CERRADO',           label: 'Cerrado'             },
   ];
 
@@ -80,9 +84,8 @@ export class SolicitudesListComponent implements OnInit {
     }).format(value);
   }
 
-  /** Editar solo está habilitado en Borrador o Emitido */
   canEdit(estado: string): boolean {
-    return estado === 'BORRADOR' || estado === 'EMITIDO';
+    return estado === 'BORRADOR';
   }
 
   onSearch(term: string): void        { this.facade.cargarSolicitudes({ busqueda: term }); }
