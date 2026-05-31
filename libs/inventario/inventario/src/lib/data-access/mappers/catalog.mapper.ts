@@ -55,7 +55,7 @@ export function bienFromCatalogoYExistencia(
     stockActual: ex.stockDisponible,
     stockMinimo: ex.stockMinimo,
     estadoStock: ex.bajoMinimo ? 'BAJO_STOCK' : ex.stockDisponible <= 0 ? 'AGOTADO' : 'DISPONIBLE',
-    estado: derivarEstadoStock(ex.stockDisponible, ex.stockMinimo),
+    estado: cat.activo ? derivarEstadoStock(ex.stockDisponible, ex.stockMinimo) : 'Inactivo',
   };
 }
 

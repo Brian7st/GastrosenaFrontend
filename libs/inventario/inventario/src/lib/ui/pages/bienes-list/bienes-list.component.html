@@ -67,7 +67,7 @@
         <span class="material-symbols-outlined search-icon">search</span>
         <input #searchInput type="text" placeholder="Buscar por código o nombre..." (input)="onSearch(searchInput.value)" />
       </div>
-      <restaurant-button variant="filter">
+      <restaurant-button variant="filter" (click)="showFilters.set(!showFilters())">
         <span class="material-symbols-outlined">filter_list</span>
         Filtros
       </restaurant-button>
@@ -131,10 +131,28 @@
                 <button class="action-icon" (click)="onVerDetalle(bien)" title="Ver detalle">
                   <span class="material-symbols-outlined">visibility</span>
                 </button>
+                @if (bien.estado === 'Activo') {
+                  <button class="action-icon action-icon--warning" (click)="onDesactivar(bien)" title="Desactivar">
+                    <span class="material-symbols-outlined">toggle_off</span>
+                  </button>
+                }
+                @if (bien.estado === 'Inactivo') {
+                  <button class="action-icon action-icon--success" (click)="onActivar(bien)" title="Activar">
+                    <span class="material-symbols-outlined">toggle_on</span>
+                  </button>
+                }
                 <button class="action-icon action-icon--danger" (click)="onEliminar(bien)" title="Eliminar">
                   <span class="material-symbols-outlined">delete</span>
                 </button>
               </div>
+            </td>
+          </tr>
+} @empty {
+          <tr>
+            <td colspan="9" class="empty-state">
+              <span class="material-symbols-outlined empty-state__icon">inventory_2</span>
+              <p class="empty-state__title">Sin bienes registrados</p>
+              <p class="empty-state__message">No se encontraron bienes con los filtros aplicados.</p>
             </td>
           </tr>
 }

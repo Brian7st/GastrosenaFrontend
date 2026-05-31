@@ -1,0 +1,69 @@
+<div class="historial-instructor-page">
+  <div class="back-action">
+    <restaurant-button variant="ghost" routerLink="../historial-pedidos">
+      <lucide-icon name="arrow-left" [size]="18"></lucide-icon>
+      <span>Volver al Centro de Pedidos</span>
+    </restaurant-button>
+  </div>
+
+  <restaurant-page-header 
+    title="Mis Pedidos (Estudiante)"
+    subtitle="Historial y estado actual de los pedidos que he tomado.">
+  </restaurant-page-header>
+
+  <div class="filters-bar">
+    <div class="search-bar">
+      <lucide-icon name="search" [size]="18"></lucide-icon>
+      <input type="text" placeholder="Buscar por ID de pedido..." [ngModel]="terminoBusqueda()" (ngModelChange)="terminoBusqueda.set($event)" />
+    </div>
+  </div>
+
+  <div class="historial-grid">
+    @for (orden of misOrdenes(); track orden.id) {
+      <restaurant-card class="ticket-card">
+        <div class="ticket-card__header">
+          <div class="ticket-card__title">
+            <lucide-icon name="user" [size]="20"></lucide-icon>
+            <h3>Pedido {{ orden.id ? orden.id.substring(0, 8) : 'N/A' }}</h3>
+          </div>
+          @if (orden.estado) {
+            <restaurant-status-badge [label]="orden.estado" [variant]="getBadgeType(orden.estado)"></restaurant-status-badge>
+          }
+        </div>
+        
+        <div class="ticket-card__body">
+          <div class="ticket-info-row">
+            <span class="ticket-label">Mesa:</span>
+            <span class="ticket-value">Mesa {{ orden.mesaId }}</span>
+          </div>
+          <div class="ticket-info-row">
+            <span class="ticket-label">Fecha:</span>
+            <span class="ticket-value">{{ orden.fechaCreacion | date:'shortTime' }}</span>
+          </div>
+          
+          <div class="ticket-items" *ngIf="orden.detalles && orden.detalles.length > 0">
+            <h4>Productos ({{ orden.detalles.length }})</h4>
+            <ul>
+              @for (item of orden.detalles; track item.productoId) {
+                <li>
+                  <span class="item-qty">{{ item.cantidad }}x</span>
+                  <span class="item-name">{{ item.nombreProducto }}</span>
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+        
+        <div class="ticket-card__footer">
+          <span class="ticket-total-label">Total</span>
+          <span class="ticket-total-value">{{ orden.subtotal | currency }}</span>
+        </div>
+      </restaurant-card>
+    } @empty {
+      <div class="empty-state">
+        <lucide-icon name="user" [size]="48" color="var(--color-text-tertiary)"></lucide-icon>
+        <p>Aún no has registrado ningún pedido.</p>
+      </div>
+    }
+  </div>
+</div>

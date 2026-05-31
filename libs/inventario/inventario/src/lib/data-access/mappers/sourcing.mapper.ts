@@ -97,7 +97,7 @@ export function conciliacionGilFromApi(dto: ConciliacionGilResponse): Conciliaci
 /**
  * Transforma el response del backend (GilResponse) al modelo interno (SolicitudGil).
  * NOTA: los nombres de campo del response están alineados con los del request
- * (fechaSolicitud, destinoBienes, fichaCaracterizacion, etc.).
+ * (fechaSolicitud, destinoBienes, codigoGrupo, etc.).
  * Revisar si el backend devuelve nombres distintos una vez que documente GilResponse
  * (tarea BACKEND #2).
  */
@@ -115,15 +115,14 @@ export function gilFromApi(dto: GilResponse): SolicitudGil {
     jefeOficinaCoordinador: dto.jefeOficinaCoordinador,
     solicitante:          dto.solicitante,
     codigoGrupo:          dto.codigoGrupo,
-    fichaCaracterizacion: dto.fichaCaracterizacion,
     estado:               dto.estado,
     observaciones:        dto.observaciones,
-    cuentadantes: dto.cuentadantes.map((c): CuentadanteGil => ({
+    cuentadantes: (dto.cuentadantes ?? []).map((c): CuentadanteGil => ({
       id:     c.id,
       nombre: c.nombre,
       cedula: c.cedula,
     })),
-    bienes: dto.bienes?.map((b): BienSolicitud => ({
+    bienes: (dto.bienes ?? []).map((b): BienSolicitud => ({
       codigoSena:    b.codigoSena,
       descripcion:   b.descripcion,
       unidadMedida:  b.unidadMedida,

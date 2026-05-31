@@ -141,7 +141,7 @@ export interface ConciliacionGil {
 /**
  * Estado de la solicitud GIL F-014.
  */
-export type EstadoGIL = 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'CERRADO';
+export type EstadoGIL = 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'VERIFICADO' | 'CERRADO';
 
 export interface GilPickerItem {
   id: string;

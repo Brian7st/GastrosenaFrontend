@@ -8,31 +8,31 @@
   <!-- Header de perfil -->
   <div class="perfil-header">
     <div class="perfil-header__avatar-wrapper">
-  <div class="perfil-header__avatar" (click)="triggerFileInput()">
-    @if (fotoUrl()) {
-      <img [src]="fotoUrl()" alt="Foto de perfil" class="perfil-header__foto"/>
-    } @else {
-      {{ iniciales() }}
-    }
-    <div class="perfil-header__avatar-overlay">
-      <lucide-icon name="camera" [size]="20"></lucide-icon>
+      <div class="perfil-header__avatar" (click)="triggerFileInput()">
+        @if (fotoUrl()) {
+          <img [src]="fotoUrl()" alt="Foto de perfil" class="perfil-header__foto"/>
+        } @else {
+          {{ iniciales() }}
+        }
+        <div class="perfil-header__avatar-overlay">
+          <lucide-icon name="camera" [size]="20"></lucide-icon>
+        </div>
+      </div>
+      <input
+        #fileInput
+        type="file"
+        accept="image/*"
+        class="perfil-header__file-input"
+        (change)="onFotoChange($event)"
+      />
     </div>
-  </div>
-  <input
-    #fileInput
-    type="file"
-    accept="image/*"
-    class="perfil-header__file-input"
-    (change)="onFotoChange($event)"
-  />
-</div>
     <div class="perfil-header__info">
       <h2 class="perfil-header__nombre">{{ usuario?.nombre }}</h2>
       <div class="perfil-header__meta">
         <lucide-icon name="user" [size]="14"></lucide-icon>
         <span>{{ usuario?.rol }}</span>
         <span class="perfil-header__dot">•</span>
-        <restaurant-status-badge label="Activo" variant="success"/>
+        <restaurant-status-badge label="Activo" variant="success" />
       </div>
       <p class="perfil-header__email">{{ usuario?.email }}</p>
     </div>
@@ -92,64 +92,53 @@
     </form>
   </div>
 
-  <!-- Seguridad y Actividad -->
-  <div class="perfil-grid">
-
-    <!-- Seguridad -->
-    <div class="perfil-card">
-      <div class="perfil-card__title">
-        <lucide-icon name="lock" [size]="18"></lucide-icon>
-        <h3>Seguridad</h3>
-      </div>
-      <form [formGroup]="seguridadForm" class="perfil-form">
-        <restaurant-input
-          label="Contraseña Actual"
-          placeholder="••••••••"
-          type="password"
-          icon="lock"
-          formControlName="contrasenaActual"
-        />
-        <restaurant-input
-          label="Nueva Contraseña"
-          placeholder="••••••••"
-          type="password"
-          icon="lock"
-          formControlName="nuevaContrasena"
-        />
-        <restaurant-input
-          label="Confirmar Contraseña"
-          placeholder="••••••••"
-          type="password"
-          icon="lock"
-          formControlName="confirmar"
-        />
-      </form>
+  <!-- Seguridad (Cambio de contraseña) -->
+  <div class="perfil-card">
+    <div class="perfil-card__title">
+      <lucide-icon name="lock" [size]="18"></lucide-icon>
+      <h3>Cambiar Contraseña</h3>
     </div>
-
-    <!-- Actividad Reciente -->
-    <div class="perfil-card">
-      <div class="perfil-card__title">
-        <lucide-icon name="activity" [size]="18"></lucide-icon>
-        <h3>Actividad Reciente</h3>
+    <form [formGroup]="seguridadForm" class="perfil-form">
+      <restaurant-input
+        label="Contraseña Actual"
+        placeholder="••••••••"
+        type="password"
+        icon="lock"
+        formControlName="contrasenaActual"
+      />
+      <restaurant-input
+        label="Nueva Contraseña"
+        placeholder="••••••••"
+        type="password"
+        icon="lock"
+        formControlName="nuevaContrasena"
+      />
+      <restaurant-input
+        label="Confirmar Contraseña"
+        placeholder="••••••••"
+        type="password"
+        icon="lock"
+        formControlName="confirmar"
+      />
+      <div style="margin-top: 1rem;">
+        <restaurant-button variant="primary" (click)="onCambiarContrasena()" [disabled]="guardando()">
+          @if (!guardando()) {
+            <lucide-icon name="lock" [size]="16"></lucide-icon>
+            Cambiar Contraseña
+          } @else {
+            <span class="perfil-spinner"></span>
+          }
+        </restaurant-button>
       </div>
-      <div class="perfil-actividad">
-        @for (item of actividadReciente; track item.fecha) {
-          <div class="perfil-actividad__item">
-            <p class="perfil-actividad__accion">{{ item.accion }}</p>
-            <div class="perfil-actividad__meta">
-              <lucide-icon name="calendar" [size]="12"></lucide-icon>
-              <span>{{ item.fecha }}</span>
-              <lucide-icon name="file-text" [size]="12"></lucide-icon>
-              <span>{{ item.modulo }}</span>
-            </div>
-          </div>
-        }
-      </div>
-    </div>
-
+    </form>
   </div>
 
-  <!-- Botones -->
+  <!-- Mensaje de éxito -->
+  @if (exito()) {
+    <div class="perfil-exito">¡Cambios guardados exitosamente!</div>
+  }
+
+  <!-- Botones de acción -->
   <div class="perfil-actions">
     <restaurant-button variant="surface" (click)="onCancelar()">
       <lucide-icon name="x" [size]="16"></lucide-icon>

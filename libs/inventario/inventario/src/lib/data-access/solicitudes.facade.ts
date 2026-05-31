@@ -4,6 +4,7 @@ import { SolicitudGil, SolicitudesGilFiltros, SolicitudesPaginacion, EstadoGil, 
 import {
   SolicitudSesion,
   CrearSolicitudSesionData,
+  ActualizarSolicitudSesionData,
   AprobarSesionData,
   RechazarSesionData,
 } from '../models/solicitud-sesion.model';
@@ -30,6 +31,8 @@ export class SolicitudesFacade {
   private _loadingSesion               = signal<boolean>(false);
   private _errorSesion                 = signal<string | null>(null);
   private _solicitudSesionSeleccionada = signal<SolicitudSesion | undefined>(undefined);
+  private _paginacionSesion            = signal<{ totalElements: number; totalPages: number; page: number; size: number }>({ totalElements: 0, totalPages: 0, page: 0, size: 20 });
+  private _filtrosSesion               = signal<{ instructorId?: string; estado?: string; page: number; size: number }>({ page: 0, size: 20 });
 
   // ── Exposición pública ─────────────────────────────────────────────────────
   public solicitudes                  = computed(() => this._solicitudes());
@@ -42,6 +45,7 @@ export class SolicitudesFacade {
   public loadingSesion                = computed(() => this._loadingSesion());
   public errorSesion                  = computed(() => this._errorSesion());
   public solicitudSesionSeleccionada  = computed(() => this._solicitudSesionSeleccionada());
+  public paginacionSesion             = computed(() => this._paginacionSesion());
 
   /**
    * Carga inicial de datos.
@@ -230,40 +234,79 @@ export class SolicitudesFacade {
       .subscribe(ok => { if (ok) this.cargarSolicitudById(id); });
   }
 
-  generarGils(data: GenerarGilData): void {
+  generarGils(data: GenerarGilData): Observable<SolicitudGil | null> {
     this._loading.set(true);
-    this.solicitudesService.generarGils(data)
+    this._error.set(null);
+    return this.solicitudesService.generarGils(data)
       .pipe(
         catchError(() => {
           this._error.set('Error al generar el GIL');
           return of(null);
         }),
         finalize(() => this._loading.set(false))
-      )
-      .subscribe(gil => {
-        if (gil) {
-          this.cargarSolicitudes();
-        }
-      });
+      );
   }
 
   // ─────────────────────────────────────────────────────────────────────────
   // Training — /api/v1/training/solicitudes
   // ─────────────────────────────────────────────────────────────────────────
 
-  /** GET /training/solicitudes — carga la lista de solicitudes de sesión */
+  /** GET /training/solicitudes — carga la lista de solicitudes de sesión (paginada) */
   cargarSolicitudesSesion(filtros?: { instructorId?: string; estado?: string }): void {
+    if (filtros) {
+      this._filtrosSesion.set({ ...this._filtrosSesion(), ...filtros, page: 0 });
+    }
     this._loadingSesion.set(true);
     this._errorSesion.set(null);
-    this.solicitudesService.getSolicitudesSesion(filtros)
+    this.solicitudesService.getSolicitudesSesion(this._filtrosSesion())
       .pipe(
         catchError(() => {
           this._errorSesion.set('Error al cargar las solicitudes de sesión');
-          return of([]);
+          return of({ solicitudes: [], paginacion: { totalElements: 0, totalPages: 0, page: 0, size: 20 } });
         }),
         finalize(() => this._loadingSesion.set(false))
       )
-      .subscribe(list => this._solicitudesSesion.set(list));
+      .subscribe(({ solicitudes, paginacion }) => {
+        this._solicitudesSesion.set(solicitudes);
+        this._paginacionSesion.set(paginacion);
+      });
+  }
+
+  /** Navega a una página específica de solicitudes de sesión */
+  irAPaginaSesion(page: number): void {
+    this._filtrosSesion.update(f => ({ ...f, page }));
+    this.cargarSolicitudesSesion();
+  }
+
+  /** GET /training/solicitudes/{id} — carga una solicitud de sesión por su ID */
+  cargarSolicitudSesionById(id: string): void {
+    this._loadingSesion.set(true);
+    this._errorSesion.set(null);
+    this.solicitudesService.getSolicitudSesionById(id)
+      .pipe(
+        catchError(() => {
+          this._errorSesion.set('Error al cargar la solicitud de sesión');
+          return of(null);
+        }),
+        finalize(() => this._loadingSesion.set(false))
+      )
+      .subscribe(res => {
+        if (res !== null) this._solicitudSesionSeleccionada.set(res);
+      });
+  }
+
+  /** PUT /training/solicitudes/{id} — actualiza la solicitud y la deja seleccionada */
+  actualizarSolicitudSesion(id: string, data: ActualizarSolicitudSesionData): Observable<SolicitudSesion | null> {
+    this._loading.set(true);
+    this._error.set(null);
+    return this.solicitudesService.actualizarSolicitudSesion(id, data)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al actualizar la solicitud de sesión');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      );
   }
 
   /** POST /training/solicitudes — crea la solicitud y la deja seleccionada */

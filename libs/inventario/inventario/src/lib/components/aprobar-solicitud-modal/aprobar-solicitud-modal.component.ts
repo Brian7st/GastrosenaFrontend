@@ -1,11 +1,10 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { CurrencyPipe } from '@angular/common';
 import { SolicitudSesion } from '../../models/solicitud-sesion.model';
 
 @Component({
   selector: 'restaurant-aprobar-solicitud-modal',
   standalone: true,
-  imports: [CurrencyPipe],
+  imports: [],
   templateUrl: './aprobar-solicitud-modal.component.html',
   styleUrls: ['./aprobar-solicitud-modal.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
