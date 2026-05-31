@@ -140,11 +140,9 @@ export class FacturasFacade {
           this._facturaSeleccionada.set(factura);
           this.cargarFacturas();
           this.cargarKpis();
-          if (gilId) {
-            this.svc.getConciliacionGil({ facturaId: String(factura.id) })
-              .pipe(catchError(() => of(null)))
-              .subscribe(c => this._conciliacionImportacion.set(c));
-          }
+          // Conciliation record is not loaded here to avoid a race condition:
+          // the backend may not have created it yet at this point.
+          // Navigate to the factura detail page to load conciliation on demand.
         }
       });
   }

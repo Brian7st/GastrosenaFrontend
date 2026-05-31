@@ -132,10 +132,20 @@ export class BienesService {
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  /** PATCH /catalog/productos/{id}/desactivar — soft delete: marca activo=false */
+  /** PATCH /catalog/productos/{id}/desactivar */
   desactivarBien(id: string | number): Observable<Bien> {
     return this.http
       .patch<ProductoResponse>(`${API}/catalog/productos/${id}/desactivar`, {})
+      .pipe(
+        map(bienFromCatalogo),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** PATCH /catalog/productos/{id}/activar */
+  activarBien(id: string | number): Observable<Bien> {
+    return this.http
+      .patch<ProductoResponse>(`${API}/catalog/productos/${id}/activar`, {})
       .pipe(
         map(bienFromCatalogo),
         catchError(err => throwError(() => err))

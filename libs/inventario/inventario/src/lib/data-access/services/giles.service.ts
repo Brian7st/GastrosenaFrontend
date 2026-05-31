@@ -18,7 +18,7 @@ export class GilesService {
   private http = inject(HttpClient);
 
   /** GET /api/v1/procurement/giles
-   *  Para entradas de Kardex usar estado: 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'CERRADO' */
+   *  Para entradas de Kardex usar estado: 'VERIFICADO' (conciliación FEL vs GIL completa). */
   getGiles(params: GilesParams = {}): Observable<PagedGilResponse> {
     let httpParams = new HttpParams();
     if (params.estado)               httpParams = httpParams.set('estado',               params.estado);
@@ -35,6 +35,13 @@ export class GilesService {
   getGilById(id: string): Observable<GilResponse> {
     return this.http
       .get<GilResponse>(`${API}/procurement/giles/${id}`)
+      .pipe(catchError(err => throwError(() => err)));
+  }
+
+  /** PATCH /api/v1/procurement/giles/{id}/cerrar */
+  cerrarGil(id: string): Observable<void> {
+    return this.http
+      .patch<void>(`${API}/procurement/giles/${id}/cerrar`, {})
       .pipe(catchError(err => throwError(() => err)));
   }
 }
