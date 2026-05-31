@@ -118,12 +118,12 @@ export function gilFromApi(dto: GilResponse): SolicitudGil {
     fichaCaracterizacion: dto.fichaCaracterizacion,
     estado:               dto.estado,
     observaciones:        dto.observaciones,
-    cuentadantes: dto.cuentadantes.map((c): CuentadanteGil => ({
+    cuentadantes: (dto.cuentadantes ?? []).map((c): CuentadanteGil => ({
       id:     c.id,
       nombre: c.nombre,
       cedula: c.cedula,
     })),
-    bienes: dto.bienes?.map((b): BienSolicitud => ({
+    bienes: (dto.bienes ?? []).map((b): BienSolicitud => ({
       codigoSena:    b.codigoSena,
       descripcion:   b.descripcion,
       unidadMedida:  b.unidadMedida,

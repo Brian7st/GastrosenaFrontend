@@ -33,18 +33,23 @@ export class SolicitudesInsumosListComponent implements OnInit {
   private router  = inject(Router);
   readonly facade = inject(SolicitudesFacade);
 
+  paginasSesion = computed(() =>
+    Array.from({ length: this.facade.paginacionSesion().totalPages }, (_, i) => i)
+  );
+
   // ─── KPIs calculados desde datos reales ───────────────────────────
+  // Valid states: CREADA | APROBADA | RECHAZADA | COMPROMETIDA (EstadoSolicitudSesion)
   totalCreadasPendientes = computed(() =>
     this.facade.solicitudesSesion().filter(s => s.estado === 'CREADA').length
   );
   totalAprobadasHoy = computed(() =>
     this.facade.solicitudesSesion().filter(s => s.estado === 'APROBADA').length
   );
-  totalCerradas = computed(() =>
-    this.facade.solicitudesSesion().filter(s => s.estado === 'CERRADA').length
+  totalRechazadas = computed(() =>
+    this.facade.solicitudesSesion().filter(s => s.estado === 'RECHAZADA').length
   );
-  totalLibres = computed(() =>
-    this.facade.solicitudesSesion().filter(s => s.estado === 'LIBRE').length
+  totalComprometidas = computed(() =>
+    this.facade.solicitudesSesion().filter(s => s.estado === 'COMPROMETIDA').length
   );
 
   // ─── Opciones filtros ──────────────────────────────────────────────
@@ -54,7 +59,6 @@ export class SolicitudesInsumosListComponent implements OnInit {
     { value: 'APROBADA',      label: 'Aprobada'     },
     { value: 'RECHAZADA',     label: 'Rechazada'    },
     { value: 'COMPROMETIDA',  label: 'Comprometida' },
-    { value: 'CERRADA',       label: 'Cerrada'      },
   ];
 
   fechaOptions = [
@@ -95,13 +99,12 @@ export class SolicitudesInsumosListComponent implements OnInit {
       'APROBADA':     'success',
       'RECHAZADA':    'danger',
       'COMPROMETIDA': 'success',
-      'CERRADA':      'neutral',
     };
     return map[estado] ?? 'neutral';
   }
 
   // ─── Handlers ─────────────────────────────────────────────────────
-  onSearch(): void                 { this.facade.cargarSolicitudesSesion(); }
+  onSearch(term: string): void     { this.facade.cargarSolicitudesSesion(term ? { instructorId: term } : undefined); }
   onFilterEstado(v: string): void  { this.facade.cargarSolicitudesSesion(v ? { estado: v } : undefined); }
   onFilterFecha(): void            { /* date range — pendiente */ }
   onClearFilters(): void          { this.facade.cargarSolicitudesSesion(); }
@@ -123,14 +126,22 @@ export class SolicitudesInsumosListComponent implements OnInit {
   }
 
   onConfirmApprove(id: string): void {
+    // TODO: replace 'current-user' with real auth context (AuthService.currentUserId)
     this.facade.aprobarSolicitudSesion(id, { aprobadorId: 'current-user' });
     this.onCloseModal();
   }
 
   onReject(id: string): void {
+    const motivo = prompt('Motivo del rechazo:');
+    if (!motivo?.trim()) return;
+    // TODO: replace 'current-user' with real auth context (AuthService.currentUserId)
     this.facade.rechazarSolicitudSesion(id, {
       aprobadorId: 'current-user',
-      motivo: 'Rechazado por el responsable',
+      motivo: motivo.trim(),
     });
+  }
+
+  onComprometer(id: string): void {
+    this.facade.comprometerSolicitudSesion(id);
   }
 }

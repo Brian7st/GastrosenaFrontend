@@ -141,7 +141,7 @@
                 <span class="cufe-box__label">CUFE</span>
                 <span class="cufe-box__value" [title]="f.cufe">{{ f.cufe ? (f.cufe | slice:0:10) + '...' + (f.cufe | slice:-5) : 'N/A' }}</span>
               </div>
-              <button class="icon-btn" title="Copiar CUFE">
+              <button class="icon-btn" title="Copiar CUFE" (click)="onCopiarCufe(f.cufe)">
                 <span class="material-symbols-outlined">content_copy</span>
               </button>
             </div>

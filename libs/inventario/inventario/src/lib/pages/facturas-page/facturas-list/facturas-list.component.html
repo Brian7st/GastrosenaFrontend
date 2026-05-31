@@ -181,13 +181,17 @@
         </td>
         <td class="cell--actions">
           <div class="actions-row">
-            <button class="action-icon" (click)="$event.stopPropagation(); onEditarFactura(factura)" title="Editar">
+            <button class="action-icon"
+              [disabled]="factura.estado === 'ANULADA' || factura.estado === 'PAGADA'"
+              (click)="$event.stopPropagation(); onEditarFactura(factura)" title="Editar">
               <span class="material-symbols-outlined">edit</span>
             </button>
             <button class="action-icon" (click)="$event.stopPropagation(); onVerFactura(factura)" title="Ver detalle">
               <span class="material-symbols-outlined">visibility</span>
             </button>
-            <button class="action-icon action-icon--danger" (click)="$event.stopPropagation(); onAnularFactura(factura)" title="Anular">
+            <button class="action-icon action-icon--danger"
+              [disabled]="factura.estado === 'ANULADA'"
+              (click)="$event.stopPropagation(); onAnularFactura(factura)" title="Anular">
               <span class="material-symbols-outlined">block</span>
             </button>
           </div>

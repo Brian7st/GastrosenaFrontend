@@ -14,6 +14,7 @@ import {
 import {
   SolicitudSesion,
   CrearSolicitudSesionData,
+  ActualizarSolicitudSesionData,
   AprobarSesionData,
   RechazarSesionData,
 } from '../../models/solicitud-sesion.model';
@@ -21,7 +22,9 @@ import { GilResponse, EnviarProveedorRequest, GenerarGilRequest } from '../api/s
 import {
   SolicitudSesionResponse,
   SolicitudesSesionFiltros,
+  PagedSolicitudSesionResponse,
   CrearSolicitudSesionRequest,
+  ActualizarSolicitudSesionRequest,
   AprobarSolicitudSesionRequest,
   RechazarSolicitudSesionRequest,
 } from '../api/training.api';
@@ -109,14 +112,14 @@ export class SolicitudesService {
 
   /** PATCH /procurement/giles/{id}/emitir o /cerrar */
   cambiarEstado(id: string, estado: EstadoGil): Observable<boolean> {
-    const accionMap: Record<EstadoGil, string> = {
-      BORRADOR:          '',
-      EMITIDO:           'emitir',
-      ENVIADO_PROVEEDOR: '', // usa enviarAProveedor() — requiere PATCH con body
-      CERRADO:           'cerrar',
+    // BORRADOR: estado inicial, no hay transición de vuelta a él.
+    // ENVIADO_PROVEEDOR: usa enviarAProveedor() — requiere body con proveedorDestinatarioId.
+    const accionMap: Partial<Record<EstadoGil, string>> = {
+      EMITIDO: 'emitir',
+      CERRADO: 'cerrar',
     };
     const accion = accionMap[estado];
-    if (!accion) return throwError(() => new Error(`Estado ${estado} sin endpoint de transición PATCH`));
+    if (!accion) return throwError(() => new Error(`Estado ${estado} no tiene endpoint de transición directa. Usá el método específico para este estado.`));
 
     return this.http
       .patch<void>(`${API}/procurement/giles/${id}/${accion}`, {})
@@ -175,16 +178,36 @@ export class SolicitudesService {
   // Training — /api/v1/training/solicitudes
   // ─────────────────────────────────────────────────────────────────────────
 
-  /** GET /training/solicitudes — lista solicitudes de sesión (filtros: instructorId, estado) */
-  getSolicitudesSesion(filtros?: SolicitudesSesionFiltros): Observable<SolicitudSesion[]> {
+  /** GET /training/solicitudes — lista solicitudes de sesión paginadas */
+  getSolicitudesSesion(filtros?: SolicitudesSesionFiltros): Observable<{ solicitudes: SolicitudSesion[]; paginacion: SolicitudesPaginacion }> {
     let params = new HttpParams();
     if (filtros?.instructorId) params = params.set('instructorId', filtros.instructorId);
     if (filtros?.estado)       params = params.set('estado', filtros.estado);
+    params = params.set('page', String(filtros?.page ?? 0));
+    params = params.set('size', String(filtros?.size ?? 20));
 
     return this.http
-      .get<SolicitudSesionResponse[]>(`${API}/training/solicitudes`, { params })
+      .get<PagedSolicitudSesionResponse>(`${API}/training/solicitudes`, { params })
       .pipe(
-        map(list => list.map(solicitudSesionFromApi)),
+        map(res => ({
+          solicitudes: res.content.map(solicitudSesionFromApi),
+          paginacion: {
+            totalElements: res.totalElements,
+            totalPages:    res.totalPages,
+            page:          res.number,
+            size:          res.size,
+          },
+        })),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** GET /training/solicitudes/{id} */
+  getSolicitudSesionById(id: string): Observable<SolicitudSesion> {
+    return this.http
+      .get<SolicitudSesionResponse>(`${API}/training/solicitudes/${id}`)
+      .pipe(
+        map(solicitudSesionFromApi),
         catchError(err => throwError(() => err))
       );
   }
@@ -214,6 +237,36 @@ export class SolicitudesService {
     };
     return this.http
       .post<SolicitudSesionResponse>(`${API}/training/solicitudes`, body)
+      .pipe(
+        map(solicitudSesionFromApi),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** PUT /training/solicitudes/{id} — actualiza una solicitud de sesión existente */
+  actualizarSolicitudSesion(id: string, data: ActualizarSolicitudSesionData): Observable<SolicitudSesion> {
+    const body: ActualizarSolicitudSesionRequest = {
+      fechaSolicitud:           data.fechaSolicitud,
+      fichaId:                  data.fichaId,
+      programaId:               data.programaId,
+      instructorId:             data.instructorId,
+      identificacionInstructor: data.identificacionInstructor,
+      valorTotalDeSolicitud:    data.valorTotalDeSolicitud,
+      items: data.items.map(i => ({
+        codigoSena:              i.codigoSena,
+        nombreBien:              i.nombreBien,
+        descripcion:             i.descripcion,
+        cantidad:                i.cantidad,
+        valorUnitarioAdjudicado: i.valorUnitarioAdjudicado,
+        codigoAlmacen:           i.codigoAlmacen,
+        unidadMedida:            i.unidadMedida,
+        valorUnitario:           i.valorUnitario,
+        total:                   i.total,
+        iva:                     i.iva,
+      })),
+    };
+    return this.http
+      .put<SolicitudSesionResponse>(`${API}/training/solicitudes/${id}`, body)
       .pipe(
         map(solicitudSesionFromApi),
         catchError(err => throwError(() => err))

@@ -2,8 +2,8 @@
      Generar GIL - Layout
 ══════════════════════════════════════════════════════════════════════════ -->
 <div class="generar-page-container">
-  
-  <!-- Breadcrumbs / Header -->
+
+  <!-- Header -->
   <div class="page-header">
     <inventario-back-button (clicked)="goBack()" />
     <div class="header-titles">
@@ -13,34 +13,169 @@
   </div>
 
   <!-- ══════════════════════════════════════════════════════════════════════════
-       Datos del GIL
+       Datos del GIL — Formato GIL-F-014 v05
   ══════════════════════════════════════════════════════════════════════════ -->
   <div class="form-card">
-    <h3 class="section-title">
-      <span class="material-symbols-outlined section-icon">description</span>
-      Datos del GIL
-    </h3>
+    <div class="form-card-header">
+      <div class="form-card-header__left">
+        <span class="material-symbols-outlined section-icon">description</span>
+        <h3 class="section-title">Formato GIL-F-014</h3>
+      </div>
+      <span class="form-card-header__code">Versión 05</span>
+    </div>
 
     <div class="form-grid">
+      <!-- Columna 1 -->
       <div class="form-col">
         <div class="form-group">
-          <label class="form-label">Ficha de Caracterización <span class="required-mark">*</span></label>
+          <label class="form-label">Fecha Solicitud <span class="required-mark">*</span></label>
+          <input
+            type="date"
+            class="form-control"
+            [value]="fechaSolicitud()"
+            (input)="fechaSolicitud.set($any($event.target).value)"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Regional (Código) <span class="required-mark">*</span></label>
+          <input
+            type="number"
+            class="form-control"
+            placeholder="Ej. 63"
+            [value]="regionalCodigo()"
+            (input)="regionalCodigo.set(+$any($event.target).value)"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nombre Regional <span class="required-mark">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Ej. Quindío"
+            [value]="regionalNombre()"
+            (input)="regionalNombre.set($any($event.target).value)"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cod Centro de Costos <span class="required-mark">*</span></label>
+          <input
+            type="number"
+            class="form-control"
+            placeholder="Ej. 953810"
+            [value]="centroCostosCodigo()"
+            (input)="centroCostosCodigo.set(+$any($event.target).value)"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nombre Centro de Costos <span class="required-mark">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Ej. COMERCIO Y TURISMO"
+            [value]="centroCostosNombre()"
+            (input)="centroCostosNombre.set($any($event.target).value)"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Área <span class="required-mark">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Ej. CENTRO DE COMERCIO Y TURISMO - ESCUELA DE GASTROSENA"
+            [value]="area()"
+            (input)="area.set($any($event.target).value)"
+          />
+        </div>
+      </div>
+
+      <!-- Columna 2 -->
+      <div class="form-col">
+        <div class="form-group">
+          <label class="form-label">Jefe de Oficina o Coordinador de Área <span class="required-mark">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Ej. CARMENZA QUINTERO DE LEON"
+            [value]="jefeOficinaCoordinador()"
+            (input)="jefeOficinaCoordinador.set($any($event.target).value)"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cuentadante(s) <span class="required-mark">*</span></label>
+
+          @if (cuentadantes().length > 0) {
+            <div class="cuentadantes-list">
+              @for (c of cuentadantes(); track c; let i = $index) {
+                <div class="cuentadante-chip">
+                  <span class="material-symbols-outlined">person</span>
+                  <span class="cuentadante-nombre">{{ c.nombre }}</span>
+                  <span class="cuentadante-cedula">CC {{ c.cedula }}</span>
+                  <button class="btn-chip-remove" type="button" (click)="onRemoveCuentadante(i)" title="Quitar">
+                    <span class="material-symbols-outlined">close</span>
+                  </button>
+                </div>
+              }
+            </div>
+          }
+
+          <button class="btn-link" type="button" (click)="onToggleNuevaCuenta()">
+            <span class="material-symbols-outlined">{{ mostrarNuevaCuenta() ? 'remove' : 'add' }}</span>
+            {{ mostrarNuevaCuenta() ? 'Cancelar' : 'Agregar cuentadante' }}
+          </button>
+
+          @if (mostrarNuevaCuenta()) {
+            <div class="nueva-cuenta-panel">
+              <div class="form-group">
+                <label class="form-label">Nombre</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Ej. Juan Pablo Gómez"
+                  [value]="nuevaCuentaNombre()"
+                  (input)="nuevaCuentaNombre.set($any($event.target).value)"
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">N° de Identificación</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Ej. 1001234567"
+                  [value]="nuevaCuentaCedula()"
+                  (input)="nuevaCuentaCedula.set($any($event.target).value)"
+                />
+              </div>
+              <button
+                class="btn-link"
+                type="button"
+                [disabled]="!nuevaCuentaNombre().trim() || !nuevaCuentaCedula().trim()"
+                (click)="onConfirmarCuentadante()">
+                <span class="material-symbols-outlined">check_circle</span>
+                Confirmar cuentadante
+              </button>
+            </div>
+          }
+        </div>
+        <div class="form-group">
+          <label class="form-label">Destino de los Bienes Solicitados <span class="required-mark">*</span></label>
+          <select
+            class="form-control"
+            [value]="destinoBienes()"
+            (change)="destinoBienes.set($any($event.target).value)">
+            <option value="FORMACION">Formación</option>
+            <option value="LABORATORIO">Laboratorio</option>
+            <option value="AULA">Aula</option>
+            <option value="OTRO">Otro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Código de Grupo o Ficha de Caracterización <span class="required-mark">*</span></label>
           <input
             type="text"
             class="form-control"
             placeholder="Ej. 2560892"
             [value]="fichaCaracterizacion()"
             (input)="fichaCaracterizacion.set($any($event.target).value)"
-          />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Jefe de Oficina / Coordinador <span class="required-mark">*</span></label>
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Nombre del jefe de oficina"
-            [value]="jefeOficinaCoordinador()"
-            (input)="jefeOficinaCoordinador.set($any($event.target).value)"
           />
         </div>
         <div class="form-group">
@@ -53,44 +188,11 @@
             (input)="solicitante.set($any($event.target).value)"
           />
         </div>
-      </div>
-
-      <div class="form-col">
-        <div class="form-group">
-          <label class="form-label">Código de Grupo <span class="required-mark">*</span></label>
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Ej. SGBP-01"
-            [value]="codigoGrupo()"
-            (input)="codigoGrupo.set($any($event.target).value)"
-          />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Cuentadante — Nombre <span class="required-mark">*</span></label>
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Nombre del cuentadante"
-            [value]="cuentadanteNombre()"
-            (input)="cuentadanteNombre.set($any($event.target).value)"
-          />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Cuentadante — Cédula <span class="required-mark">*</span></label>
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Cédula del cuentadante"
-            [value]="cuentadanteCedula()"
-            (input)="cuentadanteCedula.set($any($event.target).value)"
-          />
-        </div>
         <div class="form-group">
           <label class="form-label">Observaciones</label>
           <textarea
             class="form-control"
-            rows="3"
+            rows="2"
             placeholder="Notas adicionales (opcional)"
             [value]="observaciones()"
             (input)="observaciones.set($any($event.target).value)">
@@ -103,44 +205,33 @@
   <div class="generar-grid">
 
     <!-- ══════════════════════════════════════════════════════════════════════════
-         Columna Principal (Tabla)
+         Tabla de Solicitudes (shared DataTable)
     ══════════════════════════════════════════════════════════════════════════ -->
     <div class="main-col">
-      <div class="table-card">
-        
-        <!-- Toolbar -->
-        <div class="toolbar">
-          <div class="search-box">
-            <span class="material-symbols-outlined search-icon">search</span>
-            <input 
-              type="text" 
-              placeholder="Buscar por código o solicitante..." 
-              [value]="searchTerm()"
-              (input)="searchTerm.set($any($event.target).value)"
-            />
-          </div>
-        </div>
+      <restaurant-data-table
+        tableTitle="Solicitudes de Sesión"
+        tableIcon="checklist"
+        searchPlaceholder="Buscar por ficha o instructor..."
+        (searchChange)="searchTerm.set($event)">
 
-        <!-- Tabla -->
-        <div class="table-container">
-          <table class="styled-table">
-            <thead>
-              <tr>
-                <th class="w-checkbox"></th>
-                <th>Código / Ficha</th>
-                <th>Solicitante</th>
-                <th>Resumen</th>
-                <th>Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (row of filteredSolicitudes(); track row) {
-<tr [class.row-disabled]="!isAprobada(row.estado)">
-                <td class="td-checkbox">
-                  @if (isAprobada(row.estado)) {
-<label class="custom-checkbox">
-                    <input 
-                      type="checkbox" 
+        <thead>
+          <tr>
+            <th class="w-checkbox"></th>
+            <th>Ficha</th>
+            <th>Instructor</th>
+            <th>Items</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (row of filteredSolicitudes(); track row.id) {
+            <tr [class.row-disabled]="!isAprobada(row.estado)">
+              <td class="td-checkbox">
+                @if (isAprobada(row.estado)) {
+                  <label class="custom-checkbox">
+                    <input
+                      type="checkbox"
                       [checked]="isSelected(row.id)"
                       (change)="toggleSelection(row.id)"
                     />
@@ -148,29 +239,30 @@
                       <span class="material-symbols-outlined icon">check</span>
                     </span>
                   </label>
-}
-                </td>
-                <td class="font-medium text-dark line-clamp">
-                  {{ row.codigoFicha }}
-                </td>
-                <td class="text-dark">{{ row.solicitante }}</td>
-                <td class="text-muted">{{ row.totalBienes }} ítems seleccionados</td>
-                <td>
-                  <span class="estado-badge estado-badge--{{ row.estado | lowercase }}">
-                    {{ row.estado }}
-                  </span>
-                </td>
-              </tr>
-}
-            </tbody>
-          </table>
-        </div>
-        
-      </div>
+                }
+              </td>
+              <td class="text-dark font-medium">{{ row.fichaId }}</td>
+              <td class="text-dark">{{ row.instructorId }}</td>
+              <td class="text-muted">{{ row.totalItems }} ítems</td>
+              <td>
+                <span class="estado-badge" [ngClass]="{
+                  'estado-badge--creada':       row.estado === 'CREADA',
+                  'estado-badge--aprobada':     row.estado === 'APROBADA',
+                  'estado-badge--rechazada':    row.estado === 'RECHAZADA',
+                  'estado-badge--comprometida': row.estado === 'COMPROMETIDA'
+                }">
+                  {{ row.estado }}
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+
+      </restaurant-data-table>
     </div>
 
     <!-- ══════════════════════════════════════════════════════════════════════════
-         Columna Sidebar (Resumen)
+         Sidebar — Resumen de consolidación
     ══════════════════════════════════════════════════════════════════════════ -->
     <div class="sidebar-col">
       <div class="summary-card">
@@ -178,7 +270,7 @@
           <span class="material-symbols-outlined icon-doc">description</span>
           <h3>Resumen de Consolidación</h3>
         </div>
-        
+
         <div class="summary-body">
           <div class="summary-item">
             <span>Solicitudes seleccionadas</span>
@@ -194,7 +286,7 @@
             <p>Solo las solicitudes en estado APROBADA pueden incluirse en la Guía de Ingreso Local.</p>
           </div>
         </div>
-        
+
         <div class="summary-footer">
           <restaurant-button
             variant="primary"
@@ -212,40 +304,14 @@
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════════════
-     MODAL DE CONFIRMACIÓN
+     Modal de Confirmación (shared ConfirmDialog)
 ══════════════════════════════════════════════════════════════════════════ -->
-@if (showModal()) {
-<div class="modal-overlay">
-  <!-- Background Backdrop -->
-  <div class="modal-backdrop" (click)="cerrarModal()"></div>
-
-  <!-- Modal Container -->
-  <div class="modal-container">
-    <div class="modal-header-strip modal-header-strip--primary"></div>
-    <div class="modal-body">
-      <div class="modal-icon-container modal-icon-container--primary">
-        <span class="material-symbols-outlined modal-icon">library_add_check</span>
-      </div>
-      
-      <div class="modal-text-center">
-        <h3 class="modal-title">Confirmar Consolidación</h3>
-        <p class="modal-desc">
-          ¿Estás seguro de generar la Guía de Ingreso Local (GIL) con 
-          <span class="font-bold">{{ solicitudesSeleccionadas() }}</span> 
-          solicitudes seleccionadas y un total de 
-          <span class="font-bold">{{ itemsTotalesConsolidar() }}</span> ítems?
-        </p>
-      </div>
-
-      <div class="modal-actions-col">
-        <restaurant-button variant="primary" (click)="confirmarGeneracion()">
-          Confirmar y Generar GIL
-        </restaurant-button>
-        <restaurant-button variant="surface" (click)="cerrarModal()">
-          Cancelar
-        </restaurant-button>
-      </div>
-    </div>
-  </div>
-</div>
-}
+<restaurant-confirm-dialog
+  [open]="showModal()"
+  title="Confirmar Consolidación"
+  [message]="'¿Generar la GIL con ' + solicitudesSeleccionadas() + ' solicitudes y ' + itemsTotalesConsolidar() + ' ítems?'"
+  confirmText="Confirmar y Generar GIL"
+  cancelText="Cancelar"
+  (confirm)="confirmarGeneracion()"
+  (cancel)="cerrarModal()"
+/>

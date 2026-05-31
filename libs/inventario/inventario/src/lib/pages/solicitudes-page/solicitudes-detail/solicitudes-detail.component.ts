@@ -1,13 +1,14 @@
-import { Component, ChangeDetectionStrategy, computed, inject, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 
 @Component({
   selector: 'restaurant-solicitudes-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, BackButtonComponent],
+  imports: [CommonModule, RouterModule, FormsModule, BackButtonComponent],
   templateUrl: './solicitudes-detail.component.html',
   styleUrl: './solicitudes-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -39,13 +40,14 @@ export class SolicitudesDetailComponent implements OnInit {
   }
 
   // ─── Helpers para el Timeline ───────────────────────────
-  estados = ['BORRADOR', 'EMITIDO', 'ENVIADO_PROVEEDOR', 'CERRADO'];
+  estados = ['BORRADOR', 'EMITIDO', 'ENVIADO_PROVEEDOR', 'VERIFICADO', 'CERRADO'];
 
   getIcon(estado: string): string {
     const iconos: Record<string, string> = {
       BORRADOR:          'edit_document',
       EMITIDO:           'hourglass_empty',
       ENVIADO_PROVEEDOR: 'local_shipping',
+      VERIFICADO:        'fact_check',
       CERRADO:           'check_circle',
     };
     return iconos[estado] || 'help';
@@ -72,11 +74,30 @@ export class SolicitudesDetailComponent implements OnInit {
   }
 
   onDownloadPdf(): void {
-    // Exportación PDF pendiente de integración HTTP
+    // TODO: PDF export — tech debt
   }
 
   onEnviarAprobacion(): void {
     const id = this.solicitud()?.id;
     if (id) this.facade.cambiarEstado(String(id), 'EMITIDO');
+  }
+
+  // ─── Enviar a Proveedor (EMITIDO → ENVIADO_PROVEEDOR) ───────────────
+  showEnviarProveedorForm = signal(false);
+  proveedorDestinatarioId = signal('');
+  fechaEnvio              = signal('');
+
+  onToggleEnviarProveedor(): void {
+    this.showEnviarProveedorForm.update(v => !v);
+  }
+
+  onConfirmarEnvioProveedor(): void {
+    const id = this.solicitud()?.id;
+    if (!id || !this.proveedorDestinatarioId() || !this.fechaEnvio()) return;
+    this.facade.enviarAProveedor(String(id), {
+      proveedorDestinatarioId: this.proveedorDestinatarioId(),
+      fechaEnvio:              this.fechaEnvio(),
+    });
+    this.showEnviarProveedorForm.set(false);
   }
 }

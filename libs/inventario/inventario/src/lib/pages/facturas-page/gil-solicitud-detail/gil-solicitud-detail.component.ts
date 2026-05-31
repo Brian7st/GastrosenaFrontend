@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FacturasFacade } from '../../../data-access/facturas.facade';
+import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 import { EstadoGIL } from '../../../models/facturas.model';
 
 @Component({
@@ -13,14 +14,17 @@ import { EstadoGIL } from '../../../models/facturas.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GilSolicitudDetailPageComponent implements OnInit {
-  private facade = inject(FacturasFacade);
-  private route  = inject(ActivatedRoute);
-  private router = inject(Router);
+  private facade            = inject(FacturasFacade);
+  private solicitudesFacade = inject(SolicitudesFacade);
+  private route             = inject(ActivatedRoute);
+  private router            = inject(Router);
 
   solicitud = this.facade.solicitudGIL;
 
   /** Ordered steps for the timeline */
-  readonly STEPS: EstadoGIL[] = ['BORRADOR', 'EMITIDO', 'ENVIADO_PROVEEDOR', 'CERRADO'];
+  readonly STEPS: EstadoGIL[] = ['BORRADOR', 'EMITIDO', 'ENVIADO_PROVEEDOR', 'VERIFICADO', 'CERRADO'];
+
+  private gilId = '';
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -28,6 +32,7 @@ export class GilSolicitudDetailPageComponent implements OnInit {
       this.router.navigate(['/app/inventario/facturas']);
       return;
     }
+    this.gilId = id;
     this.facade.cargarSolicitudGIL(id);
   }
 
@@ -36,15 +41,15 @@ export class GilSolicitudDetailPageComponent implements OnInit {
   }
 
   onEditar(): void {
-    // TODO: navegar a la ruta de edición de la solicitud
+    this.router.navigate(['/app/inventario/solicitudes-gil', this.gilId, 'editar']);
   }
 
   onDescargarPDF(): void {
-    // TODO: llamar a un servicio de exportación para descargar el PDF
+    // TODO: PDF export — tech debt
   }
 
   onEnviarAprobacion(): void {
-    // TODO: llamar a un método de la facade que cambie el estado
+    this.solicitudesFacade.cambiarEstado(this.gilId, 'EMITIDO');
   }
 
   getStepState(step: EstadoGIL, currentStep: EstadoGIL): 'done' | 'active' | 'pending' {

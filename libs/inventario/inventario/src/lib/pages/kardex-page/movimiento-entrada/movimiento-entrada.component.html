@@ -1,4 +1,7 @@
 <div class="modal-overlay">
+  @if (successMessage()) {
+    <div class="success-banner" role="status">{{ successMessage() }}</div>
+  }
   <div class="modal-content">
 
     <!-- Header -->
