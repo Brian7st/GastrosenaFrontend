@@ -28,8 +28,7 @@ export interface SolicitudGil {
   jefeOficinaCoordinador: string;     // nuevo — requerido por backend
   cuentadantes: CuentadanteGil[];
   solicitante: string;                // nuevo — requerido por backend
-  codigoGrupo: string;                // nuevo — requerido por backend
-  fichaCaracterizacion: string;       // era: fichaId
+  codigoGrupo?: string;               // opcional
   estado: EstadoGil;
   observaciones?: string;
   bienes?: BienSolicitud[];
@@ -47,7 +46,7 @@ export interface SolicitudGil {
 
 export interface SolicitudesGilFiltros {
   estado?: EstadoGil;
-  fichaCaracterizacion?: string;  // filtro real del backend
+  codigoGrupo?: string;
   page?: number;
   size?: number;
   // Campos de UI sin soporte backend aún (no se envían como HTTP params):
@@ -75,8 +74,7 @@ export interface CrearSolicitudData {
   jefeOficinaCoordinador: string;
   cuentadantes: { nombre: string; cedula: string }[];
   solicitante: string;
-  codigoGrupo: string;
-  fichaCaracterizacion: string;
+  codigoGrupo?: string;
   solicitudesOrigenIds?: string[];
   bienes: { codigoSena: string; descripcion: string; unidadMedida: string; cantidad: number; valorUnitario: number; subtotal: number }[];
   observaciones?: string;
@@ -99,6 +97,5 @@ export interface GenerarGilData {
   cuentadantes: { nombre: string; cedula: string }[];
   solicitante: string;
   codigoGrupo: string;
-  fichaCaracterizacion: string;
   observaciones?: string;
 }

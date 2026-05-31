@@ -172,10 +172,12 @@
           <label class="form-label">Código de Grupo o Ficha de Caracterización <span class="required-mark">*</span></label>
           <input
             type="text"
+            inputmode="numeric"
+            pattern="[0-9]*"
             class="form-control"
-            placeholder="Ej. 2560892"
-            [value]="fichaCaracterizacion()"
-            (input)="fichaCaracterizacion.set($any($event.target).value)"
+            placeholder="Ej. 3434234324"
+            [value]="codigoGrupo()"
+            (input)="onCodigoGrupoInput($any($event.target).value)"
           />
         </div>
         <div class="form-group">

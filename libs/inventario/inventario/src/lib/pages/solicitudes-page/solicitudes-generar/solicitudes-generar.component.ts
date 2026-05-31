@@ -46,7 +46,6 @@ export class SolicitudesGenerarComponent implements OnInit {
   nuevaCuentaCedula       = signal('');
   solicitante             = signal('');
   codigoGrupo             = signal('');
-  fichaCaracterizacion    = signal('');
   observaciones           = signal('');
 
   solicitudes = computed<SolicitudRow[]>(() => {
@@ -79,7 +78,6 @@ export class SolicitudesGenerarComponent implements OnInit {
   solicitudesSeleccionadas = computed(() => this.selectedIds().size);
 
   requiredFieldsMissing = computed(() =>
-    !this.fichaCaracterizacion().trim() ||
     !this.jefeOficinaCoordinador().trim() ||
     !this.solicitante().trim() ||
     !this.codigoGrupo().trim() ||
@@ -127,6 +125,10 @@ export class SolicitudesGenerarComponent implements OnInit {
     return e === 'APROBADO' || e === 'APROBADA';
   }
 
+  onCodigoGrupoInput(value: string): void {
+    this.codigoGrupo.set(value.replace(/\D/g, ''));
+  }
+
   onGenerar(): void {
     if (this.selectedIds().size === 0) return;
     this.showModal.set(true);
@@ -146,7 +148,6 @@ export class SolicitudesGenerarComponent implements OnInit {
       cuentadantes:           this.cuentadantes(),
       solicitante:            this.solicitante(),
       codigoGrupo:            this.codigoGrupo(),
-      fichaCaracterizacion:   this.fichaCaracterizacion(),
     };
     this.showModal.set(false);
     this.facade.generarGils(data).subscribe({
