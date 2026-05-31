@@ -64,7 +64,7 @@ export const UsuariosActions = createActionGroup({
     
     // ── IMPORTAR MASIVO CON POLLING (NUEVAS) ──────────────────────────────────
     'Importar Masivo Iniciado':     props<{ tareaId: string; tipo: 'APRENDIZ' | 'INSTRUCTOR' }>(),
-    'Importar Masivo Completado':   props<{ tareaId: string }>(),
+    'Importar Masivo Completado':   props<{ tareaId: string; resultado: ImportarUsuariosResponse }>(),
     'Importar Masivo Fallido Por Estado': props<{ tareaId: string; error: string }>(),
 
     // ── Exportar ──────────────────────────────────────────────────────────────
