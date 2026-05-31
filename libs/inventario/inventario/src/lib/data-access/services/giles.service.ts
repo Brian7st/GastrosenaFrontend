@@ -7,10 +7,10 @@ import { GilResponse, PagedGilResponse, EstadoGil } from '../api/procurement.api
 const API = '/api/v1';
 
 export interface GilesParams {
-  estado?:               EstadoGil;
-  fichaCaracterizacion?: string;
-  page?:                 number;
-  size?:                 number;
+  estado?:       EstadoGil;
+  codigoGrupo?:  string;
+  page?:         number;
+  size?:         number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -21,8 +21,8 @@ export class GilesService {
    *  Para entradas de Kardex usar estado: 'VERIFICADO' (conciliación FEL vs GIL completa). */
   getGiles(params: GilesParams = {}): Observable<PagedGilResponse> {
     let httpParams = new HttpParams();
-    if (params.estado)               httpParams = httpParams.set('estado',               params.estado);
-    if (params.fichaCaracterizacion) httpParams = httpParams.set('fichaCaracterizacion', params.fichaCaracterizacion);
+    if (params.estado)       httpParams = httpParams.set('estado',       params.estado);
+    if (params.codigoGrupo) httpParams = httpParams.set('codigoGrupo',  params.codigoGrupo);
     if (params.page != null)         httpParams = httpParams.set('page',                 String(params.page));
     if (params.size != null)         httpParams = httpParams.set('size',                 String(params.size));
 

@@ -120,37 +120,17 @@
 
         <!-- Código de Grupo -->
         <div class="form-group">
-          <label class="form-label">Código de Grupo <span class="required-asterisk">*</span></label>
+          <label class="form-label">Código de Grupo</label>
           <input
             type="text"
             class="form-control"
             [class.form-control--error]="submitAttempted() && errores()['codigoGrupo']"
-            placeholder="Ej. ADSO-2670687"
+            placeholder="Ej. 2670687"
             [value]="codigoGrupo()"
             (input)="codigoGrupo.set($any($event.target).value)"
           />
           @if (submitAttempted() && errores()['codigoGrupo']) {
             <p class="field-error">{{ errores()['codigoGrupo'] }}</p>
-          }
-        </div>
-
-        <!-- Ficha de Caracterización -->
-        <div class="form-group">
-          <label class="form-label">Ficha de Caracterización <span class="required-asterisk">*</span></label>
-          <input
-            type="text"
-            class="form-control"
-            [class.form-control--error]="submitAttempted() && errores()['fichaCaracterizacion']"
-            maxlength="7"
-            pattern="\d{7}"
-            placeholder="Ej. 2471532"
-            [value]="fichaCaracterizacion()"
-            (input)="fichaCaracterizacion.set($any($event.target).value)"
-          />
-          @if (submitAttempted() && errores()['fichaCaracterizacion']) {
-            <p class="field-error">{{ errores()['fichaCaracterizacion'] }}</p>
-          } @else {
-            <p class="form-hint">Debe contener exactamente 7 dígitos.</p>
           }
         </div>
 

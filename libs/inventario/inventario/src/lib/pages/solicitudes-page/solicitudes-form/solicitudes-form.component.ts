@@ -39,7 +39,6 @@ export class SolicitudesFormComponent implements OnInit {
   jefeOficinaCoordinador  = signal('');
   solicitante             = signal('');
   codigoGrupo             = signal('');
-  fichaCaracterizacion    = signal('');
   observaciones           = signal('');
 
   cuentadantes        = signal<{ nombre: string; cedula: string }[]>([]);
@@ -47,7 +46,6 @@ export class SolicitudesFormComponent implements OnInit {
   nuevaCuenta         = signal('');
   nuevaCuentaCedula   = signal('');
 
-  private readonly FICHA_REGEX = /^\d{7}$/;
   submitAttempted = signal(false);
 
   errores = computed<Record<string, string>>(() => {
@@ -70,13 +68,8 @@ export class SolicitudesFormComponent implements OnInit {
       e['jefeOficinaCoordinador'] = 'El jefe de oficina / coordinador es requerido.';
     if (!this.solicitante().trim())
       e['solicitante'] = 'El solicitante es requerido.';
-    if (!this.codigoGrupo().trim())
-      e['codigoGrupo'] = 'El código de grupo es requerido.';
-    if (!this.fichaCaracterizacion().trim()) {
-      e['fichaCaracterizacion'] = 'La ficha de caracterización es requerida.';
-    } else if (!this.FICHA_REGEX.test(this.fichaCaracterizacion())) {
-      e['fichaCaracterizacion'] = 'La ficha debe contener exactamente 7 dígitos.';
-    }
+    if (this.codigoGrupo().trim() && !/^\d+$/.test(this.codigoGrupo().trim()))
+      e['codigoGrupo'] = 'El código de grupo debe contener solo números';
     if (this.cuentadantes().length === 0)
       e['cuentadantes'] = 'Debe agregar al menos un cuentadante.';
     return e;
@@ -129,8 +122,7 @@ export class SolicitudesFormComponent implements OnInit {
       jefeOficinaCoordinador: this.jefeOficinaCoordinador(),
       cuentadantes:           this.cuentadantes(),
       solicitante:            this.solicitante(),
-      codigoGrupo:            this.codigoGrupo(),
-      fichaCaracterizacion:   this.fichaCaracterizacion(),
+      codigoGrupo:            this.codigoGrupo() || undefined,
       bienes:                 [],
       observaciones:          this.observaciones() || undefined,
     });

@@ -37,8 +37,7 @@ export interface GilResponse {
   jefeOficinaCoordinador:  string;
   cuentadantes:            CuentadanteGilResponse[];
   solicitante:             string;
-  codigoGrupo:             string;
-  fichaCaracterizacion:    string;
+  codigoGrupo?:            string;
   bienes?:                 BienGilResponse[];
   observaciones?:          string;
   creadoEn?:               string;

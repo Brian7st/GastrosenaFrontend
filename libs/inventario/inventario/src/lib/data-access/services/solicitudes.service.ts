@@ -46,8 +46,8 @@ export class SolicitudesService {
   getSolicitudes(filtros?: SolicitudesGilFiltros): Observable<{ solicitudes: SolicitudGil[]; paginacion: SolicitudesPaginacion }> {
     let params = new HttpParams();
     // Parámetros soportados por el backend:
-    if (filtros?.estado)               params = params.set('estado', filtros.estado);
-    if (filtros?.fichaCaracterizacion) params = params.set('fichaCaracterizacion', filtros.fichaCaracterizacion);
+    if (filtros?.estado)        params = params.set('estado', filtros.estado);
+    if (filtros?.codigoGrupo)  params = params.set('codigoGrupo', filtros.codigoGrupo);
     params = params.set('page', String(filtros?.page ?? 0));
     params = params.set('size', String(filtros?.size ?? 10));
     // Nota: busqueda, instructor y fechaRango NO existen en el backend — se omiten.
@@ -163,7 +163,6 @@ export class SolicitudesService {
       cuentadantes:           data.cuentadantes,
       solicitante:            data.solicitante,
       codigoGrupo:            data.codigoGrupo,
-      fichaCaracterizacion:   data.fichaCaracterizacion,
       observaciones:          data.observaciones,
     };
     return this.http
