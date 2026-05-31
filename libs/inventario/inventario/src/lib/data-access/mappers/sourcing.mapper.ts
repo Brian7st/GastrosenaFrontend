@@ -1,6 +1,6 @@
 import { Factura, FacturaFormDto, ConciliacionGil } from '../../models/facturas.model';
 import { SolicitudGil, BienSolicitud, CuentadanteGil } from '../../models/solicitudes-gil.model';
-import { BackendDateArray, FacturaLineaResponse, FacturaResponse, GilResponse, RegistrarFacturaRequest, ConciliacionGilResponse } from '../api/sourcing.api';
+import { BackendDateArray, FacturaLineaResponse, FacturaResponse, GilResponse, RegistrarFacturaRequest, ConciliacionGilResponse, DetalleGilResponse } from '../api/sourcing.api';
 
 function backendDateToIso(date: BackendDateArray | string | undefined | null): string {
   if (!date) return '';
@@ -80,16 +80,16 @@ export function conciliacionGilFromApi(dto: ConciliacionGilResponse): Conciliaci
     facturaId: dto.facturaId,
     gilId:     dto.gilId,
     estado:    dto.estado,
-    diferencias: dto.diferencias.map(d => ({
+    diferencias: dto.detalles.map((d: DetalleGilResponse) => ({
       gilItemId:             d.gilItemId,
-      descripcion:           d.descripcion,
+      descripcion:           d.productoId,
       cantidadGil:           d.cantidadGil,
       cantidadFactura:       d.cantidadFactura,
       precioUnitarioGil:     d.precioUnitarioGil,
       precioUnitarioFactura: d.precioUnitarioFactura,
-      diferencia:            d.diferencia,
+      diferencia:            (d.precioUnitarioFactura * d.cantidadFactura) - (d.precioUnitarioGil * d.cantidadGil),
       observacion:           d.observacion,
-      resuelta:              d.resuelta,
+      resuelta:              d.estado !== 'DIFERENCIA_PENDIENTE',
     })),
   };
 }

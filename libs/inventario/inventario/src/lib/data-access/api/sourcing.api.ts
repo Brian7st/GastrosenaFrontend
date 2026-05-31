@@ -164,25 +164,28 @@ export interface VincularInstructorRequest {
 
 // ─── Sourcing — Conciliación Factura-GIL (/api/v1/sourcing/conciliaciones-gil) ─
 
-export interface GilDiferenciaItemResponse {
-  gilItemId:            string;
-  descripcion:          string;
-  cantidadGil:          number;
-  cantidadFactura:      number;
-  precioUnitarioGil:    number;
+/** Detalle tal como lo retorna el backend (campo "detalles") */
+export interface DetalleGilResponse {
+  gilItemId:             string;
+  productoId:            string;
+  cantidadGil:           number;
+  cantidadFactura:       number;
+  precioUnitarioGil:     number;
   precioUnitarioFactura: number;
-  diferencia:           number;
-  observacion?:         string;
-  resuelta:             boolean;
+  porcentajeIvaGil:      number;
+  porcentajeIvaFactura:  number;
+  estado:                'OK' | 'DIFERENCIA_PENDIENTE' | 'DIFERENCIA_RESUELTA';
+  observacion?:          string;
 }
 
 /** Respuesta de POST, GET y PATCH /sourcing/conciliaciones-gil */
 export interface ConciliacionGilResponse {
-  id:          string;
-  facturaId:   string;
-  gilId:       string;
-  estado:      string;
-  diferencias: GilDiferenciaItemResponse[];
+  id:                    string;
+  facturaId:             string;
+  gilId:                 string;
+  estado:                string;
+  diferenciasPendientes: number;
+  detalles:              DetalleGilResponse[];
 }
 
 /** POST /sourcing/conciliaciones-gil */

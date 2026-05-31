@@ -241,6 +241,16 @@
     </div>
   }
 
+  @if (conciliacionError()) {
+    <div class="alert alert--error">
+      <span class="material-symbols-outlined">error</span>
+      <div class="alert__content">
+        <h4 class="alert__title">No se pudo conciliar con el GIL</h4>
+        <p class="alert__text">{{ conciliacionError() }}</p>
+      </div>
+    </div>
+  }
+
   @if (conciliacionImportacion(); as conciliacion) {
     <div class="review-section">
       <div class="conciliacion-header">
@@ -298,6 +308,9 @@
   <button class="btn btn--ghost" (click)="goBack()">Cancelar</button>
   <div class="footer-actions">
     <button class="btn btn--outline" (click)="resetImport()">Limpiar</button>
+    @if (canConciliar()) {
+      <button class="btn btn--secondary" [disabled]="loading()" (click)="onConciliar()">Conciliar con GIL</button>
+    }
     <button class="btn btn--primary" [disabled]="!facturaImportada()" (click)="viewImportedFactura()">Ver factura registrada</button>
   </div>
 </div>
