@@ -21,19 +21,6 @@ export interface FacturaLinea {
 }
 
 /**
- * Ítem de conciliación GIL vs Factura.
- */
-export interface ConciliacionItem {
-  descripcion: string;
-  cantidadGil: number;
-  cantidadFactura: number;
-  diferenciaCantidad: number;
-  precioGil: number;
-  precioFactura: number;
-  diferenciaPrecio: number;
-}
-
-/**
  * Pre-factura vinculada a una solicitud GIL.
  */
 export interface PreFactura {
@@ -56,7 +43,6 @@ export interface Factura {
   fechaRecepcion: string;
   estado: EstadoFactura;
   lineas: FacturaLinea[];
-  conciliacion?: ConciliacionItem[];
   subtotal: number;
   totalIva: number;
   total: number;
@@ -155,7 +141,7 @@ export interface ConciliacionGil {
 /**
  * Estado de la solicitud GIL F-014.
  */
-export type EstadoGIL = 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'CERRADO';
+export type EstadoGIL = 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'VERIFICADO' | 'CERRADO';
 
 export interface GilPickerItem {
   id: string;

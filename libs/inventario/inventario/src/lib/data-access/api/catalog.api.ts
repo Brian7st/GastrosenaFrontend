@@ -52,6 +52,9 @@ export interface ActualizarProductoRequest {
   categoria?: string;
   codigoProveedor?: string;
   urlImagen?: string;
+  vrlAdjudicado?: number | null;
+  vrlAntes?: number | null;
+  iva?: number | null;
 }
 
 /** POST /catalog/productos/eliminacion-masiva */
@@ -71,12 +74,12 @@ export interface ImportarProductosRequest {
 
 /** POST /catalog/productos/exportaciones (202 Accepted — async) */
 export interface SolicitarExportacionRequest {
-  formato: 'CSV' | 'EXCEL';
+  formato: 'CSV';
 }
 
 export interface ExportacionProductosResponse {
   exportId: string;
   estado: string;
-  formato: 'CSV' | 'EXCEL';
+  formato: 'CSV';
   totalProductos: number;
 }

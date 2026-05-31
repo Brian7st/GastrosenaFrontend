@@ -172,31 +172,41 @@ export const iniciarPollingImportacion$ = createEffect(
           startWith(0 as number),
           switchMap(() =>
             svc.obtenerEstadoImportacion(tareaId, tipo).pipe(
-              map(response => ({
+              map((response: any) => ({
                 estado: response.estado,
                 tareaId,
                 tipo,
-                errores: response.errores || []
+                errores: response.errores || [],
+                exitosos: response.exitosos ?? 0,
+                fallidos: response.fallidos ?? 0,
               })),
               catchError((err) =>
                 of({
                   estado: 'FALLIDO',
                   tareaId,
                   tipo,
-                  errores: [{ mensaje: 'Error al consultar estado: ' + extractErrorMessage(err) }]
+                  errores: [{ mensaje: 'Error al consultar estado: ' + extractErrorMessage(err) }],
+                  exitosos: 0,
+                  fallidos: 0,
                 })
               )
             )
           ),
-          take(150),
           filter(({ estado }) => estado !== 'EN_PROCESO'),
-          map(({ estado, tareaId, errores }) => {
+          take(1),
+          map(({ estado, tareaId, errores, exitosos, fallidos }) => {
+            const erroresStr = (errores || []).map((e: any) =>
+              typeof e === 'string' ? e : (e.mensaje || `Fila ${e.fila}: ${e.mensaje}`)
+            );
             if (estado === 'COMPLETADO') {
-              return UsuariosActions.importarMasivoCompletado({ tareaId });
+              return UsuariosActions.importarMasivoCompletado({
+                tareaId,
+                resultado: { exitosos, fallidos, errores: erroresStr },
+              });
             } else {
               return UsuariosActions.importarMasivoFallidoPorEstado({
                 tareaId,
-                error: errores[0]?.mensaje || 'Error desconocido',
+                error: erroresStr[0] || 'Error desconocido',
               });
             }
           })

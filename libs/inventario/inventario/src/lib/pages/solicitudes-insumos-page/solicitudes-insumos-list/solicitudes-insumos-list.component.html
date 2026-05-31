@@ -31,25 +31,19 @@
     iconColor="green"
   />
 
-  <restaurant-kpi-card variant="states">
-    <div class="custom-kpi-body">
-      <span class="kpi-card__label">Cerradas</span>
-      <span class="kpi-card__value">{{ totalCerradas() | number }}</span>
-    </div>
-    <div class="custom-kpi-icon custom-kpi-icon--slate">
-      <span class="material-symbols-outlined">lock</span>
-    </div>
-  </restaurant-kpi-card>
+  <restaurant-kpi-card
+    label="Rechazadas"
+    [value]="totalRechazadas()"
+    icon="x-circle"
+    iconColor="red"
+  />
 
-  <restaurant-kpi-card variant="states">
-    <div class="custom-kpi-body">
-      <span class="kpi-card__label">Libres</span>
-      <span class="kpi-card__value">{{ totalLibres() | number }}</span>
-    </div>
-    <div class="custom-kpi-icon custom-kpi-icon--red">
-      <span class="material-symbols-outlined">pending_actions</span>
-    </div>
-  </restaurant-kpi-card>
+  <restaurant-kpi-card
+    label="Comprometidas"
+    [value]="totalComprometidas()"
+    icon="lock"
+    iconColor="slate"
+  />
 
 </div>
 
@@ -59,7 +53,8 @@
 <restaurant-data-table
   tableTitle="Solicitudes de Insumos"
   tableIcon="clipboard-list"
-  searchPlaceholder="Buscar por instructor o código...">
+  searchPlaceholder="Buscar por instructor o código..."
+  (searchChange)="onSearch($event)">
 
   <!-- Cabecera de tabla -->
   <thead>
@@ -168,6 +163,11 @@
                   <lucide-icon name="x" [size]="16"></lucide-icon>
                 </button>
               }
+              @if (s.estado === 'APROBADA') {
+                <button class="action-icon action-icon--approve" (click)="onComprometer(s.id); $event.stopPropagation()" title="Comprometer Solicitud">
+                  <span class="material-symbols-outlined" style="font-size:16px">lock</span>
+                </button>
+              }
             </div>
           </td>
         </tr>
@@ -177,8 +177,24 @@
 
   <!-- Paginación -->
   <div dtFooter class="pagination-footer">
+    <span class="pagination-info">
+      {{ facade.solicitudesSesion().length }} de {{ facade.paginacionSesion().totalElements }}
+    </span>
     <div class="page-numbers">
-      <button class="page-btn page-btn--active">1</button>
+      <button class="page-btn"
+        [disabled]="facade.paginacionSesion().page === 0"
+        (click)="facade.irAPaginaSesion(facade.paginacionSesion().page - 1)">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      @for (p of paginasSesion(); track p) {
+        <button class="page-btn" [class.page-btn--active]="p === facade.paginacionSesion().page"
+          (click)="facade.irAPaginaSesion(p)">{{ p + 1 }}</button>
+      }
+      <button class="page-btn"
+        [disabled]="facade.paginacionSesion().page >= facade.paginacionSesion().totalPages - 1"
+        (click)="facade.irAPaginaSesion(facade.paginacionSesion().page + 1)">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
     </div>
   </div>
 

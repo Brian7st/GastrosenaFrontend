@@ -54,12 +54,11 @@
         <span class="showcase__value">{{ enEspera().length }}</span>
       </div>
       @for (c of enEspera(); track c.idComanda) {
-  <restaurant-comanda-card class="comanda-card-wrapper shadow-sm" [comanda]="c"
-    (iniciarPlato)="onIniciarPlato($event, c.idComanda)"
-    (finalizarPlato)="onFinalizarPlato($event, c.idComanda)"
-    (comandaActualizada)="cargarComandas()">
-  </restaurant-comanda-card>
-}
+        <restaurant-comanda-card class="comanda-card-wrapper shadow-sm" [comanda]="c"
+          (iniciarPlato)="onIniciarPlato($event, c.idComanda)"
+          (finalizarPlato)="onFinalizarPlato($event, c.idComanda)">
+        </restaurant-comanda-card>
+      }
     </div>
 
     <div class="column col-preparando">
@@ -68,12 +67,11 @@
         <span class="showcase__value">{{ preparando().length }}</span>
       </div>
       @for (c of preparando(); track c.idComanda) {
-  <restaurant-comanda-card class="comanda-card-wrapper shadow-sm" [comanda]="c"
-    (iniciarPlato)="onIniciarPlato($event, c.idComanda)"
-    (finalizarPlato)="onFinalizarPlato($event, c.idComanda)"
-    (comandaActualizada)="cargarComandas()">
-  </restaurant-comanda-card>
-}
+        <restaurant-comanda-card class="comanda-card-wrapper shadow-sm" [comanda]="c"
+          (iniciarPlato)="onIniciarPlato($event, c.idComanda)"
+          (finalizarPlato)="onFinalizarPlato($event, c.idComanda)">
+        </restaurant-comanda-card>
+      }
     </div>
 
     <div class="column col-listo">
@@ -81,13 +79,12 @@
         <restaurant-section-title title="Listo" align="left"></restaurant-section-title>
         <span class="showcase__value">{{ listos().length }}</span>
       </div>
- @for (c of listos(); track c.idComanda) {
-  <restaurant-comanda-card class="comanda-card-wrapper shadow-sm" [comanda]="c"
-    (iniciarPlato)="onIniciarPlato($event, c.idComanda)"
-    (finalizarPlato)="onFinalizarPlato($event, c.idComanda)"
-    (comandaActualizada)="cargarComandas()">
-  </restaurant-comanda-card>
-}
+      @for (c of listos(); track c.idComanda) {
+        <restaurant-comanda-card class="comanda-card-wrapper shadow-sm card-completed" [comanda]="c"
+          (iniciarPlato)="onIniciarPlato($event, c.idComanda)"
+          (finalizarPlato)="onFinalizarPlato($event, c.idComanda)">
+        </restaurant-comanda-card>
+      }
     </div>
 
   </div>

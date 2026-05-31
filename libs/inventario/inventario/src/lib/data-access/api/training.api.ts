@@ -2,15 +2,13 @@
 
 /** Item en responses de solicitud (GET lista, GET detail, POST, PATCH) */
 export interface SolicitudSesionItemResponse {
-  productoId:              string;
-  codigoSena?:             string;
+  codigoSena:              string;
   nombreBien?:             string;
   descripcion?:            string;
   cantidad:                number;
   valorUnitarioAdjudicado?: number;
   codigoAlmacen?:          string;
   unidadMedida:            string;
-  justificacion:           string;
   valorUnitario?:          number;
   total?:                  number;
   iva?:                    number;
@@ -25,9 +23,6 @@ export interface SolicitudSesionResponse {
   programaId:               string;
   instructorId:             string;
   identificacionInstructor?: string;
-  resultadoAprendizaje:     string;
-  actividades:              string;
-  voceroId:                 string;
   estado:                   string;
   items:                    SolicitudSesionItemResponse[];
   valorTotalDeSolicitud?:   number;
@@ -37,6 +32,17 @@ export interface SolicitudSesionResponse {
 export interface SolicitudesSesionFiltros {
   instructorId?: string;
   estado?:       string;
+  page?:         number;
+  size?:         number;
+}
+
+/** Respuesta paginada de GET /training/solicitudes */
+export interface PagedSolicitudSesionResponse {
+  content:       SolicitudSesionResponse[];
+  totalElements: number;
+  totalPages:    number;
+  number:        number;
+  size:          number;
 }
 
 /** POST /training/solicitudes */
@@ -47,25 +53,23 @@ export interface CrearSolicitudSesionRequest {
   programaId:               string;
   instructorId:             string;
   identificacionInstructor?: string;
-  resultadoAprendizaje:     string;
-  actividades:              string;
-  voceroId:                 string;
   valorTotalDeSolicitud?:   number;
   items: {
-    productoId:              string;
-    codigoSena?:             string;
+    codigoSena:              string;
     nombreBien?:             string;
     descripcion?:            string;
     cantidad:                number;
     valorUnitarioAdjudicado?: number;
     codigoAlmacen?:          string;
     unidadMedida:            string;
-    justificacion:           string;
     valorUnitario?:          number;
     total?:                  number;
     iva?:                    number;
   }[];
 }
+
+/** PUT /training/solicitudes/{id} — actualiza una solicitud de sesión existente */
+export type ActualizarSolicitudSesionRequest = CrearSolicitudSesionRequest;
 
 /** PATCH /training/solicitudes/{id}/aprobar */
 export interface AprobarSolicitudSesionRequest {

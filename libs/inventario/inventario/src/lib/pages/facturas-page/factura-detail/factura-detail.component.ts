@@ -28,6 +28,9 @@ export class FacturaDetailPageComponent implements OnInit {
   observaciones   = signal<Record<string, string>>({});
   gilParaVincular = signal('');
 
+  showConfirmVerificar  = signal(false);
+  showConfirmPagada     = signal(false);
+
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -46,6 +49,7 @@ export class FacturaDetailPageComponent implements OnInit {
     const c = this.conciliacionGil();
     if (!c) return;
     const obs = this.observaciones()[gilItemId] ?? '';
+    if (!obs.trim()) return; // observation required — don't send empty string to backend
     this.facade.resolverDiferenciaGil(c.id, gilItemId, obs);
     this.observaciones.update(o => { const next = { ...o }; delete next[gilItemId]; return next; });
   }
@@ -68,6 +72,28 @@ export class FacturaDetailPageComponent implements OnInit {
 
   countPendientes(diferencias: ConciliacionGilDiferencia[]): number {
     return diferencias.filter(d => !d.resuelta).length;
+  }
+
+  confirmarVerificar(): void {
+    const factura = this.factura();
+    if (!factura) return;
+    this.showConfirmVerificar.set(false);
+    this.facade.verificarFactura(String(factura.id));
+  }
+
+  confirmarPagada(): void {
+    const factura = this.factura();
+    if (!factura) return;
+    this.showConfirmPagada.set(false);
+    this.facade.marcarPagada(String(factura.id));
+  }
+
+  onCopiarCufe(cufe: string | undefined): void {
+    if (cufe) navigator.clipboard.writeText(cufe);
+  }
+
+  descargarOImprimir(): void {
+    window.print();
   }
 
   goBack(): void {

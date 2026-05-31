@@ -19,9 +19,18 @@
       </div>
 
       <div class="page-header__actions">
-        <restaurant-button variant="surface" icon="picture_as_pdf">Descargar PDF</restaurant-button>
-        <restaurant-button variant="surface" icon="print">Imprimir</restaurant-button>
-        <restaurant-button variant="primary" icon="check_circle">Marcar como Pagada</restaurant-button>
+        <restaurant-button variant="surface" icon="picture_as_pdf" (click)="descargarOImprimir()">Descargar PDF</restaurant-button>
+        <restaurant-button variant="surface" icon="print" (click)="descargarOImprimir()">Imprimir</restaurant-button>
+
+        @if (f.estado === 'VERIFICADA') {
+          <restaurant-button variant="primary" icon="check_circle" (click)="showConfirmPagada.set(true)">Marcar como Pagada</restaurant-button>
+        }
+
+        @if (f.estado === 'REGISTRADA' && conciliacionGil(); as c) {
+          @if (estaConciliada(c.diferencias)) {
+            <restaurant-button variant="primary" icon="verified" (click)="showConfirmVerificar.set(true)">Verificar Factura</restaurant-button>
+          }
+        }
       </div>
     </header>
 
@@ -132,7 +141,7 @@
                 <span class="cufe-box__label">CUFE</span>
                 <span class="cufe-box__value" [title]="f.cufe">{{ f.cufe ? (f.cufe | slice:0:10) + '...' + (f.cufe | slice:-5) : 'N/A' }}</span>
               </div>
-              <button class="icon-btn" title="Copiar CUFE">
+              <button class="icon-btn" title="Copiar CUFE" (click)="onCopiarCufe(f.cufe)">
                 <span class="material-symbols-outlined">content_copy</span>
               </button>
             </div>
@@ -335,3 +344,46 @@
     </div>
   }
 </div>
+
+<!-- ── Confirmation: Verificar Factura ─────────────────────────────────── -->
+@if (showConfirmVerificar()) {
+  <div class="modal-backdrop" (click)="showConfirmVerificar.set(false)">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      <div class="modal-content">
+        <div class="modal-icon-wrapper modal-icon-wrapper--warning">
+          <span class="material-symbols-outlined">verified</span>
+        </div>
+        <h2 class="modal-title">Verificar Factura</h2>
+        <p class="modal-text">
+          Esta acción es <strong>irreversible</strong>. Se crearán las entradas de inventario
+          y el GIL asociado se cerrará automáticamente.
+        </p>
+        <div class="modal-actions">
+          <button class="btn-cancel" type="button" (click)="showConfirmVerificar.set(false)">Cancelar</button>
+          <button class="btn-confirm" type="button" (click)="confirmarVerificar()">Confirmar verificación</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Confirmation: Marcar como Pagada ────────────────────────────────── -->
+@if (showConfirmPagada()) {
+  <div class="modal-backdrop" (click)="showConfirmPagada.set(false)">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      <div class="modal-content">
+        <div class="modal-icon-wrapper">
+          <span class="material-symbols-outlined">payments</span>
+        </div>
+        <h2 class="modal-title">Marcar como Pagada</h2>
+        <p class="modal-text">
+          Confirmá que el pago fue realizado. La factura pasará a estado <strong>PAGADA</strong>.
+        </p>
+        <div class="modal-actions">
+          <button class="btn-cancel" type="button" (click)="showConfirmPagada.set(false)">Cancelar</button>
+          <button class="btn-confirm" type="button" (click)="confirmarPagada()">Confirmar pago</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

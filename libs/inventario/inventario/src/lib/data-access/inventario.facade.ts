@@ -2,7 +2,7 @@ import { inject, Injectable, signal, computed } from '@angular/core';
 import { Bien, BienFiltros, BienKpis, BienFormDto, BienPaginacion } from '../models/inventario.model';
 import { ExportacionProductosResponse } from './api/catalog.api';
 import { BienesService } from './services/bienes.service';
-import { finalize, catchError, of, switchMap } from 'rxjs';
+import { finalize, catchError, of, switchMap, forkJoin } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -117,15 +117,14 @@ export class InventarioFacade {
   }
 
   /**
-   * Elimina un bien: primero desactiva (PATCH /desactivar), luego elimina (DELETE).
-   * El backend requiere que el producto esté inactivo antes de aceptar el DELETE.
+   * Desactiva un bien individual (soft delete → activo: false).
+   * No hace hard delete — solo marca como inactivo.
    */
   eliminarBien(id: string | number): void {
     this._loading.set(true);
     this.bienesService.desactivarBien(id).pipe(
-      switchMap(() => this.bienesService.deleteBien(id)),
       catchError(() => {
-        this._error.set('Error al eliminar el bien');
+        this._error.set('Error al desactivar el bien');
         return of(null);
       }),
       finalize(() => this._loading.set(false))
@@ -172,6 +171,19 @@ export class InventarioFacade {
       .subscribe(res => { if (res !== null) this.cargarBienes(); });
   }
 
+  activarBien(id: string | number): void {
+    this._loading.set(true);
+    this.bienesService.activarBien(id)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al activar el bien');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => { if (res !== null) this.cargarBienes(); });
+  }
+
   /**
    * Actualiza un bien existente y refresca los datos.
    */
@@ -192,18 +204,26 @@ export class InventarioFacade {
 
   // ── Operaciones masivas ────────────────────────────────────────────────────
 
-  /** POST /catalog/productos/eliminacion-masiva */
-  eliminarBienesMasivo(ids: string[], confirmacion: string): void {
+  /**
+   * Eliminación masiva: desactiva todos primero, luego hard delete.
+   * Backend requiere productos inactivos antes de aceptar DELETE.
+   */
+  eliminarBienesMasivo(ids: string[]): void {
     this._loading.set(true);
-    this.bienesService.eliminarBienesMasivo(ids, confirmacion)
-      .pipe(
-        catchError(() => {
-          this._error.set('Error al eliminar los bienes en masa');
-          return of(null);
-        }),
-        finalize(() => this._loading.set(false))
-      )
-      .subscribe(res => { if (res !== null) this.cargarBienes(); });
+    const desactivaciones$ = ids.map(id => this.bienesService.desactivarBien(id));
+    forkJoin(desactivaciones$).pipe(
+      switchMap(() => this.bienesService.eliminarBienesMasivo(ids, 'ELIMINAR')),
+      catchError(() => {
+        this._error.set('Error al eliminar los bienes en masa');
+        return of(null);
+      }),
+      finalize(() => this._loading.set(false))
+    ).subscribe(res => {
+      if (res !== null) {
+        this.cargarBienes();
+        this.cargarKpis();
+      }
+    });
   }
 
   /** POST /catalog/productos/importar */
@@ -234,7 +254,7 @@ export class InventarioFacade {
   }
 
   /** POST /catalog/productos/exportaciones (202 Accepted — async) */
-  solicitarExportacion(formato: 'CSV' | 'EXCEL'): void {
+  solicitarExportacion(formato: 'CSV'): void {
     this._loading.set(true);
     this.bienesService.solicitarExportacion(formato)
       .pipe(

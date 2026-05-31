@@ -32,17 +32,17 @@ export class CajaCierrePageComponent {
   efectivoCtrl = new FormControl<number | null>(null, [Validators.required, Validators.min(0)]);
   vouchersCtrl = new FormControl<number | null>(null, [Validators.min(0)]);
 
-  baseInicial = computed(() => this.facade.turnoCaja()?.baseInicial || 0);
+  baseEfectivo = computed(() => this.facade.turnoCaja()?.baseEfectivo || 0);
   ventasTotales = computed(() => this.facade.cajaStats().totalFacturado);
-  totalEsperado = computed(() => this.baseInicial() + this.ventasTotales());
+  totalEsperado = computed(() => this.baseEfectivo() + this.ventasTotales());
 
   volver() {
     this.router.navigate(['..'], { relativeTo: this.route });
   }
 
   generarCierre() {
-    if (this.efectivoCtrl.valid) {
-      this.facade.cerrarCaja();
+    if (this.efectivoCtrl.valid && this.efectivoCtrl.value !== null) {
+      this.facade.cerrarCaja(this.efectivoCtrl.value);
       this.volver();
     }
   }

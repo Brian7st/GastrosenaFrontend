@@ -1,5 +1,5 @@
 import { ProductoCatalogo, BienFormDto, Bien, EstadoBien } from '../../models/inventario.model';
-import { ProductoResponse, CrearProductoRequest } from '../api/catalog.api';
+import { ProductoResponse, CrearProductoRequest, ActualizarProductoRequest } from '../api/catalog.api';
 import { ExistenciaResponse } from '../api/inventory.api';
 
 // ── Catálogo → ProductoCatalogo ──────────────────────────────────────────────
@@ -55,7 +55,7 @@ export function bienFromCatalogoYExistencia(
     stockActual: ex.stockDisponible,
     stockMinimo: ex.stockMinimo,
     estadoStock: ex.bajoMinimo ? 'BAJO_STOCK' : ex.stockDisponible <= 0 ? 'AGOTADO' : 'DISPONIBLE',
-    estado: derivarEstadoStock(ex.stockDisponible, ex.stockMinimo),
+    estado: cat.activo ? derivarEstadoStock(ex.stockDisponible, ex.stockMinimo) : 'Inactivo',
   };
 }
 
@@ -73,6 +73,20 @@ export function bienFormToRequest(form: BienFormDto): CrearProductoRequest {
   return {
     nombre: form.nombre,
     codigoSena: form.codigoSena,
+    codigoProveedor: form.codigoProveedor,
+    descripcion: form.descripcion,
+    categoria: form.categoria,
+    unidadMedida: form.unidadMedida,
+    urlImagen: form.imagenUrl,
+    vrlAdjudicado: form.vrlAdjudicado ?? null,
+    vrlAntes: form.vrlAntes ?? null,
+    iva: form.iva ?? null,
+  };
+}
+
+export function bienFormToUpdateRequest(form: BienFormDto): ActualizarProductoRequest {
+  return {
+    nombre: form.nombre,
     codigoProveedor: form.codigoProveedor,
     descripcion: form.descripcion,
     categoria: form.categoria,

@@ -7,9 +7,9 @@
     <p class="page-subtitle">Gestión de bienes y servicios — Centro de Servicios y Gestión Empresarial</p>
   </div>
   <div style="display: flex; gap: 1rem;">
-    <restaurant-button variant="primary" routerLink="nueva">
-      <span class="material-symbols-outlined">add</span>
-      Nueva Solicitud
+    <restaurant-button variant="primary" routerLink="generar">
+      <span class="material-symbols-outlined">library_add_check</span>
+      Generar GIL
     </restaurant-button>
   </div>
 </div>
@@ -27,22 +27,22 @@
   />
 
   <restaurant-kpi-card
-    label="Borradores"
-    [value]="totalBorradores() | number"
+    label="Borradores (página)"
+    [value]="borradorPagina() | number"
     icon="pencil"
     iconColor="blue"
   />
 
   <restaurant-kpi-card
-    label="En Trámite"
-    [value]="enTramite() | number"
+    label="En Trámite (página)"
+    [value]="enTramitePagina() | number"
     icon="clock"
     iconColor="orange"
   />
 
   <restaurant-kpi-card
-    label="Finalizadas"
-    [value]="finalizadas() | number"
+    label="Finalizadas (página)"
+    [value]="finalizadasPagina() | number"
     icon="check-circle"
     iconColor="green"
   />
@@ -134,8 +134,9 @@
               [ngClass]="{
                 'estado-badge--borrador':  s.estado === 'BORRADOR',
                 'estado-badge--pendiente': s.estado === 'EMITIDO',
-                'estado-badge--validado':  s.estado === 'ENVIADO_PROVEEDOR',
-                'estado-badge--procesado': s.estado === 'CERRADO'
+                'estado-badge--validado':    s.estado === 'ENVIADO_PROVEEDOR',
+                'estado-badge--verificado': s.estado === 'VERIFICADO',
+                'estado-badge--procesado':  s.estado === 'CERRADO'
               }">
           {{ s.estado }}
         </span>

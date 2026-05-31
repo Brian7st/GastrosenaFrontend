@@ -8,6 +8,7 @@ import {
   LucideIconComponent,
   PageHeaderComponent,
   SearchFilterComponent,
+  SelectFilterComponent,
   ButtonComponent,
   EmptyStateComponent,
   CardComponent,
@@ -25,6 +26,7 @@ import {
     LucideIconComponent,
     PageHeaderComponent,
     SearchFilterComponent,
+    SelectFilterComponent,
     ButtonComponent,
     EmptyStateComponent,
     CardComponent,
@@ -39,6 +41,7 @@ export class RecetasPageComponent implements OnInit {
   public recetaService = inject(RecetaService);
 
   searchTerm = signal<string>('');
+  categoriaSeleccionada = signal<string>('');
 
   // Estado para los modales
   recetaSeleccionada = signal<Receta | null>(null);
@@ -51,12 +54,47 @@ export class RecetasPageComponent implements OnInit {
   alertMessage = signal<string>('');
   alertType = signal<'success' | 'error' | 'warning' | 'info'>('info');
 
+  // Categorías estáticas del módulo Bar y Barismo
+  opcionesCategoria = [
+    { label: 'Todas las categorías', value: '' },
+    { label: 'Cócteles',            value: 'cocteles' },
+    { label: 'Bebidas Calientes',   value: 'bebidas calientes' },
+    { label: 'Bebidas Frías',       value: 'bebidas frias' },
+    { label: 'Café y Barismo',      value: 'cafe y barismo' },
+    { label: 'Shots y Chupitos',    value: 'shots' },
+    { label: 'Sin Alcohol',         value: 'sin alcohol' },
+  ];
+
   recetasFiltradas = computed(() => {
-    const term = this.searchTerm().toLowerCase();
-    return this.recetaService.recetas().filter(r =>
-      r.nombreReceta.toLowerCase().includes(term) ||
-      (r.nombreCategoria && r.nombreCategoria.toLowerCase().includes(term))
-    );
+    const term = this.searchTerm().toLowerCase().trim();
+    const cat = this.categoriaSeleccionada().toLowerCase().trim();
+
+    return this.recetaService.recetas().filter(r => {
+      const matchSearch = r.nombreReceta.toLowerCase().includes(term) ||
+                          (r.nombreCategoria && r.nombreCategoria.toLowerCase().includes(term));
+
+      let matchCategory = !cat;
+      if (cat && r.nombreCategoria) {
+        const rc = r.nombreCategoria.toLowerCase().trim();
+        // Mapeo inteligente en español para consistencia con mock y base de datos
+        if (cat === 'cocteles') {
+          matchCategory = rc.includes('cóctel') || rc.includes('coctel') || rc.includes('cócteles') || rc === 'bebidas con alcohol' || rc.includes('alcohol');
+        } else if (cat === 'bebidas calientes') {
+          matchCategory = rc.includes('caliente') || rc.includes('café') || rc.includes('cafe') || rc.includes('barismo') || rc.includes('té') || rc.includes('te');
+        } else if (cat === 'bebidas frias') {
+          matchCategory = rc.includes('fría') || rc.includes('fria') || rc.includes('frío') || rc.includes('frio') || rc.includes('helado') || rc.includes('limonada') || rc.includes('smoothie') || rc.includes('jugo');
+        } else if (cat === 'cafe y barismo') {
+          matchCategory = rc.includes('café') || rc.includes('cafe') || rc.includes('barismo') || rc.includes('espresso') || rc.includes('latte') || rc.includes('cappuccino');
+        } else if (cat === 'shots') {
+          matchCategory = rc.includes('shot') || rc.includes('chupito') || rc.includes('shooter');
+        } else if (cat === 'sin alcohol') {
+          matchCategory = rc.includes('sin alcohol') || rc.includes('mocktail') || rc.includes('limonada') || rc.includes('agua');
+        } else {
+          matchCategory = rc.includes(cat) || cat.includes(rc);
+        }
+      }
+      return matchSearch && matchCategory;
+    });
   });
 
   constructor() {

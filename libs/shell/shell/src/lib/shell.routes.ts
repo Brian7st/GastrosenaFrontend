@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
+import { Rol } from '@restaurant/shared/models';
 import { authGuard } from './guards/auth.guard';
+import { roleGuard } from './guards/role.guard';
 import { permissionGuard } from './guards/permission.guard';
 import { ShellLayoutComponent } from './shell-layout/shell-layout.component';
 import { PublicLayoutComponent } from './public-layout/public-layout.component';
@@ -16,16 +18,14 @@ export const shellRoutes: Routes = [
       },
     ],
   },
-
   {
     path: 'auth',
     loadChildren: () => import('@restaurant/auth').then(m => m.AUTH_ROUTES),
   },
-
   {
     path: 'app',
     component: ShellLayoutComponent,
-    // canActivate: [authGuard], // TEMP: bypassed for local dev
+    canActivate: [authGuard],
     children: [
       {
         path: '',
@@ -39,38 +39,39 @@ export const shellRoutes: Routes = [
       },
       {
         path: 'cocina',
-        // canActivate: [permissionGuard(['RECETAS_GESTIONAR', 'RECETAS_CONSULTAR', 'COMANDAS_CONSULTAR', 'PEDIDOS_ACTIVOS_VISUALIZAR'])],
+        canActivate: [permissionGuard(['RECETAS_GESTIONAR', 'RECETAS_CONSULTAR', 'COMANDAS_CONSULTAR', 'PEDIDOS_ACTIVOS_VISUALIZAR'])],
         loadChildren: () => import('@restaurant/cocina').then(m => m.COCINA_ROUTES),
       },
       {
         path: 'bar',
-        // canActivate: [permissionGuard(['COMANDAS_CONSULTAR', 'RECETAS_CONSULTAR', 'PEDIDOS_ACTIVOS_VISUALIZAR'])],
+        canActivate: [permissionGuard(['COMANDAS_CONSULTAR', 'RECETAS_CONSULTAR', 'PEDIDOS_ACTIVOS_VISUALIZAR'])],
         loadChildren: () => import('@restaurant/bar').then(m => m.BAR_ROUTES),
       },
       {
         path: 'restaurante',
-        // canActivate: [permissionGuard(['MODULO_MESAS_VER', 'MESAS_CONSULTAR', 'COMANDAS_CREAR', 'PEDIDOS_ACTIVOS_VISUALIZAR', 'FACTURAS_GENERAR'])],
+        canActivate: [permissionGuard(['MODULO_MESAS_VER', 'MESAS_CONSULTAR', 'COMANDAS_CREAR', 'PEDIDOS_ACTIVOS_VISUALIZAR', 'FACTURAS_GENERAR'])],
         loadChildren: () =>
           import('@restaurant/restaurante').then(m => m.RESTAURANTE_ROUTES),
       },
       {
         path: 'inventario',
-        // canActivate: [permissionGuard(['bienes:ver', 'facturas:ver', 'consolidado:ver', 'alertas:ver', 'FACTURAS_GENERAR'])],
+        canActivate: [permissionGuard(['bienes:ver', 'facturas:ver', 'consolidado:ver', 'alertas:ver', 'FACTURAS_GENERAR'])],
         loadChildren: () =>
           import('@restaurant/inventario').then(m => m.INVENTARIO_ROUTES),
       },
       {
         path: 'usuarios',
-        // canActivate: [permissionGuard(['USUARIOS_LISTAR', 'USUARIOS_VER'])],
+        canActivate: [permissionGuard(['USUARIOS_LISTAR', 'USUARIOS_VER'])],
         loadChildren: () => import('@restaurant/usuarios').then(m => m.USUARIOS_ROUTES),
       },
       {
         path: 'reportes',
-        // canActivate: [permissionGuard(['MODULO_REPORTES_VER', 'REPORTES_GESTIONAR', 'REPORTES_PEDIDOS_COCINA', 'REPORTES_VENTAS_MESERO'])],
+        canActivate: [permissionGuard(['MODULO_REPORTES_VER', 'REPORTES_GESTIONAR', 'REPORTES_PEDIDOS_COCINA', 'REPORTES_VENTAS_MESERO'])],
         loadChildren: () => import('@restaurant/reportes').then(m => m.REPORTES_ROUTES),
       },
       {
         path: 'abastecimiento',
+        canActivate: [roleGuard([Rol.ADMINISTRADOR, Rol.CONTADORA])],
         loadChildren: () =>
           import('@restaurant/abastecimiento').then(m => m.ABASTECIMIENTO_ROUTES),
       },
@@ -79,14 +80,17 @@ export const shellRoutes: Routes = [
         loadChildren: () =>
           import('@restaurant/notificaciones').then(m => m.NOTIFICACIONES_ROUTES),
       },
+      // 👇 AGREGAR ESTA RUTA:
+      {
+        path: 'perfil',
+        loadComponent: () => import('@restaurant/usuarios').then(m => m.PerfilPageComponent),
+      },
     ],
   },
-
   {
     path: 'showcase',
     loadComponent: () =>
       import('./showcase/showcase.component').then(m => m.ShowcaseComponent),
   },
-
   { path: '**', redirectTo: '' },
 ];

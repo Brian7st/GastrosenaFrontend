@@ -41,13 +41,6 @@ export const INVENTARIO_ROUTES: Routes = [
           ),
       },
       {
-        path: 'nueva',
-        loadComponent: () =>
-          import('./pages/solicitudes-page/solicitudes-form/solicitudes-form.component').then(
-            m => m.SolicitudesFormComponent
-          ),
-      },
-      {
         path: ':id',
         loadComponent: () =>
           import('./pages/solicitudes-page/solicitudes-detail/solicitudes-detail.component').then(
@@ -183,10 +176,6 @@ export const INVENTARIO_ROUTES: Routes = [
         loadComponent: () => import('./pages/kardex-page/movimiento-entrada/movimiento-entrada.component').then(m => m.MovimientoEntradaComponent)
       },
       {
-        path: 'entrada-gil',
-        loadComponent: () => import('./pages/kardex-page/movimiento-entrada-gil/movimiento-entrada-gil.component').then(m => m.MovimientoEntradaGilComponent)
-      },
-      {
         path: 'salida',
         canActivate: [salidaRequiereRequisicionGuard],
         loadComponent: () => import('./pages/kardex-page/movimiento-salida/movimiento-salida.component').then(m => m.MovimientoSalidaComponent)
@@ -196,6 +185,11 @@ export const INVENTARIO_ROUTES: Routes = [
         loadComponent: () => import('./pages/kardex-page/movimiento-export/movimiento-export.component').then(m => m.MovimientoExportComponent)
       }
     ]
+  },
+  // entrada-gil is a standalone page — NOT a child of movimientos to avoid rendering inside the list.
+  {
+    path: 'movimientos/entrada-gil',
+    loadComponent: () => import('./pages/kardex-page/movimiento-entrada-gil/movimiento-entrada-gil.component').then(m => m.MovimientoEntradaGilComponent)
   },
   {
     path: 'movimientos/:id',

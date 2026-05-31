@@ -7,15 +7,13 @@ export type EstadoSolicitudSesion =
   | 'COMPROMETIDA';
 
 export interface SolicitudSesionItem {
-  productoId:               string;
-  codigoSena?:              string;
+  codigoSena:               string;
   nombreBien?:              string;
   descripcion?:             string;
   cantidad:                 number;
   valorUnitarioAdjudicado?: number;
   codigoAlmacen?:           string;
   unidadMedida:             string;
-  justificacion:            string;
   valorUnitario?:           number;
   total?:                   number;
   iva?:                     number;
@@ -29,9 +27,6 @@ export interface SolicitudSesion {
   programaId:               string;
   instructorId:             string;
   identificacionInstructor?: string;
-  resultadoAprendizaje:     string;
-  actividades:              string;
-  voceroId:                 string;
   estado:                   string;
   items:                    SolicitudSesionItem[];
   valorTotalDeSolicitud?:   number;
@@ -45,11 +40,19 @@ export interface CrearSolicitudSesionData {
   programaId:               string;
   instructorId:             string;
   identificacionInstructor?: string;
-  resultadoAprendizaje:     string;
-  actividades:              string;
-  voceroId:                 string;
   valorTotalDeSolicitud?:   number;
   items: SolicitudSesionItem[];
+}
+
+/** Payload para actualizar una solicitud de sesión (PUT /training/solicitudes/{id}) */
+export interface ActualizarSolicitudSesionData {
+  fechaSolicitud?:           string;
+  fichaId:                   string;
+  programaId:                string;
+  instructorId:              string;
+  identificacionInstructor?: string;
+  valorTotalDeSolicitud?:    number;
+  items:                     SolicitudSesionItem[];
 }
 
 /** Payload para aprobar (PATCH /training/solicitudes/{id}/aprobar) */

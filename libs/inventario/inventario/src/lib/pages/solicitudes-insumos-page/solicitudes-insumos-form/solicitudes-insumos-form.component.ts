@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal, inject, OnInit, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, inject, OnInit, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -25,6 +25,20 @@ export class SolicitudesInsumosFormComponent implements OnInit {
   readonly inventario    = inject(InventarioFacade);
 
   isEdit          = signal(false);
+
+  constructor() {
+    effect(() => {
+      const s = this.facade.solicitudSesionSeleccionada();
+      if (s && this.isEdit()) {
+        this.fichaId.set(s.fichaId);
+        this.programaId.set(s.programaId);
+        this.instructorId.set(s.instructorId);
+        this.identificacionInstructor.set(s.identificacionInstructor ?? '');
+        if (s.fechaSolicitud) this.fechaSolicitud.set(s.fechaSolicitud);
+        this.items.set(s.items.map(i => ({ ...i })));
+      }
+    });
+  }
   solicitudId     = signal<string | null>(null);
   solicitudCodigo = signal<string | null>(null);
   isModalOpen     = signal(false);
@@ -35,9 +49,6 @@ export class SolicitudesInsumosFormComponent implements OnInit {
   programaId               = signal('');
   instructorId             = signal('');
   identificacionInstructor = signal('');
-  resultadoAprendizaje     = signal('');
-  actividades              = signal('');
-  voceroId                 = signal('');
   items                    = signal<SolicitudSesionItem[]>([]);
 
   valorTotalDeSolicitud = computed(() =>
@@ -71,10 +82,6 @@ export class SolicitudesInsumosFormComponent implements OnInit {
       e['programaId'] = 'El programa de formación es requerido.';
     if (!this.instructorId().trim())
       e['instructorId'] = 'El ID del instructor es requerido.';
-    if (!this.resultadoAprendizaje().trim())
-      e['resultadoAprendizaje'] = 'El resultado de aprendizaje es requerido.';
-    if (!this.actividades().trim())
-      e['actividades'] = 'Las actividades son requeridas.';
     if (this.items().length === 0)
       e['items'] = 'Debe agregar al menos un ítem.';
     return e;
@@ -87,6 +94,7 @@ export class SolicitudesInsumosFormComponent implements OnInit {
     if (id) {
       this.isEdit.set(true);
       this.solicitudId.set(id);
+      this.facade.cargarSolicitudSesionById(id);
     }
     this.inventario.cargarBienes({ page: 0, size: 8 });
   }
@@ -106,21 +114,20 @@ export class SolicitudesInsumosFormComponent implements OnInit {
   }
 
   estaEnLista(id: string | number): boolean {
-    return this.items().some(i => i.productoId === String(id));
+    const bien = this.inventario.bienes().find(b => b.id === id);
+    return bien ? this.items().some(i => i.codigoSena === bien.codigoSena) : false;
   }
 
   onSeleccionarBien(bien: Bien): void {
-    const yaAgregado = this.items().some(i => i.productoId === String(bien.id));
+    const yaAgregado = this.items().some(i => i.codigoSena === bien.codigoSena);
     if (yaAgregado) return;
 
     this.items.update(list => [...list, {
-      productoId:              String(bien.id),
       codigoSena:              bien.codigoSena ?? '',
       nombreBien:              bien.nombre,
       descripcion:             bien.descripcion ?? '',
       unidadMedida:            bien.unidadMedida,
       cantidad:                1,
-      justificacion:           '',
       valorUnitario:           bien.valor ?? 0,
       valorUnitarioAdjudicado: bien.valor ?? 0,
       total:                   bien.valor ?? 0,
@@ -172,18 +179,20 @@ export class SolicitudesInsumosFormComponent implements OnInit {
 
   confirmarEnvio(): void {
     this.isModalOpen.set(false);
-    this.facade.crearSolicitudSesion({
+    const payload = {
       fechaSolicitud:           this.fechaSolicitud(),
       fichaId:                  this.fichaId(),
       programaId:               this.programaId(),
       instructorId:             this.instructorId(),
       identificacionInstructor: this.identificacionInstructor() || undefined,
-      resultadoAprendizaje:     this.resultadoAprendizaje(),
-      actividades:              this.actividades(),
-      voceroId:                 this.voceroId(),
       valorTotalDeSolicitud:    this.valorTotalDeSolicitud(),
       items:                    this.items(),
-    }).subscribe(res => {
+    };
+    const id = this.solicitudId();
+    const op$ = this.isEdit() && id
+      ? this.facade.actualizarSolicitudSesion(id, payload)
+      : this.facade.crearSolicitudSesion(payload);
+    op$.subscribe(res => {
       if (res !== null) {
         this.router.navigate(['/app/inventario/solicitudes-insumos-page']);
       }

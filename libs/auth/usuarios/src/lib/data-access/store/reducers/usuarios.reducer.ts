@@ -159,6 +159,15 @@ export const usuariosFeature = createFeature({
     on(UsuariosActions.importarMasivoFallido, (state, { error }) => ({
       ...state, importando: false, error,
     })),
+    on(UsuariosActions.importarMasivoIniciado, state => ({
+      ...state, importando: true,
+    })),
+    on(UsuariosActions.importarMasivoCompletado, (state, { resultado }) => ({
+      ...state, importando: false, resultadoImport: resultado,
+    })),
+    on(UsuariosActions.importarMasivoFallidoPorEstado, (state, { error }) => ({
+      ...state, importando: false, error,
+    })),
 
     on(UsuariosActions.exportarUsuarios, state => ({
       ...state, loadingAccion: true, mensajeExport: null,

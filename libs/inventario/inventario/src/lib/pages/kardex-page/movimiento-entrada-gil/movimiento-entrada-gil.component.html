@@ -5,7 +5,7 @@
     <div class="modal-header">
       <div>
         <h2 class="modal-title">Registrar Entrada por GIL</h2>
-        <p class="modal-subtitle">Formulario GIL-F-014 — solo GILes en estado Emitido, Enviado o Cerrado</p>
+        <p class="modal-subtitle">Formulario GIL-F-014 — solo GILes en estado Verificado</p>
       </div>
       <button class="close-btn" (click)="closeModal()" aria-label="Cerrar modal">
         <lucide-icon name="x" [size]="20"></lucide-icon>
@@ -26,7 +26,7 @@
               </select>
             } @else {
               <select class="form-select" (change)="onGilChange($event)">
-                <option value="">Seleccione un GIL validado...</option>
+                <option value="">Seleccione un GIL verificado...</option>
                 @for (gil of gilesFacade.giles(); track gil.id) {
                   <option [value]="gil.id">
                     {{ gil.numeroGil ?? gil.id }} — {{ gil.destinoBienes ?? gil.area }} ({{ gil.estado }})
@@ -66,7 +66,7 @@
 
           <p class="hint-text">
             <lucide-icon name="info" [size]="14"></lucide-icon>
-            Solo GILes en estado EMITIDO, ENVIADO_PROVEEDOR o CERRADO.
+            Solo GILes en estado VERIFICADO.
           </p>
         </div>
 
@@ -141,8 +141,13 @@
         </section>
       }
 
-      <!-- Error de facade -->
-      @if (kardexFacade.error()) {
+      <!-- Error de facade o de submit -->
+      @if (submitError()) {
+        <div class="error-summary">
+          <lucide-icon name="alert-triangle" [size]="20" class="error-icon"></lucide-icon>
+          <p>{{ submitError() }}</p>
+        </div>
+      } @else if (kardexFacade.error()) {
         <div class="error-summary">
           <lucide-icon name="alert-triangle" [size]="20" class="error-icon"></lucide-icon>
           <p>{{ kardexFacade.error() }}</p>

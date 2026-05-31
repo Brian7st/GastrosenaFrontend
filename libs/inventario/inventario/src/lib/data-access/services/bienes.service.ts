@@ -17,6 +17,7 @@ import {
   bienFromCatalogo,
   bienFromCatalogoYExistencia,
   bienFormToRequest,
+  bienFormToUpdateRequest,
 } from '../mappers/catalog.mapper';
 
 const API = '/api/v1';
@@ -114,25 +115,35 @@ export class BienesService {
 
   updateBien(id: string | number, form: BienFormDto): Observable<Bien> {
     return this.http
-      .patch<ProductoResponse>(`${API}/catalog/productos/${id}`, bienFormToRequest(form))
+      .patch<ProductoResponse>(`${API}/catalog/productos/${id}`, bienFormToUpdateRequest(form))
       .pipe(
         map(bienFromCatalogo),
         catchError(err => throwError(() => err))
       );
   }
 
-  /** DELETE /catalog/productos/{id}?confirmacion={id} */
+  /** DELETE /catalog/productos/{id}?confirmacion=ELIMINAR */
   deleteBien(id: string | number): Observable<void> {
-    const params = new HttpParams().set('confirmacion', String(id));
+    const params = new HttpParams().set('confirmacion', 'ELIMINAR');
     return this.http
       .delete<void>(`${API}/catalog/productos/${id}`, { params })
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  /** PATCH /catalog/productos/{id}/desactivar — soft delete: marca activo=false */
+  /** PATCH /catalog/productos/{id}/desactivar */
   desactivarBien(id: string | number): Observable<Bien> {
     return this.http
       .patch<ProductoResponse>(`${API}/catalog/productos/${id}/desactivar`, {})
+      .pipe(
+        map(bienFromCatalogo),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** PATCH /catalog/productos/{id}/activar */
+  activarBien(id: string | number): Observable<Bien> {
+    return this.http
+      .patch<ProductoResponse>(`${API}/catalog/productos/${id}/activar`, {})
       .pipe(
         map(bienFromCatalogo),
         catchError(err => throwError(() => err))
@@ -149,26 +160,26 @@ export class BienesService {
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  /** POST /catalog/productos/importar */
-  importarBienes(productos: BienFormDto[]): Observable<{ success: boolean }> {
+  /** POST /catalog/productos/importar — retorna los productos creados */
+  importarBienes(productos: BienFormDto[]): Observable<ProductoResponse[]> {
     const body: ImportarProductosRequest = { productos: productos.map(bienFormToRequest) };
     return this.http
-      .post<{ success: boolean }>(`${API}/catalog/productos/importar`, body)
+      .post<ProductoResponse[]>(`${API}/catalog/productos/importar`, body)
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  /** POST /catalog/productos/importar-excel */
-  importarBienesExcel(archivo: File): Observable<{ success: boolean }> {
+  /** POST /catalog/productos/importar-excel — retorna { importados: N } */
+  importarBienesExcel(archivo: File): Observable<{ importados: number }> {
     const formData = new FormData();
     formData.append('archivo', archivo);
 
     return this.http
-      .post<{ success: boolean }>(`${API}/catalog/productos/importar-excel`, formData)
+      .post<{ importados: number }>(`${API}/catalog/productos/importar-excel`, formData)
       .pipe(catchError(err => throwError(() => err)));
   }
 
   /** POST /catalog/productos/exportaciones (202 Accepted — async) */
-  solicitarExportacion(formato: 'CSV' | 'EXCEL'): Observable<ExportacionProductosResponse> {
+  solicitarExportacion(formato: 'CSV'): Observable<ExportacionProductosResponse> {
     const body: SolicitarExportacionRequest = { formato };
     return this.http
       .post<ExportacionProductosResponse>(`${API}/catalog/productos/exportaciones`, body)
