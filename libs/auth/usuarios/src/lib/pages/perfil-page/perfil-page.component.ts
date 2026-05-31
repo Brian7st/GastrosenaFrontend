@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  OnInit,
   ViewChild,
   inject,
   signal,
@@ -16,12 +15,9 @@ import {
   ButtonComponent,
   LucideIconComponent,
   StatusBadgeComponent,
-  AlertComponent,
 } from '@restaurant/shared/ui';
 import { AuthService } from '@restaurant/shared/auth';
 import { UsuariosService } from '@restaurant/usuarios'; // Asegúrate que el barrel exporte el servicio
-import { PerfilFacade } from '../../data-access/perfil.facade';
-import { ActualizarPerfilRequest, CambiarContrasenaRequest } from '../../models/perfil.model';
 
 @Component({
   selector: 'restaurant-perfil-page',
@@ -33,7 +29,6 @@ import { ActualizarPerfilRequest, CambiarContrasenaRequest } from '../../models/
     ButtonComponent,
     LucideIconComponent,
     StatusBadgeComponent,
-    AlertComponent,
   ],
   templateUrl: './perfil-page.component.html',
   styleUrl: './perfil-page.component.scss',
@@ -42,7 +37,6 @@ import { ActualizarPerfilRequest, CambiarContrasenaRequest } from '../../models/
 export class PerfilPageComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly usuariosService = inject(UsuariosService);
-  private readonly facade = inject(PerfilFacade);
   private readonly fb = inject(FormBuilder);
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -55,15 +49,6 @@ export class PerfilPageComponent implements OnInit {
     const partes = nombre.split(' ');
     return partes.length >= 2 ? partes[0][0] + partes[1][0] : nombre.slice(0, 2);
   });
-  // ── Estado del facade ─────────────────────────────────────────────────────
-  readonly perfil              = this.facade.perfil;
-  readonly actividad           = this.facade.actividad;
-  readonly cargando            = this.facade.cargando;
-  readonly guardando           = this.facade.guardando;
-  readonly cambiandoContrasena = this.facade.cambiandoContrasena;
-  readonly error               = this.facade.error;
-  readonly exito               = this.facade.exito;
-  readonly iniciales           = this.facade.iniciales;
 
   readonly infoForm = this.fb.group({
     nombre: ['', Validators.required],
@@ -99,12 +84,6 @@ export class PerfilPageComponent implements OnInit {
       },
       error: (err) => console.error('Error cargando perfil', err),
     });
-  ngOnInit(): void {
-    const userId = this.usuario?.id;
-    if (userId) {
-      this.facade.cargarPerfil(userId);
-      this.facade.cargarActividad(userId);
-    }
   }
 
   triggerFileInput(): void {
@@ -117,11 +96,6 @@ export class PerfilPageComponent implements OnInit {
       const reader = new FileReader();
       reader.onload = (e) => this.fotoUrl.set(e.target?.result as string);
       reader.readAsDataURL(file);
-
-      const userId = this.usuario?.id;
-      if (userId) {
-        this.facade.subirFoto(userId, file);
-      }
     }
   }
 
@@ -183,42 +157,10 @@ onGuardar(): void {
           alert('Error al cambiar contraseña. Verifique la contraseña actual.');
         },
       });
-  onGuardar(): void {
-    if (this.infoForm.invalid) {
-      this.infoForm.markAllAsTouched();
-      return;
-    }
-    const userId = this.usuario?.id;
-    if (!userId) return;
-
-    const data: ActualizarPerfilRequest = {
-      nombre:    this.infoForm.value.nombre!,
-      apellidos: this.infoForm.value.apellidos!,
-      email:     this.infoForm.value.email!,
-      telefono:  this.infoForm.value.telefono!,
-    };
-    this.facade.actualizarPerfil(userId, data);
-  }
-
-  onCambiarContrasena(): void {
-    if (this.seguridadForm.invalid) {
-      this.seguridadForm.markAllAsTouched();
-      return;
-    }
-    const userId = this.usuario?.id;
-    if (!userId) return;
-
-    const data: CambiarContrasenaRequest = {
-      contrasenaActual: this.seguridadForm.value.contrasenaActual!,
-      nuevaContrasena:  this.seguridadForm.value.nuevaContrasena!,
-      confirmar:        this.seguridadForm.value.confirmar!,
-    };
-    this.facade.cambiarContrasena(userId, data);
   }
 
   onCancelar(): void {
     this.cargarPerfil();
     this.seguridadForm.reset();
-    this.facade.limpiarMensajes();
   }
 }
