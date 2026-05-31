@@ -1,16 +1,16 @@
-import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, OnInit, computed, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { 
-  PageHeaderComponent, 
-  CardComponent, 
+import {
+  PageHeaderComponent,
+  CardComponent,
   ButtonComponent,
   LucideIconComponent,
   StatusBadgeComponent
 } from '@restaurant/shared/ui';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
-import { PedidoResumenResponse } from '../../models/restaurante.model';
+import { RestauranteService } from '../../data-access/restaurante.service';
 
 @Component({
   selector: 'restaurant-caja-buscar-page',
@@ -31,23 +31,127 @@ import { PedidoResumenResponse } from '../../models/restaurante.model';
 export class CajaBuscarPageComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  private facade = inject(RestauranteFacade);
+  public facade = inject(RestauranteFacade);
+  private restauranteService = inject(RestauranteService);
 
   mostrarModalDetalle = signal(false);
-  facturaSeleccionada = signal<PedidoResumenResponse | null>(null);
-  
-  // Lista proveniente del Facade
-  facturas = this.facade.historialFacturas;
+  facturaSeleccionada = signal<any | null>(null); // Ahora usa FacturaResponse
+
+  // Lista de facturas reales obtenidas del backend
+  facturasReales = signal<any[]>([]);
+
+  // Filtros
+  filtroMesa = signal<string>('');
+  filtroCajero = signal<string>(''); // Cambiado a Cajero (La factura guarda cajeroId)
+  fechaInicio = signal<string>('');
+  fechaFin = signal<string>('');
+
+  dropdownMesaAbierto = signal<boolean>(false);
+  dropdownCajeroAbierto = signal<boolean>(false);
 
   ngOnInit() {
-    this.facade.cargarHistorialFacturas();
+    this.cargarFacturasReales();
+  }
+
+  cargarFacturasReales() {
+    const sesion = this.facade.turnoCaja();
+    if (sesion && sesion.id) {
+      // Traemos las facturas verdaderas de la base de datos
+      this.restauranteService.obtenerFacturasDeSesion(sesion.id).subscribe({
+        next: (data) => this.facturasReales.set(data),
+        error: (err) => console.error('Error al cargar las facturas reales', err)
+      });
+    }
+  }
+
+  mesasDisponibles = computed(() => {
+    const facturas = this.facturasReales();
+    const mesas = new Set(facturas.map(f => f.nombreMesa).filter(m => !!m));
+    return Array.from(mesas);
+  });
+
+  cajerosDisponibles = computed(() => {
+    const facturas = this.facturasReales();
+    const cajeros = new Set(facturas.map(f => f.cajeroId).filter(id => !!id));
+    return Array.from(cajeros);
+  });
+
+  mesasFiltradas = computed(() => {
+    const query = this.filtroMesa().toLowerCase();
+    return this.mesasDisponibles().filter(m => m.toLowerCase().includes(query));
+  });
+
+  cajerosFiltrados = computed(() => {
+    const query = this.filtroCajero().toLowerCase();
+    return this.cajerosDisponibles().filter(c => c.toLowerCase().includes(query));
+  });
+
+  facturasFiltradas = computed(() => {
+    let result = this.facturasReales();
+
+    // Filtro por Mesa
+    const mesaQ = this.filtroMesa().toLowerCase();
+    if (mesaQ) {
+      result = result.filter(f => f.nombreMesa?.toLowerCase().includes(mesaQ));
+    }
+
+    // Filtro por Cajero
+    const cajeroQ = this.filtroCajero().toLowerCase();
+    if (cajeroQ) {
+      result = result.filter(f => f.cajeroId?.toLowerCase().includes(cajeroQ));
+    }
+
+    // Filtro por Rango (Usando fechaEmision)
+    const fInicio = this.fechaInicio();
+    if (fInicio) {
+      const dInicio = new Date(fInicio).getTime();
+      result = result.filter(f => {
+        const fechaFac = new Date(f.fechaEmision || '').getTime();
+        return fechaFac >= dInicio;
+      });
+    }
+
+    const fFin = this.fechaFin();
+    if (fFin) {
+      const dFin = new Date(fFin);
+      dFin.setHours(23, 59, 59, 999);
+      result = result.filter(f => {
+        const fechaFac = new Date(f.fechaEmision || '').getTime();
+        return fechaFac <= dFin.getTime();
+      });
+    }
+
+    return result;
+  });
+
+  @HostListener('document:click', ['$event'])
+  cerrarDropdowns() {
+    this.dropdownMesaAbierto.set(false);
+    this.dropdownCajeroAbierto.set(false);
+  }
+
+  seleccionarMesa(mesa: string) {
+    this.filtroMesa.set(mesa);
+    this.dropdownMesaAbierto.set(false);
+  }
+
+  seleccionarCajero(cajero: string) {
+    this.filtroCajero.set(cajero);
+    this.dropdownCajeroAbierto.set(false);
+  }
+
+  limpiarFiltros() {
+    this.filtroMesa.set('');
+    this.filtroCajero.set('');
+    this.fechaInicio.set('');
+    this.fechaFin.set('');
   }
 
   volver() {
     this.router.navigate(['..'], { relativeTo: this.route });
   }
 
-  verDetalle(factura: PedidoResumenResponse) {
+  verDetalle(factura: any) {
     this.facturaSeleccionada.set(factura);
     this.mostrarModalDetalle.set(true);
   }
@@ -56,11 +160,4 @@ export class CajaBuscarPageComponent implements OnInit {
     this.mostrarModalDetalle.set(false);
     this.facturaSeleccionada.set(null);
   }
-
-  irAPagar() {
-    // Si llegara a estar pendiente, lo enviamos al cajero
-    this.cerrarModal();
-    this.router.navigate(['../pagar'], { relativeTo: this.route });
-  }
 }
-
