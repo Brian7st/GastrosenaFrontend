@@ -1,0 +1,207 @@
+/* ==========================================================================
+   GOR-F-084 V02 — Vista de impresión del Acta de Legalización
+   ========================================================================== */
+
+/* ── Barra de herramientas (solo en pantalla) ─────────────────────────────── */
+.print-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: #1a1a2e;
+  border-bottom: 2px solid #39a900;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  &__btn {
+    padding: 8px 20px;
+    border-radius: 6px;
+    border: none;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+
+    &:hover { opacity: 0.85; }
+
+    &--back {
+      background: transparent;
+      border: 1px solid #555;
+      color: #ccc;
+    }
+
+    &--print {
+      background: #39a900;
+      color: white;
+    }
+  }
+}
+
+.print-loading {
+  padding: 48px;
+  text-align: center;
+  color: #666;
+  font-size: 16px;
+}
+
+/* ── Página del documento ─────────────────────────────────────────────────── */
+.gor-doc {
+  background: white;
+  max-width: 800px;
+  margin: 24px auto;
+  padding: 32px 40px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  color: #000;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.15);
+}
+
+/* ── Logo ─────────────────────────────────────────────────────────────────── */
+.gor-logo-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.gor-logo {
+  height: 48px;
+  object-fit: contain;
+}
+
+/* ── Tabla base ───────────────────────────────────────────────────────────── */
+.gor-table {
+  border-collapse: collapse;
+  margin-bottom: 0;
+
+  &--full {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+}
+
+/* ── Celdas ───────────────────────────────────────────────────────────────── */
+.gor-cell {
+  border: 1px solid #000;
+  padding: 4px 6px;
+  vertical-align: top;
+  font-size: 10px;
+
+  &--title {
+    text-align: center;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  &--header {
+    font-weight: 700;
+    font-size: 10px;
+    padding: 5px 6px;
+  }
+
+  &--label {
+    font-weight: 700;
+    background: #f2f2f2;
+    white-space: nowrap;
+    padding: 4px 8px;
+  }
+
+  &--value {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+
+  &--section-header {
+    font-weight: 700;
+    background: #f2f2f2;
+    padding: 4px 6px;
+  }
+
+  &--section-center {
+    font-weight: 700;
+    background: #f2f2f2;
+    text-align: center;
+    padding: 4px 6px;
+  }
+
+  &--col-header {
+    font-weight: 700;
+    text-align: center;
+    background: #f9f9f9;
+    padding: 4px 6px;
+    font-size: 9.5px;
+  }
+
+  &--text {
+    font-size: 10px;
+    line-height: 1.5;
+    padding: 5px 6px;
+  }
+
+  &--develop {
+    line-height: 1.6;
+    padding: 8px;
+    font-size: 10.5px;
+  }
+
+  &--center {
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  &--anexos {
+    height: 60px;
+  }
+}
+
+/* ── Cláusula de datos ────────────────────────────────────────────────────── */
+.gor-clausula {
+  border: 1px solid #000;
+  padding: 8px;
+  font-size: 9px;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  text-align: justify;
+}
+
+/* ── Pie de página ────────────────────────────────────────────────────────── */
+.gor-footer {
+  text-align: center;
+  font-size: 9px;
+  color: #555;
+  margin-top: 16px;
+  padding-top: 8px;
+  border-top: 1px solid #ccc;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MEDIA PRINT — cuando el usuario imprime / guarda como PDF
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .gor-doc {
+    box-shadow: none;
+    margin: 0;
+    padding: 15mm 15mm 10mm;
+    max-width: 100%;
+  }
+
+  .gor-table {
+    page-break-inside: avoid;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+}

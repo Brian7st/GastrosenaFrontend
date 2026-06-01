@@ -1,14 +1,15 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
-import { ButtonComponent, LucideIconComponent } from '@restaurant/shared/ui';
+import { ButtonComponent, LucideIconComponent, ConfirmDialogComponent } from '@restaurant/shared/ui';
+import { CurrencyCopPipe } from '@restaurant/shared/util';
 
 @Component({
   selector: 'lib-pedidos-cart',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonComponent, LucideIconComponent],
+  imports: [CommonModule, FormsModule, ButtonComponent, LucideIconComponent, ConfirmDialogComponent, CurrencyCopPipe],
   templateUrl: './pedidos-cart.component.html',
   styleUrls: ['./pedidos-cart.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -18,7 +19,36 @@ export class PedidosCartComponent {
   private router = inject(Router);
 
   pedidoActivo = this.facade.pedidoActivo;
+  
+  comidasPedido = computed(() => {
+    const pedido = this.pedidoActivo();
+    return pedido ? pedido.detalles.filter(d => {
+      const cat = (d.categoria || '').toLowerCase();
+      return cat !== 'bebidas' && cat !== 'bebida';
+    }) : [];
+  });
+
+  bebidasPedido = computed(() => {
+    const pedido = this.pedidoActivo();
+    return pedido ? pedido.detalles.filter(d => {
+      const cat = (d.categoria || '').toLowerCase();
+      return cat === 'bebidas' || cat === 'bebida';
+    }) : [];
+  });
+
   observacionesGenerales = signal('');
+  showCancelModal = signal(false);
+  showConfirmModal = signal(false);
+  showAnularBackendModal = signal(false);
+
+  esPedidoSoloLectura = computed(() => {
+    const p = this.pedidoActivo();
+    return p ? p.estado !== 'BORRADOR' : false;
+  });
+
+  estadoPedido = computed(() => {
+    return this.pedidoActivo()?.estado || 'BORRADOR';
+  });
 
   incrementar(index: number) {
     this.facade.actualizarCantidadProducto(index, 1);
@@ -28,9 +58,48 @@ export class PedidosCartComponent {
     this.facade.actualizarCantidadProducto(index, -1);
   }
 
-  confirmarPedido() {
-    this.facade.confirmarPedidoActivo(this.observacionesGenerales());
-    this.router.navigate(['/restaurante/mesas']);
+  eliminarItem(index: number) {
+    this.facade.eliminarProductoDelPedido(index);
+  }
+
+  iniciarCancelacion() {
+    this.showCancelModal.set(true);
+  }
+
+  ejecutarCancelacion() {
+    this.showCancelModal.set(false);
+    this.facade.vaciarCarrito();
+    this.observacionesGenerales.set('');
+  }
+
+  iniciarConfirmacion() {
+    this.showConfirmModal.set(true);
+  }
+
+  ejecutarConfirmacion() {
+    this.showConfirmModal.set(false);
+    this.facade.confirmarPedidoActivo(this.observacionesGenerales()).subscribe({
+      next: (exito) => {
+        if (exito) {
+          this.router.navigate(['/app/restaurante/mesas']);
+        }
+      }
+    });
+  }
+
+  iniciarAnulacionBackend() {
+    this.showAnularBackendModal.set(true);
+  }
+
+  ejecutarAnulacionBackend() {
+    this.showAnularBackendModal.set(false);
+    this.facade.cancelarPedidoActivoEnBackend().subscribe({
+      next: (exito) => {
+        if (exito) {
+          this.router.navigate(['/app/restaurante/mesas']);
+        }
+      }
+    });
   }
 }
 

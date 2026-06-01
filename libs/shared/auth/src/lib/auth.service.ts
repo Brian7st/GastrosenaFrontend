@@ -79,4 +79,10 @@ export class AuthService {
   hasAlgunPermiso(permisos: string[]): boolean {
     return permisos.some(p => this.hasPermiso(p));
   }
+
+  resetPassword(token: string, newPassword: string): Promise<void> {
+  return firstValueFrom(
+    this.http.post<void>(`${this.authUrl}/reset-password`, { token, nuevaPassword: newPassword })
+  );
+}
 }

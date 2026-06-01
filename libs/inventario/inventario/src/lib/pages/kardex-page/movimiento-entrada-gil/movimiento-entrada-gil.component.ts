@@ -1,9 +1,12 @@
 import { Component, inject, ChangeDetectionStrategy, computed, signal, effect } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormArray, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { forkJoin, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 import { GilesFacade } from '../../../data-access/giles.facade';
 import { KardexFacade } from '../../../data-access/kardex.facade';
+import { MovimientosService } from '../../../data-access/services/movimientos.service';
 import { BienGilResponse } from '../../../data-access/api/procurement.api';
 import { EntradaMovimientoData } from '../../../models/movimiento.model';
 
@@ -16,13 +19,19 @@ import { EntradaMovimientoData } from '../../../models/movimiento.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MovimientoEntradaGilComponent {
-  private fb            = inject(FormBuilder);
-  private router        = inject(Router);
-  readonly gilesFacade  = inject(GilesFacade);
-  readonly kardexFacade = inject(KardexFacade);
+  private fb                 = inject(FormBuilder);
+  private router             = inject(Router);
+  private movimientosService = inject(MovimientosService);
+  readonly gilesFacade       = inject(GilesFacade);
+  readonly kardexFacade      = inject(KardexFacade);
 
   // ── Estado del selector ───────────────────────────────────────────────────
   gilIdSeleccionado = signal<string>('');
+  submitError       = signal<string | null>(null);
+  submitting        = signal<boolean>(false);
+
+  // ── FormArray: un FormGroup por bien ──────────────────────────────────────
+  bienesForm = signal<FormArray>(this.fb.array([]));
 
   // ── Computed ──────────────────────────────────────────────────────────────
   gilSeleccionado = computed(() => this.gilesFacade.gilSeleccionado());
@@ -30,12 +39,9 @@ export class MovimientoEntradaGilComponent {
   puedeRegistrar  = computed(() =>
     this.gilIdSeleccionado() !== '' &&
     this.bienesActuales().length > 0 &&
-    this.bienesForm.valid &&
-    !this.kardexFacade.loading()
+    this.bienesForm().valid &&
+    !this.submitting()
   );
-
-  // ── FormArray: un FormGroup por bien ──────────────────────────────────────
-  bienesForm: FormArray = this.fb.array([]);
 
   constructor() {
     this.gilesFacade.cargarGilesValidados();
@@ -62,24 +68,60 @@ export class MovimientoEntradaGilComponent {
     const gil = this.gilSeleccionado();
     if (!gil?.id) return;
 
-    this.bienesActuales().forEach((bien, i) => {
+    const bienes = this.bienesActuales();
+    const entradas: EntradaMovimientoData[] = [];
+
+    for (let i = 0; i < bienes.length; i++) {
+      const bien = bienes[i];
+      // Skip items missing productoId — sending an empty string would be rejected by the backend.
+      if (!bien.productoId) continue;
       const grupo = this.getBienGroup(i);
-      if (!grupo.valid) return;
-
+      if (!grupo.valid) continue;
       const cantidadRecibida: number = grupo.get('cantidadRecibida')?.value ?? 0;
-      if (cantidadRecibida <= 0) return;
-
-      const entrada: EntradaMovimientoData = {
-        productoId:     bien.productoId ?? '',
+      if (cantidadRecibida <= 0) continue;
+      entradas.push({
+        productoId:     bien.productoId,
         cantidad:       cantidadRecibida,
         precioUnitario: grupo.get('precioUnitario')?.value ?? 0,
         gilId:          gil.id,
-      };
+      });
+    }
 
-      this.kardexFacade.registrarEntrada(entrada);
-    });
+    if (entradas.length === 0) {
+      this.submitError.set('Ingresá al menos una cantidad recibida mayor a cero.');
+      return;
+    }
 
-    this.closeModal();
+    this.submitError.set(null);
+    this.submitting.set(true);
+
+    const gilId = gil.id;
+
+    forkJoin(entradas.map(e => this.movimientosService.registrarEntrada(e)))
+      .pipe(
+        switchMap(() => {
+          const todosRecibidos = bienes.every((bien, i) => {
+            const cantidadRecibida: number =
+              this.getBienGroup(i).get('cantidadRecibida')?.value ?? 0;
+            return cantidadRecibida >= (bien.cantidad ?? 0);
+          });
+
+          return todosRecibidos
+            ? this.gilesFacade.cerrarGil(gilId)
+            : of(undefined as void);
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.submitting.set(false);
+          this.closeModal();
+        },
+        error: (err: unknown) => {
+          this.submitting.set(false);
+          const msg = err instanceof Error ? err.message : 'Error al registrar la entrada.';
+          this.submitError.set(msg);
+        },
+      });
   }
 
   closeModal(): void {
@@ -90,7 +132,7 @@ export class MovimientoEntradaGilComponent {
   // ── Helpers ───────────────────────────────────────────────────────────────
 
   getBienGroup(index: number): FormGroup {
-    return this.bienesForm.at(index) as FormGroup;
+    return this.bienesForm().at(index) as FormGroup;
   }
 
   private reconstruirFormArray(bienes: BienGilResponse[]): void {
@@ -106,6 +148,6 @@ export class MovimientoEntradaGilComponent {
         ],
       })
     );
-    this.bienesForm = this.fb.array(grupos);
+    this.bienesForm.set(this.fb.array(grupos));
   }
 }

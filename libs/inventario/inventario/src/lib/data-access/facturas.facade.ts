@@ -140,11 +140,9 @@ export class FacturasFacade {
           this._facturaSeleccionada.set(factura);
           this.cargarFacturas();
           this.cargarKpis();
-          if (gilId) {
-            this.svc.getConciliacionGil({ facturaId: String(factura.id) })
-              .pipe(catchError(() => of(null)))
-              .subscribe(c => this._conciliacionImportacion.set(c));
-          }
+          // Conciliation record is not loaded here to avoid a race condition:
+          // the backend may not have created it yet at this point.
+          // Navigate to the factura detail page to load conciliation on demand.
         }
       });
   }
@@ -262,6 +260,20 @@ export class FacturasFacade {
       .subscribe(s => this._solicitudGIL.set(s ?? null));
   }
 
+  conciliarEnImportacion(facturaId: string, gilId: string): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this.svc.conciliarFacturaGil(facturaId, gilId)
+      .pipe(
+        catchError((error) => {
+          this._error.set(this.getConciliacionErrorMessage(error));
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => { if (res !== null) this._conciliacionImportacion.set(res); });
+  }
+
   conciliarFacturaGil(facturaId: string, gilId: string): void {
     this._loading.set(true);
     this._error.set(null);
@@ -316,6 +328,15 @@ export class FacturasFacade {
         finalize(() => this._loading.set(false))
       )
       .subscribe(() => { /* 204 No Content */ });
+  }
+
+  private getConciliacionErrorMessage(error: unknown): string {
+    const httpError = error as { error?: { detail?: string; title?: string }; status?: number };
+    if (httpError?.error?.detail) return httpError.error.detail;
+    if (httpError?.error?.title) return httpError.error.title;
+    if (httpError?.status === 409) return 'Ya existe una conciliación para esta factura o GIL.';
+    if (httpError?.status === 422) return 'No se pudo conciliar. Verificá que el GIL tenga ítems y la factura esté en estado REGISTRADA.';
+    return 'Error al conciliar la factura con el GIL';
   }
 
   private getImportErrorMessage(error: unknown): string {

@@ -2,23 +2,23 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  OnInit,
   ViewChild,
   inject,
   signal,
+  computed,
+  OnInit,
 } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import {
   PageHeaderComponent,
   InputComponent,
   ButtonComponent,
   LucideIconComponent,
   StatusBadgeComponent,
-  AlertComponent,
 } from '@restaurant/shared/ui';
 import { AuthService } from '@restaurant/shared/auth';
-import { PerfilFacade } from '../../data-access/perfil.facade';
-import { ActualizarPerfilRequest, CambiarContrasenaRequest } from '../../models/perfil.model';
+import { UsuariosService } from '@restaurant/usuarios';
 
 @Component({
   selector: 'restaurant-perfil-page',
@@ -30,110 +30,171 @@ import { ActualizarPerfilRequest, CambiarContrasenaRequest } from '../../models/
     ButtonComponent,
     LucideIconComponent,
     StatusBadgeComponent,
-    AlertComponent,
   ],
   templateUrl: './perfil-page.component.html',
   styleUrl: './perfil-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PerfilPageComponent implements OnInit {
-  private readonly authService = inject(AuthService);
-  private readonly facade = inject(PerfilFacade);
-  private readonly fb = inject(FormBuilder);
+  private readonly authService     = inject(AuthService);
+  private readonly usuariosService = inject(UsuariosService);
+  private readonly fb              = inject(FormBuilder);
+  private readonly http            = inject(HttpClient);
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
-  readonly usuario = this.authService.currentUser();
-  readonly fotoUrl = signal<string | null>(null);
+  readonly usuario  = this.authService.currentUser();
+  readonly guardando = signal(false);
+  readonly exito     = signal(false);
+  readonly subiendo  = signal(false);
 
-  // ── Estado del facade ─────────────────────────────────────────────────────
-  readonly perfil              = this.facade.perfil;
-  readonly actividad           = this.facade.actividad;
-  readonly cargando            = this.facade.cargando;
-  readonly guardando           = this.facade.guardando;
-  readonly cambiandoContrasena = this.facade.cambiandoContrasena;
-  readonly error               = this.facade.error;
-  readonly exito               = this.facade.exito;
-  readonly iniciales           = this.facade.iniciales;
+  readonly fotoUrl = computed(() => {
+  const userId = this.usuario?.id;
+  if (!userId) return null;
+  return localStorage.getItem(`fotoUrl_${userId}`) ?? null;
+});
+
+  readonly iniciales = computed(() => {
+    const nombre = this.usuario?.nombre ?? '';
+    const partes = nombre.split(' ');
+    return partes.length >= 2 ? partes[0][0] + partes[1][0] : nombre.slice(0, 2);
+  });
 
   readonly infoForm = this.fb.group({
-    nombre:    [this.usuario?.nombre ?? '',  [Validators.required]],
-    apellidos: ['',                           [Validators.required]],
-    email:     [this.usuario?.email ?? '',   [Validators.required, Validators.email]],
-    documento: ['',                           [Validators.required]],
-    telefono:  ['',                           [Validators.required]],
+    nombre:    ['', Validators.required],
+    apellidos: ['', Validators.required],
+    email:     ['', [Validators.required, Validators.email]],
+    documento: ['', Validators.required],
+    telefono:  ['', Validators.required],
   });
 
   readonly seguridadForm = this.fb.group({
-    contrasenaActual: ['', [Validators.required]],
+    contrasenaActual: ['', Validators.required],
     nuevaContrasena:  ['', [Validators.required, Validators.minLength(6)]],
-    confirmar:        ['', [Validators.required]],
+    confirmar:        ['', Validators.required],
   });
 
   ngOnInit(): void {
-    const userId = this.usuario?.id;
-    if (userId) {
-      this.facade.cargarPerfil(userId);
-      this.facade.cargarActividad(userId);
-    }
+    this.cargarPerfil();
+  }
+
+  cargarPerfil(): void {
+    this.usuariosService.obtenerPerfil().subscribe({
+      next: (data) => {
+        this.infoForm.patchValue({
+          nombre:    data.nombre,
+          apellidos: data.apellidos,
+          email:     data.email,
+          documento: data.documento,
+          telefono:  data.telefono,
+        });
+      },
+      error: (err) => console.error('Error cargando perfil', err),
+    });
   }
 
   triggerFileInput(): void {
     this.fileInput.nativeElement.click();
   }
 
-  onFotoChange(event: Event): void {
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.fotoUrl.set(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
+ onFotoChange(event: Event): void {
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (!file) return;
 
-      const userId = this.usuario?.id;
-      if (userId) {
-        this.facade.subirFoto(userId, file);
-      }
-    }
-  }
+  const userId = this.usuario?.id;
+  if (!userId) return;
+
+  this.subiendo.set(true);
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', 'GastroSena');
+
+  this.http.post<{ secure_url: string }>(
+    'https://api.cloudinary.com/v1_1/dryhub1jk/image/upload',
+    formData
+  ).subscribe({
+    next: (res) => {
+      // Enviar URL al backend
+      this.usuariosService.actualizarFoto(userId, res.secure_url).subscribe({
+        next: () => {
+          this.subiendo.set(false);
+          this.cargarPerfil();
+        },
+        error: () => {
+          this.subiendo.set(false);
+          alert('Error al guardar la foto');
+        }
+      });
+    },
+    error: () => {
+      this.subiendo.set(false);
+      alert('Error al subir la foto a Cloudinary');
+    },
+  });
+}
 
   onGuardar(): void {
     if (this.infoForm.invalid) {
       this.infoForm.markAllAsTouched();
       return;
     }
-    const userId = this.usuario?.id;
-    if (!userId) return;
+    this.guardando.set(true);
+    this.exito.set(false);
 
-    const data: ActualizarPerfilRequest = {
-      nombre:    this.infoForm.value.nombre!,
-      apellidos: this.infoForm.value.apellidos!,
-      email:     this.infoForm.value.email!,
-      telefono:  this.infoForm.value.telefono!,
+    const perfilData = {
+      nombre:    this.infoForm.value.nombre    ?? '',
+      apellidos: this.infoForm.value.apellidos ?? '',
+      email:     this.infoForm.value.email     ?? '',
+      documento: this.infoForm.value.documento ?? '',
+      telefono:  this.infoForm.value.telefono  ?? '',
     };
-    this.facade.actualizarPerfil(userId, data);
+
+    this.usuariosService.actualizarPerfil(perfilData).subscribe({
+      next: () => {
+        this.guardando.set(false);
+        this.exito.set(true);
+        setTimeout(() => this.exito.set(false), 3000);
+        this.cargarPerfil();
+      },
+      error: (err) => {
+        this.guardando.set(false);
+        console.error('Error al actualizar perfil', err);
+        alert('Error al guardar los datos');
+      },
+    });
   }
 
   onCambiarContrasena(): void {
-    if (this.seguridadForm.invalid) {
-      this.seguridadForm.markAllAsTouched();
+    const form = this.seguridadForm;
+    if (form.invalid) {
+      form.markAllAsTouched();
       return;
     }
-    const userId = this.usuario?.id;
-    if (!userId) return;
-
-    const data: CambiarContrasenaRequest = {
-      contrasenaActual: this.seguridadForm.value.contrasenaActual!,
-      nuevaContrasena:  this.seguridadForm.value.nuevaContrasena!,
-      confirmar:        this.seguridadForm.value.confirmar!,
-    };
-    this.facade.cambiarContrasena(userId, data);
+    const { contrasenaActual, nuevaContrasena, confirmar } = form.value;
+    if (nuevaContrasena !== confirmar) {
+      alert('Las contraseñas nuevas no coinciden');
+      return;
+    }
+    this.guardando.set(true);
+    this.usuariosService
+      .cambiarContrasena(contrasenaActual!, nuevaContrasena!)
+      .subscribe({
+        next: () => {
+          this.guardando.set(false);
+          this.exito.set(true);
+          form.reset();
+          setTimeout(() => this.exito.set(false), 3000);
+        },
+        error: () => {
+          this.guardando.set(false);
+          alert('Error al cambiar contraseña. Verifique la contraseña actual.');
+        },
+      });
   }
 
   onCancelar(): void {
-    this.infoForm.reset();
+    this.cargarPerfil();
     this.seguridadForm.reset();
-    this.facade.limpiarMensajes();
   }
-}
+} 

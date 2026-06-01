@@ -44,12 +44,22 @@ export class KardexFacade {
 
   // ── Kardex ───────────────────────────────────────────────────────────────────
 
-  /** El backend no expone un listado general de movimientos.
-   *  Llama cargarKardex(productoId) una vez se seleccione un producto. */
-  loadAll(): void {
-    this._movimientos.set([]);
+  /** Carga el listado global de movimientos (GET /inventory/movimientos). */
+  loadAll(pagina = 0, tamano = 50): void {
+    this._loading.set(true);
     this._error.set(null);
-    this._paginacion.set({ totalElementos: 0, totalPaginas: 0, page: 0, size: 10 });
+    this.movimientosService.getMovimientos(pagina, tamano)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al cargar los movimientos');
+          return of({ movimientos: [], totalPaginas: 0, totalElementos: 0 });
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(({ movimientos, totalPaginas, totalElementos }) => {
+        this._movimientos.set(movimientos);
+        this._paginacion.set({ totalElementos, totalPaginas, page: pagina, size: tamano });
+      });
   }
 
   /**
@@ -73,6 +83,12 @@ export class KardexFacade {
         this._movimientos.set(movimientos);
         this._paginacion.set({ totalElementos, totalPaginas, page: pagina, size: tamano });
       });
+  }
+
+  /** Navega a la página indicada del listado global de movimientos. */
+  irAPaginaMovimientos(page: number): void {
+    const { size } = this._paginacion();
+    this.loadAll(page, size);
   }
 
   /** Navega a la página indicada del kardex del producto actualmente cargado. */

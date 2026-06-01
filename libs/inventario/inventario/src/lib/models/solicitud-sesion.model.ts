@@ -44,6 +44,17 @@ export interface CrearSolicitudSesionData {
   items: SolicitudSesionItem[];
 }
 
+/** Payload para actualizar una solicitud de sesión (PUT /training/solicitudes/{id}) */
+export interface ActualizarSolicitudSesionData {
+  fechaSolicitud?:           string;
+  fichaId:                   string;
+  programaId:                string;
+  instructorId:              string;
+  identificacionInstructor?: string;
+  valorTotalDeSolicitud?:    number;
+  items:                     SolicitudSesionItem[];
+}
+
 /** Payload para aprobar (PATCH /training/solicitudes/{id}/aprobar) */
 export interface AprobarSesionData {
   aprobadorId:    string;

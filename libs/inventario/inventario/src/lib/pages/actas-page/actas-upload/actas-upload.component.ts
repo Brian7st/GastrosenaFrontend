@@ -1,12 +1,14 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   signal,
   inject,
 } from '@angular/core';
 
 import { Router, ActivatedRoute } from '@angular/router';
 import { LucideIconComponent } from '@restaurant/shared/ui';
+import { ActasFacade } from '../../../data-access/actas.facade';
 
 @Component({
   selector: 'restaurant-actas-upload',
@@ -17,11 +19,22 @@ import { LucideIconComponent } from '@restaurant/shared/ui';
   styleUrl: './actas-upload.component.scss',
 })
 export class ActasUploadComponent {
-  private router = inject(Router);
-  private route  = inject(ActivatedRoute);
+  private router       = inject(Router);
+  private route        = inject(ActivatedRoute);
+  private actasFacade  = inject(ActasFacade);
+
   isDragging          = signal(false);
   archivoSeleccionado = signal<File | null>(null);
   errorArchivo        = signal<string | null>(null);
+  procesando          = signal(false);
+  error               = signal<string | null>(null);
+
+  puedeConfirmar = computed(() => this.archivoSeleccionado() !== null && !this.procesando());
+
+  get actaId(): string {
+    return this.route.parent?.snapshot.paramMap.get('id') ?? '';
+  }
+
   onDragOver(event: DragEvent): void {
     event.preventDefault();
     this.isDragging.set(true);
@@ -50,6 +63,20 @@ export class ActasUploadComponent {
     this.errorArchivo.set(null);
     this.archivoSeleccionado.set(file);
   }
+
+  /**
+   * El backend no almacena el archivo; confirmar carga avanza el acta a FIRMADA.
+   * El descuento de stock se activa automáticamente en el backend (ActaFirmadaListener).
+   */
+  confirmarCarga(): void {
+    if (!this.puedeConfirmar() || !this.actaId) return;
+    this.procesando.set(true);
+    this.error.set(null);
+    this.actasFacade.cambiarEstado(this.actaId, 'FIRMADA');
+    this.procesando.set(false);
+    this.cerrar();
+  }
+
   cerrar(): void {
     this.router.navigate(['..'], { relativeTo: this.route });
   }

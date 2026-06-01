@@ -25,7 +25,7 @@ export const shellRoutes: Routes = [
   {
     path: 'app',
     component: ShellLayoutComponent,
-    canActivate: [authGuard], // ← ACTIVADO
+    canActivate: [authGuard],
     children: [
       {
         path: '',
@@ -75,10 +75,16 @@ export const shellRoutes: Routes = [
         loadChildren: () =>
           import('@restaurant/abastecimiento').then(m => m.ABASTECIMIENTO_ROUTES),
       },
+{ path: 'notificaciones', loadComponent: () => import('@restaurant/notificaciones').then(m => m.NotificacionesPageComponent) },
+      // 👇 AGREGAR ESTA RUTA:
       {
-        path: 'notificaciones',
-        loadChildren: () =>
-          import('@restaurant/notificaciones').then(m => m.NOTIFICACIONES_ROUTES),
+        path: 'perfil',
+        loadComponent: () => import('@restaurant/usuarios').then(m => m.PerfilPageComponent),
+      },
+      // 👇 AGREGAR ESTA RUTA:
+      {
+        path: 'perfil',
+        loadComponent: () => import('@restaurant/usuarios').then(m => m.PerfilPageComponent),
       },
     ],
   },

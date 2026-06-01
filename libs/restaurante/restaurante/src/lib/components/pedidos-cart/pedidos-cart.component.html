@@ -11,20 +11,29 @@
           <span class="category">{{ item.observaciones || 'Sin observaciones' }}</span>
           
           <div class="quantity-controls">
-            <button class="btn-minus" (click)="decrementar(i)">
-              <lucide-icon name="minus" [size]="14"></lucide-icon>
-            </button>
+            @if (!esPedidoSoloLectura()) {
+              <button class="btn-minus" (click)="decrementar(i)">
+                <lucide-icon name="minus" [size]="14"></lucide-icon>
+              </button>
+            }
             <span class="qty">{{ item.cantidad }}</span>
-            <button class="btn-plus" (click)="incrementar(i)">
-              <lucide-icon name="plus" [size]="14"></lucide-icon>
-            </button>
+            @if (!esPedidoSoloLectura()) {
+              <button class="btn-plus" (click)="incrementar(i)">
+                <lucide-icon name="plus" [size]="14"></lucide-icon>
+              </button>
+            }
           </div>
         </div>
         
         <div class="item-pricing">
           <div class="prices">
-            <span class="current">${{ item.precioUnitario | number:'1.2-2' }}</span>
+            <span class="current">{{ item.precioUnitario | currencyCop }}</span>
           </div>
+          @if (!esPedidoSoloLectura()) {
+            <button class="btn-delete" (click)="eliminarItem(i)" title="Eliminar producto">
+              <lucide-icon name="trash-2" [size]="16"></lucide-icon>
+            </button>
+          }
         </div>
       </div>
     } @empty {
@@ -43,6 +52,7 @@
     placeholder="Ej: Para llevar, sin sal..."
     [ngModel]="observacionesGenerales()"
     (ngModelChange)="observacionesGenerales.set($event)"
+    [readonly]="esPedidoSoloLectura()"
   ></textarea>
 </div>
 
@@ -50,15 +60,117 @@
   @if (pedidoActivo(); as pedido) {
     <div class="summary-total">
       <span class="label">Total</span>
-      <span class="value">${{ pedido.subtotal | number:'1.2-2' }}</span>
+      <span class="value">{{ pedido.subtotal | currencyCop }}</span>
     </div>
   }
 </div>
 
-<restaurant-button 
-  class="full-width-btn" 
-  variant="primary" 
-  [disabled]="!pedidoActivo()?.detalles?.length" 
-  (click)="confirmarPedido()">
-  <span>Confirmar Pedido</span>
-</restaurant-button>
+<div class="cart-actions">
+  @if (estadoPedido() === 'BORRADOR') {
+    <restaurant-button 
+      class="action-btn" 
+      variant="ghost" 
+      [disabled]="!pedidoActivo()" 
+      (click)="iniciarCancelacion()">
+      <lucide-icon name="trash-2" [size]="18" class="text-error"></lucide-icon>
+      <span>Cancelar</span>
+    </restaurant-button>
+    
+    <restaurant-button 
+      class="action-btn flex-1" 
+      variant="primary" 
+      [disabled]="!pedidoActivo()?.detalles?.length" 
+      (click)="iniciarConfirmacion()">
+      <span>Confirmar Pedido</span>
+    </restaurant-button>
+  } @else if (estadoPedido() === 'ENVIADO_COCINA') {
+    <restaurant-button 
+      class="action-btn flex-1 btn-anular" 
+      variant="primary" 
+      (click)="iniciarAnulacionBackend()">
+      <lucide-icon name="alert-triangle" [size]="18" class="text-white"></lucide-icon>
+      <span>Anular Pedido</span>
+    </restaurant-button>
+  } @else {
+    <div class="status-badge" style="width: 100%; text-align: center; padding: 12px; background: var(--bg-neutral); border-radius: var(--radius-md); color: var(--text-secondary); font-weight: 500;">
+      No se puede anular (Pedido {{ estadoPedido().replace('_', ' ') | titlecase }})
+    </div>
+  }
+</div>
+
+<restaurant-confirm-dialog
+  [open]="showCancelModal()"
+  title="Cancelar Pedido"
+  message="¿Estás seguro de que quieres cancelar este pedido? Se perderán todos los productos agregados y la mesa quedará libre."
+  confirmText="Sí, cancelar pedido"
+  cancelText="No, volver"
+  [showCancel]="true"
+  (confirm)="ejecutarCancelacion()"
+  (cancel)="showCancelModal.set(false)"
+></restaurant-confirm-dialog>
+
+<restaurant-confirm-dialog
+  [open]="showAnularBackendModal()"
+  title="Anular Pedido"
+  message="¿Estás seguro de que quieres anular esta comanda? Esto cancelará su preparación en cocina y liberará la mesa."
+  confirmText="Sí, anular pedido"
+  cancelText="No, volver"
+  [showCancel]="true"
+  (confirm)="ejecutarAnulacionBackend()"
+  (cancel)="showAnularBackendModal.set(false)"
+></restaurant-confirm-dialog>
+
+@if (showConfirmModal()) {
+  <div class="custom-modal-backdrop" (click)="showConfirmModal.set(false)">
+    <section class="custom-modal-dialog" (click)="$event.stopPropagation()">
+      <strong class="modal-title">Enviar a Cocina</strong>
+      <p class="modal-message">Verifica los productos antes de enviar. Una vez enviado, no podrás modificarlo.</p>
+      
+      <div class="modal-order-summary">
+        @if (pedidoActivo(); as pedido) {
+          
+          @if (comidasPedido().length > 0) {
+            <h5 class="category-title">Comidas</h5>
+            <ul class="summary-list">
+              @for (item of comidasPedido(); track item.productoId) {
+                <li>
+                  <span class="qty">{{ item.cantidad }}x</span>
+                  <span class="name">{{ item.nombreProducto }}</span>
+                  <span class="price">{{ (item.cantidad * item.precioUnitario) | currencyCop }}</span>
+                </li>
+              }
+            </ul>
+          }
+
+          @if (bebidasPedido().length > 0) {
+            <h5 class="category-title mt-3">Bebidas</h5>
+            <ul class="summary-list">
+              @for (item of bebidasPedido(); track item.productoId) {
+                <li>
+                  <span class="qty">{{ item.cantidad }}x</span>
+                  <span class="name">{{ item.nombreProducto }}</span>
+                  <span class="price">{{ (item.cantidad * item.precioUnitario) | currencyCop }}</span>
+                </li>
+              }
+            </ul>
+          }
+
+          @if (observacionesGenerales()) {
+            <div class="summary-notes">
+              <strong>Notas:</strong> {{ observacionesGenerales() }}
+            </div>
+          }
+          <div class="summary-total-row">
+            <span>Total:</span>
+            <strong>{{ pedido.subtotal | currencyCop }}</strong>
+          </div>
+        }
+      </div>
+
+      <div class="modal-actions">
+        <restaurant-button variant="ghost" (click)="showConfirmModal.set(false)">Revisar de nuevo</restaurant-button>
+        <restaurant-button variant="primary" (click)="ejecutarConfirmacion()">Sí, enviar pedido</restaurant-button>
+      </div>
+    </section>
+  </div>
+}

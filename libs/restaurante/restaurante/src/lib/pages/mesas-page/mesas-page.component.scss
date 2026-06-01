@@ -295,10 +295,12 @@
   left: 0;
   width: 100%;
   height: 100%;
+  box-sizing: border-box;
   background-color: var(--color-backdrop);
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: var(--space-6);
   z-index: var(--z-modal);
   backdrop-filter: blur(4px);
 }
@@ -310,11 +312,15 @@
   box-shadow: var(--shadow-lg);
   width: 100%;
   max-width: 400px;
-  max-height: 90vh;
+  max-height: 80vh;
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
   overflow: hidden; // Para el header coloreado con border radius
+
+  &--wide {
+    max-width: 700px;
+  }
 
   // Clases personalizadas para el modal de Crear Mesa
   .modal-header-colored {
@@ -325,6 +331,7 @@
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
 
     h3 {
       font-size: var(--font-size-lg);
@@ -356,6 +363,12 @@
     flex-direction: column;
     gap: var(--space-5);
 
+    &--flex {
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
     .modal-note {
       font-size: var(--font-size-xs);
       color: var(--color-text-secondary);
@@ -365,6 +378,11 @@
 
     &.modal-body--no-padding {
       padding: 0 !important;
+      margin: 0 calc(var(--space-8) * -1);
+      flex: 1;
+      min-height: 0;
+      max-height: 50vh; // Fuerza el scroll temprano (aprox 5 mesas en móviles)
+      overflow-y: auto;
       
       .empty-state-container {
         padding: var(--space-8);
@@ -374,6 +392,7 @@
     .table-responsive {
       width: 100%;
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch; // Suavidad en móviles
 
       .restaurant-table {
         width: 100%;
@@ -701,6 +720,7 @@
     display: flex;
     justify-content: flex-end;
     gap: var(--space-4);
+    flex-shrink: 0;
   }
 
   .modal-actions-between {
@@ -811,8 +831,32 @@
 
       .mesa-list-info {
         display: flex;
-        align-items: center;
-        gap: var(--space-3);
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-2);
+
+        .mesa-list-info-header {
+          display: flex;
+          align-items: center;
+          gap: var(--space-3);
+        }
+
+        .mesa-obs-text {
+          display: flex;
+          align-items: flex-start;
+          gap: var(--space-2);
+          font-size: var(--font-size-xs);
+          color: var(--color-warning-interactive-dark, #a15c00);
+          background-color: var(--color-warning-bg-subtle, #fef3c7);
+          padding: var(--space-2) var(--space-3);
+          border-radius: var(--radius-sm);
+          font-style: italic;
+          margin-top: var(--space-1);
+          width: 100%;
+          word-break: break-word;
+          white-space: normal;
+          line-height: 1.4;
+        }
       }
 
       .mesa-list-number {

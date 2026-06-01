@@ -1,4 +1,4 @@
-<div class="acta-create">
+<form [formGroup]="form" class="acta-create">
   <!-- ── Volver ──────────────────────────────────────────────────────── -->
   <inventario-back-button (clicked)="goBack()" />
 
@@ -59,35 +59,35 @@
             <label class="acta-create__label">Fecha de la Sesión</label>
             <div class="acta-create__input-wrapper">
               <lucide-icon name="calendar" [size]="16" class="acta-create__input-icon"></lucide-icon>
-              <input type="date" class="acta-create__input" />
+              <input type="date" class="acta-create__input" formControlName="fecha" />
             </div>
           </div>
           <div class="acta-create__form-field">
             <label class="acta-create__label">Hora Inicio</label>
             <div class="acta-create__input-wrapper">
               <lucide-icon name="clock" [size]="16" class="acta-create__input-icon"></lucide-icon>
-              <input type="time" class="acta-create__input" />
+              <input type="time" class="acta-create__input" formControlName="horaInicio" />
             </div>
           </div>
           <div class="acta-create__form-field">
             <label class="acta-create__label">Hora Fin</label>
             <div class="acta-create__input-wrapper">
               <lucide-icon name="clock" [size]="16" class="acta-create__input-icon"></lucide-icon>
-              <input type="time" class="acta-create__input" />
+              <input type="time" class="acta-create__input" formControlName="horaFin" />
             </div>
           </div>
           <div class="acta-create__form-field">
             <label class="acta-create__label">Ficha de Caracterización</label>
             <div class="acta-create__input-wrapper">
               <lucide-icon name="hash" [size]="16" class="acta-create__input-icon"></lucide-icon>
-              <input type="text" class="acta-create__input" placeholder="Ej: 2456789" maxlength="7" />
+              <input type="text" class="acta-create__input" formControlName="fichaId" placeholder="Ej: 2456789" maxlength="7" />
             </div>
           </div>
           <div class="acta-create__form-field">
             <label class="acta-create__label">Instructor Responsable</label>
             <div class="acta-create__input-wrapper">
               <lucide-icon name="user" [size]="16" class="acta-create__input-icon"></lucide-icon>
-              <input type="text" class="acta-create__input" placeholder="Nombre completo" />
+              <input type="text" class="acta-create__input" formControlName="instructorId" placeholder="ID del instructor" />
             </div>
           </div>
         </div>
@@ -119,11 +119,11 @@
         <div class="acta-create__form-grid">
           <div class="acta-create__form-field acta-create__form-field--full">
             <label class="acta-create__label">Resultado de Aprendizaje (RA)</label>
-            <textarea class="acta-create__textarea" rows="3" placeholder="Describa el resultado de aprendizaje esperado..."></textarea>
+            <textarea class="acta-create__textarea" rows="3" formControlName="resultadoAprendizaje" placeholder="Describa el resultado de aprendizaje esperado..."></textarea>
           </div>
           <div class="acta-create__form-field acta-create__form-field--full">
             <label class="acta-create__label">Actividades Ejecutadas</label>
-            <textarea class="acta-create__textarea" rows="3" placeholder="Describa las actividades desarrolladas en la sesión..."></textarea>
+            <textarea class="acta-create__textarea" rows="3" formControlName="actividadesRealizadas" placeholder="Describa las actividades desarrolladas en la sesión..."></textarea>
           </div>
           <div class="acta-create__form-field acta-create__form-field--full">
             <label class="acta-create__label">Observaciones Generales</label>
@@ -143,23 +143,31 @@
           Asistentes y Firmantes
         </h3>
         <div class="acta-create__firmantes-list">
-          @for (firmante of firmantes(); track firmante.nombre + $index) {
+          @for (firmante of firmantes(); track $index) {
             <div class="acta-create__firmante-row">
               <div class="acta-create__firmante-avatar">
                 <lucide-icon name="user" [size]="16"></lucide-icon>
               </div>
               <div class="acta-create__firmante-info">
-                <span class="acta-create__firmante-name">{{ firmante.nombre }}</span>
-                <span class="acta-create__firmante-role">{{ firmante.rol }}</span>
+                <input
+                  type="text"
+                  class="acta-create__firmante-input"
+                  placeholder="Nombre completo"
+                  [value]="firmante.nombre"
+                  (input)="updateFirmante($index, 'nombre', $event)"
+                />
+                <input
+                  type="text"
+                  class="acta-create__firmante-input acta-create__firmante-input--role"
+                  placeholder="Cargo/Rol"
+                  [value]="firmante.dependenciaRol"
+                  (input)="updateFirmante($index, 'dependenciaRol', $event)"
+                />
               </div>
-              <restaurant-status-badge
-                [label]="firmante.estado === 'firmado' ? 'Firmado' : 'Pendiente'"
-                [variant]="firmante.estado === 'firmado' ? 'success' : 'warning'">
-              </restaurant-status-badge>
             </div>
           }
         </div>
-        <button class="acta-create__add-firmante" (click)="addFirmante()">
+        <button class="acta-create__add-firmante" type="button" (click)="addFirmante()">
           <lucide-icon name="plus" [size]="16"></lucide-icon>
           Agregar Firmante
         </button>
@@ -185,8 +193,12 @@
             <restaurant-status-badge label="Borrador" variant="info"></restaurant-status-badge>
           </div>
           <div class="acta-create__preview-item">
+            <span class="acta-create__preview-label">Ficha</span>
+            <span class="acta-create__preview-value">{{ form.get('fichaId')?.value }}</span>
+          </div>
+          <div class="acta-create__preview-item">
             <span class="acta-create__preview-label">Firmantes registrados</span>
-            <span class="acta-create__preview-value">2 personas</span>
+            <span class="acta-create__preview-value">{{ firmantes().length }} persona(s)</span>
           </div>
         </div>
       </div>
@@ -196,22 +208,25 @@
   <!-- ── Footer Actions ──────────────────────────────────────────────── -->
   <div class="acta-create__footer">
     @if (currentStep() > 1) {
-      <button class="acta-create__btn-back" (click)="prevStep()">
+      <button class="acta-create__btn-back" type="button" (click)="prevStep()">
         <lucide-icon name="arrow-left" [size]="18"></lucide-icon>
         Anterior
       </button>
     }
     <div class="acta-create__footer-spacer"></div>
+    @if (error()) {
+      <p class="acta-create__error">{{ error() }}</p>
+    }
     @if (currentStep() < 4) {
-      <button class="acta-create__btn-next" (click)="nextStep()">
+      <button class="acta-create__btn-next" type="button" (click)="nextStep()">
         Siguiente
         <lucide-icon name="arrow-right" [size]="18"></lucide-icon>
       </button>
     } @else {
-      <button class="acta-create__btn-generate" (click)="generarActa()">
+      <button class="acta-create__btn-generate" type="button" (click)="generarActa()" [disabled]="enviando()">
         <lucide-icon name="check" [size]="18"></lucide-icon>
-        Generar Acta
+        {{ enviando() ? 'Generando...' : 'Generar Acta' }}
       </button>
     }
   </div>
-</div>
+</form>

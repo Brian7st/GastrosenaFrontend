@@ -17,6 +17,7 @@
     </div>
   </div>
 
+  <!-- NAVEGACIÓN PRINCIPAL (dinámica, desde el servicio) -->
   <nav class="barra-lateral__navegacion">
     @for (grupo of visibleGroups(); track grupo.etiqueta) {
       <div class="barra-lateral__grupo">
@@ -93,12 +94,13 @@
     }
   </nav>
 
+  <!-- PIE DEL SIDEBAR (enlaces fijos: Perfil, Configuración, Cerrar Sesión) -->
   <div class="barra-lateral__pie">
-    <a href="#" class="barra-lateral__enlace">
+    <a routerLink="/app/configuracion" class="barra-lateral__enlace">
       <svg lucideSettings class="barra-lateral__icono"></svg>
       <span class="barra-lateral__texto">Configuración</span>
     </a>
-    <a href="#" class="barra-lateral__enlace">
+    <a routerLink="/app/perfil" class="barra-lateral__enlace">
       <svg lucideUser class="barra-lateral__icono"></svg>
       <span class="barra-lateral__texto">Perfil</span>
     </a>

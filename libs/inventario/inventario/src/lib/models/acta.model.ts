@@ -5,21 +5,41 @@
 
 export type ActaEstado = 'BORRADOR' | 'PENDIENTE_FIRMAS' | 'FIRMADA' | 'REVISADA' | 'ARCHIVADA';
 
+export interface AsistenteActa {
+  nombre:         string;
+  dependenciaRol: string;
+  aprueba:        boolean;
+}
+
+export interface CompromisoActa {
+  actividad:    string;
+  responsable:  string;
+  fechaLimite:  string;
+}
+
 export interface ActaLegalizacion {
-  id: string;
-  numeroActa: string;
-  fecha: string;
-  programa: string;
-  fichaId: string;
-  instructorId: string;
-  requisicionId: string;
-  estado: ActaEstado;
-  ciudad?: string;
-  lugar?: string;
-  agendaSesion?: string;
-  desarrolloSesion?: string;
+  id:                    string;
+  numeroActa:            string;
+  comite?:               string;
+  ciudad?:               string;
+  fecha:                 string;
+  horaInicio?:           string;
+  horaFin?:              string;
+  lugar?:                string;
+  regional?:             string;
+  programa:              string;
+  fichaId:               string;
+  instructorId:          string;
+  requisicionId:         string;
+  estado:                ActaEstado;
   resultadoAprendizaje?: string;
+  actividadesRealizadas?: string;
+  asistentes?:           AsistenteActa[];
+  compromisos?:          CompromisoActa[];
+  /** @deprecated Usar actividadesRealizadas */
   actividadesEjecutadas?: string;
+  agendaSesion?:         string;
+  desarrolloSesion?:     string;
 }
 
 export interface InsumoActa {

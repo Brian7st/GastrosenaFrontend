@@ -43,11 +43,16 @@
         }
       </button>
 
-      <button class="barra-superior__boton-icono">
+      <!-- 🔔 Botón de notificaciones con enlace y badge -->
+      <button class="barra-superior__boton-icono" routerLink="/app/notificaciones">
         <svg lucideBell></svg>
+        @if (contadorNotificaciones() > 0) {
+          <span class="barra-superior__badge">{{ contadorNotificaciones() }}</span>
+        }
       </button>
 
-      <div class="barra-superior__perfil">
+      <!-- CAMBIADO: routerLink ahora apunta a /app/perfil -->
+      <div class="barra-superior__perfil" routerLink="/app/perfil" style="cursor: pointer;">
         @if (perfil.avatarUrl) {
           <img
             [alt]="perfil.nombre || 'Usuario'"

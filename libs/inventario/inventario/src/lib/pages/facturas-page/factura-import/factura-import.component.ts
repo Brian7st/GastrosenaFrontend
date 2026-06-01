@@ -30,11 +30,13 @@ export class FacturaImportPageComponent implements OnInit {
   error = computed(() => this.localError() ?? this.facade.error());
   importStatus = computed<ImportStatus>(() => {
     if (this.loading() && this.fileName()) return 'loading';
-    if (this.error() && this.fileName()) return 'error';
     if (this.facturaImportada()) return 'success';
+    if (this.error() && this.fileName()) return 'error';
     return 'idle';
   });
+  conciliacionError = computed(() => this.facturaImportada() ? this.facade.error() : null);
   fileLoaded = computed(() => this.facturaImportada() !== null);
+  canConciliar = computed(() => !!this.facturaImportada() && !!this.gilId() && !this.conciliacionImportacion());
   totalItems = computed(() => this.facturaImportada()?.lineas.length ?? 0);
   totalIvaPorTarifa = computed(() => this.groupIva(this.facturaImportada()?.lineas ?? []));
 
@@ -77,6 +79,12 @@ export class FacturaImportPageComponent implements OnInit {
     const factura = this.facturaImportada();
     if (!factura) return;
     this.router.navigate(['/app/inventario/facturas', factura.id]);
+  }
+
+  onConciliar(): void {
+    const factura = this.facturaImportada();
+    if (!factura || !this.gilId()) return;
+    this.facade.conciliarEnImportacion(String(factura.id), this.gilId());
   }
 
   resetImport(): void {

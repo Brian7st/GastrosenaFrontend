@@ -18,6 +18,13 @@
         <lucide-icon name="search" [size]="18" class="search-icon"></lucide-icon>
         <input type="text" placeholder="Buscar platillo..." [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" />
       </div>
+
+      <div class="historial-action">
+        <restaurant-button variant="surface" routerLink="../historial-pedidos">
+          <lucide-icon name="clipboard-list" [size]="18"></lucide-icon>
+          <span>Historial</span>
+        </restaurant-button>
+      </div>
       
       <div class="user-profile">
         <div class="user-info">
@@ -30,20 +37,22 @@
       </div>
     </header>
 
-    <section class="categories-section">
-      <lib-pedidos-categories
-        (categorySelected)="selectedCategory.set($event)"
-        (subcategorySelected)="selectedSubcategory.set($event)">
-      </lib-pedidos-categories>
-    </section>
+    <div [style.pointer-events]="esPedidoSoloLectura() ? 'none' : 'auto'" [style.opacity]="esPedidoSoloLectura() ? '0.5' : '1'">
+      <section class="categories-section">
+        <lib-pedidos-categories
+          (categorySelected)="selectedCategory.set($event)"
+          (subcategorySelected)="selectedSubcategory.set($event)">
+        </lib-pedidos-categories>
+      </section>
 
-    <section class="menu-section">
-      <lib-pedidos-menu-grid 
-        [searchTerm]="searchTerm()"
-        [category]="selectedCategory()"
-        [subcategory]="selectedSubcategory()">
-      </lib-pedidos-menu-grid>
-    </section>
+      <section class="menu-section">
+        <lib-pedidos-menu-grid 
+          [searchTerm]="searchTerm()"
+          [category]="selectedCategory()"
+          [subcategory]="selectedSubcategory()">
+        </lib-pedidos-menu-grid>
+      </section>
+    </div>
   </main>
 
   <!-- Área del Carrito (Derecha) -->

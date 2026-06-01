@@ -18,7 +18,12 @@
     </div>
 
     <!-- Drag & Drop Zone -->
-    <div class="acta-upload__dropzone" [class.acta-upload__dropzone--active]="isDragging()">
+    <div class="acta-upload__dropzone"
+         [class.acta-upload__dropzone--active]="isDragging()"
+         (dragover)="onDragOver($event)"
+         (dragleave)="onDragLeave($event)"
+         (drop)="onDrop($event)"
+         (click)="fileInput.click()">
       <div class="acta-upload__dropzone-icon">
         <lucide-icon name="cloud-upload" [size]="32"></lucide-icon>
       </div>
@@ -31,14 +36,32 @@
       </div>
     </div>
 
+    <input #fileInput type="file" accept=".pdf,.jpg,.jpeg,.png"
+           style="display: none" (change)="onFileSelected($event)"/>
+
+    @if (archivoSeleccionado()) {
+      <p class="acta-upload__file-name">
+        <lucide-icon name="file-check" [size]="16"></lucide-icon>
+        {{ archivoSeleccionado()?.name }}
+      </p>
+    }
+    @if (errorArchivo()) {
+      <p class="acta-upload__error">{{ errorArchivo() }}</p>
+    }
+    @if (error()) {
+      <p class="acta-upload__error">{{ error() }}</p>
+    }
+
     <!-- Footer Actions -->
     <div class="acta-upload__footer">
-      <button class="acta-upload__btn-cancel" (click)="cerrar()">
+      <button class="acta-upload__btn-cancel" (click)="cerrar()" [disabled]="procesando()">
         Cancelar
       </button>
-      <button class="acta-upload__btn-confirm">
-        Confirmar Carga
+      <button class="acta-upload__btn-confirm"
+              (click)="confirmarCarga()"
+              [disabled]="!puedeConfirmar()">
         <lucide-icon name="arrow-right" [size]="16"></lucide-icon>
+        {{ procesando() ? 'Procesando...' : 'Confirmar Carga' }}
       </button>
     </div>
   </div>

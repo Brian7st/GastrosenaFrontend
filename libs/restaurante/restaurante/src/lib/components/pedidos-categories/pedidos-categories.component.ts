@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LucideIconComponent } from '@restaurant/shared/ui';
 
 @Component({
   selector: 'lib-pedidos-categories',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideIconComponent],
   templateUrl: './pedidos-categories.component.html',
   styleUrls: ['./pedidos-categories.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -14,11 +15,11 @@ export class PedidosCategoriesComponent {
   @Output() subcategorySelected = new EventEmitter<string>();
 
   categories = [
-    { id: 'all', name: 'Todo', icon: '🍽️' },
-    { id: 'entrada', name: 'Entradas', icon: '🥗' },
-    { id: 'plato_fuerte', name: 'Plato Fuerte', icon: '🥩' },
-    { id: 'postre', name: 'Postres', icon: '🍰' },
-    { id: 'bebidas', name: 'Bebidas', icon: '🍹' },
+    { id: 'all', name: 'Todo', icon: 'layout-grid' },
+    { id: 'entrada', name: 'Entradas', icon: 'salad' },
+    { id: 'plato_fuerte', name: 'Plato Fuerte', icon: 'beef' },
+    { id: 'postre', name: 'Postres', icon: 'cake' },
+    { id: 'bebidas', name: 'Bebidas', icon: 'coffee' },
   ];
 
   subcategoriesBebidas = [

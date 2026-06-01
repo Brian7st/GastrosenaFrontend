@@ -27,6 +27,40 @@ export class MovimientosListComponent implements OnInit {
   // ── Estado reactivo desde facade ─────────────────────────────────────────
   movimientos = this.facade.movimientos;
   loading     = this.facade.loading;
+  paginacion  = this.facade.paginacion;
+
+  // ── Paginación computada ──────────────────────────────────────────────────
+  paginaActual    = computed(() => this.paginacion().page);
+  totalPaginas    = computed(() => this.paginacion().totalPaginas);
+  totalElementos  = computed(() => this.paginacion().totalElementos);
+  tamano          = computed(() => this.paginacion().size);
+
+  /** Rango "Mostrando X – Y de Z" */
+  desde = computed(() =>
+    this.totalElementos() === 0 ? 0 : this.paginaActual() * this.tamano() + 1
+  );
+  hasta = computed(() =>
+    Math.min(this.paginaActual() * this.tamano() + this.movimientos().length, this.totalElementos())
+  );
+
+  /** Ventana de hasta 5 páginas centrada en la actual */
+  paginas = computed(() => {
+    const total  = this.totalPaginas();
+    const actual = this.paginaActual();
+    if (total === 0) return [];
+    const radio  = 2;
+    let inicio   = Math.max(0, actual - radio);
+    let fin      = Math.min(total - 1, actual + radio);
+    // ajustar ventana si está al borde
+    if (fin - inicio < radio * 2) {
+      if (inicio === 0) fin   = Math.min(total - 1, radio * 2);
+      else              inicio = Math.max(0, fin - radio * 2);
+    }
+    return Array.from({ length: fin - inicio + 1 }, (_, i) => inicio + i);
+  });
+
+  hayPaginaAnterior = computed(() => this.paginaActual() > 0);
+  hayPaginaSiguiente = computed(() => this.paginaActual() < this.totalPaginas() - 1);
 
   // ── KPIs derivados del listado cargado ───────────────────────────────────
   kpiEntradas      = computed(() => this.movimientos().filter(m => m.tipo === 'ENTRADA').length);
@@ -40,6 +74,20 @@ export class MovimientosListComponent implements OnInit {
     this.facade.loadAll();
   }
 
+  // ── Paginación ────────────────────────────────────────────────────────────
+  irAPagina(page: number): void {
+    this.facade.irAPaginaMovimientos(page);
+  }
+
+  paginaAnterior(): void {
+    if (this.hayPaginaAnterior()) this.irAPagina(this.paginaActual() - 1);
+  }
+
+  paginaSiguiente(): void {
+    if (this.hayPaginaSiguiente()) this.irAPagina(this.paginaActual() + 1);
+  }
+
+  // ── Helpers UI ────────────────────────────────────────────────────────────
   getVariant(estado: string): 'success' | 'warning' | 'danger' | 'info' {
     switch (estado) {
       case 'Completado':  return 'success';

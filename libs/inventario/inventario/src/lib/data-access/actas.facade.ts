@@ -7,6 +7,7 @@ import {
   CompromisoActa,
   FirmanteActa,
 } from '../models/acta.model';
+import { CrearActaRequest } from './api/legalization.api';
 
 @Injectable({ providedIn: 'root' })
 export class ActasFacade {
@@ -44,7 +45,8 @@ export class ActasFacade {
       .subscribe(data => this._actas.set(data));
   }
 
-  /** Carga un acta por ID junto con sus insumos, compromisos y firmantes. */
+  /** Carga un acta por ID. Los sub-endpoints de insumos/firmantes/compromisos
+   *  no existen aún en el backend — quedan como arrays vacíos. */
   cargarActa(id: string): void {
     this._loading.set(true);
     this.actasService.getActaById(id)
@@ -55,21 +57,11 @@ export class ActasFacade {
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe(data => {
-        this._actaSeleccionada.set(data ?? null);
-        if (data) {
-          this.actasService.getInsumosByActa(id)
-            .subscribe(i => this._insumos.set(i));
-          this.actasService.getCompromisosByActa(id)
-            .subscribe(c => this._compromisos.set(c));
-          this.actasService.getFirmantesByActa(id)
-            .subscribe(f => this._firmantes.set(f));
-        }
-      });
+      .subscribe(data => this._actaSeleccionada.set(data ?? null));
   }
 
-  /** Crea un nuevo acta y recarga el listado. */
-  crearActa(data: Partial<ActaLegalizacion>): void {
+  /** Crea un nuevo acta. Retorna el ID creado y recarga el listado. */
+  crearActa(data: CrearActaRequest): void {
     this._loading.set(true);
     this.actasService.crearActa(data)
       .pipe(
@@ -79,8 +71,8 @@ export class ActasFacade {
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe(res => {
-        if (res) this.loadAll();
+      .subscribe(id => {
+        if (id) this.loadAll();
       });
   }
 
