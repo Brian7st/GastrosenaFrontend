@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BaseHttpService } from '@restaurant/shared/api';
 import { PaginatedResponse } from '@restaurant/shared/models';
-import { AuthService } from '@restaurant/shared/auth'; // ✅ Agregado
+import { AuthService } from '@restaurant/shared/auth';
 import {
   ActualizarUsuarioRequest,
   AsignacionMasivaRequest,
@@ -28,7 +28,7 @@ export interface EstadoImportacion {
 @Injectable({ providedIn: 'root' })
 export class UsuariosService extends BaseHttpService {
   private readonly resource = 'usuarios';
-  private readonly authService = inject(AuthService); // ✅ Agregado
+  private readonly authService = inject(AuthService);
 
   getUsuarios(filtros?: Partial<FiltrosUsuarios>): Observable<PaginatedResponse<UsuarioDetalle>> {
     let params = new HttpParams();
@@ -79,9 +79,9 @@ export class UsuariosService extends BaseHttpService {
   }
 
   eliminarUsuario(id: string): Observable<void> {
-    const userId = this.authService.currentUser()?.id; // ✅ Obtener ID del usuario autenticado
+    const userId = this.authService.currentUser()?.id;
     return this.http.delete<void>(this.buildUrl(`${this.resource}/${id}`), {
-      headers: { 'X-User-ID': userId || '' }          // ✅ Enviar header
+      headers: { 'X-User-ID': userId || '' }
     });
   }
 
@@ -100,11 +100,9 @@ export class UsuariosService extends BaseHttpService {
   importarMasivo(request: ImportarUsuariosRequest): Observable<ImportarUsuariosResponse> {
     const formData = new FormData();
     formData.append('archivo', request.archivo);
-
     const url = request.tipo === 'APRENDIZ'
       ? this.buildUrl('usuarios/masivo/aprendices')
       : this.buildUrl('usuarios/masivo/instructores');
-
     return this.http.post<ImportarUsuariosResponse>(url, formData);
   }
 
@@ -112,7 +110,6 @@ export class UsuariosService extends BaseHttpService {
     const url = tipo === 'APRENDIZ'
       ? this.buildUrl(`usuarios/masivo/estado-aprendices/${tareaId}`)
       : this.buildUrl(`usuarios/masivo/estado-instructores/${tareaId}`);
-
     return this.http.get<EstadoImportacion>(url);
   }
 
@@ -149,5 +146,12 @@ export class UsuariosService extends BaseHttpService {
       passwordActual: oldPassword,
       passwordNueva: newPassword
     });
+  }
+
+  actualizarFoto(userId: string, fotoUrl: string): Observable<void> {
+    return this.http.patch<void>(
+      this.buildUrl(`${this.resource}/${userId}/foto`),
+      { fotoUrl }
+    );
   }
 }

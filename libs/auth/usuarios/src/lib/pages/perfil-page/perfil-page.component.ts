@@ -9,6 +9,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import {
   PageHeaderComponent,
   InputComponent,
@@ -17,7 +18,7 @@ import {
   StatusBadgeComponent,
 } from '@restaurant/shared/ui';
 import { AuthService } from '@restaurant/shared/auth';
-import { UsuariosService } from '@restaurant/usuarios'; // Asegúrate que el barrel exporte el servicio
+import { UsuariosService } from '@restaurant/usuarios';
 
 @Component({
   selector: 'restaurant-perfil-page',
@@ -35,14 +36,23 @@ import { UsuariosService } from '@restaurant/usuarios'; // Asegúrate que el bar
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PerfilPageComponent implements OnInit {
-  private readonly authService = inject(AuthService);
+  private readonly authService     = inject(AuthService);
   private readonly usuariosService = inject(UsuariosService);
-  private readonly fb = inject(FormBuilder);
+  private readonly fb              = inject(FormBuilder);
+  private readonly http            = inject(HttpClient);
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
-  readonly usuario = this.authService.currentUser();
-  readonly fotoUrl = signal<string | null>(null);
+  readonly usuario  = this.authService.currentUser();
+  readonly guardando = signal(false);
+  readonly exito     = signal(false);
+  readonly subiendo  = signal(false);
+
+  readonly fotoUrl = computed(() => {
+  const userId = this.usuario?.id;
+  if (!userId) return null;
+  return localStorage.getItem(`fotoUrl_${userId}`) ?? null;
+});
 
   readonly iniciales = computed(() => {
     const nombre = this.usuario?.nombre ?? '';
@@ -51,21 +61,18 @@ export class PerfilPageComponent implements OnInit {
   });
 
   readonly infoForm = this.fb.group({
-    nombre: ['', Validators.required],
+    nombre:    ['', Validators.required],
     apellidos: ['', Validators.required],
-    email: ['', [Validators.required, Validators.email]],
+    email:     ['', [Validators.required, Validators.email]],
     documento: ['', Validators.required],
-    telefono: ['', Validators.required],
+    telefono:  ['', Validators.required],
   });
 
   readonly seguridadForm = this.fb.group({
     contrasenaActual: ['', Validators.required],
-    nuevaContrasena: ['', [Validators.required, Validators.minLength(6)]],
-    confirmar: ['', Validators.required],
+    nuevaContrasena:  ['', [Validators.required, Validators.minLength(6)]],
+    confirmar:        ['', Validators.required],
   });
-
-  readonly guardando = signal(false);
-  readonly exito = signal(false);
 
   ngOnInit(): void {
     this.cargarPerfil();
@@ -75,11 +82,11 @@ export class PerfilPageComponent implements OnInit {
     this.usuariosService.obtenerPerfil().subscribe({
       next: (data) => {
         this.infoForm.patchValue({
-          nombre: data.nombre,
+          nombre:    data.nombre,
           apellidos: data.apellidos,
-          email: data.email,
+          email:     data.email,
           documento: data.documento,
-          telefono: data.telefono,
+          telefono:  data.telefono,
         });
       },
       error: (err) => console.error('Error cargando perfil', err),
@@ -90,46 +97,73 @@ export class PerfilPageComponent implements OnInit {
     this.fileInput.nativeElement.click();
   }
 
-  onFotoChange(event: Event): void {
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => this.fotoUrl.set(e.target?.result as string);
-      reader.readAsDataURL(file);
-    }
-  }
+ onFotoChange(event: Event): void {
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (!file) return;
 
-onGuardar(): void {
-  if (this.infoForm.invalid) {
-    this.infoForm.markAllAsTouched();
-    return;
-  }
-  this.guardando.set(true);
-  this.exito.set(false);
+  const userId = this.usuario?.id;
+  if (!userId) return;
 
-  // Construimos un objeto con los valores del formulario, asegurando que no haya null
-  const perfilData = {
-    nombre: this.infoForm.value.nombre ?? '',
-    apellidos: this.infoForm.value.apellidos ?? '',
-    email: this.infoForm.value.email ?? '',
-    documento: this.infoForm.value.documento ?? '',
-    telefono: this.infoForm.value.telefono ?? ''
-  };
+  this.subiendo.set(true);
 
-  this.usuariosService.actualizarPerfil(perfilData).subscribe({
-    next: () => {
-      this.guardando.set(false);
-      this.exito.set(true);
-      setTimeout(() => this.exito.set(false), 3000);
-      this.cargarPerfil(); // refrescar datos
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', 'GastroSena');
+
+  this.http.post<{ secure_url: string }>(
+    'https://api.cloudinary.com/v1_1/dryhub1jk/image/upload',
+    formData
+  ).subscribe({
+    next: (res) => {
+      // Enviar URL al backend
+      this.usuariosService.actualizarFoto(userId, res.secure_url).subscribe({
+        next: () => {
+          this.subiendo.set(false);
+          this.cargarPerfil();
+        },
+        error: () => {
+          this.subiendo.set(false);
+          alert('Error al guardar la foto');
+        }
+      });
     },
-    error: (err) => {
-      this.guardando.set(false);
-      console.error('Error al actualizar perfil', err);
-      alert('Error al guardar los datos');
-    }
+    error: () => {
+      this.subiendo.set(false);
+      alert('Error al subir la foto a Cloudinary');
+    },
   });
 }
+
+  onGuardar(): void {
+    if (this.infoForm.invalid) {
+      this.infoForm.markAllAsTouched();
+      return;
+    }
+    this.guardando.set(true);
+    this.exito.set(false);
+
+    const perfilData = {
+      nombre:    this.infoForm.value.nombre    ?? '',
+      apellidos: this.infoForm.value.apellidos ?? '',
+      email:     this.infoForm.value.email     ?? '',
+      documento: this.infoForm.value.documento ?? '',
+      telefono:  this.infoForm.value.telefono  ?? '',
+    };
+
+    this.usuariosService.actualizarPerfil(perfilData).subscribe({
+      next: () => {
+        this.guardando.set(false);
+        this.exito.set(true);
+        setTimeout(() => this.exito.set(false), 3000);
+        this.cargarPerfil();
+      },
+      error: (err) => {
+        this.guardando.set(false);
+        console.error('Error al actualizar perfil', err);
+        alert('Error al guardar los datos');
+      },
+    });
+  }
 
   onCambiarContrasena(): void {
     const form = this.seguridadForm;
@@ -163,4 +197,4 @@ onGuardar(): void {
     this.cargarPerfil();
     this.seguridadForm.reset();
   }
-}
+} 
