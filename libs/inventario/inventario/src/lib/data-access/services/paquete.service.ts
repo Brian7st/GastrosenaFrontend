@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { PaqueteProbatorio } from '../../models/paquete.model';
-import { PaqueteResponse, CrearPaqueteRequest, TrazabilidadRequest } from '../api/legalization.api';
+import { PaqueteResponse, PaquetesPageResponse, CrearPaqueteRequest, TrazabilidadRequest } from '../api/legalization.api';
 import { paqueteFromApi } from '../mappers/legalization.mapper';
 
 const API = '/api/v1';
@@ -14,9 +14,9 @@ export class PaqueteService {
 
   getPaquetes(): Observable<PaqueteProbatorio[]> {
     return this.http
-      .get<PaqueteResponse[]>(`${API}/legalization/paquetes`)
+      .get<PaquetesPageResponse>(`${API}/legalization/paquetes`)
       .pipe(
-        map(list => list.map(paqueteFromApi)),
+        map(resp => resp.contenido.map(paqueteFromApi)),
         catchError(err => throwError(() => err))
       );
   }
@@ -33,11 +33,11 @@ export class PaqueteService {
   /** La facade pasa Partial<PaqueteProbatorio> — el service construye el request tipado. */
   crearPaquete(data: Partial<PaqueteProbatorio>): Observable<PaqueteProbatorio> {
     const request: CrearPaqueteRequest = {
-      actaId:       data.actaId       ?? '',
+      actaId:        data.actaId        ?? '',
       requisicionId: data.requisicionId ?? '',
-      fichaId:      data.fichaId      ?? '',
-      instructorId: data.instructorId ?? '',
-      titulo:       data.titulo,
+      fichaId:       data.fichaId       ?? '',
+      instructorId:  data.instructorId  ?? '',
+      titulo:        data.titulo        ?? '',
     };
     return this.http
       .post<PaqueteResponse>(`${API}/legalization/paquetes`, request)
@@ -71,9 +71,20 @@ export class PaqueteService {
     return this.adjuntarAsistencia(paqueteId);
   }
 
-  /** TODO: vincular requisición — usar vincularTrazabilidad con requisicionId */
+  /** POST /legalization/paquetes/{id}/exportar */
+  exportarPaquete(id: string): Observable<boolean> {
+    return this.http
+      .post<void>(`${API}/legalization/paquetes/${id}/exportar`, {})
+      .pipe(
+        map(() => true),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** @deprecated TrazabilidadRequest ahora requiere los 3 campos — usar vincularTrazabilidad directamente */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   incluirRequisicion(paqueteId: string, reqId: string): Observable<boolean> {
-    return this.vincularTrazabilidad(paqueteId, { requisicionId: reqId });
+    return this.archivarPaquete(paqueteId);
   }
 
   /** PATCH /legalization/paquetes/{id}/archivar */

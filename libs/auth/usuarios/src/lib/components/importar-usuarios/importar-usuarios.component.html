@@ -66,7 +66,11 @@
         <lucide-icon name="triangle-alert" [size]="16" class="modal__note-icon"></lucide-icon>
         <div>
           <p class="modal__note-title">Formato esperado de columnas:</p>
-          <p class="modal__note-cols">Documento &middot; Nombre &middot; Apellidos &middot; Email &middot; Teléfono &middot; Rol</p>
+          @if (tipo() === 'INSTRUCTOR') {
+            <p class="modal__note-cols">Documento &middot; Nombre &middot; Apellidos &middot; Email &middot; Teléfono &middot; NombreRol</p>
+          } @else {
+            <p class="modal__note-cols">Documento &middot; Nombre &middot; Apellidos &middot; Email &middot; NumeroFicha &middot; Programa</p>
+          }
         </div>
       </div>
 

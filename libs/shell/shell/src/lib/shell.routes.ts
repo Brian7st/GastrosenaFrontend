@@ -81,6 +81,11 @@ export const shellRoutes: Routes = [
         path: 'perfil',
         loadComponent: () => import('@restaurant/usuarios').then(m => m.PerfilPageComponent),
       },
+      // 👇 AGREGAR ESTA RUTA:
+      {
+        path: 'perfil',
+        loadComponent: () => import('@restaurant/usuarios').then(m => m.PerfilPageComponent),
+      },
     ],
   },
   {

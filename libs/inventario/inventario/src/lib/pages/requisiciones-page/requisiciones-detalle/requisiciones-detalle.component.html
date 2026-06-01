@@ -162,6 +162,14 @@
       <lucide-icon name="download" [size]="18"></lucide-icon>
       Descargar Soporte
     </button>
+    @if (requisicion()?.estado === 'DESPACHADA') {
+      <button class="btn-primary"
+              [routerLink]="['/app/inventario/actas/nueva']"
+              [queryParams]="{ requisicionId: reqId() }">
+        <lucide-icon name="file-plus" [size]="18"></lucide-icon>
+        Crear Acta
+      </button>
+    }
     <button class="btn-primary" [routerLink]="['/app/inventario/requisiciones/firmar', reqId()]">
       <lucide-icon name="pen-tool" [size]="18"></lucide-icon>
       Confirmar Recepción

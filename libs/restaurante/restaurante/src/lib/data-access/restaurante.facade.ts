@@ -19,6 +19,19 @@ export interface ItemCarrito {
   observaciones?: string;
 }
 
+export interface ProductoMenu {
+  id: string;
+  name: string;
+  price: number;
+  originalPrice?: number;
+  available: number;
+  sold: number;
+  discount?: string;
+  image: string;
+  category: string;
+  subcategory?: string;
+}
+
 export interface PedidoCarrito {
   id: string;
   mesaId: string;
@@ -35,29 +48,44 @@ export class RestauranteFacade {
   private restauranteService = inject(RestauranteService);
   private authService = inject(AuthService);
 
-  private _mesas          = signal<Mesa[]>([]);
-  private _mesasCargando  = signal<boolean>(false);
-  private _mesasError     = signal<string | null>(null);
+  private _mesas = signal<Mesa[]>([]);
+  private _mesasCargando = signal<boolean>(false);
+  private _mesasError = signal<string | null>(null);
   private _ordenesHistorial = signal<PedidoCarrito[]>([]);
-  private _pedidoActivo   = signal<PedidoCarrito | null>(null);
+  private _pedidoActivo = signal<PedidoCarrito | null>(null);
 
-  private _turnoCaja          = signal<SesionCajaResponse | null>(null);
-  private _pedidosParaCobro   = signal<PedidoResumenResponse[]>([]);
-  private _historialFacturas  = signal<PedidoResumenResponse[]>([]);
+  private _turnoCaja = signal<SesionCajaResponse | null>(null);
+  private _pedidosParaCobro = signal<PedidoResumenResponse[]>([]);
+  private _historialFacturas = signal<PedidoResumenResponse[]>([]);
 
-  readonly mesas            = this._mesas.asReadonly();
-  readonly mesasCargando    = this._mesasCargando.asReadonly();
-  readonly mesasError       = this._mesasError.asReadonly();
+  private _productosMenu = signal<ProductoMenu[]>([
+    { id: '1', name: 'Coffee Latte', price: 21.20, originalPrice: 26.20, available: 72, sold: 14, discount: '20% OFF', image: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300&q=80', category: 'bebidas', subcategory: 'calientes' },
+    { id: '2', name: 'Bolognese Spaghetti', price: 21.20, available: 8, sold: 32, image: 'https://images.unsplash.com/photo-1622973536968-3ead9e780960?w=300&q=80', category: 'plato_fuerte' },
+    { id: '3', name: 'Thanos Burger', price: 21.20, available: 12, sold: 73, image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300&q=80', category: 'plato_fuerte' },
+    { id: '4', name: 'Chamomile Tea', price: 21.20, available: 24, sold: 6, image: 'https://images.unsplash.com/photo-1576092762791-dd9e2220cad1?w=300&q=80', category: 'bebidas', subcategory: 'calientes' },
+    { id: '5', name: 'Neck Burner (Alitas)', price: 21.20, originalPrice: 26.20, available: 5, sold: 12, discount: '10% OFF', image: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=300&q=80', category: 'entrada' },
+    { id: '6', name: 'Black Tea', price: 21.20, available: 21, sold: 4, image: 'https://images.unsplash.com/photo-1594631252845-29fc4cc8cde9?w=300&q=80', category: 'bebidas', subcategory: 'frias' },
+    { id: '7', name: 'Otak Udang', price: 21.20, available: 3, sold: 21, discount: '20% OFF', image: 'https://images.unsplash.com/photo-1599487405270-891961f00880?w=300&q=80', category: 'entrada' },
+    { id: '8', name: 'Mie Sedap', price: 21.20, available: 2, sold: 34, image: 'https://images.unsplash.com/photo-1612929633738-8fe01f72810c?w=300&q=80', category: 'plato_fuerte' },
+    { id: '9', name: 'Pastel de Chocolate', price: 15.00, available: 10, sold: 25, image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=300&q=80', category: 'postre' },
+    { id: '10', name: 'Margarita Clásica', price: 30.00, available: 50, sold: 100, image: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=300&q=80', category: 'bebidas', subcategory: 'con_alcohol' },
+    { id: '11', name: 'Jugo Natural', price: 10.00, available: 30, sold: 50, image: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=300&q=80', category: 'bebidas', subcategory: 'sin_alcohol' }
+  ]);
+
+  readonly mesas = this._mesas.asReadonly();
+  readonly mesasCargando = this._mesasCargando.asReadonly();
+  readonly mesasError = this._mesasError.asReadonly();
   readonly ordenesHistorial = this._ordenesHistorial.asReadonly();
-  readonly pedidoActivo     = this._pedidoActivo.asReadonly();
-  readonly turnoCaja        = this._turnoCaja.asReadonly();
-  readonly isCajaAbierta    = computed(() => this._turnoCaja()?.estado === 'ABIERTA');
+  readonly pedidoActivo = this._pedidoActivo.asReadonly();
+  readonly turnoCaja = this._turnoCaja.asReadonly();
+  readonly isCajaAbierta = computed(() => this._turnoCaja()?.estado === 'ABIERTA');
   readonly pedidosParaCobro = this._pedidosParaCobro.asReadonly();
   readonly historialFacturas = this._historialFacturas.asReadonly();
+  readonly productosMenu = this._productosMenu.asReadonly();
 
   readonly stats = computed<RestauranteStats>(() => {
-    const mesasActivas  = this._mesas().filter(m => m.activo);
-    const totalMesas    = mesasActivas.length;
+    const mesasActivas = this._mesas().filter(m => m.activo);
+    const totalMesas = mesasActivas.length;
     const mesasOcupadas = mesasActivas.filter(m => m.estado !== 'LIBRE').length;
     const porcentajeOcupacion = totalMesas > 0
       ? Math.round((mesasOcupadas / totalMesas) * 100)
@@ -70,12 +98,12 @@ export class RestauranteFacade {
 
   readonly cajaStats = computed<CajaStats>(() => {
     const porCobrar = this._pedidosParaCobro();
-    const facturas  = this._historialFacturas();
+    const facturas = this._historialFacturas();
     return {
-      pedidosListos:   porCobrar.length,
-      mesasPorPagar:   porCobrar.length,
-      facturasHoy:     facturas.length,
-      totalFacturado:  facturas.reduce((sum, f) => sum + (f.subtotal || 0), 0)
+      pedidosListos: porCobrar.length,
+      mesasPorPagar: porCobrar.length,
+      facturasHoy: facturas.length,
+      totalFacturado: facturas.reduce((sum, f) => sum + (f.subtotal || 0), 0)
     };
   });
 
@@ -89,7 +117,7 @@ export class RestauranteFacade {
     this._mesasError.set(null);
 
     this.restauranteService.obtenerMesas().subscribe({
-      next:  (mesas) => {
+      next: (mesas) => {
         this._mesas.set(mesas);
         this._mesasCargando.set(false);
       },
@@ -104,7 +132,7 @@ export class RestauranteFacade {
 
   private cargarEstadoLocalNoMesas(): void {
     const ordenesGuardadas = localStorage.getItem('gastro_ordenes');
-    const turnoGuardado    = localStorage.getItem('gastro_turno_caja');
+    const turnoGuardado = localStorage.getItem('gastro_turno_caja');
 
     if (ordenesGuardadas) {
       this._ordenesHistorial.set(JSON.parse(ordenesGuardadas));
@@ -121,8 +149,8 @@ export class RestauranteFacade {
   }
 
   private guardarEstadoLocal(): void {
-    localStorage.setItem('gastro_ordenes',     JSON.stringify(this._ordenesHistorial()));
-    localStorage.setItem('gastro_turno_caja',  JSON.stringify(this._turnoCaja()));
+    localStorage.setItem('gastro_ordenes', JSON.stringify(this._ordenesHistorial()));
+    localStorage.setItem('gastro_turno_caja', JSON.stringify(this._turnoCaja()));
   }
 
   agregarMesa(nombre: string, capacidad: number, zona: string): void {
@@ -231,13 +259,25 @@ export class RestauranteFacade {
     nombreProducto: string,
     precioUnitario: number,
     categoria: string = 'COMIDA',
-    observaciones: string = ''
+    observaciones: string = '',
+    cantidad: number = 1
   ) {
     this._pedidoActivo.update(pedido => {
       if (!pedido) return null;
 
-      const nuevoItem: ItemCarrito = { productoId, nombreProducto, cantidad: 1, precioUnitario, categoria, observaciones };
-      const detalles = [...pedido.detalles, nuevoItem];
+      const detalles = [...pedido.detalles];
+      const indexExistente = detalles.findIndex(d => d.productoId === productoId && d.observaciones === observaciones);
+
+      if (indexExistente >= 0) {
+        detalles[indexExistente] = {
+          ...detalles[indexExistente],
+          cantidad: detalles[indexExistente].cantidad + cantidad
+        };
+      } else {
+        const nuevoItem: ItemCarrito = { productoId, nombreProducto, cantidad, precioUnitario, categoria, observaciones };
+        detalles.push(nuevoItem);
+      }
+
       const subtotal = detalles.reduce((sum, it) => sum + (it.precioUnitario * it.cantidad), 0);
 
       return { ...pedido, detalles, subtotal };
@@ -257,6 +297,25 @@ export class RestauranteFacade {
 
       const subtotal = detalles.reduce((sum, it) => sum + (it.precioUnitario * it.cantidad), 0);
       return { ...pedido, detalles, subtotal };
+    });
+  }
+
+  eliminarProductoDelPedido(index: number) {
+    this._pedidoActivo.update(pedido => {
+      if (!pedido) return null;
+
+      const detalles = [...pedido.detalles];
+      detalles.splice(index, 1);
+
+      const subtotal = detalles.reduce((sum, it) => sum + (it.precioUnitario * it.cantidad), 0);
+      return { ...pedido, detalles, subtotal };
+    });
+  }
+
+  vaciarCarrito() {
+    this._pedidoActivo.update(pedido => {
+      if (!pedido) return null;
+      return { ...pedido, detalles: [], subtotal: 0 };
     });
   }
 
@@ -333,11 +392,11 @@ export class RestauranteFacade {
         this._ordenesHistorial.update(historial =>
           historial.map(p => p.id === pedidoId ? { ...p, estado: 'ENTREGADO' } : p)
         );
-        
+
         this._mesas.update(mesas =>
           mesas.map(m => m.id.toString() === pedidoResponse.mesaId ? { ...m, estado: 'POR_PAGAR' } : m)
         );
-        
+
         this.guardarEstadoLocal();
       },
       error: (err) => {
@@ -361,7 +420,7 @@ export class RestauranteFacade {
   cerrarCaja(efectivoReal: number) {
     const session = this._turnoCaja();
     if (!session) return;
-    
+
     const request: CerrarSesionRequest = { efectivoReal };
     this.restauranteService.cerrarSesion(session.id, request).subscribe({
       next: (sesionCerrada) => {
@@ -373,7 +432,7 @@ export class RestauranteFacade {
 
   cargarPedidosParaCobro() {
     this.restauranteService.pedidosPorEstado('ENTREGADO').subscribe({
-      next:  (pedidos) => this._pedidosParaCobro.set(pedidos),
+      next: (pedidos) => this._pedidosParaCobro.set(pedidos),
       error: (err) => {
         console.error('[RestauranteFacade] Error al cargar pedidos para cobro:', err);
         this._pedidosParaCobro.set([]);
@@ -383,7 +442,7 @@ export class RestauranteFacade {
 
   cargarHistorialFacturas() {
     this.restauranteService.pedidosPorEstado('FACTURADO').subscribe({
-      next:  (pedidos) => this._historialFacturas.set(pedidos),
+      next: (pedidos) => this._historialFacturas.set(pedidos),
       error: (err) => {
         console.error('[RestauranteFacade] Error al cargar historial de facturas:', err);
         this._historialFacturas.set([]);

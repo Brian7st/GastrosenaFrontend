@@ -12,7 +12,7 @@
             <h3 class="modal-title">Registrar Salida de Producto</h3>
             <span class="req-badge">REQ-45-S</span>
           </div>
-          <p class="modal-subtitle">Solo requisiciones en estado ENVIADA habilitan salida.</p>
+          <p class="modal-subtitle">Solo requisiciones en estado DESPACHADA habilitan salida.</p>
         </div>
       </div>
       <button class="close-btn" (click)="closeModal()">
@@ -31,15 +31,15 @@
             <select class="form-select full-select" disabled>
               <option>Cargando requisiciones...</option>
             </select>
-          } @else if (requisicionesEnviadas().length === 0) {
+          } @else if (requisicionesDespachadas().length === 0) {
             <div class="empty-notice">
               <lucide-icon name="inbox" [size]="16"></lucide-icon>
-              No hay requisiciones en estado ENVIADA disponibles.
+              No hay requisiciones en estado DESPACHADA disponibles.
             </div>
           } @else {
             <select class="form-select full-select" (change)="onRequisicionChange($event)">
-              <option value="">Seleccione una requisición enviada...</option>
-              @for (req of requisicionesEnviadas(); track req.id) {
+              <option value="">Seleccione una requisición despachada...</option>
+              @for (req of requisicionesDespachadas(); track req.id) {
                 <option [value]="req.id">
                   {{ req.numero }} — {{ req.instructorNombre }} — {{ req.fecha }}
                 </option>

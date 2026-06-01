@@ -5,131 +5,101 @@
 <div class="modal-container">
   <div class="modal-card">
 
-    <!-- Modal Header -->
+    <!-- Header -->
     <div class="modal-card__header">
       <div>
         <h2 class="modal-card__title">Resumen y Confirmación</h2>
-        <p class="modal-card__subtitle">Verifique los ítems antes de enviar al almacén</p>
+        <p class="modal-card__subtitle">
+          Ficha {{ draft.contexto().fichaId }} — {{ draft.contexto().fecha }}
+          {{ draft.contexto().horaSesion }}
+        </p>
       </div>
       <div class="modal-card__header-icon">
         <lucide-icon name="clipboard-check" [size]="24"></lucide-icon>
       </div>
     </div>
 
-    <!-- Modal Content (Scrollable) -->
+    <!-- Body -->
     <div class="modal-card__body">
 
-      <!-- Category: Papelería y Oficina -->
-      <section class="category-section">
-        <div class="category-section__divider">
-          <span class="category-section__label">Papelería y Oficina</span>
-          <div class="category-section__line"></div>
+      @if (draft.totalItems() === 0) {
+        <div class="empty-notice">
+          <lucide-icon name="inbox" [size]="16"></lucide-icon>
+          No hay productos seleccionados. Vuelva a editar.
         </div>
-        <div class="item-list">
-          <div class="item-card">
-            <div class="item-card__left">
-              <div class="item-card__icon-wrap">
-                <lucide-icon name="pen-tool" [size]="20"></lucide-icon>
-              </div>
-              <div class="item-card__info">
-                <h4 class="item-card__name">Resaltadores Variados (Pack x12)</h4>
-                <p class="item-card__code">Código: ART-4512-B</p>
-              </div>
+      } @else {
+        @for (grupo of itemsPorCategoria(); track grupo.cat) {
+          <section class="category-section">
+            <div class="category-section__divider">
+              <span class="category-section__label">{{ grupo.label }}</span>
+              <div class="category-section__line"></div>
             </div>
-            <div class="item-card__right">
-              <span class="item-card__qty">05</span>
-              <span class="item-card__unit">Unidades</span>
-            </div>
-          </div>
-          <div class="item-card">
-            <div class="item-card__left">
-              <div class="item-card__icon-wrap">
-                <lucide-icon name="file-text" [size]="20"></lucide-icon>
-              </div>
-              <div class="item-card__info">
-                <h4 class="item-card__name">Resma de Papel Carta (500 hojas)</h4>
-                <p class="item-card__code">Código: PAP-1020-W</p>
-              </div>
-            </div>
-            <div class="item-card__right">
-              <span class="item-card__qty">10</span>
-              <span class="item-card__unit">Unidades</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Category: Equipos y Periféricos -->
-      <section class="category-section">
-        <div class="category-section__divider">
-          <span class="category-section__label">Equipos y Periféricos</span>
-          <div class="category-section__line"></div>
-        </div>
-        <div class="item-list">
-          <div class="item-card">
-            <div class="item-card__left">
-              <div class="item-card__icon-wrap">
-                <lucide-icon name="mouse" [size]="20"></lucide-icon>
-              </div>
-              <div class="item-card__info">
-                <h4 class="item-card__name">Mouse Óptico Ergonómico USB</h4>
-                <p class="item-card__code">Código: TEC-8821-H</p>
-              </div>
-            </div>
-            <div class="item-card__right">
-              <span class="item-card__qty">02</span>
-              <span class="item-card__unit">Unidades</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Category: Limpieza (With Alert) -->
-      <section class="category-section">
-        <div class="category-section__divider">
-          <span class="category-section__label">Limpieza e Higiene</span>
-          <div class="category-section__line"></div>
-        </div>
-        <div class="item-list">
-          <div class="item-card item-card--alert">
-            <div class="item-card__left">
-              <div class="item-card__icon-wrap item-card__icon-wrap--alert">
-                <lucide-icon name="spray-can" [size]="20"></lucide-icon>
-              </div>
-              <div class="item-card__info">
-                <div class="item-card__name-row">
-                  <h4 class="item-card__name">Alcohol Antiséptico 70% (1L)</h4>
-                  <span class="item-card__stock-badge">Bajo Stock</span>
+            <div class="item-list">
+              @for (item of grupo.items; track item.bien.codigoSena) {
+                <div class="item-card"
+                     [class.item-card--alert]="item.bien.estado === 'Bajo Stock' || item.bien.estado === 'Agotado'">
+                  <div class="item-card__left">
+                    <div class="item-card__icon-wrap"
+                         [class.item-card__icon-wrap--alert]="item.bien.estado === 'Bajo Stock' || item.bien.estado === 'Agotado'">
+                      <lucide-icon name="package" [size]="20"></lucide-icon>
+                    </div>
+                    <div class="item-card__info">
+                      <div class="item-card__name-row">
+                        <h4 class="item-card__name">{{ item.bien.nombre }}</h4>
+                        @if (item.bien.estado === 'Bajo Stock') {
+                          <span class="item-card__stock-badge">Bajo Stock</span>
+                        }
+                        @if (item.bien.estado === 'Agotado') {
+                          <span class="item-card__stock-badge">Agotado</span>
+                        }
+                      </div>
+                      <p class="item-card__code">Código: {{ item.bien.codigoSena }}</p>
+                    </div>
+                  </div>
+                  <div class="item-card__right"
+                       [class.item-card__right--alert]="item.bien.estado === 'Bajo Stock' || item.bien.estado === 'Agotado'">
+                    <span class="item-card__qty"
+                          [class.item-card__qty--alert]="item.bien.estado === 'Bajo Stock'">
+                      {{ item.cantidad | number:'2.0-0' }}
+                    </span>
+                    <span class="item-card__unit"
+                          [class.item-card__unit--alert]="item.bien.estado === 'Bajo Stock'">
+                      {{ item.bien.unidadMedida }}
+                    </span>
+                  </div>
                 </div>
-                <p class="item-card__code">Código: ASE-3392-A</p>
-              </div>
+              }
             </div>
-            <div class="item-card__right item-card__right--alert">
-              <span class="item-card__qty item-card__qty--alert">04</span>
-              <span class="item-card__unit item-card__unit--alert">Unidades</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
+          </section>
+        }
+      }
     </div>
 
-    <!-- Modal Footer -->
+    <!-- Footer -->
     <div class="modal-card__footer">
       <div class="modal-footer__summary">
         <div>
           <p class="modal-footer__total-label">Total de la Solicitud</p>
-          <h3 class="modal-footer__total-value">21 Ítems</h3>
+          <h3 class="modal-footer__total-value">{{ draft.totalUnidades() }} Unidades</h3>
         </div>
-        <p class="modal-footer__note">Este pedido será procesado por el almacén central del SENA.</p>
+        <p class="modal-footer__note">Este pedido será procesado por el almacén del SENA.</p>
       </div>
       <div class="modal-footer__actions">
-        <button class="btn-secondary" (click)="close()">Volver a Editar</button>
-        <button class="btn-primary">
-          Confirmar Pedido y Enviar a Almacén
-          <lucide-icon name="send" [size]="18"></lucide-icon>
+        <button class="btn-secondary" (click)="volver()" [disabled]="loading()">
+          Volver a Editar
+        </button>
+        <button class="btn-primary" (click)="confirmar()"
+                [disabled]="loading() || draft.totalItems() === 0">
+          @if (loading()) {
+            <lucide-icon name="loader-2" [size]="18"></lucide-icon>
+            Enviando...
+          } @else {
+            Confirmar Pedido y Enviar a Almacén
+            <lucide-icon name="send" [size]="18"></lucide-icon>
+          }
         </button>
       </div>
     </div>
+
   </div>
 </div>

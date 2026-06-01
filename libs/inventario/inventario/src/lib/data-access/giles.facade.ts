@@ -1,5 +1,5 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
-import { catchError, finalize, of } from 'rxjs';
+import { catchError, finalize, Observable, of } from 'rxjs';
 import { GilResponse } from './api/procurement.api';
 import { GilesService } from './services/giles.service';
 
@@ -46,18 +46,20 @@ export class GilesFacade {
   // ── Acciones ─────────────────────────────────────────────────────────────────
 
   /**
-   * Carga todos los GILes válidos para registrar entradas:
-   * estados EMITIDO, ENVIADO_PROVEEDOR y CERRADO en paralelo.
-   * Usa size=50 por estado para cubrir el volumen operativo normal.
-   * Los resultados se combinan y se paginan de a 10 en el cliente.
+   * Carga los GILes válidos para registrar entradas en Kardex.
+   * Solo se incluyen GILes en estado VERIFICADO: la conciliación FEL vs GIL
+   * fue completada por el backend, por lo que estos son los únicos aptos
+   * para registrar ingresos físicos al inventario.
+   * Usa size=50 para cubrir el volumen operativo normal.
+   * Los resultados se paginan de a 10 en el cliente.
    */
   cargarGilesValidados(): void {
     this._loading.set(true);
     this._error.set(null);
     this._paginaActual.set(0);
 
-    const estados = ['EMITIDO', 'ENVIADO_PROVEEDOR', 'CERRADO'] as const;
-    const buffer: GilResponse[][] = [[], [], []];
+    const estados = ['VERIFICADO'] as const;
+    const buffer: GilResponse[][] = [[]];
     let pendientes = estados.length;
 
     estados.forEach((estado, idx) => {
@@ -112,5 +114,10 @@ export class GilesFacade {
   /** Limpia la selección actual. */
   limpiarSeleccion(): void {
     this._gilSeleccionado.set(null);
+  }
+
+  /** PATCH /procurement/giles/{id}/cerrar — cierra el GIL cuando todos los ítems fueron recibidos. */
+  cerrarGil(id: string): Observable<void> {
+    return this.gilesService.cerrarGil(id);
   }
 }
