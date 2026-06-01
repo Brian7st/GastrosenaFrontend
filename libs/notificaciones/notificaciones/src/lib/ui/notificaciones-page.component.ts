@@ -1,15 +1,13 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal, computed } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { NotificacionesService } from '../data-access/notificaciones.service';
-import { Notificacion } from '../models/notificaciones.model';
+import { Notificacion, EstadoNotificacion, TipoNotificacion } from '../models/notificaciones.model';
 import {
   PageHeaderComponent,
   StatusBadgeComponent,
   LucideIconComponent,
   ButtonComponent,
 } from '@restaurant/shared/ui';
-import { Notificacion, EstadoNotificacion, TipoNotificacion } from '../models/notificaciones.model';
-
 const MOCK_NOTIFICACIONES: Notificacion[] = [
   {
     id: '1',
