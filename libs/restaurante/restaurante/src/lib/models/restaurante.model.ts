@@ -7,6 +7,7 @@ export interface Mesa {
   zona: string | null;
   estado: EstadoMesa;
   activo: boolean;
+  observaciones?: string | null;
 }
 
 /** Espejo de MesaCreateRequest.java — @NotBlank nombre, @NotNull capacidad */
@@ -21,6 +22,7 @@ export interface MesaUpdateRequest {
   nombre?: string;
   capacidad?: number;
   zona?: string | null;
+  observaciones?: string | null;
 }
 
 
