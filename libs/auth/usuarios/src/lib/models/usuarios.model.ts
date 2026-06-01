@@ -32,6 +32,8 @@ export interface ActualizarUsuarioRequest {
   apellidos: string;
   telefono:  string;
   idRol:     string;
+  documento: string;   // ← agregar
+  email:     string;
 }
 
 export interface RolOpcion {

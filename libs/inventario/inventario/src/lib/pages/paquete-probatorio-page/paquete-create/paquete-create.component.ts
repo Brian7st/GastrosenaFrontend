@@ -2,10 +2,11 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
+  OnInit,
   signal,
 } from '@angular/core';
 
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
@@ -19,28 +20,30 @@ import { PaqueteFacade } from '../../../data-access/paquete.facade';
   templateUrl: './paquete-create.component.html',
   styleUrl: './paquete-create.component.scss',
 })
-export class PaqueteCreateComponent {
+export class PaqueteCreateComponent implements OnInit {
   private router = inject(Router);
+  private route  = inject(ActivatedRoute);
   private fb     = inject(FormBuilder);
   private facade = inject(PaqueteFacade);
 
+  // ── Params desde la URL ─────────────────────────────────────────────────
+  actaIdParam        = signal('');
+  requisicionIdParam = signal('');
+
   // ── Formulario ──────────────────────────────────────────────────────────
   createForm = this.fb.nonNullable.group({
-    expediente:   [this.generarIdExpediente(), Validators.required],
     titulo:       ['', Validators.required],
     fichaId:      ['', Validators.required],
-    gilId:        [''],
     instructorId: ['', Validators.required],
   });
 
   // ── Estado del Stepper ──────────────────────────────────────────────────
   currentStep = signal<number>(1);
 
-  // ── Helpers ─────────────────────────────────────────────────────────────
-  private generarIdExpediente(): string {
-    const año = new Date().getFullYear();
-    const seq = String(Math.floor(Math.random() * 9000) + 1000);
-    return `EXP-${año}-${seq}`;
+  // ── Lifecycle ──────────────────────────────────────────────────────────
+  ngOnInit(): void {
+    this.actaIdParam.set(this.route.snapshot.queryParamMap.get('actaId') ?? '');
+    this.requisicionIdParam.set(this.route.snapshot.queryParamMap.get('requisicionId') ?? '');
   }
 
   // ── Navegación ─────────────────────────────────────────────────────────
@@ -68,7 +71,11 @@ export class PaqueteCreateComponent {
 
   guardarPaquete(): void {
     if (this.createForm.valid) {
-      this.facade.crearPaquete(this.createForm.getRawValue());
+      this.facade.crearPaquete({
+        ...this.createForm.getRawValue(),
+        actaId:        this.actaIdParam(),
+        requisicionId: this.requisicionIdParam(),
+      });
       this.volver();
     }
   }

@@ -2,11 +2,13 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
+  OnInit,
 } from '@angular/core';
 
 import { ActivatedRoute, Router } from '@angular/router';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 import { PaqueteFacade } from '../../../data-access/paquete.facade';
+import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
 
 @Component({
   selector: 'restaurant-paquete-req-detail',
@@ -16,24 +18,31 @@ import { PaqueteFacade } from '../../../data-access/paquete.facade';
   templateUrl: './paquete-req-detail.component.html',
   styleUrl: './paquete-req-detail.component.scss',
 })
-export class PaqueteReqDetailComponent {
-  private router = inject(Router);
-  private route  = inject(ActivatedRoute);
-  private facade = inject(PaqueteFacade);
+export class PaqueteReqDetailComponent implements OnInit {
+  private router               = inject(Router);
+  private route                = inject(ActivatedRoute);
+  private facade               = inject(PaqueteFacade);
+  private requisicionesFacade  = inject(RequisicionesFacade);
 
-  // ── Estado reactivo desde facade ─────────────────────────────────────────
-  loading = this.facade.loading;
+  // ── Estado reactivo desde facades ────────────────────────────────────────
+  loading      = this.facade.loading;
+  requisicion  = this.requisicionesFacade.requisicionSeleccionada;
+
+  ngOnInit(): void {
+    const reqId = this.route.snapshot.queryParamMap.get('reqId')
+      ?? this.facade.paqueteSeleccionado()?.requisicionId
+      ?? '';
+    if (reqId) {
+      this.requisicionesFacade.cargarRequisicion(reqId);
+    }
+  }
 
   cerrarPanel(): void {
     this.router.navigate(['../'], { relativeTo: this.route });
   }
 
+  /** La requisición ya está vinculada desde la creación del paquete — solo cierra el panel. */
   incluirEnPaquete(): void {
-    const paqueteId = this.route.parent?.snapshot.paramMap.get('id') ?? '';
-    const reqId     = this.route.snapshot.queryParamMap.get('reqId') ?? '';
-    if (paqueteId) {
-      this.facade.incluirRequisicion(paqueteId, reqId);
-    }
     this.cerrarPanel();
   }
 }

@@ -67,14 +67,23 @@ export class PaqueteDetailComponent implements OnInit {
         fecha: 'Pendiente de acción',
         activo: true,
         tipo: 'error',
-        detalle: `Validación automática - ${p.fecha}`,
+        detalle: `Validación automática - ${p.fecha ?? ''}`,
       });
     }
 
     if (p.estado === 'COMPLETO') {
       entries.push({
         estado: 'Completo',
-        fecha: p.fecha,
+        fecha: p.fecha ?? '',
+        activo: true,
+        tipo: 'success',
+      });
+    }
+
+    if (p.estado === 'REVISADO') {
+      entries.push({
+        estado: 'Revisado',
+        fecha: p.fecha ?? '',
         activo: true,
         tipo: 'success',
       });
@@ -83,7 +92,7 @@ export class PaqueteDetailComponent implements OnInit {
     if (p.estado === 'ARCHIVADO') {
       entries.push({
         estado: 'Archivado',
-        fecha: p.fecha,
+        fecha: p.fecha ?? '',
         activo: true,
         tipo: 'neutral',
       });
@@ -93,7 +102,7 @@ export class PaqueteDetailComponent implements OnInit {
     if (p.estado !== 'INCOMPLETO') {
       entries.push({
         estado: 'Incompleto',
-        fecha: p.fecha,
+        fecha: p.fecha ?? '',
         activo: false,
         tipo: 'neutral',
       });
@@ -107,6 +116,7 @@ export class PaqueteDetailComponent implements OnInit {
     const map: Record<PaqueteEstado, string> = {
       INCOMPLETO: 'Incompleto',
       COMPLETO:   'Completo',
+      REVISADO:   'Revisado',
       ARCHIVADO:  'Archivado',
     };
     return map[estado];
@@ -116,6 +126,7 @@ export class PaqueteDetailComponent implements OnInit {
     const map: Record<PaqueteEstado, 'success' | 'warning' | 'danger' | 'info'> = {
       INCOMPLETO: 'danger',
       COMPLETO:   'success',
+      REVISADO:   'success',
       ARCHIVADO:  'info',
     };
     return map[estado];
@@ -146,14 +157,14 @@ export class PaqueteDetailComponent implements OnInit {
   exportarPaquete(): void {
     const p = this.paquete();
     if (p) {
-      console.log('Exportar paquete:', p.expediente);
+      this.facade.exportarPaquete(p.id);
     }
   }
 
   archivarExpediente(): void {
     const p = this.paquete();
     if (p) {
-      console.log('Archivar expediente:', p.expediente);
+      this.facade.archivarPaquete(p.id);
     }
   }
 

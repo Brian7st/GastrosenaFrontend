@@ -9,9 +9,9 @@ import { SalidaMovimientoData } from '../../../models/movimiento.model';
 
 /**
  * Registro de salida de inventario.
- * REGLA DE NEGOCIO: toda salida debe estar vinculada a una Requisición en estado ENVIADA.
- *   ENVIADA   → habilita registrar Salida (B-04).
- *   DESPACHADA → salida ya registrada, no aparece en este selector.
+ * REGLA DE NEGOCIO: toda salida debe estar vinculada a una Requisición en estado DESPACHADA.
+ *   DESPACHADA → ecónomo aprobó físicamente la requisición; habilita registrar Salida (B-04).
+ *   ENVIADA    → pendiente de despacho del ecónomo, no habilita salida.
  * Los ítems de la requisición pre-llenan productoId, cantidad y categoria (B-02).
  */
 @Component({
@@ -32,15 +32,15 @@ export class MovimientoSalidaComponent {
   requisicionIdSeleccionada = signal<string>('');
 
   // ── Computed ──────────────────────────────────────────────────────────────
-  /** Solo requisiciones ENVIADA habilitan salida (B-04). */
-  requisicionesEnviadas = computed(() =>
-    this.requisicionesFacade.requisiciones().filter(r => r.estado === 'ENVIADA')
+  /** Solo requisiciones DESPACHADA habilitan salida (B-04 — ecónomo las ha aprobado). */
+  requisicionesDespachadas = computed(() =>
+    this.requisicionesFacade.requisiciones().filter(r => r.estado === 'DESPACHADA')
   );
 
   requisicionSeleccionada = computed<Requisicion | null>(() => {
     const id = this.requisicionIdSeleccionada();
     if (!id) return null;
-    return this.requisicionesEnviadas().find(r => r.id === id) ?? null;
+    return this.requisicionesDespachadas().find(r => r.id === id) ?? null;
   });
 
   itemsActuales = computed(() => this.requisicionSeleccionada()?.items ?? []);
@@ -56,8 +56,8 @@ export class MovimientoSalidaComponent {
   itemsForm: FormArray = this.fb.array([]);
 
   constructor() {
-    // Carga solo requisiciones ENVIADA al abrir el modal
-    this.requisicionesFacade.cargarPorEstado('ENVIADA');
+    // Carga solo requisiciones DESPACHADA al abrir el modal
+    this.requisicionesFacade.cargarPorEstado('DESPACHADA');
 
     // Reconstruye el FormArray cada vez que cambia la requisición seleccionada
     effect(() => {

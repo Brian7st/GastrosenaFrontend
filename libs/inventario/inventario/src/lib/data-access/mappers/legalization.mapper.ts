@@ -6,19 +6,17 @@ import { ActaResponse, PaqueteResponse, RequisicionResponse } from '../api/legal
 export function actaFromApi(dto: ActaResponse): ActaLegalizacion {
   return {
     id: dto.id,
-    numeroActa: dto.numeroActa,
+    numeroActa: String(dto.numeroActa), // number (long Java) → string para el modelo interno
     fecha: dto.fecha,
-    programa: dto.programa,
+    programa: '',    // el backend no retorna programa; campo vacío por compatibilidad
     fichaId: dto.fichaId,
     instructorId: dto.instructorId,
     requisicionId: dto.requisicionId,
     estado: dto.estado,
     ciudad: dto.ciudad,
     lugar: dto.lugar,
-    agendaSesion: dto.agendaSesion,
-    desarrolloSesion: dto.desarrolloSesion,
-    resultadoAprendizaje: dto.resultadoAprendizaje,
-    actividadesEjecutadas: dto.actividadesEjecutadas,
+    // agendaSesion, desarrolloSesion, resultadoAprendizaje, actividadesEjecutadas
+    // no son retornados por el backend en el listado/detalle
   };
 }
 
@@ -29,13 +27,13 @@ export function paqueteFromApi(dto: PaqueteResponse): PaqueteProbatorio {
     titulo: dto.titulo,
     fichaId: dto.fichaId,
     estado: dto.estado,
-    gilId: dto.gilId,
+    gilId: dto.gilId ?? '',
     cufeFuenteId: dto.cufeFuenteId,
     actaId: dto.actaId,
     requisicionId: dto.requisicionId,
     registroAsistenciaAdjunto: dto.registroAsistenciaAdjunto,
     instructorId: dto.instructorId,
-    fecha: dto.fecha,
+    // fecha no está en la respuesta del backend
   };
 }
 
