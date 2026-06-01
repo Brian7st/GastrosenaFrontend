@@ -46,22 +46,6 @@
 
   <section class="caja-page__actions">
     <div class="actions-grid">
-      <div class="action-card generate-card">
-        <div class="action-header">
-          <lucide-icon name="file-text" [size]="24" class="icon-green"></lucide-icon>
-          <h3 class="text-green">Generar Factura</h3>
-        </div>
-        <p class="action-desc">Crear facturas para pedidos finalizados</p>
-        <div class="action-info">
-          <span>Pedidos disponibles:</span>
-          <span class="badge-count">{{ facade.cajaStats().pedidosListos }}</span>
-        </div>
-        <restaurant-button variant="primary" class="full-width" (click)="irANuevaFactura()" [disabled]="!facade.isCajaAbierta()">
-          <lucide-icon name="plus" [size]="18"></lucide-icon>
-          <span>Crear Nueva Factura</span>
-        </restaurant-button>
-      </div>
-
       <div class="action-card search-card">
         <div class="action-header">
           <lucide-icon name="search" [size]="24" class="icon-blue"></lucide-icon>
