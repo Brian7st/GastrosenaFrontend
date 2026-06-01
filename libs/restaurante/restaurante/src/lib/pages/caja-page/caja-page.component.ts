@@ -58,4 +58,3 @@ export class CajaPageComponent implements OnInit {
     this.router.navigate(['./movimientos'], { relativeTo: this.route });
   }
 }
-
