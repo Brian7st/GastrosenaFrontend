@@ -51,12 +51,6 @@
     @if (error()) {
       <p class="acta-upload__error">{{ error() }}</p>
     }
-    @if (procesando()) {
-      <p class="acta-upload__info">
-        <lucide-icon name="loader" [size]="14"></lucide-icon>
-        Firmando acta y descontando stock...
-      </p>
-    }
 
     <!-- Footer Actions -->
     <div class="acta-upload__footer">

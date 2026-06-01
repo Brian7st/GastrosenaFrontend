@@ -89,6 +89,7 @@ export interface CrearPaqueteRequest {
   requisicionId: string;
   fichaId: string;
   instructorId: string;
+  titulo: string;
 }
 
 export interface TrazabilidadRequest {

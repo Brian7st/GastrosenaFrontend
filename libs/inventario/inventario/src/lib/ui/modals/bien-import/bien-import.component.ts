@@ -90,27 +90,23 @@ export class BienImportModalComponent {
   onDescargarPlantilla(): void {
     const headers = [
       'codigoSena',
-      'nombre',
       'descripcion',
       'categoria',
-      'unidadMedida',
-      'codigoProveedor',
-      'urlImagen',
       'vrlAdjudicado',
       'vrlAntes',
-      'iva'
+      'iva',
+      'codigoProveedor',
+      'unidadMedida',
     ];
     const sampleRow = [
       'SENA-002',                      // codigoSena
-      'Tomate chonto premium',         // nombre
       'Tomate fresco de ensalada',     // descripcion
       'Alimentos',                     // categoria
-      'Kilogramo',                     // unidadMedida
+      '4200.00',                       // vrlAdjudicado
+      '3800.00',                       // vrlAntes
+      '0.00',                          // iva (Exento en Colombia)
       'PROV-002',                      // codigoProveedor
-      'https://link-a-la-imagen.com',  // urlImagen
-      '4200.00',                         // vrlAdjudicado
-      '3800.00',                         // vrlAntes
-      '0.00'                             // iva (Exento en Colombia)
+      'Kilogramo',                     // unidadMedida
     ];
 
     const csvLines = [

@@ -37,46 +37,26 @@
       </div>
     </header>
 
-    <section class="categories-section">
-      <lib-pedidos-categories
-        (categorySelected)="selectedCategory.set($event)"
-        (subcategorySelected)="selectedSubcategory.set($event)">
-      </lib-pedidos-categories>
-    </section>
+    <div [style.pointer-events]="esPedidoSoloLectura() ? 'none' : 'auto'" [style.opacity]="esPedidoSoloLectura() ? '0.5' : '1'">
+      <section class="categories-section">
+        <lib-pedidos-categories
+          (categorySelected)="selectedCategory.set($event)"
+          (subcategorySelected)="selectedSubcategory.set($event)">
+        </lib-pedidos-categories>
+      </section>
 
-    <section class="menu-section">
-      <lib-pedidos-menu-grid 
-        [searchTerm]="searchTerm()"
-        [category]="selectedCategory()"
-        [subcategory]="selectedSubcategory()">
-      </lib-pedidos-menu-grid>
-    </section>
+      <section class="menu-section">
+        <lib-pedidos-menu-grid 
+          [searchTerm]="searchTerm()"
+          [category]="selectedCategory()"
+          [subcategory]="selectedSubcategory()">
+        </lib-pedidos-menu-grid>
+      </section>
+    </div>
   </main>
 
-  <!-- Overlay para móvil -->
-  @if (showMobileCart()) {
-    <div class="mobile-cart-backdrop" (click)="showMobileCart.set(false)"></div>
-  }
-
-  <!-- Área del Carrito (Derecha / Drawer en móvil) -->
-  <aside class="pedidos-sidebar" [class.mobile-open]="showMobileCart()">
-    <div class="mobile-drawer-header">
-      <h3>Resumen del Pedido</h3>
-      <button class="close-drawer-btn" (click)="showMobileCart.set(false)">
-        <lucide-icon name="x" [size]="24"></lucide-icon>
-      </button>
-    </div>
+  <!-- Área del Carrito (Derecha) -->
+  <aside class="pedidos-sidebar">
     <lib-pedidos-cart></lib-pedidos-cart>
   </aside>
-
-  <!-- Botón flotante para abrir el carrito en móvil -->
-  <button class="mobile-cart-fab" (click)="showMobileCart.set(true)">
-    <div class="fab-content">
-      <lucide-icon name="clipboard-list" [size]="24"></lucide-icon>
-      <span>Ver Carrito</span>
-    </div>
-    @if (totalItems() > 0) {
-      <span class="fab-badge">{{ totalItems() }}</span>
-    }
-  </button>
 </div>

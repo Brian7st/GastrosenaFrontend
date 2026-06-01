@@ -15,7 +15,7 @@
           {{ iniciales() }}
         }
         <div class="perfil-header__avatar-overlay">
-          <lucide-icon name="camera" [size]="20"></lucide-icon>
+          <lucide-icon name="upload" [size]="20"></lucide-icon>
         </div>
       </div>
       <input
@@ -95,7 +95,7 @@
   <!-- Seguridad (Cambio de contraseña) -->
   <div class="perfil-card">
     <div class="perfil-card__title">
-      <lucide-icon name="lock" [size]="18"></lucide-icon>
+      <lucide-icon name="shield-check" [size]="18"></lucide-icon>
       <h3>Cambiar Contraseña</h3>
     </div>
     <form [formGroup]="seguridadForm" class="perfil-form">
@@ -103,27 +103,27 @@
         label="Contraseña Actual"
         placeholder="••••••••"
         type="password"
-        icon="lock"
+        icon="shield-check"
         formControlName="contrasenaActual"
       />
       <restaurant-input
         label="Nueva Contraseña"
         placeholder="••••••••"
         type="password"
-        icon="lock"
+        icon="shield-check"
         formControlName="nuevaContrasena"
       />
       <restaurant-input
         label="Confirmar Contraseña"
         placeholder="••••••••"
         type="password"
-        icon="lock"
+        icon="shield-check"
         formControlName="confirmar"
       />
       <div style="margin-top: 1rem;">
         <restaurant-button variant="primary" (click)="onCambiarContrasena()" [disabled]="guardando()">
           @if (!guardando()) {
-            <lucide-icon name="lock" [size]="16"></lucide-icon>
+            <lucide-icon name="shield-check" [size]="16"></lucide-icon>
             Cambiar Contraseña
           } @else {
             <span class="perfil-spinner"></span>

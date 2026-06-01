@@ -4,6 +4,7 @@ import { RecetaService } from '../../data-access/receta.service';
 import { Receta } from '../../models/receta.model';
 import { DetalleRecetaComponent } from '../../components/detalle-receta/detalle-receta.component';
 import { GestionRecetaComponent } from '../../components/gestion-receta/gestion-receta.component';
+import { GestionCategoriasComponent } from '../../components/gestion-categorias/gestion-categorias.component';
 import {
   LucideIconComponent,
   PageHeaderComponent,
@@ -23,6 +24,7 @@ import {
     CommonModule, 
     DetalleRecetaComponent, 
     GestionRecetaComponent, 
+    GestionCategoriasComponent,
     LucideIconComponent,
     PageHeaderComponent,
     SearchFilterComponent,
@@ -47,6 +49,7 @@ export class RecetasPageComponent implements OnInit {
   recetaSeleccionada = signal<Receta | null>(null);
   mostrarDetalle = signal<boolean>(false);
   mostrarGestion = signal<boolean>(false);
+  mostrarCategorias = signal<boolean>(false);
 
   // Estados para alertas y confirmación
   confirmDeleteOpen = signal<boolean>(false);
@@ -107,6 +110,10 @@ export class RecetasPageComponent implements OnInit {
     this.mostrarGestion.set(true);
   }
 
+  abrirGestionCategorias() {
+    this.mostrarCategorias.set(true);
+  }
+
   editarReceta(receta: Receta) {
     this.recetaSeleccionada.set(receta);
     this.mostrarGestion.set(true);
@@ -115,6 +122,7 @@ export class RecetasPageComponent implements OnInit {
   cerrarModales(actualizoDatos = false) {
     this.mostrarDetalle.set(false);
     this.mostrarGestion.set(false);
+    this.mostrarCategorias.set(false);
     if (actualizoDatos) {
       this.recetaService.listar();
     }
