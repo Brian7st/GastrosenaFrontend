@@ -167,7 +167,7 @@ export interface VincularInstructorRequest {
 /** Detalle tal como lo retorna el backend (campo "detalles") */
 export interface DetalleGilResponse {
   gilItemId:             string;
-  productoId:            string;
+  descripcion:           string;
   cantidadGil:           number;
   cantidadFactura:       number;
   precioUnitarioGil:     number;

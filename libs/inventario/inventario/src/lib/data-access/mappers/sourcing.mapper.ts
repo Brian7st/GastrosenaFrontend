@@ -82,7 +82,7 @@ export function conciliacionGilFromApi(dto: ConciliacionGilResponse): Conciliaci
     estado:    dto.estado,
     diferencias: dto.detalles.map((d: DetalleGilResponse) => ({
       gilItemId:             d.gilItemId,
-      descripcion:           d.productoId,
+      descripcion:           d.descripcion,
       cantidadGil:           d.cantidadGil,
       cantidadFactura:       d.cantidadFactura,
       precioUnitarioGil:     d.precioUnitarioGil,
