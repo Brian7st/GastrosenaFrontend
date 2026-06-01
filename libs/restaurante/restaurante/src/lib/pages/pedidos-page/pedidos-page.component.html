@@ -37,20 +37,22 @@
       </div>
     </header>
 
-    <section class="categories-section">
-      <lib-pedidos-categories
-        (categorySelected)="selectedCategory.set($event)"
-        (subcategorySelected)="selectedSubcategory.set($event)">
-      </lib-pedidos-categories>
-    </section>
+    <div [style.pointer-events]="esPedidoSoloLectura() ? 'none' : 'auto'" [style.opacity]="esPedidoSoloLectura() ? '0.5' : '1'">
+      <section class="categories-section">
+        <lib-pedidos-categories
+          (categorySelected)="selectedCategory.set($event)"
+          (subcategorySelected)="selectedSubcategory.set($event)">
+        </lib-pedidos-categories>
+      </section>
 
-    <section class="menu-section">
-      <lib-pedidos-menu-grid 
-        [searchTerm]="searchTerm()"
-        [category]="selectedCategory()"
-        [subcategory]="selectedSubcategory()">
-      </lib-pedidos-menu-grid>
-    </section>
+      <section class="menu-section">
+        <lib-pedidos-menu-grid 
+          [searchTerm]="searchTerm()"
+          [category]="selectedCategory()"
+          [subcategory]="selectedSubcategory()">
+        </lib-pedidos-menu-grid>
+      </section>
+    </div>
   </main>
 
   <!-- Área del Carrito (Derecha) -->

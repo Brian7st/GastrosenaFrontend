@@ -309,6 +309,19 @@
         flex: 1;
         width: 100%;
       }
+
+      &.btn-anular {
+        button.app-btn {
+          background-color: var(--color-error, #ba1a1a);
+          color: var(--color-en-primario, #ffffff);
+          border-color: transparent;
+
+          &:hover {
+            background-color: var(--color-danger, #d63031);
+            transform: scale(1.02);
+          }
+        }
+      }
     }
   }
 }

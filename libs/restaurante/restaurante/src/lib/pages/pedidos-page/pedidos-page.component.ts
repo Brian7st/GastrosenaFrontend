@@ -41,6 +41,11 @@ export class PedidosPageComponent {
     return this.facade.mesas().find(m => m.id.toString() === pedido.mesaId);
   });
 
+  esPedidoSoloLectura = computed(() => {
+    const p = this.facade.pedidoActivo();
+    return p ? p.estado !== 'BORRADOR' : false;
+  });
+
   fechaActual = new Date();
 
   volverAMesas() {
