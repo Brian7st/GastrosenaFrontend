@@ -26,8 +26,10 @@ export class ActasUploadComponent {
   isDragging          = signal(false);
   archivoSeleccionado = signal<File | null>(null);
   errorArchivo        = signal<string | null>(null);
+  procesando          = signal(false);
+  error               = signal<string | null>(null);
 
-  puedeConfirmar = computed(() => this.archivoSeleccionado() !== null);
+  puedeConfirmar = computed(() => this.archivoSeleccionado() !== null && !this.procesando());
 
   get actaId(): string {
     return this.route.parent?.snapshot.paramMap.get('id') ?? '';
@@ -62,10 +64,16 @@ export class ActasUploadComponent {
     this.archivoSeleccionado.set(file);
   }
 
-  /** El backend no almacena el archivo; confirmar carga avanza el acta a FIRMADA. */
+  /**
+   * El backend no almacena el archivo; confirmar carga avanza el acta a FIRMADA.
+   * El descuento de stock se activa automáticamente en el backend (ActaFirmadaListener).
+   */
   confirmarCarga(): void {
     if (!this.puedeConfirmar() || !this.actaId) return;
+    this.procesando.set(true);
+    this.error.set(null);
     this.actasFacade.cambiarEstado(this.actaId, 'FIRMADA');
+    this.procesando.set(false);
     this.cerrar();
   }
 

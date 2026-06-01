@@ -37,11 +37,11 @@ export class RequisicionesCreateComponent implements OnInit {
 
   // ── Categorías reales del catálogo GastroSENA ────────────────────────────
   readonly CATEGORIAS: CategoriaMeta[] = [
-    { key: 'Perecederos',             label: 'Perecederos',            subtitulo: 'Carnes, lácteos y frescos',          icono: 'thermometer'  },
+    { key: 'Perecederos',             label: 'Perecederos',            subtitulo: 'Carnes, lácteos y frescos',           icono: 'thermometer'  },
     { key: 'Fruver',                  label: 'Fruver',                 subtitulo: 'Frutas y verduras frescas',           icono: 'apple'        },
     { key: 'Abarrotes y Secos',       label: 'Abarrotes y Secos',      subtitulo: 'Granos, aceites, harinas y enlatados', icono: 'package'     },
-    { key: 'Bebidas y Liquidos',      label: 'Bebidas y Líquidos',     subtitulo: 'Jugos, agua y bebidas',              icono: 'droplets'     },
-    { key: 'Reposteria y Congelados', label: 'Repostería y Congelados', subtitulo: 'Postres, helados y congelados',     icono: 'cake'         },
+    { key: 'Bebidas y Liquidos',      label: 'Bebidas y Líquidos',     subtitulo: 'Jugos, agua y bebidas',               icono: 'droplets'     },
+    { key: 'Reposteria y Congelados', label: 'Repostería y Congelados', subtitulo: 'Postres, helados y congelados',      icono: 'cake'         },
   ];
 
   // ── Accordion state ───────────────────────────────────────────────────────

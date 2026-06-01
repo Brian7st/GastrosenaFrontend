@@ -85,12 +85,17 @@
         <p class="modal-footer__note">Este pedido será procesado por el almacén del SENA.</p>
       </div>
       <div class="modal-footer__actions">
-        <button class="btn-secondary" (click)="volver()" [disabled]="loading()">
+        @if (error()) {
+          <p style="color:var(--color-danger, #ef4444); font-size:0.85rem; margin-bottom:0.5rem;">
+            {{ error() }}
+          </p>
+        }
+        <button class="btn-secondary" (click)="volver()" [disabled]="enviando()">
           Volver a Editar
         </button>
         <button class="btn-primary" (click)="confirmar()"
-                [disabled]="loading() || draft.totalItems() === 0">
-          @if (loading()) {
+                [disabled]="enviando() || draft.totalItems() === 0">
+          @if (enviando()) {
             <lucide-icon name="loader-2" [size]="18"></lucide-icon>
             Enviando...
           } @else {

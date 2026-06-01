@@ -214,15 +214,18 @@
       </button>
     }
     <div class="acta-create__footer-spacer"></div>
+    @if (error()) {
+      <p class="acta-create__error">{{ error() }}</p>
+    }
     @if (currentStep() < 4) {
       <button class="acta-create__btn-next" type="button" (click)="nextStep()">
         Siguiente
         <lucide-icon name="arrow-right" [size]="18"></lucide-icon>
       </button>
     } @else {
-      <button class="acta-create__btn-generate" type="button" (click)="generarActa()" [disabled]="actasFacade.loading()">
+      <button class="acta-create__btn-generate" type="button" (click)="generarActa()" [disabled]="enviando()">
         <lucide-icon name="check" [size]="18"></lucide-icon>
-        Generar Acta
+        {{ enviando() ? 'Generando...' : 'Generar Acta' }}
       </button>
     }
   </div>

@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { salidaRequiereRequisicionGuard } from './guards/salida-requisicion.guard';
 
 
 export const INVENTARIO_ROUTES: Routes = [
@@ -176,11 +175,6 @@ export const INVENTARIO_ROUTES: Routes = [
         loadComponent: () => import('./pages/kardex-page/movimiento-entrada/movimiento-entrada.component').then(m => m.MovimientoEntradaComponent)
       },
       {
-        path: 'salida',
-        canActivate: [salidaRequiereRequisicionGuard],
-        loadComponent: () => import('./pages/kardex-page/movimiento-salida/movimiento-salida.component').then(m => m.MovimientoSalidaComponent)
-      },
-      {
         path: 'exportar',
         loadComponent: () => import('./pages/kardex-page/movimiento-export/movimiento-export.component').then(m => m.MovimientoExportComponent)
       }
@@ -295,6 +289,13 @@ export const INVENTARIO_ROUTES: Routes = [
         loadComponent: () =>
           import('./pages/actas-page/actas-create/actas-create.component').then(
             m => m.ActasCreateComponent
+          ),
+      },
+      {
+        path: ':id/imprimir',
+        loadComponent: () =>
+          import('./pages/actas-page/actas-print/actas-print.component').then(
+            m => m.ActasPrintComponent
           ),
       },
       {

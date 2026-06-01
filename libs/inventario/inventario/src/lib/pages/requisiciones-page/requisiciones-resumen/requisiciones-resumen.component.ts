@@ -1,11 +1,11 @@
 import {
-  ChangeDetectionStrategy, Component, computed, inject,
+  ChangeDetectionStrategy, Component, computed, inject, signal,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 import { RequisicionDraftService, ItemDraft } from '../../../data-access/requisicion-draft.service';
-import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
+import { RequisicionesService } from '../../../data-access/services/requisiciones.service';
 
 @Component({
   selector: 'restaurant-requisiciones-resumen',
@@ -16,11 +16,12 @@ import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
   styleUrl:    './requisiciones-resumen.component.scss',
 })
 export class RequisicionesResumenComponent {
-  private router = inject(Router);
-  private facade = inject(RequisicionesFacade);
-  readonly draft = inject(RequisicionDraftService);
+  private router  = inject(Router);
+  private service = inject(RequisicionesService);
+  readonly draft  = inject(RequisicionDraftService);
 
-  readonly loading = this.facade.loading;
+  readonly enviando = signal(false);
+  readonly error    = signal<string | null>(null);
 
   /** Etiquetas para las categorías reales del catálogo.
    *  Clave = valor de bien.categoria del backend. */
@@ -48,21 +49,32 @@ export class RequisicionesResumenComponent {
   });
 
   confirmar(): void {
-    if (this.draft.totalItems() === 0) return;
+    if (this.draft.totalItems() === 0 || this.enviando()) return;
     const ctx = this.draft.contexto();
     const items = this.draft.buildItems();
 
-    this.facade.crearRequisicion({
+    this.enviando.set(true);
+    this.error.set(null);
+
+    this.service.crearRequisicion({
       fichaId:          ctx.fichaId,
       instructorId:     ctx.instructorId,
       instructorNombre: ctx.instructorNombre,
       fecha:            ctx.fecha,
       horaSesion:       ctx.horaSesion,
       items,
+    }).subscribe({
+      next: () => {
+        this.draft.limpiar();
+        this.router.navigate(['/app/inventario/requisiciones']);
+      },
+      error: (err) => {
+        this.enviando.set(false);
+        const detalle = err?.error?.detail ?? err?.message ?? '';
+        this.error.set(detalle || 'Error al crear la requisición. Verificá los datos e intentá nuevamente.');
+        console.error('[RequisicionResumen] Error:', err);
+      },
     });
-
-    this.draft.limpiar();
-    this.router.navigate(['/app/inventario/requisiciones']);
   }
 
   volver(): void {

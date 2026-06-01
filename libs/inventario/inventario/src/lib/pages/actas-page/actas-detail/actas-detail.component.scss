@@ -595,6 +595,40 @@
   text-align: center;
 }
 
+.acta-detail__firma-aprueba {
+  font-size: var(--font-size-xs);
+  color: var(--color-primario);
+  font-weight: 600;
+  text-align: center;
+}
+
+.acta-detail__requisicion-ref {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-superficie-contenedor-bajo);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
+  color: var(--color-pizarra-500);
+}
+
+.acta-detail__link {
+  color: var(--color-primario);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover { text-decoration: underline; }
+}
+
+.acta-detail__empty-row {
+  color: var(--color-pizarra-400);
+  font-size: var(--font-size-sm);
+  font-style: italic;
+  padding: var(--space-3);
+  text-align: center;
+}
+
 // ── Responsive ─────────────────────────────────────────────────────────────────
 @media (max-width: 768px) {
   .acta-detail__topbar {

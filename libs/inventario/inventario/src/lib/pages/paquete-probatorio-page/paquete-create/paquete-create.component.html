@@ -1,72 +1,124 @@
 <div class="paquete-create">
-  <!-- ── Header ────────────────────────────────────────────────────── -->
+
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
   <div class="paquete-create__header">
     <inventario-back-button (clicked)="volver()" />
-    <h1 class="paquete-create__title">Crear Nuevo Paquete Probatorio</h1>
-    <p class="paquete-create__subtitle">Complete la información requerida para iniciar un nuevo expediente de legalización.</p>
+    <h1 class="paquete-create__title">Crear Paquete Probatorio</h1>
+    <p class="paquete-create__subtitle">
+      El paquete consolidará el acta, la requisición y el registro de asistencia.
+    </p>
   </div>
 
   <div class="paquete-create__content">
-    
-    <!-- ── Stepper Indicator ─────────────────────────────────────────── -->
+
+    <!-- ── Stepper ────────────────────────────────────────────────────────── -->
     <div class="paquete-create__stepper">
-      <div class="paquete-create__step" [class.paquete-create__step--active]="currentStep() >= 1" [class.paquete-create__step--completed]="currentStep() > 1">
+      <div class="paquete-create__step"
+           [class.paquete-create__step--active]="currentStep() >= 1"
+           [class.paquete-create__step--completed]="currentStep() > 1">
         <div class="paquete-create__step-icon">
           @if (currentStep() > 1) {
             <lucide-icon name="check" [size]="14"></lucide-icon>
-          } @else {
-            1
-          }
+          } @else { 1 }
         </div>
-        <span class="paquete-create__step-label">Información General</span>
+        <span class="paquete-create__step-label">Información</span>
       </div>
-      
-      <div class="paquete-create__step-connector" [class.paquete-create__step-connector--active]="currentStep() > 1"></div>
-      
-      <div class="paquete-create__step" [class.paquete-create__step--active]="currentStep() === 2">
+
+      <div class="paquete-create__step-connector"
+           [class.paquete-create__step-connector--active]="currentStep() > 1"></div>
+
+      <div class="paquete-create__step"
+           [class.paquete-create__step--active]="currentStep() === 2">
         <div class="paquete-create__step-icon">2</div>
-        <span class="paquete-create__step-label">Requerimientos</span>
+        <span class="paquete-create__step-label">Confirmación</span>
       </div>
     </div>
 
-    <!-- ── Formulario ────────────────────────────────────────────────── -->
-    <form [formGroup]="createForm" class="paquete-create__form-container">
-      
-      <!-- Paso 1: Información General -->
+    <!-- ── Formulario ─────────────────────────────────────────────────────── -->
+    <form [formGroup]="form" class="paquete-create__form-container">
+
+      <!-- Paso 1: Información — campos pre-llenados desde el acta -->
       @if (currentStep() === 1) {
         <div class="paquete-create__section">
-          <h2 class="paquete-create__section-title">Información del Expediente</h2>
-          
+          <h2 class="paquete-create__section-title">Datos del Paquete</h2>
+
+          @if (actaLoading()) {
+            <p class="paquete-create__loading">
+              <lucide-icon name="loader" [size]="16"></lucide-icon>
+              Cargando datos del acta...
+            </p>
+          }
+
           <div class="paquete-create__form-grid">
+
+            <!-- fichaId — pre-llenado desde el acta, editable -->
             <div class="form-group">
-              <label>Título / Descripción corta <span class="required">*</span></label>
-              <input type="text" formControlName="titulo" placeholder="Ej. Insumos Cárnicos Semestre 1" />
-              @if (createForm.controls.titulo.touched && createForm.controls.titulo.errors?.['required']) {
-                <span class="error-text">El título es requerido</span>
+              <label>Ficha de Caracterización <span class="required">*</span></label>
+              <input type="text" formControlName="fichaId" placeholder="Cargando..." />
+              @if (form.controls.fichaId.touched && form.controls.fichaId.errors?.['required']) {
+                <span class="error-text">La ficha es requerida</span>
               }
             </div>
 
+            <!-- instructorId — pre-llenado desde el acta, editable -->
             <div class="form-group">
-              <label>Ficha <span class="required">*</span></label>
-              <input type="text" formControlName="fichaId" placeholder="Ej. 2574832" />
+              <label>Instructor Responsable <span class="required">*</span></label>
+              <input type="text" formControlName="instructorId" placeholder="Cargando..." />
+              @if (form.controls.instructorId.touched && form.controls.instructorId.errors?.['required']) {
+                <span class="error-text">El instructor es requerido</span>
+              }
+            </div>
+
+            <!-- Campos de vínculo — solo lectura -->
+            <div class="form-group">
+              <label>Acta vinculada</label>
+              <input type="text" class="form-control--readonly" readonly
+                     [value]="acta()?.numeroActa ? 'Acta #' + acta()!.numeroActa : actaId" />
             </div>
 
             <div class="form-group">
-              <label>Instructor <span class="required">*</span></label>
-              <input type="text" formControlName="instructorId" placeholder="ID o nombre del instructor" />
+              <label>Requisición vinculada</label>
+              <input type="text" class="form-control--readonly" readonly [value]="requisicionId" />
             </div>
+
           </div>
         </div>
       }
 
-      <!-- Paso 2: Requerimientos -->
+      <!-- Paso 2: Confirmación — resumen + documentos requeridos -->
       @if (currentStep() === 2) {
         <div class="paquete-create__section">
-          <div class="paquete-create__section-header">
-            <h2 class="paquete-create__section-title">Documentos Requeridos</h2>
-            <p class="paquete-create__section-subtitle">Al crear el paquete, se requerirá adjuntar los siguientes documentos para completarlo.</p>
+
+          <!-- Resumen del paquete -->
+          <div class="paquete-create__summary">
+            <h2 class="paquete-create__section-title">Resumen del Paquete</h2>
+            <div class="paquete-create__summary-grid">
+              <div class="paquete-create__summary-item">
+                <span class="paquete-create__summary-label">Ficha</span>
+                <span class="paquete-create__summary-value">{{ resumen().fichaId }}</span>
+              </div>
+              <div class="paquete-create__summary-item">
+                <span class="paquete-create__summary-label">Instructor</span>
+                <span class="paquete-create__summary-value">{{ resumen().instructorId }}</span>
+              </div>
+              <div class="paquete-create__summary-item">
+                <span class="paquete-create__summary-label">Acta</span>
+                <span class="paquete-create__summary-value">{{ resumen().numeroActa }}</span>
+              </div>
+              <div class="paquete-create__summary-item">
+                <span class="paquete-create__summary-label">Requisición</span>
+                <span class="paquete-create__summary-value">{{ resumen().requisicionId }}</span>
+              </div>
+            </div>
           </div>
 
+          <!-- Documentos requeridos -->
+          <div class="paquete-create__section-header">
+            <h2 class="paquete-create__section-title">Documentos Requeridos</h2>
+            <p class="paquete-create__section-subtitle">
+              Deberás adjuntar estos documentos para completar el paquete.
+            </p>
+          </div>
           <div class="paquete-create__req-grid">
             <div class="paquete-create__req-card">
               <div class="paquete-create__req-icon">
@@ -74,8 +126,9 @@
               </div>
               <div class="paquete-create__req-content">
                 <h3>Acta de Legalización</h3>
-                <p>Obligatorio para justificar el uso de insumos.</p>
+                <p>Vinculada automáticamente al crear el paquete.</p>
               </div>
+              <lucide-icon name="check-circle" [size]="16" class="paquete-create__req-done"></lucide-icon>
             </div>
 
             <div class="paquete-create__req-card">
@@ -83,9 +136,10 @@
                 <lucide-icon name="scroll-text" [size]="20"></lucide-icon>
               </div>
               <div class="paquete-create__req-content">
-                <h3>Requisición (45-S)</h3>
-                <p>Obligatorio para cruce de inventario.</p>
+                <h3>Requisición</h3>
+                <p>Vinculada automáticamente al crear el paquete.</p>
               </div>
+              <lucide-icon name="check-circle" [size]="16" class="paquete-create__req-done"></lucide-icon>
             </div>
 
             <div class="paquete-create__req-card">
@@ -94,29 +148,40 @@
               </div>
               <div class="paquete-create__req-content">
                 <h3>Registro de Asistencia</h3>
-                <p>Evidencia fotográfica o listado firmado.</p>
+                <p>Lo adjuntarás desde el detalle del paquete.</p>
               </div>
+              <lucide-icon name="clock" [size]="16" class="paquete-create__req-pending"></lucide-icon>
             </div>
           </div>
+
+          <!-- Error de creación -->
+          @if (error()) {
+            <p class="error-text paquete-create__error">{{ error() }}</p>
+          }
+
         </div>
       }
 
-      <!-- ── Footer Actions ────────────────────────────────────────────── -->
+      <!-- ── Footer Actions ──────────────────────────────────────────────── -->
       <div class="paquete-create__actions">
         @if (currentStep() === 1) {
-          <restaurant-button variant="surface" type="button" (click)="cancelar()">Cancelar</restaurant-button>
+          <restaurant-button variant="surface" type="button" (click)="cancelar()">
+            Cancelar
+          </restaurant-button>
           <restaurant-button variant="primary" type="button" (click)="siguientePaso()">
-            Siguiente Paso
+            Siguiente
             <lucide-icon name="arrow-right" [size]="16"></lucide-icon>
           </restaurant-button>
         } @else {
-          <restaurant-button variant="surface" type="button" (click)="pasoAnterior()">
+          <restaurant-button variant="surface" type="button" (click)="pasoAnterior()"
+                             [disabled]="enviando()">
             <lucide-icon name="arrow-left" [size]="16"></lucide-icon>
             Anterior
           </restaurant-button>
-          <restaurant-button variant="primary" type="button" (click)="guardarPaquete()">
+          <restaurant-button variant="primary" type="button" (click)="guardarPaquete()"
+                             [disabled]="enviando()">
             <lucide-icon name="save" [size]="16"></lucide-icon>
-            Crear Paquete
+            {{ enviando() ? 'Creando...' : 'Crear Paquete' }}
           </restaurant-button>
         }
       </div>

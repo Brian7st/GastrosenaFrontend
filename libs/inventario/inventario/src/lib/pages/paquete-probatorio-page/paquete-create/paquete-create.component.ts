@@ -1,16 +1,17 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
+  effect,
   inject,
-  OnInit,
   signal,
 } from '@angular/core';
-
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
-import { PaqueteFacade } from '../../../data-access/paquete.facade';
+import { PaqueteService } from '../../../data-access/services/paquete.service';
+import { ActasFacade } from '../../../data-access/actas.facade';
 
 @Component({
   selector: 'restaurant-paquete-create',
@@ -20,33 +21,74 @@ import { PaqueteFacade } from '../../../data-access/paquete.facade';
   templateUrl: './paquete-create.component.html',
   styleUrl: './paquete-create.component.scss',
 })
-export class PaqueteCreateComponent implements OnInit {
-  private router = inject(Router);
-  private route  = inject(ActivatedRoute);
-  private fb     = inject(FormBuilder);
-  private facade = inject(PaqueteFacade);
+export class PaqueteCreateComponent {
+  private router         = inject(Router);
+  private route          = inject(ActivatedRoute);
+  private fb             = inject(FormBuilder);
+  private paqueteService = inject(PaqueteService);
+  private actasFacade    = inject(ActasFacade);
 
-  // ── Params desde la URL ─────────────────────────────────────────────────
-  actaIdParam        = signal('');
-  requisicionIdParam = signal('');
+  // ── Query params (vienen del botón "Crear Paquete" en actas-detail) ──────
+  readonly actaId        = this.route.snapshot.queryParamMap.get('actaId')        ?? '';
+  readonly requisicionId = this.route.snapshot.queryParamMap.get('requisicionId') ?? '';
 
-  // ── Formulario ──────────────────────────────────────────────────────────
-  createForm = this.fb.nonNullable.group({
-    titulo:       ['', Validators.required],
+  // ── Estado ───────────────────────────────────────────────────────────────
+  readonly currentStep = signal(1);
+  readonly enviando    = signal(false);
+  readonly error       = signal<string | null>(null);
+
+  // ── Formulario — solo fichaId e instructorId (backend no acepta titulo) ──
+  readonly form = this.fb.nonNullable.group({
     fichaId:      ['', Validators.required],
     instructorId: ['', Validators.required],
   });
 
-  // ── Estado del Stepper ──────────────────────────────────────────────────
-  currentStep = signal<number>(1);
+  // ── Derived del acta cargada ──────────────────────────────────────────────
+  readonly acta        = this.actasFacade.actaSeleccionada;
+  readonly actaLoading = this.actasFacade.loading;
 
-  // ── Lifecycle ──────────────────────────────────────────────────────────
-  ngOnInit(): void {
-    this.actaIdParam.set(this.route.snapshot.queryParamMap.get('actaId') ?? '');
-    this.requisicionIdParam.set(this.route.snapshot.queryParamMap.get('requisicionId') ?? '');
+  /** Muestra un resumen del vínculo en el paso 2 */
+  readonly resumen = computed(() => {
+    const a = this.acta();
+    return {
+      numeroActa:    a?.numeroActa   ?? '—',
+      fichaId:       this.form.value.fichaId      ?? '—',
+      instructorId:  this.form.value.instructorId ?? '—',
+      requisicionId: this.requisicionId             || '—',
+    };
+  });
+
+  constructor() {
+    // Cargar acta para obtener fichaId e instructorId
+    if (this.actaId) {
+      this.actasFacade.cargarActa(this.actaId);
+
+      // Pre-llenar cuando el acta cargue (reactivo al signal)
+      effect(() => {
+        const a = this.actasFacade.actaSeleccionada();
+        if (a?.id === this.actaId) {
+          this.form.patchValue({
+            fichaId:      a.fichaId      ?? '',
+            instructorId: a.instructorId ?? '',
+          });
+        }
+      }, { allowSignalWrites: true });
+    }
   }
 
-  // ── Navegación ─────────────────────────────────────────────────────────
+  // ── Navegación del stepper ────────────────────────────────────────────────
+  siguientePaso(): void {
+    if (this.form.valid) {
+      this.currentStep.set(2);
+    } else {
+      this.form.markAllAsTouched();
+    }
+  }
+
+  pasoAnterior(): void {
+    if (this.currentStep() > 1) this.currentStep.update(s => s - 1);
+  }
+
   volver(): void {
     this.router.navigate(['/app/inventario/paquete-probatorio']);
   }
@@ -55,28 +97,39 @@ export class PaqueteCreateComponent implements OnInit {
     this.volver();
   }
 
-  siguientePaso(): void {
-    if (this.currentStep() === 1 && this.createForm.valid) {
-      this.currentStep.set(2);
-    } else {
-      this.createForm.markAllAsTouched();
-    }
-  }
-
-  pasoAnterior(): void {
-    if (this.currentStep() > 1) {
-      this.currentStep.update(s => s - 1);
-    }
-  }
-
+  // ── Submit ────────────────────────────────────────────────────────────────
   guardarPaquete(): void {
-    if (this.createForm.valid) {
-      this.facade.crearPaquete({
-        ...this.createForm.getRawValue(),
-        actaId:        this.actaIdParam(),
-        requisicionId: this.requisicionIdParam(),
-      });
-      this.volver();
+    if (this.form.invalid || this.enviando()) return;
+
+    if (!this.actaId || !this.requisicionId) {
+      this.error.set('Faltan datos del acta o la requisición. Volvé al detalle del acta e intentá nuevamente.');
+      return;
     }
+
+    this.enviando.set(true);
+    this.error.set(null);
+
+    const { fichaId, instructorId } = this.form.getRawValue();
+
+    this.paqueteService.crearPaquete({
+      actaId:        this.actaId,
+      requisicionId: this.requisicionId,
+      fichaId,
+      instructorId,
+    }).subscribe({
+      next: (paquete) => {
+        // Navegar al detalle del paquete recién creado
+        if (paquete.id) {
+          this.router.navigate(['/app/inventario/paquete-probatorio', paquete.id]);
+        } else {
+          this.volver();
+        }
+      },
+      error: (err) => {
+        this.enviando.set(false);
+        const detalle = (err?.error?.detail as string | undefined) ?? '';
+        this.error.set(detalle || 'Error al crear el paquete. Verificá los datos e intentá nuevamente.');
+      },
+    });
   }
 }

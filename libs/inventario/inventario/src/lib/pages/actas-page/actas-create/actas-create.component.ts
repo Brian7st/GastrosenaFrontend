@@ -2,9 +2,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   signal,
   inject,
-  OnInit,
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -14,7 +14,7 @@ import {
 } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { WizardStep } from '../../../models/acta.model';
-import { ActasFacade } from '../../../data-access/actas.facade';
+import { ActasService } from '../../../data-access/services/actas.service';
 import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
 import { CrearActaRequest, AsistenteRequest } from '../../../data-access/api/legalization.api';
 
@@ -29,16 +29,19 @@ import { CrearActaRequest, AsistenteRequest } from '../../../data-access/api/leg
     ReactiveFormsModule,
   ],
   templateUrl: './actas-create.component.html',
-  styleUrl: './actas-create.component.scss',
+  styleUrl:    './actas-create.component.scss',
 })
-export class ActasCreateComponent implements OnInit {
-  private router    = inject(Router);
-  private route     = inject(ActivatedRoute);
-  private fb        = inject(FormBuilder);
-  readonly actasFacade         = inject(ActasFacade);
+export class ActasCreateComponent {
+  private router               = inject(Router);
+  private route                = inject(ActivatedRoute);
+  private fb                   = inject(FormBuilder);
+  private actasService         = inject(ActasService);
   readonly requisicionesFacade = inject(RequisicionesFacade);
 
-  // ── Stepper ────────────────────────────────────────────────────────────
+  readonly enviando = signal(false);
+  readonly error    = signal<string | null>(null);
+
+  // ── Stepper ─────────────────────────────────────────────────────────────
   currentStep = signal(1);
   readonly totalSteps = 4;
 
@@ -51,48 +54,51 @@ export class ActasCreateComponent implements OnInit {
 
   stepProgress = computed(() => `${((this.currentStep() - 1) / (this.totalSteps - 1)) * 100}%`);
 
-  // ── Formulario ─────────────────────────────────────────────────────────
-  requisicionId = '';
+  // ── Formulario ───────────────────────────────────────────────────────────
+  readonly requisicionId: string;
+
   form: FormGroup = this.fb.group({
-    // Paso 1
-    fecha:        ['', Validators.required],
-    horaInicio:   ['', Validators.required],
-    horaFin:      ['', Validators.required],
-    fichaId:      ['', [Validators.required, Validators.pattern(/^\d{7}$/)]],
-    instructorId: ['', Validators.required],
-    // Paso 2
+    fecha:                 ['', Validators.required],
+    horaInicio:            ['', Validators.required],
+    horaFin:               ['', Validators.required],
+    fichaId:               ['', [Validators.required, Validators.pattern(/^\d{7}$/)]],
+    instructorId:          ['', Validators.required],
     resultadoAprendizaje:  ['', Validators.required],
     actividadesRealizadas: ['', Validators.required],
   });
 
-  // Firmantes / asistentes (mínimo 2: instructor cuentadante + vocero)
   firmantes = signal<AsistenteRequest[]>([
     { nombre: '', dependenciaRol: 'Instructor Cuentadante', aprueba: true },
     { nombre: '', dependenciaRol: 'Vocero de Aprendices',   aprueba: true },
   ]);
 
-  ngOnInit(): void {
+  constructor() {
+    // Leer requisicionId ANTES de registrar el effect (injection context activo)
     this.requisicionId = this.route.snapshot.queryParamMap.get('requisicionId') ?? '';
+
     if (this.requisicionId) {
       this.requisicionesFacade.cargarRequisicion(this.requisicionId);
-      const req = this.requisicionesFacade.requisicionSeleccionada();
-      if (req) {
-        this.form.patchValue({
-          fichaId:      req.fichaId,
-          instructorId: req.instructorId,
-          fecha:        req.fecha,
-        });
-        // Pre-llenar nombre del instructor en firmantes[0]
-        this.firmantes.update(list => {
-          const updated = [...list];
-          updated[0] = { ...updated[0], nombre: req.instructorNombre || req.instructorId };
-          return updated;
-        });
-      }
+
+      // Pre-llenado reactivo: se ejecuta cuando el signal se actualiza con el HTTP response
+      effect(() => {
+        const req = this.requisicionesFacade.requisicionSeleccionada();
+        if (req?.id === this.requisicionId) {
+          this.form.patchValue({
+            fichaId:      req.fichaId      ?? '',
+            instructorId: req.instructorId ?? '',
+            fecha:        req.fecha        ?? '',
+          });
+          this.firmantes.update(list => {
+            const updated = [...list];
+            updated[0] = { ...updated[0], nombre: req.instructorNombre || req.instructorId || '' };
+            return updated;
+          });
+        }
+      }, { allowSignalWrites: true });
     }
   }
 
-  // ── Firmantes helpers ──────────────────────────────────────────────────
+  // ── Firmantes helpers ────────────────────────────────────────────────────
   updateFirmante(index: number, field: keyof AsistenteRequest, event: Event): void {
     const value = field === 'aprueba'
       ? (event.target as HTMLInputElement).checked
@@ -108,38 +114,38 @@ export class ActasCreateComponent implements OnInit {
     this.firmantes.update(list => [...list, { nombre: '', dependenciaRol: '', aprueba: true }]);
   }
 
-  // ── Navegación del wizard ──────────────────────────────────────────────
+  // ── Navegación del wizard ────────────────────────────────────────────────
   nextStep(): void {
-    if (this.currentStep() < this.totalSteps) {
-      this.currentStep.update(s => s + 1);
-    }
+    if (this.currentStep() < this.totalSteps) this.currentStep.update(s => s + 1);
   }
 
   prevStep(): void {
-    if (this.currentStep() > 1) {
-      this.currentStep.update(s => s - 1);
-    }
+    if (this.currentStep() > 1) this.currentStep.update(s => s - 1);
   }
 
   goBack(): void {
     this.router.navigate(['/app/inventario/actas']);
   }
 
+  // ── Submit ───────────────────────────────────────────────────────────────
   generarActa(): void {
-    if (this.form.invalid) return;
+    if (this.form.invalid || this.enviando()) return;
+
+    if (!this.requisicionId) {
+      this.error.set('Se requiere una requisición para generar el acta.');
+      return;
+    }
+
     const v = this.form.value as {
-      fecha: string;
-      horaInicio: string;
-      horaFin: string;
-      fichaId: string;
-      instructorId: string;
-      resultadoAprendizaje: string;
-      actividadesRealizadas: string;
+      fecha: string; horaInicio: string; horaFin: string;
+      fichaId: string; instructorId: string;
+      resultadoAprendizaje: string; actividadesRealizadas: string;
     };
+
     const payload: CrearActaRequest = {
       fecha:                 v.fecha,
-      horaInicio:            v.horaInicio,
-      horaFin:               v.horaFin,
+      horaInicio:            this.toTimeString(v.horaInicio),
+      horaFin:               this.toTimeString(v.horaFin),
       requisicionId:         this.requisicionId,
       instructorId:          v.instructorId,
       fichaId:               v.fichaId,
@@ -148,7 +154,29 @@ export class ActasCreateComponent implements OnInit {
       asistentes:            this.firmantes(),
       compromisos:           [],
     };
-    this.actasFacade.crearActa(payload);
-    this.router.navigate(['/app/inventario/actas']);
+
+    this.enviando.set(true);
+    this.error.set(null);
+
+    this.actasService.crearActa(payload).subscribe({
+      next: (id) => {
+        if (id) {
+          this.router.navigate(['/app/inventario/actas', id]);
+        } else {
+          this.router.navigate(['/app/inventario/actas']);
+        }
+      },
+      error: () => {
+        this.enviando.set(false);
+        this.error.set('Error al generar el acta. Verificá los datos e intentá nuevamente.');
+      },
+    });
+  }
+
+  // ── Helpers ──────────────────────────────────────────────────────────────
+  /** Convierte "HH:mm" a "HH:mm:ss" que espera Spring LocalTime en ISO mode. */
+  private toTimeString(hora: string): string {
+    if (!hora) return '00:00:00';
+    return hora.length === 5 ? `${hora}:00` : hora;
   }
 }

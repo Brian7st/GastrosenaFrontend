@@ -1,22 +1,36 @@
-import { ActaLegalizacion } from '../../models/acta.model';
+import { ActaLegalizacion, AsistenteActa, CompromisoActa } from '../../models/acta.model';
 import { PaqueteProbatorio } from '../../models/paquete.model';
 import { Requisicion, RequisicionItem } from '../../models/requisicion.model';
 import { ActaResponse, PaqueteResponse, RequisicionResponse } from '../api/legalization.api';
 
 export function actaFromApi(dto: ActaResponse): ActaLegalizacion {
   return {
-    id: dto.id,
-    numeroActa: String(dto.numeroActa), // number (long Java) → string para el modelo interno
-    fecha: dto.fecha,
-    programa: '',    // el backend no retorna programa; campo vacío por compatibilidad
-    fichaId: dto.fichaId,
-    instructorId: dto.instructorId,
-    requisicionId: dto.requisicionId,
-    estado: dto.estado,
-    ciudad: dto.ciudad,
-    lugar: dto.lugar,
-    // agendaSesion, desarrolloSesion, resultadoAprendizaje, actividadesEjecutadas
-    // no son retornados por el backend en el listado/detalle
+    id:                    dto.id,
+    numeroActa:            String(dto.numeroActa),
+    comite:                dto.comite,
+    ciudad:                dto.ciudad,
+    fecha:                 dto.fecha,
+    horaInicio:            dto.horaInicio,
+    horaFin:               dto.horaFin,
+    lugar:                 dto.lugar,
+    regional:              dto.regional,
+    programa:              '',
+    fichaId:               dto.fichaId,
+    instructorId:          dto.instructorId,
+    requisicionId:         dto.requisicionId,
+    estado:                dto.estado,
+    resultadoAprendizaje:  dto.resultadoAprendizaje,
+    actividadesRealizadas: dto.actividadesRealizadas,
+    asistentes: (dto.asistentes ?? []).map((a): AsistenteActa => ({
+      nombre:         a.nombre,
+      dependenciaRol: a.dependenciaRol,
+      aprueba:        a.aprueba,
+    })),
+    compromisos: (dto.compromisos ?? []).map((c): CompromisoActa => ({
+      actividad:   c.actividad,
+      responsable: c.responsable,
+      fechaLimite: c.fecha,
+    })),
   };
 }
 
