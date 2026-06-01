@@ -73,6 +73,7 @@ export class PaqueteListComponent implements OnInit {
     const map: Record<PaqueteEstado, string> = {
       INCOMPLETO: 'Incompleto',
       COMPLETO:   'Completo',
+      REVISADO:   'Revisado',
       ARCHIVADO:  'Archivado',
     };
     return map[estado];
@@ -82,6 +83,7 @@ export class PaqueteListComponent implements OnInit {
     const map: Record<PaqueteEstado, 'success' | 'warning' | 'danger' | 'info'> = {
       INCOMPLETO: 'danger',
       COMPLETO:   'success',
+      REVISADO:   'success',
       ARCHIVADO:  'info',
     };
     return map[estado];

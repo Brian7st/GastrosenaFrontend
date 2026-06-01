@@ -1,9 +1,20 @@
+/** Wrapper paginado Spring estándar — usado por solicitudes-gil y facturas */
 export interface PagedResponse<T> {
   content: T[];
   totalElements: number;
   totalPages: number;
   page: number;
   size: number;
+}
+
+/** Wrapper paginado del catálogo de productos — ProductosPageHttpResponse Java
+ *  Usa nombres en español: contenido, paginaActual, totalPaginas, totalElementos, tamano */
+export interface CatalogoPageResponse<T> {
+  contenido: T[];
+  paginaActual: number;
+  totalPaginas: number;
+  totalElementos: number;
+  tamano: number;
 }
 
 export interface ProductoResponse {
