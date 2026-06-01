@@ -100,30 +100,24 @@
             <thead>
               <tr>
                 <th>CÓD. SENA</th>
-                <th>NOMBRE</th>
                 <th>DESCRIPCIÓN</th>
-                <th>UM</th>
                 <th>VLR ADJUDICADO</th>
-                <th>VLR ANTES</th>
+                <th>VLR ANTES IVA</th>
                 <th>IVA</th>
-                <th>VALIDACIÓN</th>
+                <th>CÓD. PROVEEDOR</th>
+                <th>UND. MEDIDA</th>
               </tr>
             </thead>
             <tbody>
               @for (row of previewData(); track row) {
               <tr>
                 <td class="code-mono">{{ row.codigoSena || '-' }}</td>
-                <td class="row-nombre">{{ row.nombre }}</td>
                 <td>{{ row.descripcion || '-' }}</td>
-                <td>{{ row.unidadMedida }}</td>
                 <td class="text-end">{{ row.vrlAdjudicado | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
                 <td class="text-end">{{ row.vrlAntes | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
                 <td class="text-end">{{ row.iva ? (row.iva | percent) : '0%' }}</td>
-                <td>
-                  <span class="valid-badge" [ngClass]="getValidacionClass(row.validacion)">
-                    {{ row.error || row.validacion }}
-                  </span>
-                </td>
+                <td class="code-mono">{{ row.codigoProveedor || '-' }}</td>
+                <td>{{ row.unidadMedida || '-' }}</td>
               </tr>
               }
             </tbody>
