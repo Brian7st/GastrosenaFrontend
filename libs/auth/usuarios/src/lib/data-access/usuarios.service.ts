@@ -135,25 +135,25 @@ export class UsuariosService extends BaseHttpService {
   }
 
 // ==================== PERFIL ====================
-obtenerPerfil(): Observable<UsuarioDetalle> {
-  return this.http.get<UsuarioDetalle>(this.buildUrl('perfil'));
-}
+  obtenerPerfil(): Observable<UsuarioDetalle> {
+    return this.http.get<UsuarioDetalle>(this.buildUrl('perfil'));
+  }
 
-actualizarPerfil(data: Partial<UsuarioDetalle>): Observable<UsuarioDetalle> {
-  return this.http.put<UsuarioDetalle>(this.buildUrl('perfil'), data);
-}
+  actualizarPerfil(data: Partial<UsuarioDetalle>): Observable<UsuarioDetalle> {
+    return this.http.put<UsuarioDetalle>(this.buildUrl('perfil'), data);
+  }
 
-cambiarContrasena(oldPassword: string, newPassword: string): Observable<void> {
-  return this.http.post<void>(this.buildUrl('perfil/cambiar-contrasena'), {
-    passwordActual: oldPassword,
-    passwordNueva: newPassword
-  });
-}
+  cambiarContrasena(oldPassword: string, newPassword: string): Observable<void> {
+    return this.http.post<void>(this.buildUrl('perfil/cambiar-contrasena'), {
+      passwordActual: oldPassword,
+      passwordNueva: newPassword
+    });
+  }
 
-actualizarFoto(userId: string, fotoUrl: string): Observable<void> {
-  return this.http.patch<void>(
-    this.buildUrl(`${this.resource}/${userId}/foto`),
-    { fotoUrl }
-  );
- }
+  actualizarFoto(userId: string, fotoUrl: string): Observable<void> {
+    return this.http.patch<void>(
+      this.buildUrl(`${this.resource}/${userId}/foto`),
+      { fotoUrl }
+    );
+  }
 }
