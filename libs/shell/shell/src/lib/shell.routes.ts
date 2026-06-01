@@ -75,11 +75,7 @@ export const shellRoutes: Routes = [
         loadChildren: () =>
           import('@restaurant/abastecimiento').then(m => m.ABASTECIMIENTO_ROUTES),
       },
-      {
-        path: 'notificaciones',
-        loadChildren: () =>
-          import('@restaurant/notificaciones').then(m => m.NOTIFICACIONES_ROUTES),
-      },
+{ path: 'notificaciones', loadComponent: () => import('@restaurant/notificaciones').then(m => m.NotificacionesPageComponent) },
       // 👇 AGREGAR ESTA RUTA:
       {
         path: 'perfil',

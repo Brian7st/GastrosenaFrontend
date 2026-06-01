@@ -140,7 +140,7 @@ export class ListaPageComponent implements OnInit {
     this.mostrarFormulario.set(false);
   }
 
-  onGuardarUsuario(data: CrearUsuarioRequest): void {
+onGuardarUsuario(data: CrearUsuarioRequest): void {
   const editando = this.usuarioEditando();
   if (editando) {
     const payload: ActualizarUsuarioRequest = {
@@ -148,11 +148,13 @@ export class ListaPageComponent implements OnInit {
       apellidos: data.apellidos,
       telefono:  data.telefono,
       idRol:     data.nombreRol,
+      documento: data.documento,   // ← agregar
+      email:     data.email,        // ← agregar
     };
     this.facade.actualizarUsuario(editando.id, payload);
   } else {
     this.facade.crearUsuario(data);
-    this.mostrarToast('Usuario creado exitosamente. Revisá tu correo para más información.');
+    this.mostrarToast('Usuario creado exitosamente. Revisá tu correo.');
   }
   this.onCerrarFormulario();
 }
