@@ -40,20 +40,18 @@ export class BienFormComponent implements OnInit {
       const bien = this.bien as Bien & {
         vrlAdjudicado?: number | null;
         vrlAntes?: number | null;
-        urlImagen?: string | null;
       };
 
       this.form.patchValue({
         codigoSena:      bien.codigoSena,
         codigoProveedor: bien.codigoProveedor,
-        nombre:          bien.nombre,
         descripcion:     bien.descripcion ?? '',
         categoria:       bien.categoria,
         unidadMedida:    bien.unidadMedida,
-        imagenUrl:       bien.imagenUrl ?? bien.urlImagen ?? '',
         vrlAdjudicado:   bien.vrlAdjudicado ?? bien.valor ?? null,
         vrlAntes:        bien.vrlAntes ?? bien.valorNeto ?? null,
         iva:             bien.iva ?? null,
+        stockMinimo:     bien.stockMinimo ?? null,
       });
 
       // En edicion el codigo SENA es inmutable - no se puede cambiar
@@ -66,16 +64,15 @@ export class BienFormComponent implements OnInit {
 
   private initForm(): void {
     this.form = this.fb.group({
-      codigoSena:      ['', Validators.required],   // habilitado en create; se deshabilita en edit
+      codigoSena:      ['', Validators.required],
       codigoProveedor: [''],
-      nombre:          ['', [Validators.required, Validators.minLength(3)]],
-      descripcion:     [''],
+      descripcion:     ['', [Validators.required, Validators.minLength(3)]],
       categoria:       ['', Validators.required],
       unidadMedida:    ['', Validators.required],
-      imagenUrl:       [''],
       vrlAdjudicado:   this.fb.control<number | null>(null),
       vrlAntes:        this.fb.control<number | null>(null),
       iva:             this.fb.control<number | null>(null),
+      stockMinimo:     this.fb.control<number | null>(null),
     });
   }
 
@@ -89,16 +86,6 @@ export class BienFormComponent implements OnInit {
 
   onCancel(): void {
     this.cancel.emit();
-  }
-
-  onImagenSeleccionada(event: Event): void {
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.form.patchValue({ imagenUrl: reader.result as string });
-    };
-    reader.readAsDataURL(file);
   }
 
   hasError(field: string): boolean {

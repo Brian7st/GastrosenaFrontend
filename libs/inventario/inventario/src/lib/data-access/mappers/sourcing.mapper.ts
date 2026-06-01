@@ -129,6 +129,7 @@ export function gilFromApi(dto: GilResponse): SolicitudGil {
       cantidad:      b.cantidad,
       valorUnitario: b.valorUnitario,
       subtotal:      b.subtotal,
+      iva:           b.iva ?? 0,
     })),
     creadoEn:      dto.creadoEn,
     actualizadoEn: dto.actualizadoEn,

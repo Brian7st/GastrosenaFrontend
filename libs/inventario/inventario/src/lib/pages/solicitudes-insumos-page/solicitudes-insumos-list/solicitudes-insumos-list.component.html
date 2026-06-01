@@ -50,6 +50,13 @@
 <!-- ══════════════════════════════════════════════════════════════════════════
      Tabla con filtros
 ══════════════════════════════════════════════════════════════════════════ -->
+@if (facade.errorSesion()) {
+  <div class="error-inline">
+    <lucide-icon name="alert-triangle" [size]="16" />
+    {{ facade.errorSesion() }}
+  </div>
+}
+
 <restaurant-data-table
   tableTitle="Solicitudes de Insumos"
   tableIcon="clipboard-list"
@@ -76,13 +83,6 @@
         <td colspan="7" style="text-align: center; padding: 2rem;">
           <span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">progress_activity</span>
           Cargando solicitudes...
-        </td>
-      </tr>
-    } @else if (facade.errorSesion()) {
-      <tr>
-        <td colspan="7" style="text-align: center; padding: 2rem; color: var(--color-danger);">
-          <span class="material-symbols-outlined">error</span>
-          {{ facade.errorSesion() }}
         </td>
       </tr>
     } @else if (facade.solicitudesSesion().length === 0) {

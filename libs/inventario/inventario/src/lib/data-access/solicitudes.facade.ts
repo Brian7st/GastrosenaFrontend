@@ -336,7 +336,7 @@ export class SolicitudesFacade {
         finalize(() => this._loading.set(false))
       )
       .subscribe(res => {
-        if (res !== null) this._solicitudSesionSeleccionada.set(res);
+        if (res !== null) this.cargarSolicitudesSesion();
       });
   }
 
@@ -353,7 +353,7 @@ export class SolicitudesFacade {
         finalize(() => this._loading.set(false))
       )
       .subscribe(res => {
-        if (res !== null) this._solicitudSesionSeleccionada.set(res);
+        if (res !== null) this.cargarSolicitudesSesion();
       });
   }
 
@@ -370,7 +370,7 @@ export class SolicitudesFacade {
         finalize(() => this._loading.set(false))
       )
       .subscribe(res => {
-        if (res !== null) this._solicitudSesionSeleccionada.set(res);
+        if (res !== null) this.cargarSolicitudesSesion();
       });
   }
 }

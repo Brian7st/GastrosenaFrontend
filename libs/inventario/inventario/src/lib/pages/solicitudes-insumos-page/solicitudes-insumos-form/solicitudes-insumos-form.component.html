@@ -298,15 +298,14 @@
                 <tr>
                   <td class="catalog-code">{{ bien.codigoSena }}</td>
                   <td>
-                    <p class="item-name" style="margin:0">{{ bien.nombre }}</p>
-                    <p class="item-code" style="margin:0">{{ bien.descripcion }}</p>
+                    <p class="item-name" style="margin:0">{{ bien.descripcion }}</p>
                   </td>
                   <td class="catalog-unit">{{ bien.unidadMedida }}</td>
                   <td class="text-right catalog-price">
                     {{ (bien.valor ?? 0) | currency:'COP':'symbol-narrow':'1.0-0' }}
                   </td>
                   <td class="text-center">
-                    @if (estaEnLista(bien.id)) {
+                    @if (addedCodigosSena().includes(bien.codigoSena ?? '')) {
                       <span class="catalog-added-label">
                         <span class="material-symbols-outlined" style="font-size:14px">check</span>
                         Agregado

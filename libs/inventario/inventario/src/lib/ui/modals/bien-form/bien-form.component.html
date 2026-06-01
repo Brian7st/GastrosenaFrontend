@@ -58,18 +58,13 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label">NOMBRE DEL BIEN <span class="required">*</span></label>
-          <input class="field-input" formControlName="nombre"
-                 placeholder="Descripción clara del activo"
-                 [class.field-input--error]="hasError('nombre')" />
-          @if (hasError('nombre')) {
-<p class="field-error">El nombre es obligatorio (mín. 3 caracteres)</p>
-}
-        </div>
-
-        <div class="field-group">
-          <label class="field-label">DESCRIPCIÓN</label>
-          <input class="field-input" formControlName="descripcion" placeholder="Descripción detallada (opcional)" />
+          <label class="field-label">DESCRIPCIÓN <span class="required">*</span></label>
+          <input class="field-input" formControlName="descripcion"
+                 placeholder="Descripción del bien (mín. 3 caracteres)"
+                 [class.field-input--error]="hasError('descripcion')" />
+          @if (hasError('descripcion')) {
+            <p class="field-error">La descripción es obligatoria (mín. 3 caracteres)</p>
+          }
         </div>
 
         <div class="field-row">
@@ -108,18 +103,14 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label">IMAGEN DEL BIEN</label>
-          <label class="file-upload-label">
-            <input type="file" accept="image/*" class="file-input-hidden"
-                   (change)="onImagenSeleccionada($event)" />
-            <span class="material-symbols-outlined">upload_file</span>
-            <span>{{ form.get('imagenUrl')?.value ? 'Cambiar imagen' : 'Seleccionar archivo' }}</span>
-          </label>
-          @if (form.get('imagenUrl')?.value) {
-            <img [src]="form.get('imagenUrl')?.value"
-                 alt="Vista previa"
-                 class="imagen-preview" />
-          }
+          <label class="field-label" for="stockMinimo">STOCK MÍNIMO (opcional)</label>
+          <input id="stockMinimo"
+                 class="field-input"
+                 type="number"
+                 min="0"
+                 step="1"
+                 formControlName="stockMinimo"
+                 placeholder="Ej. 10" />
         </div>
       </div>
 
