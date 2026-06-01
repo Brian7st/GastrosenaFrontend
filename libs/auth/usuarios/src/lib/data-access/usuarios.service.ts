@@ -134,7 +134,7 @@ export class UsuariosService extends BaseHttpService {
     );
   }
 
-  // ==================== PERFIL ====================
+// ==================== PERFIL ====================
 obtenerPerfil(): Observable<UsuarioDetalle> {
   return this.http.get<UsuarioDetalle>(this.buildUrl('perfil'));
 }
@@ -150,4 +150,10 @@ cambiarContrasena(oldPassword: string, newPassword: string): Observable<void> {
   });
 }
 
+actualizarFoto(userId: string, fotoUrl: string): Observable<void> {
+  return this.http.patch<void>(
+    this.buildUrl(`${this.resource}/${userId}/foto`),
+    { fotoUrl }
+  );
+ }
 }
