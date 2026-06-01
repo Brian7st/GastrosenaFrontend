@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal, inject, OnInit, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, inject, OnInit, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -25,6 +25,20 @@ export class SolicitudesInsumosFormComponent implements OnInit {
   readonly inventario    = inject(InventarioFacade);
 
   isEdit          = signal(false);
+
+  constructor() {
+    effect(() => {
+      const s = this.facade.solicitudSesionSeleccionada();
+      if (s && this.isEdit()) {
+        this.fichaId.set(s.fichaId);
+        this.programaId.set(s.programaId);
+        this.instructorId.set(s.instructorId);
+        this.identificacionInstructor.set(s.identificacionInstructor ?? '');
+        if (s.fechaSolicitud) this.fechaSolicitud.set(s.fechaSolicitud);
+        this.items.set(s.items.map(i => ({ ...i })));
+      }
+    });
+  }
   solicitudId     = signal<string | null>(null);
   solicitudCodigo = signal<string | null>(null);
   isModalOpen     = signal(false);
@@ -80,6 +94,7 @@ export class SolicitudesInsumosFormComponent implements OnInit {
     if (id) {
       this.isEdit.set(true);
       this.solicitudId.set(id);
+      this.facade.cargarSolicitudSesionById(id);
     }
     this.inventario.cargarBienes({ page: 0, size: 8 });
   }
@@ -164,7 +179,7 @@ export class SolicitudesInsumosFormComponent implements OnInit {
 
   confirmarEnvio(): void {
     this.isModalOpen.set(false);
-    this.facade.crearSolicitudSesion({
+    const payload = {
       fechaSolicitud:           this.fechaSolicitud(),
       fichaId:                  this.fichaId(),
       programaId:               this.programaId(),
@@ -172,7 +187,12 @@ export class SolicitudesInsumosFormComponent implements OnInit {
       identificacionInstructor: this.identificacionInstructor() || undefined,
       valorTotalDeSolicitud:    this.valorTotalDeSolicitud(),
       items:                    this.items(),
-    }).subscribe(res => {
+    };
+    const id = this.solicitudId();
+    const op$ = this.isEdit() && id
+      ? this.facade.actualizarSolicitudSesion(id, payload)
+      : this.facade.crearSolicitudSesion(payload);
+    op$.subscribe(res => {
       if (res !== null) {
         this.router.navigate(['/app/inventario/solicitudes-insumos-page']);
       }

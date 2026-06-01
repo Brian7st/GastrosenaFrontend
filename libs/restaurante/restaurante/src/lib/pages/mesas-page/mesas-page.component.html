@@ -2,7 +2,7 @@
   <!-- Header con botón de acción principal -->
   <div class="mesas-page__header">
     <restaurant-page-header title="Control de Mesas"
-                            subtitle="Gestión de salón y pedidos en tiempo real"></restaurant-page-header>
+      subtitle="Gestión de salón y pedidos en tiempo real"></restaurant-page-header>
 
     <div class="header-actions">
       <div class="main-search-wrapper">
@@ -11,16 +11,16 @@
             <lucide-icon name="search" [size]="16"></lucide-icon>
             MESA
           </span>
-          <input
-                  type="text"
-                  inputmode="numeric"
-                  pattern="[0-9]*"
-                  maxlength="3"
-                  (keypress)="soloNumeros($event)"
-                  class="form-control"
-                  placeholder="Ej: 7, 12..."
-                  [ngModel]="searchQueryMain()"
-                  (ngModelChange)="searchQueryMain.set($event)">
+          <input 
+            type="text" 
+            inputmode="numeric"
+            pattern="[0-9]*"
+            maxlength="3"
+            (keypress)="soloNumeros($event)"
+            class="form-control" 
+            placeholder="Ej: 7, 12..." 
+            [ngModel]="searchQueryMain()" 
+            (ngModelChange)="searchQueryMain.set($event)">
         </div>
       </div>
       <restaurant-button variant="surface" (click)="abrirModal('gestion-mesas')">
@@ -37,82 +37,80 @@
   <!-- KPIs de Dashboard migrados -->
   <div class="mesas-page__stats">
     <restaurant-kpi-card label="Mesas Totales" [value]="stats().totalMesas.toString()" icon="users"
-                         iconColor="blue"></restaurant-kpi-card>
+      iconColor="blue"></restaurant-kpi-card>
 
     <restaurant-kpi-card label="Ocupación" [value]="stats().porcentajeOcupacion + '%'" icon="layout-grid"
-                         iconColor="green" [trend]="stats().mesasOcupadas + ' ocupadas'"></restaurant-kpi-card>
+      iconColor="green" [trend]="stats().mesasOcupadas + ' ocupadas'"></restaurant-kpi-card>
 
     <restaurant-kpi-card label="Mesas en atención" [value]="mesasEnServicio().length.toString()" icon="users"
-                         class="clickable-card" (click)="abrirModal('lista-ocupadas')"></restaurant-kpi-card>
+      class="clickable-card" (click)="abrirModal('lista-ocupadas')"></restaurant-kpi-card>
   </div>
 
   <!-- Grid de Mesas -->
   <section class="mesas-page__content">
     <div class="mesas-grid">
       @for (mesa of filteredMesasActivasMain(); track mesa.id) {
-      <restaurant-card [ngClass]="['mesa-card', 'mesa-card--' + mesa.estado.toLowerCase()]">
-        <div class="mesa-card__header">
-          <span class="mesa-card__number">{{ mesa.nombre }}</span>
-          <div class="mesa-card__header-right">
-            <restaurant-status-badge
-                    [label]="mesa.estado"
-                    [variant]="getBadgeType(mesa.estado)"
-            ></restaurant-status-badge>
-            <button class="icon-action-btn" (click)="abrirModal('editar', mesa)" title="Editar mesa">
-              <lucide-icon name="pencil" [size]="16"></lucide-icon>
-            </button>
-          </div>
-        </div>
-
-        <div class="mesa-card__body">
-          <div class="mesa-icon-wrapper">
-            <lucide-icon name="utensils" [size]="32"></lucide-icon>
-          </div>
-
-          @if (mesa.zona) {
-          <div class="mesa-card__zona">
-            <span>{{ mesa.zona }}</span>
-          </div>
-          }
-
-          <div class="mesa-card__info-row">
-            <div class="mesa-card__info">
-              <lucide-icon name="users" [size]="14"></lucide-icon>
-              <span>{{ mesa.capacidad }} cap.</span>
+        <restaurant-card [ngClass]="['mesa-card', 'mesa-card--' + mesa.estado.toLowerCase()]">
+          <div class="mesa-card__header">
+            <span class="mesa-card__number">{{ mesa.nombre }}</span>
+            <div class="mesa-card__header-right">
+              <restaurant-status-badge
+                [label]="mesa.estado"
+                [variant]="getBadgeType(mesa.estado)"
+              ></restaurant-status-badge>
+              <button class="icon-action-btn" (click)="abrirModal('editar', mesa)" title="Editar mesa">
+                <lucide-icon name="pencil" [size]="16"></lucide-icon>
+              </button>
             </div>
           </div>
-        </div>
 
-        <div class="mesa-card__footer">
-          @if (mesa.estado === 'LIBRE') {
-          <restaurant-button class="full-width" variant="primary" (click)="abrirModal('abrir', mesa)">
-            <span>Asignar Mesa</span>
-          </restaurant-button>
-          } @else {
-          <div class="mesa-card__actions flex-col gap-2">
-            <div class="flex gap-2">
-              @if (mesa.estado === 'OCUPADA') {
-              <restaurant-button class="flex-1" variant="primary" (click)="verPedido(mesa.id)">
-                <span>Pedido</span>
-              </restaurant-button>
-              }
-              @if (mesa.estado === 'POR_PAGAR') {
-              <restaurant-button class="flex-1" variant="warning" (click)="abrirModal('cobrar', mesa)">
-                <span>Cobrar</span>
-              </restaurant-button>
-              }
-              <restaurant-button class="flex-1" variant="danger" (click)="abrirModal('liberar', mesa)">
-                <span>Liberar</span>
-              </restaurant-button>
+          <div class="mesa-card__body">
+            <div class="mesa-icon-wrapper">
+              <lucide-icon name="utensils" [size]="32"></lucide-icon>
+            </div>
+            
+            @if (mesa.zona) {
+              <div class="mesa-card__zona">
+                <span>{{ mesa.zona }}</span>
+              </div>
+            }
+
+            <div class="mesa-card__info-row">
+              <div class="mesa-card__info">
+                <lucide-icon name="users" [size]="14"></lucide-icon>
+                <span>{{ mesa.capacidad }} cap.</span>
+              </div>
             </div>
           </div>
-          }
-        </div>
-      </restaurant-card>
+
+          <div class="mesa-card__footer">
+            @if (mesa.estado === 'LIBRE') {
+              <restaurant-button class="full-width" variant="primary" (click)="abrirModal('abrir', mesa)">
+                <span>Asignar Mesa</span>
+              </restaurant-button>
+            } @else {
+              <div class="mesa-card__actions flex-col gap-2">
+                <div class="flex gap-2">
+                  @if (mesa.estado === 'OCUPADA') {
+                    <restaurant-button class="flex-1" variant="primary" (click)="verPedido(mesa.id)">
+                      <span>Pedido</span>
+                    </restaurant-button>
+                  }
+                  @if (mesa.estado === 'POR_PAGAR' || mesa.estado === 'LISTO_PARA_SERVIR') {
+                    <restaurant-button class="flex-1" variant="surface" (click)="verPedido(mesa.id)">
+                      <lucide-icon name="receipt" [size]="16"></lucide-icon>
+                      <span>Ver Cuenta</span>
+                    </restaurant-button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </restaurant-card>
       } @empty {
       <div class="empty-container">
         <restaurant-empty-state title="No hay mesas configuradas"
-                                message="Comienza agregando una nueva mesa para el salón."></restaurant-empty-state>
+          message="Comienza agregando una nueva mesa para el salón."></restaurant-empty-state>
       </div>
       }
     </div>
@@ -137,348 +135,378 @@
 
   <!-- Modales -->
   @if (modalActivo()) {
-  <div class="modal-overlay" (click)="cerrarModales()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-
-      @if (modalActivo() === 'agregar') {
-      <div class="modal-header-colored">
-        <h3>Crear Nueva Mesa</h3>
-        <button class="close-btn" (click)="cerrarModales()">
-          <lucide-icon name="x" [size]="20"></lucide-icon>
-        </button>
-      </div>
-      <div class="modal-body-custom">
-        <div class="form-group">
-          <label>Nombre de la Mesa</label>
-          <div class="input-group">
-            <span class="input-group-text">MESA</span>
-            <input
-                    type="text"
-                    inputmode="numeric"
-                    pattern="[0-9]*"
-                    maxlength="3"
-                    (keypress)="soloNumeros($event)"
-                    [ngModel]="nuevoNombre()"
-                    (ngModelChange)="nuevoNombre.set($event)"
-                    class="form-control"
-                    placeholder="Ej: 1, 2, 3...">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Capacidad (personas)</label>
-          <div class="capacity-control">
-            <button type="button" class="capacity-btn" (click)="decrementarCapacidad('nueva')">
-              <lucide-icon name="minus" [size]="16"></lucide-icon>
-            </button>
-            <input type="number" min="1" max="20" [ngModel]="nuevaCapacidad()" (ngModelChange)="nuevaCapacidad.set($event)" class="form-control text-center capacity-input">
-            <button type="button" class="capacity-btn" (click)="incrementarCapacidad('nueva')">
-              <lucide-icon name="plus" [size]="16"></lucide-icon>
+    <div class="modal-overlay" (click)="cerrarModales()">
+      <div 
+        class="modal-content" 
+        [class.modal-content--wide]="modalActivo() === 'lista-ocupadas'"
+        (click)="$event.stopPropagation()"
+      >
+        
+        @if (modalActivo() === 'agregar') {
+          <div class="modal-header-colored">
+            <h3>Crear Nueva Mesa</h3>
+            <button class="close-btn" (click)="cerrarModales()">
+              <lucide-icon name="x" [size]="20"></lucide-icon>
             </button>
           </div>
-        </div>
+          <div class="modal-body-custom">
+            <div class="form-group">
+              <label>Nombre de la Mesa</label>
+              <div class="input-group">
+                <span class="input-group-text">MESA</span>
+                <input 
+                  type="text" 
+                  inputmode="numeric" 
+                  pattern="[0-9]*" 
+                  maxlength="3" 
+                  (keypress)="soloNumeros($event)" 
+                  [ngModel]="nuevoNombre()" 
+                  (ngModelChange)="nuevoNombre.set($event)" 
+                  class="form-control" 
+                  placeholder="Ej: 1, 2, 3...">
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label>Capacidad (personas)</label>
+              <div class="capacity-control">
+                <button type="button" class="capacity-btn" (click)="decrementarCapacidad('nueva')">
+                  <lucide-icon name="minus" [size]="16"></lucide-icon>
+                </button>
+                <input type="number" min="1" max="20" [ngModel]="nuevaCapacidad()" (ngModelChange)="nuevaCapacidad.set($event)" class="form-control text-center capacity-input">
+                <button type="button" class="capacity-btn" (click)="incrementarCapacidad('nueva')">
+                  <lucide-icon name="plus" [size]="16"></lucide-icon>
+                </button>
+              </div>
+            </div>
 
-        <div class="form-group">
-          <label>Zona / Ubicación</label>
-          <div class="autocomplete-wrapper">
-            <input
-                    type="text"
-                    [ngModel]="nuevaZona()"
-                    (ngModelChange)="nuevaZona.set($event)"
-                    (focus)="showNuevaZonaDropdown.set(true)"
-                    (blur)="onBlurZona('nueva')"
-                    class="form-control"
-                    placeholder="Ej: Salón Principal, Terraza, VIP...">
-
-            @if (showNuevaZonaDropdown() && filteredNuevaZonas().length > 0) {
-            <ul class="autocomplete-dropdown">
-              @for (zona of filteredNuevaZonas(); track zona) {
-              <li (mousedown)="selectZona(zona, 'nueva')">{{ zona }}</li>
-              }
-            </ul>
-            }
+            <div class="form-group">
+              <label>Zona / Ubicación</label>
+              <div class="autocomplete-wrapper">
+                <input 
+                  type="text" 
+                  [ngModel]="nuevaZona()" 
+                  (ngModelChange)="nuevaZona.set($event)" 
+                  (focus)="showNuevaZonaDropdown.set(true)"
+                  (blur)="onBlurZona('nueva')"
+                  class="form-control" 
+                  placeholder="Ej: Salón Principal, Terraza, VIP...">
+                
+                @if (showNuevaZonaDropdown() && filteredNuevaZonas().length > 0) {
+                  <ul class="autocomplete-dropdown">
+                    @for (zona of filteredNuevaZonas(); track zona) {
+                      <li (mousedown)="selectZona(zona, 'nueva')">{{ zona }}</li>
+                    }
+                  </ul>
+                }
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      <div class="modal-actions">
-        <restaurant-button variant="ghost" (click)="cerrarModales()">
-          <span>Cancelar</span>
-        </restaurant-button>
-        <restaurant-button variant="primary" (click)="crearMesa()">
-          <div class="btn-content-centered">
-            <lucide-icon name="check-circle" [size]="18"></lucide-icon>
-            <span>Guardar Mesa</span>
+          <div class="modal-actions">
+            <restaurant-button variant="ghost" (click)="cerrarModales()">
+              <span>Cancelar</span>
+            </restaurant-button>
+            <restaurant-button variant="primary" (click)="crearMesa()">
+              <div class="btn-content-centered">
+                <lucide-icon name="check-circle" [size]="18"></lucide-icon>
+                <span>Guardar Mesa</span>
+              </div>
+            </restaurant-button>
           </div>
-        </restaurant-button>
-      </div>
-      }
+        }
 
-      @if (modalActivo() === 'abrir') {
-      <div class="modal-header-colored">
-        <h3>Abrir {{ mesaSeleccionada()?.nombre }}</h3>
-        <button class="close-btn" (click)="cerrarModales()">
-          <lucide-icon name="x" [size]="20"></lucide-icon>
-        </button>
-      </div>
-      <div class="modal-body-custom">
-        <div class="form-group">
-          <label>Número de Comensales</label>
-          <input
+        @if (modalActivo() === 'abrir') {
+          <div class="modal-header-colored">
+            <h3>Abrir {{ mesaSeleccionada()?.nombre }}</h3>
+            <button class="close-btn" (click)="cerrarModales()">
+              <lucide-icon name="x" [size]="20"></lucide-icon>
+            </button>
+          </div>
+          <div class="modal-body-custom">
+            <div class="form-group">
+              <label>Número de Comensales</label>
+              <div class="capacity-control">
+                <button type="button" class="capacity-btn" (click)="decrementarComensales()">
+                  <lucide-icon name="minus" [size]="16"></lucide-icon>
+                </button>
+                <input
                   type="number"
                   min="1"
                   [max]="mesaSeleccionada()?.capacidad || 20"
                   [ngModel]="comensales()"
-                  (ngModelChange)="comensales.set($event)"
-                  class="form-control"
-          >
-        </div>
-      </div>
-      <div class="modal-actions">
-        <restaurant-button variant="ghost" (click)="cerrarModales()">
-          <span>Cancelar</span>
-        </restaurant-button>
-        <restaurant-button variant="primary" (click)="abrirMesa(mesaSeleccionada()!.id)">
-          <span>Confirmar Asignación</span>
-        </restaurant-button>
-      </div>
-      }
+                  (ngModelChange)="comensales.set($event - 0 || 1)"
+                  class="form-control text-center capacity-input"
+                >
+                <button type="button" class="capacity-btn" (click)="incrementarComensales()">
+                  <lucide-icon name="plus" [size]="16"></lucide-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <restaurant-button variant="ghost" (click)="cerrarModales()">
+              <span>Cancelar</span>
+            </restaurant-button>
+            <restaurant-button variant="primary" (click)="abrirMesa(mesaSeleccionada()!.id)">
+              <span>Confirmar Asignación</span>
+            </restaurant-button>
+          </div>
+        }
 
-      @if (modalActivo() === 'lista-ocupadas') {
-      <div class="modal-header-colored">
-        <h3>Mesas en Servicio</h3>
-        <button class="close-btn" (click)="cerrarModales()">
-          <lucide-icon name="x" [size]="20"></lucide-icon>
-        </button>
-      </div>
-      <div class="modal-body-custom modal-body--no-padding">
-        @if (mesasEnServicio().length === 0) {
-        <div class="empty-state-container">
-          <restaurant-empty-state
+        @if (modalActivo() === 'lista-ocupadas') {
+          <div class="modal-header-colored">
+            <h3>Mesas en Servicio</h3>
+            <button class="close-btn" (click)="cerrarModales()">
+              <lucide-icon name="x" [size]="20"></lucide-icon>
+            </button>
+          </div>
+          <div class="modal-body-custom modal-body--no-padding">
+            @if (mesasEnServicio().length === 0) {
+              <div class="empty-state-container">
+                <restaurant-empty-state
                   icon="check-circle"
                   title="Todo despejado"
                   description="No hay mesas ocupadas ni por pagar en este momento."
-          ></restaurant-empty-state>
-        </div>
-        } @else {
-        <div class="table-responsive">
-          <table class="restaurant-table">
-            <thead>
-            <tr>
-              <th>Mesa</th>
-              <th>Ubicación</th>
-              <th>Mesero</th>
-              <th>Estado</th>
-            </tr>
-            </thead>
-            <tbody>
-            @for (mesa of mesasEnServicio(); track mesa.id) {
-            <tr>
-              <td class="fw-bold">{{ mesa.nombre }}</td>
-              <td>{{ mesa.zona || 'Sin zona' }}</td>
-              <td>{{ mesa.meseroAsignado }}</td>
-              <td>
-                <restaurant-status-badge
-                        [label]="mesa.estado"
-                        [variant]="getBadgeType(mesa.estado)">
-                </restaurant-status-badge>
-              </td>
-            </tr>
+                ></restaurant-empty-state>
+              </div>
+            } @else {
+              <div class="table-responsive">
+                <table class="restaurant-table">
+                  <thead>
+                    <tr>
+                      <th>Mesa</th>
+                      <th>Ubicación</th>
+                      <th>Mesero</th>
+                      <th>Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (mesa of mesasEnServicio(); track mesa.id) {
+                      <tr>
+                        <td class="fw-bold">{{ mesa.nombre }}</td>
+                        <td>{{ mesa.zona || 'Sin zona' }}</td>
+                        <td>{{ mesa.meseroAsignado }}</td>
+                        <td>
+                          <restaurant-status-badge 
+                            [label]="mesa.estado"
+                            [variant]="getBadgeType(mesa.estado)">
+                          </restaurant-status-badge>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
             }
-            </tbody>
-          </table>
-        </div>
+          </div>
         }
-      </div>
-      }
 
-      @if (modalActivo() === 'editar') {
-      <div class="modal-header-colored">
-        <h3>Editar {{ mesaSeleccionada()?.nombre }}</h3>
-        <button class="close-btn" (click)="cerrarModales()">
-          <lucide-icon name="x" [size]="20"></lucide-icon>
-        </button>
-      </div>
-      <div class="modal-body-custom">
-        <div class="form-group">
-          <label>Nombre de la Mesa</label>
-          <div class="input-group">
-            <span class="input-group-text">MESA</span>
-            <input
-                    type="text"
-                    inputmode="numeric"
-                    pattern="[0-9]*"
-                    maxlength="3"
-                    (keypress)="soloNumeros($event)"
-                    [ngModel]="editNombre()"
-                    (ngModelChange)="editNombre.set($event)"
-                    class="form-control"
-                    placeholder="Ej: 1, 2, 3..."
-            >
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Capacidad (personas)</label>
-          <div class="capacity-control">
-            <button type="button" class="capacity-btn" (click)="decrementarCapacidad('editar')">
-              <lucide-icon name="minus" [size]="16"></lucide-icon>
-            </button>
-            <input
-                    type="number"
-                    min="1"
-                    max="20"
-                    [ngModel]="editCapacidad()"
-                    (ngModelChange)="editCapacidad.set($event)"
-                    class="form-control text-center capacity-input"
-            >
-            <button type="button" class="capacity-btn" (click)="incrementarCapacidad('editar')">
-              <lucide-icon name="plus" [size]="16"></lucide-icon>
+        @if (modalActivo() === 'editar') {
+          <div class="modal-header-colored">
+            <h3>Editar {{ mesaSeleccionada()?.nombre }}</h3>
+            <button class="close-btn" (click)="cerrarModales()">
+              <lucide-icon name="x" [size]="20"></lucide-icon>
             </button>
           </div>
-        </div>
-        <div class="form-group">
-          <label>Zona / Ubicación</label>
-          <div class="autocomplete-wrapper">
-            <input
-                    type="text"
-                    [ngModel]="editZona()"
-                    (ngModelChange)="editZona.set($event)"
-                    (focus)="showEditZonaDropdown.set(true)"
-                    (blur)="onBlurZona('editar')"
-                    class="form-control"
-                    placeholder="Ej: Salón Principal, Terraza, VIP..."
-            >
-            @if (showEditZonaDropdown() && filteredEditZonas().length > 0) {
-            <ul class="autocomplete-dropdown">
-              @for (zona of filteredEditZonas(); track zona) {
-              <li (mousedown)="selectZona(zona, 'editar')">{{ zona }}</li>
-              }
-            </ul>
-            }
+          <div class="modal-body-custom">
+            <div class="form-group">
+              <label>Nombre de la Mesa</label>
+              <div class="input-group">
+                <span class="input-group-text">MESA</span>
+                <input
+                  type="text"
+                  inputmode="numeric" 
+                  pattern="[0-9]*" 
+                  maxlength="3" 
+                  (keypress)="soloNumeros($event)"
+                  [ngModel]="editNombre()"
+                  (ngModelChange)="editNombre.set($event)"
+                  class="form-control"
+                  placeholder="Ej: 1, 2, 3..."
+                >
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Capacidad (personas)</label>
+              <div class="capacity-control">
+                <button type="button" class="capacity-btn" (click)="decrementarCapacidad('editar')">
+                  <lucide-icon name="minus" [size]="16"></lucide-icon>
+                </button>
+                <input
+                  type="number"
+                  min="1"
+                  max="20"
+                  [ngModel]="editCapacidad()"
+                  (ngModelChange)="editCapacidad.set($event)"
+                  class="form-control text-center capacity-input"
+                >
+                <button type="button" class="capacity-btn" (click)="incrementarCapacidad('editar')">
+                  <lucide-icon name="plus" [size]="16"></lucide-icon>
+                </button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Zona / Ubicación</label>
+              <div class="autocomplete-wrapper">
+                <input
+                  type="text"
+                  [ngModel]="editZona()"
+                  (ngModelChange)="editZona.set($event)"
+                  (focus)="showEditZonaDropdown.set(true)"
+                  (blur)="onBlurZona('editar')"
+                  class="form-control"
+                  placeholder="Ej: Salón Principal, Terraza, VIP..."
+                >
+                @if (showEditZonaDropdown() && filteredEditZonas().length > 0) {
+                  <ul class="autocomplete-dropdown">
+                    @for (zona of filteredEditZonas(); track zona) {
+                      <li (mousedown)="selectZona(zona, 'editar')">{{ zona }}</li>
+                    }
+                  </ul>
+                }
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Observaciones (Opcional)</label>
+              <textarea 
+                [ngModel]="editObservaciones()" 
+                (ngModelChange)="editObservaciones.set($event)" 
+                class="form-control" 
+                rows="2" 
+                maxlength="80"
+                placeholder="Ej: Mesa inestable, rayada, etc. (Máx 80 caracteres)"></textarea>
+            </div>
           </div>
-        </div>
-      </div>
-      <div class="modal-actions">
-        <restaurant-button variant="ghost" (click)="cerrarModales()">
-          <span>Cancelar</span>
-        </restaurant-button>
-        <restaurant-button variant="primary" (click)="guardarEdicion()">
-          <div class="btn-content-centered">
-            <lucide-icon name="save" [size]="18"></lucide-icon>
-            <span>Guardar Cambios</span>
+          <div class="modal-actions">
+            <restaurant-button variant="ghost" (click)="cerrarModales()">
+              <span>Cancelar</span>
+            </restaurant-button>
+            <restaurant-button variant="primary" (click)="guardarEdicion()">
+              <div class="btn-content-centered">
+                <lucide-icon name="save" [size]="18"></lucide-icon>
+                <span>Guardar Cambios</span>
+              </div>
+            </restaurant-button>
           </div>
-        </restaurant-button>
-      </div>
-      }
+        }
 
-      @if (modalActivo() === 'liberar' || modalActivo() === 'cobrar') {
-      <div class="modal-header-colored">
-        <h3>¿Liberar {{ mesaSeleccionada()?.nombre }}?</h3>
-        <button class="close-btn" (click)="cerrarModales()">
-          <lucide-icon name="x" [size]="20"></lucide-icon>
-        </button>
-      </div>
-      <div class="modal-body-custom">
-        <p>Se cerrará la cuenta y la mesa quedará Libre.</p>
-      </div>
-      <div class="modal-actions">
-        <restaurant-button variant="ghost" (click)="cerrarModales()">
-          <span>Cancelar</span>
-        </restaurant-button>
-        <restaurant-button variant="primary" (click)="liberarMesa(mesaSeleccionada()!.id)">
-          <span>Liberar Mesa</span>
-        </restaurant-button>
-      </div>
-      }
+        @if (modalActivo() === 'liberar' || modalActivo() === 'cobrar') {
+          <div class="modal-header-colored">
+            <h3>¿Liberar {{ mesaSeleccionada()?.nombre }}?</h3>
+            <button class="close-btn" (click)="cerrarModales()">
+              <lucide-icon name="x" [size]="20"></lucide-icon>
+            </button>
+          </div>
+          <div class="modal-body-custom">
+            <p>Se cerrará la cuenta y la mesa quedará Libre.</p>
+          </div>
+          <div class="modal-actions">
+            <restaurant-button variant="ghost" (click)="cerrarModales()">
+              <span>Cancelar</span>
+            </restaurant-button>
+            <restaurant-button variant="primary" (click)="liberarMesa(mesaSeleccionada()!.id)">
+              <span>Liberar Mesa</span>
+            </restaurant-button>
+          </div>
+        }
 
-      @if (modalActivo() === 'gestion-mesas') {
-      <div class="modal-header-colored">
-        <h3>Gestión de Mesas</h3>
-        <button class="close-btn" (click)="cerrarModales()">
-          <lucide-icon name="x" [size]="20"></lucide-icon>
-        </button>
-      </div>
-      <div class="modal-body-custom">
-        <div class="tabs-container">
-          <button class="tab-btn" [class.active]="tabActivo() === 'desactivar'" (click)="tabActivo.set('desactivar')">
-            Desactivar
-          </button>
-          <button class="tab-btn" [class.active]="tabActivo() === 'activar'" (click)="tabActivo.set('activar')">
-            Activar
-          </button>
-        </div>
+        @if (modalActivo() === 'gestion-mesas') {
+          <div class="modal-header-colored">
+            <h3>Gestión de Mesas</h3>
+            <button class="close-btn" (click)="cerrarModales()">
+              <lucide-icon name="x" [size]="20"></lucide-icon>
+            </button>
+          </div>
+          <div class="modal-body-custom modal-body-custom--flex">
+            <div class="tabs-container">
+              <button class="tab-btn" [class.active]="tabActivo() === 'desactivar'" (click)="tabActivo.set('desactivar')">
+                Desactivar
+              </button>
+              <button class="tab-btn" [class.active]="tabActivo() === 'activar'" (click)="tabActivo.set('activar')">
+                Activar
+              </button>
+            </div>
 
-        <div class="gestion-mesas-search">
-          <div class="input-group search-input-group">
+            <div class="gestion-mesas-search">
+              <div class="input-group search-input-group">
                 <span class="input-group-text search-icon-addon">
                   <lucide-icon name="search" [size]="16"></lucide-icon>
                   MESA
                 </span>
-            <input
-                    type="text"
-                    inputmode="numeric"
-                    pattern="[0-9]*"
-                    maxlength="3"
-                    (keypress)="soloNumeros($event)"
-                    class="form-control"
-                    placeholder="Ej: 7, 12..."
-                    [ngModel]="searchQueryGestionMesas()"
-                    (ngModelChange)="searchQueryGestionMesas.set($event)">
-          </div>
-        </div>
+                <input 
+                  type="text" 
+                  inputmode="numeric"
+                  pattern="[0-9]*"
+                  maxlength="3"
+                  (keypress)="soloNumeros($event)"
+                  class="form-control" 
+                  placeholder="Ej: 7, 12..." 
+                  [ngModel]="searchQueryGestionMesas()" 
+                  (ngModelChange)="searchQueryGestionMesas.set($event)">
+              </div>
+            </div>
 
-        <div class="modal-body-custom modal-body-scrollable">
-          @if (tabActivo() === 'desactivar') {
-          <div class="mesa-list">
-            @for (m of filteredMesasActivasModal(); track m.id) {
-            <div class="mesa-list-item">
-              <div class="mesa-list-info">
-                <span class="mesa-list-number">{{ m.nombre }}</span>
-                <restaurant-status-badge [label]="m.estado" [variant]="getBadgeType(m.estado)"></restaurant-status-badge>
-              </div>
-              <restaurant-button variant="danger" [disabled]="m.estado !== 'LIBRE'"
-                                 (click)="cambiarEstadoMesa(m.id, false)"
-                                 [title]="m.estado !== 'LIBRE' ? 'No se puede desactivar una mesa ocupada' : ''">
-                <span>Desactivar</span>
-              </restaurant-button>
+            <div class="modal-body-scrollable">
+              @if (tabActivo() === 'desactivar') {
+                <div class="mesa-list">
+                  @for (m of filteredMesasActivasModal(); track m.id) {
+                    <div class="mesa-list-item">
+                      <div class="mesa-list-info">
+                        <span class="mesa-list-number">{{ m.nombre }}</span>
+                        <restaurant-status-badge [label]="m.estado" [variant]="getBadgeType(m.estado)"></restaurant-status-badge>
+                      </div>
+                      <restaurant-button variant="danger" [disabled]="m.estado !== 'LIBRE'"
+                        (click)="cambiarEstadoMesa(m.id, false)"
+                        [title]="m.estado !== 'LIBRE' ? 'No se puede desactivar una mesa ocupada' : ''">
+                        <span>Desactivar</span>
+                      </restaurant-button>
+                    </div>
+                  } @empty {
+                    <p class="empty-msg">No hay mesas activas disponibles.</p>
+                  }
+                </div>
+              } @else {
+                <div class="mesa-list">
+                  @for (m of filteredMesasInactivasModal(); track m.id) {
+                    <div class="mesa-list-item">
+                      <div class="mesa-list-info">
+                        <div class="mesa-list-info-header">
+                          <span class="mesa-list-number">{{ m.nombre }}</span>
+                          <span class="badge-inactiva">Desactivada</span>
+                        </div>
+                        @if (m.observaciones) {
+                          <div class="mesa-obs-text">
+                            <lucide-icon name="alert-circle" [size]="14"></lucide-icon>
+                            <span>{{ m.observaciones }}</span>
+                          </div>
+                        }
+                      </div>
+                      <restaurant-button variant="primary" (click)="cambiarEstadoMesa(m.id, true)">
+                        <span>Activar</span>
+                      </restaurant-button>
+                    </div>
+                  } @empty {
+                    <p class="empty-msg">No hay mesas desactivadas.</p>
+                  }
+                </div>
+              }
             </div>
-            } @empty {
-            <p class="empty-msg">No hay mesas activas disponibles.</p>
-            }
           </div>
-          } @else {
-          <div class="mesa-list">
-            @for (m of filteredMesasInactivasModal(); track m.id) {
-            <div class="mesa-list-item">
-              <div class="mesa-list-info">
-                <span class="mesa-list-number">{{ m.nombre }}</span>
-                <span class="badge-inactiva">Desactivada</span>
-              </div>
-              <restaurant-button variant="primary" (click)="cambiarEstadoMesa(m.id, true)">
-                <span>Activar</span>
-              </restaurant-button>
-            </div>
-            } @empty {
-            <p class="empty-msg">No hay mesas desactivadas.</p>
-            }
-          </div>
-          }
-        </div>
+        }
+
       </div>
-      }
-
     </div>
-  </div>
   }
 </div>
 
 <!-- Modal para Alertas y Notificaciones -->
 <restaurant-confirm-dialog
-        [open]="alertDialog().open"
-        [title]="alertDialog().title"
-        [message]="alertDialog().message"
-        [confirmText]="alertDialog().confirmText || 'Aceptar'"
-        [cancelText]="alertDialog().cancelText || 'Cancelar'"
-        [showCancel]="alertDialog().type === 'confirm'"
-        (confirm)="confirmAlertDialog()"
-        (cancel)="cerrarAlertDialog()"
+  [open]="alertDialog().open"
+  [title]="alertDialog().title"
+  [message]="alertDialog().message"
+  [confirmText]="alertDialog().confirmText || 'Aceptar'"
+  [cancelText]="alertDialog().cancelText || 'Cancelar'"
+  [showCancel]="alertDialog().type === 'confirm'"
+  (confirm)="confirmAlertDialog()"
+  (cancel)="cerrarAlertDialog()"
 ></restaurant-confirm-dialog>

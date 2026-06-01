@@ -77,6 +77,20 @@ export class PaqueteFacade {
       });
   }
 
+  /** Exporta el paquete — POST /legalization/paquetes/{id}/exportar. */
+  exportarPaquete(id: string): void {
+    this._loading.set(true);
+    this.paqueteService.exportarPaquete(id)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al exportar el paquete');
+          return of(false);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe();
+  }
+
   /** Archiva el paquete y recarga su detalle. */
   archivarPaquete(id: string): void {
     this._loading.set(true);

@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { forkJoin, Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Factura, FacturaFiltros, FacturaKpis, FacturaPaginacion, SolicitudGIL, EstadoGIL, ConciliacionGil, FacturaFormDto, GilPickerItem } from '../../models/facturas.model';
 import {
@@ -9,12 +9,12 @@ import {
   FacturaPagedResponse,
   FacturaResponse,
   FacturaResumenResponse,
-  GilResponse,
   ConciliacionGilResponse,
   ConciliarRequest,
   ResolverDiferenciaGilRequest,
   VincularInstructorRequest,
 } from '../api/sourcing.api';
+import { GilResponse } from '../api/procurement.api';
 import { facturaFromApi, conciliacionGilFromApi, facturaFormToRequest } from '../mappers/sourcing.mapper';
 
 const API = '/api/v1';
@@ -25,9 +25,11 @@ export class FacturasService {
 
   getFacturas(filtros?: FacturaFiltros): Observable<{ facturas: Factura[]; paginacion: FacturaPaginacion }> {
     let params = new HttpParams();
-    if (filtros?.busqueda)  params = params.set('numeroFactura', filtros.busqueda);
-    if (filtros?.estado)    params = params.set('estado', filtros.estado);
-    if (filtros?.proveedor) params = params.set('proveedorNit', filtros.proveedor);
+    if (filtros?.busqueda)   params = params.set('numeroFactura', filtros.busqueda);
+    if (filtros?.estado)     params = params.set('estado', filtros.estado);
+    if (filtros?.proveedor)  params = params.set('proveedorNit', filtros.proveedor);
+    if (filtros?.fechaDesde) params = params.set('fechaDesde', filtros.fechaDesde);
+    if (filtros?.fechaHasta) params = params.set('fechaHasta', filtros.fechaHasta);
     params = params.set('page', String(filtros?.page ?? 0));
     params = params.set('size', String(filtros?.size ?? 10));
 
@@ -194,17 +196,24 @@ export class FacturasService {
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  /** GET /procurement/giles?estado=ENVIADO_PROVEEDOR — lista para picker en importación FEL */
+  /** GET /procurement/giles — lista para picker en importación FEL.
+   *  Incluye EMITIDO y ENVIADO_PROVEEDOR: una factura puede llegar mientras el GIL
+   *  aún está en estado EMITIDO, antes de ser enviado formalmente al proveedor. */
   getGilesEnviadosProveedor(): Observable<GilPickerItem[]> {
-    const params = new HttpParams()
-      .set('estado', 'ENVIADO_PROVEEDOR')
-      .set('size', '100');
-    return this.http
-      .get<{ content: GilResponse[] }>(`${API}/procurement/giles`, { params })
-      .pipe(
-        map(res => res.content.map(g => ({ id: g.id, numeroGil: g.numeroGil, destino: g.destinoBienes }))),
-        catchError(err => throwError(() => err))
-      );
+    return forkJoin([
+      this.http.get<{ content: GilResponse[] }>(`${API}/procurement/giles`, {
+        params: new HttpParams().set('estado', 'EMITIDO').set('size', '100'),
+      }),
+      this.http.get<{ content: GilResponse[] }>(`${API}/procurement/giles`, {
+        params: new HttpParams().set('estado', 'ENVIADO_PROVEEDOR').set('size', '100'),
+      }),
+    ]).pipe(
+      map(([emitidos, enviados]) => {
+        const combined = [...(emitidos.content ?? []), ...(enviados.content ?? [])];
+        return combined.map(g => ({ id: g.id, numeroGil: g.numeroGil, destino: g.destinoBienes }));
+      }),
+      catchError(err => throwError(() => err))
+    );
   }
 
   /** Mapea GilResponse al tipo SolicitudGIL que usa la FacturasFacade.
@@ -221,18 +230,20 @@ export class FacturasService {
 
   private gilResponseToSolicitudGIL(g: GilResponse): SolicitudGIL {
     return {
-      id: g.id,
-      nombreVocero:            g.jefeOficinaCoordinador ?? '',
+      id:                      g.id,
+      nombreVocero:            g.jefeOficinaCoordinador,
+      // horarios and hashTransaccion are training-module fields not present in GilResponse
       horarios:                '',
-      resultadoAprendizaje:    '',
+      resultadoAprendizaje:    g.resultadoAprendizaje ?? '',
       estadoSolicitud:         g.estado as EstadoGIL,
       fechaCreacion:           g.fechaSolicitud,
-      totalEstimado:           0,    // calculado en backend
+      // totalEstimado is not returned by /procurement/giles — derived from bienes if needed
+      totalEstimado:           g.bienes?.reduce((acc, b) => acc + b.subtotal, 0) ?? 0,
       responsable:             g.emitidoPor ?? '',
-      regional:                g.regionalNombre ?? '',
-      centroFormacion:         g.centroCostosNombre ?? '',
+      regional:                g.regionalNombre,
+      centroFormacion:         g.centroCostosNombre,
       areaPrograma:            g.area,
-      cuentadanteResponsable:  g.cuentadantes?.[0]?.nombre ?? '',
+      cuentadanteResponsable:  g.cuentadantes[0]?.nombre ?? '',
       destinoBien:             g.destinoBienes,
       preFacturas:             [],
       observaciones:           g.observaciones ?? '',

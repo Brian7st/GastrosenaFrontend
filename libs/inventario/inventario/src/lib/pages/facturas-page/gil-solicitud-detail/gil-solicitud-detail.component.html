@@ -20,9 +20,11 @@
         <span class="material-symbols-outlined">picture_as_pdf</span>
         Descargar PDF
       </button>
-      <button class="btn btn--primary" id="btn-enviar-aprobacion" (click)="onEnviarAprobacion()">
-        Enviar a Aprobación
-      </button>
+      @if (s.estadoSolicitud === 'BORRADOR') {
+        <button class="btn btn--primary" id="btn-enviar-aprobacion" (click)="onEnviarAprobacion()">
+          Enviar a Aprobación
+        </button>
+      }
     </div>
   </div>
 

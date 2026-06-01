@@ -103,6 +103,15 @@ export class ActasDetailComponent implements OnInit {
     return flujo[actual] ?? null;
   }
 
+  /** Avanza el acta de FIRMADA → REVISADA usando el ID del instructor como revisorId provisional. */
+  revisarActa(): void {
+    const id          = this.acta()?.id;
+    const instructorId = this.acta()?.instructorId ?? 'revisor-sena';
+    if (id) {
+      this.facade.revisarActa(id, instructorId);
+    }
+  }
+
   // ── Navegación ───────────────────────────────────────────────────────────
   volver(): void {
     this.router.navigate(['/app/inventario/actas']);

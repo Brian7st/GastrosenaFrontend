@@ -38,6 +38,8 @@ export class BienesListPageComponent implements OnInit {
     Array.from({ length: this.paginacion().totalPages }, (_, i) => i)
   );
 
+  showFilters = signal(false);
+
   // Modal controls
   showFormModal = signal(false);
   showDeleteModal = signal(false);
@@ -107,6 +109,14 @@ export class BienesListPageComponent implements OnInit {
 
   onVerDetalle(bien: Bien): void {
     this.router.navigate(['/app/inventario/bienes', bien.id]);
+  }
+
+  onDesactivar(bien: Bien): void {
+    this.facade.desactivarBien(bien.id);
+  }
+
+  onActivar(bien: Bien): void {
+    this.facade.activarBien(bien.id);
   }
 
   onEliminar(bien: Bien): void {

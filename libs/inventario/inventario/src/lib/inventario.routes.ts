@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { salidaRequiereRequisicionGuard } from './guards/salida-requisicion.guard';
 
 
 export const INVENTARIO_ROUTES: Routes = [
@@ -175,11 +176,8 @@ export const INVENTARIO_ROUTES: Routes = [
         loadComponent: () => import('./pages/kardex-page/movimiento-entrada/movimiento-entrada.component').then(m => m.MovimientoEntradaComponent)
       },
       {
-        path: 'entrada-gil',
-        loadComponent: () => import('./pages/kardex-page/movimiento-entrada-gil/movimiento-entrada-gil.component').then(m => m.MovimientoEntradaGilComponent)
-      },
-      {
         path: 'salida',
+        canActivate: [salidaRequiereRequisicionGuard],
         loadComponent: () => import('./pages/kardex-page/movimiento-salida/movimiento-salida.component').then(m => m.MovimientoSalidaComponent)
       },
       {
@@ -187,6 +185,11 @@ export const INVENTARIO_ROUTES: Routes = [
         loadComponent: () => import('./pages/kardex-page/movimiento-export/movimiento-export.component').then(m => m.MovimientoExportComponent)
       }
     ]
+  },
+  // entrada-gil is a standalone page — NOT a child of movimientos to avoid rendering inside the list.
+  {
+    path: 'movimientos/entrada-gil',
+    loadComponent: () => import('./pages/kardex-page/movimiento-entrada-gil/movimiento-entrada-gil.component').then(m => m.MovimientoEntradaGilComponent)
   },
   {
     path: 'movimientos/:id',
@@ -397,6 +400,12 @@ export const INVENTARIO_ROUTES: Routes = [
           import('./pages/requisiciones-page/requisiciones-firmar/requisiciones-firmar.component').then(
             m => m.RequisicionesFirmarComponent
           ),
+      },
+      {
+        path: 'resumen/nueva',
+        loadComponent: () =>
+          import('./pages/requisiciones-page/requisiciones-resumen/requisiciones-resumen.component')
+            .then(m => m.RequisicionesResumenComponent),
       },
       {
         path: 'resumen/:id',

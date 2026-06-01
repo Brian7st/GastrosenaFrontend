@@ -1,6 +1,6 @@
 import { Factura, FacturaFormDto, ConciliacionGil } from '../../models/facturas.model';
 import { SolicitudGil, BienSolicitud, CuentadanteGil } from '../../models/solicitudes-gil.model';
-import { BackendDateArray, FacturaLineaResponse, FacturaResponse, GilResponse, RegistrarFacturaRequest, ConciliacionGilResponse } from '../api/sourcing.api';
+import { BackendDateArray, FacturaLineaResponse, FacturaResponse, GilResponse, RegistrarFacturaRequest, ConciliacionGilResponse, DetalleGilResponse } from '../api/sourcing.api';
 
 function backendDateToIso(date: BackendDateArray | string | undefined | null): string {
   if (!date) return '';
@@ -80,16 +80,16 @@ export function conciliacionGilFromApi(dto: ConciliacionGilResponse): Conciliaci
     facturaId: dto.facturaId,
     gilId:     dto.gilId,
     estado:    dto.estado,
-    diferencias: dto.diferencias.map(d => ({
+    diferencias: dto.detalles.map((d: DetalleGilResponse) => ({
       gilItemId:             d.gilItemId,
       descripcion:           d.descripcion,
       cantidadGil:           d.cantidadGil,
       cantidadFactura:       d.cantidadFactura,
       precioUnitarioGil:     d.precioUnitarioGil,
       precioUnitarioFactura: d.precioUnitarioFactura,
-      diferencia:            d.diferencia,
+      diferencia:            (d.precioUnitarioFactura * d.cantidadFactura) - (d.precioUnitarioGil * d.cantidadGil),
       observacion:           d.observacion,
-      resuelta:              d.resuelta,
+      resuelta:              d.estado !== 'DIFERENCIA_PENDIENTE',
     })),
   };
 }
@@ -97,7 +97,7 @@ export function conciliacionGilFromApi(dto: ConciliacionGilResponse): Conciliaci
 /**
  * Transforma el response del backend (GilResponse) al modelo interno (SolicitudGil).
  * NOTA: los nombres de campo del response están alineados con los del request
- * (fechaSolicitud, destinoBienes, fichaCaracterizacion, etc.).
+ * (fechaSolicitud, destinoBienes, codigoGrupo, etc.).
  * Revisar si el backend devuelve nombres distintos una vez que documente GilResponse
  * (tarea BACKEND #2).
  */
@@ -115,15 +115,14 @@ export function gilFromApi(dto: GilResponse): SolicitudGil {
     jefeOficinaCoordinador: dto.jefeOficinaCoordinador,
     solicitante:          dto.solicitante,
     codigoGrupo:          dto.codigoGrupo,
-    fichaCaracterizacion: dto.fichaCaracterizacion,
     estado:               dto.estado,
     observaciones:        dto.observaciones,
-    cuentadantes: dto.cuentadantes.map((c): CuentadanteGil => ({
+    cuentadantes: (dto.cuentadantes ?? []).map((c): CuentadanteGil => ({
       id:     c.id,
       nombre: c.nombre,
       cedula: c.cedula,
     })),
-    bienes: dto.bienes?.map((b): BienSolicitud => ({
+    bienes: (dto.bienes ?? []).map((b): BienSolicitud => ({
       codigoSena:    b.codigoSena,
       descripcion:   b.descripcion,
       unidadMedida:  b.unidadMedida,

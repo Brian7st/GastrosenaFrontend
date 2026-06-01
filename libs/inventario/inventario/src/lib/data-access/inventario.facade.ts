@@ -171,6 +171,19 @@ export class InventarioFacade {
       .subscribe(res => { if (res !== null) this.cargarBienes(); });
   }
 
+  activarBien(id: string | number): void {
+    this._loading.set(true);
+    this.bienesService.activarBien(id)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al activar el bien');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => { if (res !== null) this.cargarBienes(); });
+  }
+
   /**
    * Actualiza un bien existente y refresca los datos.
    */

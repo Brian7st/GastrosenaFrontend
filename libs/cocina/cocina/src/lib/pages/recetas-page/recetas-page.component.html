@@ -1,9 +1,14 @@
 <div class="modulo-container">
   <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-4);">
     <restaurant-page-header title="Gestión de Recetas" subtitle="Administrá el menú y recetario" style="margin-bottom: 0;"></restaurant-page-header>
-    <restaurant-button variant="primary" (click)="abrirNuevaReceta()">
-      <lucide-icon name="plus" size="18" style="margin-right: var(--space-2);"></lucide-icon> Nueva Receta
-    </restaurant-button>
+    <div style="display: flex; gap: var(--space-3);">
+      <restaurant-button variant="surface" (click)="abrirGestionCategorias()">
+        <lucide-icon name="list" size="18" style="margin-right: var(--space-2);"></lucide-icon> Gestionar Categorías
+      </restaurant-button>
+      <restaurant-button variant="primary" (click)="abrirNuevaReceta()">
+        <lucide-icon name="plus" size="18" style="margin-right: var(--space-2);"></lucide-icon> Nueva Receta
+      </restaurant-button>
+    </div>
   </div>
   <!-- Filtros: Buscador y Categorías alineados al lado -->
   <div class="recetas-filters">
@@ -79,6 +84,12 @@
       [receta]="recetaSeleccionada()" 
       (close)="cerrarModales($event)" 
     ></restaurant-gestion-receta>
+  }
+
+  @if (mostrarCategorias()) {
+    <restaurant-gestion-categorias
+      (close)="cerrarModales($event)"
+    ></restaurant-gestion-categorias>
   }
 
   <!-- Modal para confirmar eliminación -->

@@ -37,9 +37,7 @@ export class BienesService {
     if (filtros?.estado === 'Inactivo') params = params.set('activo', 'false');
     params = params
       .set('page', String(filtros?.page ?? 0))
-      .set('size', String(filtros?.size ?? 10))
-      .set('sort', 'id')
-      .set('direction', 'DESC');
+      .set('size', String(filtros?.size ?? 10));
 
     return this.http
       .get<PagedResponse<ProductoResponse>>(`${API}/catalog/productos`, { params })
@@ -132,10 +130,20 @@ export class BienesService {
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  /** PATCH /catalog/productos/{id}/desactivar — soft delete: marca activo=false */
+  /** PATCH /catalog/productos/{id}/desactivar */
   desactivarBien(id: string | number): Observable<Bien> {
     return this.http
       .patch<ProductoResponse>(`${API}/catalog/productos/${id}/desactivar`, {})
+      .pipe(
+        map(bienFromCatalogo),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** PATCH /catalog/productos/{id}/activar */
+  activarBien(id: string | number): Observable<Bien> {
+    return this.http
+      .patch<ProductoResponse>(`${API}/catalog/productos/${id}/activar`, {})
       .pipe(
         map(bienFromCatalogo),
         catchError(err => throwError(() => err))

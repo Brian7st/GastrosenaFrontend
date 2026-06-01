@@ -8,7 +8,7 @@ import {
   CompromisoActa,
   FirmanteActa,
 } from '../../models/acta.model';
-import { ActaResponse } from '../api/legalization.api';
+import { ActaResponse, ActasPageResponse, CrearActaRequest } from '../api/legalization.api';
 import { actaFromApi } from '../mappers/legalization.mapper';
 
 const API = '/api/v1';
@@ -26,9 +26,9 @@ export class ActasService {
 
   getActas(): Observable<ActaLegalizacion[]> {
     return this.http
-      .get<ActaResponse[]>(`${API}/legalization/actas`)
+      .get<ActasPageResponse>(`${API}/legalization/actas`)
       .pipe(
-        map(list => list.map(actaFromApi)),
+        map(resp => resp.contenido.map(actaFromApi)),
         catchError(err => throwError(() => err))
       );
   }
@@ -42,11 +42,11 @@ export class ActasService {
       );
   }
 
-  crearActa(data: Partial<ActaLegalizacion>): Observable<ActaLegalizacion> {
+  crearActa(data: CrearActaRequest): Observable<string> {
     return this.http
-      .post<ActaResponse>(`${API}/legalization/actas`, data)
+      .post<{ id: string }>(`${API}/legalization/actas`, data)
       .pipe(
-        map(actaFromApi),
+        map(resp => resp.id),
         catchError(err => throwError(() => err))
       );
   }

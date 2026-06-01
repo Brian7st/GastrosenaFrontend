@@ -49,6 +49,7 @@ export class FacturaDetailPageComponent implements OnInit {
     const c = this.conciliacionGil();
     if (!c) return;
     const obs = this.observaciones()[gilItemId] ?? '';
+    if (!obs.trim()) return; // observation required — don't send empty string to backend
     this.facade.resolverDiferenciaGil(c.id, gilItemId, obs);
     this.observaciones.update(o => { const next = { ...o }; delete next[gilItemId]; return next; });
   }
@@ -85,6 +86,10 @@ export class FacturaDetailPageComponent implements OnInit {
     if (!factura) return;
     this.showConfirmPagada.set(false);
     this.facade.marcarPagada(String(factura.id));
+  }
+
+  onCopiarCufe(cufe: string | undefined): void {
+    if (cufe) navigator.clipboard.writeText(cufe);
   }
 
   descargarOImprimir(): void {

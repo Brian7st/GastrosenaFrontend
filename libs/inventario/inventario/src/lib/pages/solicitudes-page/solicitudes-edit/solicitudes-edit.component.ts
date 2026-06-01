@@ -54,7 +54,6 @@ export class SolicitudesEditComponent implements OnInit {
   jefeOficinaCoordinador = signal('');
   solicitante            = signal('');
   codigoGrupo            = signal('');
-  fichaCaracterizacion   = signal('');
   observaciones          = signal('');
   cuentadantes           = signal<{ nombre: string; cedula: string }[]>([]);
   bienes                 = signal<BienSolicitud[]>([]);
@@ -84,7 +83,6 @@ export class SolicitudesEditComponent implements OnInit {
     this.jefeOficinaCoordinador.set(s.jefeOficinaCoordinador ?? '');
     this.solicitante.set(s.solicitante ?? '');
     this.codigoGrupo.set(s.codigoGrupo ?? '');
-    this.fichaCaracterizacion.set(s.fichaCaracterizacion ?? '');
     this.observaciones.set(s.observaciones ?? '');
     this.cuentadantes.set(
       (s.cuentadantes ?? []).map(c => ({ nombre: c.nombre, cedula: c.cedula ?? '' }))
@@ -122,8 +120,7 @@ export class SolicitudesEditComponent implements OnInit {
       jefeOficinaCoordinador: this.jefeOficinaCoordinador(),
       cuentadantes:           this.cuentadantes(),
       solicitante:            this.solicitante(),
-      codigoGrupo:            this.codigoGrupo(),
-      fichaCaracterizacion:   this.fichaCaracterizacion(),
+      codigoGrupo:            this.codigoGrupo() || undefined,
       bienes:                 this.bienes(),
       observaciones:          this.observaciones() || undefined,
     };

@@ -1,0 +1,78 @@
+<div class="modal-overlay" (click)="cerrar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 style="margin: 0; font-size: var(--font-size-xl);">Gestión de Categorías</h2>
+      <restaurant-button variant="ghost" (click)="cerrar()">
+        <lucide-icon name="x" size="20"></lucide-icon>
+      </restaurant-button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Alertas -->
+      <div *ngIf="alertMessage()" style="margin-bottom: 24px;">
+        <restaurant-alert [type]="alertType()" [message]="alertMessage()"></restaurant-alert>
+      </div>
+
+      <!-- Formulario para agregar/editar -->
+      <div class="form-card" style="background: #ffffff; padding: 24px; border-radius: 12px; margin-bottom: 24px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+        <h3 style="margin-top: 0; font-size: 1.1rem; color: #1e293b; font-weight: 600; margin-bottom: 16px;">
+          {{ categoriaEnEdicion ? 'Editar Categoría' : 'Nueva Categoría' }}
+        </h3>
+        
+        <div style="display: flex; gap: 16px; align-items: flex-end;">
+          <div style="flex: 1;">
+            <restaurant-input 
+              label="Nombre de la Categoría" 
+              placeholder="Ej: Carnes" 
+              [ngModel]="nuevaCategoriaNombre" 
+              (ngModelChange)="nuevaCategoriaNombre = $event"
+              (keyup.enter)="guardarCategoria()"
+            ></restaurant-input>
+          </div>
+          <restaurant-button variant="primary" (click)="guardarCategoria()">
+            {{ categoriaEnEdicion ? 'Actualizar' : 'Agregar' }}
+          </restaurant-button>
+          <restaurant-button *ngIf="categoriaEnEdicion" variant="ghost" (click)="cancelarEdicion()">
+            Cancelar
+          </restaurant-button>
+        </div>
+      </div>
+
+      <!-- Lista de Categorías -->
+      <div class="lista-categorias">
+        <h3 style="margin-top: 0; font-size: 1.1rem; color: #1e293b; font-weight: 600; margin-bottom: 16px;">Categorías Existentes</h3>
+        
+        <div *ngIf="categoriaService.categorias().length === 0" style="text-align: center; color: #94a3b8; padding: 24px; background: #ffffff; border-radius: 12px; border: 1px dashed #cbd5e1;">
+          No hay categorías registradas.
+        </div>
+
+        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+          <li *ngFor="let cat of categoriaService.categorias()" 
+              style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); transition: transform 0.2s, box-shadow 0.2s;"
+              onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 6px -1px rgba(0, 0, 0, 0.1)'"
+              onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 1px 2px 0 rgba(0, 0, 0, 0.05)'">
+            <span style="font-weight: 500; color: #334155; font-size: 1rem;">{{ cat.nombreCategoria }}</span>
+            <div style="display: flex; gap: 8px;">
+              <restaurant-button variant="surface" (click)="editarCategoria(cat)">
+                <lucide-icon name="pencil" size="16"></lucide-icon>
+              </restaurant-button>
+              <restaurant-button variant="ghost" style="color: #ef4444;" (click)="eliminarCategoria(cat.idCategoria!)">
+                <lucide-icon name="trash-2" size="16"></lucide-icon>
+              </restaurant-button>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Confirmación para Eliminar Categoría -->
+<restaurant-confirm-dialog
+  [open]="confirmDeleteOpen()"
+  title="¿Eliminar categoría?"
+  message="Si la categoría está siendo usada por recetas, no se podrá borrar. ¿Estás seguro de continuar?"
+  (confirm)="confirmarEliminacion()"
+  (cancel)="cancelarEliminacion()"
+></restaurant-confirm-dialog>

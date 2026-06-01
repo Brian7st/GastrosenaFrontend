@@ -90,6 +90,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative; // ✅ necesario para el badge
 
     &--ia {
       color: var(--color-primario);
@@ -122,5 +123,23 @@
   &__icono-perfil {
     color: var(--color-pizarra-500);
     font-size: 1.125rem;
+  }
+
+  // 🟢 Nuevo estilo para el badge de notificaciones
+  &__badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background-color: #ef4444;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 2px var(--color-superficie-contenedor-mas-bajo);
   }
 }

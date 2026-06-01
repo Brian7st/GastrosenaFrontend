@@ -122,7 +122,6 @@ export interface CrearGilRequest {
   cuentadantes: CuentadanteGilRequest[];
   solicitante: string;
   codigoGrupo: string;
-  fichaCaracterizacion: string;
   solicitudesOrigenIds?: string[];
   bienes: BienGilRequest[];
   observaciones?: string;
@@ -142,59 +141,16 @@ export interface GenerarGilRequest {
   cuentadantes: CuentadanteGilRequest[];
   solicitante: string;
   codigoGrupo: string;
-  fichaCaracterizacion: string;
   observaciones?: string;
 }
 
-// ─── GIL — Response types (esperados del backend — verificar cuando haya datos) ──
-
-/** Cuentadante en responses — incluye id y cedula */
-export interface CuentadanteGilResponse {
-  id: string;
-  nombre: string;
-  cedula: string;
-}
-
-/** Ítem de bien en responses */
-export interface BienGilResponse {
-  productoId?: string;
-  codigoSena: string;
-  descripcion: string;
-  unidadMedida: string;
-  cantidad: number;
-  valorUnitario: number;
-  subtotal: number;
-}
-
-export interface GilResponse {
-  id: string;
-  numeroGil: string;
-  fechaSolicitud: string;
-  regionalCodigo: number;
-  regionalNombre: string;
-  centroCostosCodigo: number;
-  centroCostosNombre: string;
-  area: string;
-  destinoBienes: string;
-  jefeOficinaCoordinador: string;
-  cuentadantes: CuentadanteGilResponse[];
-  solicitante: string;
-  codigoGrupo: string;
-  fichaCaracterizacion: string;
-  estado: 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'CERRADO';
-  observaciones?: string;
-  bienes?: BienGilResponse[];
-  creadoEn?: string;
-  actualizadoEn?: string;
-  // Campos opcionales del módulo training
-  programaId?: string;
-  emitidoPor?: string;
-  resultadoAprendizaje?: string;
-  actividades?: string;
-  voceroNombre?: string;
-  voceroDocumento?: string;
-  solicitudesOrigenIds?: string[];
-}
+// ─── GIL — Response types (canonical definitions live in procurement.api.ts) ──
+export {
+  BienGilResponse,
+  CuentadanteGilResponse,
+  GilResponse,
+  EstadoGil,
+} from './procurement.api';
 
 /** PUT → PATCH /api/v1/procurement/giles/{id}/enviar-proveedor */
 export interface EnviarProveedorRequest {
@@ -208,25 +164,28 @@ export interface VincularInstructorRequest {
 
 // ─── Sourcing — Conciliación Factura-GIL (/api/v1/sourcing/conciliaciones-gil) ─
 
-export interface GilDiferenciaItemResponse {
-  gilItemId:            string;
-  descripcion:          string;
-  cantidadGil:          number;
-  cantidadFactura:      number;
-  precioUnitarioGil:    number;
+/** Detalle tal como lo retorna el backend (campo "detalles") */
+export interface DetalleGilResponse {
+  gilItemId:             string;
+  descripcion:           string;
+  cantidadGil:           number;
+  cantidadFactura:       number;
+  precioUnitarioGil:     number;
   precioUnitarioFactura: number;
-  diferencia:           number;
-  observacion?:         string;
-  resuelta:             boolean;
+  porcentajeIvaGil:      number;
+  porcentajeIvaFactura:  number;
+  estado:                'OK' | 'DIFERENCIA_PENDIENTE' | 'DIFERENCIA_RESUELTA';
+  observacion?:          string;
 }
 
 /** Respuesta de POST, GET y PATCH /sourcing/conciliaciones-gil */
 export interface ConciliacionGilResponse {
-  id:          string;
-  facturaId:   string;
-  gilId:       string;
-  estado:      string;
-  diferencias: GilDiferenciaItemResponse[];
+  id:                    string;
+  facturaId:             string;
+  gilId:                 string;
+  estado:                string;
+  diferenciasPendientes: number;
+  detalles:              DetalleGilResponse[];
 }
 
 /** POST /sourcing/conciliaciones-gil */
