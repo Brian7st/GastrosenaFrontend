@@ -76,6 +76,26 @@ export class RequisicionesFacade {
       .subscribe(data => this._requisicionSeleccionada.set(data ?? null));
   }
 
+  /** PATCH /legalization/requisiciones/{id}/enviar — transición BORRADOR → ENVIADA */
+  enviarRequisicion(id: string): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this.requisicionesService.enviarRequisicion(id)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al enviar la requisición');
+          return of(false);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(ok => {
+        if (ok) {
+          this.loadAll();
+          this.cargarRequisicion(id);
+        }
+      });
+  }
+
   /** PATCH /legalization/requisiciones/{id}/despachar — economoId obligatorio */
   despacharRequisicion(id: string, economoId: string): void {
     this._loading.set(true);

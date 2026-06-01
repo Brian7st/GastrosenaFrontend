@@ -7,15 +7,23 @@ export interface LocalTimeApi {
 }
 
 export interface ActaResponse {
-  id: string;
-  numeroActa: number; // long en Java
-  fecha: string;      // LocalDate serializado como ISO date
-  fichaId: string;
-  instructorId: string;
-  requisicionId: string;
-  estado: 'BORRADOR' | 'PENDIENTE_FIRMAS' | 'FIRMADA' | 'REVISADA' | 'ARCHIVADA';
-  ciudad?: string;
-  lugar?: string;
+  id:                    string;
+  numeroActa:            number;
+  comite?:               string;
+  ciudad?:               string;
+  fecha:                 string;
+  horaInicio?:           string;
+  horaFin?:              string;
+  lugar?:                string;
+  regional?:             string;
+  fichaId:               string;
+  instructorId:          string;
+  requisicionId:         string;
+  estado:                'BORRADOR' | 'PENDIENTE_FIRMAS' | 'FIRMADA' | 'REVISADA' | 'ARCHIVADA';
+  resultadoAprendizaje?: string;
+  actividadesRealizadas?: string;
+  asistentes?:           AsistenteResponse[];
+  compromisos?:          CompromisoActaResponse[];
 }
 
 export interface AsistenteRequest {
@@ -95,6 +103,18 @@ export type CategoriaInsumo =
   | 'LACTEOS'
   | 'FRUTAS_Y_VEGETALES'
   | 'CARNES_PESCADOS_MARISCOS';
+
+export interface AsistenteResponse {
+  nombre:         string;
+  dependenciaRol: string;
+  aprueba:        boolean;
+}
+
+export interface CompromisoActaResponse {
+  actividad:    string;
+  fecha:        string;
+  responsable:  string;
+}
 
 /** RequisicionItemResponse — Swagger actualizado (B-02).
  *  productoId = codigoSena del catálogo; usar como productoId en RegistrarSalidaHttpRequest. */

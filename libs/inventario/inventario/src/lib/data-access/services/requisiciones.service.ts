@@ -79,6 +79,16 @@ export class RequisicionesService {
     return hora.length === 5 ? `${hora}:00` : hora;
   }
 
+  /** PATCH /legalization/requisiciones/{id}/enviar — transición BORRADOR → ENVIADA */
+  enviarRequisicion(id: string): Observable<boolean> {
+    return this.http
+      .patch<void>(`${API}/legalization/requisiciones/${id}/enviar`, {})
+      .pipe(
+        map(() => true),
+        catchError(err => throwError(() => err))
+      );
+  }
+
   /** PATCH /legalization/requisiciones/{id}/despachar — economoId es @NotBlank en backend */
   despacharRequisicion(id: string, economoId: string): Observable<boolean> {
     return this.http
