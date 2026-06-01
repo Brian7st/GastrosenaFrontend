@@ -44,12 +44,39 @@ export class RequisicionesService {
   }
 
   crearRequisicion(data: Partial<Requisicion>): Observable<Requisicion> {
+    // Mapeo al contrato exacto del backend CrearRequisicionHttpRequest
+    const instructorNombre = data.instructorNombre?.trim()
+      || data.instructorId  // fallback: usa el ID si no hay nombre
+      || 'Instructor';
+
+    const body = {
+      sufijo:           data.fichaId ?? '',           // identificador de la ficha
+      fecha:            data.fecha ?? '',             // ISO date "yyyy-MM-dd"
+      horaSesion:       this.toLocalTime(data.horaSesion ?? ''),
+      fichaId:          data.fichaId ?? '',
+      instructorId:     data.instructorId ?? '',
+      instructorNombre,
+      items: (data.items ?? []).map(item => ({
+        codigoSena:   item.productoId,      // backend espera codigoSena
+        descripcion:  item.productoNombre,  // backend espera descripcion
+        cantidad:     item.cantidad,
+        unidadMedida: item.unidadMedida,
+        categoria:    item.categoria,       // ya viene como CategoriaInsumo del draft
+      })),
+    };
+
     return this.http
-      .post<RequisicionResponse>(`${API}/legalization/requisiciones`, data)
+      .post<{ id: string }>(`${API}/legalization/requisiciones`, body)
       .pipe(
-        map(requisicionFromApi),
+        map(() => ({ ...data } as Requisicion)),
         catchError(err => throwError(() => err))
       );
+  }
+
+  /** Convierte "HH:mm" a "HH:mm:ss" que espera LocalTime en Spring Boot. */
+  private toLocalTime(hora: string): string {
+    if (!hora) return '00:00:00';
+    return hora.length === 5 ? `${hora}:00` : hora;
   }
 
   /** PATCH /legalization/requisiciones/{id}/despachar — economoId es @NotBlank en backend */
@@ -70,6 +97,13 @@ export class RequisicionesService {
         map(() => true),
         catchError(err => throwError(() => err))
       );
+  }
+
+  /** POST /legalization/requisiciones/{id}/exportar — genera el .docx del acta */
+  exportarRequisicion(id: string): Observable<{ exportId: string }> {
+    return this.http
+      .post<{ exportId: string }>(`${API}/legalization/requisiciones/${id}/exportar`, {})
+      .pipe(catchError(err => throwError(() => err)));
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

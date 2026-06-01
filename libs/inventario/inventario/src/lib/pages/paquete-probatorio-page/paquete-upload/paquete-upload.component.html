@@ -49,30 +49,38 @@
           </div>
           <div class="file-preview__info">
             <p class="file-preview__name">{{ selectedFile()?.name }}</p>
-            <p class="file-preview__size">{{ (selectedFile()?.size! / 1024 / 1024) | number:'1.2-2' }} MB</p>
           </div>
-          <button class="file-preview__remove" (click)="removeFile()" [disabled]="uploading()">
+          <button class="file-preview__remove" (click)="removeFile()" [disabled]="procesando()">
             <lucide-icon name="trash-2" [size]="16"></lucide-icon>
           </button>
         </div>
       }
-      
+
+      @if (errorArchivo()) {
+        <p class="upload-zone__error">{{ errorArchivo() }}</p>
+      }
+      @if (error()) {
+        <p class="upload-zone__error">{{ error() }}</p>
+      }
+
     </div>
 
     <!-- ── Footer ────────────────────────────────────────────────────── -->
     <div class="modal-footer">
-      <button class="btn-secondary" (click)="cerrarModal()" [disabled]="uploading()">Cancelar</button>
-      <button 
-        class="btn-primary" 
-        [disabled]="!selectedFile() || uploading()"
+      <button class="btn-secondary" (click)="cerrarModal()" [disabled]="procesando()">
+        Cancelar
+      </button>
+      <button
+        class="btn-primary"
+        [disabled]="!puedeAdjuntar()"
         (click)="subirDocumento()"
       >
-        @if (uploading()) {
+        @if (procesando()) {
           <lucide-icon name="refresh-cw" [size]="16" class="spin-icon"></lucide-icon>
-          Subiendo...
+          Adjuntando...
         } @else {
           <lucide-icon name="check" [size]="16"></lucide-icon>
-          Confirmar y Subir
+          Confirmar y Adjuntar
         }
       </button>
     </div>

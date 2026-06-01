@@ -9,10 +9,9 @@
         </div>
         <div>
           <div class="title-row">
-            <h3 class="modal-title">Registrar Salida de Producto</h3>
-            <span class="req-badge">REQ-45-S</span>
+            <h3 class="modal-title">Salidas de Inventario</h3>
           </div>
-          <p class="modal-subtitle">Solo requisiciones en estado DESPACHADA habilitan salida.</p>
+          <p class="modal-subtitle">El descuento de stock se registra automáticamente al firmar el Acta de Legalización.</p>
         </div>
       </div>
       <button class="close-btn" (click)="closeModal()">
@@ -140,16 +139,11 @@
 
       <!-- Footer -->
       <div class="modal-footer">
-        <restaurant-button variant="surface" (click)="closeModal()" type="button">Cancelar</restaurant-button>
-        <restaurant-button
-          variant="primary"
-          type="submit"
-          [disabled]="!puedeRegistrar()">
-          <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: bold;">
-            <lucide-icon name="check-circle" [size]="18"></lucide-icon>
-            Registrar Salida
-          </div>
-        </restaurant-button>
+        <restaurant-button variant="surface" (click)="closeModal()" type="button">Cerrar</restaurant-button>
+        <div class="modal-footer__info">
+          <lucide-icon name="info" [size]="14"></lucide-icon>
+          El descuento ocurre automáticamente al firmar el Acta (RF-5.5.3)
+        </div>
       </div>
     </form>
   </div>

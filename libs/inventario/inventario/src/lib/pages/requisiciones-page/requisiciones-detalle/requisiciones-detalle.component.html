@@ -158,11 +158,25 @@
 
   <!-- Footer Actions -->
   <footer class="sheet-panel__footer">
-    <button class="btn-outline" (click)="close()">
-      <lucide-icon name="download" [size]="18"></lucide-icon>
-      Descargar Soporte
-    </button>
-    @if (requisicion()?.estado === 'DESPACHADA') {
+    <!-- Exportar .docx — disponible desde FIRMADA -->
+    @if (estado() === 'FIRMADA' || estado() === 'LEGALIZADA') {
+      <button class="btn-outline" (click)="exportar()">
+        <lucide-icon name="download" [size]="18"></lucide-icon>
+        Descargar Soporte
+      </button>
+    }
+
+    <!-- Firmar — solo cuando está DESPACHADA (RF-5.9.6) -->
+    @if (estado() === 'DESPACHADA') {
+      <button class="btn-primary"
+              [routerLink]="['/app/inventario/requisiciones/firmar', reqId()]">
+        <lucide-icon name="pen-tool" [size]="18"></lucide-icon>
+        Confirmar Recepción
+      </button>
+    }
+
+    <!-- Crear Acta — solo cuando está FIRMADA (RF-5.9.6) -->
+    @if (estado() === 'FIRMADA') {
       <button class="btn-primary"
               [routerLink]="['/app/inventario/actas/nueva']"
               [queryParams]="{ requisicionId: reqId() }">
@@ -170,9 +184,5 @@
         Crear Acta
       </button>
     }
-    <button class="btn-primary" [routerLink]="['/app/inventario/requisiciones/firmar', reqId()]">
-      <lucide-icon name="pen-tool" [size]="18"></lucide-icon>
-      Confirmar Recepción
-    </button>
   </footer>
 </aside>

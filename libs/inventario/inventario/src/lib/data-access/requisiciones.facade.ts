@@ -104,6 +104,13 @@ export class RequisicionesFacade {
       .subscribe(ok => { if (ok) this.loadAll(); });
   }
 
+  /** POST /legalization/requisiciones/{id}/exportar — genera el .docx */
+  exportarRequisicion(id: string): void {
+    this.requisicionesService.exportarRequisicion(id)
+      .pipe(catchError(() => { this._error.set('Error al exportar la requisición'); return of(null); }))
+      .subscribe();
+  }
+
   /** POST /legalization/requisiciones — crea una nueva requisición */
   crearRequisicion(data: Partial<Requisicion>): void {
     this._loading.set(true);

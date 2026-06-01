@@ -48,17 +48,26 @@
     @if (errorArchivo()) {
       <p class="acta-upload__error">{{ errorArchivo() }}</p>
     }
+    @if (error()) {
+      <p class="acta-upload__error">{{ error() }}</p>
+    }
+    @if (procesando()) {
+      <p class="acta-upload__info">
+        <lucide-icon name="loader" [size]="14"></lucide-icon>
+        Firmando acta y descontando stock...
+      </p>
+    }
 
     <!-- Footer Actions -->
     <div class="acta-upload__footer">
-      <button class="acta-upload__btn-cancel" (click)="cerrar()">
+      <button class="acta-upload__btn-cancel" (click)="cerrar()" [disabled]="procesando()">
         Cancelar
       </button>
       <button class="acta-upload__btn-confirm"
               (click)="confirmarCarga()"
               [disabled]="!puedeConfirmar()">
-        Confirmar Carga
         <lucide-icon name="arrow-right" [size]="16"></lucide-icon>
+        {{ procesando() ? 'Procesando...' : 'Confirmar Carga' }}
       </button>
     </div>
   </div>

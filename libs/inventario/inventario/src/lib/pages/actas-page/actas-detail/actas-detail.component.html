@@ -40,24 +40,29 @@
         ></restaurant-status-badge>
       </div>
       <div class="acta-detail__action-bar-right">
-        @if (a.estado === 'REVISADA') {
-          <button class="acta-detail__btn-archivar" (click)="cambiarEstado('ARCHIVADA')">
-            Archivar
+
+        <!-- BORRADOR → Enviar a Firmas (paso explícito, no genérico) -->
+        @if (a.estado === 'BORRADOR') {
+          <button class="acta-detail__btn-cargar" (click)="cambiarEstado('PENDIENTE_FIRMAS')">
+            <lucide-icon name="send" [size]="16"></lucide-icon>
+            Enviar a Firmas
           </button>
         }
+
+        <!-- PENDIENTE_FIRMAS → Cargar Acta Firmada -->
         @if (a.estado === 'PENDIENTE_FIRMAS') {
           <button class="acta-detail__btn-cargar" (click)="cargarFirma()">
             <lucide-icon name="upload-cloud" [size]="16"></lucide-icon>
             Cargar Acta Firmada
           </button>
         }
+
+        <!-- FIRMADA → Aprobar + Crear Paquete -->
         @if (a.estado === 'FIRMADA') {
           <button class="acta-detail__btn-aprobar" (click)="revisarActa()">
             <lucide-icon name="check-circle" [size]="16"></lucide-icon>
             Aprobar
           </button>
-        }
-        @if (a.estado === 'FIRMADA') {
           <button class="acta-detail__btn-aprobar"
                   [routerLink]="['/app/inventario/paquete-probatorio/nuevo']"
                   [queryParams]="{ actaId: a.id, requisicionId: a.requisicionId }">
@@ -65,6 +70,15 @@
             Crear Paquete
           </button>
         }
+
+        <!-- REVISADA → Archivar -->
+        @if (a.estado === 'REVISADA') {
+          <button class="acta-detail__btn-archivar" (click)="cambiarEstado('ARCHIVADA')">
+            <lucide-icon name="archive" [size]="16"></lucide-icon>
+            Archivar
+          </button>
+        }
+
       </div>
     </div>
 

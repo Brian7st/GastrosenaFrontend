@@ -21,23 +21,27 @@ export class PaqueteService {
       );
   }
 
+  /** Backend no expone GET /paquetes/{id}: busca en la lista paginada por ID. */
   getPaqueteById(id: string): Observable<PaqueteProbatorio | undefined> {
     return this.http
-      .get<PaqueteResponse>(`${API}/legalization/paquetes/${id}`)
+      .get<PaquetesPageResponse>(`${API}/legalization/paquetes`, { params: { size: 100 } })
       .pipe(
-        map(paqueteFromApi),
+        map(resp => {
+          const found = resp.contenido.find(p => p.id === id);
+          return found ? paqueteFromApi(found) : undefined;
+        }),
         catchError(err => throwError(() => err))
       );
   }
 
-  /** La facade pasa Partial<PaqueteProbatorio> — el service construye el request tipado. */
+  /** La facade pasa Partial<PaqueteProbatorio> — el service construye el request tipado.
+   *  Nota: el backend no expone `titulo` en CrearPaqueteHttpRequest — solo los 4 IDs. */
   crearPaquete(data: Partial<PaqueteProbatorio>): Observable<PaqueteProbatorio> {
     const request: CrearPaqueteRequest = {
       actaId:        data.actaId        ?? '',
       requisicionId: data.requisicionId ?? '',
       fichaId:       data.fichaId       ?? '',
       instructorId:  data.instructorId  ?? '',
-      titulo:        data.titulo        ?? '',
     };
     return this.http
       .post<PaqueteResponse>(`${API}/legalization/paquetes`, request)

@@ -4,6 +4,7 @@ import {
   computed,
   inject,
   OnInit,
+  signal,
 } from '@angular/core';
 
 import { ActivatedRoute, Router, RouterOutlet, RouterLink } from '@angular/router';
@@ -40,8 +41,28 @@ export class PaqueteDetailComponent implements OnInit {
   private facade = inject(PaqueteFacade);
 
   // ── Estado reactivo desde facade ─────────────────────────────────────────
-  paquete = this.facade.paqueteSeleccionado;
-  loading = this.facade.loading;
+  paquete      = this.facade.paqueteSeleccionado;
+  loading      = this.facade.loading;
+  facadeError  = this.facade.error;
+
+  // ── Formulario de trazabilidad (signal-based) ────────────────────────────
+  readonly cufe         = signal('');
+  readonly gilId        = signal('');
+  readonly compromisoId = signal('');
+  readonly errorTraz    = signal<string | null>(null);
+
+  /** true si el paquete ya tiene trazabilidad registrada */
+  readonly trazabilidadRegistrada = computed(() => {
+    const p = this.paquete();
+    return !!(p?.gilId && p?.cufeFuenteId);
+  });
+
+  /** El formulario de trazabilidad está completo */
+  readonly trazabilidadCompleta = computed(() =>
+    this.cufe().trim().length > 0 &&
+    this.gilId().trim().length > 0 &&
+    this.compromisoId().trim().length > 0
+  );
 
   // ── Estado derivado ──────────────────────────────────────────────────────
   isCompleto = computed(() => {
@@ -159,6 +180,32 @@ export class PaqueteDetailComponent implements OnInit {
     if (p) {
       this.facade.exportarPaquete(p.id);
     }
+  }
+
+  // ── Trazabilidad handlers ────────────────────────────────────────────────
+  setCufe(e: Event): void {
+    this.cufe.set((e.target as HTMLInputElement).value);
+  }
+
+  setGilId(e: Event): void {
+    this.gilId.set((e.target as HTMLInputElement).value);
+  }
+
+  setCompromisoId(e: Event): void {
+    this.compromisoId.set((e.target as HTMLInputElement).value);
+  }
+
+  vincularTrazabilidad(): void {
+    const p = this.paquete();
+    if (!p || !this.trazabilidadCompleta()) return;
+
+    this.errorTraz.set(null);
+    this.facade.vincularTrazabilidad(p.id, {
+      cufeFuenteId:             this.cufe().trim(),
+      gilId:                    this.gilId().trim(),
+      compromisoPresupuestalId: this.compromisoId().trim(),
+    });
+    // facade.loading() refleja el estado — facade.error() expone errores del backend
   }
 
   archivarExpediente(): void {

@@ -1,3 +1,11 @@
+/** Objeto LocalTime tal como lo espera el backend (Jackson sin ISO mode). */
+export interface LocalTimeApi {
+  hour: number;
+  minute: number;
+  second: number;
+  nano: number;
+}
+
 export interface ActaResponse {
   id: string;
   numeroActa: number; // long en Java
@@ -24,8 +32,8 @@ export interface CompromisoRequest {
 
 export interface CrearActaRequest {
   fecha: string;          // ISO date "yyyy-MM-dd"
-  horaInicio: string;     // "HH:mm"
-  horaFin: string;        // "HH:mm"
+  horaInicio: string;     // "HH:mm:ss" — Spring LocalTime con ISO mode
+  horaFin: string;        // "HH:mm:ss" — Spring LocalTime con ISO mode
   requisicionId: string;
   instructorId: string;
   fichaId: string;
@@ -67,12 +75,12 @@ export interface PaquetesPageResponse {
   tamano: number;
 }
 
+/** Alineado con CrearPaqueteHttpRequest del backend — sin titulo. */
 export interface CrearPaqueteRequest {
   actaId: string;
   requisicionId: string;
   fichaId: string;
   instructorId: string;
-  titulo: string;
 }
 
 export interface TrazabilidadRequest {
