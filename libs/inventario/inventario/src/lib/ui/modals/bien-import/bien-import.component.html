@@ -101,6 +101,7 @@
               <tr>
                 <th>CÓD. SENA</th>
                 <th>DESCRIPCIÓN</th>
+                <th>CATEGORÍA</th>
                 <th>VLR ADJUDICADO</th>
                 <th>VLR ANTES IVA</th>
                 <th>IVA</th>
@@ -113,6 +114,7 @@
               <tr>
                 <td class="code-mono">{{ row.codigoSena || '-' }}</td>
                 <td>{{ row.descripcion || '-' }}</td>
+                <td>{{ row.categoria || '-' }}</td>
                 <td class="text-end">{{ row.vrlAdjudicado | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
                 <td class="text-end">{{ row.vrlAntes | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
                 <td class="text-end">{{ row.iva ? (row.iva | percent) : '0%' }}</td>

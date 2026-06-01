@@ -91,6 +91,7 @@ export class BienImportModalComponent {
     const headers = [
       'codigoSena',
       'descripcion',
+      'categoria',
       'vrlAdjudicado',
       'vrlAntes',
       'iva',
@@ -100,6 +101,7 @@ export class BienImportModalComponent {
     const sampleRow = [
       'SENA-002',                      // codigoSena
       'Tomate fresco de ensalada',     // descripcion
+      'Alimentos',                     // categoria
       '4200.00',                       // vrlAdjudicado
       '3800.00',                       // vrlAntes
       '0.00',                          // iva (Exento en Colombia)
