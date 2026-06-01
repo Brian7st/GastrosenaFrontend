@@ -48,16 +48,20 @@
               <h3 class="reporte-card__titulo">{{ reporte.titulo }}</h3>
               <p class="reporte-card__desc">{{ reporte.descripcion }}</p>
             </div>
-            <div class="reporte-card__actions">
-              <restaurant-button variant="primary" (click)="generarReporte(reporte.id)">
-                <lucide-icon name="refresh-cw" [size]="14"></lucide-icon>
-                Generar
-              </restaurant-button>
-              <restaurant-button variant="surface" (click)="descargarPdf(reporte.id)">
-                <lucide-icon name="file-text" [size]="14"></lucide-icon>
-                PDF
-              </restaurant-button>
-            </div>
+           <div class="reporte-card__actions">
+  <restaurant-button variant="surface" (click)="descargarPdf(reporte.id)">
+    <lucide-icon name="file-text" [size]="14"></lucide-icon>
+    PDF
+  </restaurant-button>
+  <restaurant-button variant="primary" (click)="generarReporte(reporte.id)">
+    <lucide-icon name="refresh-cw" [size]="14"></lucide-icon>
+    Generar
+  </restaurant-button>
+  <restaurant-button variant="surface" (click)="descargarReporte(reporte.id)">
+    <lucide-icon name="file-spreadsheet" [size]="14"></lucide-icon>
+    Excel
+  </restaurant-button>
+</div>
           </div>
         }
       </div>
