@@ -1,47 +1,123 @@
 <div class="caja-movimientos-page">
   <div class="header-section">
+    <button class="back-btn" (click)="volver()">
+      <lucide-icon name="arrow-left" [size]="20"></lucide-icon>
+    </button>
     <restaurant-page-header
-      title="Movimientos de Caja"
-      subtitle="Registrar ingresos y egresos de efectivo adicionales"
+            title="Movimientos de Caja"
+            subtitle="Historial de pedidos pagados y cuadre de turno"
     ></restaurant-page-header>
   </div>
 
-  <div class="form-block">
-    <div class="card">
-      <div class="block-header">
-        <div class="title-group">
-          <h5>Nuevo Movimiento</h5>
-          <span class="subtitle">Ingrese los datos del movimiento de caja menor</span>
-        </div>
+  <div class="kpi-cards-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon cash">
+        <lucide-icon name="inbox" [size]="24"></lucide-icon>
       </div>
-
-      <div class="input-group">
-        <label>Tipo de Movimiento</label>
-        <select class="form-control">
-          <option value="ingreso">Ingreso (Entrada)</option>
-          <option value="egreso">Egreso (Salida)</option>
-        </select>
+      <div class="kpi-info">
+        <span class="kpi-label">Efectivo</span>
+        <span class="kpi-value">{{ totalEfectivo() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
       </div>
+    </div>
 
-      <div class="input-group mt-4">
-        <label>Monto</label>
-        <input type="number" class="form-control" placeholder="$ 0" />
+    <div class="kpi-card">
+      <div class="kpi-icon card-payment">
+        <lucide-icon name="credit-card" [size]="24"></lucide-icon>
       </div>
-
-      <div class="input-group mt-4">
-        <label>Concepto / Observación</label>
-        <textarea class="form-control" rows="3" placeholder="Razón del movimiento..."></textarea>
+      <div class="kpi-info">
+        <span class="kpi-label">Tarjeta</span>
+        <span class="kpi-value">{{ totalTarjeta() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
       </div>
+    </div>
 
-      <div class="form-actions mt-6">
-        <restaurant-button variant="surface" (click)="volver()">
-          Cancelar
-        </restaurant-button>
-        <restaurant-button variant="primary">
-          <lucide-icon name="save" [size]="18"></lucide-icon>
-          <span>Registrar Movimiento</span>
-        </restaurant-button>
+    <div class="kpi-card">
+      <div class="kpi-icon transfer">
+        <lucide-icon name="arrow-left-right" [size]="24"></lucide-icon>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">Transferencia</span>
+        <span class="kpi-value">{{ totalTransferencia() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
       </div>
     </div>
   </div>
+
+  <div class="main-content-block">
+    <div class="card">
+      <div class="block-header">
+        <div class="title-group">
+          <h5>Pedidos Pagados en el Turno</h5>
+          <span class="subtitle">Consulte las ventas detalladas y genere el cuadre final</span>
+        </div>
+
+        <restaurant-button variant="primary" (click)="generarReporteCuadre()">
+          <lucide-icon name="file-text" [size]="18"></lucide-icon>
+          <span>Generar Reporte de Cuadre</span>
+        </restaurant-button>
+      </div>
+
+      <div class="table-responsive mt-4">
+        <table class="restaurant-table">
+          <thead>
+          <tr>
+            <th>Hora</th>
+            <th>N° Pedido (Ref)</th>
+            <th>N° Factura</th>
+            <th>Método de Pago</th>
+            <th>Total Pagado</th>
+            <th class="text-center">Imprimir</th>
+          </tr>
+          </thead>
+          <tbody>
+          @for (factura of facturas(); track factura.id) {
+          <tr>
+            <td>{{ factura.fechaEmision | date:'shortTime' }}</td>
+
+            <td title="{{ factura.pedidoId }}"><strong>#{{ factura.pedidoId | slice:0:8 | uppercase }}</strong></td>
+
+            <td>{{ factura.numeroFactura }}</td>
+
+            <td>
+                  <span class="badge"
+                        [ngClass]="factura.metodoPago?.includes('EFECTIVO') ? 'badge-cash' : 'badge-card'">
+                    {{ factura.metodoPago?.includes('TARJETA') ? 'TARJETA' : factura.metodoPago }}
+                  </span>
+            </td>
+
+            <td class="amount-positive">{{ (factura.total || factura.subtotal) | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+
+            <td class="text-center">
+              <button class="action-btn-print" (click)="imprimirFactura(factura.pedidoId)" title="Imprimir Factura">
+                <lucide-icon name="file-text" [size]="16"></lucide-icon>
+                <span>Imprimir</span>
+              </button>
+            </td>
+          </tr>
+          } @empty {
+          <tr>
+            <td colspan="6" class="p-0 border-0">
+              <div class="empty-state-wrapper">
+                <div class="icon-circle">
+                  <lucide-icon name="inbox" [size]="40"></lucide-icon>
+                </div>
+                <h4>Sin pedidos pagados</h4>
+                <p>Aún no hay pedidos pagados registrados en este turno.</p>
+              </div>
+            </td>
+          </tr>
+          }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <restaurant-confirm-dialog
+          [open]="alertDialog().open"
+          [title]="alertDialog().title"
+          [message]="alertDialog().message"
+          confirmText="Aceptar"
+          [showCancel]="false"
+          (confirm)="cerrarAlertDialog()"
+  ></restaurant-confirm-dialog>
+
 </div>

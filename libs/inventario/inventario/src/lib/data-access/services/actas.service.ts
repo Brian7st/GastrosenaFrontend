@@ -8,7 +8,7 @@ import {
   CompromisoActa,
   FirmanteActa,
 } from '../../models/acta.model';
-import { ActaResponse, ActasPageResponse, CrearActaRequest } from '../api/legalization.api';
+import { ActasPageResponse, CrearActaRequest } from '../api/legalization.api';
 import { actaFromApi } from '../mappers/legalization.mapper';
 
 const API = '/api/v1';
@@ -33,11 +33,15 @@ export class ActasService {
       );
   }
 
+  /** Backend no expone GET /actas/{id}: busca en la lista paginada por ID. */
   getActaById(id: string): Observable<ActaLegalizacion | undefined> {
     return this.http
-      .get<ActaResponse>(`${API}/legalization/actas/${id}`)
+      .get<ActasPageResponse>(`${API}/legalization/actas`, { params: { size: 100 } })
       .pipe(
-        map(actaFromApi),
+        map(resp => {
+          const found = resp.contenido.find(a => a.id === id);
+          return found ? actaFromApi(found) : undefined;
+        }),
         catchError(err => throwError(() => err))
       );
   }

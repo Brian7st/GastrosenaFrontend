@@ -1,163 +1,153 @@
 <div class="caja-pagar-page">
-  <div class="header-section">
-    <restaurant-button variant="ghost" (click)="volver()">
-      <lucide-icon name="arrow-left" [size]="18"></lucide-icon>
-      <span>Volver a Caja</span>
-    </restaurant-button>
-    <restaurant-page-header
-      title="Registrar Pago"
-      subtitle="Procesa pagos de mesas por pagar"
-    ></restaurant-page-header>
-  </div>
-
-  <restaurant-card class="form-block">
-    <div class="block-header">
-      <lucide-icon name="clipboard-list" [size]="20" class="icon-primary"></lucide-icon>
-      <div class="title-group">
-        <h5>Mesas Listas para Pago</h5>
-        <span class="subtitle">Selecciona una mesa para procesar el pago</span>
-      </div>
+    <div class="header-section">
+        <button class="back-btn" (click)="volver()">
+            <lucide-icon name="arrow-left" [size]="20"></lucide-icon>
+        </button>
+        <restaurant-page-header
+                title="Registrar Pago"
+                subtitle="Cuentas pendientes por recaudar e imprimir comprobante"
+        ></restaurant-page-header>
     </div>
 
-    <div class="mesas-list">
-      @for (mesa of mesasPorPagar(); track mesa.id) {
-        <restaurant-card class="mesa-card">
-          <div class="mesa-info" (click)="verDetalle(mesa)">
-            <div class="icon-container purple-bg">
-              <lucide-icon name="credit-card" [size]="24"></lucide-icon>
+    <div class="main-content-block">
+        <div class="card">
+            <div class="block-header">
+                <div class="title-group">
+                    <h5>Pedidos por Cobrar</h5>
+                </div>
             </div>
-            <div class="details">
-              <span class="mesa-name">{{ mesa.nombreMesa }}</span>
-              <span class="mesa-meta">Comensales: {{ mesa.numeroComensales }}</span>
-              <span class="mesa-time">{{ mesa.fechaCreacion | date:'shortTime' }}</span>
+
+            <div class="table-responsive mt-4">
+                <table class="restaurant-table">
+                    <thead>
+                    <tr>
+                        <th>N° Pedido (Ref)</th>
+                        <th>Mesa</th>
+                        <th>Mesero (ID)</th>
+                        <th>Total a Pagar</th>
+                        <th class="text-center">Acción</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @for (pedido of pedidosPorPagar(); track pedido.id) {
+                    <tr>
+                        <td title="{{ pedido.id }}"><strong>#{{ pedido.id | slice:0:8 | uppercase }}</strong></td>
+                        <td>{{ pedido.nombreMesa || 'Para Llevar' }}</td>
+                        <td title="{{ pedido.meseroId }}"><span class="badge-count">{{ pedido.meseroId | slice:0:8 }}...</span></td>
+                        <td class="amount-pending">{{ pedido.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                        <td class="text-center">
+                            <button class="action-btn-collect" (click)="abrirCobro(pedido)">
+                                <lucide-icon name="dollar-sign" [size]="16"></lucide-icon>
+                                <span>Cobrar</span>
+                            </button>
+                        </td>
+                    </tr>
+                    } @empty {
+                    <tr>
+                        <td colspan="5" class="text-center empty-state-row">
+                            <lucide-icon name="check-circle" [size]="24" class="text-success"></lucide-icon>
+                            <p>¡Excelente! No hay pedidos entregados pendientes por pagar en este momento.</p>
+                        </td>
+                    </tr>
+                    }
+                    </tbody>
+                </table>
             </div>
-          </div>
-
-          <div class="mesa-actions">
-            <span class="mesa-price">${{ mesa.subtotal | number }}</span>
-            <restaurant-button variant="primary" (click)="abrirCobro(mesa)">
-              <span>Procesar Pago</span>
-            </restaurant-button>
-          </div>
-        </restaurant-card>
-      } @empty {
-        <div class="empty-state">
-          <p>No hay mesas pendientes de pago.</p>
         </div>
-      }
     </div>
-  </restaurant-card>
 
-  <!-- Modal Detalle -->
-  @if (mostrarModalDetalle() && mesaSeleccionada()) {
-    <div class="modal-overlay" (click)="cerrarModales()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <div class="modal-header-colored info-bg">
-          <h3>Detalle de Factura</h3>
-          <button class="close-btn" (click)="cerrarModales()">
-            <lucide-icon name="x" [size]="20"></lucide-icon>
-          </button>
-        </div>
-        <div class="modal-body-custom">
-          <div class="invoice-id text-center">
-            <small>ID FACTURA</small>
-            <h2>{{ mesaSeleccionada()?.id | slice:0:8 }}</h2>
-          </div>
-          <div class="info-grid">
-            <div class="info-item"><span>Mesa:</span> <strong>{{ mesaSeleccionada()?.nombreMesa }}</strong></div>
-            <div class="info-item"><span>Comensales:</span> <strong>{{ mesaSeleccionada()?.numeroComensales }}</strong></div>
-            <div class="info-item"><span>Fecha:</span> <strong>{{ mesaSeleccionada()?.fechaCreacion | date:'shortDate' }}</strong></div>
-          </div>
-          <!-- TODO: Traer los detalles completos con GET /api/pedidos/{id} si el subtotal no fuera suficiente -->
-          <div class="billing-rows">
-            <div class="row"><span>Subtotal:</span> <span>${{ mesaSeleccionada()?.subtotal | number }}</span></div>
-            <div class="row total"><span>TOTAL:</span> <strong>${{ mesaSeleccionada()?.subtotal | number }}</strong></div>
-          </div>
-        </div>
-        <div class="modal-actions-between">
-          <restaurant-button variant="ghost" (click)="cerrarModales()">
-            <span>Cerrar</span>
-          </restaurant-button>
-          <restaurant-button variant="primary" class="success-btn" (click)="abrirCobro()">
-            <lucide-icon name="credit-card" [size]="18"></lucide-icon>
-            <span>Registrar Pago</span>
-          </restaurant-button>
-        </div>
-      </div>
-    </div>
-  }
+    @if (modalAbierto()) {
+    <div class="modal-overlay" (click)="cerrarModal()">
+        <div class="modal-card" (click)="$event.stopPropagation()">
 
-  <!-- Modal Cobro -->
-  @if (mostrarModalCobro()) {
-    <div class="modal-overlay" (click)="cerrarModales()">
-      <div class="modal-content payment-modal" (click)="$event.stopPropagation()">
-        <div class="modal-header-colored info-bg">
-          <h3>Procesar Pago</h3>
-          <button class="close-btn" (click)="cerrarModales()">
-            <lucide-icon name="x" [size]="20"></lucide-icon>
-          </button>
-        </div>
-        <div class="modal-body-custom text-center">
-          <p class="total-label">TOTAL A COBRAR</p>
-          <h2 class="total-amount">${{ mesaSeleccionada()?.subtotal | number }}</h2>
-          <p class="invoice-sub">Factura: {{ mesaSeleccionada()?.id }}</p>
-          
-          <div class="payment-methods">
-            <p class="methods-title">Seleccionar Método de Pago</p>
-            <div class="methods-grid">
-              <div class="method-option"
-                [class.active]="metodoSeleccionado() === 'Efectivo'"
-                (click)="seleccionarMetodo('Efectivo')">
-                <lucide-icon name="banknote" [size]="24"></lucide-icon>
-                <span>Efectivo</span>
-              </div>
-              <div class="method-option"
-                [class.active]="metodoSeleccionado() === 'Tarjeta'"
-                (click)="seleccionarMetodo('Tarjeta')">
-                <lucide-icon name="credit-card" [size]="24"></lucide-icon>
-                <span>Tarjeta</span>
-              </div>
-              <div class="method-option"
-                [class.active]="metodoSeleccionado() === 'Transferencia'"
-                (click)="seleccionarMetodo('Transferencia')">
-                <lucide-icon name="send" [size]="24"></lucide-icon>
-                <span>Transferencia</span>
-              </div>
+            <div class="modal-header">
+                <h6>Procesar Pago - Pedido #{{ pedidoSeleccionado()?.id | slice:0:8 | uppercase }}</h6>
+                <button class="close-btn" (click)="cerrarModal()">
+                    <lucide-icon name="x" [size]="20"></lucide-icon>
+                </button>
             </div>
-          </div>
-        </div>
-        <div class="modal-actions-between">
-          <restaurant-button variant="ghost" (click)="cerrarModales()">
-            <span>Cancelar</span>
-          </restaurant-button>
-          <restaurant-button variant="primary" class="success-btn" (click)="confirmarPago()">
-            <lucide-icon name="check-circle" [size]="18"></lucide-icon>
-            <span>Confirmar ({{ metodoSeleccionado() }})</span>
-          </restaurant-button>
-        </div>
-      </div>
-    </div>
-  }
 
-  <!-- Modal Éxito -->
-  @if (mostrarModalExito()) {
-    <div class="modal-overlay">
-      <div class="modal-content success-modal text-center">
-        <div class="modal-body-custom">
-          <div class="success-icon-container">
-            <lucide-icon name="check-circle-2" [size]="48" class="icon-success"></lucide-icon>
-          </div>
-          <h2>¡Pago Exitoso!</h2>
-          <p>El pago de la <strong>{{ mesaSeleccionada()?.nombreMesa }}</strong> se ha registrado correctamente mediante <strong>{{ metodoSeleccionado() }}</strong>.</p>
-          <div class="success-details">
-            <span>Total Pagado:</span>
-            <span class="amount">${{ mesaSeleccionada()?.subtotal | number }}</span>
-          </div>
-          <restaurant-button variant="primary" class="full-width mt-4" (click)="finalizarTodo()">
-            <span>Entendido</span>
-          </restaurant-button>
+            <div class="modal-body">
+                <div class="total-badge">
+                    <span class="lbl">Total a Cobrar:</span>
+                    <span class="val">{{ pedidoSeleccionado()?.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                </div>
+
+                <span class="section-hint">Seleccione el método de pago elegido por el cliente:</span>
+
+                <div class="method-cards-grid">
+                    <div class="method-card" [class.active]="metodoSeleccionado() === 'EFECTIVO'" (click)="seleccionarMetodo('EFECTIVO')">
+                        <lucide-icon name="banknote" [size]="24"></lucide-icon>
+                        <span>Efectivo</span>
+                    </div>
+                    <div class="method-card" [class.active]="metodoSeleccionado() === 'TARJETA'" (click)="seleccionarMetodo('TARJETA')">
+                        <lucide-icon name="credit-card" [size]="24"></lucide-icon>
+                        <span>Tarjeta</span>
+                    </div>
+                    <div class="method-card" [class.active]="metodoSeleccionado() === 'TRANSFERENCIA'" (click)="seleccionarMetodo('TRANSFERENCIA')">
+                        <lucide-icon name="arrow-right-left" [size]="24"></lucide-icon>
+                        <span>Transferencia</span>
+                    </div>
+                </div>
+
+                @if (metodoSeleccionado() === 'EFECTIVO') {
+                <div class="cash-calculator-box mt-4">
+                    <div class="input-group">
+                        <label for="cashReceived">Monto Recibido en Efectivo:</label>
+                        <input
+                                id="cashReceived"
+                                type="number"
+                                class="form-control"
+                                placeholder="¿Con cuánto paga?"
+                                [value]="montoRecibido() === 0 ? '' : montoRecibido()"
+                                (input)="actualizarMontoRecibido($event)"
+                                (keydown)="preventInvalidChars($event)"
+                        />
+                    </div>
+
+                    <div class="change-row mt-4">
+                        <span class="change-lbl">Cambio / Devuelta:</span>
+                        <span class="change-val" [class.negative]="calcularDevuelta() < 0">
+                  {{ calcularDevuelta() | currency:'COP':'symbol-narrow':'1.0-0' }}
+                </span>
+                    </div>
+                </div>
+                }
+
+                @if (metodoSeleccionado() === 'TARJETA' || metodoSeleccionado() === 'TRANSFERENCIA') {
+                <div class="alert alert-info mt-4">
+                    <lucide-icon name="info" [size]="16"></lucide-icon>
+                    <span>Al confirmar, el sistema procesará la transacción electrónica de forma inmediata.</span>
+                </div>
+                }
+            </div>
+
+            <div class="modal-footer">
+                <restaurant-button variant="surface" (click)="cerrarModal()">
+                    Cancelar
+                </restaurant-button>
+
+                <restaurant-button
+                        variant="primary"
+                        [disabled]="!esPagoValido()"
+                        (click)="confirmarPago()"
+                >
+                    <lucide-icon name="check" [size]="18"></lucide-icon>
+                    <span>Confirmar Pago</span>
+                </restaurant-button>
+            </div>
         </div>
-      </div>
     </div>
-  }
+    }
+
+    <restaurant-confirm-dialog
+            [open]="alertDialog().open"
+            [title]="alertDialog().title"
+            [message]="alertDialog().message"
+            confirmText="Ir a Movimientos"
+            cancelText="Cerrar"
+            [showCancel]="true"
+            (confirm)="irAMovimientos()"
+            (cancel)="cerrarAlertDialog()"
+    ></restaurant-confirm-dialog>
 </div>

@@ -14,9 +14,10 @@
       <span class="acta-detail__topbar-title">{{ a.numeroActa }}</span>
     </div>
     <div class="acta-detail__topbar-right">
-      <button class="acta-detail__export-btn">
-        <lucide-icon name="download" [size]="16"></lucide-icon>
-        Exportar .docx
+      <button class="acta-detail__export-btn"
+              [routerLink]="['/app/inventario/actas', a.id, 'imprimir']">
+        <lucide-icon name="printer" [size]="16"></lucide-icon>
+        Exportar GOR-F-084
       </button>
       @if (a.estado !== 'ARCHIVADA') {
         <button class="acta-detail__status-btn" (click)="cambiarEstado()">
@@ -40,24 +41,29 @@
         ></restaurant-status-badge>
       </div>
       <div class="acta-detail__action-bar-right">
-        @if (a.estado === 'REVISADA') {
-          <button class="acta-detail__btn-archivar" (click)="cambiarEstado('ARCHIVADA')">
-            Archivar
+
+        <!-- BORRADOR → Enviar a Firmas (paso explícito, no genérico) -->
+        @if (a.estado === 'BORRADOR') {
+          <button class="acta-detail__btn-cargar" (click)="cambiarEstado('PENDIENTE_FIRMAS')">
+            <lucide-icon name="send" [size]="16"></lucide-icon>
+            Enviar a Firmas
           </button>
         }
+
+        <!-- PENDIENTE_FIRMAS → Cargar Acta Firmada -->
         @if (a.estado === 'PENDIENTE_FIRMAS') {
           <button class="acta-detail__btn-cargar" (click)="cargarFirma()">
             <lucide-icon name="upload-cloud" [size]="16"></lucide-icon>
             Cargar Acta Firmada
           </button>
         }
+
+        <!-- FIRMADA → Aprobar + Crear Paquete -->
         @if (a.estado === 'FIRMADA') {
           <button class="acta-detail__btn-aprobar" (click)="revisarActa()">
             <lucide-icon name="check-circle" [size]="16"></lucide-icon>
             Aprobar
           </button>
-        }
-        @if (a.estado === 'FIRMADA') {
           <button class="acta-detail__btn-aprobar"
                   [routerLink]="['/app/inventario/paquete-probatorio/nuevo']"
                   [queryParams]="{ actaId: a.id, requisicionId: a.requisicionId }">
@@ -65,6 +71,15 @@
             Crear Paquete
           </button>
         }
+
+        <!-- REVISADA → Archivar -->
+        @if (a.estado === 'REVISADA') {
+          <button class="acta-detail__btn-archivar" (click)="cambiarEstado('ARCHIVADA')">
+            <lucide-icon name="archive" [size]="16"></lucide-icon>
+            Archivar
+          </button>
+        }
+
       </div>
     </div>
 
@@ -77,7 +92,7 @@
           <lucide-icon name="graduation-cap" [size]="40"></lucide-icon>
         </div>
         <h1 class="acta-detail__doc-institution">SERVICIO NACIONAL DE APRENDIZAJE — SENA</h1>
-        <h2 class="acta-detail__doc-regional">REGIONAL DISTRITO CAPITAL</h2>
+        <h2 class="acta-detail__doc-regional">{{ (a.regional ?? 'Regional Quindío – CCYT') | uppercase }}</h2>
         <div class="acta-detail__doc-badge">
           <h3 class="acta-detail__doc-badge-text">{{ a.numeroActa | uppercase }}</h3>
         </div>
@@ -108,14 +123,17 @@
           </div>
         </section>
 
-        <!-- Sección: Agenda de la Sesión -->
+        <!-- Sección: Agenda de la Sesión (texto fijo institucional) -->
         <section class="acta-detail__section">
           <h4 class="acta-detail__section-title">
             <span class="acta-detail__section-indicator"></span>
             Agenda de la Sesión
           </h4>
           <div class="acta-detail__section-content">
-            <p class="acta-detail__section-text">{{ a.agendaSesion }}</p>
+            <p class="acta-detail__section-text">
+              1. Descripción sesión de formación.<br>
+              2. Listado de materiales utilizados.
+            </p>
           </div>
         </section>
 
@@ -130,7 +148,7 @@
               <div class="acta-detail__desarrollo-grid">
                 <div>
                   <span class="acta-detail__field-label">Instructor a Cargo</span>
-                  <span class="acta-detail__field-value acta-detail__field-value--medium">{{ a.instructorId }}</span>
+                  <span class="acta-detail__field-value acta-detail__field-value--medium">{{ instructorNombre() }}</span>
                 </div>
                 <div>
                   <span class="acta-detail__field-label">Documento Soporte</span>
@@ -144,55 +162,29 @@
                   <span class="acta-detail__field-value">{{ a.resultadoAprendizaje }}</span>
                 </div>
                 <div class="acta-detail__desarrollo-full">
-                  <span class="acta-detail__field-label">Actividades Ejecutadas</span>
-                  <span class="acta-detail__field-value">{{ a.actividadesEjecutadas }}</span>
+                  <span class="acta-detail__field-label">Actividades Realizadas</span>
+                  <span class="acta-detail__field-value">{{ a.actividadesRealizadas ?? '—' }}</span>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- Sección: Consumo de Materiales -->
+        <!-- Sección: Materiales — los ítems viven en la requisición vinculada -->
         <section class="acta-detail__section">
           <h4 class="acta-detail__section-title">
             <span class="acta-detail__section-indicator"></span>
-            Consumo de Materiales (Requisición {{ a.requisicionId }})
+            Materiales de Formación
           </h4>
-          <div class="acta-detail__insumos-table-wrapper">
-            <table class="acta-detail__insumos-table">
-              <thead>
-                <tr>
-                  <th>CÓDIGO</th>
-                  <th>DESCRIPCIÓN DEL BIEN</th>
-                  <th class="text-center">CANTIDAD</th>
-                  <th class="text-right">COSTO UNITARIO</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (insumo of insumos(); track insumo.codigo) {
-                  <tr>
-                    <td class="acta-detail__insumo-codigo">{{ insumo.codigo }}</td>
-                    <td>{{ insumo.descripcion }}</td>
-                    <td class="text-center">{{ insumo.cantidad }}</td>
-                    <td class="text-right">{{ insumo.costoUnitario | currency:'COP':'$ ':'1.0-0' }}</td>
-                  </tr>
-                }
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td colspan="3" class="text-right acta-detail__total-label">Subtotal</td>
-                  <td class="text-right acta-detail__total-value">{{ subtotal() | currency:'COP':'$ ':'1.0-0' }}</td>
-                </tr>
-                <tr>
-                  <td colspan="3" class="text-right acta-detail__total-label">IVA (5%)</td>
-                  <td class="text-right acta-detail__total-value">{{ iva() | currency:'COP':'$ ':'1.0-0' }}</td>
-                </tr>
-                <tr class="acta-detail__total-row">
-                  <td colspan="3" class="text-right acta-detail__grand-total-label">Total Legalizado</td>
-                  <td class="text-right acta-detail__grand-total-value">{{ total() | currency:'COP':'$ ':'1.0-0' }}</td>
-                </tr>
-              </tfoot>
-            </table>
+          <div class="acta-detail__requisicion-ref">
+            <lucide-icon name="file-text" [size]="16"></lucide-icon>
+            Los materiales se detallan en la
+            <a [routerLink]="['/app/inventario/requisiciones']"
+               [queryParams]="{ id: a.requisicionId }"
+               class="acta-detail__link">
+              requisición vinculada
+            </a>
+            adjunta a esta acta.
           </div>
         </section>
 
@@ -212,11 +204,16 @@
                 </tr>
               </thead>
               <tbody>
-                @for (comp of compromisos(); track comp.actividad) {
+                @for (comp of (a.compromisos ?? []); track comp.actividad) {
                   <tr>
                     <td>{{ comp.actividad }}</td>
                     <td>{{ comp.responsable }}</td>
                     <td class="acta-detail__compromiso-fecha">{{ comp.fechaLimite }}</td>
+                  </tr>
+                }
+                @if ((a.compromisos ?? []).length === 0) {
+                  <tr>
+                    <td colspan="3" class="acta-detail__empty-row">Sin compromisos registrados</td>
                   </tr>
                 }
               </tbody>
@@ -224,16 +221,20 @@
           </div>
         </section>
 
-        <!-- Sección: Firmas -->
+        <!-- Sección: Asistentes y Aprobación -->
         <section class="acta-detail__firmas-section">
           <h4 class="acta-detail__firmas-title">Asistentes y Aprobación</h4>
           <div class="acta-detail__firmas-grid">
-            @for (firmante of firmantes(); track firmante.nombre) {
+            @for (asistente of (a.asistentes ?? []); track asistente.nombre) {
               <div class="acta-detail__firma-block">
                 <div class="acta-detail__firma-line"></div>
-                <span class="acta-detail__firma-nombre">{{ firmante.nombre }}</span>
-                <span class="acta-detail__firma-cargo">{{ firmante.cargo }}</span>
+                <span class="acta-detail__firma-nombre">{{ asistente.nombre }}</span>
+                <span class="acta-detail__firma-cargo">{{ asistente.dependenciaRol }}</span>
+                <span class="acta-detail__firma-aprueba">{{ asistente.aprueba ? 'Aprueba ✓' : 'No aprueba' }}</span>
               </div>
+            }
+            @if ((a.asistentes ?? []).length === 0) {
+              <p class="acta-detail__empty-row">Sin asistentes registrados</p>
             }
           </div>
         </section>

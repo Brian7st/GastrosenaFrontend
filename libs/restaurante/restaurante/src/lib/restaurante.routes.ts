@@ -11,13 +11,32 @@ import { CajaMovimientosPageComponent } from './pages/caja-movimientos-page/caja
 import { PedidosHubPageComponent } from './pages/pedidos-hub-page/pedidos-hub-page.component';
 import { HistorialInstructorPageComponent } from './pages/historial-instructor-page/historial-instructor-page.component';
 import { HistorialEstudiantePageComponent } from './pages/historial-estudiante-page/historial-estudiante-page.component';
-import { provideLucideIcons, LucideSalad, LucideBeef, LucideCake, LucideLayoutGrid, LucideCoffee, LucideMinus, LucidePlus, LucideClipboardList, LucideUser, LucideArrowLeft, LucideChevronDown, LucideSearch, LucideTrash2, LucideUtensils, LucideUsers, LucidePencil, LucideLoader, LucideAlertTriangle, LucideX, LucideCheckCircle, LucideSave } from '@lucide/angular';
+import {
+  provideLucideIcons,
+  LucideSalad, LucideBeef, LucideCake, LucideLayoutGrid, LucideCoffee,
+  LucideMinus, LucidePlus, LucideClipboardList, LucideUser, LucideArrowLeft,
+  LucideChevronDown, LucideSearch, LucideTrash2, LucideUtensils, LucideUsers,
+  LucidePencil, LucideLoader, LucideAlertTriangle, LucideX, LucideCheckCircle,
+  LucideSave, LucideCreditCard, LucideFileText, LucideWallet, LucideLogIn,
+  LucideLogOut, LucideArrowLeftRight, LucideBanknote, LucideLock,
+  LucideFileCheck2, LucidePrinter, LucideSend, LucideCheckCircle2,
+  LucideReceipt, LucideDownload
+} from '@lucide/angular';
 
 export const RESTAURANTE_ROUTES: Routes = [
   {
     path: '',
     providers: [
-      provideLucideIcons(LucideSalad, LucideBeef, LucideCake, LucideLayoutGrid, LucideCoffee, LucideMinus, LucidePlus, LucideClipboardList, LucideUser, LucideArrowLeft, LucideChevronDown, LucideSearch, LucideTrash2, LucideUtensils, LucideUsers, LucidePencil, LucideLoader, LucideAlertTriangle, LucideX, LucideCheckCircle, LucideSave)
+      provideLucideIcons(
+        LucideSalad, LucideBeef, LucideCake, LucideLayoutGrid, LucideCoffee,
+        LucideMinus, LucidePlus, LucideClipboardList, LucideUser, LucideArrowLeft,
+        LucideChevronDown, LucideSearch, LucideTrash2, LucideUtensils, LucideUsers,
+        LucidePencil, LucideLoader, LucideAlertTriangle, LucideX, LucideCheckCircle,
+        LucideSave, LucideCreditCard, LucideFileText, LucideWallet, LucideLogIn,
+        LucideLogOut, LucideArrowLeftRight, LucideBanknote, LucideLock,
+        LucideFileCheck2, LucidePrinter, LucideSend, LucideCheckCircle2,
+        LucideReceipt, LucideDownload
+      )
     ],
     children: [
       {
