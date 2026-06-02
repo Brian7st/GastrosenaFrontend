@@ -114,11 +114,8 @@ export class CajaPagarPageComponent implements OnInit {
     const pedido = this.pedidoSeleccionado();
     const metodo = this.metodoSeleccionado();
 
-    // Mapeo exacto de los Enums que exige tu Spring Boot (TARJETA_CREDITO, TRANSFERENCIA, EFECTIVO)
+    // Mapeo exacto de los Enums que exige tu Spring Boot (TARJETA, TRANSFERENCIA, EFECTIVO)
     let metodoBackend = metodo;
-    if (metodo === 'TARJETA') {
-      metodoBackend = 'TARJETA_CREDITO';
-    }
 
     // Enviamos los parámetros separados tal y como los exige tu Facade
     this.facade.facturarPedido(pedido.id, metodoBackend as MetodoPago, 0);
