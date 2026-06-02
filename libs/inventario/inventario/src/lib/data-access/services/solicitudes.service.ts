@@ -268,7 +268,7 @@ export class SolicitudesService {
       })),
     };
     return this.http
-      .put<SolicitudSesionResponse>(`${API}/training/solicitudes/${id}`, body)
+      .patch<SolicitudSesionResponse>(`${API}/training/solicitudes/${id}`, body)
       .pipe(
         map(solicitudSesionFromApi),
         catchError(err => throwError(() => err))

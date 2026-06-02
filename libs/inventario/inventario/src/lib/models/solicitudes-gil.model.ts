@@ -76,6 +76,7 @@ export interface CrearSolicitudData {
   cuentadantes: { nombre: string; cedula: string }[];
   solicitante: string;
   codigoGrupo?: string;
+  fichaCaracterizacion?: string;
   solicitudesOrigenIds?: string[];
   bienes: { codigoSena: string; descripcion: string; unidadMedida: string; cantidad: number; valorUnitario: number; subtotal: number; iva: number }[];
   observaciones?: string;

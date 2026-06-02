@@ -240,8 +240,8 @@
   <div class="actions-footer">
     <restaurant-button variant="ghost" (click)="onCancel()">Cancelar</restaurant-button>
     <restaurant-button variant="primary" (click)="onSave()" [disabled]="facade.loading()">
-      {{ facade.loading() ? 'Enviando...' : 'Enviar solicitud' }}
-      <span class="material-symbols-outlined right-icon">arrow_forward</span>
+      {{ facade.loading() ? (isEdit() ? 'Guardando...' : 'Enviando...') : (isEdit() ? 'Guardar cambios' : 'Enviar solicitud') }}
+      <span class="material-symbols-outlined right-icon">{{ isEdit() ? 'save' : 'arrow_forward' }}</span>
     </restaurant-button>
   </div>
 
