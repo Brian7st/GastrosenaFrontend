@@ -5,7 +5,6 @@
     subtitle="Panel, historial y alertas en tiempo real."
   />
 
-  <!-- Badge de no leídas + acción -->
   <div class="notificaciones-topbar">
     <div class="notificaciones-topbar__info">
       @if (noLeidas() > 0) {
@@ -26,97 +25,47 @@
     </restaurant-button>
   </div>
 
-  <!-- Filtros -->
-  <div class="notificaciones-filtros">
-    <restaurant-select-filter
-      label="ESTADO"
-      [value]="filtroEstado()"
-      [options]="estadoOpciones"
-      (valueChange)="filtroEstado.set($event)"
-    />
-    <restaurant-select-filter
-      label="TIPO DE EVENTO"
-      [value]="filtroTipo()"
-      [options]="tipoOpciones"
-      (valueChange)="filtroTipo.set($event)"
-    />
-  </div>
-
-  <!-- Panel principal -->
-  <div class="notificaciones-layout">
-
-    <!-- Lista de notificaciones -->
-    <div class="notificaciones-lista">
-      @if (notificacionesFiltradas().length === 0) {
+  @if (loading()) {
+    <div class="notificaciones-loading">Cargando...</div>
+  } @else {
+    <div class="notificaciones-lista-simple">
+      @if (notificaciones().length === 0) {
         <div class="notificaciones-empty">
           <lucide-icon name="bell-off" [size]="40"></lucide-icon>
           <p>No hay notificaciones</p>
         </div>
       } @else {
-        @for (n of notificacionesFiltradas(); track n.id) {
-          <div
-            class="notificacion-item"
-            [class.notificacion-item--no-leida]="n.estado === 'no_leida'"
-            [class.notificacion-item--activa]="notificacionSeleccionada()?.id === n.id"
-            (click)="seleccionarNotificacion(n)"
-          >
+        @for (n of notificaciones(); track n.idNotificacion) {
+          <div class="notificacion-item" [class.notificacion-item--no-leida]="!n.leida">
             <div class="notificacion-item__icono">
-              <lucide-icon [name]="n.icono ?? 'bell'" [size]="20"></lucide-icon>
+              <lucide-icon name="bell" [size]="20"></lucide-icon>
             </div>
             <div class="notificacion-item__body">
               <div class="notificacion-item__header">
-                <p class="notificacion-item__titulo">{{ n.titulo }}</p>
-                @if (n.estado === 'no_leida') {
+                <p class="notificacion-item__titulo">{{ getTipoLabel(n.tipo) }}</p>
+                @if (!n.leida) {
                   <span class="notificacion-item__punto"></span>
                 }
               </div>
               <p class="notificacion-item__mensaje">{{ n.mensaje }}</p>
               <div class="notificacion-item__meta">
                 <restaurant-status-badge
-                  [label]="getTipoLabel(n.tipo)"
-                  variant="info"
+                  [label]="n.leida ? 'Leída' : 'No leída'"
+                  [variant]="n.leida ? 'success' : 'warning'"
                 />
                 <span class="notificacion-item__fecha">
-                  {{ n.fecha | date:'dd/MM/yyyy HH:mm' }}
+                  {{ n.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}
                 </span>
               </div>
+              @if (!n.leida) {
+                <restaurant-button variant="ghost" (click)="marcarComoLeida(n.idNotificacion)">
+                  Marcar como leída
+                </restaurant-button>
+              }
             </div>
           </div>
         }
       }
     </div>
-
-    <!-- Detalle de notificación -->
-    @if (notificacionSeleccionada(); as detalle) {
-      <div class="notificacion-detalle">
-        <div class="notificacion-detalle__header">
-          <h3 class="notificacion-detalle__titulo">{{ detalle.titulo }}</h3>
-          <restaurant-button variant="ghost" (click)="cerrarDetalle()">
-            <lucide-icon name="x" [size]="16"></lucide-icon>
-          </restaurant-button>
-        </div>
-        <div class="notificacion-detalle__body">
-          <div class="notificacion-detalle__icono">
-            <lucide-icon [name]="detalle.icono ?? 'bell'" [size]="32"></lucide-icon>
-          </div>
-          <p class="notificacion-detalle__mensaje">{{ detalle.mensaje }}</p>
-          <div class="notificacion-detalle__info">
-            <restaurant-status-badge
-              [label]="getTipoLabel(detalle.tipo)"
-              variant="info"
-            />
-            <span class="notificacion-detalle__fecha">
-              {{ detalle.fecha | date:'dd/MM/yyyy HH:mm' }}
-            </span>
-          </div>
-          <restaurant-status-badge
-            [label]="detalle.estado === 'leida' ? 'Leída' : 'No leída'"
-            [variant]="detalle.estado === 'leida' ? 'success' : 'warning'"
-          />
-        </div>
-      </div>
-    }
-
-  </div>
-
+  }
 </div>

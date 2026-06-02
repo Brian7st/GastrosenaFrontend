@@ -137,11 +137,10 @@
             <label>Área <span class="required">*</span></label>
             <select
               class="form-control"
-              [value]="area()"
               (change)="area.set($any($event.target).value)">
-              <option value="">Seleccione Área</option>
+              <option value="" [selected]="area() === ''">Seleccione Área</option>
               @for (a of AREAS; track a) {
-                <option [value]="a">{{ a }}</option>
+                <option [value]="a" [selected]="a === area()">{{ a }}</option>
               }
             </select>
           </div>

@@ -1,5 +1,5 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { SolicitudGil, SolicitudesGilFiltros, SolicitudesPaginacion, EstadoGil, CrearSolicitudData, ActualizarSolicitudData, GenerarGilData } from '../models/solicitudes-gil.model';
 import {
   SolicitudSesion,
@@ -19,8 +19,9 @@ export class SolicitudesFacade {
   private solicitudesService = inject(SolicitudesService);
 
   // ── Estado GIL (Procurement) ───────────────────────────────────────────────
-  private _solicitudes           = signal<SolicitudGil[]>([]);
-  private _loading               = signal<boolean>(false);
+  private _solicitudes              = signal<SolicitudGil[]>([]);
+  private _loading                  = signal<boolean>(false);
+  private _cargarByIdSub?: Subscription;
   private _filtros               = signal<SolicitudesGilFiltros>({ page: 0, size: 10 });
   private _paginacion            = signal<SolicitudesPaginacion>({ totalElements: 0, totalPages: 0, page: 0, size: 10 });
   private _solicitudSeleccionada = signal<SolicitudGil | undefined>(undefined);
@@ -102,8 +103,11 @@ export class SolicitudesFacade {
    * Carga una solicitud específica por su ID.
    */
   cargarSolicitudById(id: string): void {
+    // Cancela cualquier fetch anterior en vuelo para evitar race conditions
+    this._cargarByIdSub?.unsubscribe();
+    this._solicitudSeleccionada.set(undefined); // limpia datos del GIL anterior
     this._loading.set(true);
-    this.solicitudesService.getSolicitudById(id)
+    this._cargarByIdSub = this.solicitudesService.getSolicitudById(id)
       .pipe(
         catchError(() => {
           this._error.set('Error al cargar el detalle de la solicitud');
@@ -125,19 +129,25 @@ export class SolicitudesFacade {
   /**
    * Crea una nueva solicitud y recarga el listado.
    */
-  crearSolicitud(data: CrearSolicitudData): void {
+  limpiarSolicitudSeleccionada(): void {
+    this._solicitudSeleccionada.set(undefined);
+  }
+
+  crearSolicitud(data: CrearSolicitudData): Observable<boolean> {
     this._loading.set(true);
-    this.solicitudesService.crearSolicitud(data)
+    this._error.set(null);
+    return this.solicitudesService.crearSolicitud(data)
       .pipe(
+        map(result => {
+          if (result) this.cargarSolicitudes();
+          return !!result;
+        }),
         catchError(() => {
           this._error.set('Error al crear la solicitud');
-          return of(null);
+          return of(false);
         }),
         finalize(() => this._loading.set(false))
-      )
-      .subscribe(result => {
-        if (result) this.cargarSolicitudes();
-      });
+      );
   }
 
   /**
@@ -336,7 +346,7 @@ export class SolicitudesFacade {
         finalize(() => this._loading.set(false))
       )
       .subscribe(res => {
-        if (res !== null) this._solicitudSesionSeleccionada.set(res);
+        if (res !== null) this.cargarSolicitudesSesion();
       });
   }
 
@@ -353,7 +363,7 @@ export class SolicitudesFacade {
         finalize(() => this._loading.set(false))
       )
       .subscribe(res => {
-        if (res !== null) this._solicitudSesionSeleccionada.set(res);
+        if (res !== null) this.cargarSolicitudesSesion();
       });
   }
 
@@ -370,7 +380,7 @@ export class SolicitudesFacade {
         finalize(() => this._loading.set(false))
       )
       .subscribe(res => {
-        if (res !== null) this._solicitudSesionSeleccionada.set(res);
+        if (res !== null) this.cargarSolicitudesSesion();
       });
   }
 }

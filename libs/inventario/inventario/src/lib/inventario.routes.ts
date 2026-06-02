@@ -75,8 +75,8 @@ export const INVENTARIO_ROUTES: Routes = [
 
 
   {
-    path: 'solicitudes-insumos-page/:id/consolidacion',
-    loadComponent: () => import('./pages/solicitudes-insumos-page/solicitudes-insumos-consolidacion/solicitudes-insumos-consolidacion.component').then(m => m.SolicitudesInsumosConsolidacionComponent)
+    path: 'solicitudes-insumos-page/:id',
+    loadComponent: () => import('./pages/solicitudes-insumos-page/solicitudes-insumos-detail/solicitudes-insumos-detail.component').then(m => m.SolicitudesInsumosDetailComponent)
   },
 
   {
@@ -173,10 +173,6 @@ export const INVENTARIO_ROUTES: Routes = [
       {
         path: 'entrada',
         loadComponent: () => import('./pages/kardex-page/movimiento-entrada/movimiento-entrada.component').then(m => m.MovimientoEntradaComponent)
-      },
-      {
-        path: 'salida',
-        loadComponent: () => import('./pages/kardex-page/movimiento-salida/movimiento-salida.component').then(m => m.MovimientoSalidaComponent)
       },
       {
         path: 'exportar',
@@ -296,6 +292,13 @@ export const INVENTARIO_ROUTES: Routes = [
           ),
       },
       {
+        path: ':id/imprimir',
+        loadComponent: () =>
+          import('./pages/actas-page/actas-print/actas-print.component').then(
+            m => m.ActasPrintComponent
+          ),
+      },
+      {
         path: ':id',
         loadComponent: () =>
           import('./pages/actas-page/actas-detail/actas-detail.component').then(
@@ -398,6 +401,12 @@ export const INVENTARIO_ROUTES: Routes = [
           import('./pages/requisiciones-page/requisiciones-firmar/requisiciones-firmar.component').then(
             m => m.RequisicionesFirmarComponent
           ),
+      },
+      {
+        path: 'resumen/nueva',
+        loadComponent: () =>
+          import('./pages/requisiciones-page/requisiciones-resumen/requisiciones-resumen.component')
+            .then(m => m.RequisicionesResumenComponent),
       },
       {
         path: 'resumen/:id',

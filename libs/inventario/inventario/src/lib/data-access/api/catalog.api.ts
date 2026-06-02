@@ -1,9 +1,20 @@
+/** Wrapper paginado Spring estándar — usado por solicitudes-gil y facturas */
 export interface PagedResponse<T> {
   content: T[];
   totalElements: number;
   totalPages: number;
   page: number;
   size: number;
+}
+
+/** Wrapper paginado del catálogo de productos — ProductosPageHttpResponse Java
+ *  Usa nombres en español: contenido, paginaActual, totalPaginas, totalElementos, tamano */
+export interface CatalogoPageResponse<T> {
+  contenido: T[];
+  paginaActual: number;
+  totalPaginas: number;
+  totalElementos: number;
+  tamano: number;
 }
 
 export interface ProductoResponse {
@@ -14,36 +25,34 @@ export interface ProductoResponse {
   descripcion?: string;
   categoria: string;
   unidadMedida: string;
-  urlImagen?: string | null;
   vrlAdjudicado: number | null;
   vrlAntes: number | null;
   iva: number | null;
+  stockMinimo: number | null;
   activo: boolean;
 }
 
 export interface CrearProductoRequest {
   codigoSena?: string;
   codigoProveedor?: string;
-  nombre: string;
   descripcion?: string;
   categoria: string;
   unidadMedida: string;
-  urlImagen?: string;
   vrlAdjudicado?: number | null;
   vrlAntes?: number | null;
   iva?: number | null;
+  stockMinimo?: number | null;
 }
 
 export interface ActualizarProductoRequest {
-  nombre: string;
   unidadMedida: string;
   descripcion?: string;
   categoria?: string;
   codigoProveedor?: string;
-  urlImagen?: string;
   vrlAdjudicado?: number | null;
   vrlAntes?: number | null;
   iva?: number | null;
+  stockMinimo?: number | null;
 }
 
 /** POST /catalog/productos/eliminacion-masiva */

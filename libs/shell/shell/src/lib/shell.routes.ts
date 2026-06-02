@@ -76,9 +76,15 @@ export const shellRoutes: Routes = [
           import('@restaurant/abastecimiento').then(m => m.ABASTECIMIENTO_ROUTES),
       },
       {
-        path: 'notificaciones',
+        path: 'configuracion',
         loadChildren: () =>
-          import('@restaurant/notificaciones').then(m => m.NOTIFICACIONES_ROUTES),
+          import('@restaurant/configuracion').then(m => m.CONFIGURACION_ROUTES),
+      },
+{ path: 'notificaciones', loadComponent: () => import('@restaurant/notificaciones').then(m => m.NotificacionesPageComponent) },
+      // 👇 AGREGAR ESTA RUTA:
+      {
+        path: 'perfil',
+        loadComponent: () => import('@restaurant/usuarios').then(m => m.PerfilPageComponent),
       },
       // 👇 AGREGAR ESTA RUTA:
       {

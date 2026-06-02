@@ -1,9 +1,10 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BaseHttpService } from '@restaurant/shared/api';
 import { PaginatedResponse } from '@restaurant/shared/models';
+import { AuthService } from '@restaurant/shared/auth';
 import {
   ActualizarUsuarioRequest,
   AsignacionMasivaRequest,
@@ -27,6 +28,7 @@ export interface EstadoImportacion {
 @Injectable({ providedIn: 'root' })
 export class UsuariosService extends BaseHttpService {
   private readonly resource = 'usuarios';
+  private readonly authService = inject(AuthService);
 
   getUsuarios(filtros?: Partial<FiltrosUsuarios>): Observable<PaginatedResponse<UsuarioDetalle>> {
     let params = new HttpParams();
@@ -77,7 +79,10 @@ export class UsuariosService extends BaseHttpService {
   }
 
   eliminarUsuario(id: string): Observable<void> {
-    return this.http.delete<void>(this.buildUrl(`${this.resource}/${id}`));
+    const userId = this.authService.currentUser()?.id;
+    return this.http.delete<void>(this.buildUrl(`${this.resource}/${id}`), {
+      headers: { 'X-User-ID': userId || '' }
+    });
   }
 
   activarUsuario(id: string): Observable<UsuarioDetalle> {
@@ -95,20 +100,16 @@ export class UsuariosService extends BaseHttpService {
   importarMasivo(request: ImportarUsuariosRequest): Observable<ImportarUsuariosResponse> {
     const formData = new FormData();
     formData.append('archivo', request.archivo);
-
     const url = request.tipo === 'APRENDIZ'
       ? this.buildUrl('usuarios/masivo/aprendices')
       : this.buildUrl('usuarios/masivo/instructores');
-
     return this.http.post<ImportarUsuariosResponse>(url, formData);
   }
 
-  // ─── NUEVO: Obtener estado de importación (para polling) ────────────────────
   obtenerEstadoImportacion(tareaId: string, tipo: 'APRENDIZ' | 'INSTRUCTOR'): Observable<EstadoImportacion> {
     const url = tipo === 'APRENDIZ'
       ? this.buildUrl(`usuarios/masivo/estado-aprendices/${tareaId}`)
       : this.buildUrl(`usuarios/masivo/estado-instructores/${tareaId}`);
-
     return this.http.get<EstadoImportacion>(url);
   }
 
@@ -119,9 +120,6 @@ export class UsuariosService extends BaseHttpService {
   getHistorial(): Observable<HistorialItem[]> {
     return this.http.get<HistorialItem[]>(this.buildUrl(`${this.resource}/historial`));
   }
-
-
-
 
   exportarUsuarios(config: ExportarConfig): Observable<Blob> {
     const params = new HttpParams()
@@ -135,19 +133,25 @@ export class UsuariosService extends BaseHttpService {
   }
 
   // ==================== PERFIL ====================
-obtenerPerfil(): Observable<UsuarioDetalle> {
-  return this.http.get<UsuarioDetalle>(this.buildUrl('perfil'));
-}
+  obtenerPerfil(): Observable<UsuarioDetalle> {
+    return this.http.get<UsuarioDetalle>(this.buildUrl('perfil'));
+  }
 
-actualizarPerfil(data: Partial<UsuarioDetalle>): Observable<UsuarioDetalle> {
-  return this.http.put<UsuarioDetalle>(this.buildUrl('perfil'), data);
-}
+  actualizarPerfil(data: Partial<UsuarioDetalle>): Observable<UsuarioDetalle> {
+    return this.http.put<UsuarioDetalle>(this.buildUrl('perfil'), data);
+  }
 
-cambiarContrasena(oldPassword: string, newPassword: string): Observable<void> {
-  return this.http.post<void>(this.buildUrl('perfil/cambiar-contrasena'), {
-    passwordActual: oldPassword,
-    passwordNueva: newPassword
-  });
-}
+  cambiarContrasena(oldPassword: string, newPassword: string): Observable<void> {
+    return this.http.post<void>(this.buildUrl('perfil/cambiar-contrasena'), {
+      passwordActual: oldPassword,
+      passwordNueva: newPassword
+    });
+  }
 
+  actualizarFoto(userId: string, fotoUrl: string): Observable<void> {
+    return this.http.patch<void>(
+      this.buildUrl(`${this.resource}/${userId}/foto`),
+      { fotoUrl }
+    );
+  }
 }

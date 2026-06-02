@@ -14,7 +14,7 @@ import {
   ResolverDiferenciaGilRequest,
   VincularInstructorRequest,
 } from '../api/sourcing.api';
-import { GilResponse } from '../api/procurement.api';
+import { BienGilResponse, GilResponse } from '../api/procurement.api';
 import { facturaFromApi, conciliacionGilFromApi, facturaFormToRequest } from '../mappers/sourcing.mapper';
 
 const API = '/api/v1';
@@ -94,6 +94,21 @@ export class FacturasService {
 
     return this.http
       .post<FacturaResponse>(`${API}/sourcing/facturas/importar-fel`, formData, { params })
+      .pipe(
+        map(facturaFromApi),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  importarFacturaFelXml(file: File, gilId?: string): Observable<Factura> {
+    const formData = new FormData();
+    formData.append('archivo', file, file.name);
+
+    let params = new HttpParams();
+    if (gilId) params = params.set('gilId', gilId);
+
+    return this.http
+      .post<FacturaResponse>(`${API}/sourcing/facturas/importar-fel-xml`, formData, { params })
       .pipe(
         map(facturaFromApi),
         catchError(err => throwError(() => err))
@@ -194,6 +209,16 @@ export class FacturasService {
     return this.http
       .put<void>(`${API}/sourcing/instructor-vinculos/${ordenCompra}`, body)
       .pipe(catchError(err => throwError(() => err)));
+  }
+
+  /** GET /procurement/giles/:id — bienes del GIL para cruce manual en importación FEL. */
+  getGilBienes(gilId: string): Observable<BienGilResponse[]> {
+    return this.http
+      .get<GilResponse>(`${API}/procurement/giles/${gilId}`)
+      .pipe(
+        map(r => r.bienes ?? []),
+        catchError(err => throwError(() => err))
+      );
   }
 
   /** GET /procurement/giles — lista para picker en importación FEL.

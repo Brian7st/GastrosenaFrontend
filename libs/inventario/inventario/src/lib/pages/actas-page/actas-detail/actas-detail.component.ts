@@ -5,8 +5,8 @@ import {
   inject,
   OnInit,
 } from '@angular/core';
-import { CommonModule, UpperCasePipe, CurrencyPipe } from '@angular/common';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
+import { UpperCasePipe } from '@angular/common';
 import {
   StatusBadgeComponent,
   LucideIconComponent,
@@ -20,10 +20,8 @@ import { ActasFacade } from '../../../data-access/actas.facade';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     RouterModule,
     UpperCasePipe,
-    CurrencyPipe,
     StatusBadgeComponent,
     LucideIconComponent,
     BackButtonComponent,
@@ -36,20 +34,18 @@ export class ActasDetailComponent implements OnInit {
   private route  = inject(ActivatedRoute);
   private facade = inject(ActasFacade);
 
-  // ── Estado reactivo desde facade ─────────────────────────────────────────
-  acta        = this.facade.actaSeleccionada;
-  insumos     = this.facade.insumos;
-  compromisos = this.facade.compromisos;
-  firmantes   = this.facade.firmantes;
-  loading     = this.facade.loading;
+  acta    = this.facade.actaSeleccionada;
+  loading = this.facade.loading;
 
-  // ── Cálculos monetarios ──────────────────────────────────────────────────
-  subtotal = computed(() =>
-    this.insumos().reduce((sum, i) => sum + i.cantidad * i.costoUnitario, 0)
-  );
-
-  iva   = computed(() => this.subtotal() * 0.19);
-  total = computed(() => this.subtotal() + this.iva());
+  /** Nombre del instructor tomado de la lista de asistentes */
+  instructorNombre = computed(() => {
+    const a = this.acta();
+    if (!a) return a?.instructorId ?? '';
+    const firmante = a.asistentes?.find(f =>
+      f.dependenciaRol.toLowerCase().includes('instructor')
+    );
+    return firmante?.nombre || a.instructorId;
+  });
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -101,6 +97,15 @@ export class ActasDetailComponent implements OnInit {
       REVISADA:         'ARCHIVADA',
     };
     return flujo[actual] ?? null;
+  }
+
+  /** Avanza el acta de FIRMADA → REVISADA usando el ID del instructor como revisorId provisional. */
+  revisarActa(): void {
+    const id          = this.acta()?.id;
+    const instructorId = this.acta()?.instructorId ?? 'revisor-sena';
+    if (id) {
+      this.facade.revisarActa(id, instructorId);
+    }
   }
 
   // ── Navegación ───────────────────────────────────────────────────────────

@@ -47,13 +47,13 @@ export interface PagedSolicitudSesionResponse {
 
 /** POST /training/solicitudes */
 export interface CrearSolicitudSesionRequest {
-  fechaSolicitud?:          string;
-  numeroSolicitud?:         number;
-  fichaId:                  string;
-  programaId:               string;
-  instructorId:             string;
+  fechaSolicitud?:           string;
+  numeroSolicitud?:          number;
+  fichaId:                   string;
+  programaId:                string;
+  instructorId:              string;
   identificacionInstructor?: string;
-  valorTotalDeSolicitud?:   number;
+  valorTotalDeSolicitud?:    number;
   items: {
     codigoSena:              string;
     nombreBien?:             string;

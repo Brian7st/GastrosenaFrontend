@@ -208,6 +208,27 @@
       color: var(--color-text-secondary);
     }
 
+    .ticket-scroll-wrapper {
+      max-height: 150px;
+      overflow-y: auto;
+      padding-right: var(--space-2);
+
+      /* Scrollbar minimalista */
+      &::-webkit-scrollbar {
+        width: 4px;
+      }
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: var(--color-border-hover);
+        border-radius: var(--radius-full);
+      }
+      &::-webkit-scrollbar-thumb:hover {
+        background: var(--color-text-tertiary);
+      }
+    }
+
     ul {
       list-style: none;
       padding: 0;
@@ -215,7 +236,7 @@
       display: flex;
       flex-direction: column;
       gap: var(--space-2);
-      max-height: 150px; /* Aproximadamente 5-6 items */
+      max-height: 150px; /* Mantenido para retrocompatibilidad con otras páginas */
       overflow-y: auto;
       padding-right: var(--space-2);
 

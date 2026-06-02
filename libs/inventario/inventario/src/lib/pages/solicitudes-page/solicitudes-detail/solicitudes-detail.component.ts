@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import { ButtonComponent } from '@restaurant/shared/ui';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 
 @Component({
   selector: 'restaurant-solicitudes-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, BackButtonComponent],
+  imports: [CommonModule, RouterModule, FormsModule, BackButtonComponent, ButtonComponent],
   templateUrl: './solicitudes-detail.component.html',
   styleUrl: './solicitudes-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -84,8 +85,9 @@ export class SolicitudesDetailComponent implements OnInit {
 
   // ─── Enviar a Proveedor (EMITIDO → ENVIADO_PROVEEDOR) ───────────────
   showEnviarProveedorForm = signal(false);
-  proveedorDestinatarioId = signal('');
-  fechaEnvio              = signal('');
+  correoProveedor         = signal('');
+  nombreProveedor         = signal('');
+  asuntoCorreo            = signal('');
 
   onToggleEnviarProveedor(): void {
     this.showEnviarProveedorForm.update(v => !v);
@@ -93,10 +95,10 @@ export class SolicitudesDetailComponent implements OnInit {
 
   onConfirmarEnvioProveedor(): void {
     const id = this.solicitud()?.id;
-    if (!id || !this.proveedorDestinatarioId() || !this.fechaEnvio()) return;
+    if (!id || !this.correoProveedor()) return;
     this.facade.enviarAProveedor(String(id), {
-      proveedorDestinatarioId: this.proveedorDestinatarioId(),
-      fechaEnvio:              this.fechaEnvio(),
+      proveedorDestinatarioId: this.correoProveedor(),
+      fechaEnvio:              new Date().toISOString().split('T')[0],
     });
     this.showEnviarProveedorForm.set(false);
   }
