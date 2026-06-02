@@ -48,21 +48,29 @@
 .icon-wrapper {
   width: 64px;
   height: 64px;
-  border-radius: 16px;
-  background-color: #e8f5e9;
+  border-radius: var(--radius-xl, 16px);
+  background-color: var(--color-success-50, #e8f5e9);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 24px;
+  margin-bottom: var(--space-6, 24px);
 
   .material-symbols-outlined {
     font-size: 32px;
     color: var(--color-primario, #39a900);
-    // Angular/Lucide sometimes requires specific classes, but material icon is fine.
-    // Small rotation for the send icon to make it look like paper airplane going up
     transform: rotate(-25deg);
-    margin-left: 6px; 
+    margin-left: 6px;
     margin-top: 2px;
+  }
+
+  &--edit {
+    background-color: var(--color-info-50, #e3f2fd);
+
+    .material-symbols-outlined {
+      color: var(--color-info-600, #1565c0);
+      transform: none;
+      margin: 0;
+    }
   }
 }
 

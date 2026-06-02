@@ -163,6 +163,7 @@ export class SolicitudesService {
       cuentadantes:           data.cuentadantes,
       solicitante:            data.solicitante,
       codigoGrupo:            data.codigoGrupo,
+      fichaCaracterizacion:   data.codigoGrupo,
       observaciones:          data.observaciones,
     };
     return this.http
@@ -186,17 +187,19 @@ export class SolicitudesService {
     params = params.set('size', String(filtros?.size ?? 20));
 
     return this.http
-      .get<PagedSolicitudSesionResponse>(`${API}/training/solicitudes`, { params })
+      .get<PagedSolicitudSesionResponse | SolicitudSesionResponse[]>(`${API}/training/solicitudes`, { params })
       .pipe(
-        map(res => ({
-          solicitudes: res.content.map(solicitudSesionFromApi),
-          paginacion: {
-            totalElements: res.totalElements,
-            totalPages:    res.totalPages,
-            page:          res.number,
-            size:          res.size,
-          },
-        })),
+        map(res => {
+          const items = Array.isArray(res) ? res : res.content;
+          const total = Array.isArray(res) ? items.length : res.totalElements;
+          const pages = Array.isArray(res) ? 1 : res.totalPages;
+          const page  = Array.isArray(res) ? 0 : res.number;
+          const size  = Array.isArray(res) ? items.length : res.size;
+          return {
+            solicitudes: items.map(solicitudSesionFromApi),
+            paginacion: { totalElements: total, totalPages: pages, page, size },
+          };
+        }),
         catchError(err => throwError(() => err))
       );
   }
@@ -265,7 +268,7 @@ export class SolicitudesService {
       })),
     };
     return this.http
-      .put<SolicitudSesionResponse>(`${API}/training/solicitudes/${id}`, body)
+      .patch<SolicitudSesionResponse>(`${API}/training/solicitudes/${id}`, body)
       .pipe(
         map(solicitudSesionFromApi),
         catchError(err => throwError(() => err))

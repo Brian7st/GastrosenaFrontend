@@ -3,6 +3,7 @@ import { finalize, catchError, of } from 'rxjs';
 import { Factura, FacturaFiltros, FacturaKpis, FacturaPaginacion, SolicitudGIL, ConciliacionGil, FacturaFormDto, GilPickerItem } from '../models/facturas.model';
 import { FacturasService } from './services/facturas.service';
 import { ActualizarFacturaRequest } from './api/sourcing.api';
+import { BienGilResponse } from './api/procurement.api';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,7 @@ export class FacturasFacade {
   private _conciliacionGil       = signal<ConciliacionGil | null>(null);
   private _gilesDisponibles      = signal<GilPickerItem[]>([]);
   private _conciliacionImportacion = signal<ConciliacionGil | null>(null);
+  private _gilBienes               = signal<BienGilResponse[]>([]);
   private _conciliacionCargada   = signal(false);
   private _paginacion            = signal<FacturaPaginacion>({ totalElements: 0, totalPages: 1, page: 0, size: 10 });
   private _loading               = signal<boolean>(false);
@@ -32,6 +34,7 @@ export class FacturasFacade {
   public conciliacionGil       = computed(() => this._conciliacionGil());
   public gilesDisponibles      = computed(() => this._gilesDisponibles());
   public conciliacionImportacion = computed(() => this._conciliacionImportacion());
+  public gilBienes               = computed(() => this._gilBienes());
   public conciliacionCargada   = computed(() => this._conciliacionCargada());
   public paginacion            = computed(() => this._paginacion());
   public loading               = computed(() => this._loading());
@@ -140,9 +143,29 @@ export class FacturasFacade {
           this._facturaSeleccionada.set(factura);
           this.cargarFacturas();
           this.cargarKpis();
-          // Conciliation record is not loaded here to avoid a race condition:
-          // the backend may not have created it yet at this point.
-          // Navigate to the factura detail page to load conciliation on demand.
+        }
+      });
+  }
+
+  importarFacturaFelXml(file: File, gilId?: string): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this._facturaImportada.set(null);
+
+    this.svc.importarFacturaFelXml(file, gilId)
+      .pipe(
+        catchError((error) => {
+          this._error.set(this.getImportErrorMessage(error));
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe((factura) => {
+        if (factura !== null) {
+          this._facturaImportada.set(factura);
+          this._facturaSeleccionada.set(factura);
+          this.cargarFacturas();
+          this.cargarKpis();
         }
       });
   }
@@ -162,6 +185,13 @@ export class FacturasFacade {
         this._conciliacionGil.set(res);
         this._conciliacionCargada.set(true);
       });
+  }
+
+  cargarGilBienes(gilId: string): void {
+    if (!gilId) { this._gilBienes.set([]); return; }
+    this.svc.getGilBienes(gilId)
+      .pipe(catchError(() => of([])))
+      .subscribe(bienes => this._gilBienes.set(bienes));
   }
 
   cargarGilesDisponibles(): void {

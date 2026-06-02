@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { ConfirmarEnvioSolicitudModalComponent } from '../../../components/confirmar-envio-solicitud-modal/confirmar-envio-solicitud-modal.component';
+import { BienTableComponent } from '../../../ui/components/bien-table/bien-table.component';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { SolicitudSesionItem } from '../../../models/solicitud-sesion.model';
@@ -13,7 +14,7 @@ import { Bien } from '../../../models/inventario.model';
 @Component({
   selector: 'restaurant-solicitudes-insumos-form',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ButtonComponent, BackButtonComponent, ConfirmarEnvioSolicitudModalComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ButtonComponent, BackButtonComponent, ConfirmarEnvioSolicitudModalComponent, BienTableComponent],
   templateUrl: './solicitudes-insumos-form.component.html',
   styleUrl: './solicitudes-insumos-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -71,6 +72,8 @@ export class SolicitudesInsumosFormComponent implements OnInit {
     return { desde, hasta, total: totalElements };
   });
 
+  addedCodigosSena = computed(() => this.items().map(i => i.codigoSena));
+
   // ── Validación ────────────────────────────────────────────────────────────
   submitAttempted = signal(false);
 
@@ -113,18 +116,13 @@ export class SolicitudesInsumosFormComponent implements OnInit {
     this.inventario.irAPagina(page);
   }
 
-  estaEnLista(id: string | number): boolean {
-    const bien = this.inventario.bienes().find(b => b.id === id);
-    return bien ? this.items().some(i => i.codigoSena === bien.codigoSena) : false;
-  }
-
   onSeleccionarBien(bien: Bien): void {
     const yaAgregado = this.items().some(i => i.codigoSena === bien.codigoSena);
     if (yaAgregado) return;
 
     this.items.update(list => [...list, {
       codigoSena:              bien.codigoSena ?? '',
-      nombreBien:              bien.nombre,
+      nombreBien:              bien.descripcion ?? '',
       descripcion:             bien.descripcion ?? '',
       unidadMedida:            bien.unidadMedida,
       cantidad:                1,

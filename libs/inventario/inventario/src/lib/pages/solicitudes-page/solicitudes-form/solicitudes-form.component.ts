@@ -79,6 +79,7 @@ export class SolicitudesFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.facade.loadAll();
+    this.facade.limpiarSolicitudSeleccionada();
   }
 
   onAddCuentadante(): void {
@@ -125,8 +126,8 @@ export class SolicitudesFormComponent implements OnInit {
       codigoGrupo:            this.codigoGrupo() || undefined,
       bienes:                 [],
       observaciones:          this.observaciones() || undefined,
+    }).subscribe(ok => {
+      if (ok) this.router.navigate(['/app/inventario/solicitudes-gil']);
     });
-
-    this.router.navigate(['/app/inventario/solicitudes-gil']);
   }
 }
