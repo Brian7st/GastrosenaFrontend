@@ -62,7 +62,7 @@ const ROLES_SIMULACION_SET = new Set<string>(ROLES_SIMULACION_INFO.map(r => r.ro
 
 const ROLES_STAFF = new Set<string>([
   Rol.ADMINISTRADOR, Rol.CONTADORA, Rol.INSTRUCTOR,
-  Rol.APRENDIZ,
+  
 ]);
 
 @Component({
