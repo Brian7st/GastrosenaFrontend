@@ -116,6 +116,24 @@
         },
 
         {
+          label: 'Configuración',
+          ruta: '/app/configuracion',
+          icono: 'settings',
+          children: [
+            {
+              label: 'General',
+              ruta: '/app/configuracion/general',
+              icono: 'building-2',
+            },
+            {
+              label: 'Eliminación masiva de bienes',
+              ruta: '/app/configuracion/bienes/eliminar-masiva',
+              icono: 'trash-2',
+            },
+          ],
+        },
+
+        {
           label: 'Reportes y estadísticas',
           ruta: '/app/reportes',
           icono: 'pie-chart',
