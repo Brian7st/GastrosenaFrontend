@@ -3,7 +3,7 @@
     <inventario-back-button (clicked)="goBack()" />
     <div>
       <h1 class="page-header__title">Importar Factura Electrónica</h1>
-      <p class="page-header__subtitle">Subí el PDF de la factura electrónica para registrarla en el sistema.</p>
+      <p class="page-header__subtitle">Subí el XML de la factura electrónica para registrarla en el sistema.</p>
     </div>
   </header>
 
@@ -35,30 +35,6 @@
     </div>
   }
 
-  <div class="formato-toggle">
-    <restaurant-button
-      [variant]="formato() === 'pdf' ? 'primary' : 'ghost'"
-      (click)="setFormato('pdf')"
-    >
-      <span class="material-symbols-outlined">picture_as_pdf</span>
-      PDF
-    </restaurant-button>
-    <restaurant-button
-      [variant]="formato() === 'xml' ? 'primary' : 'ghost'"
-      (click)="setFormato('xml')"
-    >
-      <span class="material-symbols-outlined">code</span>
-      XML · UBL 2.1
-    </restaurant-button>
-  </div>
-
-  @if (formato() === 'xml') {
-    <div class="formato-banner">
-      <span class="material-symbols-outlined">verified</span>
-      <span>Importación desde XML estructurado DIAN — mayor exactitud en la extracción de ítems</span>
-    </div>
-  }
-
   <div class="import-grid">
     <div class="upload-zone-wrapper">
       <div
@@ -71,15 +47,11 @@
       >
         <div class="upload-zone__icon-wrapper">
           <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">
-            {{ formato() === 'xml' ? 'code' : 'cloud_upload' }}
+            code
           </span>
         </div>
-        <h3 class="upload-zone__title">
-          {{ formato() === 'xml' ? 'Arrastrá el XML UBL 2.1 acá' : 'Arrastrá tu factura acá' }}
-        </h3>
-        <p class="upload-zone__subtitle">
-          {{ formato() === 'xml' ? 'Solo archivos .xml · máximo 10 MB' : 'Solo archivos .pdf · máximo 10 MB' }}
-        </p>
+        <h3 class="upload-zone__title">Arrastrá el XML UBL 2.1 acá</h3>
+        <p class="upload-zone__subtitle">Solo archivos .xml · máximo 10 MB</p>
 
         <div class="field-group upload-zone__field">
           <label class="field-label">GIL a vincular (opcional)</label>
@@ -103,7 +75,7 @@
         <input
           #fileInput
           type="file"
-          [attr.accept]="formato() === 'xml' ? '.xml' : '.pdf'"
+          accept=".xml"
           hidden
           (change)="onFileInput($event)"
         >
@@ -118,7 +90,7 @@
       <ul class="instructions-list">
         <li>
           <div class="step-badge">1</div>
-          <p>Subí el PDF de la factura electrónica original. El sistema extrae automáticamente los datos del documento.</p>
+          <p>Subí el XML de la factura electrónica original. El sistema extrae automáticamente los datos del documento.</p>
         </li>
         <li>
           <div class="step-badge">2</div>

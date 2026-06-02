@@ -124,29 +124,6 @@ export class FacturasFacade {
       });
   }
 
-  importarFacturaFel(file: File, gilId?: string): void {
-    this._loading.set(true);
-    this._error.set(null);
-    this._facturaImportada.set(null);
-
-    this.svc.importarFacturaFel(file, gilId)
-      .pipe(
-        catchError((error) => {
-          this._error.set(this.getImportErrorMessage(error));
-          return of(null);
-        }),
-        finalize(() => this._loading.set(false))
-      )
-      .subscribe((factura) => {
-        if (factura !== null) {
-          this._facturaImportada.set(factura);
-          this._facturaSeleccionada.set(factura);
-          this.cargarFacturas();
-          this.cargarKpis();
-        }
-      });
-  }
-
   importarFacturaFelXml(file: File, gilId?: string): void {
     this._loading.set(true);
     this._error.set(null);
@@ -378,7 +355,7 @@ export class FacturasFacade {
     if (httpError?.error?.detail) return httpError.error.detail;
     if (httpError?.error?.title) return httpError.error.title;
     if (httpError?.status === 409) return 'La factura ya existe en el sistema.';
-    if (httpError?.status === 400) return 'El archivo no es un PDF FEL válido.';
+    if (httpError?.status === 400) return 'El archivo no es un XML FEL válido.';
     if (httpError?.status === 422) return 'No se pudo procesar el contenido de la factura.';
 
     return 'Error al importar la factura electrónica';
