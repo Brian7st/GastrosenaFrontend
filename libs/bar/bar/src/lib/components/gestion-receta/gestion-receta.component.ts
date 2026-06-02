@@ -1,11 +1,12 @@
-import { Component, OnInit, inject, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, inject, Input, Output, EventEmitter, signal } from '@angular/core';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CategoriaService } from '../../data-access/categoria.service';
 import { RecetaService } from '../../data-access/receta.service';
 import { IngredienteService } from '../../data-access/ingrediente.service';
 import { Receta, Ingrediente, Paso } from '../../models/receta.model';
-import { LucideIconComponent } from '@restaurant/shared/ui';
+import { LucideIconComponent, ButtonComponent, InputComponent, ConfirmDialogComponent } from '@restaurant/shared/ui';
+import { soloLetrasValidator } from '../../validators/solo-letras.validator';
 
 export function noDuplicatesValidator(fieldName: string): ValidatorFn {
   return (formArray: AbstractControl): ValidationErrors | null => {
@@ -21,7 +22,7 @@ export function noDuplicatesValidator(fieldName: string): ValidatorFn {
 @Component({
   selector: 'bar-gestion-receta',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, LucideIconComponent],
+  imports: [ReactiveFormsModule, CommonModule, LucideIconComponent, ButtonComponent, InputComponent, ConfirmDialogComponent],
   templateUrl: './gestion-receta.component.html',
   styleUrl: './gestion-receta.component.scss'
 })
@@ -35,12 +36,15 @@ export class GestionRecetaComponent implements OnInit {
   private recetaService = inject(RecetaService);
 
   isSaving = false;
+  mostrarExitoModal = signal<boolean>(false);
+  exitoModalTitulo = signal<string>('');
+  exitoModalMensaje = signal<string>('');
 
   recipeForm = this.fb.group({
     idCategoria: ['', Validators.required],        
-    nombreReceta: ['', [Validators.required, Validators.minLength(5)]], 
-    tiempoPreparacion: [0, [Validators.required, Validators.min(1)]],   
-    precioUnitario: [0, [Validators.required, Validators.min(0)]],    
+    nombreReceta: ['', [Validators.required, Validators.minLength(5), soloLetrasValidator()]], 
+    tiempoPreparacion: [0, [Validators.required, Validators.min(1), Validators.max(720)]],   
+    precioUnitario: [0, [Validators.required, Validators.min(0), Validators.max(1000000)]],    
     temperatura: ['', Validators.required],
     urlImagen: [''],
     ingredientes: this.fb.array([], [Validators.required, noDuplicatesValidator('nombreIngrediente')]),
@@ -83,7 +87,7 @@ export class GestionRecetaComponent implements OnInit {
       receta.ingredientes.forEach((ing: Ingrediente) => {
         const group = this.fb.group({
           nombreIngrediente: [ing.nombreIngrediente || (ing as unknown as Record<string, unknown>)['nombre'] as string, [Validators.required, Validators.minLength(2)]],
-          cantidadRequerida: [ing.cantidadRequerida, [Validators.required, Validators.min(0.1)]],
+          cantidadRequerida: [ing.cantidadRequerida, [Validators.required, Validators.min(0.1), Validators.max(10000)]],
           unidadMedida: [ing.unidadMedida, Validators.required]
         });
         this.ingredientesArr.push(group);
@@ -94,7 +98,7 @@ export class GestionRecetaComponent implements OnInit {
       receta.pasos.forEach((paso: Paso) => {
         const group = this.fb.group({
           orden: [paso.orden],
-          descripcionPaso: [paso.descripcionPaso, Validators.required],
+          descripcionPaso: [paso.descripcionPaso, [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
           notesAdicionales: [paso.notasAdicionales || ''] // keep compatibility
         });
         this.pasosArr.push(group);
@@ -114,8 +118,8 @@ export class GestionRecetaComponent implements OnInit {
     }
 
     const nuevoIngrediente = this.fb.group({
-      nombreIngrediente: ['', [Validators.required, Validators.minLength(2)]], 
-      cantidadRequerida: [1, [Validators.required, Validators.min(0.1)]],      
+      nombreIngrediente: ['', [Validators.required, Validators.minLength(2), soloLetrasValidator()]], 
+      cantidadRequerida: [1, [Validators.required, Validators.min(0.1), Validators.max(10000)]],      
       unidadMedida: ['GR', Validators.required]                             
     });
     this.ingredientesArr.push(nuevoIngrediente);
@@ -139,7 +143,7 @@ export class GestionRecetaComponent implements OnInit {
     const orden = this.pasosArr.length + 1;
     const group = this.fb.group({
       orden: [orden],
-      descripcionPaso: ['', Validators.required],
+      descripcionPaso: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
       notasAdicionales: ['']
     });
     this.pasosArr.push(group);
@@ -152,8 +156,19 @@ export class GestionRecetaComponent implements OnInit {
     });
   }
 
+  removerImagen() {
+    this.recipeForm.patchValue({ urlImagen: '' });
+    const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
+  }
+
   cancelar() {
     this.closeManage.emit(false);
+  }
+
+  cerrarExitoModal() {
+    this.mostrarExitoModal.set(false);
+    this.closeManage.emit(true);
   }
 
   guardar() {
@@ -204,8 +219,9 @@ export class GestionRecetaComponent implements OnInit {
 
       observable.subscribe({
         next: () => {
-          alert(this.receta ? '¡Receta actualizada con éxito!' : '¡Receta guardada con éxito!');
-          this.closeManage.emit(true);
+          this.exitoModalTitulo.set(this.receta ? 'Receta actualizada correctamente' : 'Receta guardada correctamente');
+          this.exitoModalMensaje.set(this.receta ? 'Los cambios han sido guardados en el sistema.' : 'La nueva receta ha sido registrada en el sistema.');
+          this.mostrarExitoModal.set(true);
         },
         error: (err) => {
           console.error('Error al guardar:', err);
@@ -230,12 +246,38 @@ export class GestionRecetaComponent implements OnInit {
 
   onFileSelected(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.recipeForm.patchValue({ urlImagen: reader.result as string });
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      alert('Solo se permiten archivos de imagen');
+      return;
     }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const max = 800;
+        let w = img.width;
+        let h = img.height;
+        if (w > max || h > max) {
+          const ratio = Math.min(max / w, max / h);
+          w = Math.round(w * ratio);
+          h = Math.round(h * ratio);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d')!;
+        ctx.drawImage(img, 0, 0, w, h);
+        const compressed = canvas.toDataURL('image/jpeg', 0.7);
+        const bytes = Math.round((compressed.length * 3) / 4);
+        if (bytes > 1_000_000) {
+          alert('La imagen sigue siendo muy grande después de comprimir. Selecciona una imagen más pequeña.');
+          return;
+        }
+        this.recipeForm.patchValue({ urlImagen: compressed });
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
   }
 }

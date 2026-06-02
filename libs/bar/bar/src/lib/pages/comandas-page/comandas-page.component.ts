@@ -1,6 +1,7 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { interval, Subscription } from 'rxjs';
 import {
   PageHeaderComponent,
   SearchFilterComponent,
@@ -8,7 +9,7 @@ import {
   SectionTitleComponent
 } from '@restaurant/shared/ui';
 import { ComandaService } from '../../data-access/comanda.service';
-import { ComandaBarYBarismo } from '../../models/comanda.model';
+import { ComandaBarYBarismo, ComandaItem } from '../../models/comanda.model';
 import { ComandaCardComponent } from '../../components/comanda-card/comanda-card.component';
 
 @Component({
@@ -27,8 +28,9 @@ import { ComandaCardComponent } from '../../components/comanda-card/comanda-card
   styleUrls: ['./comandas-page.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ComandasComponent implements OnInit {
+export class ComandasComponent implements OnInit, OnDestroy {
   private comandaService = inject(ComandaService);
+  private pollingSub: Subscription | null = null;
 
   searchTerm = signal('');
   filtroEstado = signal('Todos los estados');
@@ -60,11 +62,28 @@ export class ComandasComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarComandas();
+    this.pollingSub = interval(5000).subscribe(() => this.cargarComandas());
+  }
+
+  ngOnDestroy(): void {
+    this.pollingSub?.unsubscribe();
   }
 
   cargarComandas(): void {
     this.comandaService.listarComandas().subscribe({
-      next: (data) => this.comandas.set(data),
+      next: (data) => {
+        const now = new Date();
+        const filtradas = data.filter(c => {
+          if (c.estadoPreparacion === 'LISTO') {
+            const fecha = new Date(c.horaEntrada);
+            return fecha.getDate() === now.getDate() &&
+                   fecha.getMonth() === now.getMonth() &&
+                   fecha.getFullYear() === now.getFullYear();
+          }
+          return true;
+        });
+        this.comandas.set(filtradas);
+      },
       error: (err) => {
         console.error('Error fetching comandas:', err);
         this.mostrarError('Error de conexión con el backend');
@@ -77,67 +96,48 @@ export class ComandasComponent implements OnInit {
     setTimeout(() => this.errorToast.set(null), 3000);
   }
 
-  onIniciarPlato(idDetalle: string, idComanda: string) {
-    this.comandaService.actualizarEstado(idComanda, 'EN_PREPARACION').subscribe({
-      next: () => {
-        this.cargarComandas();
-      },
+  onIniciarPlato(idDetalle: string) {
+    this.comandaService.iniciarDetalle(idDetalle).subscribe({
+      next: () => this.actualizarEstadoItem(idDetalle, 'PREPARANDO'),
       error: (err) => this.mostrarError('Error al iniciar bebida: ' + err.message)
     });
   }
 
-  onFinalizarPlato(idDetalle: string, idComanda: string) {
-    this.comandaService.actualizarEstado(idComanda, 'LISTO').subscribe({
-      next: () => {
-        this.cargarComandas();
-      },
+  onFinalizarPlato(idDetalle: string) {
+    this.comandaService.finalizarDetalle(idDetalle).subscribe({
+      next: () => this.actualizarEstadoItem(idDetalle, 'LISTO'),
       error: (err) => this.mostrarError('Error al finalizar bebida: ' + err.message)
     });
   }
 
-  private actualizarEstadoItem(idComanda: string, idDetalle: string, nuevoEstado: 'PREPARANDO' | 'LISTO') {
+  private actualizarEstadoItem(idDetalle: string, nuevoEstado: 'PREPARANDO' | 'LISTO') {
     this.comandas.update(comandas => comandas.map(c => {
-      if (c.idComanda === idComanda && c.items) {
-        const items = c.items.map(i => {
-          if (i.idDetalleComanda === idDetalle) {
-            const horaFin = nuevoEstado === 'LISTO' ? new Date().toISOString() : i.horaFinPreparacion;
-            const duracion = nuevoEstado === 'LISTO' && i.horaInicioPreparacion 
-                             ? Math.floor((new Date().getTime() - new Date(i.horaInicioPreparacion).getTime()) / 60000) 
-                             : i.duracionMinutos;
-            return { 
-              ...i, 
-              estado: nuevoEstado,
-              horaInicioPreparacion: nuevoEstado === 'PREPARANDO' ? new Date().toISOString() : i.horaInicioPreparacion,
-              horaFinPreparacion: horaFin,
-              duracionMinutos: duracion
-            };
-          }
-          return i;
-        });
-        return { ...c, items };
-      }
-      return c;
+      if (!c.items?.some(i => i.idDetalleComanda === idDetalle)) return c;
+      const items = c.items.map(i => {
+        if (i.idDetalleComanda !== idDetalle) return i;
+        return {
+          ...i,
+          estado: nuevoEstado,
+          horaInicioPreparacion: nuevoEstado === 'PREPARANDO'
+            ? (i.horaInicioPreparacion || new Date().toISOString())
+            : i.horaInicioPreparacion,
+          horaFinPreparacion: nuevoEstado === 'LISTO' ? new Date().toISOString() : i.horaFinPreparacion,
+          duracionMinutos: nuevoEstado === 'LISTO' && i.horaInicioPreparacion
+            ? Math.floor((new Date().getTime() - new Date(i.horaInicioPreparacion).getTime()) / 60000)
+            : i.duracionMinutos
+        };
+      });
+      return { ...c, items, estadoPreparacion: this.calcularEstadoComanda(items, c.estadoPreparacion) };
     }));
   }
 
-  private evaluarEstadoComanda(idComanda: string) {
-    this.comandas.update(comandas => comandas.map(c => {
-      if (c.idComanda === idComanda && c.items) {
-        const todosListos = c.items.every(i => i.estado === 'LISTO');
-        const algunoPreparandoOlisto = c.items.some(i => i.estado === 'PREPARANDO' || i.estado === 'LISTO');
-        
-        let nuevoEstado = c.estadoPreparacion;
-        if (todosListos) {
-          nuevoEstado = 'LISTO';
-        } else if (algunoPreparandoOlisto) {
-          nuevoEstado = 'PREPARANDO';
-        } else {
-          nuevoEstado = 'PENDIENTE';
-        }
-        return { ...c, estadoPreparacion: nuevoEstado };
-      }
-      return c;
-    }));
+  private calcularEstadoComanda(items: ComandaItem[], estadoActual: string): string {
+    if (items.length === 0) return estadoActual;
+    const todosListos = items.every(i => i.estado === 'LISTO');
+    const algunoPreparandoOlisto = items.some(i => i.estado === 'PREPARANDO' || i.estado === 'LISTO');
+    if (todosListos) return 'LISTO';
+    if (algunoPreparandoOlisto) return 'PREPARANDO';
+    return 'PENDIENTE';
   }
 
   comandasFiltradas = computed(() => {
@@ -164,6 +164,6 @@ export class ComandasComponent implements OnInit {
   });
 
   enEspera = computed(() => this.comandasFiltradas().filter(c => c.estadoPreparacion === 'PENDIENTE'));
-  preparando = computed(() => this.comandasFiltradas().filter(c => c.estadoPreparacion === 'EN_PREPARACION'));
+  preparando = computed(() => this.comandasFiltradas().filter(c => c.estadoPreparacion === 'PREPARANDO'));
   listos = computed(() => this.comandasFiltradas().filter(c => c.estadoPreparacion === 'LISTO'));
 }

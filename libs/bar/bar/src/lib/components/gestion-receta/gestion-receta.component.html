@@ -5,21 +5,17 @@
         <h2>{{ receta ? 'Editar Receta' : 'Nueva Receta' }}</h2>
         <p>{{ receta ? 'Modifica los detalles de la bebida' : 'Crear una nueva receta para el módulo de bar y barismo' }}</p>
       </div>
-      <button type="button" class="btn-close" (click)="cancelar()">
+      <restaurant-button type="button" variant="ghost" (click)="cancelar()">
         <lucide-icon name="x" size="24"></lucide-icon>
-      </button>
+      </restaurant-button>
     </header>
 
     <form [formGroup]="recipeForm" (ngSubmit)="guardar()" class="modern-form">
       <!-- Section 1: General Info -->
       <div class="form-grid">
         <div class="field Full">
-          <label>Nombre de la Receta *</label>
-          <input type="text" formControlName="nombreReceta" placeholder="Ej: Margarita Tradicional"
-                 [class.error]="esCampoInvalido('nombreReceta')">
-          @if (esCampoInvalido('nombreReceta')) {
-            <span class="error-text">El nombre es obligatorio (min 5 letras).</span>
-          }
+          <restaurant-input formControlName="nombreReceta" label="Nombre de la Receta *" placeholder="Ej: Margarita Tradicional"
+                 [error]="recipeForm.get('nombreReceta')?.hasError('soloLetras') ? 'El nombre solo puede contener letras y espacios.' : esCampoInvalido('nombreReceta') ? 'El nombre es obligatorio (min 5 letras).' : ''"></restaurant-input>
         </div>
 
         <div class="field">
@@ -33,13 +29,13 @@
         </div>
 
         <div class="field">
-          <label>Tiempo de Preparación (min) *</label>
-          <input type="number" formControlName="tiempoPreparacion" placeholder="5">
+          <restaurant-input type="number" formControlName="tiempoPreparacion" label="Tiempo de Preparación (min) *"
+            [error]="recipeForm.get('tiempoPreparacion')?.hasError('max') ? 'El tiempo no puede exceder 720 min.' : esCampoInvalido('tiempoPreparacion') ? 'El tiempo debe ser mayor a 0.' : ''"></restaurant-input>
         </div>
 
         <div class="field">
-          <label>Precio Unitario ($) *</label>
-          <input type="number" formControlName="precioUnitario" placeholder="0.00">
+          <restaurant-input type="number" formControlName="precioUnitario" label="Precio Unitario ($) *"
+            [error]="recipeForm.get('precioUnitario')?.hasError('max') ? 'El precio excede el límite permitido.' : esCampoInvalido('precioUnitario') ? 'El precio no puede ser negativo.' : ''"></restaurant-input>
         </div>
 
         <div class="field">
@@ -65,8 +61,11 @@
           <input type="hidden" formControlName="urlImagen">
           
           @if (recipeForm.get('urlImagen')?.value) {
-            <div class="image-preview">
-              <img [src]="recipeForm.get('urlImagen')?.value" alt="Vista previa">
+            <div class="image-preview" style="position: relative; display: inline-block; margin-top: var(--space-3);">
+              <img [src]="recipeForm.get('urlImagen')?.value" alt="Vista previa" style="display: block; max-width: 100%; border-radius: var(--radius-md);">
+              <button type="button" (click)="removerImagen()" title="Eliminar imagen" style="position: absolute; bottom: 8px; right: 8px; background: var(--color-danger); color: white; border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: background 0.2s; z-index: 10;">
+                <lucide-icon name="trash-2" size="18"></lucide-icon>
+              </button>
             </div>
           }
         </div>
@@ -74,31 +73,31 @@
 
       <!-- Section 2: Ingredients -->
       <section class="form-section">
-        <div class="section-header">
+        <div class="section-header" style="display: flex; justify-content: space-between; align-items: center;">
           <h3>Ingredientes *</h3>
-          <button type="button" class="btn-add-item" (click)="agregarIngrediente()">
+          <restaurant-button type="button" variant="surface" (click)="agregarIngrediente()">
             <lucide-icon name="plus" size="16"></lucide-icon> Agregar Ingrediente
-          </button>
+          </restaurant-button>
         </div>
 
         <div formArrayName="ingredientes" class="items-list">
           @if (ingredientesArr.hasError('duplicate')) {
-            <div class="error-banner" style="background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.85rem;">
+            <div class="error-banner" style="background: var(--color-error-bg); border: 1px solid var(--color-error-border); color: var(--color-error-text); padding: var(--space-2); border-radius: var(--radius-md); margin-bottom: var(--space-4); font-size: var(--font-size-sm);">
               ⚠️ Existen ingredientes con el mismo nombre. Por favor, modifícalos o elimínalos para continuar.
             </div>
           }
           @for (ing of ingredientesArr.controls; track $index) {
-            <div [formGroupName]="$index" class="item-row ingredient-row">
-              <input type="text" formControlName="nombreIngrediente" placeholder="Nombre del ingrediente" class="flex-3">
-              <input type="number" formControlName="cantidadRequerida" placeholder="Cantidad" class="flex-1">
-              <select formControlName="unidadMedida" class="flex-1">
+            <div [formGroupName]="$index" class="item-row ingredient-row" style="display: flex; gap: var(--space-2); margin-bottom: var(--space-2);">
+              <restaurant-input type="text" formControlName="nombreIngrediente" placeholder="Nombre del ingrediente" style="flex: 3;"></restaurant-input>
+              <restaurant-input type="number" formControlName="cantidadRequerida" placeholder="Cantidad" style="flex: 1;"></restaurant-input>
+              <select formControlName="unidadMedida" class="flex-1" style="height: 40px; border-radius: var(--radius-md); border: 1px solid var(--color-border); padding: 0 8px;">
                 <option value="GR">Gramos (g)</option>
                 <option value="ML">Mililitros (ml)</option>
                 <option value="UN">Unidades</option>
               </select>
-              <button type="button" class="btn-remove" (click)="removerIngrediente($index)">
-                <lucide-icon name="trash-2" size="16"></lucide-icon>
-              </button>
+              <restaurant-button type="button" variant="ghost" (click)="removerIngrediente($index)">
+                <lucide-icon name="trash-2" size="16" style="color: var(--color-danger)"></lucide-icon>
+              </restaurant-button>
             </div>
           } @empty {
             <p class="empty-list">No hay ingredientes. Haga clic en "+ Agregar Ingrediente".</p>
@@ -108,26 +107,26 @@
 
       <!-- Section 3: Steps -->
       <section class="form-section">
-        <div class="section-header">
+        <div class="section-header" style="display: flex; justify-content: space-between; align-items: center;">
           <h3>Instrucciones *</h3>
-          <button type="button" class="btn-add-item" (click)="agregarPaso()">
+          <restaurant-button type="button" variant="surface" (click)="agregarPaso()">
             <lucide-icon name="plus" size="16"></lucide-icon> Agregar Paso
-          </button>
+          </restaurant-button>
         </div>
 
         <div formArrayName="pasos" class="items-list">
           @if (pasosArr.hasError('duplicate')) {
-            <div class="error-banner" style="background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.85rem;">
+            <div class="error-banner" style="background: var(--color-error-bg); border: 1px solid var(--color-error-border); color: var(--color-error-text); padding: var(--space-2); border-radius: var(--radius-md); margin-bottom: var(--space-4); font-size: var(--font-size-sm);">
               ⚠️ Existen pasos con la misma descripción. Por favor, modifícalos o elimínalos para continuar.
             </div>
           }
           @for (paso of pasosArr.controls; track $index) {
-            <div [formGroupName]="$index" class="item-row step-row">
-              <div class="step-badge">{{ $index + 1 }}</div>
-              <textarea formControlName="descripcionPaso" placeholder="Paso {{ $index + 1 }}..." rows="2" class="flex-5"></textarea>
-              <button type="button" class="btn-remove" (click)="removerPaso($index)">
-                <lucide-icon name="trash-2" size="16"></lucide-icon>
-              </button>
+            <div [formGroupName]="$index" class="item-row step-row" style="display: flex; gap: var(--space-2); margin-bottom: var(--space-2); align-items: flex-start;">
+              <div class="step-badge" style="background: var(--color-primario); color: var(--color-en-primario); width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-pill); font-weight: bold;">{{ $index + 1 }}</div>
+              <textarea formControlName="descripcionPaso" placeholder="Paso {{ $index + 1 }}..." rows="2" style="flex: 1; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-2); font-family: inherit;"></textarea>
+              <restaurant-button type="button" variant="ghost" (click)="removerPaso($index)">
+                <lucide-icon name="trash-2" size="16" style="color: var(--color-danger)"></lucide-icon>
+              </restaurant-button>
             </div>
           } @empty {
             <p class="empty-list">No hay pasos definidos. Haga clic en "+ Agregar Paso".</p>
@@ -136,16 +135,25 @@
       </section>
 
       <!-- Actions -->
-      <footer class="form-footer">
-        <button type="button" class="btn-cancel" (click)="cancelar()">Cancelar</button>
-        <button type="submit" [disabled]="recipeForm.invalid || isSaving" class="btn-submit">
+      <footer class="form-footer" style="display: flex; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--color-border);">
+        <restaurant-button type="button" variant="ghost" (click)="cancelar()">Cancelar</restaurant-button>
+        <restaurant-button type="submit" variant="primary" [disabled]="recipeForm.invalid || isSaving">
           @if (isSaving) {
             <span>Guardando...</span>
           } @else {
             {{ receta ? 'Actualizar Receta' : 'Crear Receta' }}
           }
-        </button>
+        </restaurant-button>
       </footer>
     </form>
   </div>
 </div>
+
+<restaurant-confirm-dialog
+  [open]="mostrarExitoModal()"
+  [title]="exitoModalTitulo()"
+  [message]="exitoModalMensaje()"
+  confirmText="Aceptar"
+  [showCancel]="false"
+  (confirm)="cerrarExitoModal()"
+></restaurant-confirm-dialog>

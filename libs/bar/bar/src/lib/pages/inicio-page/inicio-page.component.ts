@@ -1,7 +1,8 @@
-import { Component, inject, signal, computed, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Subject, timer, takeUntil, switchMap } from 'rxjs';
 import { IncidenciaService } from '../../data-access/incidencia.service';
 import { ComandaService } from '../../data-access/comanda.service';
 import { AuditoriaIncidencia } from '../../models/incidencia.model';
@@ -33,9 +34,10 @@ import {
   styleUrls: ['./inicio-page.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class InicioPageComponent implements OnInit {
+export class InicioPageComponent implements OnInit, OnDestroy {
   private incidenciaService = inject(IncidenciaService);
   private comandaService = inject(ComandaService);
+  private destroy$ = new Subject<void>();
 
   comandas = signal<ComandaBarYBarismo[]>([]);
   totalCancelados = signal(0);
@@ -43,7 +45,7 @@ export class InicioPageComponent implements OnInit {
 
   estadisticas = computed(() => {
     const list = this.comandas();
-    const activos = list.filter(c => c.estadoPreparacion === 'PENDIENTE' || c.estadoPreparacion === 'EN_PREPARACION').length;
+    const activos = list.filter(c => c.estadoPreparacion === 'PENDIENTE' || c.estadoPreparacion === 'PREPARANDO').length;
     const completados = list.filter(c => c.estadoPreparacion === 'LISTO').length;
     
     return {
@@ -61,7 +63,7 @@ export class InicioPageComponent implements OnInit {
       .map(c => {
         let estado = 'En espera';
         let clase = 'waiting';
-        if (c.estadoPreparacion === 'EN_PREPARACION') {
+        if (c.estadoPreparacion === 'PREPARANDO') {
           estado = 'Preparando';
           clase = 'preparing';
         } else if (c.estadoPreparacion === 'LISTO') {
@@ -103,6 +105,7 @@ export class InicioPageComponent implements OnInit {
   busquedaListas = signal('');
   fechaEliminarDesde = signal('');
   fechaEliminarHasta = signal('');
+  mensajeEliminar = signal('');
 
   comandasListas = computed(() =>
     this.comandas().filter(c => c.estadoPreparacion === 'LISTO')
@@ -120,15 +123,19 @@ export class InicioPageComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.cargarComandas();
-    this.cargarIncidenciasCounts();
-  }
-
-  cargarComandas(): void {
-    this.comandaService.listarComandas().subscribe({
+    timer(0, 5000).pipe(
+      switchMap(() => this.comandaService.listarComandas()),
+      takeUntil(this.destroy$)
+    ).subscribe({
       next: (data) => this.comandas.set(data),
       error: (err) => console.error('Error loading comandas for dashboard:', err)
     });
+    this.cargarIncidenciasCounts();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   cargarIncidenciasCounts(): void {
@@ -221,21 +228,51 @@ export class InicioPageComponent implements OnInit {
   eliminarPorRango() {
     const desde = this.fechaEliminarDesde();
     const hasta = this.fechaEliminarHasta();
-    if (!desde || !hasta) return;
+    if (!desde || !hasta) {
+      this.mensajeEliminar.set('Seleccioná ambas fechas primero');
+      return;
+    }
 
-    const desdeDate = new Date(desde);
-    const hastaDate = new Date(hasta);
-    hastaDate.setHours(23, 59, 59, 999);
+    const desdeDate = new Date(desde + 'T00:00:00');
+    const hastaDate = new Date(hasta + 'T23:59:59');
 
-    // Filtramos del listado local las que NO están en ese rango (simulamos eliminación visual)
-    // El backend no expone endpoint de borrado masivo en el contrato actual
-    const restantes = this.comandas().filter(c => {
-      const fecha = new Date(c.horaEntrada);
-      return !(fecha >= desdeDate && fecha <= hastaDate && c.estadoPreparacion === 'LISTO');
+    this.comandaService.limpiarComandas(desde, hasta).subscribe({
+      next: () => {
+        const restantes = this.comandas().filter(c => {
+          const fecha = new Date(c.horaEntrada);
+          return !(fecha >= desdeDate && fecha <= hastaDate && c.estadoPreparacion === 'LISTO');
+        });
+        const antes = this.comandasListas().length;
+        const eliminadas = antes - restantes.filter(c => c.estadoPreparacion === 'LISTO').length;
+        this.comandas.set(restantes);
+        this.fechaEliminarDesde.set('');
+        this.fechaEliminarHasta.set('');
+        this.mensajeEliminar.set(eliminadas > 0 ? `Se eliminaron ${eliminadas} comandas` : 'No hay comandas en ese rango');
+        setTimeout(() => this.mensajeEliminar.set(''), 3000);
+      },
+      error: (err) => {
+        console.error('Error al limpiar comandas:', err);
+        this.mensajeEliminar.set('Error al eliminar comandas');
+        setTimeout(() => this.mensajeEliminar.set(''), 3000);
+      }
     });
-    this.comandas.set(restantes);
-    this.fechaEliminarDesde.set('');
-    this.fechaEliminarHasta.set('');
+  }
+
+  eliminarComanda(idComanda: string) {
+    if (!confirm('¿Eliminar comanda #' + idComanda + '?')) return;
+    this.comandaService.eliminarComandaPorId(idComanda).subscribe({
+      next: () => {
+        const restantes = this.comandas().filter(c => c.idComanda !== idComanda);
+        this.comandas.set(restantes);
+        this.mensajeEliminar.set('Comanda eliminada');
+        setTimeout(() => this.mensajeEliminar.set(''), 2000);
+      },
+      error: (err) => {
+        console.error('Error al eliminar comanda:', err);
+        this.mensajeEliminar.set('Error al eliminar comanda');
+        setTimeout(() => this.mensajeEliminar.set(''), 3000);
+      }
+    });
   }
 
   getIdCorto(idComanda: string): string {
