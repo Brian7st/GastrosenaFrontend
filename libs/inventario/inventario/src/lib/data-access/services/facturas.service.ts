@@ -85,21 +85,6 @@ export class FacturasService {
       );
   }
 
-  importarFacturaFel(file: File, gilId?: string): Observable<Factura> {
-    const formData = new FormData();
-    formData.append('archivo', file, file.name);
-
-    let params = new HttpParams();
-    if (gilId) params = params.set('gilId', gilId);
-
-    return this.http
-      .post<FacturaResponse>(`${API}/sourcing/facturas/importar-fel`, formData, { params })
-      .pipe(
-        map(facturaFromApi),
-        catchError(err => throwError(() => err))
-      );
-  }
-
   importarFacturaFelXml(file: File, gilId?: string): Observable<Factura> {
     const formData = new FormData();
     formData.append('archivo', file, file.name);
