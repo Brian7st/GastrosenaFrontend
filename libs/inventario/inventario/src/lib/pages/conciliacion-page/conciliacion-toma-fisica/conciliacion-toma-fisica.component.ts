@@ -112,7 +112,13 @@ export class ConciliacionTomaFisicaComponent implements OnInit {
     );
   }
 
+  puedeFinalizar = computed(() =>
+    !this.loading() && this.itemsContados() > 0 && this.responsable().trim().length > 0
+  );
+
   finalizar(): void {
+    if (!this.puedeFinalizar()) return;
+
     const conteoItems: ConteoItemData[] = this.items()
       .filter(i => i.conteoFisico !== null)
       .map(i => ({

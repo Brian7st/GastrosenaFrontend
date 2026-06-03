@@ -53,12 +53,6 @@ export interface TomaFisicaItem {
   valorUnitario: number;
 }
 
-export interface TopDiferencia {
-  producto: string;
-  diferencia: string;
-  icon: string;
-}
-
 /** Payload UI para registrar el conteo físico de un ítem
  *  (POST /reconciliation/conciliaciones/{id}/conteo) */
 export interface ConteoItemData {

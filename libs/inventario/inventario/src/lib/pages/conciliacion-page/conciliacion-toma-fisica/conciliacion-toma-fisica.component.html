@@ -12,12 +12,23 @@
       <div class="header-meta">
         <div class="meta-item">
           <lucide-icon name="calendar" [size]="16"></lucide-icon>
-          <span>{{ fecha() }}</span>
+          <input
+            type="date"
+            class="meta-input"
+            [ngModel]="fecha()"
+            (ngModelChange)="fecha.set($event)"
+            aria-label="Fecha de la toma física">
         </div>
         <div class="meta-divider"></div>
         <div class="meta-item">
           <lucide-icon name="user" [size]="16"></lucide-icon>
-          <span>{{ responsable() }}</span>
+          <input
+            type="text"
+            class="meta-input"
+            [ngModel]="responsable()"
+            (ngModelChange)="responsable.set($event)"
+            placeholder="Responsable del conteo"
+            aria-label="Responsable del conteo">
         </div>
       </div>
     </div>
@@ -155,7 +166,7 @@
       <div></div>
     }
     
-    <restaurant-button variant="primary" [disabled]="loading() || itemsContados() === 0" (click)="finalizar()">
+    <restaurant-button variant="primary" [disabled]="!puedeFinalizar()" (click)="finalizar()">
       <div class="btn-icon-text">
         @if (loading()) {
           Procesando...

@@ -18,6 +18,8 @@ export interface DiferenciaBackendResponse {
   id:              string;
   codigoSena:      string;
   descripcion:     string;
+  categoria:       string;
+  unidad:          string;
   cantidadSistema: number;
   cantidadFisica:  number;
   valorUnitario:   number;
