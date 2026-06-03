@@ -1,5 +1,17 @@
 // ── Movimiento de Almacén — Modelo (F-11) ──────────────────────────────────
 
+/** Documento agrupado de movimientos (lista de entradas/salidas). */
+export interface DocumentoMovimiento {
+  tipo: 'ENTRADA' | 'SALIDA';
+  documentoId: string;
+  numeroDocumento: string;
+  cantidadBienes: number;
+  cantidadTotal: number;
+  valorTotal: number;
+  fecha: string;
+  estado: 'Completado' | 'Pendiente' | 'Cancelado';
+}
+
 export interface Movimiento {
   id: string;
   tipo: 'ENTRADA' | 'SALIDA' | 'RESERVA' | 'LIBERACION' | 'AJUSTE';

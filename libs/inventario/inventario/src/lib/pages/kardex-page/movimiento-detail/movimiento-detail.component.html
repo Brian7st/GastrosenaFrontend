@@ -1,6 +1,25 @@
 <main class="page-container">
 
-  @if (movimiento(); as mov) {
+  @if (!loading() && documento() === undefined && bienes().length === 0) {
+
+  <div class="content-area">
+    <header class="action-header">
+      <inventario-back-button (clicked)="goBack()"></inventario-back-button>
+    </header>
+    <section class="card">
+      <p class="text-secondary">No se encontró el documento solicitado.</p>
+    </section>
+  </div>
+
+  } @else if (loading() && bienes().length === 0) {
+
+  <div class="content-area">
+    <section class="card">
+      <p class="text-secondary">Cargando documento…</p>
+    </section>
+  </div>
+
+  } @else {
 
   <!-- Action Header -->
   <header class="action-header">
@@ -8,8 +27,9 @@
       <inventario-back-button (clicked)="goBack()"></inventario-back-button>
       <div>
         <h1 class="page-title">
-          Detalle de Movimiento #{{ mov.id }}
-          <span class="status-badge">{{ mov.estado }}</span>
+          {{ getTipoLabel(documento()?.tipo) }} —
+          {{ documento()?.numeroDocumento ?? 'Documento' }}
+          <span class="status-badge">{{ documento()?.estado }}</span>
         </h1>
       </div>
     </div>
@@ -33,18 +53,27 @@
   <!-- Content Area -->
   <div class="content-area">
 
-    <!-- Section 1: Información del Movimiento -->
+    <!-- Section 1: Información del Documento -->
     <section class="card">
-      <h2 class="section-title">Información del Movimiento</h2>
+      <h2 class="section-title">Información del Documento</h2>
       <div class="info-grid">
 
         <div class="info-item">
           <span class="info-label">Tipo</span>
           <div class="info-value">
-            <div class="icon-box" [class.icon-box--entrada]="mov.tipo === 'ENTRADA'" [class.icon-box--salida]="mov.tipo !== 'ENTRADA'">
-              <lucide-icon [name]="mov.tipo === 'ENTRADA' ? 'arrow-down' : 'arrow-up'" [size]="16"></lucide-icon>
+            <div class="icon-box"
+                 [class.icon-box--entrada]="documento()?.tipo === 'ENTRADA'"
+                 [class.icon-box--salida]="documento()?.tipo !== 'ENTRADA'">
+              <lucide-icon [name]="documento()?.tipo === 'ENTRADA' ? 'arrow-down' : 'arrow-up'" [size]="16"></lucide-icon>
             </div>
-            {{ getTipoLabel(mov.tipo) }}
+            {{ getTipoLabel(documento()?.tipo) }}
+          </div>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">N° Documento</span>
+          <div class="info-value">
+            {{ documento()?.numeroDocumento ?? '—' }}
           </div>
         </div>
 
@@ -52,25 +81,32 @@
           <span class="info-label">Fecha</span>
           <div class="info-value">
             <lucide-icon name="calendar" [size]="18" class="text-secondary"></lucide-icon>
-            {{ mov.fechaMovimiento | date:'dd MMM y, hh:mm a' }}
+            {{ documento()?.fecha | date:'dd MMM y, hh:mm a' }}
           </div>
         </div>
 
         <div class="info-item">
-          <span class="info-label">Responsable</span>
-          <div class="info-value">
-            <lucide-icon name="user" [size]="18" class="text-secondary"></lucide-icon>
-            {{ mov.responsableNombre || 'Sin responsable' }}
-          </div>
+          <span class="info-label">Cantidad de Bienes</span>
+          <div class="info-value">{{ documento()?.cantidadBienes ?? bienes().length }}</div>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Cantidad Total</span>
+          <div class="info-value">{{ documento()?.cantidadTotal ?? 0 }}</div>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Estado</span>
+          <div class="info-value">{{ documento()?.estado ?? '—' }}</div>
         </div>
 
       </div>
     </section>
 
-    <!-- Section 2: Detalle del Producto -->
+    <!-- Section 2: Bienes del Documento -->
     <section class="card no-padding">
       <div class="card-header">
-        <h2 class="section-title">Detalle del Producto</h2>
+        <h2 class="section-title">Bienes del Documento</h2>
       </div>
 
       <div class="table-responsive">
@@ -80,57 +116,38 @@
               <th>Producto</th>
               <th>Código SENA</th>
               <th class="text-right">Cantidad</th>
-              <th class="text-right">Valor Unitario</th>
-              <th class="text-right">Valor Total</th>
+              <th class="text-right">Valor</th>
             </tr>
           </thead>
           <tbody>
+            @for (bien of bienes(); track bien.id) {
             <tr>
               <td>
                 <div class="product-cell">
                   <div class="product-icon">
                     <lucide-icon name="box" [size]="20"></lucide-icon>
                   </div>
-                  <span class="product-name">{{ mov.productoNombre || '—' }}</span>
+                  <span class="product-name">{{ bien.productoNombre || '—' }}</span>
                 </div>
               </td>
-              <td class="text-secondary">{{ mov.codigoSena }}</td>
+              <td class="text-secondary">{{ bien.codigoSena }}</td>
               <td class="text-right">
-                <span class="qty-badge">{{ mov.tipo === 'ENTRADA' ? '+' : '' }}{{ mov.cantidad }} {{ mov.unidadMedida }}</span>
+                <span class="qty-badge">{{ bien.cantidad }} {{ bien.unidadMedida }}</span>
               </td>
-              <td class="text-right">${{ valorUnitario() | number:'1.0-0' }}</td>
-              <td class="text-right font-bold">${{ mov.valor | number:'1.0-0' }}</td>
+              <td class="text-right">${{ bien.valor | number:'1.0-0' }}</td>
             </tr>
+            }
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="4" class="text-right font-bold">Gran Total</td>
-              <td class="text-right font-bold total-val">${{ mov.valor | number:'1.0-0' }}</td>
+              <td colspan="3" class="text-right font-bold">Gran Total</td>
+              <td class="text-right font-bold total-val">${{ documento()?.valorTotal | number:'1.0-0' }}</td>
             </tr>
           </tfoot>
         </table>
       </div>
     </section>
 
-  </div>
-
-  } @else if (loading()) {
-
-  <div class="content-area">
-    <section class="card">
-      <p class="text-secondary">Cargando movimiento…</p>
-    </section>
-  </div>
-
-  } @else {
-
-  <div class="content-area">
-    <header class="action-header">
-      <inventario-back-button (clicked)="goBack()"></inventario-back-button>
-    </header>
-    <section class="card">
-      <p class="text-secondary">No se encontró el movimiento solicitado.</p>
-    </section>
   </div>
 
   }
@@ -140,9 +157,8 @@
 <!-- Modal de exportación -->
 @if (showExportModal()) {
 <inventario-exportar
-
-  titulo="Exportar Movimiento"
-  subtitulo="Seleccione el formato de salida para este movimiento"
+  titulo="Exportar Documento"
+  subtitulo="Seleccione el formato de salida para este documento"
   (exportar)="onExport($event)"
   (cerrar)="closeExportModal()">
 </inventario-exportar>

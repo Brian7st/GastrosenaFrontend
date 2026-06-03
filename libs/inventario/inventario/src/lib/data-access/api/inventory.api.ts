@@ -85,3 +85,32 @@ export interface AjusteRequest {
   motivo: string;
   responsableId: string;
 }
+
+// ── Documentos agrupados (GET /inventory/movimientos) ─────────────────────
+
+export interface DocumentoResponse {
+  tipo: 'ENTRADA' | 'SALIDA';
+  documentoId: string;
+  numeroDocumento: string | null;
+  cantidadBienes: number;
+  cantidadTotal: number;
+  valorTotal: number;
+  fecha: string;
+  estado: 'Completado' | 'Pendiente' | 'Cancelado';
+}
+
+export interface DocumentoPageResponse {
+  documentos?: DocumentoResponse[];
+  paginaActual?: number;
+  totalPaginas?: number;
+  totalElementos?: number;
+  tamano?: number;
+}
+
+/** GET /inventory/movimientos/documento/{documentoId}?tipo= */
+export interface DocumentoDetalleResponse {
+  tipo: 'ENTRADA' | 'SALIDA';
+  documentoId: string;
+  numeroDocumento: string | null;
+  bienes: MovimientoResponse[];
+}
