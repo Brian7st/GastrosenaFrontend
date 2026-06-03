@@ -110,8 +110,12 @@
               <td class="text-right text-secondary">{{ item.stockSistema }} {{ item.unidad }}</td>
               <td class="text-right font-bold">{{ item.stockFisico }} {{ item.unidad }}</td>
               <td class="text-center">
-                <span class="dif-badge" [ngClass]="item.diferencia >= 0 ? 'dif-badge--pos' : 'dif-badge--neg'">
-                  {{ item.diferencia > 0 ? '+' : '' }}{{ item.diferencia }} {{ item.unidad }}
+                <!-- RF-5.8.4: faltante (sistema > físico → dif positiva) = rojo; sobrante = amarillo -->
+                <span class="dif-badge"
+                      [class.dif-badge--neg]="item.diferencia > 0"
+                      [class.dif-badge--warn]="item.diferencia < 0"
+                      [class.dif-badge--zero]="item.diferencia === 0">
+                  {{ item.diferencia > 0 ? '+' : '' }}{{ item.diferencia }}
                 </span>
               </td>
               <td class="text-right text-secondary">${{ item.valorUnit | number }}</td>

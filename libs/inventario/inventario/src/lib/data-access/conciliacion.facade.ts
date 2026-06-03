@@ -129,26 +129,27 @@ export class ConciliacionFacade {
   }
 
   /**
-   * Carga el detalle de una conciliación específica y sus diferencias.
+   * Carga el detalle de una conciliación y sus diferencias en una sola llamada.
+   * El backend embebe las diferencias en GET /{id} — no existe endpoint separado.
    */
   cargarConciliacion(id: string): void {
     this._loading.set(true);
     this._error.set(null);
     this.conciliacionService
-      .getConciliacionById(id)
+      .getConciliacionConDiferencias(id)
       .pipe(
         catchError(() => {
           this._error.set('Error al cargar el detalle de la conciliación');
-          return of(undefined);
+          return of(null);
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe((data) => this._conciliacionSeleccionada.set(data));
-
-    this.conciliacionService
-      .getDiferenciasByConciliacion(id)
-      .pipe(catchError(() => of([])))
-      .subscribe((data) => this._diferenciasList.set(data));
+      .subscribe(result => {
+        if (result) {
+          this._conciliacionSeleccionada.set(result.detalle);
+          this._diferenciasList.set(result.diferencias);
+        }
+      });
   }
 
   /** Carga los ítems de la sesión de toma física activa. */

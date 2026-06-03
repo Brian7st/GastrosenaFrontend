@@ -1,65 +1,32 @@
-export interface ConciliacionListItemResponse {
-  id: string;
-  fecha: string;
-  ubicacion: string;
-  itemsTotal: number;
-  itemsDif: number;
-  precision: number;
-  estado: string;
-}
+// ─── Tipos que coinciden exactamente con los records Java del backend ─────────
 
-export interface ConciliacionDetailResponse {
-  id: string;
-  fecha: string;
-  responsable: string;
-  estado: string;
-  totalItemsContados: number;
-  diferencias: number;
-  precision: number;
+/** GET /conciliaciones y GET /conciliaciones/{id} → mismo shape */
+export interface ConciliacionBackendResponse {
+  id:                   string;
+  responsableId:        string;
+  responsableNombre:    string;
+  tipo:                 string;
+  fecha:                string;
+  estado:               string;
+  totalItemsContados:   number;
+  precision:            number;
   valorTotalDiferencias: number;
+  diferencias:          DiferenciaBackendResponse[];
 }
 
-export interface DiferenciaResponse {
-  id: string;
-  producto: string;
-  codigo: string;
-  categoria: string;
-  stockSistema: number;
-  stockFisico: number;
-  diferencia: number;
-  unidad: string;
-  valorUnit: number;
-  impacto: number;
-}
-
-/** POST /reconciliation/conciliaciones — inicia una nueva conciliación */
-export interface IniciarConciliacionRequest {
-  responsableId: string;
-  responsableNombre: string;
-  tipo: 'FISICA' | 'DOCUMENTAL';
-  fecha: string;
-}
-
-/** Ítem de conteo físico (POST /reconciliation/conciliaciones/{id}/conteo) */
-export interface ConteoItemRequest {
-  codigoSena: string;
-  descripcion: string;
+export interface DiferenciaBackendResponse {
+  id:              string;
+  codigoSena:      string;
+  descripcion:     string;
   cantidadSistema: number;
-  cantidadFisica: number;
-  valorUnitario: number;
+  cantidadFisica:  number;
+  valorUnitario:   number;
+  valorMonetario:  number;
+  estado:          string;
+  justificacion:   string | null;
 }
 
-/** Body de POST /reconciliation/conciliaciones/{id}/conteo */
-export interface RegistrarConteoRequest {
-  items: ConteoItemRequest[];
-}
-
-/** PATCH /reconciliation/conciliaciones/{id}/diferencias/{diferenciaId}/resolver */
-export interface ResolverDiferenciaRequest {
-  justificacion: string;
-}
-
-/** GET /reconciliation/conciliaciones/catalogo — ítem del catálogo con stock actual */
+/** GET /conciliaciones/catalogo */
 export interface CatalogoItemResponse {
   codigoSena:      string;
   descripcion:     string;
@@ -67,4 +34,32 @@ export interface CatalogoItemResponse {
   unidadMedida:    string;
   valorUnitario:   number;
   cantidadSistema: number;
+}
+
+// ─── Requests ────────────────────────────────────────────────────────────────
+
+/** POST /conciliaciones */
+export interface IniciarConciliacionRequest {
+  responsableId:     string;
+  responsableNombre: string;
+  tipo:              'FISICA' | 'DOCUMENTAL';
+  fecha:             string;
+}
+
+/** POST /conciliaciones/{id}/conteo */
+export interface ConteoItemRequest {
+  codigoSena:      string;
+  descripcion:     string;
+  cantidadSistema: number;
+  cantidadFisica:  number;
+  valorUnitario:   number;
+}
+
+export interface RegistrarConteoRequest {
+  items: ConteoItemRequest[];
+}
+
+/** PATCH /conciliaciones/{id}/diferencias/{diferenciaId}/resolver */
+export interface ResolverDiferenciaRequest {
+  justificacion: string;
 }

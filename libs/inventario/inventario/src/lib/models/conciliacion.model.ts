@@ -29,15 +29,18 @@ export interface ConciliacionDetalle {
  * Sustituye a ConciliacionDiferencia eliminando los strings combinados.
  */
 export interface DiferenciaItem {
-  producto: string;
-  codigo: string;
-  categoria: string;
-  stockSistema: number;
-  stockFisico: number;
-  diferencia: number;
-  unidad: string;
-  valorUnit: number;
-  impacto: number;
+  id:            string;
+  producto:      string;
+  codigo:        string;
+  categoria:     string;
+  stockSistema:  number;
+  stockFisico:   number;
+  diferencia:    number;
+  unidad:        string;
+  valorUnit:     number;
+  impacto:       number;
+  estado:        string;
+  justificacion: string | null;
 }
 
 export interface TomaFisicaItem {

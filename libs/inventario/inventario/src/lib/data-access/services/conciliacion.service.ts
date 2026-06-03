@@ -7,17 +7,15 @@ import {
   ConciliacionDetalle,
   DiferenciaItem,
   TomaFisicaItem,
+  ConteoItemData,
 } from '../../models/conciliacion.model';
 import {
-  ConciliacionListItemResponse,
-  ConciliacionDetailResponse,
-  DiferenciaResponse,
+  ConciliacionBackendResponse,
+  CatalogoItemResponse,
   IniciarConciliacionRequest,
   RegistrarConteoRequest,
   ResolverDiferenciaRequest,
-  CatalogoItemResponse,
 } from '../api/reconciliation.api';
-import { ConteoItemData } from '../../models/conciliacion.model';
 import {
   conciliacionListItemFromApi,
   conciliacionDetailFromApi,
@@ -33,47 +31,47 @@ export class ConciliacionService {
 
   getConciliaciones(): Observable<ConciliacionRegistro[]> {
     return this.http
-      .get<ConciliacionListItemResponse[]>(`${API}/reconciliation/conciliaciones`)
+      .get<ConciliacionBackendResponse[]>(`${API}/reconciliation/conciliaciones`)
       .pipe(
         map(list => list.map(conciliacionListItemFromApi)),
         catchError(err => throwError(() => err))
       );
   }
 
-  getConciliacionById(id: string): Observable<ConciliacionDetalle | undefined> {
+  /**
+   * Retorna el detalle Y las diferencias en una sola llamada.
+   * El backend embebe las diferencias en GET /{id} — no existe un endpoint separado.
+   */
+  getConciliacionConDiferencias(id: string): Observable<{
+    detalle:      ConciliacionDetalle;
+    diferencias:  DiferenciaItem[];
+  }> {
     return this.http
-      .get<ConciliacionDetailResponse>(`${API}/reconciliation/conciliaciones/${id}`)
+      .get<ConciliacionBackendResponse>(`${API}/reconciliation/conciliaciones/${id}`)
       .pipe(
-        map(conciliacionDetailFromApi),
+        map(raw => ({
+          detalle:     conciliacionDetailFromApi(raw),
+          diferencias: raw.diferencias.map(diferenciaFromApi),
+        })),
         catchError(err => throwError(() => err))
       );
   }
 
-  getDiferenciasByConciliacion(id: string): Observable<DiferenciaItem[]> {
-    return this.http
-      .get<DiferenciaResponse[]>(`${API}/reconciliation/conciliaciones/${id}/diferencias`)
-      .pipe(
-        map(list => list.map(diferenciaFromApi)),
-        catchError(err => throwError(() => err))
-      );
-  }
-
-  /** POST /reconciliation/conciliaciones — responsableId, responsableNombre, tipo y fecha son obligatorios */
+  /** POST /reconciliation/conciliaciones */
   iniciarTomaFisica(data: IniciarConciliacionRequest): Observable<{ id: string }> {
     return this.http
       .post<{ id: string }>(`${API}/reconciliation/conciliaciones`, data)
       .pipe(catchError(err => throwError(() => err)));
   }
 
+  /** PATCH /reconciliation/conciliaciones/{id}/cerrar */
   cerrarConciliacion(id: string): Observable<void> {
     return this.http
       .patch<void>(`${API}/reconciliation/conciliaciones/${id}/cerrar`, {})
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  /** POST /reconciliation/conciliaciones/{id}/conteo
-   *  Registra el conteo físico de todos los ítems de la sesión.
-   *  Respuesta: 204 No Content */
+  /** POST /reconciliation/conciliaciones/{id}/conteo — 204 No Content */
   registrarConteo(id: string, items: ConteoItemData[]): Observable<void> {
     const body: RegistrarConteoRequest = {
       items: items.map(i => ({
@@ -89,8 +87,7 @@ export class ConciliacionService {
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  /** PATCH /reconciliation/conciliaciones/{id}/diferencias/{diferenciaId}/resolver
-   *  Respuesta: 204 No Content */
+  /** PATCH /reconciliation/conciliaciones/{id}/diferencias/{diferenciaId}/resolver — 204 */
   resolverDiferencia(id: string, diferenciaId: string, justificacion: string): Observable<void> {
     const body: ResolverDiferenciaRequest = { justificacion };
     return this.http
@@ -101,7 +98,7 @@ export class ConciliacionService {
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  /** GET /reconciliation/conciliaciones/catalogo — catálogo activo con stock actual del sistema */
+  /** GET /reconciliation/conciliaciones/catalogo — catálogo activo con stock del sistema */
   getTomaFisicaItems(): Observable<TomaFisicaItem[]> {
     return this.http
       .get<CatalogoItemResponse[]>(`${API}/reconciliation/conciliaciones/catalogo`)
