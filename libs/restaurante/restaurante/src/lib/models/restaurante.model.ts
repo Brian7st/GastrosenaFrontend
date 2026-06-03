@@ -68,7 +68,6 @@ export interface FacturaResponse {
   sesionCajaId: string;
   cajeroId: string;
   subtotal: number;
-  propina: number;
   total: number;
   metodoPago: MetodoPago;
   estado: EstadoFacturaRestaurante;
@@ -87,7 +86,6 @@ export interface CerrarSesionRequest {
 export interface FacturarPedidoRequest {
   pedidoId: string;
   metodoPago: MetodoPago;
-  propina: number;
 }
 
 /**
