@@ -1,15 +1,19 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { ButtonComponent, DataTableComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { FacturasFacade } from '../../../data-access/facturas.facade';
-import { ConciliacionGilDiferencia } from '../../../models/facturas.model';
+import { ConciliacionGilDiferencia, FacturaLinea } from '../../../models/facturas.model';
+
+/** Sentinel del backend para líneas de factura sin bien de catálogo asignado. */
+const PRODUCTO_PENDIENTE = 'PENDIENTE-CATALOGO';
 
 @Component({
   selector: 'restaurant-factura-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, BackButtonComponent],
+  imports: [CommonModule, FormsModule, RouterModule, ButtonComponent, DataTableComponent, BackButtonComponent],
   templateUrl: './factura-detail.component.html',
   styleUrl: './factura-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,6 +34,17 @@ export class FacturaDetailPageComponent implements OnInit {
 
   showConfirmVerificar  = signal(false);
   showConfirmPagada     = signal(false);
+
+  /** Código SENA tipeado por el usuario para cada línea pendiente (clave: descripción). */
+  codigosSenaPendientes = signal<Record<string, string>>({});
+
+  /** Líneas de la factura que aún no tienen bien de catálogo asignado. */
+  lineasPendientes = computed<FacturaLinea[]>(() =>
+    (this.factura()?.lineas ?? []).filter(l => this.esPendiente(l)));
+
+  esPendiente(linea: FacturaLinea): boolean {
+    return linea.productoId === PRODUCTO_PENDIENTE;
+  }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -52,6 +67,24 @@ export class FacturaDetailPageComponent implements OnInit {
     if (!obs.trim()) return; // observation required — don't send empty string to backend
     this.facade.resolverDiferenciaGil(c.id, gilItemId, obs);
     this.observaciones.update(o => { const next = { ...o }; delete next[gilItemId]; return next; });
+  }
+
+  setCodigoSenaPendiente(descripcion: string, event: Event): void {
+    const val = (event.target as HTMLInputElement).value;
+    this.codigosSenaPendientes.update(c => ({ ...c, [descripcion]: val }));
+  }
+
+  resolverPendiente(descripcion: string): void {
+    const factura = this.factura();
+    if (!factura) return;
+    const codigo = (this.codigosSenaPendientes()[descripcion] ?? '').trim();
+    if (!codigo) return; // el código SENA es obligatorio
+    this.facade.resolverLineaPendiente(String(factura.id), descripcion, codigo);
+    this.codigosSenaPendientes.update(c => { const next = { ...c }; delete next[descripcion]; return next; });
+  }
+
+  irACrearBien(): void {
+    this.router.navigate(['/app/inventario/bienes']);
   }
 
   onGilVincularChange(event: Event): void {
