@@ -46,6 +46,23 @@ export class ConciliacionFacade {
   );
 
   /**
+   * Agrupa los ítems del catálogo por categoría.
+   * Se alimenta del mismo endpoint /catalogo que usa la toma física,
+   * por lo que solo contiene productos activos con stock real.
+   */
+  public categoriasSummary = computed(() => {
+    const items = this._tomaFisicaItems();
+    const grouped = new Map<string, number>();
+    for (const item of items) {
+      const cat = item.categoria?.trim() || 'Sin categoría';
+      grouped.set(cat, (grouped.get(cat) ?? 0) + 1);
+    }
+    return Array.from(grouped.entries())
+      .map(([nombre, totalItems]) => ({ nombre, totalItems }))
+      .sort((a, b) => a.nombre.localeCompare(b.nombre));
+  });
+
+  /**
    * Carga inicial: obtiene la lista completa de conciliaciones.
    */
   loadAll(): void {

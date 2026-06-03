@@ -76,24 +76,25 @@
       </div>
 
       <div class="categorias-grid">
-        @for (cat of categorias(); track cat.nombre) {
-          <div class="categoria-card" [class.categoria-card--alert]="cat.tipo === 'alert'">
-            <div class="categoria-icon-box" [class.categoria-icon-box--alert]="cat.tipo === 'alert'">
-              <lucide-icon [name]="cat.icono" [size]="24"></lucide-icon>
+        @if (facade.loading()) {
+          <p class="text-secondary">Cargando categorías...</p>
+        } @else if (categorias().length === 0) {
+          <p class="text-secondary">Sin productos en el catálogo.</p>
+        } @else {
+          @for (cat of categorias(); track cat.nombre) {
+            <div class="categoria-card">
+              <div class="categoria-icon-box">
+                <lucide-icon [name]="iconoDeCategoria(cat.nombre)" [size]="24"></lucide-icon>
+              </div>
+              <div class="categoria-info">
+                <h3 class="categoria-name">{{ cat.nombre }}</h3>
+                <p class="categoria-status">{{ cat.totalItems }} ítems activos</p>
+              </div>
+              <div class="categoria-arrow">
+                <lucide-icon name="chevron-right" [size]="20"></lucide-icon>
+              </div>
             </div>
-            <div class="categoria-info">
-              <h3 class="categoria-name">{{ cat.nombre }}</h3>
-              <p class="categoria-status" [class.categoria-status--alert]="cat.tipo === 'alert'">
-                @if (cat.tipo === 'alert') {
-                  <lucide-icon name="alert-triangle" [size]="14"></lucide-icon>
-                }
-                {{ cat.estado }}
-              </p>
-            </div>
-            <div class="categoria-arrow">
-              <lucide-icon name="chevron-right" [size]="20"></lucide-icon>
-            </div>
-          </div>
+          }
         }
       </div>
     </div>
