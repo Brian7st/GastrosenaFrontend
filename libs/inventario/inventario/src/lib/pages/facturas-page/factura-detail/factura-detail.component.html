@@ -104,7 +104,13 @@
                 <tr>
                   <td class="text-center text-secondary">{{ i + 1 }}</td>
                   <td class="font-medium">{{ item.descripcion }}</td>
-                  <td class="text-secondary">{{ item.productoId || '—' }}</td>
+                  <td class="text-secondary">
+                    @if (esPendiente(item)) {
+                      <span class="badge badge--orange" title="Esta línea aún no está asociada a un bien del catálogo">Sin bien</span>
+                    } @else {
+                      {{ item.productoId || '—' }}
+                    }
+                  </td>
                   <td class="text-right">{{ item.cantidad }}</td>
                   <td class="text-right">{{ item.precioUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
                   <td class="text-right text-secondary">{{ item.porcentajeIva ?? item.iva }}%</td>
@@ -122,6 +128,51 @@
           </restaurant-data-table>
         </div>
       </section>
+
+      <!-- Cola de revisión: líneas FEL sin bien de catálogo asignado -->
+      @if (lineasPendientes().length > 0) {
+        <section class="bento-card pendientes-card">
+          <div class="card-section">
+            <h4 class="card-section__title">
+              <span class="material-symbols-outlined text-tertiary">rule</span>
+              Líneas sin bien asignado ({{ lineasPendientes().length }})
+            </h4>
+            <p class="pendientes-card__hint">
+              Estas líneas del FEL no se asociaron a un bien del catálogo. Asociá cada una a un bien
+              existente por su código SENA. Si el bien no existe,
+              <button type="button" class="link-btn" (click)="irACrearBien()">creálo primero en Bienes</button>.
+            </p>
+
+            @if (f.estado === 'REGISTRADA') {
+              <ul class="pendientes-list">
+                @for (linea of lineasPendientes(); track linea.descripcion) {
+                  <li class="pendientes-list__item">
+                    <span class="pendientes-list__desc font-medium">{{ linea.descripcion }}</span>
+                    <div class="pendientes-list__action">
+                      <input
+                        type="text"
+                        class="pendientes-input"
+                        placeholder="Código SENA del bien"
+                        [ngModel]="codigosSenaPendientes()[linea.descripcion] ?? ''"
+                        (input)="setCodigoSenaPendiente(linea.descripcion, $event)" />
+                      <restaurant-button
+                        variant="primary"
+                        [disabled]="!(codigosSenaPendientes()[linea.descripcion] || '').trim()"
+                        (click)="resolverPendiente(linea.descripcion)">
+                        Asociar
+                      </restaurant-button>
+                    </div>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="pendientes-card__locked text-secondary">
+                Solo se pueden asociar líneas mientras la factura está en estado REGISTRADA.
+              </p>
+            }
+          </div>
+        </section>
+      }
 
       <!-- Tarjetas inferiores: DIAN + Orden Compra + Resumen Fiscal -->
       <div class="bottom-cards-grid">

@@ -127,6 +127,24 @@ export class FacturasService {
       );
   }
 
+  /**
+   * PATCH /sourcing/facturas/{id}/lineas/resolver — asocia una línea PENDIENTE-CATALOGO
+   * a un bien existente del catálogo por su código SENA. El bien debe existir.
+   */
+  resolverLineaPendiente(
+    id: string | number,
+    descripcionLinea: string,
+    codigoProductoSena: string
+  ): Observable<Factura> {
+    const body = { descripcionLinea, codigoProductoSena };
+    return this.http
+      .patch<FacturaResponse>(`${API}/sourcing/facturas/${id}/lineas/resolver`, body)
+      .pipe(
+        map(facturaFromApi),
+        catchError(err => throwError(() => err))
+      );
+  }
+
   /** PATCH /sourcing/facturas/{id}/pagar - solo válido desde estado VERIFICADA */
   marcarPagada(id: string | number): Observable<Factura> {
     return this.http
@@ -259,6 +277,19 @@ export class FacturasService {
       observaciones:           g.observaciones ?? '',
       hashTransaccion:         '',
       idTransaccion:           '',
+      numeroGil:               g.numeroGil,
+      codigoGrupo:             g.codigoGrupo ?? '',
+      solicitante:             g.solicitante ?? '',
+      cuentadantes:            g.cuentadantes?.map(c => c.nombre) ?? [],
+      bienes:                  (g.bienes ?? []).map(b => ({
+        codigoSena:    b.codigoSena,
+        descripcion:   b.descripcion,
+        unidadMedida:  b.unidadMedida,
+        cantidad:      b.cantidad,
+        valorUnitario: b.valorUnitario,
+        iva:           b.iva,
+        subtotal:      b.subtotal,
+      })),
     };
   }
 }

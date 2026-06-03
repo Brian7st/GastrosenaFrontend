@@ -428,6 +428,24 @@
   .td--center { text-align: center; }
   .td--right  { text-align: right; }
   .td--bold   { font-weight: 700; }
+  .td--mono   { font-family: var(--font-family-mono, monospace); }
+
+  tfoot td {
+    border-top: 2px solid var(--color-contorno, #d9dce0);
+    background: var(--color-superficie-contenedor-mas-bajo);
+  }
+}
+
+.bienes-table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.empty-hint {
+  margin: 0;
+  padding: 1rem 0;
+  color: var(--color-en-superficie-variante);
+  font-size: 0.875rem;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
