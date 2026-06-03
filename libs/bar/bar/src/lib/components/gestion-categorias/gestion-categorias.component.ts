@@ -48,7 +48,10 @@ export class GestionCategoriasComponent implements OnInit {
             this.resetFormulario();
             this.categoriaService.listar();
           },
-          error: () => this.mostrarAlerta('error', 'Error al actualizar categoría')
+          error: (err) => {
+            const msg = err.error?.mensaje || 'Error al actualizar categoría';
+            this.mostrarAlerta('error', msg);
+          }
         });
     } else {
       this.categoriaService.guardarCategoria({ nombreCategoria: this.nuevaCategoriaNombre })
@@ -58,7 +61,10 @@ export class GestionCategoriasComponent implements OnInit {
             this.resetFormulario();
             this.categoriaService.listar();
           },
-          error: () => this.mostrarAlerta('error', 'Error al crear categoría')
+          error: (err) => {
+            const msg = err.error?.mensaje || 'Error al crear categoría';
+            this.mostrarAlerta('error', msg);
+          }
         });
     }
   }
@@ -86,8 +92,9 @@ export class GestionCategoriasComponent implements OnInit {
           this.mostrarAlerta('success', 'Categoría eliminada con éxito');
           this.categoriaService.listar();
         },
-        error: () => {
-          this.mostrarAlerta('error', 'La categoría está en uso por una o más recetas y no se puede eliminar.');
+        error: (err) => {
+          const msg = err.error?.mensaje || 'Error al eliminar categoría';
+          this.mostrarAlerta('error', msg);
         }
       });
     }

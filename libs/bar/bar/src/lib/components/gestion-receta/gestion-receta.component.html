@@ -11,11 +11,10 @@
     </header>
 
     <form [formGroup]="recipeForm" (ngSubmit)="guardar()" class="modern-form">
-      <!-- Section 1: General Info -->
       <div class="form-grid">
         <div class="field Full">
           <restaurant-input formControlName="nombreReceta" label="Nombre de la Receta *" placeholder="Ej: Margarita Tradicional"
-                 [error]="recipeForm.get('nombreReceta')?.hasError('soloLetras') ? 'El nombre solo puede contener letras y espacios.' : esCampoInvalido('nombreReceta') ? 'El nombre es obligatorio (min 5 letras).' : ''"></restaurant-input>
+                 [error]="esCampoInvalido('nombreReceta') ? 'El nombre es obligatorio (min 3 letras).' : ''"></restaurant-input>
         </div>
 
         <div class="field">
@@ -71,9 +70,8 @@
         </div>
       </div>
 
-      <!-- Section 2: Ingredients -->
       <section class="form-section">
-        <div class="section-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="section-header">
           <h3>Ingredientes *</h3>
           <restaurant-button type="button" variant="surface" (click)="agregarIngrediente()">
             <lucide-icon name="plus" size="16"></lucide-icon> Agregar Ingrediente
@@ -81,16 +79,11 @@
         </div>
 
         <div formArrayName="ingredientes" class="items-list">
-          @if (ingredientesArr.hasError('duplicate')) {
-            <div class="error-banner" style="background: var(--color-error-bg); border: 1px solid var(--color-error-border); color: var(--color-error-text); padding: var(--space-2); border-radius: var(--radius-md); margin-bottom: var(--space-4); font-size: var(--font-size-sm);">
-              ⚠️ Existen ingredientes con el mismo nombre. Por favor, modifícalos o elimínalos para continuar.
-            </div>
-          }
           @for (ing of ingredientesArr.controls; track $index) {
-            <div [formGroupName]="$index" class="item-row ingredient-row" style="display: flex; gap: var(--space-2); margin-bottom: var(--space-2);">
+            <div [formGroupName]="$index" class="item-row ingredient-row">
               <restaurant-input type="text" formControlName="nombreIngrediente" placeholder="Nombre del ingrediente" style="flex: 3;"></restaurant-input>
               <restaurant-input type="number" formControlName="cantidadRequerida" placeholder="Cantidad" style="flex: 1;"></restaurant-input>
-              <select formControlName="unidadMedida" class="flex-1" style="height: 40px; border-radius: var(--radius-md); border: 1px solid var(--color-border); padding: 0 8px;">
+              <select formControlName="unidadMedida" class="flex-1">
                 <option value="GR">Gramos (g)</option>
                 <option value="ML">Mililitros (ml)</option>
                 <option value="UN">Unidades</option>
@@ -105,9 +98,8 @@
         </div>
       </section>
 
-      <!-- Section 3: Steps -->
       <section class="form-section">
-        <div class="section-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="section-header">
           <h3>Instrucciones *</h3>
           <restaurant-button type="button" variant="surface" (click)="agregarPaso()">
             <lucide-icon name="plus" size="16"></lucide-icon> Agregar Paso
@@ -115,15 +107,10 @@
         </div>
 
         <div formArrayName="pasos" class="items-list">
-          @if (pasosArr.hasError('duplicate')) {
-            <div class="error-banner" style="background: var(--color-error-bg); border: 1px solid var(--color-error-border); color: var(--color-error-text); padding: var(--space-2); border-radius: var(--radius-md); margin-bottom: var(--space-4); font-size: var(--font-size-sm);">
-              ⚠️ Existen pasos con la misma descripción. Por favor, modifícalos o elimínalos para continuar.
-            </div>
-          }
           @for (paso of pasosArr.controls; track $index) {
-            <div [formGroupName]="$index" class="item-row step-row" style="display: flex; gap: var(--space-2); margin-bottom: var(--space-2); align-items: flex-start;">
-              <div class="step-badge" style="background: var(--color-primario); color: var(--color-en-primario); width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-pill); font-weight: bold;">{{ $index + 1 }}</div>
-              <textarea formControlName="descripcionPaso" placeholder="Paso {{ $index + 1 }}..." rows="2" style="flex: 1; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-2); font-family: inherit;"></textarea>
+            <div [formGroupName]="$index" class="item-row step-row">
+              <div class="step-badge">{{ $index + 1 }}</div>
+              <textarea formControlName="descripcionPaso" placeholder="Paso {{ $index + 1 }}..." rows="2" class="flex-1"></textarea>
               <restaurant-button type="button" variant="ghost" (click)="removerPaso($index)">
                 <lucide-icon name="trash-2" size="16" style="color: var(--color-danger)"></lucide-icon>
               </restaurant-button>
@@ -134,8 +121,7 @@
         </div>
       </section>
 
-      <!-- Actions -->
-      <footer class="form-footer" style="display: flex; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--color-border);">
+      <footer class="form-footer">
         <restaurant-button type="button" variant="ghost" (click)="cancelar()">Cancelar</restaurant-button>
         <restaurant-button type="submit" variant="primary" [disabled]="recipeForm.invalid || isSaving">
           @if (isSaving) {

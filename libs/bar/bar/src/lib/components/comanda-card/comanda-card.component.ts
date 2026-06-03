@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input, output, signal, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, signal, computed, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ComandaBarYBarismo, ComandaItem } from '../../models/comanda.model';
 import { ComandaService } from '../../data-access/comanda.service';
@@ -48,6 +48,11 @@ export class ComandaCardComponent implements OnInit, OnDestroy {
   finalizar(item: ComandaItem) {
     this.finalizarPlato.emit(item.idDetalleComanda);
   }
+
+  puedePrepararTodos = computed(() => {
+    const items = this.comanda()?.items;
+    return !!items && items.length > 1 && items.some(i => i.estado === 'ESPERA');
+  });
 
   iniciarTodos() {
     for (const item of this.comanda().items || []) {

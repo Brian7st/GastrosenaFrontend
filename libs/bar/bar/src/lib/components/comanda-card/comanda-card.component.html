@@ -76,7 +76,7 @@
         }
       </div>
 
-      @if (comanda().items && comanda().items!.length > 1 && comanda().items!.some(i => i.estado === 'ESPERA')) {
+      @if (puedePrepararTodos()) {
         <div style="margin-top: var(--space-3);">
           <restaurant-button (click)="iniciarTodos()" variant="primary" size="small" style="width: 100%;">Preparar todas</restaurant-button>
         </div>

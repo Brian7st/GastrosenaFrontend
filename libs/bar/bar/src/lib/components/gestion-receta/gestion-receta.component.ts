@@ -1,23 +1,11 @@
 import { Component, OnInit, inject, Input, Output, EventEmitter, signal } from '@angular/core';
-import { FormArray, FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CategoriaService } from '../../data-access/categoria.service';
 import { RecetaService } from '../../data-access/receta.service';
 import { IngredienteService } from '../../data-access/ingrediente.service';
 import { Receta, Ingrediente, Paso } from '../../models/receta.model';
 import { LucideIconComponent, ButtonComponent, InputComponent, ConfirmDialogComponent } from '@restaurant/shared/ui';
-import { soloLetrasValidator } from '../../validators/solo-letras.validator';
-
-export function noDuplicatesValidator(fieldName: string): ValidatorFn {
-  return (formArray: AbstractControl): ValidationErrors | null => {
-    if (!(formArray instanceof FormArray)) return null;
-    const values = formArray.controls
-      .map(ctrl => ctrl.get(fieldName)?.value?.toString().toLowerCase().trim())
-      .filter(v => !!v); // ignore empty
-    const hasDuplicates = new Set(values).size !== values.length;
-    return hasDuplicates ? { duplicate: true } : null;
-  };
-}
 
 @Component({
   selector: 'bar-gestion-receta',
@@ -42,13 +30,13 @@ export class GestionRecetaComponent implements OnInit {
 
   recipeForm = this.fb.group({
     idCategoria: ['', Validators.required],        
-    nombreReceta: ['', [Validators.required, Validators.minLength(5), soloLetrasValidator()]], 
-    tiempoPreparacion: [0, [Validators.required, Validators.min(1), Validators.max(720)]],   
+    nombreReceta: ['', [Validators.required, Validators.minLength(3)]], 
+    tiempoPreparacion: [1, [Validators.required, Validators.min(1), Validators.max(720)]],   
     precioUnitario: [0, [Validators.required, Validators.min(0), Validators.max(1000000)]],    
     temperatura: ['', Validators.required],
     urlImagen: [''],
-    ingredientes: this.fb.array([], [Validators.required, noDuplicatesValidator('nombreIngrediente')]),
-    pasos: this.fb.array([], [Validators.required, noDuplicatesValidator('descripcionPaso')])
+    ingredientes: this.fb.array([], Validators.required),
+    pasos: this.fb.array([], Validators.required)
   });
 
   get ingredientesArr(){
@@ -71,6 +59,7 @@ export class GestionRecetaComponent implements OnInit {
     if (this.receta) {
       this.cargarDatosParaEdicion(this.receta);
     }
+
   }
 
   private cargarDatosParaEdicion(receta: Receta) {
@@ -98,7 +87,7 @@ export class GestionRecetaComponent implements OnInit {
       receta.pasos.forEach((paso: Paso) => {
         const group = this.fb.group({
           orden: [paso.orden],
-          descripcionPaso: [paso.descripcionPaso, [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
+          descripcionPaso: [paso.descripcionPaso, [Validators.required, Validators.minLength(3), Validators.maxLength(500)]],
           notesAdicionales: [paso.notasAdicionales || ''] // keep compatibility
         });
         this.pasosArr.push(group);
@@ -118,7 +107,7 @@ export class GestionRecetaComponent implements OnInit {
     }
 
     const nuevoIngrediente = this.fb.group({
-      nombreIngrediente: ['', [Validators.required, Validators.minLength(2), soloLetrasValidator()]], 
+      nombreIngrediente: ['', [Validators.required, Validators.minLength(2)]], 
       cantidadRequerida: [1, [Validators.required, Validators.min(0.1), Validators.max(10000)]],      
       unidadMedida: ['GR', Validators.required]                             
     });
@@ -143,7 +132,7 @@ export class GestionRecetaComponent implements OnInit {
     const orden = this.pasosArr.length + 1;
     const group = this.fb.group({
       orden: [orden],
-      descripcionPaso: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
+      descripcionPaso: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(500)]],
       notasAdicionales: ['']
     });
     this.pasosArr.push(group);
