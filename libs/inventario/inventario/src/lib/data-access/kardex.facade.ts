@@ -2,6 +2,7 @@ import { inject, Injectable, signal, computed } from '@angular/core';
 import { catchError, EMPTY, finalize, of } from 'rxjs';
 import {
   Movimiento,
+  DocumentoMovimiento,
   EntradaMovimientoData,
   SalidaMovimientoData,
   ReservaMovimientoData,
@@ -17,8 +18,11 @@ export class KardexFacade {
   private movimientosService = inject(MovimientosService);
 
   // ── Estado ───────────────────────────────────────────────────────────────────
-  private _movimientos              = signal<Movimiento[]>([]);
-  private _movimientoSeleccionado   = signal<Movimiento | undefined>(undefined);
+  private _documentos               = signal<DocumentoMovimiento[]>([]);
+  private _documentoSeleccionado    = signal<DocumentoMovimiento | undefined>(undefined);
+  private _bienesDocumento          = signal<Movimiento[]>([]);
+  /** Movimientos del kardex por producto (GET /inventory/movimientos/{productoId}) */
+  private _kardexMovimientos        = signal<Movimiento[]>([]);
   private _existencia               = signal<ExistenciaProducto | null>(null);
   private _bajoMinimo               = signal<ExistenciaProducto[]>([]);
   private _kardexValorizado         = signal<KardexValorizadoItem[]>([]);
@@ -33,8 +37,10 @@ export class KardexFacade {
   private _productoIdActual = signal<string>('');
 
   // ── Lectura pública ──────────────────────────────────────────────────────────
-  public movimientos              = computed(() => this._movimientos());
-  public movimientoSeleccionado   = computed(() => this._movimientoSeleccionado());
+  public documentos               = computed(() => this._documentos());
+  public documentoSeleccionado    = computed(() => this._documentoSeleccionado());
+  public bienesDocumento          = computed(() => this._bienesDocumento());
+  public kardexMovimientos        = computed(() => this._kardexMovimientos());
   public existencia               = computed(() => this._existencia());
   public bajoMinimo               = computed(() => this._bajoMinimo());
   public kardexValorizado         = computed(() => this._kardexValorizado());
@@ -42,23 +48,46 @@ export class KardexFacade {
   public error                    = computed(() => this._error());
   public paginacion               = computed(() => this._paginacion());
 
-  // ── Kardex ───────────────────────────────────────────────────────────────────
+  // ── Documentos agrupados ─────────────────────────────────────────────────────
 
-  /** Carga el listado global de movimientos (GET /inventory/movimientos). */
+  /** Carga el listado paginado de documentos (GET /inventory/movimientos). */
   loadAll(pagina = 0, tamano = 20): void {
     this._loading.set(true);
     this._error.set(null);
-    this.movimientosService.getMovimientos(pagina, tamano)
+    this.movimientosService.getDocumentos(pagina, tamano)
       .pipe(
         catchError(() => {
-          this._error.set('Error al cargar los movimientos');
-          return of({ movimientos: [], totalPaginas: 0, totalElementos: 0 });
+          this._error.set('Error al cargar los documentos');
+          return of({ documentos: [], totalPaginas: 0, totalElementos: 0, paginaActual: pagina, tamano });
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe(({ movimientos, totalPaginas, totalElementos }) => {
-        this._movimientos.set(movimientos);
+      .subscribe(({ documentos, totalPaginas, totalElementos }) => {
+        this._documentos.set(documentos);
         this._paginacion.set({ totalElementos, totalPaginas, page: pagina, size: tamano });
+      });
+  }
+
+  /**
+   * Carga el detalle de un documento: resuelve `_documentoSeleccionado` desde
+   * la lista en memoria (fallback: deja undefined → header usa documentoId) y
+   * carga los bienes via `getBienesPorDocumento`.
+   */
+  cargarDocumento(documentoId: string, tipo: 'ENTRADA' | 'SALIDA'): void {
+    const encontrado = this._documentos().find(d => d.documentoId === documentoId);
+    this._documentoSeleccionado.set(encontrado);
+    this._loading.set(true);
+    this._error.set(null);
+    this.movimientosService.getBienesPorDocumento(documentoId, tipo)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al cargar los bienes del documento');
+          return of({ tipo, documentoId, numeroDocumento: null, bienes: [] as Movimiento[] });
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(({ bienes }) => {
+        this._bienesDocumento.set(bienes);
       });
   }
 
@@ -80,12 +109,12 @@ export class KardexFacade {
         finalize(() => this._loading.set(false))
       )
       .subscribe(({ movimientos, totalPaginas, totalElementos }) => {
-        this._movimientos.set(movimientos);
+        this._kardexMovimientos.set(movimientos);
         this._paginacion.set({ totalElementos, totalPaginas, page: pagina, size: tamano });
       });
   }
 
-  /** Navega a la página indicada del listado global de movimientos. */
+  /** Navega a la página indicada del listado de documentos. */
   irAPaginaMovimientos(page: number): void {
     const { size } = this._paginacion();
     this.loadAll(page, size);
@@ -98,16 +127,6 @@ export class KardexFacade {
     if (productoId) {
       this.cargarKardex(productoId, page, size);
     }
-  }
-
-  cargarMovimiento(id: string): void {
-    this._loading.set(true);
-    this.movimientosService.getMovimientoById(id)
-      .pipe(
-        catchError(() => of(undefined)),
-        finalize(() => this._loading.set(false))
-      )
-      .subscribe(data => this._movimientoSeleccionado.set(data));
   }
 
   /** GET /reporting/kardex?productoId?&desde?&hasta? */

@@ -29,6 +29,14 @@
     </div>
   </div>
 
+  <!-- Estado de error -->
+  @if (error()) {
+  <div class="error-banner" role="alert">
+    <lucide-icon name="alert-triangle" [size]="18"></lucide-icon>
+    {{ error() }}
+  </div>
+  }
+
   <!-- KPIs Bento Grid -->
   <div class="kpi-grid">
     <restaurant-kpi-card
@@ -55,11 +63,11 @@
     </restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="PENDIENTES"
-      [value]="kpiPendientes()"
-      icon="alert-circle"
+      label="BIENES EN PÁGINA"
+      [value]="kpiBienesPagina()"
+      icon="package"
       iconColor="red"
-      trend="Requieren verificación"
+      trend="Total bienes en documentos"
       [trendUp]="null">
     </restaurant-kpi-card>
   </div>
@@ -82,49 +90,48 @@
     <thead>
       <tr>
         <th style="text-align: center;">Tipo</th>
-        <th style="text-align: center;">Producto</th>
-        <th style="text-align: center;">Código SENA</th>
-        <th style="text-align: center;">Cantidad</th>
-        <th style="text-align: center;">Fecha/Hora</th>
-        <th style="text-align: center;">Valor</th>
+        <th style="text-align: center;">N° Documento</th>
+        <th style="text-align: center;">Bienes</th>
+        <th style="text-align: center;">Cant. Total</th>
+        <th style="text-align: center;">Valor Total</th>
+        <th style="text-align: center;">Fecha</th>
         <th style="text-align: center;">Estado</th>
         <th style="text-align: center;">Acciones</th>
       </tr>
     </thead>
     <tbody>
-      @for (movimiento of movimientos(); track movimiento.id) {
+      @for (doc of documentos(); track doc.documentoId) {
       <tr class="table-row">
         <td style="text-align: center;">
-          <span class="type-badge" [ngClass]="movimiento.tipo === 'ENTRADA' ? 'type-badge--entrada' : 'type-badge--salida'">
-            <lucide-icon [name]="movimiento.tipo === 'ENTRADA' ? 'arrow-down' : 'arrow-up'" [size]="14"></lucide-icon>
-            {{ movimiento.tipo === 'ENTRADA' ? 'Entrada' : 'Salida' }}
+          <span class="type-badge" [ngClass]="doc.tipo === 'ENTRADA' ? 'type-badge--entrada' : 'type-badge--salida'">
+            <lucide-icon [name]="doc.tipo === 'ENTRADA' ? 'arrow-down' : 'arrow-up'" [size]="14"></lucide-icon>
+            {{ doc.tipo === 'ENTRADA' ? 'Entrada' : 'Salida' }}
           </span>
         </td>
         <td style="text-align: center;">
-          <p class="prod-name">{{ movimiento.productoNombre }}</p>
+          <p class="prod-name">{{ doc.numeroDocumento }}</p>
         </td>
         <td style="text-align: center;">
-          <span class="code-sena">{{ movimiento.codigoSena }}</span>
+          <span class="qty-val">{{ doc.cantidadBienes }}</span>
         </td>
         <td style="text-align: center;">
-          <span class="qty-val" [ngClass]="movimiento.tipo === 'ENTRADA' ? 'qty-val--entrada' : 'qty-val--salida'">
-            {{ movimiento.tipo === 'ENTRADA' ? '+' : '-' }}{{ movimiento.cantidad }}
+          <span class="qty-val" [ngClass]="doc.tipo === 'ENTRADA' ? 'qty-val--entrada' : 'qty-val--salida'">
+            {{ doc.tipo === 'ENTRADA' ? '+' : '-' }}{{ doc.cantidadTotal }}
           </span>
-          <span class="qty-unit">{{ movimiento.unidadMedida }}</span>
         </td>
         <td style="text-align: center;">
-          <p class="date-text">{{ movimiento.fechaMovimiento.split('T')[0] }}</p>
-          <p class="time-text">{{ movimiento.fechaMovimiento.split('T')[1]?.slice(0, 5) }}</p>
+          <p class="money-val">{{ doc.valorTotal | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
         </td>
         <td style="text-align: center;">
-          <p class="money-val">{{ movimiento.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
+          <p class="date-text">{{ doc.fecha.split('T')[0] }}</p>
+          <p class="time-text">{{ doc.fecha.split('T')[1]?.slice(0, 5) }}</p>
         </td>
         <td style="text-align: center;">
-          <restaurant-status-badge [label]="movimiento.estado" [variant]="getVariant(movimiento.estado)"></restaurant-status-badge>
+          <restaurant-status-badge [label]="doc.estado" [variant]="getVariant(doc.estado)"></restaurant-status-badge>
         </td>
         <td style="text-align: center;">
           <div class="actions-row" style="justify-content: center;">
-            <button class="action-icon" [routerLink]="[movimiento.id]" title="Ver Detalle">
+            <button class="action-icon" [routerLink]="[doc.documentoId]" [queryParams]="{ tipo: doc.tipo }" title="Ver Detalle">
               <lucide-icon name="eye" [size]="18"></lucide-icon>
             </button>
           </div>
@@ -135,9 +142,9 @@
     <div dtFooter class="dt-footer">
       <span class="table-pagination__info">
         @if (totalElementos() === 0) {
-          Sin movimientos
+          Sin documentos
         } @else {
-          Mostrando {{ desde() }}–{{ hasta() }} de {{ totalElementos() }} movimiento(s)
+          Mostrando {{ desde() }}–{{ hasta() }} de {{ totalElementos() }} documento(s)
         }
       </span>
       <div class="pagination-btns">

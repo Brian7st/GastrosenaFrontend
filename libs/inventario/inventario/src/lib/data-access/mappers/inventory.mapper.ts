@@ -1,5 +1,6 @@
 import {
   Movimiento,
+  DocumentoMovimiento,
   EntradaMovimientoData,
   SalidaMovimientoData,
   ReservaMovimientoData,
@@ -16,6 +17,8 @@ import {
   ReservaRequest,
   LiberacionRequest,
   AjusteRequest,
+  DocumentoResponse,
+  DocumentoPageResponse,
 } from '../api/inventory.api';
 
 /**
@@ -51,6 +54,36 @@ export function movimientoFromApi(dto: MovimientoResponse): Movimiento {
     responsableNombre: dto.responsableNombre,
     valor: dto.valor,
     estado: dto.estado,
+  };
+}
+
+export function documentoFromApi(dto: DocumentoResponse): DocumentoMovimiento {
+  return {
+    tipo: dto.tipo,
+    documentoId: dto.documentoId,
+    numeroDocumento: dto.numeroDocumento ?? dto.documentoId,
+    cantidadBienes: dto.cantidadBienes,
+    cantidadTotal: dto.cantidadTotal,
+    valorTotal: dto.valorTotal,
+    fecha: dto.fecha,
+    estado: dto.estado,
+  };
+}
+
+export function documentoPageFromApi(resp: DocumentoPageResponse): {
+  documentos: DocumentoMovimiento[];
+  totalPaginas: number;
+  totalElementos: number;
+  paginaActual: number;
+  tamano: number;
+} {
+  const dtos = resp.documentos ?? [];
+  return {
+    documentos: dtos.map(documentoFromApi),
+    totalPaginas: resp.totalPaginas ?? 0,
+    totalElementos: resp.totalElementos ?? 0,
+    paginaActual: resp.paginaActual ?? 0,
+    tamano: resp.tamano ?? 0,
   };
 }
 
