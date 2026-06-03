@@ -124,6 +124,7 @@ export class SolicitudesInsumosFormComponent implements OnInit {
       codigoSena:              bien.codigoSena ?? '',
       nombreBien:              bien.descripcion ?? '',
       descripcion:             bien.descripcion ?? '',
+      codigoAlmacen:           bien.codigoProveedor ?? '',
       unidadMedida:            bien.unidadMedida,
       cantidad:                1,
       valorUnitario:           bien.valor ?? 0,
