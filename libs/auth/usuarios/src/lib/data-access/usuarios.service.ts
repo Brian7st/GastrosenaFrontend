@@ -149,9 +149,9 @@ export class UsuariosService extends BaseHttpService {
   }
 
   actualizarFoto(userId: string, fotoUrl: string): Observable<void> {
-    return this.http.patch<void>(
-      this.buildUrl(`${this.resource}/${userId}/foto`),
-      { fotoUrl }
-    );
-  }
+  return this.http.patch<void>(
+    this.buildUrl('perfil/foto'),
+    { fotoUrl }
+  ); 
+ }
 }
