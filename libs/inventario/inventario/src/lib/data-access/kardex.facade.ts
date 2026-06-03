@@ -31,6 +31,9 @@ export class KardexFacade {
   });
   /** productoId activo para reutilizarlo al navegar páginas sin pasarlo de nuevo */
   private _productoIdActual = signal<string>('');
+  /** Filtro de tipo activo en el listado global (undefined = todos) */
+  private _tipoFiltro = signal<string | undefined>(undefined);
+  public tipoFiltro = computed(() => this._tipoFiltro());
 
   // ── Lectura pública ──────────────────────────────────────────────────────────
   public movimientos              = computed(() => this._movimientos());
@@ -45,10 +48,10 @@ export class KardexFacade {
   // ── Kardex ───────────────────────────────────────────────────────────────────
 
   /** Carga el listado global de movimientos (GET /inventory/movimientos). */
-  loadAll(pagina = 0, tamano = 50): void {
+  loadAll(pagina = 0, tamano = 10): void {
     this._loading.set(true);
     this._error.set(null);
-    this.movimientosService.getMovimientos(pagina, tamano)
+    this.movimientosService.getMovimientos(pagina, tamano, this._tipoFiltro())
       .pipe(
         catchError(() => {
           this._error.set('Error al cargar los movimientos');
@@ -60,6 +63,13 @@ export class KardexFacade {
         this._movimientos.set(movimientos);
         this._paginacion.set({ totalElementos, totalPaginas, page: pagina, size: tamano });
       });
+  }
+
+  /** Cambia el filtro de tipo (undefined = todos) y recarga desde la página 0. */
+  filtrarPorTipo(tipo: string | undefined): void {
+    this._tipoFiltro.set(tipo);
+    const { size } = this._paginacion();
+    this.loadAll(0, size);
   }
 
   /**

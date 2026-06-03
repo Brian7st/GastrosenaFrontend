@@ -72,6 +72,25 @@
         <h3 class="dt-controls__heading">Historial de Movimientos</h3>
       </div>
       <div class="dt-controls__actions">
+        <div class="mov-filters">
+          <button class="mov-filter"
+                  [class.mov-filter--active]="!tipoActivo()"
+                  (click)="filtrar(undefined)">
+            Todos
+          </button>
+          <button class="mov-filter"
+                  [class.mov-filter--active]="tipoActivo() === 'SALIDA'"
+                  (click)="filtrar('SALIDA')">
+            <lucide-icon name="arrow-up" [size]="14"></lucide-icon>
+            Salidas
+          </button>
+          <button class="mov-filter"
+                  [class.mov-filter--active]="tipoActivo() === 'ENTRADA'"
+                  (click)="filtrar('ENTRADA')">
+            <lucide-icon name="arrow-down" [size]="14"></lucide-icon>
+            Entradas
+          </button>
+        </div>
         <div class="dt-search">
           <lucide-icon name="search" [size]="18" class="dt-search__icon"></lucide-icon>
           <input type="text" class="dt-search__input" placeholder="Buscar movimientos, productos o usuarios...">

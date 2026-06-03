@@ -41,11 +41,15 @@ export class MovimientosService {
    */
   getMovimientos(
     pagina = 0,
-    tamano = 50,
+    tamano = 10,
+    tipo?: string,
   ): Observable<{ movimientos: Movimiento[]; totalPaginas: number; totalElementos: number }> {
-    const params = new HttpParams()
+    let params = new HttpParams()
       .set('pagina', String(pagina))
       .set('tamano', String(tamano));
+    if (tipo) {
+      params = params.set('tipo', tipo);
+    }
     return this.http
       .get<MovimientoPageResponse>(`${API}/inventory/movimientos`, { params })
       .pipe(

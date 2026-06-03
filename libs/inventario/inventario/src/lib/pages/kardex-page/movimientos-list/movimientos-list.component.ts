@@ -28,6 +28,7 @@ export class MovimientosListComponent implements OnInit {
   movimientos = this.facade.movimientos;
   loading     = this.facade.loading;
   paginacion  = this.facade.paginacion;
+  tipoActivo  = this.facade.tipoFiltro;
 
   // ── Paginación computada ──────────────────────────────────────────────────
   paginaActual    = computed(() => this.paginacion().page);
@@ -72,6 +73,11 @@ export class MovimientosListComponent implements OnInit {
 
   ngOnInit(): void {
     this.facade.loadAll();
+  }
+
+  // ── Filtro por tipo ───────────────────────────────────────────────────────
+  filtrar(tipo: string | undefined): void {
+    this.facade.filtrarPorTipo(tipo);
   }
 
   // ── Paginación ────────────────────────────────────────────────────────────
