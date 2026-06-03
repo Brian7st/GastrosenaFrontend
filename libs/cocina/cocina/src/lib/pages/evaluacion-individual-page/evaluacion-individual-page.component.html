@@ -58,84 +58,207 @@
 
     <hr class="divider" />
 
-    <!-- Observaciones -->
-    <div class="obs-section">
+    <!-- ===== SECCIÓN EVALUACIÓN ===== -->
+    @if (!tieneEvaluacion()) {
 
-      <div class="obs-header">
-        <span class="obs-icon">📋</span>
-        <span class="obs-title">Observaciones</span>
-      </div>
+      <!-- Formulario de primera evaluación -->
+      <div class="obs-section">
 
-      <div class="obs-body">
+        <div class="obs-header">
+          <span class="obs-icon">📋</span>
+          <span class="obs-title">Observaciones</span>
+        </div>
 
-        <textarea
-          id="textarea-observaciones"
-          class="obs-textarea"
-          rows="4"
-          placeholder="Anote observaciones sobre el desempeño del aprendiz en esta actividad..."
-          [(ngModel)]="observaciones"
-          (click)="$event.stopPropagation()"
-        ></textarea>
+        <div class="obs-body">
 
-        <!-- Botón EVALUAR -->
-        <div
-          class="evaluar-dropdown-wrapper"
-          (click)="$event.stopPropagation()"
-        >
+          <textarea
+            id="textarea-observaciones"
+            class="obs-textarea"
+            rows="4"
+            placeholder="Anote observaciones sobre el desempeño del aprendiz en esta actividad..."
+            [(ngModel)]="observaciones"
+            (click)="$event.stopPropagation()"
+          ></textarea>
 
-          @if (menuEvaluarAbierto()) {
-
-            <div
-              class="evaluar-menu"
-              role="menu"
-              aria-label="Opciones de evaluación"
-            >
-
-              <button
-                id="btn-aprobo-individual"
-                class="evaluar-option evaluar-option--aprobo"
-                type="button"
-                role="menuitem"
-                (click)="submitEvaluacionIndividual('aprobo')"
-              >
-                <span class="option-icon">✓</span>
-                Aprobó
-              </button>
-
-              <button
-                id="btn-no-aprobo-individual"
-                class="evaluar-option evaluar-option--no-aprobo"
-                type="button"
-                role="menuitem"
-                (click)="submitEvaluacionIndividual('no_aprobo')"
-              >
-                <span class="option-icon">✗</span>
-                No Aprobó
-              </button>
-
-            </div>
-          }
-
-          <button
-            id="btn-evaluar-individual"
-            class="btn-evaluar"
-            type="button"
-            (click)="toggleMenuEvaluar()"
-            [attr.aria-expanded]="menuEvaluarAbierto()"
-            aria-haspopup="menu"
+          <!-- Botón EVALUAR -->
+          <div
+            class="evaluar-dropdown-wrapper"
+            (click)="$event.stopPropagation()"
           >
-            EVALUAR
-            <span
-              class="evaluar-caret"
-              [class.caret-up]="menuEvaluarAbierto()"
-            >
-              ▲
-            </span>
-          </button>
 
+            @if (menuEvaluarAbierto()) {
+
+              <div
+                class="evaluar-menu"
+                role="menu"
+                aria-label="Opciones de evaluación"
+              >
+
+                <button
+                  id="btn-aprobo-individual"
+                  class="evaluar-option evaluar-option--aprobo"
+                  type="button"
+                  role="menuitem"
+                  (click)="submitEvaluacionIndividual('aprobo')"
+                >
+                  <span class="option-icon">✓</span>
+                  Aprobó
+                </button>
+
+                <button
+                  id="btn-no-aprobo-individual"
+                  class="evaluar-option evaluar-option--no-aprobo"
+                  type="button"
+                  role="menuitem"
+                  (click)="submitEvaluacionIndividual('no_aprobo')"
+                >
+                  <span class="option-icon">✗</span>
+                  No Aprobó
+                </button>
+
+              </div>
+            }
+
+            <button
+              id="btn-evaluar-individual"
+              class="btn-evaluar"
+              type="button"
+              (click)="toggleMenuEvaluar()"
+              [attr.aria-expanded]="menuEvaluarAbierto()"
+              aria-haspopup="menu"
+            >
+              EVALUAR
+              <span
+                class="evaluar-caret"
+                [class.caret-up]="menuEvaluarAbierto()"
+              >
+                ▲
+              </span>
+            </button>
+
+          </div>
         </div>
       </div>
-    </div>
+
+    } @else {
+
+      <!-- ===== HISTORIAL DE EVALUACIONES ===== -->
+      <div class="historial-section">
+
+        <div class="historial-header">
+          <span class="obs-icon">📋</span>
+          <span class="obs-title">Historial de Evaluaciones</span>
+        </div>
+
+        @for (registro of historialEvaluaciones(); track $index) {
+          <div class="registro-card" [class.registro-revaluacion]="registro.esRevaluacion">
+
+            <div class="registro-top">
+              <span
+                class="registro-resultado"
+                [class.resultado-aprobado]="registro.resultado === 'Aprobado'"
+                [class.resultado-no-aprobado]="registro.resultado === 'No Aprobado'"
+              >
+                <span class="resultado-icono">
+                  {{ registro.resultado === 'Aprobado' ? '✓' : '✗' }}
+                </span>
+                {{ registro.resultado }}
+              </span>
+
+              @if (registro.esRevaluacion) {
+                <span class="revaluacion-tag">Re-evaluación</span>
+              }
+
+              <span class="registro-fecha">{{ registro.fecha }}</span>
+            </div>
+
+            @if (registro.observaciones) {
+              <p class="registro-obs">{{ registro.observaciones }}</p>
+            } @else {
+              <p class="registro-obs registro-obs--vacio">Sin observaciones adicionales.</p>
+            }
+
+          </div>
+        }
+
+        <!-- Botón re-evaluar (pequeño, al final) -->
+        @if (!modoRevaluar()) {
+          <div class="revaluar-trigger">
+            <button
+              id="btn-revaluar"
+              class="btn-revaluar"
+              type="button"
+              (click)="abrirRevaluar(); $event.stopPropagation()"
+            >
+              <span>↻</span> Re-evaluar
+            </button>
+          </div>
+        }
+
+        <!-- Formulario de re-evaluación inline -->
+        @if (modoRevaluar()) {
+          <div class="revaluar-form" (click)="$event.stopPropagation()">
+
+            <div class="revaluar-form-header">
+              <span class="obs-icon">🔄</span>
+              <span class="obs-title">Nueva evaluación</span>
+            </div>
+
+            <div class="revaluar-resultado-row">
+              <label class="revaluar-label">Resultado</label>
+              <div class="revaluar-opciones">
+                <button
+                  type="button"
+                  class="opcion-btn"
+                  [class.opcion-btn--aprobado]="resultadoRevaluar() === 'Aprobado'"
+                  (click)="resultadoRevaluar.set('Aprobado')"
+                >
+                  ✓ Aprobado
+                </button>
+                <button
+                  type="button"
+                  class="opcion-btn"
+                  [class.opcion-btn--reprobado]="resultadoRevaluar() === 'No Aprobado'"
+                  (click)="resultadoRevaluar.set('No Aprobado')"
+                >
+                  ✗ No Aprobado
+                </button>
+              </div>
+            </div>
+
+            <textarea
+              id="textarea-revaluar"
+              class="obs-textarea"
+              rows="3"
+              placeholder="Observaciones de la re-evaluación..."
+              [(ngModel)]="observacionesRevaluar"
+            ></textarea>
+
+            <div class="revaluar-actions">
+              <button
+                type="button"
+                class="btn-cancelar-revaluar"
+                (click)="cancelarRevaluar()"
+              >
+                Cancelar
+              </button>
+              <button
+                id="btn-confirmar-revaluar"
+                type="button"
+                class="btn-confirmar-revaluar"
+                [disabled]="!resultadoRevaluar()"
+                (click)="submitRevaluar()"
+              >
+                Confirmar
+              </button>
+            </div>
+
+          </div>
+        }
+
+      </div>
+
+    }
 
   </div>
 

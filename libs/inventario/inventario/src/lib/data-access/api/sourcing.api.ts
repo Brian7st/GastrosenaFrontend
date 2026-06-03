@@ -122,6 +122,7 @@ export interface CrearGilRequest {
   cuentadantes: CuentadanteGilRequest[];
   solicitante: string;
   codigoGrupo: string;
+  fichaCaracterizacion?: string;
   solicitudesOrigenIds?: string[];
   bienes: BienGilRequest[];
   observaciones?: string;
@@ -141,6 +142,7 @@ export interface GenerarGilRequest {
   cuentadantes: CuentadanteGilRequest[];
   solicitante: string;
   codigoGrupo: string;
+  fichaCaracterizacion: string;
   observaciones?: string;
 }
 

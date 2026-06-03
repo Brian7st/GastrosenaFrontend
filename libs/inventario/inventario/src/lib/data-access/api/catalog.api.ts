@@ -25,36 +25,34 @@ export interface ProductoResponse {
   descripcion?: string;
   categoria: string;
   unidadMedida: string;
-  urlImagen?: string | null;
   vrlAdjudicado: number | null;
   vrlAntes: number | null;
   iva: number | null;
+  stockMinimo: number | null;
   activo: boolean;
 }
 
 export interface CrearProductoRequest {
   codigoSena?: string;
   codigoProveedor?: string;
-  nombre: string;
   descripcion?: string;
   categoria: string;
   unidadMedida: string;
-  urlImagen?: string;
   vrlAdjudicado?: number | null;
   vrlAntes?: number | null;
   iva?: number | null;
+  stockMinimo?: number | null;
 }
 
 export interface ActualizarProductoRequest {
-  nombre: string;
   unidadMedida: string;
   descripcion?: string;
   categoria?: string;
   codigoProveedor?: string;
-  urlImagen?: string;
   vrlAdjudicado?: number | null;
   vrlAntes?: number | null;
   iva?: number | null;
+  stockMinimo?: number | null;
 }
 
 /** POST /catalog/productos/eliminacion-masiva */

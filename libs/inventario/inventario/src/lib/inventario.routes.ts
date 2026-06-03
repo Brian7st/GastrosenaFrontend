@@ -75,8 +75,8 @@ export const INVENTARIO_ROUTES: Routes = [
 
 
   {
-    path: 'solicitudes-insumos-page/:id/consolidacion',
-    loadComponent: () => import('./pages/solicitudes-insumos-page/solicitudes-insumos-consolidacion/solicitudes-insumos-consolidacion.component').then(m => m.SolicitudesInsumosConsolidacionComponent)
+    path: 'solicitudes-insumos-page/:id',
+    loadComponent: () => import('./pages/solicitudes-insumos-page/solicitudes-insumos-detail/solicitudes-insumos-detail.component').then(m => m.SolicitudesInsumosDetailComponent)
   },
 
   {

@@ -1,49 +1,66 @@
 <div class="caja-cierre-page">
   <div class="header-section">
+    <button class="back-btn" (click)="volver()">
+      <lucide-icon name="arrow-left" [size]="20"></lucide-icon>
+    </button>
     <restaurant-page-header
-      title="Cierre de Caja"
-      subtitle="Arqueo de efectivo y resumen del turno"
+            title="Cierre de Caja"
+            subtitle="Resumen automático del turno y cuadre final"
     ></restaurant-page-header>
   </div>
 
-  <div class="form-block">
-    <div class="card">
+  <div class="main-content-block">
+    <div class="card summary-card">
       <div class="block-header">
         <div class="title-group">
-          <h5>Arqueo Físico (Ciego)</h5>
-          <span class="subtitle">Ingrese los montos contados físicamente en la caja</span>
+          <h5>Resumen de Operaciones</h5>
+          <span class="subtitle">Validación de ingresos calculados por el sistema</span>
         </div>
       </div>
 
-      <div class="input-group">
-        <label>Efectivo Total Contado</label>
-        <input type="number" class="form-control" placeholder="$ 0" [formControl]="efectivoCtrl" />
-      </div>
-
-      <div class="input-group mt-4">
-        <label>Total Vouchers (Tarjetas)</label>
-        <input type="number" class="form-control" placeholder="$ 0" [formControl]="vouchersCtrl" />
-      </div>
-
-      <div class="resumen-sistema mt-6">
-        <div class="resumen-header">
-          <h6>Resumen del Sistema</h6>
-          <span class="badge-hidden">Oculto hasta cuadre</span>
+      <div class="summary-body">
+        <div class="summary-row">
+          <span class="label">Monto Inicial (Base):</span>
+          <span class="value">{{ montoInicial() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
         </div>
-        
-        <div class="resumen-list">
-          <div class="resumen-item">
-            <span class="label">Base Inicial:</span>
-            <span class="value">{{ baseEfectivo() | currency:'USD':'symbol':'1.0-0' }}</span>
+
+        <div class="divider"></div>
+        <h6 class="section-title">Ingresos por Método de Pago</h6>
+
+        <div class="summary-row">
+          <span class="label">
+            <lucide-icon name="banknote" [size]="16" class="icon-align"></lucide-icon> Efectivo:
+          </span>
+          <span class="value text-success">+ {{ totalEfectivo() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+
+        <div class="summary-row">
+          <span class="label">
+            <lucide-icon name="credit-card" [size]="16" class="icon-align"></lucide-icon> Tarjeta:
+          </span>
+          <span class="value text-success">+ {{ totalTarjeta() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+
+        <div class="summary-row">
+          <span class="label">
+            <lucide-icon name="arrow-right-left" [size]="16" class="icon-align"></lucide-icon> Transferencia:
+          </span>
+          <span class="value text-success">+ {{ totalTransferencia() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="summary-row total-row">
+          <span class="label">Total Ventas del Turno:</span>
+          <span class="value">{{ totalVentas() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+
+        <div class="summary-row expected-row mt-6">
+          <div class="label-group">
+            <span class="label">Total Esperado Físico:</span>
+            <span class="hint">(Base + Ventas en Efectivo)</span>
           </div>
-          <div class="resumen-item">
-            <span class="label">Ventas del Turno:</span>
-            <span class="value">{{ ventasTotales() | currency:'USD':'symbol':'1.0-0' }}</span>
-          </div>
-          <div class="resumen-item total">
-            <span class="label">Total Esperado en Caja:</span>
-            <span class="value">{{ totalEsperado() | currency:'USD':'symbol':'1.0-0' }}</span>
-          </div>
+          <span class="value highlight">{{ totalEsperado() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
         </div>
       </div>
 
@@ -51,11 +68,20 @@
         <restaurant-button variant="surface" (click)="volver()">
           Cancelar
         </restaurant-button>
-        <restaurant-button variant="primary" (click)="generarCierre()" [disabled]="efectivoCtrl.invalid">
+        <restaurant-button variant="primary" (click)="generarCierre()">
           <lucide-icon name="lock" [size]="18"></lucide-icon>
-          <span>Generar Cierre (Reporte Z)</span>
+          <span>Confirmar Cierre de Caja</span>
         </restaurant-button>
       </div>
     </div>
   </div>
+
+  <restaurant-confirm-dialog
+          [open]="alertDialog().open"
+          [title]="alertDialog().title"
+          [message]="alertDialog().message"
+          confirmText="Aceptar y Volver"
+          [showCancel]="false"
+          (confirm)="confirmarCierreExitoso()"
+  ></restaurant-confirm-dialog>
 </div>

@@ -3,7 +3,7 @@
     <div class="import-header">
       <div>
         <h1 class="import-title">Importar Bienes</h1>
-        <p class="import-subtitle">Cargue un archivo CSV con los bienes a importar.</p>
+        <p class="import-subtitle">Cargue un archivo CSV o Excel con los bienes a importar.</p>
       </div>
       <button class="btn-plantilla" (click)="onDescargarPlantilla()">
         <span class="material-symbols-outlined">download</span>
@@ -21,7 +21,7 @@
               <span class="material-symbols-outlined">upload_file</span>
             </div>
             <h3>Arrastre su archivo aquí</h3>
-            <p>Solo archivos <strong>.csv</strong> generados desde la plantilla.</p>
+            <p>Archivos <strong>.xlsx</strong> o <strong>.csv</strong> generados desde la plantilla.</p>
             <label class="btn-select-file">
               Seleccionar Archivo
               <input type="file" accept=".csv,.xlsx,.xls" (change)="onFileSelected($event)" />
@@ -132,7 +132,7 @@
 
     <div class="import-footer">
       <button class="btn-cancel" (click)="cancelar.emit()">Cancelar</button>
-      <button class="btn-procesar" [disabled]="!file() || isProcessing() || previewData().length === 0 || hasErrors()"
+      <button class="btn-procesar" [disabled]="!file() || isProcessing() || (!isExcel() && (previewData().length === 0 || hasErrors()))"
         (click)="onProcesar()">
         <span class="material-symbols-outlined">check_circle</span>
         Importar Bienes

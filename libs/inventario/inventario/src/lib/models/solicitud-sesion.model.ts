@@ -20,28 +20,28 @@ export interface SolicitudSesionItem {
 }
 
 export interface SolicitudSesion {
-  id:                       string;
-  fechaSolicitud?:          string;
-  numeroSolicitud?:         number;
-  fichaId:                  string;
-  programaId:               string;
-  instructorId:             string;
+  id:                        string;
+  fechaSolicitud?:           string;
+  numeroSolicitud?:          number;
+  fichaId:                   string;
+  programaId:                string;
+  instructorId:              string;
   identificacionInstructor?: string;
-  estado:                   string;
-  items:                    SolicitudSesionItem[];
-  valorTotalDeSolicitud?:   number;
+  estado:                    string;
+  items:                     SolicitudSesionItem[];
+  valorTotalDeSolicitud?:    number;
 }
 
 /** Payload para crear una solicitud de sesión (POST /training/solicitudes) */
 export interface CrearSolicitudSesionData {
-  fechaSolicitud?:          string;
-  numeroSolicitud?:         number;
-  fichaId:                  string;
-  programaId:               string;
-  instructorId:             string;
+  fechaSolicitud?:           string;
+  numeroSolicitud?:          number;
+  fichaId:                   string;
+  programaId:                string;
+  instructorId:              string;
   identificacionInstructor?: string;
-  valorTotalDeSolicitud?:   number;
-  items: SolicitudSesionItem[];
+  valorTotalDeSolicitud?:    number;
+  items:                     SolicitudSesionItem[];
 }
 
 /** Payload para actualizar una solicitud de sesión (PUT /training/solicitudes/{id}) */

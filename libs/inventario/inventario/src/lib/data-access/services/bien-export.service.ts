@@ -9,12 +9,12 @@ export class BienExportService {
    * Exporta un listado de bienes a CSV.
    */
   exportToCsv(bienes: Bien[]): void {
-    const headers = ['ID', 'Código SENA', 'Código Proveedor', 'Nombre', 'Categoría', 'Stock', 'Valor', 'Estado'];
+    const headers = ['ID', 'Código SENA', 'Código Proveedor', 'Descripción', 'Categoría', 'Stock', 'Valor', 'Estado'];
     const rows = bienes.map(b => [
       b.id,
       b.codigoSena,
       b.codigoProveedor || '',
-      b.nombre,
+      b.descripcion,
       b.categoria,
       b.stockActual,
       b.valor,

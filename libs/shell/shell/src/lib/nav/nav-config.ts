@@ -101,17 +101,35 @@
           permisos: ['MODULO_INVENTARIO_VER'],
           children: [
             { label: 'Gestión de Bienes',           ruta: '/app/inventario/bienes',                   icono: 'package-open'     },
-            { label: 'Facturas Electrónicas',       ruta: '/app/inventario/facturas',                 icono: 'file-spreadsheet' },
-            { label: 'Solicitudes GIL-F-014',       ruta: '/app/inventario/solicitudes-gil',          icono: 'clipboard-check'  },
             { label: 'Solicitudes Insumos',         ruta: '/app/inventario/solicitudes-insumos-page', icono: 'clipboard-list'   },
-            { label: 'Consolidado de Ejecución',    ruta: '/app/inventario/consolidado',              icono: 'bar-chart-2'      },
+            { label: 'Solicitudes GIL-F-014',       ruta: '/app/inventario/solicitudes-gil',          icono: 'clipboard-check'  },
+            { label: 'Facturas Electrónicas',       ruta: '/app/inventario/facturas',                 icono: 'file-spreadsheet' },
             { label: 'Entradas y Salidas (Kardex)', ruta: '/app/inventario/movimientos',              icono: 'arrow-left-right' },
+            { label: 'Consolidado de Ejecución',    ruta: '/app/inventario/consolidado',              icono: 'bar-chart-2'      },
             { label: 'Alertas de Stock',            ruta: '/app/inventario/alertas',                  icono: 'alert-circle'     },
             { label: 'Presupuesto General',         ruta: '/app/inventario/presupuesto',              icono: 'wallet'           },
             { label: 'Conciliación',                ruta: '/app/inventario/conciliacion',             icono: 'scale'            },
             { label: 'Requisiciones Diarias',       ruta: '/app/inventario/requisiciones',            icono: 'calendar'         },
             { label: 'Actas de Legalización',       ruta: '/app/inventario/actas',                    icono: 'file-check'       },
             { label: 'Paquete Probatorio',          ruta: '/app/inventario/paquete-probatorio',       icono: 'file-stack'       },
+          ],
+        },
+
+        {
+          label: 'Configuración',
+          ruta: '/app/configuracion',
+          icono: 'settings',
+          children: [
+            {
+              label: 'General',
+              ruta: '/app/configuracion/general',
+              icono: 'building-2',
+            },
+            {
+              label: 'Eliminación masiva de bienes',
+              ruta: '/app/configuracion/bienes/eliminar-masiva',
+              icono: 'trash-2',
+            },
           ],
         },
 

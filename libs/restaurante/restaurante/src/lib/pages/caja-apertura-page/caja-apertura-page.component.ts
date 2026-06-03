@@ -40,4 +40,10 @@ export class CajaAperturaPageComponent {
       this.volver();
     }
   }
+
+preventInvalidChars(event: KeyboardEvent): void {
+    if (['e', 'E', '+', '-'].includes(event.key)) {
+      event.preventDefault();
+    }
+  }
 }

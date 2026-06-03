@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { FacturasFacade } from '../../../data-access/facturas.facade';
 import { FacturaLinea } from '../../../models/facturas.model';
+import { BienGilResponse } from '../../../data-access/api/procurement.api';
 
 export type ImportStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -26,6 +27,7 @@ export class FacturaImportPageComponent implements OnInit {
   facturaImportada        = this.facade.facturaImportada;
   gilesDisponibles        = this.facade.gilesDisponibles;
   conciliacionImportacion = this.facade.conciliacionImportacion;
+  gilBienes               = this.facade.gilBienes;
   loading = this.facade.loading;
   error = computed(() => this.localError() ?? this.facade.error());
   importStatus = computed<ImportStatus>(() => {
@@ -39,6 +41,21 @@ export class FacturaImportPageComponent implements OnInit {
   canConciliar = computed(() => !!this.facturaImportada() && !!this.gilId() && !this.conciliacionImportacion());
   totalItems = computed(() => this.facturaImportada()?.lineas.length ?? 0);
   totalIvaPorTarifa = computed(() => this.groupIva(this.facturaImportada()?.lineas ?? []));
+  showManualMapping = computed(() => this.fileLoaded() && this.gilBienes().length > 0);
+
+  manualLinks = signal<(number | null)[]>([]);
+
+  constructor() {
+    effect(() => {
+      const bienes = this.gilBienes();
+      const factura = this.facturaImportada();
+      if (bienes.length > 0 && factura) {
+        this.manualLinks.set(this.buildAutoLinks(bienes, factura.lineas));
+      } else {
+        this.manualLinks.set([]);
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.facade.cargarGilesDisponibles();
@@ -69,6 +86,73 @@ export class FacturaImportPageComponent implements OnInit {
   onGilSelect(event: Event): void {
     const select = event.target as HTMLSelectElement;
     this.gilId.set(select.value);
+    this.facade.cargarGilBienes(select.value);
+  }
+
+  onLinkChange(gilIdx: number, event: Event): void {
+    const val = (event.target as HTMLSelectElement).value;
+    const felIdx = val === '' ? null : Number(val);
+    this.manualLinks.update(links => {
+      const copy = [...links];
+      copy[gilIdx] = felIdx;
+      return copy;
+    });
+  }
+
+  getLinea(felIdx: number): FacturaLinea | undefined {
+    return this.facturaImportada()?.lineas[felIdx];
+  }
+
+  matchStatus(gilIdx: number): 'ok' | 'diferencia' | 'sin-asignar' {
+    const felIdx = this.manualLinks()[gilIdx];
+    if (felIdx === null || felIdx === undefined) return 'sin-asignar';
+    const gil = this.gilBienes()[gilIdx];
+    const fel = this.getLinea(felIdx);
+    if (!fel) return 'sin-asignar';
+    const cantOk = Math.abs(gil.cantidad - fel.cantidad) < 0.001;
+    const precioOk = Math.abs(gil.valorUnitario - fel.precioUnitario) < 1;
+    return cantOk && precioOk ? 'ok' : 'diferencia';
+  }
+
+  matchStatusLabel(gilIdx: number): string {
+    const s = this.matchStatus(gilIdx);
+    if (s === 'ok') return 'Coincide';
+    if (s === 'diferencia') return 'Diferencia';
+    return 'Sin asignar';
+  }
+
+  matchStatusClass(gilIdx: number): string {
+    const s = this.matchStatus(gilIdx);
+    if (s === 'ok') return 'badge badge--green';
+    if (s === 'diferencia') return 'badge badge--orange';
+    return 'badge badge--gray';
+  }
+
+  matchRowClass(gilIdx: number): string {
+    const s = this.matchStatus(gilIdx);
+    if (s === 'diferencia') return 'match-row--diferencia';
+    if (s === 'sin-asignar') return 'match-row--sin-asignar';
+    return '';
+  }
+
+  private buildAutoLinks(bienes: BienGilResponse[], lineas: FacturaLinea[]): (number | null)[] {
+    return bienes.map(bien => {
+      const gilDesc = this.normalizeDesc(bien.descripcion);
+      const idx = lineas.findIndex(l => {
+        const felDesc = this.normalizeDesc(l.descripcion);
+        return felDesc.includes(gilDesc) || gilDesc.includes(felDesc);
+      });
+      return idx >= 0 ? idx : null;
+    });
+  }
+
+  private normalizeDesc(s: string): string {
+    return s.toLowerCase()
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '')
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 
   goBack(): void {
@@ -113,21 +197,20 @@ export class FacturaImportPageComponent implements OnInit {
     this.localError.set(null);
     this.facade.limpiarImportacionFactura();
 
-    const isPdf = file.name.toLowerCase().endsWith('.pdf');
     const isValidSize = file.size <= 10 * 1024 * 1024;
-
-    if (!isPdf) {
-      this.localError.set('Solo se aceptan archivos en formato PDF.');
-      return;
-    }
-
     if (!isValidSize) {
       this.localError.set('El archivo supera el límite de 10 MB.');
       return;
     }
 
     const normalizedGilId = this.gilId().trim();
-    this.facade.importarFacturaFel(file, normalizedGilId || undefined);
+    const ext = file.name.toLowerCase().split('.').pop();
+
+    if (ext !== 'xml') {
+      this.localError.set('Para importación XML seleccioná un archivo .xml');
+      return;
+    }
+    this.facade.importarFacturaFelXml(file, normalizedGilId || undefined);
   }
 
   private groupIva(lineas: FacturaLinea[]): Array<{ porcentaje: number; valor: number }> {

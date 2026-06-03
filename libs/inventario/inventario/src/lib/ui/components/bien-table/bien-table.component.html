@@ -4,7 +4,7 @@
       <tr>
         <th>CÓD. SENA</th>
         <th>CÓD. PROVEEDOR</th>
-        <th>Nombre</th>
+        <th>Descripción</th>
         <th>Categoría</th>
         <th class="text-center">Stock</th>
         <th class="text-center">Stock Mín.</th>
@@ -25,7 +25,6 @@
         </td>
         <td>
           <div class="name-cell">
-            <span class="name">{{ bien.nombre }}</span>
             <span class="description">{{ bien.descripcion }}</span>
           </div>
         </td>
@@ -53,15 +52,29 @@
         </td>
         <td>
           <div class="actions-cell">
-            <button class="action-btn" (click)="onEdit(bien)" title="Editar">
-              <span class="material-symbols-outlined">edit</span>
-            </button>
-            <button class="action-btn" (click)="onView(bien)" title="Ver Detalle">
-              <span class="material-symbols-outlined">visibility</span>
-            </button>
-            <button class="action-btn danger" (click)="onDelete(bien)" title="Eliminar">
-              <span class="material-symbols-outlined">delete</span>
-            </button>
+            @if (selectMode) {
+              @if (isAdded(bien)) {
+                <span class="catalog-added-label">
+                  <span class="material-symbols-outlined" style="font-size:14px">check</span>
+                  Agregado
+                </span>
+              } @else {
+                <button class="btn-catalog-add" type="button" (click)="onSelect(bien)" title="Agregar al pedido">
+                  <span class="material-symbols-outlined" style="font-size:14px">add</span>
+                  Agregar
+                </button>
+              }
+            } @else {
+              <button class="action-btn" (click)="onEdit(bien)" title="Editar">
+                <span class="material-symbols-outlined">edit</span>
+              </button>
+              <button class="action-btn" (click)="onView(bien)" title="Ver Detalle">
+                <span class="material-symbols-outlined">visibility</span>
+              </button>
+              <button class="action-btn danger" (click)="onDelete(bien)" title="Eliminar">
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            }
           </div>
         </td>
       </tr>
