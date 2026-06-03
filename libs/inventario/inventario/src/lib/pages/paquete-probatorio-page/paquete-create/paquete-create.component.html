@@ -18,8 +18,10 @@
            [class.paquete-create__step--completed]="currentStep() > 1">
         <div class="paquete-create__step-icon">
           @if (currentStep() > 1) {
-            <lucide-icon name="check" [size]="14"></lucide-icon>
-          } @else { 1 }
+            <lucide-icon name="check-circle" [size]="16"></lucide-icon>
+          } @else {
+            <span class="paquete-create__step-num">1</span>
+          }
         </div>
         <span class="paquete-create__step-label">Información</span>
       </div>

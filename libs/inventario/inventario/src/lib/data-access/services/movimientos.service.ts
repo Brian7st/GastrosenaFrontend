@@ -86,6 +86,30 @@ export class MovimientosService {
   // ── Kardex ──────────────────────────────────────────────────────────────────
 
   /**
+   * GET /inventory/movimientos?pagina=0&tamano=50
+   * Listado global de TODOS los movimientos (entradas + salidas + ajustes),
+   * enriquecido por el backend con nombre y unidad de medida del catálogo.
+   */
+  getMovimientos(
+    pagina = 0,
+    tamano = 10,
+    tipo?: string,
+  ): Observable<{ movimientos: Movimiento[]; totalPaginas: number; totalElementos: number }> {
+    let params = new HttpParams()
+      .set('pagina', String(pagina))
+      .set('tamano', String(tamano));
+    if (tipo) {
+      params = params.set('tipo', tipo);
+    }
+    return this.http
+      .get<MovimientoPageResponse>(`${API}/inventory/movimientos`, { params })
+      .pipe(
+        map(resp => movimientoPageFromApi(resp)),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /**
    * GET /inventory/movimientos/{productoId}?pagina=0&tamano=10
    * El Swagger declara params `pagina`/`tamano` (español) y respuesta genérica `object`.
    * El mapper `movimientoPageFromApi` normaliza ambas convenciones de campo.
