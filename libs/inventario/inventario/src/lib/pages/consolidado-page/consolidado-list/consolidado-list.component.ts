@@ -30,17 +30,11 @@ export class ConsolidadoListComponent implements OnInit {
 
   // ── KPIs derivados de la lista real ─────────────────────────────────────
   kpiTotalEjecutado = computed(() =>
-    this.consolidados().reduce((acc, c) => acc + c.totales.totalGeneral, 0)
+    this.consolidados().reduce((acc, c) => acc + c.totales.valorNeto, 0)
   );
-  kpiContabilizados = computed(() =>
-    this.consolidados().filter(c => c.estado === 'CONTABILIZADO').length
-  );
-  kpiGenerados = computed(() =>
-    this.consolidados().filter(c => c.estado === 'GENERADO').length
-  );
-  kpiReversados = computed(() =>
-    this.consolidados().filter(c => c.estado === 'REVERSADO').length
-  );
+  kpiContabilizados = computed(() => 0);
+  kpiGenerados      = computed(() => this.consolidados().filter(c => c.estado === 'GENERADO').length);
+  kpiReversados     = computed(() => this.consolidados().filter(c => c.estado === 'REVERSADO').length);
 
   ngOnInit(): void {
     this.facade.loadAll();
@@ -68,18 +62,13 @@ export class ConsolidadoListComponent implements OnInit {
     const item = this.consolidados().find(c => c.id === id);
     if (item) {
       this.selectedReversarItem.set(item);
-      this.isReversarBlocked.set(item.estado === 'CONTABILIZADO');
+      this.isReversarBlocked.set(item.estado === 'REVERSADO');
       this.showReversarModal.set(true);
     }
   }
 
   getVariantFromEstado(estado: string): 'info' | 'success' | 'danger' | 'warning' {
-    const map: Record<string, 'info' | 'success' | 'danger' | 'warning'> = {
-      GENERADO:      'info',
-      CONTABILIZADO: 'success',
-      REVERSADO:     'danger',
-    };
-    return map[estado] ?? 'warning';
+    return estado === 'REVERSADO' ? 'danger' : 'info';
   }
 
   closeReversarModal(): void {
@@ -88,8 +77,8 @@ export class ConsolidadoListComponent implements OnInit {
   }
 
   confirmReversar(): void {
-    const id = this.selectedReversarItem()?.id;
-    if (id) this.facade.reversarConsolidado(id);
+    const item = this.selectedReversarItem();
+    if (item) this.facade.reversarConsolidado(item.numero);
     this.closeReversarModal();
   }
 }
