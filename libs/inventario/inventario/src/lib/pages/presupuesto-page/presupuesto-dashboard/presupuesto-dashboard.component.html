@@ -2,13 +2,14 @@
   <!-- ═══════════════════════════════════════════════════════════════════════
        HEADER
        ═══════════════════════════════════════════════════════════════════════ -->
-  @if (resumen()) {
-    <div class="page-header-row">
+  <div class="page-header-row">
     <div>
       <h1 class="page-title">Presupuesto General de Gastos</h1>
-      <p class="page-subtitle">
-        Vigencia Fiscal {{ resumen()!.vigenciaFiscal }} — Corte: {{ resumen()!.corte }}
-      </p>
+      @if (resumenGlobal()) {
+        <p class="page-subtitle">
+          Vigencia Fiscal {{ resumenGlobal()!.vigencia ?? 'N/A' }} — {{ resumenGlobal()!.totalPresupuestos }} presupuesto(s)
+        </p>
+      }
     </div>
     <div class="header-actions">
       <restaurant-button variant="surface" (click)="openExportModal()">
@@ -27,24 +28,24 @@
   </div>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       KPI GRID (5 cards — Bento)
+       KPI GRID — datos del endpoint /resumen (cuando disponibles)
        ═══════════════════════════════════════════════════════════════════════ -->
+  @if (resumenGlobal()) {
   <div class="kpi-grid">
-    <restaurant-kpi-card label="TOTAL APROPIACIÓN" [value]="resumen()!.totalApropiacion | formatoMoneda" icon="landmark"
-      iconColor="blue" [trend]="'+' + resumen()!.variacionAnual + '% vs ' + (resumen()!.vigenciaFiscal - 1)"
-      [trendUp]="true"></restaurant-kpi-card>
+    <restaurant-kpi-card label="TOTAL ASIGNADO" [value]="resumenGlobal()!.totalAsignado | formatoMoneda" icon="landmark"
+      iconColor="blue" trend="Apropiación total" [trendUp]="null"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="COMPROMETIDO" [value]="resumen()!.totalComprometido | formatoMoneda" icon="file-check"
-      iconColor="orange" [trend]="resumen()!.porcentajeEjecucion + '% ejecutado'" [trendUp]="null"></restaurant-kpi-card>
+    <restaurant-kpi-card label="COMPROMETIDO" [value]="resumenGlobal()!.totalComprometido | formatoMoneda" icon="file-check"
+      iconColor="orange" [trend]="resumenGlobal()!.porcentajeEjecucion + '% ejecutado'" [trendUp]="null"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="PAGADO REAL" [value]="resumen()!.totalPagado | formatoMoneda" icon="banknote"
+    <restaurant-kpi-card label="PAGADO REAL" [value]="resumenGlobal()!.totalPagado | formatoMoneda" icon="banknote"
       iconColor="green" trend="Verificado a la fecha" [trendUp]="null"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="DISPONIBLE" [value]="resumen()!.totalDisponible | formatoMoneda" icon="wallet"
+    <restaurant-kpi-card label="SALDO GLOBAL" [value]="resumenGlobal()!.saldoGlobal | formatoMoneda" icon="wallet"
       iconColor="blue" trend="Saldo sin comprometer" [trendUp]="null"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="TOTAL ZESE APLICADA" [value]="resumen()!.totalZese | formatoMoneda" icon="shield-check"
-      iconColor="red" trend="Retención 0.625%" [trendUp]="null"></restaurant-kpi-card>
+    <restaurant-kpi-card label="PRESUPUESTOS" [value]="resumenGlobal()!.totalPresupuestos" icon="layers"
+      iconColor="red" trend="Total registrados" [trendUp]="null"></restaurant-kpi-card>
   </div>
   }
 
@@ -126,21 +127,23 @@
           }
           }
         </tbody>
+        @if (resumenGlobal()) {
         <tfoot>
           <tr class="total-row">
             <td class="col-estructura total-label">TOTAL CONSOLIDADO</td>
-            <td class="col-money total-value">{{ resumen()!.totalApropiacion | formatoMoneda:false }}</td>
-            <td class="col-money total-value">{{ resumen()!.totalDisponible | formatoMoneda:false }}</td>
-            <td class="col-money total-value">{{ resumen()!.totalComprometido | formatoMoneda:false }}</td>
-            <td class="col-money total-value">{{ resumen()!.totalPagado | formatoMoneda:false }}</td>
-            <td class="col-money total-value">{{ resumen()!.totalZese | formatoMoneda:false }}</td>
+            <td class="col-money total-value">{{ resumenGlobal()!.totalAsignado | formatoMoneda:false }}</td>
+            <td class="col-money total-value">{{ resumenGlobal()!.saldoGlobal | formatoMoneda:false }}</td>
+            <td class="col-money total-value">{{ resumenGlobal()!.totalComprometido | formatoMoneda:false }}</td>
+            <td class="col-money total-value">{{ resumenGlobal()!.totalPagado | formatoMoneda:false }}</td>
+            <td class="col-money total-value">—</td>
             <td class="col-ejecucion">
-              <span class="ejecucion-badge" [ngClass]="getEjecucionClass(resumen()!.porcentajeEjecucion)">
-                {{ resumen()!.porcentajeEjecucion }}%
+              <span class="ejecucion-badge" [ngClass]="getEjecucionClass(resumenGlobal()!.porcentajeEjecucion)">
+                {{ resumenGlobal()!.porcentajeEjecucion }}%
               </span>
             </td>
           </tr>
         </tfoot>
+        }
       </table>
     </div>
   </div>

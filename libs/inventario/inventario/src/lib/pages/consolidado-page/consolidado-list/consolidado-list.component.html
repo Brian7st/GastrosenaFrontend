@@ -74,7 +74,7 @@
             </div>
           </td>
           <td>
-            <span class="td-bold">{{ item.totales.totalGeneral | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+            <span class="td-bold">{{ item.totales.valorNeto | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
           </td>
           <td>
             <restaurant-status-badge [label]="item.estado" [variant]="getVariantFromEstado(item.estado)"></restaurant-status-badge>
@@ -156,7 +156,7 @@
    
     [consolidadoId]="selectedReversarItem()!.id"
     [periodo]="selectedReversarItem()!.fechaGeneracion"
-    [total]="(selectedReversarItem()!.totales.totalGeneral | currency:'COP':'symbol-narrow':'1.0-0') ?? ''"
+    [total]="(selectedReversarItem()!.totales.valorNeto | currency:'COP':'symbol-narrow':'1.0-0') ?? ''"
     [comprobantes]="selectedReversarItem()!.lineas.length"
     [isBlocked]="isReversarBlocked()"
     (close)="closeReversarModal()"

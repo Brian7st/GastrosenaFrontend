@@ -38,8 +38,9 @@ export class PresupuestoDashboardComponent implements OnInit {
   // ── Modal de exportación ──────────────────────────────────────────────────
   showExportModal = signal(false);
 
-  /** Datos de resumen presupuestal */
-  resumen = this.facade.resumen;
+  /** Resumen global del backend — null hasta que cargue */
+  resumen      = this.facade.resumen;
+  resumenGlobal = this.facade.resumenGlobal;
 
   /** Grupos de rubros agrupados por ficha (tabla colapsable) */
   grupos = this.facade.grupos;
