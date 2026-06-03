@@ -22,9 +22,14 @@ export class ConciliacionDashboardComponent implements OnInit {
   protected facade = inject(ConciliacionFacade);
 
   // Signals expuestos desde la facade (solo lectura)
-  conciliaciones = this.facade.conciliaciones;
-  loading = this.facade.loading;
-  error = this.facade.error;
+  conciliaciones     = this.facade.conciliaciones;
+  loading            = this.facade.loading;
+  error              = this.facade.error;
+
+  // KPIs derivados del historial real
+  totalConciliaciones = this.facade.totalConciliaciones;
+  precisionPromedio   = this.facade.precisionPromedio;
+  diferenciasTotal    = this.facade.diferenciasTotal;
 
   // ─── Datos de UI locales como signals ───
   tendencias = signal([

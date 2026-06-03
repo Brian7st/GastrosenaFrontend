@@ -27,39 +27,39 @@
        ═══════════════════════════════════════════════════════════════════════ -->
   <div class="kpi-grid">
     <restaurant-kpi-card
-      label="ESTADO GLOBAL"
-      value="96%"
+      label="PRECISIÓN PROMEDIO"
+      [value]="precisionPromedio() + '%'"
       icon="check-circle-2"
       iconColor="green"
-      trend="Óptimo"
-      [trendUp]="true"
+      trend="Exactitud global"
+      [trendUp]="precisionPromedio() >= 90"
     ></restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="CONCILIACIONES TRIMESTRE"
-      value="12"
+      label="CONCILIACIONES REGISTRADAS"
+      [value]="totalConciliaciones()"
       icon="calendar"
       iconColor="blue"
-      trend="completadas"
+      trend="en el historial"
       [trendUp]="null"
     ></restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="DIFERENCIAS CRÍTICAS"
-      value="3"
+      label="ÍTEMS CON DIFERENCIA"
+      [value]="diferenciasTotal()"
       icon="alert-triangle"
       iconColor="red"
-      trend="pendientes"
+      trend="detectadas"
       [trendUp]="false"
     ></restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="PRECISIÓN PROMEDIO"
-      value="95%"
+      label="ESTADO"
+      [value]="precisionPromedio() >= 90 ? 'Óptimo' : 'Revisar'"
       icon="check-circle-2"
-      iconColor="green"
-      trend="+2%"
-      [trendUp]="true"
+      [iconColor]="precisionPromedio() >= 90 ? 'green' : 'orange'"
+      trend="umbral: 90%"
+      [trendUp]="precisionPromedio() >= 90"
     ></restaurant-kpi-card>
   </div>
 
