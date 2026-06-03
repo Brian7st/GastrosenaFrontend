@@ -176,6 +176,7 @@
         <input
           type="date"
           class="date-input"
+          #desdeInput
           [ngModel]="fechaEliminarDesde()"
           (ngModelChange)="fechaEliminarDesde.set($event)"
         />
@@ -183,15 +184,19 @@
         <input
           type="date"
           class="date-input"
+          #hastaInput
           [ngModel]="fechaEliminarHasta()"
           (ngModelChange)="fechaEliminarHasta.set($event)"
         />
         <button
           class="btn-eliminar"
           (click)="eliminarPorRango()"
-          [disabled]="!fechaEliminarDesde() || !fechaEliminarHasta()"
         >Eliminar</button>
       </div>
+
+      @if (mensajeEliminar()) {
+        <div class="mensaje-eliminar">{{ mensajeEliminar() }}</div>
+      }
 
       <!-- Body -->
       <div class="modal-body">
@@ -234,7 +239,7 @@
               </div>
 
               <!-- Icono eliminar individual -->
-              <button class="btn-delete-single" title="Eliminar comanda">
+              <button class="btn-delete-single" (click)="eliminarComanda(c.idComanda)" title="Eliminar comanda">
                 <lucide-icon name="trash-2" size="16"></lucide-icon>
               </button>
             </div>
