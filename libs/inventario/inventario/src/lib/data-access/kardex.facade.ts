@@ -45,7 +45,7 @@ export class KardexFacade {
   // ── Kardex ───────────────────────────────────────────────────────────────────
 
   /** Carga el listado global de movimientos (GET /inventory/movimientos). */
-  loadAll(pagina = 0, tamano = 50): void {
+  loadAll(pagina = 0, tamano = 20): void {
     this._loading.set(true);
     this._error.set(null);
     this.movimientosService.getMovimientos(pagina, tamano)

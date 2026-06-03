@@ -20,8 +20,10 @@ import {
 
 /**
  * Normaliza la respuesta paginada de GET /inventory/movimientos/{productoId}.
- * El backend no documenta el schema en Swagger (type: object genérico) y puede
- * usar convención inglés (content/totalElements) o español (contenido/totalElementos).
+ * El backend no documenta el schema en Swagger (type: object genérico).
+ * La respuesta real expone el array bajo `movimientos` (KardexHttpResponse);
+ * se mantienen los fallbacks inglés (content/totalElements) y español
+ * (contenido/totalElementos) por compatibilidad.
  */
 export function movimientoPageFromApi(resp: MovimientoPageResponse): {
   movimientos:    Movimiento[];
@@ -29,7 +31,7 @@ export function movimientoPageFromApi(resp: MovimientoPageResponse): {
   totalElementos: number;
 } {
   const dtos: MovimientoResponse[] =
-    resp.content ?? resp.contenido ?? [];
+    resp.movimientos ?? resp.content ?? resp.contenido ?? [];
   return {
     movimientos:    dtos.map(movimientoFromApi),
     totalPaginas:   resp.totalPages   ?? resp.totalPaginas   ?? 0,
