@@ -29,6 +29,14 @@
     </div>
   </div>
 
+  <!-- Estado de error -->
+  @if (error()) {
+  <div class="error-banner" role="alert">
+    <lucide-icon name="alert-triangle" [size]="18"></lucide-icon>
+    {{ error() }}
+  </div>
+  }
+
   <!-- KPIs Bento Grid -->
   <div class="kpi-grid">
     <restaurant-kpi-card

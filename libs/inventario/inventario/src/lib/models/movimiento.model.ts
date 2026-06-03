@@ -4,7 +4,7 @@
 export interface DocumentoMovimiento {
   tipo: 'ENTRADA' | 'SALIDA';
   documentoId: string;
-  numeroDocumento: string;
+  numeroDocumento: string | null;
   cantidadBienes: number;
   cantidadTotal: number;
   valorTotal: number;

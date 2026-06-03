@@ -27,6 +27,7 @@ export class MovimientosListComponent implements OnInit {
   // ── Estado reactivo desde facade ─────────────────────────────────────────
   documentos = this.facade.documentos;
   loading    = this.facade.loading;
+  error      = this.facade.error;
   paginacion = this.facade.paginacion;
 
   // ── Paginación computada ──────────────────────────────────────────────────
