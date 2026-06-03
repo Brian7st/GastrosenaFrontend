@@ -45,6 +45,54 @@ export class ConciliacionFacade {
     this._conciliaciones().reduce((acc, c) => acc + c.itemsDif, 0)
   );
 
+  /** Top 3 conciliaciones con más ítems en diferencia */
+  public topPorDiferencias = computed(() =>
+    [...this._conciliaciones()]
+      .filter(c => c.itemsDif > 0)
+      .sort((a, b) => b.itemsDif - a.itemsDif)
+      .slice(0, 3)
+      .map(c => ({
+        label:      c.id,
+        diferencia: c.itemsDif,
+        fecha:      c.fecha,
+      }))
+  );
+
+  /** Fecha de la conciliación más reciente (o null si no hay ninguna) */
+  public ultimaFecha = computed(() => {
+    const list = this._conciliaciones();
+    if (list.length === 0) return null;
+    return list.reduce((prev, cur) => (cur.fecha > prev.fecha ? cur : prev)).fecha;
+  });
+
+  /**
+   * Tendencia mensual: agrupa conciliaciones por mes (últimos 6 meses),
+   * calcula promedio de precisión y suma de ítems totales por mes.
+   */
+  public tendenciaMensual = computed(() => {
+    const meses: Record<string, { sumaPrecision: number; sumaItems: number; count: number }> = {};
+
+    for (const c of this._conciliaciones()) {
+      const mes = c.fecha.slice(0, 7); // 'YYYY-MM'
+      if (!meses[mes]) meses[mes] = { sumaPrecision: 0, sumaItems: 0, count: 0 };
+      meses[mes].sumaPrecision += c.precision;
+      meses[mes].sumaItems    += c.itemsTotal;
+      meses[mes].count        += 1;
+    }
+
+    return Object.entries(meses)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .slice(-6)
+      .map(([mes, v]) => ({
+        mes,
+        label:     new Date(mes + '-01').toLocaleString('es-CO', { month: 'short' }),
+        precision: Math.round(v.sumaPrecision / v.count),
+        items:     v.sumaItems,
+        isCurrent: false,
+      }))
+      .map((entry, _i, arr) => ({ ...entry, isCurrent: entry.mes === arr[arr.length - 1].mes }));
+  });
+
   /**
    * Agrupa los ítems del catálogo por categoría.
    * Se alimenta del mismo endpoint /catalogo que usa la toma física,
