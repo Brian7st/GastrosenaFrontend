@@ -1,8 +1,9 @@
-import { ConciliacionRegistro, ConciliacionDetalle, DiferenciaItem } from '../../models/conciliacion.model';
+import { ConciliacionRegistro, ConciliacionDetalle, DiferenciaItem, TomaFisicaItem } from '../../models/conciliacion.model';
 import {
   ConciliacionListItemResponse,
   ConciliacionDetailResponse,
   DiferenciaResponse,
+  CatalogoItemResponse,
 } from '../api/reconciliation.api';
 
 export function conciliacionListItemFromApi(dto: ConciliacionListItemResponse): ConciliacionRegistro {
@@ -48,5 +49,17 @@ export function diferenciaFromApi(dto: DiferenciaResponse): DiferenciaItem {
     unidad: dto.unidad,
     valorUnit: dto.valorUnit,
     impacto: dto.impacto,
+  };
+}
+
+export function catalogoItemToTomaFisicaItem(dto: CatalogoItemResponse): TomaFisicaItem {
+  return {
+    id: dto.codigoSena,
+    codigoSena: dto.codigoSena,
+    categoria: dto.categoria ?? '',
+    producto: dto.descripcion,
+    stockSistema: dto.cantidadSistema,
+    conteoFisico: null,
+    valorUnitario: dto.valorUnitario,
   };
 }

@@ -1,5 +1,5 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
-import { finalize, catchError, of } from 'rxjs';
+import { finalize, catchError, of, switchMap, map } from 'rxjs';
 import { ConciliacionService } from './services/conciliacion.service';
 import {
   ConciliacionRegistro,
@@ -23,6 +23,7 @@ export class ConciliacionFacade {
   private _tomaFisicaItems           = signal<TomaFisicaItem[]>([]);
   private _loading                   = signal<boolean>(false);
   private _error                     = signal<string | null>(null);
+  private _ultimaConciliacionId      = signal<string | null>(null);
 
   // ─────────────── Exposición pública (solo lectura) ───────────────
   public conciliaciones           = computed(() => this._conciliaciones());
@@ -31,6 +32,7 @@ export class ConciliacionFacade {
   public tomaFisicaItems          = computed(() => this._tomaFisicaItems());
   public loading                  = computed(() => this._loading());
   public error                    = computed(() => this._error());
+  public ultimaConciliacionId     = computed(() => this._ultimaConciliacionId());
 
   // ─────────────── KPIs derivados ───────────────
   public totalConciliaciones = computed(() => this._conciliaciones().length);
@@ -157,6 +159,33 @@ export class ConciliacionFacade {
       )
       .subscribe(res => {
         if (res !== null) this.cargarConciliacion(id);
+      });
+  }
+
+  /**
+   * Flujo completo de toma física:
+   * 1. Crea la sesión de conciliación (POST /conciliaciones)
+   * 2. Registra el conteo de todos los ítems (POST /conciliaciones/{id}/conteo)
+   * Al completar, expone el ID de la nueva conciliación en `ultimaConciliacionId`.
+   */
+  finalizarTomaFisica(data: IniciarConciliacionRequest, items: ConteoItemData[]): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this._ultimaConciliacionId.set(null);
+
+    this.conciliacionService.iniciarTomaFisica(data)
+      .pipe(
+        switchMap(({ id }) =>
+          this.conciliacionService.registrarConteo(id, items).pipe(map(() => id))
+        ),
+        catchError(() => {
+          this._error.set('Error al finalizar la toma física');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(id => {
+        if (id) this._ultimaConciliacionId.set(id);
       });
   }
 

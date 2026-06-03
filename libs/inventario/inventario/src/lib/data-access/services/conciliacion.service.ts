@@ -15,12 +15,14 @@ import {
   IniciarConciliacionRequest,
   RegistrarConteoRequest,
   ResolverDiferenciaRequest,
+  CatalogoItemResponse,
 } from '../api/reconciliation.api';
 import { ConteoItemData } from '../../models/conciliacion.model';
 import {
   conciliacionListItemFromApi,
   conciliacionDetailFromApi,
   diferenciaFromApi,
+  catalogoItemToTomaFisicaItem,
 } from '../mappers/reconciliation.mapper';
 
 const API = '/api/v1';
@@ -57,9 +59,9 @@ export class ConciliacionService {
   }
 
   /** POST /reconciliation/conciliaciones — responsableId, responsableNombre, tipo y fecha son obligatorios */
-  iniciarTomaFisica(data: IniciarConciliacionRequest): Observable<{ sesionId: string }> {
+  iniciarTomaFisica(data: IniciarConciliacionRequest): Observable<{ id: string }> {
     return this.http
-      .post<{ sesionId: string }>(`${API}/reconciliation/conciliaciones`, data)
+      .post<{ id: string }>(`${API}/reconciliation/conciliaciones`, data)
       .pipe(catchError(err => throwError(() => err)));
   }
 
@@ -99,8 +101,13 @@ export class ConciliacionService {
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  /** TODO: endpoint de ítems de toma física pendiente de confirmación con backend */
+  /** GET /reconciliation/conciliaciones/catalogo — catálogo activo con stock actual del sistema */
   getTomaFisicaItems(): Observable<TomaFisicaItem[]> {
-    return throwError(() => new Error('getTomaFisicaItems: endpoint no disponible — pendiente con backend'));
+    return this.http
+      .get<CatalogoItemResponse[]>(`${API}/reconciliation/conciliaciones/catalogo`)
+      .pipe(
+        map(list => list.map(catalogoItemToTomaFisicaItem)),
+        catchError(err => throwError(() => err))
+      );
   }
 }

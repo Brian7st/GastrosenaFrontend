@@ -67,9 +67,9 @@
        ═══════════════════════════════════════════════════════════════════════ -->
   <div class="table-controls">
     <div class="tabs-group">
-      <button class="tab-btn tab-btn--active">TODOS</button>
-      <button class="tab-btn">DIFERENCIAS</button>
-      <button class="tab-btn">PENDIENTES</button>
+      <button class="tab-btn" [class.tab-btn--active]="activeTab() === 'todos'" (click)="setTab('todos')">TODOS</button>
+      <button class="tab-btn" [class.tab-btn--active]="activeTab() === 'diferencias'" (click)="setTab('diferencias')">DIFERENCIAS</button>
+      <button class="tab-btn" [class.tab-btn--active]="activeTab() === 'pendientes'" (click)="setTab('pendientes')">PENDIENTES</button>
     </div>
     
     <div class="actions-group">
@@ -106,7 +106,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (item of items(); track item.id) {
+        @for (item of filteredItems(); track item.id) {
           <tr>
             <td class="font-medium text-secondary">{{ item.codigoSena }}</td>
             <td class="text-secondary">{{ item.categoria }}</td>
@@ -155,10 +155,14 @@
       <div></div>
     }
     
-    <restaurant-button variant="primary">
+    <restaurant-button variant="primary" [disabled]="loading() || itemsContados() === 0" (click)="finalizar()">
       <div class="btn-icon-text">
-        Finalizar y Ajustar Stock
-        <lucide-icon name="arrow-right" [size]="18"></lucide-icon>
+        @if (loading()) {
+          Procesando...
+        } @else {
+          Finalizar y Ajustar Stock
+          <lucide-icon name="arrow-right" [size]="18"></lucide-icon>
+        }
       </div>
     </restaurant-button>
   </div>

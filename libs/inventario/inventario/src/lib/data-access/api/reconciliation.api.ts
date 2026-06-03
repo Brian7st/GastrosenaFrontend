@@ -58,3 +58,13 @@ export interface RegistrarConteoRequest {
 export interface ResolverDiferenciaRequest {
   justificacion: string;
 }
+
+/** GET /reconciliation/conciliaciones/catalogo — ítem del catálogo con stock actual */
+export interface CatalogoItemResponse {
+  codigoSena:      string;
+  descripcion:     string;
+  categoria:       string;
+  unidadMedida:    string;
+  valorUnitario:   number;
+  cantidadSistema: number;
+}
