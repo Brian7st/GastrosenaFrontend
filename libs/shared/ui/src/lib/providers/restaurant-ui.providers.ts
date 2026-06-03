@@ -98,6 +98,10 @@ import {
   LucideWarehouse,
   LucideX,
   LucideXCircle,
+  LucideFlame,
+  LucideLeaf,
+  LucideSnowflake,
+  LucideTag,
   provideLucideIcons,
 } from '@lucide/angular';
 
@@ -204,6 +208,10 @@ export const RESTAURANT_UI_BASE_ICONS: RestaurantUiIcon[] = [
   LucideWarehouse,
   LucideX,
   LucideXCircle,
+  LucideFlame,
+  LucideLeaf,
+  LucideSnowflake,
+  LucideTag,
 ];
 
 export function provideRestaurantUi(
