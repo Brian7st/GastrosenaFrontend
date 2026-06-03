@@ -5,6 +5,8 @@
  * español (contenido/totalElementos) para cubrir las variaciones del backend.
  */
 export interface MovimientoPageResponse {
+  // Clave real del backend (KardexHttpResponse): array bajo `movimientos`
+  movimientos?:   MovimientoResponse[];
   // Convención inglés (Spring Page<T> estándar — igual que PagedGilResponse)
   content?:       MovimientoResponse[];
   totalElements?: number;
