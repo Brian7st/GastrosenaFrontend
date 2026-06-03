@@ -100,14 +100,32 @@ export class KardexFacade {
     }
   }
 
+  /**
+   * Selecciona un movimiento por id. El backend no expone "obtener movimiento
+   * por id" (GET /movimientos/{id} es el kardex por productoId), así que se
+   * resuelve desde el listado ya cargado en memoria. Si la lista está vacía
+   * (acceso directo a la URL del detalle), se carga la primera página y se busca.
+   */
   cargarMovimiento(id: string): void {
+    const encontrado = this._movimientos().find(m => m.id === id);
+    if (encontrado) {
+      this._movimientoSeleccionado.set(encontrado);
+      return;
+    }
     this._loading.set(true);
-    this.movimientosService.getMovimientoById(id)
+    this._error.set(null);
+    this.movimientosService.getMovimientos(0, this._paginacion().size || 20)
       .pipe(
-        catchError(() => of(undefined)),
+        catchError(() => {
+          this._error.set('Error al cargar el movimiento');
+          return of({ movimientos: [] as Movimiento[], totalPaginas: 0, totalElementos: 0 });
+        }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe(data => this._movimientoSeleccionado.set(data));
+      .subscribe(({ movimientos }) => {
+        this._movimientos.set(movimientos);
+        this._movimientoSeleccionado.set(movimientos.find(m => m.id === id));
+      });
   }
 
   /** GET /reporting/kardex?productoId?&desde?&hasta? */

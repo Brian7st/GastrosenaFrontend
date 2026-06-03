@@ -1,16 +1,19 @@
 <main class="page-container">
+
+  @if (movimiento(); as mov) {
+
   <!-- Action Header -->
   <header class="action-header">
     <div class="header-left">
       <inventario-back-button (clicked)="goBack()"></inventario-back-button>
       <div>
         <h1 class="page-title">
-          Detalle de Movimiento #MOV-2024-0156
-          <span class="status-badge">Completado</span>
+          Detalle de Movimiento #{{ mov.id }}
+          <span class="status-badge">{{ mov.estado }}</span>
         </h1>
       </div>
     </div>
-    
+
     <div class="header-right">
       <restaurant-button variant="surface">
         <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: bold;">
@@ -29,19 +32,19 @@
 
   <!-- Content Area -->
   <div class="content-area">
-    
+
     <!-- Section 1: Información del Movimiento -->
     <section class="card">
       <h2 class="section-title">Información del Movimiento</h2>
       <div class="info-grid">
-        
+
         <div class="info-item">
           <span class="info-label">Tipo</span>
           <div class="info-value">
-            <div class="icon-box icon-box--entrada">
-              <lucide-icon name="arrow-down" [size]="16"></lucide-icon>
+            <div class="icon-box" [class.icon-box--entrada]="mov.tipo === 'ENTRADA'" [class.icon-box--salida]="mov.tipo !== 'ENTRADA'">
+              <lucide-icon [name]="mov.tipo === 'ENTRADA' ? 'arrow-down' : 'arrow-up'" [size]="16"></lucide-icon>
             </div>
-            Entrada
+            {{ getTipoLabel(mov.tipo) }}
           </div>
         </div>
 
@@ -49,33 +52,15 @@
           <span class="info-label">Fecha</span>
           <div class="info-value">
             <lucide-icon name="calendar" [size]="18" class="text-secondary"></lucide-icon>
-            15 Oct 2023, 09:45 AM
+            {{ mov.fechaMovimiento | date:'dd MMM y, hh:mm a' }}
           </div>
         </div>
 
         <div class="info-item">
-          <span class="info-label">Usuario</span>
+          <span class="info-label">Responsable</span>
           <div class="info-value">
-            <div class="avatar">CR</div>
-            Carlos R.
-          </div>
-        </div>
-
-        <div class="info-item">
-          <span class="info-label">Documento origen</span>
-          <div class="info-value">
-            <a href="javascript:void(0)" class="doc-link">
-              <lucide-icon name="file-text" [size]="18"></lucide-icon>
-              <span>FAC-2025-001</span>
-            </a>
-          </div>
-        </div>
-
-        <div class="info-item full-width">
-          <span class="info-label">Origen / Destino</span>
-          <div class="info-box">
-            <lucide-icon name="store" [size]="20" class="text-secondary"></lucide-icon>
-            <span>Proveedor: <strong>TechGlobal</strong></span>
+            <lucide-icon name="user" [size]="18" class="text-secondary"></lucide-icon>
+            {{ mov.responsableNombre || 'Sin responsable' }}
           </div>
         </div>
 
@@ -87,7 +72,7 @@
       <div class="card-header">
         <h2 class="section-title">Detalle del Producto</h2>
       </div>
-      
+
       <div class="table-responsive">
         <table class="data-table">
           <thead>
@@ -106,42 +91,56 @@
                   <div class="product-icon">
                     <lucide-icon name="box" [size]="20"></lucide-icon>
                   </div>
-                  <span class="product-name">Cable UTP Cat 6a</span>
+                  <span class="product-name">{{ mov.productoNombre || '—' }}</span>
                 </div>
               </td>
-              <td class="text-secondary">AOL001</td>
+              <td class="text-secondary">{{ mov.codigoSena }}</td>
               <td class="text-right">
-                <span class="qty-badge">+150 Metros</span>
+                <span class="qty-badge">{{ mov.tipo === 'ENTRADA' ? '+' : '' }}{{ mov.cantidad }} {{ mov.unidadMedida }}</span>
               </td>
-              <td class="text-right">$3.000</td>
-              <td class="text-right font-bold">$450.000</td>
+              <td class="text-right">${{ valorUnitario() | number:'1.0-0' }}</td>
+              <td class="text-right font-bold">${{ mov.valor | number:'1.0-0' }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
               <td colspan="4" class="text-right font-bold">Gran Total</td>
-              <td class="text-right font-bold total-val">$450.000</td>
+              <td class="text-right font-bold total-val">${{ mov.valor | number:'1.0-0' }}</td>
             </tr>
           </tfoot>
         </table>
       </div>
     </section>
 
-    <!-- Section 3: Observaciones -->
-    <section class="card">
-      <h2 class="section-title mb-4">Observaciones</h2>
-      <div class="obs-box">
-        <p>Recepción de pedido semanal de cableado estructurado para laboratorio de redes.</p>
-      </div>
-    </section>
-
   </div>
+
+  } @else if (loading()) {
+
+  <div class="content-area">
+    <section class="card">
+      <p class="text-secondary">Cargando movimiento…</p>
+    </section>
+  </div>
+
+  } @else {
+
+  <div class="content-area">
+    <header class="action-header">
+      <inventario-back-button (clicked)="goBack()"></inventario-back-button>
+    </header>
+    <section class="card">
+      <p class="text-secondary">No se encontró el movimiento solicitado.</p>
+    </section>
+  </div>
+
+  }
+
 </main>
 
 <!-- Modal de exportación -->
 @if (showExportModal()) {
 <inventario-exportar
- 
+
   titulo="Exportar Movimiento"
   subtitulo="Seleccione el formato de salida para este movimiento"
   (exportar)="onExport($event)"
