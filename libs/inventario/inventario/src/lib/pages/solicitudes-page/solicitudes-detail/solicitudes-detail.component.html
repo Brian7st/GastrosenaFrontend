@@ -249,31 +249,6 @@
         </div>
       </div>
 
-      <!-- Card: Observaciones y Justificación -->
-      @if (estadoActual() === 'BORRADOR') {
-      <div class="card">
-        <div class="card-header-icon mb-4">
-          <span class="material-symbols-outlined icon-primary">comment</span>
-          <h3>Observaciones y Justificación</h3>
-        </div>
-        <div class="comment-box">
-          @if (solicitud()?.observaciones) {
-            <p>"{{ solicitud()!.observaciones }}"</p>
-          } @else {
-            <p class="text-muted">Sin observaciones registradas.</p>
-          }
-        </div>
-        @if (estadoActual() === 'BORRADOR') {
-          <div class="card-edit-action">
-            <restaurant-button variant="surface" (click)="onEditar()">
-              <span class="material-symbols-outlined">edit</span>
-              Editar {{ solicitudId() }}
-            </restaurant-button>
-          </div>
-        }
-      </div>
-      }
-
     </div>
   </div>
 

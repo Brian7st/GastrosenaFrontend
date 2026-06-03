@@ -277,6 +277,19 @@ export class FacturasService {
       observaciones:           g.observaciones ?? '',
       hashTransaccion:         '',
       idTransaccion:           '',
+      numeroGil:               g.numeroGil,
+      codigoGrupo:             g.codigoGrupo ?? '',
+      solicitante:             g.solicitante ?? '',
+      cuentadantes:            g.cuentadantes?.map(c => c.nombre) ?? [],
+      bienes:                  (g.bienes ?? []).map(b => ({
+        codigoSena:    b.codigoSena,
+        descripcion:   b.descripcion,
+        unidadMedida:  b.unidadMedida,
+        cantidad:      b.cantidad,
+        valorUnitario: b.valorUnitario,
+        iva:           b.iva,
+        subtotal:      b.subtotal,
+      })),
     };
   }
 }
