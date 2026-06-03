@@ -47,7 +47,9 @@ export class PerfilPageComponent implements OnInit {
   readonly guardando = signal(false);
   readonly exito     = signal(false);
   readonly subiendo  = signal(false);
-  readonly fotoUrl   = signal<string | null>(null);
+ readonly fotoUrl = signal<string | null>(
+  localStorage.getItem(`fotoUrl_${this.usuario?.id}`) ?? null
+);
 
   readonly iniciales = computed(() => {
     const nombre = this.usuario?.nombre ?? '';
@@ -74,22 +76,23 @@ export class PerfilPageComponent implements OnInit {
   }
 
   cargarPerfil(): void {
-    this.usuariosService.obtenerPerfil().subscribe({
-      next: (data) => {
-        this.infoForm.patchValue({
-          nombre:    data.nombre,
-          apellidos: data.apellidos,
-          email:     data.email,
-          documento: data.documento,
-          telefono:  data.telefono,
-        });
-        if ((data as any).fotoUrl) {
-          this.fotoUrl.set((data as any).fotoUrl);
-        }
-      },
-      error: (err) => console.error('Error cargando perfil', err),
-    });
-  }
+  this.usuariosService.obtenerPerfil().subscribe({
+    next: (data) => {
+      this.infoForm.patchValue({
+        nombre:    data.nombre,
+        apellidos: data.apellidos,
+        email:     data.email,
+        documento: data.documento,
+        telefono:  data.telefono,
+      });
+      if ((data as any).fotoUrl) {
+        this.fotoUrl.set((data as any).fotoUrl);
+        localStorage.setItem(`fotoUrl_${this.usuario?.id}`, (data as any).fotoUrl);
+      }
+    },
+    error: (err) => console.error('Error cargando perfil', err),
+  });
+}
 
   triggerFileInput(): void {
     this.fileInput.nativeElement.click();
