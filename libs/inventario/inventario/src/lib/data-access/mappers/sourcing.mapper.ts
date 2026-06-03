@@ -80,7 +80,12 @@ export function conciliacionGilFromApi(dto: ConciliacionGilResponse): Conciliaci
     facturaId: dto.facturaId,
     gilId:     dto.gilId,
     estado:    dto.estado,
-    diferencias: dto.detalles.map((d: DetalleGilResponse) => ({
+    // Solo los detalles que NO coinciden son diferencias. Un detalle en estado 'OK'
+    // significa que el ítem cuadra (cantidad, precio e IVA) y no debe contarse ni
+    // listarse como diferencia.
+    diferencias: dto.detalles
+      .filter((d: DetalleGilResponse) => d.estado !== 'OK')
+      .map((d: DetalleGilResponse) => ({
       gilItemId:             d.gilItemId,
       descripcion:           d.descripcion,
       cantidadGil:           d.cantidadGil,
@@ -129,6 +134,7 @@ export function gilFromApi(dto: GilResponse): SolicitudGil {
       cantidad:      b.cantidad,
       valorUnitario: b.valorUnitario,
       subtotal:      b.subtotal,
+      iva:           b.iva ?? 0,
     })),
     creadoEn:      dto.creadoEn,
     actualizadoEn: dto.actualizadoEn,

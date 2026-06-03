@@ -55,8 +55,8 @@
       </div>
       @for (c of enEspera(); track c.idComanda) {
         <restaurant-comanda-card class="comanda-card-wrapper shadow-sm" [comanda]="c"
-          (iniciarPlato)="onIniciarPlato($event, c.idComanda)"
-          (finalizarPlato)="onFinalizarPlato($event, c.idComanda)">
+          (iniciarPlato)="onIniciarPlato($event)"
+          (finalizarPlato)="onFinalizarPlato($event)">
         </restaurant-comanda-card>
       }
     </div>
@@ -68,8 +68,8 @@
       </div>
       @for (c of preparando(); track c.idComanda) {
         <restaurant-comanda-card class="comanda-card-wrapper shadow-sm" [comanda]="c"
-          (iniciarPlato)="onIniciarPlato($event, c.idComanda)"
-          (finalizarPlato)="onFinalizarPlato($event, c.idComanda)">
+          (iniciarPlato)="onIniciarPlato($event)"
+          (finalizarPlato)="onFinalizarPlato($event)">
         </restaurant-comanda-card>
       }
     </div>
@@ -81,8 +81,8 @@
       </div>
       @for (c of listos(); track c.idComanda) {
         <restaurant-comanda-card class="comanda-card-wrapper shadow-sm card-completed" [comanda]="c"
-          (iniciarPlato)="onIniciarPlato($event, c.idComanda)"
-          (finalizarPlato)="onFinalizarPlato($event, c.idComanda)">
+          (iniciarPlato)="onIniciarPlato($event)"
+          (finalizarPlato)="onFinalizarPlato($event)">
         </restaurant-comanda-card>
       }
     </div>

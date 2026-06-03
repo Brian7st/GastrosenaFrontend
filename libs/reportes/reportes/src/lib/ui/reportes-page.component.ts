@@ -89,7 +89,6 @@ export class ReportesPageComponent implements OnInit {
       icono: 'user',
       color: 'danger',
       reportes: [
-        { id: 'desempeno',     titulo: 'Desempeño por Aprendiz', descripcion: 'Métricas de desempeño individual de cada aprendiz.',          tipo: 'administrador' },
         { id: 'pedidos-cocina',titulo: 'Pedidos de Cocina',      descripcion: 'Volumen y tiempos de pedidos procesados por cocina.',          tipo: 'administrador' },
         { id: 'ventas-mesero', titulo: 'Ventas por Mesero',      descripcion: 'Total de ventas generadas por cada mesero en el período.',     tipo: 'administrador' },
       ],

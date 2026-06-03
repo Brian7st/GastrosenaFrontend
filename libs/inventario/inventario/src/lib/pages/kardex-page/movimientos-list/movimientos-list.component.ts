@@ -25,10 +25,10 @@ export class MovimientosListComponent implements OnInit {
   private facade = inject(KardexFacade);
 
   // ── Estado reactivo desde facade ─────────────────────────────────────────
-  movimientos = this.facade.movimientos;
-  loading     = this.facade.loading;
-  paginacion  = this.facade.paginacion;
-  tipoActivo  = this.facade.tipoFiltro;
+  documentos = this.facade.documentos;
+  loading    = this.facade.loading;
+  error      = this.facade.error;
+  paginacion = this.facade.paginacion;
 
   // ── Paginación computada ──────────────────────────────────────────────────
   paginaActual    = computed(() => this.paginacion().page);
@@ -41,7 +41,7 @@ export class MovimientosListComponent implements OnInit {
     this.totalElementos() === 0 ? 0 : this.paginaActual() * this.tamano() + 1
   );
   hasta = computed(() =>
-    Math.min(this.paginaActual() * this.tamano() + this.movimientos().length, this.totalElementos())
+    Math.min(this.paginaActual() * this.tamano() + this.documentos().length, this.totalElementos())
   );
 
   /** Ventana de hasta 5 páginas centrada en la actual */
@@ -63,21 +63,18 @@ export class MovimientosListComponent implements OnInit {
   hayPaginaAnterior = computed(() => this.paginaActual() > 0);
   hayPaginaSiguiente = computed(() => this.paginaActual() < this.totalPaginas() - 1);
 
-  // ── KPIs derivados del listado cargado ───────────────────────────────────
-  kpiEntradas      = computed(() => this.movimientos().filter(m => m.tipo === 'ENTRADA').length);
-  kpiSalidas       = computed(() => this.movimientos().filter(m => m.tipo === 'SALIDA').length);
+  // ── KPIs derivados del listado de documentos ─────────────────────────────
+  kpiEntradas      = computed(() => this.documentos().filter(d => d.tipo === 'ENTRADA').length);
+  kpiSalidas       = computed(() => this.documentos().filter(d => d.tipo === 'SALIDA').length);
   kpiValorEntradas = computed(() =>
-    this.movimientos().filter(m => m.tipo === 'ENTRADA').reduce((acc, m) => acc + m.valor, 0)
+    this.documentos().filter(d => d.tipo === 'ENTRADA').reduce((acc, d) => acc + d.valorTotal, 0)
   );
-  kpiPendientes    = computed(() => this.movimientos().filter(m => m.estado === 'Pendiente').length);
+  kpiBienesPagina  = computed(() =>
+    this.documentos().reduce((acc, d) => acc + d.cantidadBienes, 0)
+  );
 
   ngOnInit(): void {
     this.facade.loadAll();
-  }
-
-  // ── Filtro por tipo ───────────────────────────────────────────────────────
-  filtrar(tipo: string | undefined): void {
-    this.facade.filtrarPorTipo(tipo);
   }
 
   // ── Paginación ────────────────────────────────────────────────────────────

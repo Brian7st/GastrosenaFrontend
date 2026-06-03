@@ -3,7 +3,7 @@
     <inventario-back-button (clicked)="goBack()" />
     <div>
       <h1 class="page-header__title">Importar Factura Electrónica</h1>
-      <p class="page-header__subtitle">Subí el PDF de la factura electrónica para registrarla en el sistema.</p>
+      <p class="page-header__subtitle">Subí el XML de la factura electrónica para registrarla en el sistema.</p>
     </div>
   </header>
 
@@ -46,10 +46,12 @@
         (click)="fileInput.click()"
       >
         <div class="upload-zone__icon-wrapper">
-          <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">cloud_upload</span>
+          <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">
+            code
+          </span>
         </div>
-        <h3 class="upload-zone__title">Arrastrá tu factura acá</h3>
-        <p class="upload-zone__subtitle">Solo se aceptan archivos PDF · máximo 10 MB</p>
+        <h3 class="upload-zone__title">Arrastrá el XML UBL 2.1 acá</h3>
+        <p class="upload-zone__subtitle">Solo archivos .xml · máximo 10 MB</p>
 
         <div class="field-group upload-zone__field">
           <label class="field-label">GIL a vincular (opcional)</label>
@@ -73,7 +75,7 @@
         <input
           #fileInput
           type="file"
-          accept=".pdf"
+          accept=".xml"
           hidden
           (change)="onFileInput($event)"
         >
@@ -88,7 +90,7 @@
       <ul class="instructions-list">
         <li>
           <div class="step-badge">1</div>
-          <p>Subí el PDF de la factura electrónica original. El sistema extrae automáticamente los datos del documento.</p>
+          <p>Subí el XML de la factura electrónica original. El sistema extrae automáticamente los datos del documento.</p>
         </li>
         <li>
           <div class="step-badge">2</div>
@@ -236,6 +238,93 @@
             <span class="total-label">Total a Pagar</span>
             <span class="total-value">{{ formatMoney(facturaImportada()?.total) }}</span>
           </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (showManualMapping()) {
+    <div class="matching-section">
+      <div class="matching-header">
+        <div>
+          <h2 class="matching-header__title">Cruce manual de ítems</h2>
+          <p class="matching-header__subtitle">
+            Verificá que cada ítem del GIL esté asignado al ítem correcto de la factura.
+            El sistema hace una asignación automática por descripción — podés corregirla.
+          </p>
+        </div>
+        <div class="matching-legend">
+          <span class="badge badge--green">Coincide</span>
+          <span class="badge badge--orange">Diferencia</span>
+          <span class="badge badge--gray">Sin asignar</span>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-wrapper">
+          <table class="matching-table">
+            <thead>
+              <tr>
+                <th>Ítem GIL solicitado</th>
+                <th class="text-right">Cant. solicitada</th>
+                <th class="text-right">V. Unit. GIL</th>
+                <th>Ítem FEL recibido</th>
+                <th class="text-right">Cant. recibida</th>
+                <th class="text-right">V. Unit. FEL</th>
+                <th class="text-center">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (bien of gilBienes(); track $index; let i = $index) {
+                <tr [class]="matchRowClass(i)">
+                  <td>
+                    <div class="item-cell">
+                      <span class="item-code">{{ bien.codigoSena }}</span>
+                      <span class="item-name">{{ bien.descripcion }}</span>
+                    </div>
+                  </td>
+                  <td class="text-right text-secondary">
+                    {{ bien.cantidad }} {{ bien.unidadMedida }}
+                  </td>
+                  <td class="text-right text-secondary">{{ formatMoney(bien.valorUnitario) }}</td>
+                  <td>
+                    <select
+                      class="field-input field-input--sm"
+                      [value]="manualLinks()[i] ?? ''"
+                      (change)="onLinkChange(i, $event)"
+                      (click)="$event.stopPropagation()"
+                    >
+                      <option value="">— Sin asignar —</option>
+                      @for (linea of facturaImportada()?.lineas ?? []; track $index; let fi = $index) {
+                        <option [value]="fi">{{ fi + 1 }}. {{ linea.descripcion }}</option>
+                      }
+                    </select>
+                  </td>
+                  <td class="text-right font-bold">
+                    @if (manualLinks()[i] !== null && manualLinks()[i] !== undefined) {
+                      <span [class.text-diferencia]="getLinea(manualLinks()[i]!)?.cantidad !== bien.cantidad">
+                        {{ getLinea(manualLinks()[i]!)?.cantidad }}
+                      </span>
+                    } @else {
+                      <span class="text-secondary">—</span>
+                    }
+                  </td>
+                  <td class="text-right font-bold">
+                    @if (manualLinks()[i] !== null && manualLinks()[i] !== undefined) {
+                      <span [class.text-diferencia]="(getLinea(manualLinks()[i]!)?.precioUnitario ?? 0) !== bien.valorUnitario">
+                        {{ formatMoney(getLinea(manualLinks()[i]!)?.precioUnitario) }}
+                      </span>
+                    } @else {
+                      <span class="text-secondary">—</span>
+                    }
+                  </td>
+                  <td class="text-center">
+                    <span [class]="matchStatusClass(i)">{{ matchStatusLabel(i) }}</span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

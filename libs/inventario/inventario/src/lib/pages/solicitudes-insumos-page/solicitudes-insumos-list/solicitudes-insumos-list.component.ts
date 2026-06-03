@@ -110,7 +110,7 @@ export class SolicitudesInsumosListComponent implements OnInit {
   onClearFilters(): void          { this.facade.cargarSolicitudesSesion(); }
 
   onView(id: string): void {
-    this.router.navigate(['/app/inventario/solicitudes-insumos-page', id, 'consolidacion']);
+    this.router.navigate(['/app/inventario/solicitudes-insumos-page', id]);
   }
 
   onEdit(id: string): void {

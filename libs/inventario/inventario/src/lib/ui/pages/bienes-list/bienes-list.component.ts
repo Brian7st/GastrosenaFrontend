@@ -72,12 +72,11 @@ export class BienesListPageComponent implements OnInit {
 
     this.facade.importarBienes(payload.filas.map(row => ({
       codigoSena: row.codigoSena,
-      nombre: row.nombre,
       descripcion: row.descripcion,
       categoria: row.categoria ?? 'General',
       unidadMedida: row.unidadMedida,
       codigoProveedor: row.codigoProveedor,
-      imagenUrl: undefined,
+      stockMinimo: row.stockMinimo ?? null,
     })));
     this.showImportModal.set(false);
   }

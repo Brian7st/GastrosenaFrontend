@@ -1,0 +1,172 @@
+<div class="bien-delete-page">
+
+  @if (showSuccess()) {
+    <div class="bien-delete-page__toast" role="status" aria-live="polite">
+      <lucide-icon name="check-circle" [size]="16"></lucide-icon>
+      {{ deletedCount() }} bien{{ deletedCount() !== 1 ? 'es' : '' }} eliminado{{ deletedCount() !== 1 ? 's' : '' }} correctamente
+    </div>
+  }
+
+  <div class="bien-delete-page__header">
+    <div class="bien-delete-page__header-text">
+      <h1 class="bien-delete-page__title">Eliminación Masiva de Bienes</h1>
+      <p class="bien-delete-page__subtitle">Seleccioná los bienes que deseás eliminar del sistema</p>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="bien-delete-page__filters">
+    <div class="bien-delete-page__search-wrapper">
+      <lucide-icon name="search" [size]="16" class="bien-delete-page__search-icon"></lucide-icon>
+      <input
+        class="bien-delete-page__search-input"
+        type="text"
+        placeholder="Buscar por nombre, ID o categoría..."
+        [value]="busqueda()"
+        (input)="busqueda.set($any($event.target).value)"
+      >
+    </div>
+    <div class="bien-delete-page__filter-selects">
+      <div class="bien-delete-page__select-wrapper">
+        <select class="bien-delete-page__select" (change)="categoriaFiltro.set($any($event.target).value)">
+          <option value="">Todas las categorías</option>
+          @for (cat of categorias(); track cat) {
+            <option [value]="cat">{{ cat }}</option>
+          }
+        </select>
+        <lucide-icon name="filter" [size]="14" class="bien-delete-page__select-icon"></lucide-icon>
+      </div>
+      <div class="bien-delete-page__select-wrapper">
+        <select class="bien-delete-page__select" (change)="estadoFiltro.set($any($event.target).value)">
+          <option value="todos">Todos</option>
+          <option value="activos">Activos</option>
+          <option value="inactivos">Inactivos</option>
+        </select>
+        <lucide-icon name="filter" [size]="14" class="bien-delete-page__select-icon"></lucide-icon>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra de selección -->
+  @if (algunaSeleccionado()) {
+    <div class="bien-delete-page__selection-bar">
+      <lucide-icon name="info" [size]="16"></lucide-icon>
+      <span>{{ seleccionadosCount() }} bien{{ seleccionadosCount() !== 1 ? 'es' : '' }} seleccionado{{ seleccionadosCount() !== 1 ? 's' : '' }}</span>
+      <button class="bien-delete-page__btn bien-delete-page__btn--danger" type="button" (click)="onOpenConfirm()">
+        <lucide-icon name="trash-2" [size]="16"></lucide-icon>
+        Eliminar seleccionados
+      </button>
+    </div>
+  }
+
+  <!-- Tabla -->
+  <div class="bien-delete-page__table-wrapper">
+    <table class="bien-delete-page__table">
+      <thead>
+        <tr>
+          <th class="bien-delete-page__check-col">
+            <input
+              type="checkbox"
+              class="bien-delete-page__checkbox"
+              [checked]="selectAll()"
+              (change)="onToggleSelectAll()"
+            >
+          </th>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Categoría</th>
+          <th>Unidad</th>
+          <th>Stock</th>
+          <th>Estado</th>
+          <th>Fecha registro</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (bienesFiltrados().length === 0) {
+          <tr>
+            <td colspan="8" class="bien-delete-page__empty">
+              <lucide-icon name="package-x" [size]="20"></lucide-icon>
+              No se encontraron bienes
+            </td>
+          </tr>
+        } @else {
+          @for (bien of bienesFiltrados(); track bien.id) {
+            <tr
+              class="bien-delete-page__row"
+              [class.bien-delete-page__row--selected]="selectedIds().has(bien.id)"
+            >
+              <td class="bien-delete-page__check-col">
+                <input
+                  type="checkbox"
+                  class="bien-delete-page__checkbox"
+                  [checked]="selectedIds().has(bien.id)"
+                  (change)="onToggleSelect(bien.id)"
+                >
+              </td>
+              <td class="bien-delete-page__id">{{ bien.id }}</td>
+              <td class="bien-delete-page__name">{{ bien.nombre }}</td>
+              <td>
+                <span class="bien-delete-page__category-badge">{{ bien.categoria }}</span>
+              </td>
+              <td class="bien-delete-page__unit">{{ bien.unidad }}</td>
+              <td class="bien-delete-page__stock">{{ bien.stock }}</td>
+              <td>
+                <span
+                  class="bien-delete-page__badge"
+                  [class.bien-delete-page__badge--activo]="bien.estado === 'Activo'"
+                  [class.bien-delete-page__badge--inactivo]="bien.estado === 'Inactivo'"
+                >
+                  {{ bien.estado }}
+                </span>
+              </td>
+              <td class="bien-delete-page__date">{{ bien.fechaRegistro | date:'dd/MM/yyyy' }}</td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal de confirmación -->
+  @if (showConfirm()) {
+    <div class="bien-delete-page__overlay" (click)="onCancelDelete()">
+      <div class="bien-delete-page__modal" (click)="$event.stopPropagation()">
+        <div class="bien-delete-page__modal-header">
+          <div class="bien-delete-page__modal-icon-wrapper">
+            <lucide-icon name="alert-triangle" [size]="24"></lucide-icon>
+          </div>
+          <h2 class="bien-delete-page__modal-title">Confirmar eliminación</h2>
+        </div>
+        <p class="bien-delete-page__modal-text">
+          Vas a eliminar <strong>{{ seleccionadosCount() }} bien{{ seleccionadosCount() !== 1 ? 'es' : '' }}</strong>.
+          Esta acción no se puede deshacer.
+        </p>
+        <div class="bien-delete-page__field">
+          <label class="bien-delete-page__label">Motivo de la eliminación</label>
+          <textarea
+            class="bien-delete-page__textarea"
+            rows="3"
+            placeholder="Ej: Bienes dados de baja, obsoletos o en mal estado..."
+            [value]="motivoEliminacion()"
+            (input)="motivoEliminacion.set($any($event.target).value)"
+          ></textarea>
+        </div>
+        <div class="bien-delete-page__modal-actions">
+          <button class="bien-delete-page__btn bien-delete-page__btn--ghost" type="button" (click)="onCancelDelete()">
+            Cancelar
+          </button>
+          <button
+            class="bien-delete-page__btn bien-delete-page__btn--danger"
+            type="button"
+            [disabled]="!motivoEliminacion().trim()"
+            (click)="onConfirmDelete()"
+          >
+            <lucide-icon name="trash-2" [size]="16"></lucide-icon>
+            Eliminar {{ seleccionadosCount() }} bien{{ seleccionadosCount() !== 1 ? 'es' : '' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>
