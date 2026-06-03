@@ -37,7 +37,7 @@ export class CajaPagarPageComponent implements OnInit {
   metodoSeleccionado = signal<string>('');
   montoRecibido = signal<number>(0);
 
-  alertDialog = signal<{open: boolean, title: string, message: string}>({
+  alertDialog = signal<{ open: boolean, title: string, message: string }>({
     open: false,
     title: '',
     message: ''
@@ -118,7 +118,7 @@ export class CajaPagarPageComponent implements OnInit {
     let metodoBackend = metodo;
 
     // Enviamos los parámetros separados tal y como los exige tu Facade
-    this.facade.facturarPedido(pedido.id, metodoBackend as MetodoPago, 0);
+    this.facade.facturarPedido(pedido.id, metodoBackend as MetodoPago);
 
     this.cerrarModal();
 
@@ -126,7 +126,7 @@ export class CajaPagarPageComponent implements OnInit {
     this.alertDialog.set({
       open: true,
       title: 'Pago Procesado',
-      message: `El pago del pedido #${pedido.id.substring(0,8).toUpperCase()} se registró correctamente.`
+      message: `El pago del pedido #${pedido.id.substring(0, 8).toUpperCase()} se registró correctamente.`
     });
   }
 
