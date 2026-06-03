@@ -217,8 +217,11 @@ export class PaqueteDetailComponent implements OnInit {
 
   verDocumento(tipo: string): void {
     const p = this.paquete();
-    if (p) {
-      this.router.navigate(['/app/inventario/paquete-probatorio', p.id, tipo]);
+    if (!p) return;
+    // Solo 'requisicion' tiene ruta hija de detalle. Acta/asistencia aún no
+    // exponen vista propia — evitamos navegar a una ruta inexistente (pantalla en blanco).
+    if (tipo === 'requisicion') {
+      this.router.navigate(['/app/inventario/paquete-probatorio', p.id, 'requisicion']);
     }
   }
 
