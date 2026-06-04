@@ -50,7 +50,7 @@
   padding: 0;
   transition: opacity 0.15s;
   &:hover { opacity: 0.75; }
-  .material-symbols-outlined { font-size: 1.125rem; }
+  lucide-icon { color: var(--color-primario); }
 }
 
 .breadcrumb-sep { color: #d1d5db; }
@@ -99,8 +99,6 @@
     justify-content: center;
     z-index: 1;
     transition: all 0.2s;
-
-    .material-symbols-outlined { font-size: 1.125rem; }
   }
 
   &__label {
@@ -133,11 +131,11 @@
 
   &--done {
     .timeline-step__icon {
-      background: var(--color-superficie-contenedor-bajo);
-      color: #9ca3af;
+      background: var(--color-primario);
+      color: #fff;
     }
-    .timeline-step__label { color: #6b7280; }
-    .timeline-step__connector { background: var(--color-superficie-contenedor); }
+    .timeline-step__label { color: var(--color-en-superficie); }
+    .timeline-step__connector { background: var(--color-primario); }
   }
 
   &--pending {
@@ -192,9 +190,8 @@
     padding-bottom: 0.75rem;
     border-bottom: 1px solid var(--color-superficie-contenedor);
 
-    .material-symbols-outlined {
-      font-size: 1.125rem;
-      color: var(--color-primario-contenedor);
+    lucide-icon {
+      color: var(--color-primario);
     }
 
     h2 {
@@ -275,16 +272,6 @@
   align-items: center;
   gap: 0.625rem;
   flex-wrap: wrap;
-}
-
-.status-pill {
-  background: var(--color-superficie-contenedor);
-  color: #374151;
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  border: 1px solid rgba(0,0,0,0.06);
 }
 
 .status-date {
@@ -521,47 +508,6 @@
   letter-spacing: 0.05em;
 
   .material-symbols-outlined { font-size: 0.9375rem; }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Buttons
-// ─────────────────────────────────────────────────────────────────────────────
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  border-radius: 0.5rem;
-  border: none;
-  cursor: pointer;
-  font-family: var(--font-family-base);
-  font-weight: 600;
-  font-size: 0.875rem;
-  padding: 0.5rem 1rem;
-  transition: all 0.15s ease;
-
-  .material-symbols-outlined { font-size: 1rem; }
-
-  &--ghost {
-    background: var(--color-superficie-contenedor-mas-bajo);
-    border: 1px solid var(--color-superficie-contenedor);
-    color: #374151;
-    &:hover { background: var(--color-superficie-contenedor-bajo); }
-  }
-
-  &--outline {
-    background: transparent;
-    border: 1px solid var(--color-superficie-contenedor);
-    color: #374151;
-    &:hover { background: var(--color-superficie-contenedor-bajo); }
-  }
-
-  &--primary {
-    background: var(--color-primario);
-    color: #fff;
-    box-shadow: 0 1px 4px rgba(0,110,37,0.25);
-    &:hover { background: var(--color-primario-hover); }
-    &:active { transform: scale(0.97); }
-  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

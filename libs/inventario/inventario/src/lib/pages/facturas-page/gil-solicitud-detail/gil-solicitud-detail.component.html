@@ -5,25 +5,25 @@
   <div class="topbar">
     <div class="topbar__left">
       <button class="back-link" (click)="onVolver()">
-        <span class="material-symbols-outlined">arrow_back</span>
+        <lucide-icon name="arrow-left" [size]="18"></lucide-icon>
         Volver
       </button>
       <span class="breadcrumb-sep">/</span>
       <span class="breadcrumb-label">Solicitudes GIL</span>
     </div>
     <div class="topbar__actions">
-      <button class="btn btn--ghost" (click)="onEditar()">
-        <span class="material-symbols-outlined">edit</span>
+      <restaurant-button variant="ghost" (click)="onEditar()">
+        <lucide-icon name="pencil" [size]="16"></lucide-icon>
         Editar
-      </button>
-      <button class="btn btn--outline" (click)="onDescargarPDF()">
-        <span class="material-symbols-outlined">picture_as_pdf</span>
+      </restaurant-button>
+      <restaurant-button variant="surface" (click)="onDescargarPDF()">
+        <lucide-icon name="file-text" [size]="16"></lucide-icon>
         Descargar PDF
-      </button>
+      </restaurant-button>
       @if (s.estadoSolicitud === 'BORRADOR') {
-        <button class="btn btn--primary" id="btn-enviar-aprobacion" (click)="onEnviarAprobacion()">
+        <restaurant-button variant="primary" id="btn-enviar-aprobacion" (click)="onEnviarAprobacion()">
           Enviar a Aprobación
-        </button>
+        </restaurant-button>
       }
     </div>
   </div>
@@ -41,13 +41,13 @@
     >
       <div class="timeline-step__icon">
         @if (getStepState(step, s.estadoSolicitud) === 'active') {
-<span class="material-symbols-outlined">play_arrow</span>
+<lucide-icon name="clock" [size]="18"></lucide-icon>
 }
         @if (getStepState(step, s.estadoSolicitud) === 'done') {
-<span class="material-symbols-outlined">check</span>
+<lucide-icon name="check-circle" [size]="18"></lucide-icon>
 }
         @if (getStepState(step, s.estadoSolicitud) === 'pending') {
-<span class="material-symbols-outlined">radio_button_unchecked</span>
+<lucide-icon name="circle" [size]="18"></lucide-icon>
 }
       </div>
       <span class="timeline-step__label">{{ step | uppercase }}</span>
@@ -67,7 +67,7 @@
       <!-- Info Sesión -->
       <div class="detail-card">
         <div class="detail-card__header">
-          <span class="material-symbols-outlined">calendar_month</span>
+          <lucide-icon name="calendar" [size]="18"></lucide-icon>
           <h2>Información de la Sesión</h2>
         </div>
         <div class="info-grid">
@@ -90,7 +90,10 @@
         <div class="detail-card status-card">
           <span class="info-item__label">Estado de Solicitud</span>
           <div class="status-badge-wrap">
-            <span class="status-pill">{{ s.estadoSolicitud }}</span>
+            <restaurant-status-badge
+              [label]="s.estadoSolicitud"
+              [variant]="getEstadoVariant(s.estadoSolicitud)"
+            ></restaurant-status-badge>
             <span class="status-date">Creado el {{ s.fechaCreacion | date:'dd MMM yyyy' }}</span>
           </div>
           <div class="total-amount">{{ formatMoney(s.totalEstimado) }}</div>
@@ -150,7 +153,7 @@
       <!-- Bienes del GIL -->
       <div class="detail-card">
         <div class="detail-card__header">
-          <span class="material-symbols-outlined">inventory_2</span>
+          <lucide-icon name="package" [size]="18"></lucide-icon>
           <h2>Bienes del GIL</h2>
           <span class="count-badge">{{ (s.bienes?.length ?? 0) }} ÍTEMS</span>
         </div>
