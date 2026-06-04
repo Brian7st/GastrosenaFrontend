@@ -30,16 +30,51 @@ export class ConsolidadoListComponent implements OnInit {
   selectedReversarItem = signal<Consolidado | null>(null);
   isReversarBlocked    = signal(false);
 
+  // ── Filtros (panel colapsable) ──────────────────────────────────────────────
+  showFilters  = signal(false);
+  filtroEstado = signal<string>('');
+  filtrosActivos = computed(() => (this.filtroEstado() ? 1 : 0));
+
+  onToggleFilters(): void { this.showFilters.update(v => !v); }
+  onFilterEstado(v: string): void { this.filtroEstado.set(v); this.paginaActual.set(1); }
+  onLimpiarFiltros(): void { this.filtroEstado.set(''); this.paginaActual.set(1); }
+
   // ── Filtro cliente ────────────────────────────────────────────────────────
   filteredConsolidados = computed(() => {
     const q = this.searchText().toLowerCase();
-    if (!q) return this.consolidados();
-    return this.consolidados().filter(c =>
-      String(c.id).toLowerCase().includes(q) ||
-      c.fechaGeneracion.toLowerCase().includes(q) ||
-      c.estado.toLowerCase().includes(q)
-    );
+    const estado = this.filtroEstado();
+    return this.consolidados().filter(c => {
+      const matchQ = !q ||
+        String(c.id).toLowerCase().includes(q) ||
+        c.fechaGeneracion.toLowerCase().includes(q) ||
+        c.estado.toLowerCase().includes(q);
+      const matchEstado = !estado || c.estado === estado;
+      return matchQ && matchEstado;
+    });
   });
+
+  // ── Paginación cliente ──────────────────────────────────────────────────────
+  readonly ITEMS_POR_PAGINA = 8;
+  paginaActual = signal(1);
+
+  totalPaginas = computed(() =>
+    Math.max(1, Math.ceil(this.filteredConsolidados().length / this.ITEMS_POR_PAGINA))
+  );
+
+  consolidadosPaginados = computed(() => {
+    const inicio = (this.paginaActual() - 1) * this.ITEMS_POR_PAGINA;
+    return this.filteredConsolidados().slice(inicio, inicio + this.ITEMS_POR_PAGINA);
+  });
+
+  paginas = computed(() =>
+    Array.from({ length: this.totalPaginas() }, (_, i) => i + 1)
+  );
+
+  irAPagina(n: number): void {
+    if (n >= 1 && n <= this.totalPaginas()) { this.paginaActual.set(n); }
+  }
+  anterior(): void { this.irAPagina(this.paginaActual() - 1); }
+  siguiente(): void { this.irAPagina(this.paginaActual() + 1); }
 
   // ── KPIs derivados de la lista real ─────────────────────────────────────
   kpiTotalEjecutado = computed(() =>
@@ -55,6 +90,7 @@ export class ConsolidadoListComponent implements OnInit {
 
   onSearch(query: string): void {
     this.searchText.set(query);
+    this.paginaActual.set(1);
   }
 
   openExportModal(): void {

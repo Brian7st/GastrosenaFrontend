@@ -27,6 +27,17 @@ export class SolicitudesListComponent implements OnInit {
     Array.from({ length: this.paginacion().totalPages }, (_, i) => i)
   );
 
+  // ─── Filtros (panel colapsable) ──────────────────────────────────────────────
+  showFilters  = signal(false);
+  filtroEstado = signal<string>('');
+  filtrosActivos = computed(() => (this.filtroEstado() ? 1 : 0));
+
+  onToggleFilters(): void { this.showFilters.update(v => !v); }
+  onLimpiarFiltros(): void {
+    this.filtroEstado.set('');
+    this.facade.cargarSolicitudes({ estado: undefined });
+  }
+
   ngOnInit(): void {
     this.facade.loadAll();
   }
@@ -83,7 +94,10 @@ export class SolicitudesListComponent implements OnInit {
   }
 
   onSearch(term: string): void        { this.facade.cargarSolicitudes({ busqueda: term }); }
-  onFilterEstado(v: string): void     { this.facade.cargarSolicitudes({ estado: v ? (v as EstadoGil) : undefined }); }
+  onFilterEstado(v: string): void     {
+    this.filtroEstado.set(v);
+    this.facade.cargarSolicitudes({ estado: v ? (v as EstadoGil) : undefined });
+  }
   onIrAPagina(page: number): void     { this.facade.irAPagina(page); }
   onExportPdf(id: string | number): void {
     this.router.navigate(['/app/inventario/solicitudes-gil', id, 'exportar']);

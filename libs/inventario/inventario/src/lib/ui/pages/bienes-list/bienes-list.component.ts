@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { ButtonComponent, KpiCardComponent, LoadingSkeletonComponent } from '@restaurant/shared/ui';
+import { ButtonComponent, DataTableComponent, KpiCardComponent, LoadingSkeletonComponent } from '@restaurant/shared/ui';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { BienFormComponent } from '../../../ui/modals/bien-form/bien-form.component';
 import { BienImportModalComponent, BienImportPayload } from '../../modals/bien-import/bien-import.component';
@@ -15,6 +15,7 @@ import { CATEGORIAS_BIEN } from '../../../models/categorias.model';
   imports: [
     CommonModule,
     ButtonComponent,
+    DataTableComponent,
     KpiCardComponent,
     LoadingSkeletonComponent,
     BienFormComponent,
@@ -39,10 +40,17 @@ export class BienesListPageComponent implements OnInit {
     Array.from({ length: this.paginacion().totalPages }, (_, i) => i)
   );
 
-  showFilters     = signal(false);
   readonly CATEGORIAS = CATEGORIAS_BIEN;
+  showFilters     = signal(false);
   filtroCategoria = signal<string>('');
   filtroEstado    = signal<EstadoBien | ''>('');
+
+  filtrosActivos = computed(() => {
+    let count = 0;
+    if (this.filtroCategoria()) count++;
+    if (this.filtroEstado())    count++;
+    return count;
+  });
 
   // Modal controls
   showFormModal = signal(false);
@@ -52,6 +60,10 @@ export class BienesListPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.facade.loadAll();
+  }
+
+  onToggleFilters(): void {
+    this.showFilters.update(v => !v);
   }
 
   onSearch(query: string): void {

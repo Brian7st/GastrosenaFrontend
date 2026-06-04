@@ -150,17 +150,17 @@
       }
     </tbody>
     <div dtFooter class="dt-footer">
-      <span class="table-pagination__info">
+      <span class="dt-page-info">
         @if (totalElementos() === 0) {
           Sin documentos
         } @else {
           Mostrando {{ desde() }}–{{ hasta() }} de {{ totalElementos() }} documento(s)
         }
       </span>
-      <div class="pagination-btns">
+      <div class="dt-pagination">
 
         <!-- Anterior -->
-        <button class="pagination-btn"
+        <button class="dt-page-btn"
                 [disabled]="!hayPaginaAnterior() || loading()"
                 (click)="paginaAnterior()">
           <lucide-icon name="chevron-left" [size]="16"></lucide-icon>
@@ -168,7 +168,7 @@
 
         <!-- Primera página si no está en la ventana -->
         @if (paginas()[0] > 0) {
-          <button class="pagination-btn" (click)="irAPagina(0)">1</button>
+          <button class="dt-page-btn" (click)="irAPagina(0)">1</button>
           @if (paginas()[0] > 1) {
             <span class="pagination-ellipsis">…</span>
           }
@@ -176,8 +176,8 @@
 
         <!-- Ventana de páginas -->
         @for (p of paginas(); track p) {
-          <button class="pagination-btn"
-                  [class.pagination-btn--active]="p === paginaActual()"
+          <button class="dt-page-btn"
+                  [class.dt-page-btn--active]="p === paginaActual()"
                   [disabled]="loading()"
                   (click)="irAPagina(p)">
             {{ p + 1 }}
@@ -189,13 +189,13 @@
           @if (paginas()[paginas().length - 1] < totalPaginas() - 2) {
             <span class="pagination-ellipsis">…</span>
           }
-          <button class="pagination-btn" (click)="irAPagina(totalPaginas() - 1)">
+          <button class="dt-page-btn" (click)="irAPagina(totalPaginas() - 1)">
             {{ totalPaginas() }}
           </button>
         }
 
         <!-- Siguiente -->
-        <button class="pagination-btn"
+        <button class="dt-page-btn"
                 [disabled]="!hayPaginaSiguiente() || loading()"
                 (click)="paginaSiguiente()">
           <lucide-icon name="chevron-right" [size]="16"></lucide-icon>

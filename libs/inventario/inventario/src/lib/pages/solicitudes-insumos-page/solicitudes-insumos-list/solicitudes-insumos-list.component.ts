@@ -67,6 +67,13 @@ export class SolicitudesInsumosListComponent implements OnInit {
     { value: '', label: 'Fecha (Rango)' },
   ];
 
+  // ─── Filtros (panel colapsable) ────────────────────────────────────
+  showFilters  = signal(false);
+  filtroEstado = signal<string>('');
+  filtrosActivos = computed(() => (this.filtroEstado() ? 1 : 0));
+
+  onToggleFilters(): void { this.showFilters.update(v => !v); }
+
   // ─── Estado del modal de aprobación ───────────────────────────────
   solicitudSeleccionada = signal<SolicitudSesion | null>(null);
 
@@ -107,9 +114,15 @@ export class SolicitudesInsumosListComponent implements OnInit {
 
   // ─── Handlers ─────────────────────────────────────────────────────
   onSearch(term: string): void     { this.facade.cargarSolicitudesSesion(term ? { instructorId: term } : undefined); }
-  onFilterEstado(v: string): void  { this.facade.cargarSolicitudesSesion(v ? { estado: v } : undefined); }
+  onFilterEstado(v: string): void  {
+    this.filtroEstado.set(v);
+    this.facade.cargarSolicitudesSesion(v ? { estado: v } : undefined);
+  }
   onFilterFecha(): void            { /* date range — pendiente */ }
-  onClearFilters(): void          { this.facade.cargarSolicitudesSesion(); }
+  onClearFilters(): void          {
+    this.filtroEstado.set('');
+    this.facade.cargarSolicitudesSesion();
+  }
 
   onView(id: string): void {
     this.router.navigate(['/app/inventario/solicitudes-insumos-page', id]);
