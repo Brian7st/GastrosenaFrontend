@@ -129,45 +129,6 @@
         </div>
       </section>
 
-      <!-- Cola de revisión: líneas FEL sin bien de catálogo asignado -->
-      @if (lineasPendientes().length > 0) {
-        <section class="bento-card pendientes-card">
-          <div class="card-section">
-            <h4 class="card-section__title">
-              <span class="material-symbols-outlined text-tertiary">rule</span>
-              Líneas sin bien asignado ({{ lineasPendientes().length }})
-            </h4>
-            <p class="pendientes-card__hint">
-              Estas líneas del FEL no se asociaron a un bien del catálogo. Asociá cada una a un bien
-              existente por su código SENA. Si el bien no existe,
-              <button type="button" class="link-btn" (click)="irACrearBien()">creálo primero en Bienes</button>.
-            </p>
-
-            @if (f.estado === 'REGISTRADA') {
-              <ul class="pendientes-list">
-                @for (linea of lineasPendientes(); track linea.descripcion) {
-                  <li class="pendientes-list__item">
-                    <span class="pendientes-list__desc font-medium">{{ linea.descripcion }}</span>
-                    <div class="pendientes-list__action">
-                      <restaurant-button
-                        variant="primary"
-                        (click)="abrirBuscadorBien(linea.descripcion)">
-                        <span class="material-symbols-outlined">search</span>
-                        Buscar bien…
-                      </restaurant-button>
-                    </div>
-                  </li>
-                }
-              </ul>
-            } @else {
-              <p class="pendientes-card__locked text-secondary">
-                Solo se pueden asociar líneas mientras la factura está en estado REGISTRADA.
-              </p>
-            }
-          </div>
-        </section>
-      }
-
       <!-- Tarjetas inferiores: DIAN + Orden Compra + Resumen Fiscal -->
       <div class="bottom-cards-grid">
 
@@ -376,6 +337,45 @@
             >
               Vincular
             </button>
+          </div>
+        </section>
+      }
+
+      <!-- Cola de revisión: líneas FEL que quedaron sin bien tras la conciliación -->
+      @if (lineasPendientes().length > 0) {
+        <section class="bento-card pendientes-card">
+          <div class="card-section">
+            <h4 class="card-section__title">
+              <span class="material-symbols-outlined text-tertiary">rule</span>
+              Líneas sin bien asignado ({{ lineasPendientes().length }})
+            </h4>
+            <p class="pendientes-card__hint">
+              Estas líneas no se resolvieron automáticamente al conciliar con el GIL. Asociá cada una a un
+              bien existente del catálogo. Si el bien no existe,
+              <button type="button" class="link-btn" (click)="irACrearBien()">creálo primero en Bienes</button>.
+            </p>
+
+            @if (f.estado === 'REGISTRADA') {
+              <ul class="pendientes-list">
+                @for (linea of lineasPendientes(); track linea.descripcion) {
+                  <li class="pendientes-list__item">
+                    <span class="pendientes-list__desc font-medium">{{ linea.descripcion }}</span>
+                    <div class="pendientes-list__action">
+                      <restaurant-button
+                        variant="primary"
+                        (click)="abrirBuscadorBien(linea.descripcion)">
+                        <span class="material-symbols-outlined">search</span>
+                        Buscar bien…
+                      </restaurant-button>
+                    </div>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="pendientes-card__locked text-secondary">
+                Solo se pueden asociar líneas mientras la factura está en estado REGISTRADA.
+              </p>
+            }
           </div>
         </section>
       }
