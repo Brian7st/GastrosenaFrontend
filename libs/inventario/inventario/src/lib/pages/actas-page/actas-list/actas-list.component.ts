@@ -15,6 +15,7 @@ import {
   ButtonComponent,
 } from '@restaurant/shared/ui';
 import { ActaEstado } from '../../../models/acta.model';
+import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 import { ActasFacade } from '../../../data-access/actas.facade';
 
 @Component({
@@ -25,8 +26,9 @@ import { ActasFacade } from '../../../data-access/actas.facade';
     DataTableComponent,
     StatusBadgeComponent,
     LucideIconComponent,
-    ButtonComponent
-],
+    ButtonComponent,
+    EmptyStateComponent,
+  ],
   templateUrl: './actas-list.component.html',
   styleUrl: './actas-list.component.scss',
 })

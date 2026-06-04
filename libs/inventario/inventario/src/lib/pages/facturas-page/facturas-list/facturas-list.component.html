@@ -43,14 +43,6 @@
           <label class="filter-label">Proveedor (NIT)</label>
           <input type="text" class="filter-input" placeholder="Ej. 900000001" [value]="filtroProveedor()" (input)="onFiltroProveedorChange($any($event.target).value)" />
         </div>
-        <div class="filter-group">
-          <label class="filter-label">Desde</label>
-          <input type="date" class="filter-input" [value]="filtroFechaDesde()" (change)="filtroFechaDesde.set($any($event.target).value); onFiltroFechaChange()" />
-        </div>
-        <div class="filter-group">
-          <label class="filter-label">Hasta</label>
-          <input type="date" class="filter-input" [value]="filtroFechaHasta()" (change)="filtroFechaHasta.set($any($event.target).value); onFiltroFechaChange()" />
-        </div>
         <div class="filter-group filter-group--actions">
           <button class="filter-clear-btn" (click)="onLimpiarFiltros()" [disabled]="filtrosActivos() === 0">
             <span class="material-symbols-outlined">clear_all</span>
@@ -151,7 +143,6 @@
 <tbody>
       @for (factura of facturas(); track factura) {
 <tr
-       
         (click)="onVerFactura(factura)"
         class="row-clickable"
       >
@@ -197,14 +188,14 @@
           </div>
         </td>
       </tr>
-}
-
-      @if (facturas().length === 0) {
-<tr>
-        <td colspan="6" class="empty-state">
-          <span class="material-symbols-outlined">receipt_long</span>
-          <p>No se encontraron facturas</p>
-          <span>Intenta ajustar los filtros de búsqueda</span>
+} @empty {
+      <tr>
+        <td colspan="6">
+          <inventario-empty-state
+            icon="receipt_long"
+            title="Sin facturas"
+            message="Intenta ajustar los filtros de búsqueda."
+          />
         </td>
       </tr>
 }

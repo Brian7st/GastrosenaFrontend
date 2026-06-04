@@ -63,6 +63,19 @@
   searchPlaceholder="Buscar por instructor o código..."
   (searchChange)="onSearch($event)">
 
+  <!-- Filtro de estado -->
+  <div dtHeader class="si-filter-bar">
+    <select class="si-filter-select" (change)="onFilterEstado($any($event.target).value)">
+      @for (opt of estadoOptions; track opt.value) {
+        <option [value]="opt.value">{{ opt.label }}</option>
+      }
+    </select>
+    <button class="si-clear-btn" (click)="onClearFilters()" type="button">
+      <span class="material-symbols-outlined">clear_all</span>
+      Limpiar
+    </button>
+  </div>
+
   <!-- Cabecera de tabla -->
   <thead>
     <tr>
@@ -83,12 +96,6 @@
         <td colspan="7" style="text-align: center; padding: 2rem;">
           <span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">progress_activity</span>
           Cargando solicitudes...
-        </td>
-      </tr>
-    } @else if (facade.solicitudesSesion().length === 0) {
-      <tr>
-        <td colspan="7" style="text-align: center; padding: 2rem; color: var(--color-text-secondary);">
-          No hay solicitudes registradas.
         </td>
       </tr>
     } @else {
@@ -169,6 +176,16 @@
                 </button>
               }
             </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="7">
+            <inventario-empty-state
+              icon="assignment"
+              title="Sin solicitudes de insumos"
+              message="No hay solicitudes registradas para esta sesión."
+            />
           </td>
         </tr>
       }

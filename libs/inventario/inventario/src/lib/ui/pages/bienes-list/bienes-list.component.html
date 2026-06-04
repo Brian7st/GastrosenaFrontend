@@ -74,6 +74,37 @@
     </div>
   </div>
 
+  <!-- Filter Panel -->
+  @if (showFilters()) {
+    <div class="filter-panel">
+      <div class="filter-panel__row">
+        <div class="filter-group">
+          <label class="filter-label">Categoría</label>
+          <select class="filter-select" [value]="filtroCategoria()" (change)="onFiltroCategoria($any($event.target).value)">
+            <option value="">Todas</option>
+            @for (cat of CATEGORIAS; track cat) {
+              <option [value]="cat">{{ cat }}</option>
+            }
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Estado</label>
+          <select class="filter-select" [value]="filtroEstado()" (change)="onFiltroEstado($any($event.target).value)">
+            <option value="">Todos</option>
+            <option value="Activo">Activo</option>
+            <option value="Inactivo">Inactivo</option>
+          </select>
+        </div>
+        <div class="filter-group filter-group--actions">
+          <button class="filter-clear-btn" (click)="onLimpiarFiltros()" [disabled]="filtroCategoria() === '' && filtroEstado() === ''">
+            <span class="material-symbols-outlined">clear_all</span>
+            Limpiar filtros
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
   <!-- Data Table -->
   @if (!loading()) {
 
@@ -145,10 +176,12 @@
           </tr>
 } @empty {
           <tr>
-            <td colspan="9" class="empty-state">
-              <span class="material-symbols-outlined empty-state__icon">inventory_2</span>
-              <p class="empty-state__title">Sin bienes registrados</p>
-              <p class="empty-state__message">No se encontraron bienes con los filtros aplicados.</p>
+            <td colspan="9">
+              <inventario-empty-state
+                icon="inventory_2"
+                title="Sin bienes registrados"
+                message="No se encontraron bienes con los filtros aplicados."
+              />
             </td>
           </tr>
 }

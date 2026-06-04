@@ -5,7 +5,9 @@ import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { ButtonComponent, DataTableComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { FacturasFacade } from '../../../data-access/facturas.facade';
+import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { ConciliacionGilDiferencia, FacturaLinea } from '../../../models/facturas.model';
+import { Bien } from '../../../models/inventario.model';
 
 /** Sentinel del backend para líneas de factura sin bien de catálogo asignado. */
 const PRODUCTO_PENDIENTE = 'PENDIENTE-CATALOGO';
@@ -22,6 +24,7 @@ export class FacturaDetailPageComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private facade = inject(FacturasFacade);
+  private inventario = inject(InventarioFacade);
 
   factura              = this.facade.facturaSeleccionada;
   loading              = this.facade.loading;
@@ -35,8 +38,12 @@ export class FacturaDetailPageComponent implements OnInit {
   showConfirmVerificar  = signal(false);
   showConfirmPagada     = signal(false);
 
-  /** Código SENA tipeado por el usuario para cada línea pendiente (clave: descripción). */
-  codigosSenaPendientes = signal<Record<string, string>>({});
+  // ── Buscador de bien para asociar líneas pendientes ──
+  buscadorBienAbierto  = signal(false);
+  lineaPendienteActiva = signal<string | null>(null);
+  bienAConfirmar       = signal<Bien | null>(null);
+  catalogoBienes       = this.inventario.bienes;
+  catalogoLoading      = this.inventario.loading;
 
   /** Líneas de la factura que aún no tienen bien de catálogo asignado. */
   lineasPendientes = computed<FacturaLinea[]>(() =>
@@ -69,18 +76,40 @@ export class FacturaDetailPageComponent implements OnInit {
     this.observaciones.update(o => { const next = { ...o }; delete next[gilItemId]; return next; });
   }
 
-  setCodigoSenaPendiente(descripcion: string, event: Event): void {
-    const val = (event.target as HTMLInputElement).value;
-    this.codigosSenaPendientes.update(c => ({ ...c, [descripcion]: val }));
+  abrirBuscadorBien(descripcion: string): void {
+    this.lineaPendienteActiva.set(descripcion);
+    this.buscadorBienAbierto.set(true);
+    this.inventario.cargarBienes({ estado: 'Activo', page: 0, size: 8 });
   }
 
-  resolverPendiente(descripcion: string): void {
+  onBuscarBienCatalogo(term: string): void {
+    this.inventario.cargarBienes({ estado: 'Activo', busqueda: term, page: 0, size: 8 });
+  }
+
+  cerrarBuscadorBien(): void {
+    this.buscadorBienAbierto.set(false);
+    this.lineaPendienteActiva.set(null);
+    this.bienAConfirmar.set(null);
+  }
+
+  /** Paso 1: elegir un bien pide confirmación antes de asociar. */
+  onBienCatalogoSeleccionado(bien: Bien): void {
+    this.bienAConfirmar.set(bien);
+  }
+
+  /** Volver del paso de confirmación a la lista de resultados. */
+  volverABuscar(): void {
+    this.bienAConfirmar.set(null);
+  }
+
+  /** Paso 2: confirmar la asociación línea FEL → bien elegido. */
+  confirmarAsociacion(): void {
     const factura = this.factura();
-    if (!factura) return;
-    const codigo = (this.codigosSenaPendientes()[descripcion] ?? '').trim();
-    if (!codigo) return; // el código SENA es obligatorio
+    const descripcion = this.lineaPendienteActiva();
+    const codigo = (this.bienAConfirmar()?.codigoSena ?? '').trim();
+    if (!factura || !descripcion || !codigo) return;
     this.facade.resolverLineaPendiente(String(factura.id), descripcion, codigo);
-    this.codigosSenaPendientes.update(c => { const next = { ...c }; delete next[descripcion]; return next; });
+    this.cerrarBuscadorBien();
   }
 
   irACrearBien(): void {

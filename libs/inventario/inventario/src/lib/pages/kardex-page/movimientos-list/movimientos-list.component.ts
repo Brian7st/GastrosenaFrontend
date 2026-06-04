@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { KpiCardComponent, DataTableComponent, LucideIconComponent, ButtonComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
 import { KardexFacade } from '../../../data-access/kardex.facade';
+import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 
 @Component({
   selector: 'restaurant-movimientos-list',
@@ -15,7 +16,8 @@ import { KardexFacade } from '../../../data-access/kardex.facade';
     DataTableComponent,
     LucideIconComponent,
     ButtonComponent,
-    StatusBadgeComponent
+    StatusBadgeComponent,
+    EmptyStateComponent,
   ],
   templateUrl: './movimientos-list.component.html',
   styleUrl: './movimientos-list.component.scss',
@@ -29,6 +31,7 @@ export class MovimientosListComponent implements OnInit {
   loading    = this.facade.loading;
   error      = this.facade.error;
   paginacion = this.facade.paginacion;
+  searchText = signal<string>('');
 
   // ── Paginación computada ──────────────────────────────────────────────────
   paginaActual    = computed(() => this.paginacion().page);
@@ -43,6 +46,16 @@ export class MovimientosListComponent implements OnInit {
   hasta = computed(() =>
     Math.min(this.paginaActual() * this.tamano() + this.documentos().length, this.totalElementos())
   );
+
+  /** Documentos filtrados por búsqueda (client-side — backend no soporta query) */
+  filteredDocumentos = computed(() => {
+    const q = this.searchText().toLowerCase();
+    if (!q) return this.documentos();
+    return this.documentos().filter(d =>
+      d.numeroDocumento?.toLowerCase().includes(q) ||
+      d.tipo.toLowerCase().includes(q)
+    );
+  });
 
   /** Ventana de hasta 5 páginas centrada en la actual */
   paginas = computed(() => {
@@ -75,6 +88,10 @@ export class MovimientosListComponent implements OnInit {
 
   ngOnInit(): void {
     this.facade.loadAll();
+  }
+
+  onSearch(query: string): void {
+    this.searchText.set(query);
   }
 
   // ── Paginación ────────────────────────────────────────────────────────────

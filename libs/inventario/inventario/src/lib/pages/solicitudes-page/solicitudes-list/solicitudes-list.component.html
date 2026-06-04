@@ -68,16 +68,6 @@
         <span class="material-symbols-outlined dropdown-icon">expand_more</span>
       </div>
 
-      <!-- Filtro Fecha -->
-      <div class="select-box">
-        <select #fechaSelect (change)="onFilterFecha(fechaSelect.value)">
-          @for (opt of fechaOptions; track opt) {
-<option [value]="opt.value">{{ opt.label }}</option>
-}
-        </select>
-        <span class="material-symbols-outlined dropdown-icon">calendar_month</span>
-      </div>
-
       <!-- Buscar por instructor -->
       <div class="search-box">
         <span class="material-symbols-outlined search-icon">search</span>
@@ -169,6 +159,16 @@
             <span class="material-symbols-outlined">delete</span>
           </button>
         </div>
+      </td>
+    </tr>
+} @empty {
+    <tr>
+      <td colspan="7">
+        <inventario-empty-state
+          icon="assignment"
+          title="Sin solicitudes"
+          message="No se encontraron solicitudes con los filtros aplicados."
+        />
       </td>
     </tr>
 }

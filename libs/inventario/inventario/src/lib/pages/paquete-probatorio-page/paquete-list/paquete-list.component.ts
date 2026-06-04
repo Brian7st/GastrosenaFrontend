@@ -16,6 +16,7 @@ import {
   ButtonComponent,
 } from '@restaurant/shared/ui';
 import { PaqueteProbatorio, PaqueteEstado } from '../../../models/paquete.model';
+import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 import { PaqueteFacade } from '../../../data-access/paquete.facade';
 
 @Component({
@@ -27,7 +28,8 @@ import { PaqueteFacade } from '../../../data-access/paquete.facade';
     StatusBadgeComponent,
     LucideIconComponent,
     KpiCardComponent,
-    ButtonComponent
+    ButtonComponent,
+    EmptyStateComponent,
 ],
   templateUrl: './paquete-list.component.html',
   styleUrl: './paquete-list.component.scss',

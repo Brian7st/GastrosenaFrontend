@@ -82,7 +82,7 @@
       <div class="dt-controls__actions">
         <div class="dt-search">
           <lucide-icon name="search" [size]="18" class="dt-search__icon"></lucide-icon>
-          <input type="text" class="dt-search__input" placeholder="Buscar movimientos, productos o usuarios...">
+          <input type="text" class="dt-search__input" placeholder="Buscar movimientos, productos o usuarios..." (input)="onSearch($any($event.target).value)">
         </div>
       </div>
     </div>
@@ -100,7 +100,7 @@
       </tr>
     </thead>
     <tbody>
-      @for (doc of documentos(); track doc.documentoId) {
+      @for (doc of filteredDocumentos(); track doc.documentoId) {
       <tr class="table-row">
         <td style="text-align: center;">
           <span class="type-badge" [ngClass]="doc.tipo === 'ENTRADA' ? 'type-badge--entrada' : 'type-badge--salida'">
@@ -135,6 +135,16 @@
               <lucide-icon name="eye" [size]="18"></lucide-icon>
             </button>
           </div>
+        </td>
+      </tr>
+      } @empty {
+      <tr>
+        <td colspan="8">
+          <inventario-empty-state
+            icon="swap_vert"
+            title="Sin movimientos"
+            message="No se encontraron documentos de entrada o salida."
+          />
         </td>
       </tr>
       }

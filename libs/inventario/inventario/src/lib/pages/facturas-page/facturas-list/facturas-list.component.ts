@@ -5,11 +5,12 @@ import { ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmMo
 import { FacturasFacade } from '../../../data-access/facturas.facade';
 import { Factura, EstadoFactura } from '../../../models/facturas.model';
 import { ExportarComponent } from '../../../components/exportar/exportar.component';
+import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 
 @Component({
   selector: 'restaurant-facturas-list',
   standalone: true,
-  imports: [CommonModule, ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmModalComponent, ExportarComponent],
+  imports: [CommonModule, ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmModalComponent, ExportarComponent, EmptyStateComponent],
   templateUrl: './facturas-list.component.html',
   styleUrl: './facturas-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,15 +30,11 @@ export class FacturasListPageComponent implements OnInit {
   showFilters       = signal(false);
   filtroEstado      = signal<EstadoFactura | ''>('');
   filtroProveedor   = signal('');
-  filtroFechaDesde  = signal('');
-  filtroFechaHasta  = signal('');
 
   filtrosActivos = computed(() => {
     let count = 0;
-    if (this.filtroEstado())     count++;
-    if (this.filtroProveedor())  count++;
-    if (this.filtroFechaDesde()) count++;
-    if (this.filtroFechaHasta()) count++;
+    if (this.filtroEstado())    count++;
+    if (this.filtroProveedor()) count++;
     return count;
   });
 
@@ -70,24 +67,13 @@ export class FacturasListPageComponent implements OnInit {
     this.facade.setFiltros({ proveedor: value || undefined });
   }
 
-  onFiltroFechaChange(): void {
-    this.facade.setFiltros({
-      fechaDesde: this.filtroFechaDesde() || undefined,
-      fechaHasta: this.filtroFechaHasta() || undefined,
-    });
-  }
-
   onLimpiarFiltros(): void {
     this.filtroEstado.set('');
     this.filtroProveedor.set('');
-    this.filtroFechaDesde.set('');
-    this.filtroFechaHasta.set('');
     this.facade.setFiltros({
-      busqueda:   undefined,
-      estado:     undefined,
-      proveedor:  undefined,
-      fechaDesde: undefined,
-      fechaHasta: undefined,
+      busqueda:  undefined,
+      estado:    undefined,
+      proveedor: undefined,
     });
   }
 

@@ -5,12 +5,13 @@ import { ButtonComponent, DataTableComponent, KpiCardComponent, StatusBadgeCompo
 import { ExportarConsolidadoModalComponent } from '../components/exportar-consolidado-modal/exportar-consolidado-modal.component';
 import { ReversarConsolidadoModalComponent } from '../components/reversar-consolidado-modal/reversar-consolidado-modal.component';
 import { Consolidado } from '../../../models/consolidado.model';
+import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 import { ConsolidadoFacade } from '../../../data-access/consolidado.facade';
 
 @Component({
   selector: 'restaurant-consolidado-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent, StatusBadgeComponent, ExportarConsolidadoModalComponent, ReversarConsolidadoModalComponent],
+  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent, StatusBadgeComponent, ExportarConsolidadoModalComponent, ReversarConsolidadoModalComponent, EmptyStateComponent],
   templateUrl: './consolidado-list.component.html',
   styleUrl: './consolidado-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,11 +23,23 @@ export class ConsolidadoListComponent implements OnInit {
   // ── Estado reactivo desde facade ─────────────────────────────────────────
   consolidados = this.facade.consolidados;
   loading      = this.facade.loading;
+  searchText   = signal<string>('');
 
   showExportModal      = signal(false);
   showReversarModal    = signal(false);
   selectedReversarItem = signal<Consolidado | null>(null);
   isReversarBlocked    = signal(false);
+
+  // ── Filtro cliente ────────────────────────────────────────────────────────
+  filteredConsolidados = computed(() => {
+    const q = this.searchText().toLowerCase();
+    if (!q) return this.consolidados();
+    return this.consolidados().filter(c =>
+      String(c.id).toLowerCase().includes(q) ||
+      c.fechaGeneracion.toLowerCase().includes(q) ||
+      c.estado.toLowerCase().includes(q)
+    );
+  });
 
   // ── KPIs derivados de la lista real ─────────────────────────────────────
   kpiTotalEjecutado = computed(() =>
@@ -38,6 +51,10 @@ export class ConsolidadoListComponent implements OnInit {
 
   ngOnInit(): void {
     this.facade.loadAll();
+  }
+
+  onSearch(query: string): void {
+    this.searchText.set(query);
   }
 
   openExportModal(): void {

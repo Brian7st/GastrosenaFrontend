@@ -5,7 +5,9 @@ import { ButtonComponent, KpiCardComponent, LoadingSkeletonComponent } from '@re
 import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { BienFormComponent } from '../../../ui/modals/bien-form/bien-form.component';
 import { BienImportModalComponent, BienImportPayload } from '../../modals/bien-import/bien-import.component';
-import { Bien, BienFormDto, EstadoBien } from '../../../models/inventario.model';
+import { Bien, BienFormDto, EstadoBien, BienFiltros } from '../../../models/inventario.model';
+import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
+import { CATEGORIAS_BIEN } from '../../../models/categorias.model';
 
 @Component({
   selector: 'restaurant-bienes-list',
@@ -17,6 +19,7 @@ import { Bien, BienFormDto, EstadoBien } from '../../../models/inventario.model'
     LoadingSkeletonComponent,
     BienFormComponent,
     BienImportModalComponent,
+    EmptyStateComponent,
   ],
   templateUrl: './bienes-list.component.html',
   styleUrl: './bienes-list.component.scss',
@@ -36,7 +39,10 @@ export class BienesListPageComponent implements OnInit {
     Array.from({ length: this.paginacion().totalPages }, (_, i) => i)
   );
 
-  showFilters = signal(false);
+  showFilters     = signal(false);
+  readonly CATEGORIAS = CATEGORIAS_BIEN;
+  filtroCategoria = signal<string>('');
+  filtroEstado    = signal<EstadoBien | ''>('');
 
   // Modal controls
   showFormModal = signal(false);
@@ -50,6 +56,28 @@ export class BienesListPageComponent implements OnInit {
 
   onSearch(query: string): void {
     this.facade.cargarBienes({ busqueda: query });
+  }
+
+  onFiltroCategoria(value: string): void {
+    this.filtroCategoria.set(value);
+    const filtros: BienFiltros = {};
+    if (value)                    filtros.categoria = value;
+    if (this.filtroEstado())      filtros.estado    = this.filtroEstado() as EstadoBien;
+    this.facade.cargarBienes(filtros);
+  }
+
+  onFiltroEstado(value: string): void {
+    this.filtroEstado.set(value as EstadoBien | '');
+    const filtros: BienFiltros = {};
+    if (value)                      filtros.estado    = value as EstadoBien;
+    if (this.filtroCategoria())     filtros.categoria = this.filtroCategoria();
+    this.facade.cargarBienes(filtros);
+  }
+
+  onLimpiarFiltros(): void {
+    this.filtroCategoria.set('');
+    this.filtroEstado.set('');
+    this.facade.cargarBienes({ categoria: undefined, estado: undefined, busqueda: undefined });
   }
 
   onIrAPagina(page: number): void {
