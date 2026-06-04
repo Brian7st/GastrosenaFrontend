@@ -50,8 +50,35 @@
   <restaurant-data-table
     tableTitle="Consolidados Históricos"
     tableIcon="history"
-    searchPlaceholder="Buscar reporte o ID...">
-    
+    searchPlaceholder="Buscar reporte o ID..."
+    [showFilterButton]="true"
+    [filterActive]="showFilters()"
+    [filterCount]="filtrosActivos()"
+    (searchChange)="onSearch($event)"
+    (filterToggle)="onToggleFilters()">
+
+    <!-- Panel de filtros colapsable (slot [dtHeader]) -->
+    @if (showFilters()) {
+      <div dtHeader class="filter-panel">
+        <div class="filter-panel__row">
+          <div class="filter-group">
+            <label class="filter-label">Estado</label>
+            <select class="filter-select" [value]="filtroEstado()" (change)="onFilterEstado($any($event.target).value)">
+              <option value="">Todos</option>
+              <option value="GENERADO">Generado</option>
+              <option value="REVERSADO">Reversado</option>
+            </select>
+          </div>
+          <div class="filter-group filter-group--actions">
+            <button class="filter-clear-btn" (click)="onLimpiarFiltros()" [disabled]="filtrosActivos() === 0">
+              <span class="material-symbols-outlined">clear_all</span>
+              Limpiar
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
     <thead>
       <tr>
         <th class="th-center">ID Consolidado</th>
@@ -62,8 +89,8 @@
       </tr>
     </thead>
     <tbody class="text-black text-center">
-      @for (item of consolidados(); track item.id) {
-        <tr>
+      @for (item of consolidadosPaginados(); track item.id) {
+      <tr>
           <td>
             <span class="td-value-primary td-mono">#{{ item.id }}</span>
           </td>
@@ -90,19 +117,29 @@
             </div>
           </td>
         </tr>
+      } @empty {
+        <tr>
+          <td colspan="5">
+            <inventario-empty-state
+              icon="summarize"
+              title="Sin consolidados"
+              message="No hay consolidados generados para el período actual."
+            />
+          </td>
+        </tr>
       }
     </tbody>
     
     <div dtFooter class="dt-footer">
-      <span class="table-pagination__info">Mostrando {{ consolidados().length }} consolidado(s)</span>
-      <div class="pagination-btns">
-        <button class="pagination-btn" disabled>
+      <span class="dt-page-info">Mostrando {{ consolidadosPaginados().length }} de {{ filteredConsolidados().length }} consolidados</span>
+      <div class="dt-pagination">
+        <button class="dt-page-btn" [disabled]="paginaActual() === 1" (click)="anterior()">
           <span class="material-symbols-outlined">chevron_left</span>
         </button>
-        <button class="pagination-btn pagination-btn--active">1</button>
-        <button class="pagination-btn">2</button>
-        <button class="pagination-btn">3</button>
-        <button class="pagination-btn">
+        @for (p of paginas(); track p) {
+          <button class="dt-page-btn" [class.dt-page-btn--active]="paginaActual() === p" (click)="irAPagina(p)">{{ p }}</button>
+        }
+        <button class="dt-page-btn" [disabled]="paginaActual() === totalPaginas()" (click)="siguiente()">
           <span class="material-symbols-outlined">chevron_right</span>
         </button>
       </div>

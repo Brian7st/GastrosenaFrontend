@@ -198,17 +198,45 @@
        HISTORIAL DE AFECTACIÓN PRESUPUESTAL (DataTableComponent)
        ═══════════════════════════════════════════════════════════════════════ -->
   <restaurant-data-table tableTitle="Historial de Afectación Presupuestal" tableIcon="history"
-    searchPlaceholder="Buscar afectaciones, documentos o rubros...">
+    searchPlaceholder="Buscar afectaciones, documentos o rubros..."
+    [showFilterButton]="true"
+    [filterActive]="showFilters()"
+    [filterCount]="filtrosActivos()"
+    (filterToggle)="onToggleFilters()">
     <restaurant-button dtActions variant="surface" routerLink="cargar-gil">
       <div class="btn-icon-text">
         <lucide-icon name="upload" [size]="18"></lucide-icon>
         Cargar GIL
       </div>
     </restaurant-button>
+
+    <!-- Panel de filtros colapsable (slot [dtHeader]) -->
+    @if (showFilters()) {
+      <div dtHeader class="filter-panel">
+        <div class="filter-panel__row">
+          <div class="filter-group">
+            <label class="filter-label">Estado</label>
+            <select class="filter-select" [value]="filtroEstado()" (change)="onFilterEstado($any($event.target).value)">
+              <option value="">Todos</option>
+              @for (e of estadosDisponibles(); track e) {
+                <option [value]="e">{{ e }}</option>
+              }
+            </select>
+          </div>
+          <div class="filter-group filter-group--actions">
+            <button class="filter-clear-btn" (click)="onLimpiarFiltros()" [disabled]="filtrosActivos() === 0">
+              <span class="material-symbols-outlined">clear_all</span>
+              Limpiar
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
     <thead>
       <tr>
         <th class="text-center">Fecha</th>
-        <th class="text-center">Tipo</th>
+        <th class="text-center">Estado</th>
         <th class="text-center">Documento</th>
         <th class="text-center">Programa</th>
         <th class="text-center">Rubro</th>
@@ -223,7 +251,7 @@
           <span class="fecha-text">{{ a.fecha }}</span>
         </td>
         <td class="text-center">
-          <restaurant-status-badge [status]="getTipoConfig(a.tipo).status" [class]="getTipoConfig(a.tipo).cssClass" [label]="a.tipo"></restaurant-status-badge>
+          <restaurant-status-badge [status]="getTipoConfig(a.estado).status" [class]="getTipoConfig(a.estado).cssClass" [label]="a.estado"></restaurant-status-badge>
         </td>
         <td class="text-center">
           <a href="javascript:void(0)" class="doc-link">
@@ -249,14 +277,14 @@
       }
     </tbody>
     
-    <div dtFooter class="pagination-footer">
-      <span class="results-count">
-        Mostrando {{ (paginaActual() - 1) * ITEMS_POR_PAGINA + 1 }}–{{ minOf(paginaActual() * ITEMS_POR_PAGINA, afectaciones().length) }}
-        de {{ afectaciones().length }} resultados
+    <div dtFooter class="dt-footer">
+      <span class="dt-page-info">
+        Mostrando {{ (paginaActual() - 1) * ITEMS_POR_PAGINA + 1 }}–{{ minOf(paginaActual() * ITEMS_POR_PAGINA, afectacionesFiltradas().length) }}
+        de {{ afectacionesFiltradas().length }} resultados
       </span>
-      <div class="page-numbers">
+      <div class="dt-pagination">
         <button
-          class="page-btn page-btn--nav"
+          class="dt-page-btn"
           [disabled]="paginaActual() === 1"
           (click)="anterior()"
           aria-label="Página anterior"
@@ -266,14 +294,14 @@
 
         @for (p of paginas(); track p) {
           <button
-            class="page-btn"
-            [class.page-btn--active]="paginaActual() === p"
+            class="dt-page-btn"
+            [class.dt-page-btn--active]="paginaActual() === p"
             (click)="irAPagina(p)"
           >{{ p }}</button>
         }
 
         <button
-          class="page-btn page-btn--nav"
+          class="dt-page-btn"
           [disabled]="paginaActual() === totalPaginas()"
           (click)="siguiente()"
           aria-label="Página siguiente"
