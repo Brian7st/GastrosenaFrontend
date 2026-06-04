@@ -5,7 +5,7 @@
     <header class="panel-asistente__encabezado">
       <div class="panel-asistente__identidad">
         <div class="panel-asistente__avatar">
-          <svg lucideBot></svg>
+          <svg lucideBrainCircuit></svg>
         </div>
         <div class="panel-asistente__titulos">
           <h2 class="panel-asistente__nombre">{{ perfil.nombre }}</h2>
@@ -31,7 +31,7 @@
 
     <!-- Conversacion -->
     <div class="panel-asistente__conversacion">
-      @for (mensaje of mensajes; track mensaje.id) {
+      @for (mensaje of mensajes(); track mensaje.id) {
         <div
           class="panel-asistente__mensaje"
           [class.panel-asistente__mensaje--usuario]="mensaje.autor === 'usuario'"
@@ -39,11 +39,15 @@
         >
           @if (mensaje.autor === 'asistente') {
             <div class="panel-asistente__mensaje-avatar">
-              <svg lucideBot></svg>
+              <svg lucideBrainCircuit></svg>
             </div>
           }
           <div class="panel-asistente__burbuja">
-            <p class="panel-asistente__texto">{{ mensaje.texto }}</p>
+            @if (mensaje.autor === 'asistente') {
+              <markdown class="panel-asistente__texto panel-asistente__texto--md" [data]="mensaje.texto"></markdown>
+            } @else {
+              <p class="panel-asistente__texto">{{ mensaje.texto }}</p>
+            }
             @if (mensaje.hora) {
               <span class="panel-asistente__hora">{{ mensaje.hora }}</span>
             }
@@ -60,11 +64,17 @@
           class="panel-asistente__input"
           placeholder="Escribe un mensaje..."
           aria-label="Escribe un mensaje para GastroIA"
+          [(ngModel)]="texto"
+          [disabled]="enviando()"
+          (keyup.enter)="enviar()"
         />
-        <button type="button" class="panel-asistente__microfono" aria-label="Dictar mensaje">
-          <svg lucideMic></svg>
-        </button>
-        <button type="button" class="panel-asistente__enviar" aria-label="Enviar mensaje">
+        <button
+          type="button"
+          class="panel-asistente__enviar"
+          aria-label="Enviar mensaje"
+          [disabled]="enviando() || !texto.trim()"
+          (click)="enviar()"
+        >
           <svg lucideSend></svg>
         </button>
       </div>
