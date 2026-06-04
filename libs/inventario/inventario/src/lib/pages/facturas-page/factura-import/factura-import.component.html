@@ -37,6 +37,20 @@
 
   <div class="import-grid">
     <div class="upload-zone-wrapper">
+      <div class="field-group gil-vincular-field">
+        <label class="field-label">GIL a vincular (opcional)</label>
+        <select
+          class="field-input"
+          [value]="gilId()"
+          (change)="onGilSelect($event)"
+        >
+          <option value="">Sin GIL</option>
+          @for (gil of gilesDisponibles(); track gil.id) {
+            <option [value]="gil.id">{{ gil.numeroGil }} — {{ gil.destino }}</option>
+          }
+        </select>
+      </div>
+
       <div
         class="upload-zone"
         [class.upload-zone--active]="isDragOver()"
@@ -52,21 +66,6 @@
         </div>
         <h3 class="upload-zone__title">Arrastrá el XML UBL 2.1 acá</h3>
         <p class="upload-zone__subtitle">Solo archivos .xml · máximo 10 MB</p>
-
-        <div class="field-group upload-zone__field">
-          <label class="field-label">GIL a vincular (opcional)</label>
-          <select
-            class="field-input"
-            [value]="gilId()"
-            (change)="onGilSelect($event); $event.stopPropagation()"
-            (click)="$event.stopPropagation()"
-          >
-            <option value="">Sin GIL</option>
-            @for (gil of gilesDisponibles(); track gil.id) {
-              <option [value]="gil.id">{{ gil.numeroGil }} — {{ gil.destino }}</option>
-            }
-          </select>
-        </div>
 
         <button class="btn btn--primary" (click)="fileInput.click(); $event.stopPropagation()">
           Seleccionar archivo
