@@ -74,13 +74,26 @@
 
   @media (min-width: 768px) {
     grid-template-columns: 2fr 1fr;
+    align-items: start;
+
+    /* Fila 1: Información Institucional | Historial + Resumen */
+    .info-card     { grid-column: 1; grid-row: 1; }
+    .sidebar-col   { grid-column: 2; grid-row: 1; }
+    /* Fila 2: el resto del formulario, ancho completo */
+    .form-col-full { grid-column: 1 / -1; grid-row: 2; }
   }
 }
 
-.main-form-col {
+.form-col-full {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  min-width: 0; /* permite que la tabla ancha use overflow-x interno en vez de desbordar el grid */
+}
+
+.info-card {
+  min-width: 0;
+  align-self: start;
 }
 
 /* ── Form Cards ─────────────────────────────────────────────────────────── */
@@ -154,7 +167,7 @@
   }
 
   textarea.form-control {
-    resize: vertical;
+    resize: none; /* tamaño fijo: el usuario no puede redimensionar el cuadro */
   }
 }
 
@@ -245,6 +258,8 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  min-width: 0;
+  align-self: start;
 }
 
 .side-card {
