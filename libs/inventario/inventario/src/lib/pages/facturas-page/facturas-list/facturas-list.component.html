@@ -7,13 +7,6 @@
       <p class="page-header__subtitle">Supervisión y control de documentos electrónicos en tiempo real.</p>
     </div>
     <div class="page-header__actions">
-      <restaurant-button variant="surface" (click)="onToggleFilters()">
-        <span class="material-symbols-outlined">filter_list</span>
-        Filtros
-        @if (filtrosActivos() > 0) {
-          <span class="filter-badge">{{ filtrosActivos() }}</span>
-        }
-      </restaurant-button>
       <restaurant-button variant="ghost" (click)="onImportar()">
         <span class="material-symbols-outlined">upload</span>
         Importar
@@ -24,34 +17,6 @@
       </restaurant-button>
     </div>
   </div>
-
-  <!-- ── FILTER PANEL ── -->
-  @if (showFilters()) {
-    <div class="filter-panel">
-      <div class="filter-panel__row">
-        <div class="filter-group">
-          <label class="filter-label">Estado</label>
-          <select class="filter-select" [value]="filtroEstado()" (change)="onFiltroEstadoChange($any($event.target).value)">
-            <option value="">Todos</option>
-            <option value="REGISTRADA">Registrada</option>
-            <option value="VERIFICADA">Verificada</option>
-            <option value="PAGADA">Pagada</option>
-            <option value="ANULADA">Anulada</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <label class="filter-label">Proveedor (NIT)</label>
-          <input type="text" class="filter-input" placeholder="Ej. 900000001" [value]="filtroProveedor()" (input)="onFiltroProveedorChange($any($event.target).value)" />
-        </div>
-        <div class="filter-group filter-group--actions">
-          <button class="filter-clear-btn" (click)="onLimpiarFiltros()" [disabled]="filtrosActivos() === 0">
-            <span class="material-symbols-outlined">clear_all</span>
-            Limpiar
-          </button>
-        </div>
-      </div>
-    </div>
-  }
 
   <!-- ── KPI CARDS ── -->
   @if (kpis(); as k) {
@@ -104,8 +69,40 @@
     tableTitle="Lista de Facturas"
     tableIcon="receipt_long"
     searchPlaceholder="Buscar por proveedor o número de orden..."
+    [showFilterButton]="true"
+    [filterActive]="showFilters()"
+    [filterCount]="filtrosActivos()"
     (searchChange)="onSearch($event)"
+    (filterToggle)="onToggleFilters()"
   >
+
+    <!-- Panel de filtros colapsable (slot [dtHeader]) -->
+    @if (showFilters()) {
+      <div dtHeader class="filter-panel">
+        <div class="filter-panel__row">
+          <div class="filter-group">
+            <label class="filter-label">Estado</label>
+            <select class="filter-select" [value]="filtroEstado()" (change)="onFiltroEstadoChange($any($event.target).value)">
+              <option value="">Todos</option>
+              <option value="REGISTRADA">Registrada</option>
+              <option value="VERIFICADA">Verificada</option>
+              <option value="PAGADA">Pagada</option>
+              <option value="ANULADA">Anulada</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Proveedor (NIT)</label>
+            <input type="text" class="filter-input" placeholder="Ej. 900000001" [value]="filtroProveedor()" (input)="onFiltroProveedorChange($any($event.target).value)" />
+          </div>
+          <div class="filter-group filter-group--actions">
+            <button class="filter-clear-btn" (click)="onLimpiarFiltros()" [disabled]="filtrosActivos() === 0">
+              <span class="material-symbols-outlined">clear_all</span>
+              Limpiar
+            </button>
+          </div>
+        </div>
+      </div>
+    }
 
     <!-- Loading skeleton -->
     @if (loading()) {
@@ -204,18 +201,18 @@
 
     <!-- Pagination slot -->
     @if (!loading() && facturas().length > 0) {
-<div dtFooter class="table-pagination">
-      <span class="table-pagination__info">
+<div dtFooter class="dt-footer">
+      <span class="dt-page-info">
         Mostrando {{ facturas().length }} de {{ paginacion().totalElements | number }} facturas
       </span>
-      <div class="pagination-btns">
-        <button class="pagination-btn" [disabled]="paginacion().page === 0" (click)="onIrAPagina(paginacion().page - 1)">
+      <div class="dt-pagination">
+        <button class="dt-page-btn" [disabled]="paginacion().page === 0" (click)="onIrAPagina(paginacion().page - 1)">
           <span class="material-symbols-outlined">chevron_left</span>
         </button>
         @for (p of paginas(); track p) {
-          <button class="pagination-btn" [class.pagination-btn--active]="p === paginacion().page" (click)="onIrAPagina(p)">{{ p + 1 }}</button>
+          <button class="dt-page-btn" [class.dt-page-btn--active]="p === paginacion().page" (click)="onIrAPagina(p)">{{ p + 1 }}</button>
         }
-        <button class="pagination-btn" [disabled]="paginacion().page >= paginacion().totalPages - 1" (click)="onIrAPagina(paginacion().page + 1)">
+        <button class="dt-page-btn" [disabled]="paginacion().page >= paginacion().totalPages - 1" (click)="onIrAPagina(paginacion().page + 1)">
           <span class="material-symbols-outlined">chevron_right</span>
         </button>
       </div>

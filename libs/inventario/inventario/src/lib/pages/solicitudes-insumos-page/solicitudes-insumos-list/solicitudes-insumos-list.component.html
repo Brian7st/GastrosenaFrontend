@@ -61,20 +61,33 @@
   tableTitle="Solicitudes de Insumos"
   tableIcon="clipboard-list"
   searchPlaceholder="Buscar por instructor o código..."
-  (searchChange)="onSearch($event)">
+  [showFilterButton]="true"
+  [filterActive]="showFilters()"
+  [filterCount]="filtrosActivos()"
+  (searchChange)="onSearch($event)"
+  (filterToggle)="onToggleFilters()">
 
-  <!-- Filtro de estado -->
-  <div dtHeader class="si-filter-bar">
-    <select class="si-filter-select" (change)="onFilterEstado($any($event.target).value)">
-      @for (opt of estadoOptions; track opt.value) {
-        <option [value]="opt.value">{{ opt.label }}</option>
-      }
-    </select>
-    <button class="si-clear-btn" (click)="onClearFilters()" type="button">
-      <span class="material-symbols-outlined">clear_all</span>
-      Limpiar
-    </button>
-  </div>
+  <!-- Panel de filtros colapsable (slot [dtHeader]) -->
+  @if (showFilters()) {
+    <div dtHeader class="filter-panel">
+      <div class="filter-panel__row">
+        <div class="filter-group">
+          <label class="filter-label">Estado</label>
+          <select class="filter-select" [value]="filtroEstado()" (change)="onFilterEstado($any($event.target).value)">
+            @for (opt of estadoOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="filter-group filter-group--actions">
+          <button class="filter-clear-btn" (click)="onClearFilters()" type="button" [disabled]="filtrosActivos() === 0">
+            <span class="material-symbols-outlined">clear_all</span>
+            Limpiar
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 
   <!-- Cabecera de tabla -->
   <thead>
@@ -193,21 +206,21 @@
   </tbody>
 
   <!-- Paginación -->
-  <div dtFooter class="pagination-footer">
-    <span class="pagination-info">
-      {{ facade.solicitudesSesion().length }} de {{ facade.paginacionSesion().totalElements }}
+  <div dtFooter class="dt-footer">
+    <span class="dt-page-info">
+      Mostrando {{ facade.solicitudesSesion().length }} de {{ facade.paginacionSesion().totalElements }} solicitudes
     </span>
-    <div class="page-numbers">
-      <button class="page-btn"
+    <div class="dt-pagination">
+      <button class="dt-page-btn"
         [disabled]="facade.paginacionSesion().page === 0"
         (click)="facade.irAPaginaSesion(facade.paginacionSesion().page - 1)">
         <span class="material-symbols-outlined">chevron_left</span>
       </button>
       @for (p of paginasSesion(); track p) {
-        <button class="page-btn" [class.page-btn--active]="p === facade.paginacionSesion().page"
+        <button class="dt-page-btn" [class.dt-page-btn--active]="p === facade.paginacionSesion().page"
           (click)="facade.irAPaginaSesion(p)">{{ p + 1 }}</button>
       }
-      <button class="page-btn"
+      <button class="dt-page-btn"
         [disabled]="facade.paginacionSesion().page >= facade.paginacionSesion().totalPages - 1"
         (click)="facade.irAPaginaSesion(facade.paginacionSesion().page + 1)">
         <span class="material-symbols-outlined">chevron_right</span>
