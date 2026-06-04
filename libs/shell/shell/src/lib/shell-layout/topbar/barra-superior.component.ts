@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { LucideBell, LucideBrainCircuit, LucideMoon, LucideSearch, LucideSun, LucideUser } from '@lucide/angular';
 import { PerfilConfig, TopNavLink } from '../../nav/nav.models';
 import { NotificacionesService } from '@restaurant/notificaciones';
+import { AsistenteUiService } from '../asistente/asistente-ui.service';
 
 @Component({
   selector: 'restaurant-barra-superior',
@@ -20,6 +21,7 @@ export class BarraSuperiorComponent implements OnInit, OnDestroy {
   readonly esOscuro = signal(false);
   readonly contadorNotificaciones = signal(0);
 
+  protected readonly asistente = inject(AsistenteUiService);
   private notificacionesService = inject(NotificacionesService);
   private intervalId: any;
 
