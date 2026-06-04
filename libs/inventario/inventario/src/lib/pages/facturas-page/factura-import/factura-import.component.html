@@ -395,7 +395,9 @@
 <div class="sticky-footer">
   <button class="btn btn--ghost" (click)="goBack()">Cancelar</button>
   <div class="footer-actions">
-    <button class="btn btn--outline" (click)="resetImport()">Limpiar</button>
+    @if (fileLoaded()) {
+      <button class="btn btn--outline" (click)="resetImport()">Importar otra factura</button>
+    }
     @if (canConciliar()) {
       <button class="btn btn--secondary" [disabled]="loading()" (click)="onConciliar()">Conciliar con GIL</button>
     }
