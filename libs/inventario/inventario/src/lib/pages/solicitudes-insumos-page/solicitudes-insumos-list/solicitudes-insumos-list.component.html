@@ -63,6 +63,19 @@
   searchPlaceholder="Buscar por instructor o código..."
   (searchChange)="onSearch($event)">
 
+  <!-- Filtro de estado -->
+  <div dtHeader class="si-filter-bar">
+    <select class="si-filter-select" (change)="onFilterEstado($any($event.target).value)">
+      @for (opt of estadoOptions; track opt.value) {
+        <option [value]="opt.value">{{ opt.label }}</option>
+      }
+    </select>
+    <button class="si-clear-btn" (click)="onClearFilters()" type="button">
+      <span class="material-symbols-outlined">clear_all</span>
+      Limpiar
+    </button>
+  </div>
+
   <!-- Cabecera de tabla -->
   <thead>
     <tr>

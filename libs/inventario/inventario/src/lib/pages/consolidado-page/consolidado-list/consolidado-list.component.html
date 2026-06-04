@@ -50,7 +50,8 @@
   <restaurant-data-table
     tableTitle="Consolidados Históricos"
     tableIcon="history"
-    searchPlaceholder="Buscar reporte o ID...">
+    searchPlaceholder="Buscar reporte o ID..."
+    (searchChange)="onSearch($event)">
     
     <thead>
       <tr>
@@ -62,7 +63,7 @@
       </tr>
     </thead>
     <tbody class="text-black text-center">
-      @for (item of consolidados(); track item.id) {
+      @for (item of filteredConsolidados(); track item.id) {
       <tr>
           <td>
             <span class="td-value-primary td-mono">#{{ item.id }}</span>
@@ -104,7 +105,7 @@
     </tbody>
     
     <div dtFooter class="dt-footer">
-      <span class="table-pagination__info">Mostrando {{ consolidados().length }} consolidado(s)</span>
+      <span class="table-pagination__info">Mostrando {{ filteredConsolidados().length }} consolidado(s)</span>
       <div class="pagination-btns">
         <button class="pagination-btn" disabled>
           <span class="material-symbols-outlined">chevron_left</span>

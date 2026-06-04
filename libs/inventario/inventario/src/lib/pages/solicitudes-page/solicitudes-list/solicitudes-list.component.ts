@@ -50,13 +50,6 @@ export class SolicitudesListComponent implements OnInit {
     { value: 'CERRADO',           label: 'Cerrado'             },
   ];
 
-  fechaOptions = [
-    { value: '', label: 'Filtrar por Fecha' },
-    { value: '7d',    label: 'Últimos 7 días' },
-    { value: 'mes',   label: 'Este mes'       },
-    { value: '2024',  label: 'Año 2024'       },
-  ];
-
   // ─── Helpers ───────────────────────────────────────────────────────────────
   getInitials(nombre: string): string {
     return nombre
@@ -91,7 +84,6 @@ export class SolicitudesListComponent implements OnInit {
 
   onSearch(term: string): void        { this.facade.cargarSolicitudes({ busqueda: term }); }
   onFilterEstado(v: string): void     { this.facade.cargarSolicitudes({ estado: v ? (v as EstadoGil) : undefined }); }
-  onFilterFecha(v: string): void      { this.facade.cargarSolicitudes({ fechaRango: v }); }
   onIrAPagina(page: number): void     { this.facade.irAPagina(page); }
   onExportPdf(id: string | number): void {
     this.router.navigate(['/app/inventario/solicitudes-gil', id, 'exportar']);

@@ -23,11 +23,23 @@ export class ConsolidadoListComponent implements OnInit {
   // ── Estado reactivo desde facade ─────────────────────────────────────────
   consolidados = this.facade.consolidados;
   loading      = this.facade.loading;
+  searchText   = signal<string>('');
 
   showExportModal      = signal(false);
   showReversarModal    = signal(false);
   selectedReversarItem = signal<Consolidado | null>(null);
   isReversarBlocked    = signal(false);
+
+  // ── Filtro cliente ────────────────────────────────────────────────────────
+  filteredConsolidados = computed(() => {
+    const q = this.searchText().toLowerCase();
+    if (!q) return this.consolidados();
+    return this.consolidados().filter(c =>
+      String(c.id).toLowerCase().includes(q) ||
+      c.fechaGeneracion.toLowerCase().includes(q) ||
+      c.estado.toLowerCase().includes(q)
+    );
+  });
 
   // ── KPIs derivados de la lista real ─────────────────────────────────────
   kpiTotalEjecutado = computed(() =>
@@ -39,6 +51,10 @@ export class ConsolidadoListComponent implements OnInit {
 
   ngOnInit(): void {
     this.facade.loadAll();
+  }
+
+  onSearch(query: string): void {
+    this.searchText.set(query);
   }
 
   openExportModal(): void {

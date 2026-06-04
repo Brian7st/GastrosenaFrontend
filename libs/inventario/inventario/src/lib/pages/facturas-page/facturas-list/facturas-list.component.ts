@@ -30,15 +30,11 @@ export class FacturasListPageComponent implements OnInit {
   showFilters       = signal(false);
   filtroEstado      = signal<EstadoFactura | ''>('');
   filtroProveedor   = signal('');
-  filtroFechaDesde  = signal('');
-  filtroFechaHasta  = signal('');
 
   filtrosActivos = computed(() => {
     let count = 0;
-    if (this.filtroEstado())     count++;
-    if (this.filtroProveedor())  count++;
-    if (this.filtroFechaDesde()) count++;
-    if (this.filtroFechaHasta()) count++;
+    if (this.filtroEstado())    count++;
+    if (this.filtroProveedor()) count++;
     return count;
   });
 
@@ -71,24 +67,13 @@ export class FacturasListPageComponent implements OnInit {
     this.facade.setFiltros({ proveedor: value || undefined });
   }
 
-  onFiltroFechaChange(): void {
-    this.facade.setFiltros({
-      fechaDesde: this.filtroFechaDesde() || undefined,
-      fechaHasta: this.filtroFechaHasta() || undefined,
-    });
-  }
-
   onLimpiarFiltros(): void {
     this.filtroEstado.set('');
     this.filtroProveedor.set('');
-    this.filtroFechaDesde.set('');
-    this.filtroFechaHasta.set('');
     this.facade.setFiltros({
-      busqueda:   undefined,
-      estado:     undefined,
-      proveedor:  undefined,
-      fechaDesde: undefined,
-      fechaHasta: undefined,
+      busqueda:  undefined,
+      estado:    undefined,
+      proveedor: undefined,
     });
   }
 
