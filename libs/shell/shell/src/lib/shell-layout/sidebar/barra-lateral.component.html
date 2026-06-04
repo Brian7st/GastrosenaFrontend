@@ -1,4 +1,7 @@
-<aside class="barra-lateral">
+<aside
+  class="barra-lateral"
+  [class.barra-lateral--colapsada]="asistente.panelAbierto()"
+>
   <div class="barra-lateral__encabezado">
     <div class="barra-lateral__logo-contenedor">
       <div class="barra-lateral__logo-icono barra-lateral__logo-icono--imagen">
@@ -29,7 +32,7 @@
               <button
                 class="barra-lateral__enlace barra-lateral__enlace--expandible"
                 [class.barra-lateral__enlace--expandido]="isExpanded(item.ruta)"
-                (click)="toggleItem(item.ruta)"
+                (click)="asistente.cerrar(); toggleItem(item.ruta)"
                 type="button"
               >
                 @if (item.icono) {
@@ -55,6 +58,7 @@
                       [routerLink]="child.ruta"
                       routerLinkActive="barra-lateral__subenlace--activo"
                       class="barra-lateral__subenlace"
+                      (click)="asistente.cerrar()"
                     >
                       @if (child.icono) {
                         <svg [lucideIcon]="child.icono!" class="barra-lateral__subicono"></svg>
@@ -74,6 +78,7 @@
                 [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
                 class="barra-lateral__enlace"
                 [class.barra-lateral__enlace--con-insignia]="item.insignia !== undefined"
+                (click)="asistente.cerrar()"
               >
                 @if (item.icono) {
                   <svg [lucideIcon]="item.icono!" class="barra-lateral__icono"></svg>
@@ -96,11 +101,11 @@
 
   <!-- PIE DEL SIDEBAR (enlaces fijos: Perfil, Configuración, Cerrar Sesión) -->
   <div class="barra-lateral__pie">
-    <a routerLink="/app/configuracion" class="barra-lateral__enlace">
+    <a routerLink="/app/configuracion" class="barra-lateral__enlace" (click)="asistente.cerrar()">
       <svg lucideSettings class="barra-lateral__icono"></svg>
       <span class="barra-lateral__texto">Configuración</span>
     </a>
-    <a routerLink="/app/perfil" class="barra-lateral__enlace">
+    <a routerLink="/app/perfil" class="barra-lateral__enlace" (click)="asistente.cerrar()">
       <svg lucideUser class="barra-lateral__icono"></svg>
       <span class="barra-lateral__texto">Perfil</span>
     </a>
