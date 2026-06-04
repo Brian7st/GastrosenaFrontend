@@ -88,53 +88,6 @@ $yellow:          #eab308;
   padding: 0 2rem 2rem;
 }
 
-// ── Paginación ─────────────────────────────────────────────────────────────
-.table-pagination__info {
-  font-size: 0.875rem;
-  color: $on-surface-var;
-}
-
-.pagination-btns {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.pagination-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 0.375rem;
-  border: 1px solid #e2e8f0;
-  background: white;
-  color: #475569;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover:not(:disabled):not(.pagination-btn--active) {
-    background: #f8fafc;
-    border-color: #cbd5e1;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    background: #f1f5f9;
-  }
-
-  &--active {
-    background: var(--color-primario);
-    color: white;
-    border-color: var(--color-primario);
-  }
-
-  .material-symbols-outlined {
-    font-size: 1.25rem;
-  }
-}
 // ── Filtros ─────────────────────────────────────────────────────────────────
 .filter-select-wrap {
   position: relative;

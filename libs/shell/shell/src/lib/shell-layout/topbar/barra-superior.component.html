@@ -1,4 +1,7 @@
-<header class="barra-superior">
+<header
+  class="barra-superior"
+  [class.barra-superior--comprimida]="asistente.panelAbierto()"
+>
   @if (enlaces.length > 0) {
     <nav class="barra-superior__nav">
       @for (enlace of enlaces; track enlace.ruta) {
@@ -24,8 +27,11 @@
     <div class="barra-superior__herramientas">
       <button
         class="barra-superior__boton-icono barra-superior__boton-icono--ia"
+        [class.barra-superior__boton-icono--ia-activo]="asistente.panelAbierto()"
+        [attr.aria-pressed]="asistente.panelAbierto()"
         title="Asistente IA"
         type="button"
+        (click)="asistente.toggle()"
       >
         <svg lucideBrainCircuit></svg>
       </button>

@@ -19,18 +19,25 @@ export class PresupuestoRegistrarComponent implements OnInit {
   private fb     = inject(FormBuilder);
   private facade = inject(PresupuestoFacade);
 
-  registroForm = this.fb.group({
-    programaId:          ['', Validators.required],
-    vigenciaFiscal:      [2025, Validators.required],
-    nombreRubro:         ['', Validators.required],
-    codigoPresupuestal:  ['', Validators.required],
-    bolsaInicial:        [null as number | null, [Validators.required, Validators.min(1)]],
-  });
-
   // Grupos de rubros agrupados por ficha (para el selector de programa)
   grupos = this.facade.grupos;
 
   readonly VIGENCIAS = [2024, 2025, 2026];
+
+  /**
+   * Formulario alineado con el payload real POST /budget/presupuestos.
+   * Un presupuesto tiene múltiples rubros; este formulario crea uno con un solo rubro.
+   */
+  registroForm = this.fb.nonNullable.group({
+    fichaId:           ['', Validators.required],
+    programaFormacion: ['', Validators.required],
+    vigencia:          [new Date().getFullYear(), Validators.required],
+    fechaAprobacion:   ['', Validators.required],
+    // Rubro único inline
+    rubroCodigo:       ['', Validators.required],
+    rubroDescripcion:  ['', Validators.required],
+    montoAsignado:     [0, [Validators.required, Validators.min(1)]],
+  });
 
   ngOnInit(): void {
     this.facade.loadAll();
@@ -38,7 +45,19 @@ export class PresupuestoRegistrarComponent implements OnInit {
 
   onSubmit(): void {
     if (this.registroForm.valid) {
-      this.facade.registrarPresupuesto(this.registroForm.getRawValue() as RegistrarPresupuestoData);
+      const v = this.registroForm.getRawValue();
+      const data: RegistrarPresupuestoData = {
+        fichaId:           v.fichaId,
+        programaFormacion: v.programaFormacion,
+        vigencia:          v.vigencia,
+        fechaAprobacion:   v.fechaAprobacion,
+        rubros: [{
+          codigo:        v.rubroCodigo,
+          descripcion:   v.rubroDescripcion,
+          montoAsignado: v.montoAsignado,
+        }],
+      };
+      this.facade.registrarPresupuesto(data);
       this.closeModal();
     }
   }

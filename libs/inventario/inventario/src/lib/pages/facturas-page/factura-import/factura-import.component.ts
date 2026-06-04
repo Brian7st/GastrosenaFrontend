@@ -3,16 +3,14 @@ import { Router, RouterModule } from '@angular/router';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { FacturasFacade } from '../../../data-access/facturas.facade';
 import { FacturaLinea } from '../../../models/facturas.model';
-import { ButtonComponent } from '@restaurant/shared/ui';
 import { BienGilResponse } from '../../../data-access/api/procurement.api';
 
 export type ImportStatus = 'idle' | 'loading' | 'success' | 'error';
-export type FormatoArchivo = 'pdf' | 'xml';
 
 @Component({
   selector: 'restaurant-factura-import',
   standalone: true,
-  imports: [RouterModule, BackButtonComponent, ButtonComponent],
+  imports: [RouterModule, BackButtonComponent],
   templateUrl: './factura-import.component.html',
   styleUrl: './factura-import.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,7 +23,6 @@ export class FacturaImportPageComponent implements OnInit {
   fileName = signal('');
   gilId = signal('');
   localError = signal<string | null>(null);
-  formato = signal<FormatoArchivo>('pdf');
 
   facturaImportada        = this.facade.facturaImportada;
   gilesDisponibles        = this.facade.gilesDisponibles;
@@ -158,12 +155,6 @@ export class FacturaImportPageComponent implements OnInit {
       .trim();
   }
 
-  setFormato(f: FormatoArchivo): void {
-    if (this.formato() === f) return;
-    this.formato.set(f);
-    this.resetImport();
-  }
-
   goBack(): void {
     this.router.navigate(['/app/inventario/facturas']);
   }
@@ -215,19 +206,11 @@ export class FacturaImportPageComponent implements OnInit {
     const normalizedGilId = this.gilId().trim();
     const ext = file.name.toLowerCase().split('.').pop();
 
-    if (this.formato() === 'xml') {
-      if (ext !== 'xml') {
-        this.localError.set('Para importación XML seleccioná un archivo .xml');
-        return;
-      }
-      this.facade.importarFacturaFelXml(file, normalizedGilId || undefined);
-    } else {
-      if (ext !== 'pdf') {
-        this.localError.set('Para importación PDF seleccioná un archivo .pdf');
-        return;
-      }
-      this.facade.importarFacturaFel(file, normalizedGilId || undefined);
+    if (ext !== 'xml') {
+      this.localError.set('Para importación XML seleccioná un archivo .xml');
+      return;
     }
+    this.facade.importarFacturaFelXml(file, normalizedGilId || undefined);
   }
 
   private groupIva(lineas: FacturaLinea[]): Array<{ porcentaje: number; valor: number }> {

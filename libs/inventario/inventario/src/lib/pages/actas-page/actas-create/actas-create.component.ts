@@ -114,6 +114,18 @@ export class ActasCreateComponent {
     this.firmantes.update(list => [...list, { nombre: '', dependenciaRol: '', aprueba: true }]);
   }
 
+  /** Quita un firmante adicional. Los dos primeros (Instructor Cuentadante y
+   *  Vocero de Aprendices) son obligatorios y no se pueden eliminar (RF-5.10.7). */
+  removeFirmante(index: number): void {
+    if (index < 2) return;
+    this.firmantes.update(list => list.filter((_, i) => i !== index));
+  }
+
+  /** true para los dos firmantes obligatorios (instructor y vocero). */
+  esFirmanteObligatorio(index: number): boolean {
+    return index < 2;
+  }
+
   // ── Navegación del wizard ────────────────────────────────────────────────
   nextStep(): void {
     if (this.currentStep() < this.totalSteps) this.currentStep.update(s => s + 1);

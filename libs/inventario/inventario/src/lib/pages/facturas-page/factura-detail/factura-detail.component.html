@@ -104,7 +104,13 @@
                 <tr>
                   <td class="text-center text-secondary">{{ i + 1 }}</td>
                   <td class="font-medium">{{ item.descripcion }}</td>
-                  <td class="text-secondary">{{ item.productoId || '—' }}</td>
+                  <td class="text-secondary">
+                    @if (esPendiente(item)) {
+                      <span class="badge badge--orange" title="Esta línea aún no está asociada a un bien del catálogo">Sin bien</span>
+                    } @else {
+                      {{ item.productoId || '—' }}
+                    }
+                  </td>
                   <td class="text-right">{{ item.cantidad }}</td>
                   <td class="text-right">{{ item.precioUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
                   <td class="text-right text-secondary">{{ item.porcentajeIva ?? item.iva }}%</td>
@@ -335,6 +341,45 @@
         </section>
       }
 
+      <!-- Cola de revisión: líneas FEL que quedaron sin bien tras la conciliación -->
+      @if (lineasPendientes().length > 0) {
+        <section class="bento-card pendientes-card">
+          <div class="card-section">
+            <h4 class="card-section__title">
+              <span class="material-symbols-outlined text-tertiary">rule</span>
+              Líneas sin bien asignado ({{ lineasPendientes().length }})
+            </h4>
+            <p class="pendientes-card__hint">
+              Estas líneas no se resolvieron automáticamente al conciliar con el GIL. Asociá cada una a un
+              bien existente del catálogo. Si el bien no existe,
+              <button type="button" class="link-btn" (click)="irACrearBien()">creálo primero en Bienes</button>.
+            </p>
+
+            @if (f.estado === 'REGISTRADA') {
+              <ul class="pendientes-list">
+                @for (linea of lineasPendientes(); track linea.descripcion) {
+                  <li class="pendientes-list__item">
+                    <span class="pendientes-list__desc font-medium">{{ linea.descripcion }}</span>
+                    <div class="pendientes-list__action">
+                      <restaurant-button
+                        variant="primary"
+                        (click)="abrirBuscadorBien(linea.descripcion)">
+                        <span class="material-symbols-outlined">search</span>
+                        Buscar bien…
+                      </restaurant-button>
+                    </div>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="pendientes-card__locked text-secondary">
+                Solo se pueden asociar líneas mientras la factura está en estado REGISTRADA.
+              </p>
+            }
+          </div>
+        </section>
+      }
+
     </div>
 
   } @else {
@@ -383,6 +428,72 @@
           <button class="btn-cancel" type="button" (click)="showConfirmPagada.set(false)">Cancelar</button>
           <button class="btn-confirm" type="button" (click)="confirmarPagada()">Confirmar pago</button>
         </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Buscador de bien para asociar línea pendiente ───────────────────── -->
+@if (buscadorBienAbierto()) {
+  <div class="modal-backdrop" (click)="cerrarBuscadorBien()">
+    <div class="modal-container modal-container--wide" (click)="$event.stopPropagation()">
+      <div class="buscador-bien">
+        <h2 class="modal-title">Buscar bien para asociar</h2>
+        @if (lineaPendienteActiva(); as desc) {
+          <p class="modal-text">Línea FEL: <strong>{{ desc }}</strong></p>
+        }
+        @if (bienAConfirmar(); as b) {
+          <div class="confirm-pair">
+            <div class="confirm-pair__side">
+              <span class="confirm-pair__label">Línea del FEL</span>
+              <span class="confirm-pair__value">{{ lineaPendienteActiva() }}</span>
+            </div>
+            <span class="material-symbols-outlined confirm-pair__arrow">arrow_forward</span>
+            <div class="confirm-pair__side">
+              <span class="confirm-pair__label">Bien del catálogo</span>
+              <span class="confirm-pair__value"><strong>{{ b.codigoSena }}</strong> — {{ b.descripcion }}</span>
+            </div>
+          </div>
+          <p class="confirm-pair__warn">
+            <span class="material-symbols-outlined">info</span>
+            Verificá que correspondan: el sistema no valida que coincidan.
+          </p>
+          <div class="modal-actions">
+            <button class="btn-cancel" type="button" (click)="volverABuscar()">Volver</button>
+            <button class="btn-confirm" type="button" (click)="confirmarAsociacion()">Confirmar asociación</button>
+          </div>
+        } @else {
+          <input
+            type="text"
+            class="gil-obs-input buscador-bien__search"
+            placeholder="Buscar por nombre o código SENA…"
+            (input)="onBuscarBienCatalogo($any($event.target).value)" />
+          <div class="buscador-bien__results">
+            @if (catalogoLoading()) {
+              <p class="buscador-bien__empty">Buscando…</p>
+            } @else if (catalogoBienes().length === 0) {
+              <p class="buscador-bien__empty">No se encontraron bienes. Probá con otro término.</p>
+            } @else {
+              <ul class="bien-result-list">
+                @for (bien of catalogoBienes(); track bien.id) {
+                  <li class="bien-result">
+                    <div class="bien-result__info">
+                      <span class="bien-result__code">{{ bien.codigoSena }}</span>
+                      <span class="bien-result__name">{{ bien.descripcion }}</span>
+                      <span class="bien-result__meta">{{ bien.unidadMedida }}</span>
+                    </div>
+                    <restaurant-button variant="primary" (click)="onBienCatalogoSeleccionado(bien)">
+                      Seleccionar
+                    </restaurant-button>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+          <div class="modal-actions">
+            <button class="btn-cancel" type="button" (click)="cerrarBuscadorBien()">Cerrar</button>
+          </div>
+        }
       </div>
     </div>
   </div>

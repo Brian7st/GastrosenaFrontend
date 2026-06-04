@@ -1,6 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import {
+  ButtonComponent,
+  LucideIconComponent,
+  StatusBadgeComponent,
+} from '@restaurant/shared/ui';
 import { FacturasFacade } from '../../../data-access/facturas.facade';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 import { EstadoGIL } from '../../../models/facturas.model';
@@ -8,7 +13,7 @@ import { EstadoGIL } from '../../../models/facturas.model';
 @Component({
   selector: 'restaurant-gil-solicitud-detail',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonComponent, LucideIconComponent, StatusBadgeComponent],
   templateUrl: './gil-solicitud-detail.component.html',
   styleUrl: './gil-solicitud-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -50,6 +55,17 @@ export class GilSolicitudDetailPageComponent implements OnInit {
 
   onEnviarAprobacion(): void {
     this.solicitudesFacade.cambiarEstado(this.gilId, 'EMITIDO');
+  }
+
+  getEstadoVariant(estado: EstadoGIL): 'success' | 'warning' | 'danger' | 'info' {
+    const map: Record<EstadoGIL, 'success' | 'warning' | 'danger' | 'info'> = {
+      BORRADOR:          'info',
+      EMITIDO:           'warning',
+      ENVIADO_PROVEEDOR: 'warning',
+      VERIFICADO:        'success',
+      CERRADO:           'success',
+    };
+    return map[estado];
   }
 
   getStepState(step: EstadoGIL, currentStep: EstadoGIL): 'done' | 'active' | 'pending' {

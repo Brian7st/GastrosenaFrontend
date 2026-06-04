@@ -18,6 +18,7 @@ import {
   AlertaPrioridad
 } from '../../../models/alerta.model';
 import { AlertasFacade } from '../../../data-access/alertas.facade';
+import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 
 export interface HistorialResolucion {
   bien: string;
@@ -35,7 +36,7 @@ export interface MovimientoReciente {
   selector: 'restaurant-alertas-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterModule, KpiCardComponent, ButtonComponent, StatusBadgeComponent, LucideIconComponent],
+  imports: [RouterModule, KpiCardComponent, ButtonComponent, StatusBadgeComponent, LucideIconComponent, EmptyStateComponent],
   templateUrl: './alertas-list.component.html',
   styleUrl: './alertas-list.component.scss',
 })
