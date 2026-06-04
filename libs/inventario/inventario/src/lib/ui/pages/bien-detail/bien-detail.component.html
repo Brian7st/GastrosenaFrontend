@@ -4,7 +4,7 @@
   <nav class="breadcrumb-nav">
     <span class="breadcrumb-link" (click)="onVolver()">Inventario</span>
     <span class="material-symbols-outlined breadcrumb-sep">chevron_right</span>
-    <span class="breadcrumb-link" (click)="onVolver()">Equipos de Cómputo</span>
+    <span class="breadcrumb-link" (click)="onVolver()">{{ bien()?.categoria ?? 'Bienes' }}</span>
     <span class="material-symbols-outlined breadcrumb-sep">chevron_right</span>
     <span class="breadcrumb-current">{{ bien()?.codigoSena }}</span>
   </nav>
@@ -12,18 +12,13 @@
 
 @if (bien(); as b) {
 
-
   <!-- Page Header -->
   <div class="page-header">
     <div>
-      <h1 class="page-title">{{ b.nombre }}</h1>
-      <p class="page-subtitle">Referencia técnica para auditoría de activos SENA</p>
+      <p class="page-codigo">{{ b.codigoSena }}</p>
+      <h1 class="page-title">{{ b.descripcion }}</h1>
     </div>
     <div class="header-actions">
-      <button class="btn-surface" (click)="onExportarHistorial()">
-        <span class="material-symbols-outlined">history</span>
-        Exportar Historial
-      </button>
       <restaurant-button variant="primary" (click)="onEditarActivo()">
         <span class="material-symbols-outlined">edit</span>
         Editar Bien
@@ -31,84 +26,85 @@
     </div>
   </div>
 
-  <!-- Top Section: imagen + KPIs + especificaciones -->
-  <div class="detail-top">
-    <!-- Left: imagen + badges -->
-    <div class="asset-card">
-      <div class="asset-image-wrap">
-        @if (b.imagenUrl) {
-<img
-             [src]="b.imagenUrl" [alt]="b.nombre" class="asset-image" />
-} @else {
+  <!-- Info Grid -->
+  <div class="info-grid">
 
-          <div class="asset-image-placeholder">
-            <span class="material-symbols-outlined">inventory_2</span>
-          </div>
-        
-}
-        
+    <!-- Identificación -->
+    <div class="info-card">
+      <div class="info-card__header">
+        <span class="material-symbols-outlined">badge</span>
+        <h4>Identificación</h4>
       </div>
-      <div class="asset-badges">
-        <div class="asset-badge-item">
-          <span class="badge-label">ESTADO</span>
-          <restaurant-status-badge
-            [label]="b.estado"
-            [variant]="getEstadoVariant(b.estado)">
-          </restaurant-status-badge>
+      <div class="info-rows">
+        <div class="info-row">
+          <span class="info-label">Código SENA</span>
+          <span class="info-val code-mono">{{ b.codigoSena }}</span>
         </div>
-        <div class="asset-badge-item">
-          <span class="badge-label">CATEGORÍA</span>
-          <span class="categoria-text">{{ b.categoria }}</span>
+        <div class="info-row">
+          <span class="info-label">Código Proveedor</span>
+          <span class="info-val code-mono">{{ b.codigoProveedor || '—' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Categoría</span>
+          <span class="info-val">{{ b.categoria }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Unidad de Medida</span>
+          <span class="info-val">{{ b.unidadMedida }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Estado</span>
+          <restaurant-status-badge [label]="b.estado" [variant]="getEstadoVariant(b.estado)" />
         </div>
       </div>
     </div>
 
-    <!-- Center: KPI cards -->
-    <div class="kpi-cards-col">
-      <div class="kpi-mini-card">
-        <div class="kpi-mini-icon kpi-mini-icon--primary">
-          <span class="material-symbols-outlined filled">inventory</span>
-        </div>
-        <div>
-          <p class="kpi-mini-label">STOCK ACTUAL</p>
-          <h3 class="kpi-mini-value" [class.kpi-mini-value--danger]="b.stockActual < b.stockMinimo">{{ b.stockActual }}</h3>
-          <p class="kpi-mini-sub">
-            <span class="dot-green"></span>
-            Stock Mínimo Requerido: <strong>{{ b.stockMinimo }}</strong>
-          </p>
-        </div>
+    <!-- Stock -->
+    <div class="info-card">
+      <div class="info-card__header">
+        <span class="material-symbols-outlined">inventory</span>
+        <h4>Stock</h4>
       </div>
-      <div class="kpi-mini-card">
-        <div class="kpi-mini-icon kpi-mini-icon--blue">
-          <span class="material-symbols-outlined filled">payments</span>
+      <div class="stock-display">
+        <div class="stock-main" [class.stock-main--danger]="b.stockActual < b.stockMinimo">
+          <span class="stock-num">{{ b.stockActual }}</span>
+          <span class="stock-um">{{ b.unidadMedida }}</span>
         </div>
-        <div>
-          <p class="kpi-mini-label">VALOR UNITARIO</p>
-          <h3 class="kpi-mini-value">{{ b.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</h3>
-          @if (b.depreciacionAnual) {
-<p class="kpi-mini-sub">Depreciación anual: {{ b.depreciacionAnual }}%</p>
-}
+        <div class="stock-min-row">
+          <span class="material-symbols-outlined" [class.icon--danger]="b.stockActual < b.stockMinimo">
+            {{ b.stockActual < b.stockMinimo ? 'warning' : 'check_circle' }}
+          </span>
+          <span>Mínimo requerido: <strong>{{ b.stockMinimo }}</strong></span>
+        </div>
+        <div class="info-row mt-2">
+          <span class="info-label">Estado stock</span>
+          <span class="info-val">{{ b.estadoStock ?? '—' }}</span>
         </div>
       </div>
     </div>
 
-    <!-- Right: especificaciones técnicas -->
-    @if (espec().length > 0) {
-<div class="spec-card">
-      <div class="spec-card__header">
-        <span class="material-symbols-outlined">settings</span>
-        <h4>Especificaciones Técnicas</h4>
+    <!-- Valores -->
+    <div class="info-card">
+      <div class="info-card__header">
+        <span class="material-symbols-outlined">payments</span>
+        <h4>Valores</h4>
       </div>
-      <div class="spec-grid">
-        @for (s of espec(); track s) {
-<div class="spec-item">
-          <span class="spec-key">{{ s[0] }}</span>
-          <span class="spec-val">{{ s[1] }}</span>
+      <div class="info-rows">
+        <div class="info-row">
+          <span class="info-label">Valor Adjudicado</span>
+          <span class="info-val valor-text">{{ b.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
         </div>
-}
+        <div class="info-row">
+          <span class="info-label">Valor Antes IVA</span>
+          <span class="info-val">{{ (b.valorNeto | currency:'COP':'symbol-narrow':'1.0-0') ?? '—' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">IVA</span>
+          <span class="info-val">{{ b.iva !== null && b.iva !== undefined ? (b.iva + '%') : '—' }}</span>
+        </div>
       </div>
     </div>
-}
+
   </div>
 
   <!-- Historial de Movimientos -->
@@ -118,7 +114,6 @@
         <span class="material-symbols-outlined filled text-primary">sync</span>
         <h3>Historial de Movimientos</h3>
       </div>
-      <button class="link-btn">Ver todo el historial</button>
     </div>
 
     @if (movimientos().length > 0) {
@@ -139,10 +134,7 @@
               <tr>
                 <td class="mov-fecha">{{ m.fecha | date:'dd/MM/yyyy' }}</td>
                 <td>
-                  <restaurant-status-badge
-                    [label]="m.tipo"
-                    [variant]="getTipoVariant(m.tipo)">
-                  </restaurant-status-badge>
+                  <restaurant-status-badge [label]="m.tipo" [variant]="getTipoVariant(m.tipo)" />
                 </td>
                 <td class="mov-responsable">{{ m.responsable }}</td>
                 <td class="mov-ubicacion">{{ m.ubicacion }}</td>
@@ -166,75 +158,6 @@
     }
   </section>
 
-  <!-- Facturas de Abastecimiento -->
-  <section class="section-card mt-6">
-    <div class="section-header">
-      <div class="section-title">
-        <span class="material-symbols-outlined filled text-primary">receipt_long</span>
-        <h3>Facturas de Abastecimiento</h3>
-      </div>
-      @if (b.facturas && b.facturas.length > FACTURAS_PREVIEW_COUNT) {
-<button
-        class="link-btn"
-       
-        (click)="toggleFacturas()">
-        {{ mostrarTodasFacturas() ? 'Ver menos' : 'Ver todas (' + b.facturas.length + ')' }}
-      </button>
-}
-    </div>
-
-    @if (b.facturas && b.facturas.length > 0) {
-
-      <div class="movements-table-wrap">
-        <table class="movements-table">
-          <thead>
-            <tr>
-              <th>FEL</th>
-              <th>CUFE</th>
-              <th>PROVEEDOR</th>
-              <th>FECHA</th>
-              <th>MONTO</th>
-              <th>ESTADO</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (f of (mostrarTodasFacturas() ? b.facturas : (b.facturas | slice:0:FACTURAS_PREVIEW_COUNT)); track f) {
-<tr>
-              <td class="code-mono">{{ f.fel }}</td>
-              <td class="code-mono text-muted">{{ f.cufe }}</td>
-              <td>{{ f.proveedor }}</td>
-              <td>{{ f.fecha | date:'dd/MM/yyyy' }}</td>
-              <td class="mov-valor">{{ f.monto | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
-              <td>
-                <restaurant-status-badge
-                  [label]="f.estado"
-                  [variant]="getFacturaEstadoVariant(f.estado)">
-                </restaurant-status-badge>
-              </td>
-            </tr>
-}
-          </tbody>
-        </table>
-      </div>
-    
-} @else {
-
-      <div class="empty-state">
-        <span class="material-symbols-outlined">receipt_long</span>
-        <p>No hay facturas vinculadas</p>
-        <small>Este activo aún no tiene facturas de abastecimiento asociadas.</small>
-        <button class="btn-outline-sm">
-          <span class="material-symbols-outlined">add</span>
-          Vincular Factura Manualmente
-        </button>
-      </div>
-    
-}
-
-    
-  </section>
-
-
 } @else {
 
   <div class="loading-state">
@@ -244,12 +167,9 @@
 
 }
 
-
-
 <!-- Modal de edición -->
 @if (showEditModal()) {
 <restaurant-bien-form
- 
   mode="edit"
   [bien]="bien()"
   (save)="onSaveEdit($event)"

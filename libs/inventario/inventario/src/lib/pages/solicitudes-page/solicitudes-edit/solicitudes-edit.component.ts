@@ -121,6 +121,7 @@ export class SolicitudesEditComponent implements OnInit {
       cuentadantes:           this.cuentadantes(),
       solicitante:            this.solicitante(),
       codigoGrupo:            this.codigoGrupo() || undefined,
+      fichaCaracterizacion:   this.codigoGrupo() || undefined,
       bienes:                 this.bienes(),
       observaciones:          this.observaciones() || undefined,
     };

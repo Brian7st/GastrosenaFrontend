@@ -351,3 +351,51 @@
     max-width: 50px;
   }
 }
+
+// ── Número del paso (cuando no está completado) ─────────────────────────────
+.paquete-create__step-num {
+  line-height: 1;
+}
+
+// ── Resumen del paquete (paso 2) ────────────────────────────────────────────
+.paquete-create__summary {
+  margin-bottom: var(--space-6, 1.5rem);
+}
+
+.paquete-create__summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3, 0.75rem);
+  margin-top: var(--space-3, 0.75rem);
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.paquete-create__summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: var(--space-4, 1rem);
+  background: var(--color-superficie-contenedor, #f8fafc);
+  border: 1px solid var(--color-borde, #e2e8f0);
+  border-radius: var(--radius-md, 0.5rem);
+  min-width: 0;
+}
+
+.paquete-create__summary-label {
+  font-size: var(--font-size-xs, 0.75rem);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-secondary, #64748b);
+}
+
+.paquete-create__summary-value {
+  font-size: var(--font-size-sm, 0.875rem);
+  font-weight: 600;
+  color: var(--color-text, #1e293b);
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}

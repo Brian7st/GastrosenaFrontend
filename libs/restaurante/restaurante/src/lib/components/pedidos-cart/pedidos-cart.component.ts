@@ -39,6 +39,16 @@ export class PedidosCartComponent {
   observacionesGenerales = signal('');
   showCancelModal = signal(false);
   showConfirmModal = signal(false);
+  showAnularBackendModal = signal(false);
+
+  esPedidoSoloLectura = computed(() => {
+    const p = this.pedidoActivo();
+    return p ? p.estado !== 'BORRADOR' : false;
+  });
+
+  estadoPedido = computed(() => {
+    return this.pedidoActivo()?.estado || 'BORRADOR';
+  });
 
   incrementar(index: number) {
     this.facade.actualizarCantidadProducto(index, 1);
@@ -68,8 +78,28 @@ export class PedidosCartComponent {
 
   ejecutarConfirmacion() {
     this.showConfirmModal.set(false);
-    this.facade.confirmarPedidoActivo(this.observacionesGenerales());
-    this.router.navigate(['/restaurante/mesas']);
+    this.facade.confirmarPedidoActivo(this.observacionesGenerales()).subscribe({
+      next: (exito) => {
+        if (exito) {
+          this.router.navigate(['/app/restaurante/mesas']);
+        }
+      }
+    });
+  }
+
+  iniciarAnulacionBackend() {
+    this.showAnularBackendModal.set(true);
+  }
+
+  ejecutarAnulacionBackend() {
+    this.showAnularBackendModal.set(false);
+    this.facade.cancelarPedidoActivoEnBackend().subscribe({
+      next: (exito) => {
+        if (exito) {
+          this.router.navigate(['/app/restaurante/mesas']);
+        }
+      }
+    });
   }
 }
 

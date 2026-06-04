@@ -11,6 +11,7 @@ import {
   ButtonComponent,
   StatusBadgeComponent
 } from '@restaurant/shared/ui';
+import { CurrencyCopPipe } from '@restaurant/shared/util';
 
 @Component({
   selector: 'restaurant-historial-estudiante-page',
@@ -23,7 +24,8 @@ import {
     CardComponent,
     PageHeaderComponent,
     ButtonComponent,
-    StatusBadgeComponent
+    StatusBadgeComponent,
+    CurrencyCopPipe
   ],
   templateUrl: './historial-estudiante-page.component.html',
   styleUrls: ['../historial-instructor-page/historial-instructor-page.component.scss'], // Estilos compartidos
@@ -53,8 +55,29 @@ export class HistorialEstudiantePageComponent {
       case 'ENTREGADO': return 'success';
       case 'FACTURADO': return 'success';
       case 'EN_PREPARACION': return 'warning';
+      case 'LISTO_PARA_SERVIR': return 'warning';
       case 'BORRADOR': return 'info';
       default: return 'info';
     }
+  }
+
+  marcarEntregado(pedidoId: string): void {
+    this.facade.marcarPedidoComoEntregado(pedidoId);
+  }
+
+  obtenerComidas(detalles: any[]) {
+    if (!detalles) return [];
+    return detalles.filter(d => {
+      const cat = (d.categoria || '').toLowerCase();
+      return cat !== 'bebidas' && cat !== 'bebida';
+    });
+  }
+
+  obtenerBebidas(detalles: any[]) {
+    if (!detalles) return [];
+    return detalles.filter(d => {
+      const cat = (d.categoria || '').toLowerCase();
+      return cat === 'bebidas' || cat === 'bebida';
+    });
   }
 }

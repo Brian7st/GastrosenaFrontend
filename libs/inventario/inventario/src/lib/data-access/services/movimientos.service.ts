@@ -4,6 +4,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import {
   Movimiento,
+  DocumentoMovimiento,
   EntradaMovimientoData,
   SalidaMovimientoData,
   ReservaMovimientoData,
@@ -11,7 +12,7 @@ import {
   AjusteMovimientoData,
 } from '../../models/movimiento.model';
 import { ExistenciaProducto } from '../../models/inventario.model';
-import { MovimientoResponse, MovimientoPageResponse, ExistenciaResponse } from '../api/inventory.api';
+import { MovimientoPageResponse, ExistenciaResponse, DocumentoPageResponse, DocumentoDetalleResponse } from '../api/inventory.api';
 import { KardexValorizadoItemResponse } from '../api/reporting.api';
 import { KardexValorizadoItem } from '../../models/reporting.model';
 import {
@@ -23,6 +24,7 @@ import {
   liberacionToRequest,
   ajusteToRequest,
   movimientoPageFromApi,
+  documentoPageFromApi,
 } from '../mappers/inventory.mapper';
 import { kardexValorizadoFromApi } from '../mappers/reporting.mapper';
 
@@ -32,7 +34,80 @@ const API = '/api/v1';
 export class MovimientosService {
   private http = inject(HttpClient);
 
+  // ── Documentos agrupados ────────────────────────────────────────────────────
+
+  /**
+   * GET /inventory/movimientos?pagina=&tamano=
+   * Listado paginado de documentos de movimiento (agrupados por documento).
+   */
+  getDocumentos(
+    pagina = 0,
+    tamano = 20,
+  ): Observable<{
+    documentos: DocumentoMovimiento[];
+    totalPaginas: number;
+    totalElementos: number;
+    paginaActual: number;
+    tamano: number;
+  }> {
+    const params = new HttpParams()
+      .set('pagina', String(pagina))
+      .set('tamano', String(tamano));
+    return this.http
+      .get<DocumentoPageResponse>(`${API}/inventory/movimientos`, { params })
+      .pipe(
+        map(resp => documentoPageFromApi(resp)),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /**
+   * GET /inventory/movimientos/documento/{documentoId}?tipo=ENTRADA|SALIDA
+   * Retorna los bienes de un documento específico.
+   */
+  getBienesPorDocumento(
+    documentoId: string,
+    tipo: 'ENTRADA' | 'SALIDA',
+  ): Observable<{ tipo: 'ENTRADA' | 'SALIDA'; documentoId: string; numeroDocumento: string | null; bienes: Movimiento[] }> {
+    const params = new HttpParams().set('tipo', tipo);
+    return this.http
+      .get<DocumentoDetalleResponse>(`${API}/inventory/movimientos/documento/${documentoId}`, { params })
+      .pipe(
+        map(resp => ({
+          tipo: resp.tipo,
+          documentoId: resp.documentoId,
+          numeroDocumento: resp.numeroDocumento,
+          bienes: resp.bienes.map(movimientoFromApi),
+        })),
+        catchError(err => throwError(() => err))
+      );
+  }
+
   // ── Kardex ──────────────────────────────────────────────────────────────────
+
+  /**
+   * GET /inventory/movimientos?pagina=0&tamano=50
+   * Listado global de TODOS los movimientos (entradas + salidas + ajustes),
+   * enriquecido por el backend con nombre y unidad de medida del catálogo.
+   */
+  getMovimientos(
+    pagina = 0,
+    tamano = 10,
+    tipo?: string,
+  ): Observable<{ movimientos: Movimiento[]; totalPaginas: number; totalElementos: number }> {
+    let params = new HttpParams()
+      .set('pagina', String(pagina))
+      .set('tamano', String(tamano));
+    if (tipo) {
+      params = params.set('tipo', tipo);
+    }
+    return this.http
+      .get<MovimientoPageResponse>(`${API}/inventory/movimientos`, { params })
+      .pipe(
+        map(resp => movimientoPageFromApi(resp)),
+        catchError(err => throwError(() => err))
+      );
+  }
 
   /**
    * GET /inventory/movimientos/{productoId}?pagina=0&tamano=10
@@ -51,15 +126,6 @@ export class MovimientosService {
       .get<MovimientoPageResponse>(`${API}/inventory/movimientos/${productoId}`, { params })
       .pipe(
         map(resp => movimientoPageFromApi(resp)),
-        catchError(err => throwError(() => err))
-      );
-  }
-
-  getMovimientoById(id: string): Observable<Movimiento | undefined> {
-    return this.http
-      .get<MovimientoResponse>(`${API}/inventory/movimientos/${id}`)
-      .pipe(
-        map(movimientoFromApi),
         catchError(err => throwError(() => err))
       );
   }

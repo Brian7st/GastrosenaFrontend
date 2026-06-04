@@ -35,17 +35,15 @@ export class PedidosPageComponent {
   selectedCategory = signal('all');
   selectedSubcategory = signal('');
 
-  showMobileCart = signal(false);
-  totalItems = computed(() => {
-    const pedido = this.facade.pedidoActivo();
-    if (!pedido) return 0;
-    return pedido.detalles.reduce((sum, item) => sum + item.cantidad, 0);
-  });
-
   mesaActual = computed(() => {
     const pedido = this.facade.pedidoActivo();
     if (!pedido) return null;
     return this.facade.mesas().find(m => m.id.toString() === pedido.mesaId);
+  });
+
+  esPedidoSoloLectura = computed(() => {
+    const p = this.facade.pedidoActivo();
+    return p ? p.estado !== 'BORRADOR' : false;
   });
 
   fechaActual = new Date();

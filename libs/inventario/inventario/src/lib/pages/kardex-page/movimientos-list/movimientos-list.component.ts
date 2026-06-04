@@ -25,21 +25,72 @@ export class MovimientosListComponent implements OnInit {
   private facade = inject(KardexFacade);
 
   // ── Estado reactivo desde facade ─────────────────────────────────────────
-  movimientos = this.facade.movimientos;
-  loading     = this.facade.loading;
+  documentos = this.facade.documentos;
+  loading    = this.facade.loading;
+  error      = this.facade.error;
+  paginacion = this.facade.paginacion;
 
-  // ── KPIs derivados del listado cargado ───────────────────────────────────
-  kpiEntradas      = computed(() => this.movimientos().filter(m => m.tipo === 'ENTRADA').length);
-  kpiSalidas       = computed(() => this.movimientos().filter(m => m.tipo === 'SALIDA').length);
-  kpiValorEntradas = computed(() =>
-    this.movimientos().filter(m => m.tipo === 'ENTRADA').reduce((acc, m) => acc + m.valor, 0)
+  // ── Paginación computada ──────────────────────────────────────────────────
+  paginaActual    = computed(() => this.paginacion().page);
+  totalPaginas    = computed(() => this.paginacion().totalPaginas);
+  totalElementos  = computed(() => this.paginacion().totalElementos);
+  tamano          = computed(() => this.paginacion().size);
+
+  /** Rango "Mostrando X – Y de Z" */
+  desde = computed(() =>
+    this.totalElementos() === 0 ? 0 : this.paginaActual() * this.tamano() + 1
   );
-  kpiPendientes    = computed(() => this.movimientos().filter(m => m.estado === 'Pendiente').length);
+  hasta = computed(() =>
+    Math.min(this.paginaActual() * this.tamano() + this.documentos().length, this.totalElementos())
+  );
+
+  /** Ventana de hasta 5 páginas centrada en la actual */
+  paginas = computed(() => {
+    const total  = this.totalPaginas();
+    const actual = this.paginaActual();
+    if (total === 0) return [];
+    const radio  = 2;
+    let inicio   = Math.max(0, actual - radio);
+    let fin      = Math.min(total - 1, actual + radio);
+    // ajustar ventana si está al borde
+    if (fin - inicio < radio * 2) {
+      if (inicio === 0) fin   = Math.min(total - 1, radio * 2);
+      else              inicio = Math.max(0, fin - radio * 2);
+    }
+    return Array.from({ length: fin - inicio + 1 }, (_, i) => inicio + i);
+  });
+
+  hayPaginaAnterior = computed(() => this.paginaActual() > 0);
+  hayPaginaSiguiente = computed(() => this.paginaActual() < this.totalPaginas() - 1);
+
+  // ── KPIs derivados del listado de documentos ─────────────────────────────
+  kpiEntradas      = computed(() => this.documentos().filter(d => d.tipo === 'ENTRADA').length);
+  kpiSalidas       = computed(() => this.documentos().filter(d => d.tipo === 'SALIDA').length);
+  kpiValorEntradas = computed(() =>
+    this.documentos().filter(d => d.tipo === 'ENTRADA').reduce((acc, d) => acc + d.valorTotal, 0)
+  );
+  kpiBienesPagina  = computed(() =>
+    this.documentos().reduce((acc, d) => acc + d.cantidadBienes, 0)
+  );
 
   ngOnInit(): void {
     this.facade.loadAll();
   }
 
+  // ── Paginación ────────────────────────────────────────────────────────────
+  irAPagina(page: number): void {
+    this.facade.irAPaginaMovimientos(page);
+  }
+
+  paginaAnterior(): void {
+    if (this.hayPaginaAnterior()) this.irAPagina(this.paginaActual() - 1);
+  }
+
+  paginaSiguiente(): void {
+    if (this.hayPaginaSiguiente()) this.irAPagina(this.paginaActual() + 1);
+  }
+
+  // ── Helpers UI ────────────────────────────────────────────────────────────
   getVariant(estado: string): 'success' | 'warning' | 'danger' | 'info' {
     switch (estado) {
       case 'Completado':  return 'success';

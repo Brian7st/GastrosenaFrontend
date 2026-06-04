@@ -3,14 +3,23 @@
 
 <!-- SIDE SHEET: Detalle de Requisición -->
 <aside class="sheet-panel">
+
   <!-- Header -->
   <header class="sheet-panel__header">
     <div class="sheet-panel__header-top">
       <div class="sheet-panel__badge-row">
-        <span class="sheet-panel__status-badge sheet-panel__status-badge--info">Despachada</span>
-        <span class="sheet-panel__date">15 Oct 2026, 14:30</span>
+        @if (loading()) {
+          <span class="sheet-panel__status-badge sheet-panel__status-badge--draft">Cargando...</span>
+        } @else {
+          <span class="sheet-panel__status-badge sheet-panel__status-badge--{{ estadoClass() }}">
+            {{ estadoLabel() }}
+          </span>
+          <span class="sheet-panel__date">{{ requisicion()?.fecha ?? '' }}</span>
+        }
       </div>
-      <h2 class="sheet-panel__title">REQ-2024-{{ reqId() }}</h2>
+      <h2 class="sheet-panel__title">
+        {{ requisicion()?.numero ?? reqId() }}
+      </h2>
     </div>
     <button class="sheet-panel__close" (click)="close()">
       <lucide-icon name="x" [size]="20"></lucide-icon>
@@ -20,151 +29,158 @@
   <!-- Scrollable Canvas -->
   <div class="sheet-panel__body">
 
-    <!-- Section 1: Información de la Sesión -->
-    <section class="detail-section">
-      <h3 class="detail-section__title">
-        <lucide-icon name="info" [size]="20" class="detail-section__icon"></lucide-icon>
-        Información de la Sesión
-      </h3>
-      <div class="info-grid">
-        <div class="info-cell">
-          <div class="info-cell__icon-wrap"><lucide-icon name="tag" [size]="20"></lucide-icon></div>
-          <div>
-            <p class="info-cell__label">Ficha</p>
-            <p class="info-cell__value">2560892</p>
-          </div>
-        </div>
-        <div class="info-cell">
-          <div class="info-cell__icon-wrap"><lucide-icon name="user" [size]="20"></lucide-icon></div>
-          <div>
-            <p class="info-cell__label">Instructor</p>
-            <p class="info-cell__value">Sebastian Betancourt</p>
-          </div>
-        </div>
-        <div class="info-cell">
-          <div class="info-cell__icon-wrap"><lucide-icon name="calendar" [size]="20"></lucide-icon></div>
-          <div>
-            <p class="info-cell__label">Fecha Programada</p>
-            <p class="info-cell__value">15 Oct 2026</p>
-          </div>
-        </div>
-        <div class="info-cell">
-          <div class="info-cell__icon-wrap"><lucide-icon name="clock" [size]="20"></lucide-icon></div>
-          <div>
-            <p class="info-cell__label">Horario</p>
-            <p class="info-cell__value">08:00 - 10:00</p>
-          </div>
-        </div>
+    @if (loading()) {
+      <div class="loading-notice">
+        <lucide-icon name="loader-2" [size]="20"></lucide-icon>
+        Cargando requisición...
       </div>
-    </section>
+    } @else if (!requisicion()) {
+      <div class="loading-notice">
+        <lucide-icon name="alert-circle" [size]="20"></lucide-icon>
+        No se pudo cargar la requisición.
+      </div>
+    } @else {
 
-    <!-- Section 2: Ítems por Categoría -->
-    <section class="detail-section">
-      <div class="detail-section__header-row">
+      <!-- Section 1: Información de la Sesión -->
+      <section class="detail-section">
         <h3 class="detail-section__title">
-          <lucide-icon name="package" [size]="20" class="detail-section__icon"></lucide-icon>
-          Ítems Solicitados
+          <lucide-icon name="info" [size]="20" class="detail-section__icon"></lucide-icon>
+          Información de la Sesión
         </h3>
-        <span class="detail-section__counter">Total: 4 ítems</span>
-      </div>
+        <div class="info-grid">
+          <div class="info-cell">
+            <div class="info-cell__icon-wrap"><lucide-icon name="hash" [size]="20"></lucide-icon></div>
+            <div>
+              <p class="info-cell__label">Ficha</p>
+              <p class="info-cell__value">{{ requisicion()?.fichaId ?? '—' }}</p>
+            </div>
+          </div>
+          <div class="info-cell">
+            <div class="info-cell__icon-wrap"><lucide-icon name="user" [size]="20"></lucide-icon></div>
+            <div>
+              <p class="info-cell__label">Instructor</p>
+              <p class="info-cell__value">{{ requisicion()?.instructorNombre || requisicion()?.instructorId || '—' }}</p>
+            </div>
+          </div>
+          <div class="info-cell">
+            <div class="info-cell__icon-wrap"><lucide-icon name="calendar" [size]="20"></lucide-icon></div>
+            <div>
+              <p class="info-cell__label">Fecha Programada</p>
+              <p class="info-cell__value">{{ requisicion()?.fecha ?? '—' }}</p>
+            </div>
+          </div>
+          <div class="info-cell">
+            <div class="info-cell__icon-wrap"><lucide-icon name="clock" [size]="20"></lucide-icon></div>
+            <div>
+              <p class="info-cell__label">Hora Sesión</p>
+              <p class="info-cell__value">{{ requisicion()?.horaSesion ?? '—' }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
-      <!-- Category: Abarrotes -->
-      <div class="items-category">
-        <h4 class="items-category__label"><span class="items-category__dot"></span> Abarrotes</h4>
-        <div class="items-table">
-          <div class="items-table__head">
-            <div class="items-table__col items-table__col--name">Ítem</div>
-            <div class="items-table__col items-table__col--center">UM</div>
-            <div class="items-table__col items-table__col--right">Solicitada</div>
-            <div class="items-table__col items-table__col--right">Entregada</div>
-          </div>
-          <div class="items-table__row">
-            <div class="items-table__col items-table__col--name">Harina de Trigo</div>
-            <div class="items-table__col items-table__col--center items-table__col--muted">kg</div>
-            <div class="items-table__col items-table__col--right">10</div>
-            <div class="items-table__col items-table__col--right"><span class="qty-badge">10</span></div>
-          </div>
-          <div class="items-table__row">
-            <div class="items-table__col items-table__col--name">Aceite Vegetal</div>
-            <div class="items-table__col items-table__col--center items-table__col--muted">L</div>
-            <div class="items-table__col items-table__col--right">5</div>
-            <div class="items-table__col items-table__col--right"><span class="qty-badge">5</span></div>
-          </div>
+      <!-- Section 2: Ítems por Categoría -->
+      <section class="detail-section">
+        <div class="detail-section__header-row">
+          <h3 class="detail-section__title">
+            <lucide-icon name="package" [size]="20" class="detail-section__icon"></lucide-icon>
+            Ítems Solicitados
+          </h3>
+          <span class="detail-section__counter">Total: {{ totalItems() }} ítems</span>
         </div>
-      </div>
 
-      <!-- Category: Lácteos -->
-      <div class="items-category">
-        <h4 class="items-category__label"><span class="items-category__dot"></span> Lácteos</h4>
-        <div class="items-table">
-          <div class="items-table__row">
-            <div class="items-table__col items-table__col--name">Leche Entera</div>
-            <div class="items-table__col items-table__col--center items-table__col--muted">L</div>
-            <div class="items-table__col items-table__col--right">12</div>
-            <div class="items-table__col items-table__col--right"><span class="qty-badge">12</span></div>
+        @if (totalItems() === 0) {
+          <div class="loading-notice">
+            <lucide-icon name="inbox" [size]="16"></lucide-icon>
+            Sin ítems registrados.
           </div>
-        </div>
-      </div>
+        } @else {
+          @for (grupo of itemsPorCategoria(); track grupo.cat) {
+            <div class="items-category">
+              <h4 class="items-category__label">
+                <span class="items-category__dot"></span>
+                {{ grupo.label }}
+              </h4>
+              <div class="items-table">
+                <div class="items-table__head">
+                  <div class="items-table__col items-table__col--name">Ítem</div>
+                  <div class="items-table__col items-table__col--center">UM</div>
+                  <div class="items-table__col items-table__col--right">Solicitada</div>
+                </div>
+                @for (item of grupo.items; track item.productoId) {
+                  <div class="items-table__row">
+                    <div class="items-table__col items-table__col--name">{{ item.productoNombre }}</div>
+                    <div class="items-table__col items-table__col--center items-table__col--muted">
+                      {{ item.unidadMedida }}
+                    </div>
+                    <div class="items-table__col items-table__col--right">
+                      {{ item.cantidad | number:'1.0-2' }}
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        }
+      </section>
 
-      <!-- Category: Carnes -->
-      <div class="items-category">
-        <h4 class="items-category__label"><span class="items-category__dot"></span> Carnes</h4>
-        <div class="items-table">
-          <div class="items-table__row">
-            <div class="items-table__col items-table__col--name">Carne de Res (Cadera)</div>
-            <div class="items-table__col items-table__col--center items-table__col--muted">kg</div>
-            <div class="items-table__col items-table__col--right">5</div>
-            <div class="items-table__col items-table__col--right"><span class="qty-badge">5</span></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Section 3: Historial de Estados (Timeline) -->
-    <section class="detail-section detail-section--timeline">
-      <h3 class="detail-section__title">
-        <lucide-icon name="history" [size]="20" class="detail-section__icon"></lucide-icon>
-        Historial de Estados
-      </h3>
-      <div class="timeline">
-        <div class="timeline__line"></div>
-        <div class="timeline__step">
-          <div class="timeline__dot"><lucide-icon name="file-edit" [size]="14"></lucide-icon></div>
-          <div class="timeline__content">
-            <h4 class="timeline__step-title">Borrador</h4>
-            <p class="timeline__step-desc">Requisición creada por Sebastian Betancourt.</p>
-            <p class="timeline__step-date">10 Oct 2026, 09:15</p>
-          </div>
-        </div>
-        <div class="timeline__step">
-          <div class="timeline__dot"><lucide-icon name="send" [size]="14"></lucide-icon></div>
-          <div class="timeline__content">
-            <h4 class="timeline__step-title">Enviada</h4>
-            <p class="timeline__step-desc">Enviada a almacén para su revisión.</p>
-            <p class="timeline__step-date">12 Oct 2026, 11:30</p>
-          </div>
-        </div>
-        <div class="timeline__step timeline__step--active">
-          <div class="timeline__dot timeline__dot--active"><lucide-icon name="truck" [size]="14"></lucide-icon></div>
-          <div class="timeline__content timeline__content--active">
-            <h4 class="timeline__step-title timeline__step-title--active">Despachada</h4>
-            <p class="timeline__step-desc">Ítems preparados y listos en almacén.</p>
-            <p class="timeline__step-date">15 Oct 2026, 14:30</p>
-          </div>
-        </div>
-      </div>
-    </section>
+    }
   </div>
+
+  <!-- Error inline -->
+  @if (error()) {
+    <div class="sheet-panel__error">
+      <lucide-icon name="alert-circle" [size]="16"></lucide-icon>
+      {{ error() }}
+    </div>
+  }
 
   <!-- Footer Actions -->
   <footer class="sheet-panel__footer">
-    <button class="btn-outline" (click)="close()">
-      <lucide-icon name="download" [size]="18"></lucide-icon>
-      Descargar Soporte
-    </button>
-    <button class="btn-primary" [routerLink]="['/app/inventario/requisiciones/firmar', reqId()]">
-      <lucide-icon name="pen-tool" [size]="18"></lucide-icon>
-      Confirmar Recepción
-    </button>
+
+    <!-- Enviar al Economato — solo cuando BORRADOR (RF-5.9.2) -->
+    @if (estado() === 'BORRADOR') {
+      <button class="btn-primary" (click)="enviar()" [disabled]="loading()">
+        <lucide-icon name="send" [size]="18"></lucide-icon>
+        Enviar al Economato
+      </button>
+    }
+
+    <!-- Registrar Despacho — solo cuando ENVIADA (RF-5.9.3) -->
+    @if (estado() === 'ENVIADA') {
+      <button class="btn-primary"
+              [routerLink]="['/app/inventario/requisiciones/despacho', reqId()]">
+        <lucide-icon name="truck" [size]="18"></lucide-icon>
+        Registrar Despacho
+      </button>
+    }
+
+    <!-- Exportar .docx — disponible desde FIRMADA -->
+    @if (estado() === 'FIRMADA' || estado() === 'LEGALIZADA') {
+      <button class="btn-outline" (click)="exportar()">
+        <lucide-icon name="download" [size]="18"></lucide-icon>
+        Descargar Soporte
+      </button>
+    }
+
+    <!-- Confirmar Recepción / Firmar — solo cuando DESPACHADA (RF-5.9.6) -->
+    @if (estado() === 'DESPACHADA') {
+      <button class="btn-primary"
+              [routerLink]="['/app/inventario/requisiciones/firmar', reqId()]">
+        <lucide-icon name="pen-tool" [size]="18"></lucide-icon>
+        Confirmar Recepción
+      </button>
+    }
+
+    <!-- Crear Acta — solo cuando FIRMADA (RF-5.9.6) -->
+    @if (estado() === 'FIRMADA') {
+      <button class="btn-primary"
+              [routerLink]="['/app/inventario/actas/nueva']"
+              [queryParams]="{ requisicionId: reqId() }">
+        <lucide-icon name="file-plus" [size]="18"></lucide-icon>
+        Crear Acta
+      </button>
+    }
+
   </footer>
 </aside>

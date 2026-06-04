@@ -76,6 +76,26 @@ export class RequisicionesFacade {
       .subscribe(data => this._requisicionSeleccionada.set(data ?? null));
   }
 
+  /** PATCH /legalization/requisiciones/{id}/enviar — transición BORRADOR → ENVIADA */
+  enviarRequisicion(id: string): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this.requisicionesService.enviarRequisicion(id)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al enviar la requisición');
+          return of(false);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(ok => {
+        if (ok) {
+          this.loadAll();
+          this.cargarRequisicion(id);
+        }
+      });
+  }
+
   /** PATCH /legalization/requisiciones/{id}/despachar — economoId obligatorio */
   despacharRequisicion(id: string, economoId: string): void {
     this._loading.set(true);
@@ -102,6 +122,30 @@ export class RequisicionesFacade {
         finalize(() => this._loading.set(false))
       )
       .subscribe(ok => { if (ok) this.loadAll(); });
+  }
+
+  /** POST /legalization/requisiciones/{id}/exportar — genera el .docx */
+  exportarRequisicion(id: string): void {
+    this.requisicionesService.exportarRequisicion(id)
+      .pipe(catchError(() => { this._error.set('Error al exportar la requisición'); return of(null); }))
+      .subscribe();
+  }
+
+  /** POST /legalization/requisiciones — crea una nueva requisición */
+  crearRequisicion(data: Partial<Requisicion>): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this.requisicionesService.crearRequisicion(data)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al crear la requisición');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => {
+        if (res) this.loadAll();
+      });
   }
 
   /** Elimina una requisición y recarga el listado. */

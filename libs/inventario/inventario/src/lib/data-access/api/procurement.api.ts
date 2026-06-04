@@ -11,6 +11,7 @@ export interface BienGilResponse {
   cantidad:      number;
   valorUnitario: number;
   subtotal:      number;
+  iva:           number;
 }
 
 /** Cuentadante en responses de GIL — incluye id, nombre y cedula */

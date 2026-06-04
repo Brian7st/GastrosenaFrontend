@@ -7,6 +7,7 @@ export interface Mesa {
   zona: string | null;
   estado: EstadoMesa;
   activo: boolean;
+  observaciones?: string | null;
 }
 
 /** Espejo de MesaCreateRequest.java — @NotBlank nombre, @NotNull capacidad */
@@ -21,6 +22,7 @@ export interface MesaUpdateRequest {
   nombre?: string;
   capacidad?: number;
   zona?: string | null;
+  observaciones?: string | null;
 }
 
 
@@ -66,7 +68,6 @@ export interface FacturaResponse {
   sesionCajaId: string;
   cajeroId: string;
   subtotal: number;
-  propina: number;
   total: number;
   metodoPago: MetodoPago;
   estado: EstadoFacturaRestaurante;
@@ -85,7 +86,6 @@ export interface CerrarSesionRequest {
 export interface FacturarPedidoRequest {
   pedidoId: string;
   metodoPago: MetodoPago;
-  propina: number;
 }
 
 /**

@@ -77,6 +77,37 @@ export class PaqueteFacade {
       });
   }
 
+  /** Exporta el paquete — POST /legalization/paquetes/{id}/exportar. */
+  exportarPaquete(id: string): void {
+    this._loading.set(true);
+    this.paqueteService.exportarPaquete(id)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al exportar el paquete');
+          return of(false);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe();
+  }
+
+  /** PATCH /legalization/paquetes/{id}/trazabilidad — vincula GIL, CUFE y compromiso. */
+  vincularTrazabilidad(
+    id: string,
+    datos: { cufeFuenteId: string; gilId: string; compromisoPresupuestalId: string }
+  ): void {
+    this._loading.set(true);
+    this.paqueteService.vincularTrazabilidad(id, datos)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al vincular la trazabilidad');
+          return of(false);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(ok => { if (ok) this.cargarPaquete(id); });
+  }
+
   /** Archiva el paquete y recarga su detalle. */
   archivarPaquete(id: string): void {
     this._loading.set(true);

@@ -14,16 +14,30 @@ import {
   Compromiso,
   ComprometerData,
   PagoData,
+  EstadoCompromiso,
 } from '../../models/presupuesto.model';
 import {
+  PaginatedResponse,
   PresupuestoResponse,
-  PresupuestoDetalleResponse,
-  ResumenPresupuestosResponse,
   CompromisoResponse,
   ComprometerRequest,
   PagoRequest,
+  RegistrarPresupuestoRequest,
+  RegistrarPresupuestoResponse,
+  ResumenPresupuestosResponse,
 } from '../api/budget.api';
-import { rubroFromApi, compromisoFromApi, presupuestoDetalleFromApi, resumenPresupuestosFromApi } from '../mappers/budget.mapper';
+import {
+  VencimientoResponse,
+  EjecucionMensualResponse,
+} from '../api/reporting.api';
+import {
+  rubrosFromPresupuestoList,
+  compromisoFromApi,
+  presupuestoDetalleFromApi,
+  resumenPresupuestosFromApi,
+  afectacionFromCompromiso,
+} from '../mappers/budget.mapper';
+import { vencimientoFromApi, ejecucionMensualListFromApi } from '../mappers/reporting.mapper';
 
 const API = '/api/v1';
 
@@ -31,50 +45,59 @@ const API = '/api/v1';
 export class PresupuestoService {
   private http = inject(HttpClient);
 
-  getRubros(): Observable<Rubro[]> {
+  /**
+   * GET /budget/presupuestos?fichaId&vigencia&page&size
+   * Retorna lista paginada; aplana todos los rubros de todos los presupuestos.
+   */
+  getRubros(params?: { fichaId?: string; vigencia?: number; page?: number; size?: number }): Observable<Rubro[]> {
+    let httpParams = new HttpParams();
+    if (params?.fichaId)  httpParams = httpParams.set('fichaId',  params.fichaId);
+    if (params?.vigencia) httpParams = httpParams.set('vigencia', String(params.vigencia));
+    if (params?.page !== undefined) httpParams = httpParams.set('page', String(params.page));
+    if (params?.size !== undefined) httpParams = httpParams.set('size', String(params.size));
+
     return this.http
-      .get<PresupuestoResponse[]>(`${API}/budget/presupuestos`)
+      .get<PaginatedResponse<PresupuestoResponse>>(`${API}/budget/presupuestos`, { params: httpParams })
       .pipe(
-        map(list => list.map(rubroFromApi)),
-        catchError(err => throwError(() => err))
+        map(resp => rubrosFromPresupuestoList(resp.contenido)),
+        catchError(err => throwError(() => err)),
       );
   }
 
-  /** GET /budget/presupuestos/resumen?vigencia? */
-  getResumen(vigencia?: number): Observable<ResumenPresupuestosGlobal> {
-    let params = new HttpParams();
-    if (vigencia) params = params.set('vigencia', String(vigencia));
-    return this.http
-      .get<ResumenPresupuestosResponse>(`${API}/budget/presupuestos/resumen`, { params })
-      .pipe(
-        map(resumenPresupuestosFromApi),
-        catchError(err => throwError(() => err))
-      );
-  }
-
-  /** GET /budget/presupuestos/{id} */
+  /**
+   * GET /budget/presupuestos/{id}
+   * Un único PresupuestoResponse (misma forma, no paginado).
+   */
   getPresupuestoById(id: string): Observable<PresupuestoDetalle> {
     return this.http
-      .get<PresupuestoDetalleResponse>(`${API}/budget/presupuestos/${id}`)
+      .get<PresupuestoResponse>(`${API}/budget/presupuestos/${id}`)
       .pipe(
         map(presupuestoDetalleFromApi),
-        catchError(err => throwError(() => err))
+        catchError(err => throwError(() => err)),
       );
   }
 
-  registrarPresupuesto(data: RegistrarPresupuestoData): Observable<{ success: boolean }> {
+  /**
+   * POST /budget/presupuestos → 201 { id }
+   * Envía el payload real del backend.
+   */
+  registrarPresupuesto(data: RegistrarPresupuestoData): Observable<{ id: string }> {
+    const body: RegistrarPresupuestoRequest = {
+      fichaId:           data.fichaId,
+      programaFormacion: data.programaFormacion,
+      vigencia:          data.vigencia,
+      fechaAprobacion:   data.fechaAprobacion,
+      rubros:            data.rubros,
+    };
     return this.http
-      .post<PresupuestoResponse>(`${API}/budget/presupuestos`, data)
-      .pipe(
-        map(() => ({ success: true })),
-        catchError(err => throwError(() => err))
-      );
+      .post<RegistrarPresupuestoResponse>(`${API}/budget/presupuestos`, body)
+      .pipe(catchError(err => throwError(() => err)));
   }
 
   // ── Compromisos ──────────────────────────────────────────────────────────────
 
-  /** GET /budget/compromisos — lista filtrada por presupuesto y/o estado */
-  getCompromisos(presupuestoId?: string, estado?: 'VIGENTE' | 'ANULADO'): Observable<Compromiso[]> {
+  /** GET /budget/compromisos?presupuestoId&estado — flat array */
+  getCompromisos(presupuestoId?: string, estado?: EstadoCompromiso): Observable<Compromiso[]> {
     let params = new HttpParams();
     if (presupuestoId) params = params.set('presupuestoId', presupuestoId);
     if (estado)        params = params.set('estado', estado);
@@ -83,7 +106,7 @@ export class PresupuestoService {
       .get<CompromisoResponse[]>(`${API}/budget/compromisos`, { params })
       .pipe(
         map(list => list.map(compromisoFromApi)),
-        catchError(err => throwError(() => err))
+        catchError(err => throwError(() => err)),
       );
   }
 
@@ -106,7 +129,7 @@ export class PresupuestoService {
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  /** PATCH /budget/compromisos/{id}/anular — 422 si ya anulado */
+  /** PATCH /budget/compromisos/{id}/anular → 204 No Content */
   anularCompromiso(id: string): Observable<void> {
     return this.http
       .patch<void>(`${API}/budget/compromisos/${id}/anular`, {})
@@ -125,30 +148,71 @@ export class PresupuestoService {
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  // ── FE-06: los métodos siguientes requieren alineación con backend ──
+  // ── Implementados (antes pendientes FE-06) ───────────────────────────────────
 
-  /** TODO FE-06 — sin endpoint de afectaciones */
-  getAfectaciones(): Observable<AfectacionPresupuestal[]> {
-    return throwError(() => new Error('getAfectaciones: endpoint no disponible — pendiente FE-06'));
+  /** GET /budget/presupuestos/resumen?vigencia */
+  getResumen(vigencia?: number): Observable<ResumenPresupuestosGlobal> {
+    let params = new HttpParams();
+    if (vigencia !== undefined) params = params.set('vigencia', String(vigencia));
+    return this.http
+      .get<ResumenPresupuestosResponse>(`${API}/budget/presupuestos/resumen`, { params })
+      .pipe(
+        map(resumenPresupuestosFromApi),
+        catchError(err => throwError(() => err)),
+      );
   }
 
-  /** TODO FE-06 — sin endpoint de vencimientos */
+  /**
+   * Afectaciones — GET /budget/compromisos?presupuestoId
+   * Maps each Compromiso → AfectacionPresupuestal.
+   */
+  getAfectaciones(presupuestoId?: string): Observable<AfectacionPresupuestal[]> {
+    let params = new HttpParams();
+    if (presupuestoId) params = params.set('presupuestoId', presupuestoId);
+    return this.http
+      .get<CompromisoResponse[]>(`${API}/budget/compromisos`, { params })
+      .pipe(
+        map(list => list.map(afectacionFromCompromiso)),
+        catchError(err => throwError(() => err)),
+      );
+  }
+
+  /** GET /reporting/vencimientos?dias=30 */
   getVencimientos(): Observable<VencimientoProximo[]> {
-    return throwError(() => new Error('getVencimientos: endpoint no disponible — pendiente FE-06'));
+    const params = new HttpParams().set('dias', '30');
+    return this.http
+      .get<VencimientoResponse[]>(`${API}/reporting/vencimientos`, { params })
+      .pipe(
+        map(list => list.map(vencimientoFromApi)),
+        catchError(err => throwError(() => err)),
+      );
   }
 
-  /** TODO FE-06 — sin endpoint de ejecución mensual */
-  getEjecucionMensual(): Observable<EjecucionMensual[]> {
-    return throwError(() => new Error('getEjecucionMensual: endpoint no disponible — pendiente FE-06'));
+  /** GET /reporting/ejecucion-mensual?fichaId&vigencia (both optional) */
+  getEjecucionMensual(params?: { fichaId?: string; vigencia?: number }): Observable<EjecucionMensual[]> {
+    let httpParams = new HttpParams();
+    if (params?.fichaId)  httpParams = httpParams.set('fichaId',  params.fichaId);
+    if (params?.vigencia) httpParams = httpParams.set('vigencia', String(params.vigencia));
+    return this.http
+      .get<EjecucionMensualResponse[]>(`${API}/reporting/ejecucion-mensual`, { params: httpParams })
+      .pipe(
+        map(ejecucionMensualListFromApi),
+        catchError(err => throwError(() => err)),
+      );
   }
 
-  /** TODO FE-06 — sin endpoint de traslado */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  trasladarRubro(_data: TrasladarRubroData): Observable<{ success: boolean }> {
-    return throwError(() => new Error('trasladarRubro: endpoint no disponible — pendiente FE-06'));
+  /** POST /budget/presupuestos/{id}/traslados — body { rubroOrigenId, rubroDestinoId, monto } */
+  trasladarRubro(data: TrasladarRubroData): Observable<void> {
+    return this.http
+      .post<void>(`${API}/budget/presupuestos/${data.presupuestoId}/traslados`, {
+        rubroOrigenId:  data.rubroOrigenId,
+        rubroDestinoId: data.rubroDestinoId,
+        monto:          data.monto,
+      })
+      .pipe(catchError(err => throwError(() => err)));
   }
 
-  /** TODO FE-06 — sin endpoint de exportación */
+  /** TODO FE-06 — exportar: endpoint pendiente */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   exportar(_formato: string): Observable<Blob> {
     return throwError(() => new Error('exportar: endpoint no disponible — pendiente FE-06'));

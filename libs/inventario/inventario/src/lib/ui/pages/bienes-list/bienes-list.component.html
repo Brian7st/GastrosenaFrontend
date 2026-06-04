@@ -82,7 +82,7 @@
         <thead>
           <tr>
             <th>CÓD. SENA</th>
-            <th>Nombre</th>
+            <th>Descripción</th>
             <th>Categoría</th>
             <th class="text-center">Stock</th>
             <th class="text-center">Stock Mín.</th>
@@ -99,7 +99,6 @@
               <span class="code-mono">{{ bien.codigoSena }}</span>
             </td>
             <td>
-              <p class="bien-nombre">{{ bien.nombre }}</p>
               <p class="bien-desc">{{ bien.descripcion }}</p>
             </td>
             <td>
@@ -141,9 +140,6 @@
                     <span class="material-symbols-outlined">toggle_on</span>
                   </button>
                 }
-                <button class="action-icon action-icon--danger" (click)="onEliminar(bien)" title="Eliminar">
-                  <span class="material-symbols-outlined">delete</span>
-                </button>
               </div>
             </td>
           </tr>
@@ -204,15 +200,6 @@
   (save)="onSaveBien($event)"
   (cancel)="showFormModal.set(false)"
 ></restaurant-bien-form>
-}
-
-@if (showDeleteModal() && selectedBien()) {
-<restaurant-bien-delete-modal
- 
-  [bien]="selectedBien()!"
-  (cancel)="showDeleteModal.set(false)"
-  (confirm)="confirmarEliminacion()"
-></restaurant-bien-delete-modal>
 }
 
 @if (showImportModal()) {

@@ -322,3 +322,14 @@
     font-size: 1.25rem;
   }
 }
+
+.pagination-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  color: var(--color-pizarra-400);
+  font-size: 0.875rem;
+  user-select: none;
+}

@@ -1,14 +1,20 @@
 // ─── Modelos UI del módulo Reporting ────────────────────────────────────────
 
+/** GET /reporting/ejecucion-presupuestal — campos reales del backend */
 export interface EjecucionPresupuestal {
+  presupuestoId:       string;
   fichaId:             string;
   programaFormacion:   string;
   vigencia:            number;
-  totalPresupuestado:  number;
-  totalComprometido:   number;
-  totalPagado:         number;
-  porcentajeEjecucion: number;
+  rubroId:             string;
+  rubroCodigo:         string;
+  rubroDescripcion:    string;
+  montoAsignado:       number;
+  montoComprometido:   number;
+  montoPagado:         number;
   saldoDisponible:     number;
+  /** COMPUTADO en FE: (montoComprometido+montoPagado)/montoAsignado*100, guard zero */
+  porcentajeEjecucion: number;
 }
 
 export interface KardexValorizadoItem {

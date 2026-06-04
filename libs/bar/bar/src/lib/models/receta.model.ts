@@ -1,6 +1,7 @@
 export interface Categoria {
   idCategoria: string;
   nombreCategoria: string;
+  activo?: boolean;
 }
 
 export interface Ingrediente {

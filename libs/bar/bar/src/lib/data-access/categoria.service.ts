@@ -20,4 +20,16 @@ export class CategoriaService {
       }
     });
   }
+
+  guardarCategoria(datos: { nombreCategoria: string }) {
+    return this.http.post<Categoria>(this.url, datos);
+  }
+
+  actualizarCategoria(id: string, datos: { nombreCategoria: string }) {
+    return this.http.put<Categoria>(`${this.url}/${id}`, datos);
+  }
+
+  eliminarCategoria(id: string) {
+    return this.http.delete(`${this.url}/${id}`);
+  }
 }

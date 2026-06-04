@@ -8,7 +8,7 @@ import {
 } from '../models/restaurante.model';
 import { RestauranteService } from './restaurante.service';
 import { AuthService } from './auth.service';
-import { catchError, of } from 'rxjs';
+import { catchError, of, Observable } from 'rxjs';
 
 export interface ItemCarrito {
   productoId: string;
@@ -177,7 +177,10 @@ export class RestauranteFacade {
     this.restauranteService.cambiarEstadoActivo(mesaId, activo).subscribe({
       next: (mesaActualizada) => {
         this._mesas.update(lista =>
-          lista.map(m => m.id === mesaActualizada.id ? mesaActualizada : m)
+          lista.map(m => m.id === mesaActualizada.id 
+            ? { ...mesaActualizada, observaciones: m.observaciones } 
+            : m
+          )
         );
       },
       error: (err) => {
@@ -201,7 +204,10 @@ export class RestauranteFacade {
     this.restauranteService.editarMesa(mesaId, cambios).subscribe({
       next: (mesaActualizada) => {
         this._mesas.update(lista =>
-          lista.map(m => m.id === mesaActualizada.id ? mesaActualizada : m)
+          lista.map(m => m.id === mesaActualizada.id 
+            ? { ...mesaActualizada, observaciones: cambios.observaciones || m.observaciones } 
+            : m
+          )
         );
       },
       error: (err) => {
@@ -236,7 +242,87 @@ export class RestauranteFacade {
   }
 
   seleccionarMesaParaPedido(mesaId: string): void {
+    const mesa = this.mesas().find(m => m.id === mesaId);
+    if (mesa && (mesa.estado === 'OCUPADA' || mesa.estado === 'POR_PAGAR')) {
+      // Si la mesa está ocupada, no creamos un carrito vacío, sino que el componente debe llamar a cargarPedidoDeMesaOcupada
+      return;
+    }
     this.iniciarCarrito(mesaId, 1);
+  }
+
+  cargarPedidoDeMesaOcupada(mesaId: string): Observable<boolean> {
+    return new Observable(observer => {
+      this.restauranteService.pedidosPorMesa(mesaId).subscribe({
+        next: (pedidos) => {
+          // Filtrar el pedido activo (que no esté pagado ni cancelado)
+          const pedidoActivo = pedidos.find(p => p.estado !== 'FACTURADO' && p.estado !== 'CANCELADO');
+          
+          if (!pedidoActivo) {
+            console.error('[RestauranteFacade] No se encontró pedido activo para la mesa Ocupada.');
+            observer.next(false);
+            observer.complete();
+            return;
+          }
+
+          this.restauranteService.obtenerPedidoPorId(pedidoActivo.id).subscribe({
+            next: (pedidoFull) => {
+              const pedidoParaCarrito: PedidoCarrito = {
+                id: pedidoFull.id,
+                mesaId: pedidoFull.mesaId,
+                meseroId: pedidoFull.meseroId,
+                numeroComensales: pedidoFull.numeroComensales,
+                estado: pedidoFull.estado,
+                fechaCreacion: pedidoFull.fechaCreacion,
+                subtotal: pedidoFull.subtotal,
+                detalles: pedidoFull.detalles.map(d => ({
+                  productoId: d.productoId,
+                  nombreProducto: d.nombreProducto,
+                  cantidad: d.cantidad,
+                  precioUnitario: d.precioUnitario,
+                  categoria: 'COMIDA', // Valor por defecto visual
+                  observaciones: d.observaciones || undefined
+                }))
+              };
+              this._pedidoActivo.set(pedidoParaCarrito);
+              observer.next(true);
+              observer.complete();
+            },
+            error: (err) => {
+              console.error('[RestauranteFacade] Error obteniendo detalle del pedido:', err);
+              observer.next(false);
+              observer.complete();
+            }
+          });
+        },
+        error: (err) => {
+          console.error('[RestauranteFacade] Error obteniendo pedidos por mesa:', err);
+          observer.next(false);
+          observer.complete();
+        }
+      });
+    });
+  }
+
+  cancelarPedidoActivoEnBackend(): Observable<boolean> {
+    const pedido = this.pedidoActivo();
+    if (!pedido || pedido.estado === 'BORRADOR') {
+      return of(false);
+    }
+    return new Observable(observer => {
+      this.restauranteService.cancelarPedido(pedido.id).subscribe({
+        next: () => {
+          this.vaciarCarrito();
+          this.cargarMesas(); // Recargar mesas para actualizar el mapa
+          observer.next(true);
+          observer.complete();
+        },
+        error: (err) => {
+          console.error('[RestauranteFacade] Error al cancelar pedido en backend:', err);
+          observer.next(false);
+          observer.complete();
+        }
+      });
+    });
   }
 
   private iniciarCarrito(mesaId: string, numeroComensales: number): void {
@@ -264,6 +350,7 @@ export class RestauranteFacade {
   ) {
     this._pedidoActivo.update(pedido => {
       if (!pedido) return null;
+      if (pedido.estado !== 'BORRADOR') return pedido;
 
       const detalles = [...pedido.detalles];
       const indexExistente = detalles.findIndex(d => d.productoId === productoId && d.observaciones === observaciones);
@@ -287,6 +374,7 @@ export class RestauranteFacade {
   actualizarCantidadProducto(index: number, delta: number) {
     this._pedidoActivo.update(pedido => {
       if (!pedido) return null;
+      if (pedido.estado !== 'BORRADOR') return pedido;
 
       const detalles = [...pedido.detalles];
       detalles[index].cantidad += delta;
@@ -303,6 +391,7 @@ export class RestauranteFacade {
   eliminarProductoDelPedido(index: number) {
     this._pedidoActivo.update(pedido => {
       if (!pedido) return null;
+      if (pedido.estado !== 'BORRADOR') return pedido;
 
       const detalles = [...pedido.detalles];
       detalles.splice(index, 1);
@@ -323,13 +412,11 @@ export class RestauranteFacade {
     this._pedidoActivo.set(null);
   }
 
-  confirmarPedidoActivo(notas: string = ''): void {
+  confirmarPedidoActivo(notas: string = ''): Observable<boolean> {
     const pedido = this._pedidoActivo();
-    if (!pedido) return;
-
-    if (pedido.detalles.length === 0) {
+    if (!pedido || pedido.detalles.length === 0) {
       alert('No puedes confirmar un pedido vacío');
-      return;
+      return of(false);
     }
 
     const request: PedidoCreateRequest = {
@@ -346,29 +433,37 @@ export class RestauranteFacade {
       }))
     };
 
-    this.restauranteService.crearPedido(request).subscribe({
-      next: (pedidoResponse) => {
-        const pedidoConfirmado: PedidoCarrito = {
-          id: pedidoResponse.id,
-          mesaId: pedidoResponse.mesaId,
-          meseroId: pedidoResponse.meseroId,
-          numeroComensales: pedidoResponse.numeroComensales,
-          estado: 'EN_PREPARACION',
-          fechaCreacion: pedidoResponse.fechaCreacion,
-          detalles: pedido.detalles,
-          subtotal: pedidoResponse.subtotal
-        };
+    return new Observable(observer => {
+      this.restauranteService.crearPedido(request).subscribe({
+        next: (pedidoResponse) => {
+          const pedidoConfirmado: PedidoCarrito = {
+            id: pedidoResponse.id,
+            mesaId: pedidoResponse.mesaId,
+            meseroId: pedidoResponse.meseroId,
+            numeroComensales: pedidoResponse.numeroComensales,
+            estado: 'EN_PREPARACION',
+            fechaCreacion: pedidoResponse.fechaCreacion,
+            detalles: pedido.detalles,
+            subtotal: pedidoResponse.subtotal
+          };
 
-        this._ordenesHistorial.update(historial => [pedidoConfirmado, ...historial]);
-        this.limpiarPedidoActivo();
-        this.guardarEstadoLocal();
+          this._ordenesHistorial.update(historial => [pedidoConfirmado, ...historial]);
+          this.limpiarPedidoActivo();
+          this.guardarEstadoLocal();
+          
+          this.cargarMesas(); // Importante para actualizar estado OCUPADA
 
-        this.enviarPedidoACocina(pedidoResponse.id);
-      },
-      error: (err) => {
-        console.error('[RestauranteFacade] Error al crear pedido:', err);
-        alert('Hubo un error de comunicación al crear el pedido.');
-      }
+          this.enviarPedidoACocina(pedidoResponse.id);
+          observer.next(true);
+          observer.complete();
+        },
+        error: (err) => {
+          console.error('[RestauranteFacade] Error al crear pedido:', err);
+          alert('Hubo un error de comunicación al crear el pedido.');
+          observer.next(false);
+          observer.complete();
+        }
+      });
     });
   }
 
@@ -450,8 +545,8 @@ export class RestauranteFacade {
     });
   }
 
-  facturarPedido(pedidoId: string, metodoPago: MetodoPago, propina: number = 0): void {
-    const request: FacturarPedidoRequest = { pedidoId, metodoPago, propina };
+  facturarPedido(pedidoId: string, metodoPago: MetodoPago): void {
+    const request: FacturarPedidoRequest = { pedidoId, metodoPago };
     this.restauranteService.facturarPedido(request).subscribe({
       next: (factura) => {
         this._pedidosParaCobro.update(lista => lista.filter(p => p.id !== pedidoId));
@@ -476,6 +571,6 @@ export class RestauranteFacade {
       'Cortesía': 'CORTESIA'
     };
     const metodoPago: MetodoPago = metodoMap[metodo] || 'EFECTIVO';
-    this.facturarPedido(pedidoId, metodoPago, 0);
+    this.facturarPedido(pedidoId, metodoPago);
   }
 }
