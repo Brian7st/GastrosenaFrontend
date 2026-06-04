@@ -149,17 +149,11 @@
                   <li class="pendientes-list__item">
                     <span class="pendientes-list__desc font-medium">{{ linea.descripcion }}</span>
                     <div class="pendientes-list__action">
-                      <input
-                        type="text"
-                        class="pendientes-input"
-                        placeholder="Código SENA del bien"
-                        [ngModel]="codigosSenaPendientes()[linea.descripcion] ?? ''"
-                        (input)="setCodigoSenaPendiente(linea.descripcion, $event)" />
                       <restaurant-button
                         variant="primary"
-                        [disabled]="!(codigosSenaPendientes()[linea.descripcion] || '').trim()"
-                        (click)="resolverPendiente(linea.descripcion)">
-                        Asociar
+                        (click)="abrirBuscadorBien(linea.descripcion)">
+                        <span class="material-symbols-outlined">search</span>
+                        Buscar bien…
                       </restaurant-button>
                     </div>
                   </li>
@@ -434,6 +428,72 @@
           <button class="btn-cancel" type="button" (click)="showConfirmPagada.set(false)">Cancelar</button>
           <button class="btn-confirm" type="button" (click)="confirmarPagada()">Confirmar pago</button>
         </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Buscador de bien para asociar línea pendiente ───────────────────── -->
+@if (buscadorBienAbierto()) {
+  <div class="modal-backdrop" (click)="cerrarBuscadorBien()">
+    <div class="modal-container modal-container--wide" (click)="$event.stopPropagation()">
+      <div class="buscador-bien">
+        <h2 class="modal-title">Buscar bien para asociar</h2>
+        @if (lineaPendienteActiva(); as desc) {
+          <p class="modal-text">Línea FEL: <strong>{{ desc }}</strong></p>
+        }
+        @if (bienAConfirmar(); as b) {
+          <div class="confirm-pair">
+            <div class="confirm-pair__side">
+              <span class="confirm-pair__label">Línea del FEL</span>
+              <span class="confirm-pair__value">{{ lineaPendienteActiva() }}</span>
+            </div>
+            <span class="material-symbols-outlined confirm-pair__arrow">arrow_forward</span>
+            <div class="confirm-pair__side">
+              <span class="confirm-pair__label">Bien del catálogo</span>
+              <span class="confirm-pair__value"><strong>{{ b.codigoSena }}</strong> — {{ b.descripcion }}</span>
+            </div>
+          </div>
+          <p class="confirm-pair__warn">
+            <span class="material-symbols-outlined">info</span>
+            Verificá que correspondan: el sistema no valida que coincidan.
+          </p>
+          <div class="modal-actions">
+            <button class="btn-cancel" type="button" (click)="volverABuscar()">Volver</button>
+            <button class="btn-confirm" type="button" (click)="confirmarAsociacion()">Confirmar asociación</button>
+          </div>
+        } @else {
+          <input
+            type="text"
+            class="gil-obs-input buscador-bien__search"
+            placeholder="Buscar por nombre o código SENA…"
+            (input)="onBuscarBienCatalogo($any($event.target).value)" />
+          <div class="buscador-bien__results">
+            @if (catalogoLoading()) {
+              <p class="buscador-bien__empty">Buscando…</p>
+            } @else if (catalogoBienes().length === 0) {
+              <p class="buscador-bien__empty">No se encontraron bienes. Probá con otro término.</p>
+            } @else {
+              <ul class="bien-result-list">
+                @for (bien of catalogoBienes(); track bien.id) {
+                  <li class="bien-result">
+                    <div class="bien-result__info">
+                      <span class="bien-result__code">{{ bien.codigoSena }}</span>
+                      <span class="bien-result__name">{{ bien.descripcion }}</span>
+                      <span class="bien-result__meta">{{ bien.unidadMedida }}</span>
+                    </div>
+                    <restaurant-button variant="primary" (click)="onBienCatalogoSeleccionado(bien)">
+                      Seleccionar
+                    </restaurant-button>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+          <div class="modal-actions">
+            <button class="btn-cancel" type="button" (click)="cerrarBuscadorBien()">Cerrar</button>
+          </div>
+        }
       </div>
     </div>
   </div>
