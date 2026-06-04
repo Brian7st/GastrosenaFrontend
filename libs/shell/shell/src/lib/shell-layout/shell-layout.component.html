@@ -1,4 +1,7 @@
-<div class="layout-principal">
+<div
+  class="layout-principal"
+  [class.layout-principal--asistente]="asistente.panelAbierto()"
+>
   <restaurant-barra-lateral [config]="sidebarConfig"></restaurant-barra-lateral>
 
   <main class="contenido-principal">
@@ -12,4 +15,6 @@
       <router-outlet></router-outlet>
     </div>
   </main>
+
+  <restaurant-panel-asistente></restaurant-panel-asistente>
 </div>
