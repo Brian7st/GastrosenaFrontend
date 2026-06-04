@@ -5,7 +5,6 @@ import { ButtonComponent, KpiCardComponent, LoadingSkeletonComponent } from '@re
 import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { BienFormComponent } from '../../../ui/modals/bien-form/bien-form.component';
 import { BienImportModalComponent, BienImportPayload } from '../../modals/bien-import/bien-import.component';
-import { BienDeleteModalComponent } from '../../modals/bien-delete-modal/bien-delete-modal.component';
 import { Bien, BienFormDto, EstadoBien } from '../../../models/inventario.model';
 
 @Component({
@@ -18,7 +17,6 @@ import { Bien, BienFormDto, EstadoBien } from '../../../models/inventario.model'
     LoadingSkeletonComponent,
     BienFormComponent,
     BienImportModalComponent,
-    BienDeleteModalComponent,
   ],
   templateUrl: './bienes-list.component.html',
   styleUrl: './bienes-list.component.scss',
@@ -42,7 +40,6 @@ export class BienesListPageComponent implements OnInit {
 
   // Modal controls
   showFormModal = signal(false);
-  showDeleteModal = signal(false);
   showImportModal = signal(false);
   formMode = signal<'create' | 'edit'>('create');
   selectedBien = signal<Bien | undefined>(undefined);
@@ -116,18 +113,6 @@ export class BienesListPageComponent implements OnInit {
 
   onActivar(bien: Bien): void {
     this.facade.activarBien(bien.id);
-  }
-
-  onEliminar(bien: Bien): void {
-    this.selectedBien.set(bien);
-    this.showDeleteModal.set(true);
-  }
-
-  confirmarEliminacion(): void {
-    if (this.selectedBien()) {
-      this.facade.eliminarBien(this.selectedBien()!.id);
-      this.showDeleteModal.set(false);
-    }
   }
 
   getEstadoBadgeClass(estado: EstadoBien): string {
