@@ -11,6 +11,7 @@ import {
 } from '@restaurant/shared/api';
 import { shellRoutes } from '@restaurant/shell';
 import { provideRestaurantUi } from '@restaurant/shared/ui';
+import { provideMarkdown } from 'ngx-markdown';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -25,5 +26,6 @@ export const appConfig: ApplicationConfig = {
     provideStore({}),      // ← store vacío, cada feature se registra en sus rutas
     provideEffects(),      // ← effects base vacío
     provideRestaurantUi(),
+    provideMarkdown(),
   ],
 };

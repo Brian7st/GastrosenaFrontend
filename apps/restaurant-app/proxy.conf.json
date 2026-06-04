@@ -1,7 +1,13 @@
 {
   "//": "MAPA DE PUERTOS — mantener sincronizado con docker-compose.yml",
   "// restaurante": "8080 | inventario: 8081 | cocina: 8082 | barbarismo: 8086 | usuarios: 8087",
+  "// agente": "9000 — API HTTP del agente Gastrosena (IA). DEBE ir antes del catch-all /api",
 
+  "/api/agente": {
+    "target": "http://localhost:9000",
+    "secure": false,
+    "changeOrigin": true
+  },
   "/api/auth": {
     "target": "http://localhost:8087",
     "secure": false,

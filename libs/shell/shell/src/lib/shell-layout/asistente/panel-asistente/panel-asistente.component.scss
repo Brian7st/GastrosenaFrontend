@@ -138,11 +138,15 @@ $panel-ancho: 22rem;
   }
 
   &__burbuja {
+    min-width: 0;
+    max-width: 100%;
     padding: 0.625rem 0.875rem;
     border-radius: 1rem;
     background-color: var(--color-superficie-contenedor-mas-bajo);
     border: 1px solid var(--color-pizarra-100);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 
   &__mensaje--usuario &__burbuja {
@@ -157,6 +161,82 @@ $panel-ancho: 22rem;
     font-size: 0.875rem;
     line-height: 1.45;
     color: var(--color-en-superficie);
+  }
+
+  // ---- Markdown renderizado (respuestas del asistente) ----
+  // ngx-markdown inyecta el HTML dinamicamente, sin el atributo de
+  // encapsulacion del componente. Por eso los hijos se estilan con
+  // ::ng-deep, si no las reglas no aplican y el contenido se desborda.
+  &__texto--md {
+    display: block;
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+
+    ::ng-deep {
+      > :first-child { margin-top: 0; }
+      > :last-child { margin-bottom: 0; }
+
+      p { margin: 0 0 0.5rem; }
+
+      ul,
+      ol {
+        margin: 0 0 0.5rem;
+        padding-left: 1.25rem;
+      }
+
+      li { margin: 0.125rem 0; }
+
+      strong { font-weight: 600; }
+
+      a {
+        color: var(--color-primario);
+        text-decoration: underline;
+        overflow-wrap: anywhere;
+      }
+
+      code {
+        font-family: ui-monospace, "Cascadia Code", monospace;
+        font-size: 0.8125rem;
+        padding: 0.1rem 0.3rem;
+        border-radius: 0.25rem;
+        background-color: var(--color-pizarra-100);
+        overflow-wrap: anywhere;
+      }
+
+      pre {
+        margin: 0 0 0.5rem;
+        max-width: 100%;
+        padding: 0.625rem 0.75rem;
+        border-radius: 0.5rem;
+        overflow-x: auto;
+        background-color: var(--color-pizarra-100);
+
+        code {
+          padding: 0;
+          background: none;
+          white-space: pre;
+          overflow-wrap: normal;
+        }
+      }
+
+      table {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        border-collapse: collapse;
+        font-size: 0.8125rem;
+
+        th,
+        td {
+          padding: 0.25rem 0.5rem;
+          border: 1px solid var(--color-pizarra-100);
+          text-align: left;
+        }
+      }
+    }
   }
 
   &__hora {
