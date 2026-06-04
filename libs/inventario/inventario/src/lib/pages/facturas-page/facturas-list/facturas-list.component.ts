@@ -5,11 +5,12 @@ import { ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmMo
 import { FacturasFacade } from '../../../data-access/facturas.facade';
 import { Factura, EstadoFactura } from '../../../models/facturas.model';
 import { ExportarComponent } from '../../../components/exportar/exportar.component';
+import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 
 @Component({
   selector: 'restaurant-facturas-list',
   standalone: true,
-  imports: [CommonModule, ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmModalComponent, ExportarComponent],
+  imports: [CommonModule, ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmModalComponent, ExportarComponent, EmptyStateComponent],
   templateUrl: './facturas-list.component.html',
   styleUrl: './facturas-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -112,6 +112,16 @@
             </div>
           </td>
         </tr>
+      } @empty {
+        <tr>
+          <td colspan="7">
+            <inventario-empty-state
+              icon="description"
+              title="Sin actas"
+              message="No se encontraron actas con los filtros aplicados."
+            />
+          </td>
+        </tr>
       }
     </tbody>
     <div dtFooter class="dt-footer">

@@ -63,7 +63,7 @@
     </thead>
     <tbody class="text-black text-center">
       @for (item of consolidados(); track item.id) {
-        <tr>
+      <tr>
           <td>
             <span class="td-value-primary td-mono">#{{ item.id }}</span>
           </td>
@@ -88,6 +88,16 @@
                 <span class="material-symbols-outlined">undo</span>
               </button>
             </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="5">
+            <inventario-empty-state
+              icon="summarize"
+              title="Sin consolidados"
+              message="No hay consolidados generados para el período actual."
+            />
           </td>
         </tr>
       }

@@ -5,12 +5,13 @@ import { ButtonComponent, DataTableComponent, KpiCardComponent, StatusBadgeCompo
 import { ExportarConsolidadoModalComponent } from '../components/exportar-consolidado-modal/exportar-consolidado-modal.component';
 import { ReversarConsolidadoModalComponent } from '../components/reversar-consolidado-modal/reversar-consolidado-modal.component';
 import { Consolidado } from '../../../models/consolidado.model';
+import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 import { ConsolidadoFacade } from '../../../data-access/consolidado.facade';
 
 @Component({
   selector: 'restaurant-consolidado-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent, StatusBadgeComponent, ExportarConsolidadoModalComponent, ReversarConsolidadoModalComponent],
+  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent, StatusBadgeComponent, ExportarConsolidadoModalComponent, ReversarConsolidadoModalComponent, EmptyStateComponent],
   templateUrl: './consolidado-list.component.html',
   styleUrl: './consolidado-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

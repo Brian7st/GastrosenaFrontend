@@ -145,10 +145,12 @@
           </tr>
 } @empty {
           <tr>
-            <td colspan="9" class="empty-state">
-              <span class="material-symbols-outlined empty-state__icon">inventory_2</span>
-              <p class="empty-state__title">Sin bienes registrados</p>
-              <p class="empty-state__message">No se encontraron bienes con los filtros aplicados.</p>
+            <td colspan="9">
+              <inventario-empty-state
+                icon="inventory_2"
+                title="Sin bienes registrados"
+                message="No se encontraron bienes con los filtros aplicados."
+              />
             </td>
           </tr>
 }

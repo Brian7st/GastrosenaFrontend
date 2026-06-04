@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { KpiCardComponent, DataTableComponent, LucideIconComponent, ButtonComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
 import { KardexFacade } from '../../../data-access/kardex.facade';
+import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 
 @Component({
   selector: 'restaurant-movimientos-list',
@@ -15,7 +16,8 @@ import { KardexFacade } from '../../../data-access/kardex.facade';
     DataTableComponent,
     LucideIconComponent,
     ButtonComponent,
-    StatusBadgeComponent
+    StatusBadgeComponent,
+    EmptyStateComponent,
   ],
   templateUrl: './movimientos-list.component.html',
   styleUrl: './movimientos-list.component.scss',

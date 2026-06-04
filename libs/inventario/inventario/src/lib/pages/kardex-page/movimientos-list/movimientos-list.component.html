@@ -137,6 +137,16 @@
           </div>
         </td>
       </tr>
+      } @empty {
+      <tr>
+        <td colspan="8">
+          <inventario-empty-state
+            icon="swap_vert"
+            title="Sin movimientos"
+            message="No se encontraron documentos de entrada o salida."
+          />
+        </td>
+      </tr>
       }
     </tbody>
     <div dtFooter class="dt-footer">

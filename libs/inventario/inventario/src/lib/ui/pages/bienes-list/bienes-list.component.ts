@@ -6,6 +6,7 @@ import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { BienFormComponent } from '../../../ui/modals/bien-form/bien-form.component';
 import { BienImportModalComponent, BienImportPayload } from '../../modals/bien-import/bien-import.component';
 import { Bien, BienFormDto, EstadoBien } from '../../../models/inventario.model';
+import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 
 @Component({
   selector: 'restaurant-bienes-list',
@@ -17,6 +18,7 @@ import { Bien, BienFormDto, EstadoBien } from '../../../models/inventario.model'
     LoadingSkeletonComponent,
     BienFormComponent,
     BienImportModalComponent,
+    EmptyStateComponent,
   ],
   templateUrl: './bienes-list.component.html',
   styleUrl: './bienes-list.component.scss',

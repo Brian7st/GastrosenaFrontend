@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmModalComponent } from '@restaurant/shared/ui';
 import { SolicitudGil, EstadoGil } from '../../../models/solicitudes-gil.model';
+import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 
 @Component({
   selector: 'restaurant-solicitudes-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmModalComponent],
+  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmModalComponent, EmptyStateComponent],
   templateUrl: './solicitudes-list.component.html',
   styleUrl: './solicitudes-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

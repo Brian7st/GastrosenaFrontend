@@ -11,6 +11,7 @@ import {
 import { AprobarSolicitudModalComponent } from '../../../components/aprobar-solicitud-modal/aprobar-solicitud-modal.component';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 import { SolicitudSesion } from '../../../models/solicitud-sesion.model';
+import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-solicitudes-insumos-list',
@@ -23,7 +24,8 @@ import { SolicitudSesion } from '../../../models/solicitud-sesion.model';
     KpiCardComponent,
     StatusBadgeComponent,
     LucideIconComponent,
-    AprobarSolicitudModalComponent
+    AprobarSolicitudModalComponent,
+    EmptyStateComponent,
   ],
   templateUrl: './solicitudes-insumos-list.component.html',
   styleUrls: ['./solicitudes-insumos-list.component.scss'],
