@@ -169,8 +169,15 @@ export class FacturasService {
   }
 
   /** POST /sourcing/conciliaciones-gil - vincula una factura con su GIL - 201 Created */
-  conciliarFacturaGil(facturaId: string, gilId: string): Observable<ConciliacionGil> {
+  conciliarFacturaGil(
+    facturaId: string,
+    gilId: string,
+    cantidadesRecibidas?: Record<string, number>,
+  ): Observable<ConciliacionGil> {
     const body: ConciliarRequest = { facturaId, gilId };
+    if (cantidadesRecibidas && Object.keys(cantidadesRecibidas).length > 0) {
+      body.cantidadesRecibidas = cantidadesRecibidas;
+    }
     return this.http
       .post<ConciliacionGilResponse>(`${API}/sourcing/conciliaciones-gil`, body)
       .pipe(

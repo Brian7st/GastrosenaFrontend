@@ -293,20 +293,21 @@
                       (change)="onLinkChange(i, $event)"
                       (click)="$event.stopPropagation()"
                     >
-                      <option value="">— Sin asignar —</option>
+                      <option value="" [selected]="manualLinks()[i] === null || manualLinks()[i] === undefined">— Sin asignar —</option>
                       @for (linea of facturaImportada()?.lineas ?? []; track $index; let fi = $index) {
-                        <option [value]="fi">{{ fi + 1 }}. {{ linea.descripcion }}</option>
+                        <option [value]="fi" [selected]="manualLinks()[i] === fi">{{ fi + 1 }}. {{ linea.descripcion }}</option>
                       }
                     </select>
                   </td>
-                  <td class="text-right font-bold">
-                    @if (manualLinks()[i] !== null && manualLinks()[i] !== undefined) {
-                      <span [class.text-diferencia]="getLinea(manualLinks()[i]!)?.cantidad !== bien.cantidad">
-                        {{ getLinea(manualLinks()[i]!)?.cantidad }}
-                      </span>
-                    } @else {
-                      <span class="text-secondary">—</span>
-                    }
+                  <td class="text-right">
+                    <input
+                      type="number"
+                      min="0"
+                      class="field-input field-input--sm count-input"
+                      [value]="cantidadesRecibidas()[i] ?? ''"
+                      (input)="onCantidadRecibidaChange(i, $event)"
+                      (click)="$event.stopPropagation()"
+                    />
                   </td>
                   <td class="text-right font-bold">
                     @if (manualLinks()[i] !== null && manualLinks()[i] !== undefined) {
@@ -399,6 +400,9 @@
       <button class="btn btn--outline" (click)="resetImport()">Importar otra factura</button>
     }
     @if (canConciliar()) {
+      @if (missingCounts()) {
+        <p class="count-warning">Hay ítems sin conteo físico. Podés conciliar igual, pero la verificación de la factura lo exigirá.</p>
+      }
       <button class="btn btn--secondary" [disabled]="loading()" (click)="onConciliar()">Conciliar con GIL</button>
     }
     <button class="btn btn--primary" [disabled]="!facturaImportada()" (click)="viewImportedFactura()">Ver factura registrada</button>
