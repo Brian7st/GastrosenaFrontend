@@ -1,8 +1,9 @@
-<div class="modal-overlay">
+<div class="modal-overlay" (click)="cerrarSelector()">
   @if (successMessage()) {
     <div class="success-banner" role="status">{{ successMessage() }}</div>
   }
-  <div class="modal-content">
+
+  <div class="modal-content" (click)="$event.stopPropagation()">
 
     <!-- Header -->
     <div class="modal-header">
@@ -16,7 +17,7 @@
         </div>
       </div>
       <button class="close-btn" type="button" (click)="closeModal()">
-        <lucide-icon name="x" [size]="24"></lucide-icon>
+        <lucide-icon name="x" [size]="20"></lucide-icon>
       </button>
     </div>
 
@@ -32,28 +33,78 @@
     <form [formGroup]="ajusteForm" (ngSubmit)="onSubmit()" class="modal-body">
       <div class="form-grid">
 
-        <!-- Producto ID (UUID) -->
+        <!-- Selector de producto -->
         <div class="form-group full-width">
-          <label for="productoId">ID DEL PRODUCTO <span class="required">*</span></label>
-          <div class="input-wrapper">
-            <lucide-icon name="barcode" class="input-icon" [size]="18"></lucide-icon>
-            <input
-              id="productoId"
-              type="text"
-              formControlName="productoId"
-              placeholder="UUID del producto del catálogo"
-              class="form-input">
-          </div>
+          <label for="busqueda-producto">PRODUCTO <span class="required">*</span></label>
+
+          @if (productoSeleccionado()) {
+            <!-- Producto ya elegido -->
+            <div class="producto-seleccionado">
+              <div class="producto-seleccionado__info">
+                <lucide-icon name="package" [size]="16"></lucide-icon>
+                <span class="producto-seleccionado__nombre">{{ productoSeleccionado()!.descripcion }}</span>
+                <span class="producto-seleccionado__codigo">{{ productoSeleccionado()!.codigoSena }}</span>
+              </div>
+              <button
+                type="button"
+                class="producto-seleccionado__clear"
+                (click)="limpiarProducto()"
+                aria-label="Cambiar producto">
+                <lucide-icon name="x" [size]="14"></lucide-icon>
+              </button>
+            </div>
+          } @else {
+            <!-- Input de búsqueda -->
+            <div class="search-wrapper">
+              <div class="input-wrapper">
+                <lucide-icon name="search" class="input-icon" [size]="16"></lucide-icon>
+                <input
+                  id="busqueda-producto"
+                  type="text"
+                  [value]="busqueda()"
+                  (input)="onBusquedaChange($event)"
+                  (focus)="selectorAbierto.set(true)"
+                  placeholder="Buscar por nombre o código SENA..."
+                  class="form-input"
+                  autocomplete="off">
+                @if (buscando()) {
+                  <lucide-icon name="loader-circle" class="input-icon-right" [size]="16"></lucide-icon>
+                }
+              </div>
+
+              @if (selectorAbierto() && resultados().length > 0) {
+                <ul class="resultados-lista" role="listbox">
+                  @for (bien of resultados(); track bien.id) {
+                    <li
+                      class="resultados-lista__item"
+                      role="option"
+                      (click)="seleccionarProducto(bien)">
+                      <span class="resultados-lista__nombre">{{ bien.descripcion }}</span>
+                      <span class="resultados-lista__meta">{{ bien.codigoSena }} · {{ bien.unidadMedida }}</span>
+                    </li>
+                  }
+                </ul>
+              }
+
+              @if (selectorAbierto() && !buscando() && busqueda().length >= 2 && resultados().length === 0) {
+                <div class="resultados-vacio">
+                  <lucide-icon name="search-x" [size]="16"></lucide-icon>
+                  <span>Sin resultados para "{{ busqueda() }}"</span>
+                </div>
+              }
+            </div>
+          }
+
           @if (ajusteForm.get('productoId')?.invalid && ajusteForm.get('productoId')?.touched) {
-            <p class="error-hint">El ID del producto es obligatorio.</p>
+            <p class="error-hint">Seleccioná un producto del catálogo.</p>
           }
         </div>
 
         <!-- Cantidad real / stock corregido -->
         <div class="form-group">
-          <label for="cantidadNueva">CANTIDAD REAL / STOCK CORREGIDO <span class="required">*</span></label>
+          <label for="cantidadNueva">STOCK CORREGIDO <span class="required">*</span></label>
           <div class="input-wrapper">
-            <lucide-icon name="package" class="input-icon" [size]="18"></lucide-icon>
+            <lucide-icon name="package-check" class="input-icon" [size]="16"></lucide-icon>
             <input
               id="cantidadNueva"
               type="number"
@@ -101,7 +152,7 @@
       <div class="modal-footer">
         <restaurant-button variant="surface" type="button" (click)="closeModal()">Cancelar</restaurant-button>
         <restaurant-button variant="primary" type="submit" [disabled]="ajusteForm.invalid || facade.loading()">
-          <lucide-icon name="check-circle" [size]="18" style="margin-right: 0.5rem;"></lucide-icon>
+          <lucide-icon name="check-circle" [size]="16"></lucide-icon>
           Registrar Ajuste
         </restaurant-button>
       </div>
