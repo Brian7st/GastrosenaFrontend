@@ -44,6 +44,11 @@ export class FacturaImportPageComponent implements OnInit {
   showManualMapping = computed(() => this.fileLoaded() && this.gilBienes().length > 0);
 
   manualLinks = signal<(number | null)[]>([]);
+  cantidadesRecibidas = signal<(number | null)[]>([]);
+
+  missingCounts = computed(() =>
+    this.gilBienes().some((_, i) => this.cantidadesRecibidas()[i] === null)
+  );
 
   constructor() {
     effect(() => {
@@ -51,8 +56,10 @@ export class FacturaImportPageComponent implements OnInit {
       const factura = this.facturaImportada();
       if (bienes.length > 0 && factura) {
         this.manualLinks.set(this.buildAutoLinks(bienes, factura.lineas));
+        this.cantidadesRecibidas.set(bienes.map(() => null));
       } else {
         this.manualLinks.set([]);
+        this.cantidadesRecibidas.set([]);
       }
     });
   }
@@ -87,6 +94,17 @@ export class FacturaImportPageComponent implements OnInit {
     const select = event.target as HTMLSelectElement;
     this.gilId.set(select.value);
     this.facade.cargarGilBienes(select.value);
+  }
+
+  onCantidadRecibidaChange(i: number, event: Event): void {
+    const raw = (event.target as HTMLInputElement).value;
+    const num = raw === '' ? null : Number(raw);
+    const val = num === null || Number.isNaN(num) || num < 0 ? null : num;
+    this.cantidadesRecibidas.update(c => {
+      const copy = [...c];
+      copy[i] = val;
+      return copy;
+    });
   }
 
   onLinkChange(gilIdx: number, event: Event): void {
@@ -168,7 +186,21 @@ export class FacturaImportPageComponent implements OnInit {
   onConciliar(): void {
     const factura = this.facturaImportada();
     if (!factura || !this.gilId()) return;
-    this.facade.conciliarEnImportacion(String(factura.id), this.gilId());
+
+    const cantidadesMap: Record<string, number> = {};
+    let droppedCount = false;
+    this.gilBienes().forEach((bien, i) => {
+      const val = this.cantidadesRecibidas()[i];
+      if (val === null) return;
+      if (!bien.productoId) { droppedCount = true; return; }
+      cantidadesMap[bien.productoId] = val;
+    });
+
+    if (droppedCount) {
+      this.localError.set('Algunos conteos no se enviaron: ítems sin producto vinculado.');
+    }
+
+    this.facade.conciliarEnImportacion(String(factura.id), this.gilId(), cantidadesMap);
   }
 
   resetImport(): void {

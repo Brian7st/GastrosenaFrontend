@@ -1,6 +1,6 @@
 import { Component, inject, ChangeDetectionStrategy, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 import { KardexFacade } from '../../../data-access/kardex.facade';
@@ -8,13 +8,13 @@ import { EntradaMovimientoData } from '../../../models/movimiento.model';
 
 /**
  * Entrada directa sin GIL — para casos excepcionales (ajustes de stock, devoluciones, etc.).
- * Para entradas desde GIL usar la ruta /entrada-gil.
+ * Las entradas desde GIL se gestionan mediante el proceso de conciliación de facturas.
  * Alineado con RegistrarEntradaHttpRequest (Swagger).
  */
 @Component({
   selector: 'restaurant-movimiento-entrada',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterModule, CommonModule, LucideIconComponent, ButtonComponent],
+  imports: [ReactiveFormsModule, CommonModule, LucideIconComponent, ButtonComponent],
   templateUrl: './movimiento-entrada.component.html',
   styleUrl: './movimiento-entrada.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
