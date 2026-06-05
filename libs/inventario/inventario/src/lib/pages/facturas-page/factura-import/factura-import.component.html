@@ -358,6 +358,7 @@
                   <th>Descripción</th>
                   <th class="text-right">Cant. GIL</th>
                   <th class="text-right">Cant. FEL</th>
+                  <th class="text-right">Cant. recibida</th>
                   <th class="text-right">Precio GIL</th>
                   <th class="text-right">Precio FEL</th>
                   <th class="text-right">Diferencia</th>
@@ -370,6 +371,7 @@
                     <td>{{ dif.descripcion }}</td>
                     <td class="text-right">{{ dif.cantidadGil }}</td>
                     <td class="text-right">{{ dif.cantidadFactura }}</td>
+                    <td class="text-right">{{ dif.cantidadRecibida ?? '—' }}</td>
                     <td class="text-right">{{ formatMoney(dif.precioUnitarioGil) }}</td>
                     <td class="text-right">{{ formatMoney(dif.precioUnitarioFactura) }}</td>
                     <td class="text-right" [class.text-tertiary]="dif.diferencia !== 0">
