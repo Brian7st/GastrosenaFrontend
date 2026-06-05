@@ -46,74 +46,115 @@
       class="clickable-card" (click)="abrirModal('lista-ocupadas')"></restaurant-kpi-card>
   </div>
 
-  <!-- Grid de Mesas -->
+  <!-- Plantilla reutilizable para la tarjeta de mesa -->
+  <ng-template #mesaCardTemplate let-mesa="mesa">
+    <restaurant-card [ngClass]="['mesa-card', 'mesa-card--' + mesa.estado.toLowerCase()]">
+      <div class="mesa-card__header">
+        <span class="mesa-card__number">{{ mesa.nombre }}</span>
+        <div class="mesa-card__header-right">
+          <restaurant-status-badge
+            [label]="mesa.estado"
+            [variant]="getBadgeType(mesa.estado)"
+          ></restaurant-status-badge>
+          <button class="icon-action-btn" (click)="abrirModal('editar', mesa)" title="Editar mesa">
+            <lucide-icon name="pencil" [size]="16"></lucide-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="mesa-card__body">
+        <div class="mesa-icon-wrapper">
+          <lucide-icon name="utensils" [size]="32"></lucide-icon>
+        </div>
+        
+        @if (mesa.zona) {
+          <div class="mesa-card__zona">
+            <span>{{ mesa.zona }}</span>
+          </div>
+        }
+
+        <div class="mesa-card__info-row">
+          <div class="mesa-card__info">
+            <lucide-icon name="users" [size]="14"></lucide-icon>
+            <span>{{ mesa.capacidad }} cap.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mesa-card__footer">
+        @if (mesa.estado === 'LIBRE') {
+          <restaurant-button class="full-width" variant="primary" (click)="abrirModal('abrir', mesa)">
+            <span>Asignar Mesa</span>
+          </restaurant-button>
+        } @else {
+          <div class="mesa-card__actions flex-col gap-2">
+            <div class="flex gap-2">
+              @if (mesa.estado === 'OCUPADA') {
+                <restaurant-button class="flex-1" variant="primary" (click)="verPedido(mesa.id)">
+                  <span>Pedido</span>
+                </restaurant-button>
+              }
+              @if (mesa.estado === 'POR_PAGAR' || mesa.estado === 'LISTO_PARA_SERVIR') {
+                <restaurant-button class="flex-1" variant="surface" (click)="verPedido(mesa.id)">
+                  <lucide-icon name="receipt" [size]="16"></lucide-icon>
+                  <span>Ver Cuenta</span>
+                </restaurant-button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </restaurant-card>
+  </ng-template>
+
+  <!-- Grid de Mesas Agrupadas -->
   <section class="mesas-page__content">
-    <div class="mesas-grid">
-      @for (mesa of filteredMesasActivasMain(); track mesa.id) {
-        <restaurant-card [ngClass]="['mesa-card', 'mesa-card--' + mesa.estado.toLowerCase()]">
-          <div class="mesa-card__header">
-            <span class="mesa-card__number">{{ mesa.nombre }}</span>
-            <div class="mesa-card__header-right">
-              <restaurant-status-badge
-                [label]="mesa.estado"
-                [variant]="getBadgeType(mesa.estado)"
-              ></restaurant-status-badge>
-              <button class="icon-action-btn" (click)="abrirModal('editar', mesa)" title="Editar mesa">
-                <lucide-icon name="pencil" [size]="16"></lucide-icon>
-              </button>
-            </div>
-          </div>
+    
+    @if (filteredMesasLibres().length > 0) {
+      <div class="mesas-group mb-4">
+        <h3 class="mesas-group__title text-success" style="margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+          <lucide-icon name="check-circle" [size]="20"></lucide-icon> Mesas Libres
+        </h3>
+        <div class="mesas-grid">
+          @for (mesa of filteredMesasLibres(); track mesa.id) {
+            <ng-container *ngTemplateOutlet="mesaCardTemplate; context: { mesa: mesa }"></ng-container>
+          }
+        </div>
+      </div>
+    }
 
-          <div class="mesa-card__body">
-            <div class="mesa-icon-wrapper">
-              <lucide-icon name="utensils" [size]="32"></lucide-icon>
-            </div>
-            
-            @if (mesa.zona) {
-              <div class="mesa-card__zona">
-                <span>{{ mesa.zona }}</span>
-              </div>
-            }
+    @if (filteredMesasOcupadas().length > 0) {
+      <div class="mesas-group mb-4" [style.marginTop]="filteredMesasLibres().length > 0 ? '2rem' : '0'">
+        <h3 class="mesas-group__title text-danger" style="margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+          <lucide-icon name="users" [size]="20"></lucide-icon> Mesas Ocupadas
+        </h3>
+        <div class="mesas-grid">
+          @for (mesa of filteredMesasOcupadas(); track mesa.id) {
+            <ng-container *ngTemplateOutlet="mesaCardTemplate; context: { mesa: mesa }"></ng-container>
+          }
+        </div>
+      </div>
+    }
 
-            <div class="mesa-card__info-row">
-              <div class="mesa-card__info">
-                <lucide-icon name="users" [size]="14"></lucide-icon>
-                <span>{{ mesa.capacidad }} cap.</span>
-              </div>
-            </div>
-          </div>
+    @if (filteredMesasPorPagar().length > 0) {
+      <div class="mesas-group mb-4" [style.marginTop]="(filteredMesasLibres().length > 0 || filteredMesasOcupadas().length > 0) ? '2rem' : '0'">
+        <h3 class="mesas-group__title text-warning" style="margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; color: #d97706;">
+          <lucide-icon name="receipt" [size]="20"></lucide-icon> Mesas Por Pagar
+        </h3>
+        <div class="mesas-grid">
+          @for (mesa of filteredMesasPorPagar(); track mesa.id) {
+            <ng-container *ngTemplateOutlet="mesaCardTemplate; context: { mesa: mesa }"></ng-container>
+          }
+        </div>
+      </div>
+    }
 
-          <div class="mesa-card__footer">
-            @if (mesa.estado === 'LIBRE') {
-              <restaurant-button class="full-width" variant="primary" (click)="abrirModal('abrir', mesa)">
-                <span>Asignar Mesa</span>
-              </restaurant-button>
-            } @else {
-              <div class="mesa-card__actions flex-col gap-2">
-                <div class="flex gap-2">
-                  @if (mesa.estado === 'OCUPADA') {
-                    <restaurant-button class="flex-1" variant="primary" (click)="verPedido(mesa.id)">
-                      <span>Pedido</span>
-                    </restaurant-button>
-                  }
-                  @if (mesa.estado === 'POR_PAGAR' || mesa.estado === 'LISTO_PARA_SERVIR') {
-                    <restaurant-button class="flex-1" variant="surface" (click)="verPedido(mesa.id)">
-                      <lucide-icon name="receipt" [size]="16"></lucide-icon>
-                      <span>Ver Cuenta</span>
-                    </restaurant-button>
-                  }
-                </div>
-              </div>
-            }
-          </div>
-        </restaurant-card>
-      } @empty {
+    @if (filteredMesasActivasMain().length === 0) {
       <div class="empty-container">
         <restaurant-empty-state title="No hay mesas configuradas"
           message="Comienza agregando una nueva mesa para el salón."></restaurant-empty-state>
       </div>
-      }
-    </div>
+    }
   </section>
 
   <!-- Banner de carga y error -->

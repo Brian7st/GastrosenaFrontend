@@ -60,6 +60,26 @@ export class MesasPageComponent {
     return this.mesasActivas().filter(m => this._matchMesa(m.nombre, this.searchQueryMain()));
   });
 
+  private _sortMesas(mesas: Mesa[]): Mesa[] {
+    return [...mesas].sort((a, b) => {
+      const numA = parseInt(a.nombre.replace(/\D/g, ''), 10) || 0;
+      const numB = parseInt(b.nombre.replace(/\D/g, ''), 10) || 0;
+      return numA - numB;
+    });
+  }
+
+  filteredMesasLibres = computed(() => {
+    return this._sortMesas(this.filteredMesasActivasMain().filter(m => m.estado === 'LIBRE'));
+  });
+
+  filteredMesasOcupadas = computed(() => {
+    return this._sortMesas(this.filteredMesasActivasMain().filter(m => m.estado === 'OCUPADA'));
+  });
+
+  filteredMesasPorPagar = computed(() => {
+    return this._sortMesas(this.filteredMesasActivasMain().filter(m => m.estado === 'POR_PAGAR'));
+  });
+
   filteredMesasActivasModal = computed(() => {
     return this.mesasActivas().filter(m => this._matchMesa(m.nombre, this.searchQueryGestionMesas()));
   });

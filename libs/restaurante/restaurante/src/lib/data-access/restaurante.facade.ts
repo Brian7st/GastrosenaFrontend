@@ -8,7 +8,7 @@ import {
 } from '../models/restaurante.model';
 import { RestauranteService } from './restaurante.service';
 import { AuthService } from './auth.service';
-import { catchError, of, Observable } from 'rxjs';
+import { catchError, of, Observable, forkJoin } from 'rxjs';
 
 export interface ItemCarrito {
   productoId: string;
@@ -116,9 +116,12 @@ export class RestauranteFacade {
     this._mesasCargando.set(true);
     this._mesasError.set(null);
 
-    this.restauranteService.obtenerMesas().subscribe({
-      next: (mesas) => {
-        this._mesas.set(mesas);
+    forkJoin([
+      this.restauranteService.obtenerMesas(),
+      this.restauranteService.obtenerMesasInactivas()
+    ]).subscribe({
+      next: ([activas, inactivas]) => {
+        this._mesas.set([...activas, ...inactivas]);
         this._mesasCargando.set(false);
       },
       error: (err) => {

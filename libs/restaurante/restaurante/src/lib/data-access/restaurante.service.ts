@@ -31,6 +31,10 @@ export class RestauranteService {
     return this.http.get<Mesa[]>(this.mesasUrl);
   }
 
+  obtenerMesasInactivas(): Observable<Mesa[]> {
+    return this.http.get<Mesa[]>(`${this.mesasUrl}/inactivas`);
+  }
+
   // ── Mesas — escritura ───────────────────────────────────────────────────────
 
   /**
