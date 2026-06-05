@@ -3,7 +3,6 @@ import { catchError, EMPTY, finalize, of } from 'rxjs';
 import {
   Movimiento,
   DocumentoMovimiento,
-  EntradaMovimientoData,
   SalidaMovimientoData,
   ReservaMovimientoData,
   LiberacionMovimientoData,
@@ -179,23 +178,6 @@ export class KardexFacade {
   }
 
   // ── Registros ────────────────────────────────────────────────────────────────
-
-  registrarEntrada(data: EntradaMovimientoData): void {
-    this._loading.set(true);
-    this._error.set(null);
-    this.movimientosService.registrarEntrada(data)
-      .pipe(
-        catchError(() => {
-          this._error.set('Error al registrar entrada');
-          return EMPTY;
-        }),
-        finalize(() => this._loading.set(false))
-      )
-      .subscribe(() => {
-        const { page, size } = this._paginacion();
-        this.cargarKardex(data.productoId, page, size);
-      });
-  }
 
   registrarSalida(data: SalidaMovimientoData): void {
     this._loading.set(true);

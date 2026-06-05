@@ -1,7 +1,6 @@
 import {
   Movimiento,
   DocumentoMovimiento,
-  EntradaMovimientoData,
   SalidaMovimientoData,
   ReservaMovimientoData,
   LiberacionMovimientoData,
@@ -12,7 +11,6 @@ import {
   MovimientoResponse,
   MovimientoPageResponse,
   ExistenciaResponse,
-  EntradaRequest,
   SalidaRequest,
   ReservaRequest,
   LiberacionRequest,
@@ -98,18 +96,6 @@ export function existenciaFromApi(dto: ExistenciaResponse): ExistenciaProducto {
   };
 }
 
-export function entradaToRequest(data: EntradaMovimientoData): EntradaRequest {
-  return {
-    productoId:      data.productoId,
-    cantidad:        data.cantidad,
-    precioUnitario:  data.precioUnitario,
-    facturaId:       data.facturaId,
-    proveedorNit:    data.proveedorNit,
-    gilId:           data.gilId,
-    conciliacionId:  data.conciliacionId,
-  };
-}
-
 export function salidaToRequest(data: SalidaMovimientoData): SalidaRequest {
   return {
     productoId:    data.productoId,
@@ -140,9 +126,10 @@ export function liberacionToRequest(data: LiberacionMovimientoData): LiberacionR
 
 export function ajusteToRequest(data: AjusteMovimientoData): AjusteRequest {
   return {
-    productoId: data.producto,
+    productoId:    data.producto,
     cantidadNueva: data.cantidadNueva,
-    motivo: data.motivo,
-    responsableId: data.responsableId,
+    motivo:        data.motivo,
+    autorizado:    data.autorizado,
+    referenciaId:  data.referenciaId ?? null,
   };
 }
