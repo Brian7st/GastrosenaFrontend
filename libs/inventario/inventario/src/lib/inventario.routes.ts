@@ -171,8 +171,8 @@ export const INVENTARIO_ROUTES: Routes = [
     loadComponent: () => import('./pages/kardex-page/movimientos-list/movimientos-list.component').then(m => m.MovimientosListComponent),
     children: [
       {
-        path: 'entrada',
-        loadComponent: () => import('./pages/kardex-page/movimiento-entrada/movimiento-entrada.component').then(m => m.MovimientoEntradaComponent)
+        path: 'ajuste',
+        loadComponent: () => import('./pages/kardex-page/movimiento-ajuste/movimiento-ajuste.component').then(m => m.MovimientoAjusteComponent)
       },
       {
         path: 'exportar',

@@ -1,0 +1,110 @@
+<div class="modal-overlay">
+  @if (successMessage()) {
+    <div class="success-banner" role="status">{{ successMessage() }}</div>
+  }
+  <div class="modal-content">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-info">
+        <div class="header-icon">
+          <lucide-icon name="sliders-horizontal" [size]="28"></lucide-icon>
+        </div>
+        <div>
+          <h3 class="modal-title">Ajuste de Inventario</h3>
+          <p class="modal-subtitle">Correcciones de stock: mermas, devoluciones, conteo físico, carga inicial.</p>
+        </div>
+      </div>
+      <button class="close-btn" type="button" (click)="closeModal()">
+        <lucide-icon name="x" [size]="24"></lucide-icon>
+      </button>
+    </div>
+
+    <!-- Aviso de canal controlado -->
+    <div class="notice-banner">
+      <lucide-icon name="info" [size]="16"></lucide-icon>
+      <span>
+        Las compras ingresan SOLO mediante la conciliación FEL. Este formulario es para ajustes auditables sin factura.
+      </span>
+    </div>
+
+    <!-- Body -->
+    <form [formGroup]="ajusteForm" (ngSubmit)="onSubmit()" class="modal-body">
+      <div class="form-grid">
+
+        <!-- Producto ID (UUID) -->
+        <div class="form-group full-width">
+          <label for="productoId">ID DEL PRODUCTO <span class="required">*</span></label>
+          <div class="input-wrapper">
+            <lucide-icon name="barcode" class="input-icon" [size]="18"></lucide-icon>
+            <input
+              id="productoId"
+              type="text"
+              formControlName="productoId"
+              placeholder="UUID del producto del catálogo"
+              class="form-input">
+          </div>
+          @if (ajusteForm.get('productoId')?.invalid && ajusteForm.get('productoId')?.touched) {
+            <p class="error-hint">El ID del producto es obligatorio.</p>
+          }
+        </div>
+
+        <!-- Cantidad real / stock corregido -->
+        <div class="form-group">
+          <label for="cantidadNueva">CANTIDAD REAL / STOCK CORREGIDO <span class="required">*</span></label>
+          <div class="input-wrapper">
+            <lucide-icon name="package" class="input-icon" [size]="18"></lucide-icon>
+            <input
+              id="cantidadNueva"
+              type="number"
+              formControlName="cantidadNueva"
+              placeholder="0"
+              min="0"
+              class="form-input">
+          </div>
+          @if (ajusteForm.get('cantidadNueva')?.invalid && ajusteForm.get('cantidadNueva')?.touched) {
+            <p class="error-hint">Ingresá la cantidad real (mínimo 0).</p>
+          }
+          <span class="field-hint">Valor absoluto del stock después del ajuste, no un delta.</span>
+        </div>
+
+        <!-- Autorizado -->
+        <div class="form-group form-group--checkbox">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              formControlName="autorizado"
+              class="form-checkbox">
+            <span>Ajuste autorizado</span>
+          </label>
+        </div>
+
+        <!-- Motivo -->
+        <div class="form-group full-width">
+          <label for="motivo">MOTIVO DEL AJUSTE <span class="required">*</span></label>
+          <div class="input-wrapper input-wrapper--textarea">
+            <textarea
+              id="motivo"
+              formControlName="motivo"
+              placeholder="Describí el motivo: merma, conteo físico, devolución, carga inicial, etc."
+              rows="3"
+              class="form-textarea"></textarea>
+          </div>
+          @if (ajusteForm.get('motivo')?.invalid && ajusteForm.get('motivo')?.touched) {
+            <p class="error-hint">El motivo es obligatorio.</p>
+          }
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer">
+        <restaurant-button variant="surface" type="button" (click)="closeModal()">Cancelar</restaurant-button>
+        <restaurant-button variant="primary" type="submit" [disabled]="ajusteForm.invalid || facade.loading()">
+          <lucide-icon name="check-circle" [size]="18" style="margin-right: 0.5rem;"></lucide-icon>
+          Registrar Ajuste
+        </restaurant-button>
+      </div>
+    </form>
+  </div>
+</div>
