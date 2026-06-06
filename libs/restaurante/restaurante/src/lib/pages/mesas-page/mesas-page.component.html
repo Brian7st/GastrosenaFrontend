@@ -540,6 +540,58 @@
   }
 </div>
 
+<!-- Modal Ver Cuenta -->
+@if (modalActivo() === 'ver-cuenta' && pedidoCuenta()) {
+  <div class="custom-modal-backdrop" (click)="cerrarModales()">
+    <section class="custom-modal-dialog" (click)="$event.stopPropagation()">
+      <strong class="modal-title" style="margin-bottom: 1.5rem; display: block; text-align: center;">Detalle de la Cuenta</strong>
+      
+      <div class="modal-order-summary">
+        @if (comidasPedidoCuenta().length > 0) {
+          <h5 class="category-title">Comidas</h5>
+          <ul class="summary-list">
+            @for (item of comidasPedidoCuenta(); track item.productoId) {
+              <li>
+                <span class="qty">{{ item.cantidad }}x</span>
+                <span class="name">{{ item.nombreProducto }}</span>
+                <span class="price">{{ (item.cantidad * item.precioUnitario) | currencyCop }}</span>
+              </li>
+            }
+          </ul>
+        }
+
+        @if (bebidasPedidoCuenta().length > 0) {
+          <h5 class="category-title mt-3">Bebidas</h5>
+          <ul class="summary-list">
+            @for (item of bebidasPedidoCuenta(); track item.productoId) {
+              <li>
+                <span class="qty">{{ item.cantidad }}x</span>
+                <span class="name">{{ item.nombreProducto }}</span>
+                <span class="price">{{ (item.cantidad * item.precioUnitario) | currencyCop }}</span>
+              </li>
+            }
+          </ul>
+        }
+
+        @if (pedidoCuenta()?.observacionesGenerales) {
+          <div class="summary-notes">
+            <strong>Observaciones:</strong> {{ pedidoCuenta()?.observacionesGenerales }}
+          </div>
+        }
+
+        <div class="summary-total-row">
+          <span>Total:</span>
+          <strong>{{ totalCuenta() | currencyCop }}</strong>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="display: flex; justify-content: center; gap: 12px; margin-top: 1.5rem;">
+        <restaurant-button variant="primary" (click)="cerrarModales()">Cerrar Cuenta</restaurant-button>
+      </div>
+    </section>
+  </div>
+}
+
 <!-- Modal para Alertas y Notificaciones -->
 <restaurant-confirm-dialog
   [open]="alertDialog().open"

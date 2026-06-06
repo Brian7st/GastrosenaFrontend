@@ -40,6 +40,7 @@ export class PedidosCartComponent {
   showCancelModal = signal(false);
   showConfirmModal = signal(false);
   showAnularBackendModal = signal(false);
+  showEmptyCartModal = signal(false);
   motivoAnulacion = signal('');
 
   esPedidoSoloLectura = computed(() => {
@@ -74,6 +75,11 @@ export class PedidosCartComponent {
   }
 
   iniciarConfirmacion() {
+    const pedido = this.pedidoActivo();
+    if (!pedido || !pedido.detalles || pedido.detalles.length === 0) {
+      this.showEmptyCartModal.set(true);
+      return;
+    }
     this.showConfirmModal.set(true);
   }
 

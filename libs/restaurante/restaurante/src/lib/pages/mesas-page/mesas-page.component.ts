@@ -14,6 +14,7 @@ import {
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
 import { Mesa } from '../../models/restaurante.model';
+import { CurrencyCopPipe } from '@restaurant/shared/util';
 
 @Component({
   selector: 'restaurant-mesas-page',
@@ -28,7 +29,8 @@ import { Mesa } from '../../models/restaurante.model';
     ButtonComponent,
     LucideIconComponent,
     EmptyStateComponent,
-    ConfirmDialogComponent
+    ConfirmDialogComponent,
+    CurrencyCopPipe
   ],
   templateUrl: './mesas-page.component.html',
   styleUrl: './mesas-page.component.scss',
@@ -395,7 +397,11 @@ export class MesasPageComponent {
       this.facade.cargarPedidoDeMesaOcupada(id).subscribe({
         next: (exito) => {
           if (exito) {
-            this.router.navigate(['../pedidos'], { relativeTo: this.route });
+            if (mesa.estado === 'POR_PAGAR') {
+              this.abrirModal('ver-cuenta', mesa);
+            } else {
+              this.router.navigate(['../pedidos'], { relativeTo: this.route });
+            }
           } else {
             this.pedirConfirmacion(
               'Mesa sin comanda activa',
@@ -429,6 +435,27 @@ export class MesasPageComponent {
       }
     });
   }
+
+  // ── COMPUTEDS PARA MODAL DE CUENTA ───────────────────────────────────────────
+  pedidoCuenta = computed(() => this.facade.pedidoActivo());
+  comidasPedidoCuenta = computed(() => {
+    const pedido = this.pedidoCuenta();
+    return pedido ? pedido.detalles.filter(d => {
+      const cat = (d.categoria || '').toLowerCase();
+      return cat !== 'bebidas' && cat !== 'bebida';
+    }) : [];
+  });
+  bebidasPedidoCuenta = computed(() => {
+    const pedido = this.pedidoCuenta();
+    return pedido ? pedido.detalles.filter(d => {
+      const cat = (d.categoria || '').toLowerCase();
+      return cat === 'bebidas' || cat === 'bebida';
+    }) : [];
+  });
+  totalCuenta = computed(() => {
+    const detalles = this.pedidoCuenta()?.detalles || [];
+    return detalles.reduce((sum, item) => sum + (item.cantidad * item.precioUnitario), 0);
+  });
 
   // ── ACTIVAR / DESACTIVAR ─────────────────────────────────────────────────────
   cambiarEstadoMesa(id: string, activo: boolean) {

@@ -109,6 +109,15 @@
   (cancel)="showCancelModal.set(false)"
 ></restaurant-confirm-dialog>
 
+<restaurant-confirm-dialog
+  [open]="showEmptyCartModal()"
+  title="Carrito Vacío"
+  message="No puedes confirmar un pedido vacío. Por favor agrega al menos un producto a la comanda antes de enviarla a cocina."
+  confirmText="Entendido"
+  [showCancel]="false"
+  (confirm)="showEmptyCartModal.set(false)"
+></restaurant-confirm-dialog>
+
 @if (showAnularBackendModal()) {
   <div class="custom-modal-backdrop" (click)="showAnularBackendModal.set(false)">
     <section class="custom-modal-dialog" (click)="$event.stopPropagation()">

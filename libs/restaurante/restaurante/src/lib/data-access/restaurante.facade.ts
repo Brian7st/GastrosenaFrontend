@@ -442,7 +442,6 @@ export class RestauranteFacade {
   confirmarPedidoActivo(notas: string = ''): Observable<boolean> {
     const pedido = this._pedidoActivo();
     if (!pedido || pedido.detalles.length === 0) {
-      alert('No puedes confirmar un pedido vacío');
       return of(false);
     }
 
