@@ -14,7 +14,7 @@ export interface DocumentoMovimiento {
 
 export interface Movimiento {
   id: string;
-  tipo: 'ENTRADA' | 'SALIDA' | 'RESERVA' | 'LIBERACION' | 'AJUSTE';
+  tipo: 'ENTRADA' | 'SALIDA' | 'RESERVA' | 'LIBERACION' | 'AJUSTE' | 'AJUSTE_POSITIVO' | 'AJUSTE_NEGATIVO';
   productoNombre: string;
   codigoSena: string;
   cantidad: number;

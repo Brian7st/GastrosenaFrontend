@@ -4,6 +4,11 @@ import { RouterLink, RouterOutlet } from '@angular/router';
 import { KpiCardComponent, DataTableComponent, LucideIconComponent, ButtonComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
 import { KardexFacade } from '../../../data-access/kardex.facade';
 import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
+import { MovimientosService } from '../../../data-access/services/movimientos.service';
+import { Movimiento } from '../../../models/movimiento.model';
+
+type Vista = 'documentos' | 'todos';
+type TipoMovimiento = Movimiento['tipo'];
 
 @Component({
   selector: 'restaurant-movimientos-list',
@@ -24,14 +29,25 @@ import { EmptyStateComponent } from '../../../components/empty-state/empty-state
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MovimientosListComponent implements OnInit {
-  private facade = inject(KardexFacade);
+  private facade             = inject(KardexFacade);
+  private movimientosService = inject(MovimientosService);
 
-  // ── Estado reactivo desde facade ─────────────────────────────────────────
+  // ── Vista activa (toggle) ─────────────────────────────────────────────────
+  vista = signal<Vista>('documentos');
+
+  // ── Estado reactivo desde facade (vista documentos) ───────────────────────
   documentos = this.facade.documentos;
   loading    = this.facade.loading;
   error      = this.facade.error;
   paginacion = this.facade.paginacion;
   searchText = signal<string>('');
+
+  // ── Estado para vista "todos los movimientos" ─────────────────────────────
+  movimientosTodos     = signal<Movimiento[]>([]);
+  loadingTodos         = signal(false);
+  errorTodos           = signal<string | null>(null);
+  /** true una vez que se cargaron los datos (lazy) */
+  private todosLoaded  = signal(false);
 
   // ── Paginación computada ──────────────────────────────────────────────────
   paginaActual    = computed(() => this.paginacion().page);
@@ -73,7 +89,7 @@ export class MovimientosListComponent implements OnInit {
     return Array.from({ length: fin - inicio + 1 }, (_, i) => inicio + i);
   });
 
-  hayPaginaAnterior = computed(() => this.paginaActual() > 0);
+  hayPaginaAnterior  = computed(() => this.paginaActual() > 0);
   hayPaginaSiguiente = computed(() => this.paginaActual() < this.totalPaginas() - 1);
 
   // ── KPIs derivados del listado de documentos ─────────────────────────────
@@ -88,6 +104,32 @@ export class MovimientosListComponent implements OnInit {
 
   ngOnInit(): void {
     this.facade.loadAll();
+  }
+
+  // ── Toggle de vista ───────────────────────────────────────────────────────
+  cambiarVista(v: Vista): void {
+    this.vista.set(v);
+    // Carga lazy: solo la primera vez que se selecciona "todos"
+    if (v === 'todos' && !this.todosLoaded()) {
+      this.cargarTodos();
+    }
+  }
+
+  private cargarTodos(): void {
+    this.loadingTodos.set(true);
+    this.errorTodos.set(null);
+    this.movimientosService.getMovimientos(0, 50).subscribe({
+      next: ({ movimientos }) => {
+        this.movimientosTodos.set(movimientos);
+        this.todosLoaded.set(true);
+        this.loadingTodos.set(false);
+      },
+      error: (err: unknown) => {
+        const msg = err instanceof Error ? err.message : 'Error al cargar los movimientos';
+        this.errorTodos.set(msg);
+        this.loadingTodos.set(false);
+      },
+    });
   }
 
   onSearch(query: string): void {
@@ -119,12 +161,41 @@ export class MovimientosListComponent implements OnInit {
 
   getTipoLabel(tipo: string): string {
     const map: Record<string, string> = {
-      ENTRADA:    'Entrada',
-      SALIDA:     'Salida',
-      RESERVA:    'Reserva',
-      LIBERACION: 'Liberación',
-      AJUSTE:     'Ajuste',
+      ENTRADA:          'Entrada',
+      SALIDA:           'Salida',
+      RESERVA:          'Reserva',
+      LIBERACION:       'Liberación',
+      AJUSTE:           'Ajuste',
+      AJUSTE_POSITIVO:  'Ajuste (+)',
+      AJUSTE_NEGATIVO:  'Ajuste (−)',
     };
     return map[tipo] ?? tipo;
+  }
+
+  /** Clase CSS para el badge de tipo en la vista plana */
+  getTipoBadgeClass(tipo: TipoMovimiento): string {
+    if (tipo === 'ENTRADA' || tipo === 'AJUSTE_POSITIVO') return 'type-badge--entrada';
+    if (tipo === 'SALIDA'  || tipo === 'LIBERACION' || tipo === 'AJUSTE_NEGATIVO') return 'type-badge--salida';
+    return 'type-badge--ajuste';
+  }
+
+  /** Clase CSS + signo para la columna cantidad en la vista plana */
+  getCantidadClass(tipo: TipoMovimiento): string {
+    if (tipo === 'ENTRADA' || tipo === 'AJUSTE_POSITIVO') return 'qty-val--entrada';
+    if (tipo === 'SALIDA'  || tipo === 'LIBERACION' || tipo === 'AJUSTE_NEGATIVO') return 'qty-val--salida';
+    return '';
+  }
+
+  getCantidadSigno(tipo: TipoMovimiento): string {
+    if (tipo === 'ENTRADA' || tipo === 'AJUSTE_POSITIVO') return '+';
+    if (tipo === 'SALIDA'  || tipo === 'LIBERACION' || tipo === 'AJUSTE_NEGATIVO') return '−';
+    return '';
+  }
+
+  /** Ícono Lucide para el tipo de movimiento */
+  getTipoIcon(tipo: TipoMovimiento): string {
+    if (tipo === 'ENTRADA' || tipo === 'AJUSTE_POSITIVO') return 'arrow-down';
+    if (tipo === 'SALIDA'  || tipo === 'LIBERACION' || tipo === 'AJUSTE_NEGATIVO') return 'arrow-up';
+    return 'sliders-horizontal';
   }
 }
