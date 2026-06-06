@@ -123,27 +123,25 @@
             <tr>
               <th>FECHA</th>
               <th>TIPO</th>
-              <th>RESPONSABLE</th>
-              <th>UBICACIÓN</th>
-              <th>CANTIDAD</th>
-              <th>OBSERVACIÓN</th>
+              <th class="text-right">CANTIDAD</th>
+              <th class="text-right">VALOR</th>
+              <th>ESTADO</th>
             </tr>
           </thead>
           <tbody>
-            @for (m of movimientos(); track m) {
+            @for (m of movimientos(); track m.id) {
               <tr>
-                <td class="mov-fecha">{{ m.fecha | date:'dd/MM/yyyy' }}</td>
+                <td class="mov-fecha">{{ m.fechaMovimiento | date:'dd/MM/yyyy HH:mm' }}</td>
                 <td>
-                  <restaurant-status-badge [label]="m.tipo" [variant]="getTipoVariant(m.tipo)" />
+                  <restaurant-status-badge [label]="getTipoLabel(m.tipo)" [variant]="getTipoVariant(m.tipo)" />
                 </td>
-                <td class="mov-responsable">{{ m.responsable }}</td>
-                <td class="mov-ubicacion">{{ m.ubicacion }}</td>
-                <td>
-                  <span class="cantidad-text" [ngClass]="getCantidadClass(m.cantidad)">
-                    {{ getCantidadPrefix(m.cantidad) }}
+                <td class="text-right">
+                  <span class="cantidad-text" [ngClass]="getCantidadClass(m)">
+                    {{ getCantidadPrefix(m) }} {{ m.unidadMedida }}
                   </span>
                 </td>
-                <td class="mov-obs">{{ m.observacion }}</td>
+                <td class="text-right mov-valor">{{ m.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                <td class="mov-estado">{{ m.estado }}</td>
               </tr>
             }
           </tbody>
