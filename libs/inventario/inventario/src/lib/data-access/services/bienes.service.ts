@@ -55,7 +55,9 @@ export class BienesService {
           if (!productos.length) return of({ bienes: [] as Bien[], paginacion });
           const existencias$ = productos.map(p =>
             this.http
-              .get<ExistenciaResponse>(`${API}/inventory/existencias/${p.id}`)
+              // El backend llavea la existencia por codigoSena (productoId canónico),
+              // no por el id (UUID) del catálogo. Ver JpaGilSolicitudQueryAdapter.findByCodigoSena.
+              .get<ExistenciaResponse>(`${API}/inventory/existencias/${p.codigoSena}`)
               .pipe(catchError(() => of(null)))
           );
           return forkJoin(existencias$).pipe(
@@ -76,21 +78,23 @@ export class BienesService {
   /** GET /catalog/productos/{id} + GET /inventory/existencias/{id}
    *  Compone el Bien con estado de stock real (Agotado / Bajo Stock / Activo). */
   getBienById(id: string | number): Observable<Bien | undefined> {
-    const catalogo$ = this.http
+    return this.http
       .get<ProductoResponse>(`${API}/catalog/productos/${id}`)
-      .pipe(catchError(() => of(undefined)));
-
-    const existencia$ = this.http
-      .get<ExistenciaResponse>(`${API}/inventory/existencias/${id}`)
-      .pipe(catchError(() => of(null)));
-
-    return forkJoin([catalogo$, existencia$]).pipe(
-      map(([cat, ex]) => {
-        if (!cat) return undefined;
-        return bienFromCatalogoYExistencia(cat, ex ?? null);
-      }),
-      catchError(err => throwError(() => err))
-    );
+      .pipe(
+        catchError(() => of(undefined)),
+        // La existencia se consulta por codigoSena (productoId canónico), obtenido del
+        // catálogo — no por el id (UUID), que nunca matchea la existencia almacenada.
+        switchMap(cat => {
+          if (!cat) return of<Bien | undefined>(undefined);
+          return this.http
+            .get<ExistenciaResponse>(`${API}/inventory/existencias/${cat.codigoSena}`)
+            .pipe(
+              catchError(() => of(null)),
+              map(ex => bienFromCatalogoYExistencia(cat, ex ?? null))
+            );
+        }),
+        catchError(err => throwError(() => err))
+      );
   }
 
   // ── KPIs ─────────────────────────────────────────────────────────────────────

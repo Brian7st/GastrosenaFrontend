@@ -144,9 +144,25 @@
     margin-bottom: var(--space-2);
   }
 
-  &--checkbox {
+  &--checkbox .checkbox-label {
     display: flex;
     align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    margin-bottom: 0;
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-contorno-variante);
+    border-radius: var(--radius-md);
+    background-color: var(--color-superficie-contenedor-mas-bajo);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-en-superficie);
+    text-transform: none;
+    letter-spacing: 0;
+    cursor: pointer;
+    transition: border-color var(--duration-fast) var(--ease-standard);
+
+    &:hover { border-color: var(--color-primario); }
   }
 }
 
@@ -338,18 +354,6 @@
 
 /* ── Checkbox ───────────────────────────────────────────────────────────────── */
 
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-pizarra-500);
-  cursor: pointer;
-  text-transform: none;
-  letter-spacing: 0;
-}
-
 .form-checkbox {
   width: 1rem;
   height: 1rem;
@@ -371,6 +375,49 @@
 .required {
   color: var(--color-danger);
   margin-left: 2px;
+}
+
+/* ── Stock actual del producto seleccionado ─────────────────────────────────── */
+
+.producto-seleccionado__stock {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-superficie-contenedor-mas-bajo);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-pizarra-500);
+
+  strong {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-en-superficie);
+  }
+
+  lucide-icon {
+    color: var(--color-pizarra-400);
+    flex-shrink: 0;
+  }
+}
+
+/* ── Indicador del ajuste resultante (merma / incremento) ───────────────────── */
+
+.ajuste-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-pizarra-500);
+
+  lucide-icon { flex-shrink: 0; }
+
+  &--baja { color: var(--color-danger); }
+  &--alza { color: var(--color-success-text); }
 }
 
 .error-hint {
