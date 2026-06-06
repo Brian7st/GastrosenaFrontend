@@ -45,6 +45,10 @@
                 <span class="producto-seleccionado__nombre">{{ productoSeleccionado()!.descripcion }}</span>
                 <span class="producto-seleccionado__codigo">{{ productoSeleccionado()!.codigoSena }}</span>
               </div>
+              <span class="producto-seleccionado__stock">
+                <lucide-icon name="layers" [size]="14"></lucide-icon>
+                Stock actual:&nbsp;<strong>{{ stockActual() ?? '—' }}</strong>&nbsp;{{ unidadProducto() }}
+              </span>
               <button
                 type="button"
                 class="producto-seleccionado__clear"
@@ -109,6 +113,7 @@
               id="cantidadNueva"
               type="number"
               formControlName="cantidadNueva"
+              (input)="onCantidadChange($event)"
               placeholder="0"
               min="0"
               class="form-input">
@@ -116,7 +121,25 @@
           @if (ajusteForm.get('cantidadNueva')?.invalid && ajusteForm.get('cantidadNueva')?.touched) {
             <p class="error-hint">Ingresá la cantidad real (mínimo 0).</p>
           }
-          <span class="field-hint">Valor absoluto del stock después del ajuste, no un delta.</span>
+          @if (ajusteDelta() !== null) {
+            <span
+              class="ajuste-delta"
+              [class.ajuste-delta--baja]="ajusteDelta()! < 0"
+              [class.ajuste-delta--alza]="ajusteDelta()! > 0">
+              @if (ajusteDelta()! < 0) {
+                <lucide-icon name="trending-down" [size]="14"></lucide-icon>
+                Merma de {{ -ajusteDelta()! }} {{ unidadProducto() }}
+              } @else if (ajusteDelta()! > 0) {
+                <lucide-icon name="trending-up" [size]="14"></lucide-icon>
+                Incremento de {{ ajusteDelta()! }} {{ unidadProducto() }}
+              } @else {
+                <lucide-icon name="minus" [size]="14"></lucide-icon>
+                Sin cambios respecto al stock actual
+              }
+            </span>
+          } @else {
+            <span class="field-hint">Valor absoluto del stock después del ajuste, no un delta.</span>
+          }
         </div>
 
         <!-- Autorizado -->
