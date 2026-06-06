@@ -10,7 +10,30 @@
         <inventario-back-button (clicked)="goBack()" />
         <h1 class="page-title">Detalle de Conciliación</h1>
       </div>
+
+      @if (detalle()!.estado !== 'COMPLETADA') {
+        <button
+          class="cerrar-btn"
+          [disabled]="!puedeCerrar() || loading()"
+          [title]="puedeCerrar() ? 'Cerrar y finalizar la conciliación' : 'Resolvé todas las diferencias antes de cerrar'"
+          (click)="cerrar()">
+          <lucide-icon name="lock" [size]="18"></lucide-icon>
+          Cerrar conciliación
+        </button>
+      } @else {
+        <span class="cerrada-badge">
+          <lucide-icon name="check-circle" [size]="18"></lucide-icon>
+          Conciliación cerrada
+        </span>
+      }
     </div>
+
+    @if (detalle()!.estado !== 'COMPLETADA' && diferenciasPendientes() > 0) {
+      <p class="cerrar-hint">
+        <lucide-icon name="info" [size]="14"></lucide-icon>
+        Quedan {{ diferenciasPendientes() }} diferencia(s) por resolver para poder cerrar la conciliación.
+      </p>
+    }
 
     <div class="info-badges-row">
       <div class="info-badge">

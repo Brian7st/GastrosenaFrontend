@@ -280,7 +280,8 @@ export class ConciliacionFacade {
         finalize(() => this._loading.set(false))
       )
       .subscribe(() => {
-        // Refresca la lista tras cerrar
+        // Recarga el detalle (estado → COMPLETADA en pantalla) y la lista.
+        this.cargarConciliacion(id);
         this.loadAll();
       });
   }
