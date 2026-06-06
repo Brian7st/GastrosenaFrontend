@@ -156,15 +156,22 @@ export class RestauranteFacade {
     localStorage.setItem('gastro_turno_caja', JSON.stringify(this._turnoCaja()));
   }
 
-  agregarMesa(nombre: string, capacidad: number, zona: string): void {
+  agregarMesa(nombre: string, capacidad: number, zona: string): Observable<boolean | string> {
     const request: MesaCreateRequest = { nombre, capacidad, zona: zona || null };
-    this.restauranteService.crearMesa(request).subscribe({
-      next: (mesaNueva) => {
-        this._mesas.update(lista => [...lista, mesaNueva]);
-      },
-      error: (err) => {
-        console.error('[RestauranteFacade] Error al crear mesa:', err);
-      }
+    return new Observable(observer => {
+      this.restauranteService.crearMesa(request).subscribe({
+        next: (mesaNueva) => {
+          this._mesas.update(lista => [...lista, mesaNueva]);
+          observer.next(true);
+          observer.complete();
+        },
+        error: (err) => {
+          console.error('[RestauranteFacade] Error al crear mesa:', err);
+          const msg = err.error?.mensaje || err.error?.message || 'Error desconocido al crear mesa.';
+          observer.next(msg);
+          observer.complete();
+        }
+      });
     });
   }
 
@@ -203,19 +210,26 @@ export class RestauranteFacade {
     console.warn('[RestauranteFacade] actualizarNotas() aún no está conectado al backend.');
   }
 
-  editarMesa(mesaId: string, cambios: MesaUpdateRequest): void {
-    this.restauranteService.editarMesa(mesaId, cambios).subscribe({
-      next: (mesaActualizada) => {
-        this._mesas.update(lista =>
-          lista.map(m => m.id === mesaActualizada.id 
-            ? { ...mesaActualizada, observaciones: cambios.observaciones || m.observaciones } 
-            : m
-          )
-        );
-      },
-      error: (err) => {
-        console.error(`[RestauranteFacade] Error al editar mesa ${mesaId}:`, err);
-      }
+  editarMesa(mesaId: string, cambios: MesaUpdateRequest): Observable<boolean | string> {
+    return new Observable(observer => {
+      this.restauranteService.editarMesa(mesaId, cambios).subscribe({
+        next: (mesaActualizada) => {
+          this._mesas.update(lista =>
+            lista.map(m => m.id === mesaActualizada.id 
+              ? { ...mesaActualizada, observaciones: cambios.observaciones || m.observaciones } 
+              : m
+            )
+          );
+          observer.next(true);
+          observer.complete();
+        },
+        error: (err) => {
+          console.error(`[RestauranteFacade] Error al editar mesa ${mesaId}:`, err);
+          const msg = err.error?.mensaje || err.error?.message || 'Error desconocido al editar mesa.';
+          observer.next(msg);
+          observer.complete();
+        }
+      });
     });
   }
 

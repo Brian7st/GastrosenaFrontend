@@ -287,9 +287,16 @@ export class MesasPageComponent {
       return;
     }
 
-    this.facade.agregarMesa(nombre, capacidad, zona);
-    this.cerrarModales();
-    this.mostrarExito(`La mesa "${nombre}" ha sido creada correctamente.`);
+    this.facade.agregarMesa(nombre, capacidad, zona).subscribe({
+      next: (resultado) => {
+        if (resultado === true) {
+          this.cerrarModales();
+          this.mostrarExito(`La mesa "${nombre}" ha sido creada correctamente.`);
+        } else {
+          this.mostrarError(resultado as string);
+        }
+      }
+    });
   }
 
   // ── EDITAR ───────────────────────────────────────────────────────────────────
@@ -313,24 +320,30 @@ export class MesasPageComponent {
       return;
     }
 
-    this.cerrarModales();
     this.facade.editarMesa(mesa.id, {
       nombre,
       capacidad,
       zona: zona || null,
       observaciones: obs || null,
-    });
-
-    if (obs && obsCambiada) {
-      if (mesa.estado !== 'LIBRE') {
-        this.mostrarExito('Observaciones actualizadas, pero la mesa no se desactivó porque está ocupada.');
-      } else {
-        this.facade.cambiarEstadoActivoMesa(mesa.id, false);
-        this.mostrarExito('Mesa actualizada y desactivada por daños/observaciones.');
+    }).subscribe({
+      next: (resultado) => {
+        if (resultado === true) {
+          this.cerrarModales();
+          if (obs && obsCambiada) {
+            if (mesa.estado !== 'LIBRE') {
+              this.mostrarExito('Observaciones actualizadas, pero la mesa no se desactivó porque está ocupada.');
+            } else {
+              this.facade.cambiarEstadoActivoMesa(mesa.id, false);
+              this.mostrarExito('Mesa actualizada y desactivada por daños/observaciones.');
+            }
+          } else {
+            this.mostrarExito('Mesa actualizada correctamente.');
+          }
+        } else {
+          this.mostrarError(resultado as string);
+        }
       }
-    } else {
-      this.mostrarExito('Mesa actualizada correctamente.');
-    }
+    });
   }
 
   // ── CONTROLES DE CAPACIDAD ───────────────────────────────────────────────────
