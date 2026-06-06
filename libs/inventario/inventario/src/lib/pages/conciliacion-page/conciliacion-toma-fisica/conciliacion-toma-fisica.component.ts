@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LucideIconComponent, ButtonComponent, KpiCardComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
@@ -35,8 +35,15 @@ type TabActivo = 'todos' | 'diferencias' | 'pendientes';
 })
 export class ConciliacionTomaFisicaComponent implements OnInit {
   private router   = inject(Router);
+  private route    = inject(ActivatedRoute);
   private location = inject(Location);
   private facade   = inject(ConciliacionFacade);
+
+  constructor() {
+    // El facade es singleton: limpiar cualquier id de una conciliación previa
+    // ANTES de que corra navEffect, para no redirigir al entrar a esta pantalla.
+    this.facade.limpiarUltimaConciliacion();
+  }
 
   fecha       = signal(new Date().toISOString().slice(0, 10));
   responsable = signal('Instructor');
@@ -56,11 +63,12 @@ export class ConciliacionTomaFisicaComponent implements OnInit {
     }
   }, { allowSignalWrites: true });
 
-  // Navega al detalle cuando el backend confirma la conciliación creada
+  // Navega al detalle cuando el backend confirma la conciliación creada.
+  // Navegación relativa: desde 'conciliacion/toma-fisica' → '../:id'.
   private readonly navEffect = effect(() => {
     const id = this.facade.ultimaConciliacionId();
     if (id) {
-      this.router.navigate(['/inventario/conciliacion', id]);
+      this.router.navigate(['../', id], { relativeTo: this.route });
     }
   });
 

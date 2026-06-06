@@ -111,6 +111,15 @@ export class ConciliacionFacade {
   });
 
   /**
+   * Limpia el id de la última conciliación creada.
+   * Debe llamarse al entrar a la toma física para evitar que una conciliación
+   * previa (el facade es singleton) dispare una navegación automática indebida.
+   */
+  limpiarUltimaConciliacion(): void {
+    this._ultimaConciliacionId.set(null);
+  }
+
+  /**
    * Carga inicial: obtiene la lista completa de conciliaciones.
    */
   loadAll(): void {
