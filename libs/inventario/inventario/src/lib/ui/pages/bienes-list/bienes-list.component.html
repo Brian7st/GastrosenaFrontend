@@ -102,7 +102,6 @@
     <tr>
       <th>CÓD. SENA</th>
       <th>Descripción</th>
-      <th>Categoría</th>
       <th class="text-center">Stock</th>
       <th class="text-center">Stock Mín.</th>
       <th class="text-center">UM</th>
@@ -116,8 +115,8 @@
   <tbody>
     @if (loading()) {
       <tr>
-        <td colspan="9">
-          <restaurant-loading-skeleton [rows]="5" [columns]="10"></restaurant-loading-skeleton>
+        <td colspan="8">
+          <restaurant-loading-skeleton [rows]="5" [columns]="8"></restaurant-loading-skeleton>
         </td>
       </tr>
     } @else {
@@ -128,9 +127,6 @@
             </td>
             <td>
               <p class="bien-desc">{{ bien.descripcion }}</p>
-            </td>
-            <td>
-              <span class="category-pill" [ngClass]="'category-pill--' + bien.categoriaColor">{{ bien.categoria }}</span>
             </td>
             <td class="text-center">
               <span class="stock-value" [class.stock-value--danger]="bien.stockActual < bien.stockMinimo">{{ bien.stockActual }}</span>
@@ -173,7 +169,7 @@
           </tr>
 } @empty {
           <tr>
-            <td colspan="9">
+            <td colspan="8">
               <inventario-empty-state
                 icon="inventory_2"
                 title="Sin bienes registrados"
