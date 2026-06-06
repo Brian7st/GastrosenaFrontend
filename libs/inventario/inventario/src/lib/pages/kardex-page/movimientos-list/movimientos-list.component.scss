@@ -154,6 +154,47 @@
   transition: all 0.2s ease;
 }
 
+/* ── Toggle de vistas ───────────────────────────────────────────────────────── */
+.vista-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  background: var(--color-superficie-contenedor-bajo);
+  border: 1px solid var(--color-contorno-variante);
+  border-radius: var(--radius-lg);
+  padding: var(--space-1);
+  margin-bottom: var(--space-6);
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border: none;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-standard),
+                color var(--duration-fast) var(--ease-standard);
+
+    &:hover:not(.vista-toggle__btn--active) {
+      background: var(--color-superficie-contenedor-alto);
+      color: var(--color-en-superficie);
+    }
+
+    &--active {
+      background: var(--color-superficie-contenedor-mas-alto);
+      color: var(--color-en-superficie);
+      font-weight: var(--font-weight-semibold);
+      box-shadow: var(--shadow-xs);
+    }
+  }
+}
+
+/* ── Type badges ─────────────────────────────────────────────────────────────── */
 .type-badge {
   display: inline-flex;
   align-items: center;
@@ -163,8 +204,30 @@
   font-size: 0.75rem;
   font-weight: 700;
 
-  &--entrada { background: #d1fae5; color: #065f46; }
-  &--salida  { background: #fee2e2; color: #991b1b; }
+  &--entrada { background: var(--color-esmeralda-100); color: var(--color-esmeralda-800); }
+  &--salida  { background: var(--color-error-bg);      color: var(--color-error-text);    }
+  /* Ajustes neutros: usa la paleta de warning (ámbar) que ya existe en los tokens */
+  &--ajuste  { background: var(--color-warning-badge-bg); color: var(--color-warning-badge-text); }
+}
+
+/* ── Loading state para la vista "todos" ─────────────────────────────────────── */
+.todos-loading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-6);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+
+  &__icon {
+    animation: spin var(--duration-slow) linear infinite;
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
 .prod-name {
