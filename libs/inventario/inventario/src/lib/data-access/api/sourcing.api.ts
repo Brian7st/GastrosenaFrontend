@@ -178,6 +178,7 @@ export interface DetalleGilResponse {
   porcentajeIvaFactura:  number;
   estado:                'OK' | 'DIFERENCIA_PENDIENTE' | 'DIFERENCIA_RESUELTA';
   observacion?:          string;
+  cantidadRecibida:      number | null;
 }
 
 /** Respuesta de POST, GET y PATCH /sourcing/conciliaciones-gil */
@@ -192,8 +193,9 @@ export interface ConciliacionGilResponse {
 
 /** POST /sourcing/conciliaciones-gil */
 export interface ConciliarRequest {
-  facturaId: string;
-  gilId:     string;
+  facturaId:             string;
+  gilId:                 string;
+  cantidadesRecibidas?:  Record<string, number>;
 }
 
 /** PATCH /sourcing/conciliaciones-gil/{id}/diferencias/{gilItemId}/resolver */

@@ -80,7 +80,12 @@ export function conciliacionGilFromApi(dto: ConciliacionGilResponse): Conciliaci
     facturaId: dto.facturaId,
     gilId:     dto.gilId,
     estado:    dto.estado,
-    diferencias: dto.detalles.map((d: DetalleGilResponse) => ({
+    // Solo los detalles que NO coinciden son diferencias. Un detalle en estado 'OK'
+    // significa que el ítem cuadra (cantidad, precio e IVA) y no debe contarse ni
+    // listarse como diferencia.
+    diferencias: dto.detalles
+      .filter((d: DetalleGilResponse) => d.estado !== 'OK')
+      .map((d: DetalleGilResponse) => ({
       gilItemId:             d.gilItemId,
       descripcion:           d.descripcion,
       cantidadGil:           d.cantidadGil,
@@ -90,6 +95,7 @@ export function conciliacionGilFromApi(dto: ConciliacionGilResponse): Conciliaci
       diferencia:            (d.precioUnitarioFactura * d.cantidadFactura) - (d.precioUnitarioGil * d.cantidadGil),
       observacion:           d.observacion,
       resuelta:              d.estado !== 'DIFERENCIA_PENDIENTE',
+      cantidadRecibida:      d.cantidadRecibida ?? null,
     })),
   };
 }

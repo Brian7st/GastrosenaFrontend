@@ -42,7 +42,26 @@ export class ActividadPageComponent {
     { value: 'trimestre2', label: 'Trimestre 2' },
     { value: 'trimestre3', label: 'Trimestre 3' },
     { value: 'trimestre4', label: 'Trimestre 4' },
+    { value: 'trimestre5', label: 'Trimestre 5' },
+    { value: 'trimestre6', label: 'Trimestre 6' },
+    { value: 'trimestre7', label: 'Trimestre 7' },
   ];
+
+  get esFormularioValido(): boolean {
+    const isYearValid = () => {
+      if (!this.fecha()) return false;
+      const year = new Date(this.fecha()).getFullYear();
+      return year >= 2020 && year <= 2050;
+    };
+
+    return (
+      this.nombreActividad().trim().length > 0 &&
+      this.jornada().trim().length > 0 &&
+      this.numeroFicha().trim().length > 0 &&
+      this.trimestre().trim().length > 0 &&
+      isYearValid()
+    );
+  }
 
   crearActividad(): void {
 

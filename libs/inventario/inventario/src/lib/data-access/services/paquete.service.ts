@@ -37,7 +37,6 @@ export class PaqueteService {
       requisicionId: data.requisicionId ?? '',
       fichaId:       data.fichaId       ?? '',
       instructorId:  data.instructorId  ?? '',
-      titulo:        data.titulo        ?? '',
     };
     return this.http
       .post<PaqueteResponse>(`${API}/legalization/paquetes`, request)

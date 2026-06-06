@@ -83,13 +83,12 @@ export interface PaquetesPageResponse {
   tamano: number;
 }
 
-/** Alineado con CrearPaqueteHttpRequest del backend — sin titulo. */
+/** Alineado con CrearPaqueteHttpRequest del backend — solo estos 4 campos. */
 export interface CrearPaqueteRequest {
   actaId: string;
   requisicionId: string;
   fichaId: string;
   instructorId: string;
-  titulo: string;
 }
 
 export interface TrazabilidadRequest {

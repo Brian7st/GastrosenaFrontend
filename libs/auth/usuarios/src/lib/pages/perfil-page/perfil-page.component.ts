@@ -43,16 +43,13 @@ export class PerfilPageComponent implements OnInit {
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
-  readonly usuario  = this.authService.currentUser();
+  readonly usuario   = this.authService.currentUser();
   readonly guardando = signal(false);
   readonly exito     = signal(false);
   readonly subiendo  = signal(false);
-
-  readonly fotoUrl = computed(() => {
-  const userId = this.usuario?.id;
-  if (!userId) return null;
-  return localStorage.getItem(`fotoUrl_${userId}`) ?? null;
-});
+ readonly fotoUrl = signal<string | null>(
+  localStorage.getItem(`fotoUrl_${this.usuario?.id}`) ?? null
+);
 
   readonly iniciales = computed(() => {
     const nombre = this.usuario?.nombre ?? '';
@@ -79,60 +76,62 @@ export class PerfilPageComponent implements OnInit {
   }
 
   cargarPerfil(): void {
-    this.usuariosService.obtenerPerfil().subscribe({
-      next: (data) => {
-        this.infoForm.patchValue({
-          nombre:    data.nombre,
-          apellidos: data.apellidos,
-          email:     data.email,
-          documento: data.documento,
-          telefono:  data.telefono,
-        });
-      },
-      error: (err) => console.error('Error cargando perfil', err),
-    });
-  }
+  this.usuariosService.obtenerPerfil().subscribe({
+    next: (data) => {
+      this.infoForm.patchValue({
+        nombre:    data.nombre,
+        apellidos: data.apellidos,
+        email:     data.email,
+        documento: data.documento,
+        telefono:  data.telefono,
+      });
+      if ((data as any).fotoUrl) {
+        this.fotoUrl.set((data as any).fotoUrl);
+        localStorage.setItem(`fotoUrl_${this.usuario?.id}`, (data as any).fotoUrl);
+      }
+    },
+    error: (err) => console.error('Error cargando perfil', err),
+  });
+}
 
   triggerFileInput(): void {
     this.fileInput.nativeElement.click();
   }
 
- onFotoChange(event: Event): void {
-  const file = (event.target as HTMLInputElement).files?.[0];
-  if (!file) return;
+  onFotoChange(event: Event): void {
+    console.log('onFotoChange llamado', event);
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
 
-  const userId = this.usuario?.id;
-  if (!userId) return;
+    this.subiendo.set(true);
 
-  this.subiendo.set(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'GastroSena');
 
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', 'GastroSena');
-
-  this.http.post<{ secure_url: string }>(
-    'https://api.cloudinary.com/v1_1/dryhub1jk/image/upload',
-    formData
-  ).subscribe({
-    next: (res) => {
-      // Enviar URL al backend
-      this.usuariosService.actualizarFoto(userId, res.secure_url).subscribe({
-        next: () => {
-          this.subiendo.set(false);
-          this.cargarPerfil();
-        },
-        error: () => {
-          this.subiendo.set(false);
-          alert('Error al guardar la foto');
-        }
+    fetch('https://api.cloudinary.com/v1_1/dryhub1jk/image/upload', {
+      method: 'POST',
+      body: formData,
+    })
+      .then(res => res.json())
+      .then(data => {
+        this.fotoUrl.set(data.secure_url);
+        this.usuariosService.actualizarFoto('', data.secure_url).subscribe({
+          next: () => {
+            this.subiendo.set(false);
+            this.cargarPerfil();
+          },
+          error: () => {
+            this.subiendo.set(false);
+            alert('Error al guardar la foto');
+          }
+        });
+      })
+      .catch(() => {
+        this.subiendo.set(false);
+        alert('Error al subir la foto a Cloudinary');
       });
-    },
-    error: () => {
-      this.subiendo.set(false);
-      alert('Error al subir la foto a Cloudinary');
-    },
-  });
-}
+  }
 
   onGuardar(): void {
     if (this.infoForm.invalid) {
@@ -197,4 +196,4 @@ export class PerfilPageComponent implements OnInit {
     this.cargarPerfil();
     this.seguridadForm.reset();
   }
-} 
+}

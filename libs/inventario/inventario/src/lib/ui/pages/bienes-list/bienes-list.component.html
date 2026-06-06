@@ -55,45 +55,73 @@
 }
 
 <!-- Dashboard Card Container (Tabla) -->
-<div class="card-container">
-  <!-- Table Controls -->
-  <div class="table-controls">
-    <div class="table-controls__title">
-      <span class="material-symbols-outlined filled text-primary">list_alt</span>
-      <h3>Lista de Bienes</h3>
-    </div>
-    <div class="table-controls__actions">
-      <div class="search-box">
-        <span class="material-symbols-outlined search-icon">search</span>
-        <input #searchInput type="text" placeholder="Buscar por código o nombre..." (input)="onSearch(searchInput.value)" />
+<restaurant-data-table
+  tableTitle="Lista de Bienes"
+  tableIcon="package"
+  searchPlaceholder="Buscar por código o nombre..."
+  [showFilterButton]="true"
+  [filterActive]="showFilters()"
+  [filterCount]="filtrosActivos()"
+  (searchChange)="onSearch($event)"
+  (filterToggle)="onToggleFilters()"
+>
+
+  <!-- Panel de filtros colapsable (slot [dtHeader]) -->
+  @if (showFilters()) {
+    <div dtHeader class="filter-panel">
+      <div class="filter-panel__row">
+        <div class="filter-group">
+          <label class="filter-label">Categoría</label>
+          <select class="filter-select" [value]="filtroCategoria()" (change)="onFiltroCategoria($any($event.target).value)">
+            <option value="">Todas</option>
+            @for (cat of CATEGORIAS; track cat) {
+              <option [value]="cat">{{ cat }}</option>
+            }
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Estado</label>
+          <select class="filter-select" [value]="filtroEstado()" (change)="onFiltroEstado($any($event.target).value)">
+            <option value="">Todos</option>
+            <option value="Activo">Activo</option>
+            <option value="Inactivo">Inactivo</option>
+          </select>
+        </div>
+        <div class="filter-group filter-group--actions">
+          <button class="filter-clear-btn" (click)="onLimpiarFiltros()" [disabled]="filtrosActivos() === 0">
+            <span class="material-symbols-outlined">clear_all</span>
+            Limpiar
+          </button>
+        </div>
       </div>
-      <restaurant-button variant="filter" (click)="showFilters.set(!showFilters())">
-        <span class="material-symbols-outlined">filter_list</span>
-        Filtros
-      </restaurant-button>
     </div>
-  </div>
+  }
 
-  <!-- Data Table -->
-  @if (!loading()) {
+  <!-- Cabecera de tabla -->
+  <thead>
+    <tr>
+      <th>CÓD. SENA</th>
+      <th>Descripción</th>
+      <th>Categoría</th>
+      <th class="text-center">Stock</th>
+      <th class="text-center">Stock Mín.</th>
+      <th class="text-center">UM</th>
+      <th>Valor</th>
+      <th>Estado</th>
+      <th class="text-center">Acciones</th>
+    </tr>
+  </thead>
 
-    <div class="table-scroll">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>CÓD. SENA</th>
-            <th>Descripción</th>
-            <th>Categoría</th>
-            <th class="text-center">Stock</th>
-            <th class="text-center">Stock Mín.</th>
-            <th class="text-center">UM</th>
-            <th>Valor</th>
-            <th>Estado</th>
-            <th class="text-center">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (bien of bienes(); track bien) {
+  <!-- Filas de datos -->
+  <tbody>
+    @if (loading()) {
+      <tr>
+        <td colspan="9">
+          <restaurant-loading-skeleton [rows]="5" [columns]="10"></restaurant-loading-skeleton>
+        </td>
+      </tr>
+    } @else {
+      @for (bien of bienes(); track bien) {
 <tr class="table-row">
             <td>
               <span class="code-mono">{{ bien.codigoSena }}</span>
@@ -140,59 +168,50 @@
                     <span class="material-symbols-outlined">toggle_on</span>
                   </button>
                 }
-                <button class="action-icon action-icon--danger" (click)="onEliminar(bien)" title="Eliminar">
-                  <span class="material-symbols-outlined">delete</span>
-                </button>
               </div>
             </td>
           </tr>
 } @empty {
           <tr>
-            <td colspan="9" class="empty-state">
-              <span class="material-symbols-outlined empty-state__icon">inventory_2</span>
-              <p class="empty-state__title">Sin bienes registrados</p>
-              <p class="empty-state__message">No se encontraron bienes con los filtros aplicados.</p>
+            <td colspan="9">
+              <inventario-empty-state
+                icon="inventory_2"
+                title="Sin bienes registrados"
+                message="No se encontraron bienes con los filtros aplicados."
+              />
             </td>
           </tr>
 }
-        </tbody>
-      </table>
-    </div>
+    }
+  </tbody>
 
-    <!-- Pagination Footer -->
-    <div class="pagination-footer">
-      <p class="pagination-info">
-        MOSTRANDO {{ bienes().length }} DE {{ paginacion().totalElements }} BIENES
-      </p>
-      <div class="pagination-controls">
-        <button class="page-btn"
-          [disabled]="paginacion().page === 0"
-          (click)="onIrAPagina(paginacion().page - 1)">
-          <span class="material-symbols-outlined">chevron_left</span>
+  <!-- Paginación (slot [dtFooter]) -->
+  <div dtFooter class="dt-footer">
+    <p class="dt-page-info">
+      Mostrando {{ bienes().length }} de {{ paginacion().totalElements }} bienes
+    </p>
+    <div class="dt-pagination">
+      <button class="dt-page-btn"
+        [disabled]="paginacion().page === 0"
+        (click)="onIrAPagina(paginacion().page - 1)">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      @for (p of paginas(); track p) {
+        <button class="dt-page-btn"
+          [class.dt-page-btn--active]="p === paginacion().page"
+          (click)="onIrAPagina(p)">
+          {{ p + 1 }}
         </button>
-        @for (p of paginas(); track p) {
-          <button class="page-btn"
-            [class.page-btn--active]="p === paginacion().page"
-            (click)="onIrAPagina(p)">
-            {{ p + 1 }}
-          </button>
-        }
-        <button class="page-btn"
-          [disabled]="paginacion().page >= paginacion().totalPages - 1"
-          (click)="onIrAPagina(paginacion().page + 1)">
-          <span class="material-symbols-outlined">chevron_right</span>
-        </button>
-      </div>
+      }
+      <button class="dt-page-btn"
+        [disabled]="paginacion().page >= paginacion().totalPages - 1"
+        (click)="onIrAPagina(paginacion().page + 1)">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
     </div>
-  
-} @else {
+  </div>
 
-    <restaurant-loading-skeleton [rows]="5" [columns]="10"></restaurant-loading-skeleton>
-  
-}
-
-  
-</div>
+</restaurant-data-table>
 
 <!-- Modales -->
 @if (showFormModal()) {
@@ -203,15 +222,6 @@
   (save)="onSaveBien($event)"
   (cancel)="showFormModal.set(false)"
 ></restaurant-bien-form>
-}
-
-@if (showDeleteModal() && selectedBien()) {
-<restaurant-bien-delete-modal
- 
-  [bien]="selectedBien()!"
-  (cancel)="showDeleteModal.set(false)"
-  (confirm)="confirmarEliminacion()"
-></restaurant-bien-delete-modal>
 }
 
 @if (showImportModal()) {

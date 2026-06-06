@@ -10,11 +10,71 @@
     </div>
     <div class="modal-body">
       <h3 class="modal-title">Traslado de Recursos Presupuestales</h3>
-      <p class="modal-subtitle">Transferencia de fondos entre rubros — en construcción.</p>
+      <p class="modal-subtitle">Transfiere fondos entre rubros del mismo presupuesto.</p>
+
+      <form [formGroup]="form" class="traslado-form">
+        <div class="form-field">
+          <label class="form-label" for="presupuestoId">Presupuesto (Ficha / Programa)</label>
+          <select id="presupuestoId" class="form-select" formControlName="presupuestoId">
+            <option value="">Seleccione un presupuesto</option>
+            @for (p of presupuestos(); track p.id) {
+              <option [value]="p.id">{{ p.label }}</option>
+            }
+          </select>
+          @if (form.controls.presupuestoId.invalid && form.controls.presupuestoId.touched) {
+            <span class="field-error">Requerido</span>
+          }
+        </div>
+
+        <div class="form-field">
+          <label class="form-label" for="rubroOrigenId">Rubro Origen (ID)</label>
+          <select id="rubroOrigenId" class="form-select" formControlName="rubroOrigenId">
+            <option value="">Seleccione el rubro origen</option>
+            @for (r of rubros(); track r.id) {
+              <option [value]="r.id">{{ r.codigo }} — {{ r.descripcion }}</option>
+            }
+          </select>
+          @if (form.controls.rubroOrigenId.invalid && form.controls.rubroOrigenId.touched) {
+            <span class="field-error">Requerido</span>
+          }
+        </div>
+
+        <div class="form-field">
+          <label class="form-label" for="rubroDestinoId">Rubro Destino (ID)</label>
+          <select id="rubroDestinoId" class="form-select" formControlName="rubroDestinoId">
+            <option value="">Seleccione el rubro destino</option>
+            @for (r of rubros(); track r.id) {
+              <option [value]="r.id">{{ r.codigo }} — {{ r.descripcion }}</option>
+            }
+          </select>
+          @if (form.controls.rubroDestinoId.invalid && form.controls.rubroDestinoId.touched) {
+            <span class="field-error">Requerido</span>
+          }
+        </div>
+
+        <div class="form-field">
+          <label class="form-label" for="monto">Monto a Trasladar (COP)</label>
+          <input
+            id="monto"
+            class="form-input"
+            type="number"
+            min="1"
+            formControlName="monto"
+            placeholder="0" />
+          @if (form.controls.monto.invalid && form.controls.monto.touched) {
+            <span class="field-error">Monto requerido y mayor a 0</span>
+          }
+        </div>
+      </form>
     </div>
     <div class="modal-footer">
       <restaurant-button variant="surface" (click)="closeModal()">Cancelar</restaurant-button>
-      <restaurant-button variant="primary" [disabled]="true">Confirmar Traslado</restaurant-button>
+      <restaurant-button
+        variant="primary"
+        [disabled]="form.invalid || loading()"
+        (click)="onSubmit()">
+        Confirmar Traslado
+      </restaurant-button>
     </div>
   </div>
 </div>

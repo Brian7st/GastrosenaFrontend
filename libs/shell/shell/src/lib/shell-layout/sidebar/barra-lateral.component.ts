@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { LucideBox, LucideDynamicIcon, LucideLogOut, LucideSettings, LucideUser } from '@lucide/angular';
 import { AuthService } from '@restaurant/shared/auth';
 import { BarraLateralConfig } from '../../nav/nav.models';
+import { AsistenteUiService } from '../asistente/asistente-ui.service';
 
 @Component({
   selector: 'restaurant-barra-lateral',
@@ -22,6 +23,7 @@ import { BarraLateralConfig } from '../../nav/nav.models';
 })
 export class BarraLateralComponent {
   private readonly authService = inject(AuthService);
+  protected readonly asistente = inject(AsistenteUiService);
 
   @Input() config: BarraLateralConfig = {
     titulo: 'Mi App',

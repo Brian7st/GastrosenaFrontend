@@ -545,8 +545,8 @@ export class RestauranteFacade {
     });
   }
 
-  facturarPedido(pedidoId: string, metodoPago: MetodoPago, propina: number = 0): void {
-    const request: FacturarPedidoRequest = { pedidoId, metodoPago, propina };
+  facturarPedido(pedidoId: string, metodoPago: MetodoPago): void {
+    const request: FacturarPedidoRequest = { pedidoId, metodoPago };
     this.restauranteService.facturarPedido(request).subscribe({
       next: (factura) => {
         this._pedidosParaCobro.update(lista => lista.filter(p => p.id !== pedidoId));
@@ -571,6 +571,6 @@ export class RestauranteFacade {
       'Cortesía': 'CORTESIA'
     };
     const metodoPago: MetodoPago = metodoMap[metodo] || 'EFECTIVO';
-    this.facturarPedido(pedidoId, metodoPago, 0);
+    this.facturarPedido(pedidoId, metodoPago);
   }
 }

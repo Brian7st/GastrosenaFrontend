@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { ButtonComponent, KpiCardComponent, LoadingSkeletonComponent } from '@restaurant/shared/ui';
+import { ButtonComponent, DataTableComponent, KpiCardComponent, LoadingSkeletonComponent } from '@restaurant/shared/ui';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { BienFormComponent } from '../../../ui/modals/bien-form/bien-form.component';
 import { BienImportModalComponent, BienImportPayload } from '../../modals/bien-import/bien-import.component';
-import { BienDeleteModalComponent } from '../../modals/bien-delete-modal/bien-delete-modal.component';
-import { Bien, BienFormDto, EstadoBien } from '../../../models/inventario.model';
+import { Bien, BienFormDto, EstadoBien, BienFiltros } from '../../../models/inventario.model';
+import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
+import { CATEGORIAS_BIEN } from '../../../models/categorias.model';
 
 @Component({
   selector: 'restaurant-bienes-list',
@@ -14,11 +15,12 @@ import { Bien, BienFormDto, EstadoBien } from '../../../models/inventario.model'
   imports: [
     CommonModule,
     ButtonComponent,
+    DataTableComponent,
     KpiCardComponent,
     LoadingSkeletonComponent,
     BienFormComponent,
     BienImportModalComponent,
-    BienDeleteModalComponent,
+    EmptyStateComponent,
   ],
   templateUrl: './bienes-list.component.html',
   styleUrl: './bienes-list.component.scss',
@@ -38,11 +40,20 @@ export class BienesListPageComponent implements OnInit {
     Array.from({ length: this.paginacion().totalPages }, (_, i) => i)
   );
 
-  showFilters = signal(false);
+  readonly CATEGORIAS = CATEGORIAS_BIEN;
+  showFilters     = signal(false);
+  filtroCategoria = signal<string>('');
+  filtroEstado    = signal<EstadoBien | ''>('');
+
+  filtrosActivos = computed(() => {
+    let count = 0;
+    if (this.filtroCategoria()) count++;
+    if (this.filtroEstado())    count++;
+    return count;
+  });
 
   // Modal controls
   showFormModal = signal(false);
-  showDeleteModal = signal(false);
   showImportModal = signal(false);
   formMode = signal<'create' | 'edit'>('create');
   selectedBien = signal<Bien | undefined>(undefined);
@@ -51,8 +62,34 @@ export class BienesListPageComponent implements OnInit {
     this.facade.loadAll();
   }
 
+  onToggleFilters(): void {
+    this.showFilters.update(v => !v);
+  }
+
   onSearch(query: string): void {
     this.facade.cargarBienes({ busqueda: query });
+  }
+
+  onFiltroCategoria(value: string): void {
+    this.filtroCategoria.set(value);
+    const filtros: BienFiltros = {};
+    if (value)                    filtros.categoria = value;
+    if (this.filtroEstado())      filtros.estado    = this.filtroEstado() as EstadoBien;
+    this.facade.cargarBienes(filtros);
+  }
+
+  onFiltroEstado(value: string): void {
+    this.filtroEstado.set(value as EstadoBien | '');
+    const filtros: BienFiltros = {};
+    if (value)                      filtros.estado    = value as EstadoBien;
+    if (this.filtroCategoria())     filtros.categoria = this.filtroCategoria();
+    this.facade.cargarBienes(filtros);
+  }
+
+  onLimpiarFiltros(): void {
+    this.filtroCategoria.set('');
+    this.filtroEstado.set('');
+    this.facade.cargarBienes({ categoria: undefined, estado: undefined, busqueda: undefined });
   }
 
   onIrAPagina(page: number): void {
@@ -116,18 +153,6 @@ export class BienesListPageComponent implements OnInit {
 
   onActivar(bien: Bien): void {
     this.facade.activarBien(bien.id);
-  }
-
-  onEliminar(bien: Bien): void {
-    this.selectedBien.set(bien);
-    this.showDeleteModal.set(true);
-  }
-
-  confirmarEliminacion(): void {
-    if (this.selectedBien()) {
-      this.facade.eliminarBien(this.selectedBien()!.id);
-      this.showDeleteModal.set(false);
-    }
   }
 
   getEstadoBadgeClass(estado: EstadoBien): string {

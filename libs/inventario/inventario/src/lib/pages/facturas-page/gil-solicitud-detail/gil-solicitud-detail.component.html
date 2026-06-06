@@ -5,31 +5,31 @@
   <div class="topbar">
     <div class="topbar__left">
       <button class="back-link" (click)="onVolver()">
-        <span class="material-symbols-outlined">arrow_back</span>
+        <lucide-icon name="arrow-left" [size]="18"></lucide-icon>
         Volver
       </button>
       <span class="breadcrumb-sep">/</span>
       <span class="breadcrumb-label">Solicitudes GIL</span>
     </div>
     <div class="topbar__actions">
-      <button class="btn btn--ghost" (click)="onEditar()">
-        <span class="material-symbols-outlined">edit</span>
+      <restaurant-button variant="ghost" (click)="onEditar()">
+        <lucide-icon name="pencil" [size]="16"></lucide-icon>
         Editar
-      </button>
-      <button class="btn btn--outline" (click)="onDescargarPDF()">
-        <span class="material-symbols-outlined">picture_as_pdf</span>
+      </restaurant-button>
+      <restaurant-button variant="surface" (click)="onDescargarPDF()">
+        <lucide-icon name="file-text" [size]="16"></lucide-icon>
         Descargar PDF
-      </button>
+      </restaurant-button>
       @if (s.estadoSolicitud === 'BORRADOR') {
-        <button class="btn btn--primary" id="btn-enviar-aprobacion" (click)="onEnviarAprobacion()">
+        <restaurant-button variant="primary" id="btn-enviar-aprobacion" (click)="onEnviarAprobacion()">
           Enviar a Aprobación
-        </button>
+        </restaurant-button>
       }
     </div>
   </div>
 
   <!-- ── TITLE ── -->
-  <h1 class="gil-title">{{ s.id }}</h1>
+  <h1 class="gil-title">{{ s.numeroGil || s.id }}</h1>
 
   <!-- ── TIMELINE ── -->
   <div class="timeline-container">
@@ -41,13 +41,13 @@
     >
       <div class="timeline-step__icon">
         @if (getStepState(step, s.estadoSolicitud) === 'active') {
-<span class="material-symbols-outlined">play_arrow</span>
+<lucide-icon name="clock" [size]="18"></lucide-icon>
 }
         @if (getStepState(step, s.estadoSolicitud) === 'done') {
-<span class="material-symbols-outlined">check</span>
+<lucide-icon name="check-circle" [size]="18"></lucide-icon>
 }
         @if (getStepState(step, s.estadoSolicitud) === 'pending') {
-<span class="material-symbols-outlined">radio_button_unchecked</span>
+<lucide-icon name="circle" [size]="18"></lucide-icon>
 }
       </div>
       <span class="timeline-step__label">{{ step | uppercase }}</span>
@@ -67,7 +67,7 @@
       <!-- Info Sesión -->
       <div class="detail-card">
         <div class="detail-card__header">
-          <span class="material-symbols-outlined">calendar_month</span>
+          <lucide-icon name="calendar" [size]="18"></lucide-icon>
           <h2>Información de la Sesión</h2>
         </div>
         <div class="info-grid">
@@ -75,14 +75,12 @@
             <span class="info-item__label">Nombre del Vocero</span>
             <span class="info-item__value">{{ s.nombreVocero }}</span>
           </div>
-          <div class="info-item">
-            <span class="info-item__label">Horarios</span>
-            <span class="info-item__value">{{ s.horarios }}</span>
-          </div>
-          <div class="info-item info-item--full">
-            <span class="info-item__label">Resultado de Aprendizaje (RA)</span>
-            <span class="info-item__value">{{ s.resultadoAprendizaje }}</span>
-          </div>
+          @if (s.resultadoAprendizaje) {
+            <div class="info-item info-item--full">
+              <span class="info-item__label">Resultado de Aprendizaje (RA)</span>
+              <span class="info-item__value">{{ s.resultadoAprendizaje }}</span>
+            </div>
+          }
         </div>
       </div>
 
@@ -92,7 +90,10 @@
         <div class="detail-card status-card">
           <span class="info-item__label">Estado de Solicitud</span>
           <div class="status-badge-wrap">
-            <span class="status-pill">{{ s.estadoSolicitud }}</span>
+            <restaurant-status-badge
+              [label]="s.estadoSolicitud"
+              [variant]="getEstadoVariant(s.estadoSolicitud)"
+            ></restaurant-status-badge>
             <span class="status-date">Creado el {{ s.fechaCreacion | date:'dd MMM yyyy' }}</span>
           </div>
           <div class="total-amount">{{ formatMoney(s.totalEstimado) }}</div>
@@ -121,9 +122,21 @@
               <span class="info-item__value">{{ s.areaPrograma }}</span>
             </div>
             <div class="info-item">
-              <span class="info-item__label">Cuentadante Responsable</span>
-              <span class="info-item__value">{{ s.cuentadanteResponsable }}</span>
+              <span class="info-item__label">Cuentadante(s)</span>
+              <span class="info-item__value">{{ (s.cuentadantes?.length ? s.cuentadantes : [s.cuentadanteResponsable]).join(', ') || '—' }}</span>
             </div>
+            @if (s.solicitante) {
+              <div class="info-item">
+                <span class="info-item__label">Solicitante</span>
+                <span class="info-item__value">{{ s.solicitante }}</span>
+              </div>
+            }
+            @if (s.codigoGrupo) {
+              <div class="info-item">
+                <span class="info-item__label">Código de Grupo</span>
+                <span class="info-item__value">{{ s.codigoGrupo }}</span>
+              </div>
+            }
             <div class="info-item">
               <span class="info-item__label">Destino del Bien</span>
               <span class="info-item__value">{{ s.destinoBien }}</span>
@@ -137,82 +150,54 @@
     <!-- RIGHT COLUMN -->
     <div class="detail-right">
 
-      <!-- Pre-Facturas -->
+      <!-- Bienes del GIL -->
       <div class="detail-card">
         <div class="detail-card__header">
-          <span class="material-symbols-outlined">receipt</span>
-          <h2>Pre-Facturas Asociadas</h2>
-          <span class="count-badge">{{ s.preFacturas.length }} DOCUMENTOS</span>
+          <lucide-icon name="package" [size]="18"></lucide-icon>
+          <h2>Bienes del GIL</h2>
+          <span class="count-badge">{{ (s.bienes?.length ?? 0) }} ÍTEMS</span>
         </div>
 
-        <div class="prefacturas-list">
-          @for (pf of s.preFacturas; track pf) {
-<div class="prefactura-item">
-            <div class="prefactura-header">
-              <div class="prefactura-header__left">
-                <span class="material-symbols-outlined">receipt_long</span>
-                <div>
-                  <p class="prefactura-id">{{ pf.id }}</p>
-                  <p class="prefactura-proveedor">Proveedor: {{ pf.proveedor }}</p>
-                </div>
-              </div>
-              <span class="prefactura-total">{{ formatMoney(pf.subtotal) }}</span>
-            </div>
-
+        @if (s.bienes?.length) {
+          <div class="bienes-table-scroll">
             <table class="pf-items-table">
               <thead>
                 <tr>
-                  <th>Ítem / Descripción</th>
-                  <th>Cant.</th>
-                  <th>Unitario</th>
-                  <th>Subtotal</th>
+                  <th>Código SENA</th>
+                  <th>Descripción</th>
+                  <th>Unidad</th>
+                  <th class="td--center">Cant.</th>
+                  <th class="td--right">Vr. Unitario</th>
+                  <th class="td--center">IVA %</th>
+                  <th class="td--right">Subtotal</th>
                 </tr>
               </thead>
               <tbody>
-                @for (item of pf.items; track item) {
-<tr>
-                  <td>{{ item.descripcion }}</td>
-                  <td class="td--center">{{ item.cantidad }}</td>
-                  <td class="td--right">{{ formatMoney(item.precioUnitario) }}</td>
-                  <td class="td--right td--bold">{{ formatMoney(item.total) }}</td>
-                </tr>
-}
+                @for (bien of s.bienes; track bien.codigoSena) {
+                  <tr>
+                    <td class="td--mono">{{ bien.codigoSena }}</td>
+                    <td>{{ bien.descripcion }}</td>
+                    <td>{{ bien.unidadMedida }}</td>
+                    <td class="td--center">{{ bien.cantidad }}</td>
+                    <td class="td--right">{{ formatMoney(bien.valorUnitario) }}</td>
+                    <td class="td--center">{{ bien.iva }}%</td>
+                    <td class="td--right td--bold">{{ formatMoney(bien.subtotal) }}</td>
+                  </tr>
+                }
               </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="6" class="td--right td--bold">Total estimado</td>
+                  <td class="td--right td--bold">{{ formatMoney(s.totalEstimado) }}</td>
+                </tr>
+              </tfoot>
             </table>
           </div>
-}
-        </div>
+        } @else {
+          <p class="empty-hint">Este GIL no tiene bienes registrados.</p>
+        }
       </div>
 
-      <!-- Observaciones -->
-      <div class="detail-card">
-        <div class="detail-card__header">
-          <span class="material-symbols-outlined">chat_bubble</span>
-          <h2>Observaciones y Justificación</h2>
-        </div>
-        <blockquote class="observacion-quote">{{ s.observaciones }}</blockquote>
-
-        @if (s.comentarios?.length) {
-<div class="comentarios-row">
-          @for (c of s.comentarios; track c) {
-<div class="comentario-bubble">{{ c }}</div>
-}
-          <button class="btn-comentario">Añadir comentario +</button>
-        </div>
-}
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ── FOOTER (hash) ── -->
-  <div class="gil-footer">
-    <span class="hash-id">ID TRANSACCIÓN: {{ s.idTransaccion }}</span>
-    <span class="hash-sep">|</span>
-    <span class="hash-val">HASH: {{ s.hashTransaccion }}</span>
-    <div class="hash-seal">
-      <span class="material-symbols-outlined">verified</span>
-      VALIDADO BAJO ESTÁNDAR SENA-GIL-2024
     </div>
   </div>
 

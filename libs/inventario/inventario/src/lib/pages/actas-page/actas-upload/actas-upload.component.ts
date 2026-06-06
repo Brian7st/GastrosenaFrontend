@@ -9,6 +9,7 @@ import {
 import { Router, ActivatedRoute } from '@angular/router';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 import { ActasFacade } from '../../../data-access/actas.facade';
+import { ActasService } from '../../../data-access/services/actas.service';
 
 @Component({
   selector: 'restaurant-actas-upload',
@@ -22,6 +23,7 @@ export class ActasUploadComponent {
   private router       = inject(Router);
   private route        = inject(ActivatedRoute);
   private actasFacade  = inject(ActasFacade);
+  private actasService = inject(ActasService);
 
   isDragging          = signal(false);
   archivoSeleccionado = signal<File | null>(null);
@@ -67,14 +69,29 @@ export class ActasUploadComponent {
   /**
    * El backend no almacena el archivo; confirmar carga avanza el acta a FIRMADA.
    * El descuento de stock se activa automáticamente en el backend (ActaFirmadaListener).
+   * Se suscribe al resultado: solo navega en éxito; si falla (ej. firmas faltantes
+   * o stock insuficiente) muestra el error y NO cierra el modal.
    */
   confirmarCarga(): void {
     if (!this.puedeConfirmar() || !this.actaId) return;
     this.procesando.set(true);
     this.error.set(null);
-    this.actasFacade.cambiarEstado(this.actaId, 'FIRMADA');
-    this.procesando.set(false);
-    this.cerrar();
+
+    this.actasService.cambiarEstado(this.actaId, 'FIRMADA').subscribe({
+      next: () => {
+        this.actasFacade.cargarActa(this.actaId);
+        this.procesando.set(false);
+        this.cerrar();
+      },
+      error: (err) => {
+        this.procesando.set(false);
+        const detalle = (err?.error?.detail as string | undefined) ?? '';
+        this.error.set(
+          detalle ||
+          'No se pudo firmar el acta. Verificá que ambas firmas estén registradas y que haya stock suficiente.'
+        );
+      },
+    });
   }
 
   cerrar(): void {
