@@ -59,6 +59,13 @@ export const USUARIOS_ROUTES: Routes = [
             m => m.FichasPageComponent,
           ),
       },
+      {
+        path: 'comentarios-admin',
+        loadComponent: () =>
+          import('./pages/comentarios-admin-page/comentarios-admin.component').then(
+            m => m.ComentariosAdminComponent
+          ),
+      },
     ],
   },
 ];

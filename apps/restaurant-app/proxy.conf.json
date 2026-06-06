@@ -1,12 +1,4 @@
 {
-  "//": "MAPA DE PUERTOS — mantener sincronizado con docker-compose.yml",
-  "// restaurante": "8080 | inventario: 8081 | cocina: 8082 | barbarismo: 8086 | usuarios: 8087",
-
-  "/api/auth": {
-    "target": "http://localhost:8087",
-    "secure": false,
-    "changeOrigin": true
-  },
   "/api/barybarismo": {
     "target": "http://localhost:8086",
     "secure": false,
@@ -14,17 +6,17 @@
     "pathRewrite": { "^/api/barybarismo": "/api/barybarismo" }
   },
   "/api/v1/catalog": {
-    "target": "http://localhost:8081",
+    "target": "http://localhost:8080",
     "secure": false,
     "changeOrigin": true
   },
   "/api/v1/inventory": {
-    "target": "http://localhost:8081",
+    "target": "http://localhost:8080",
     "secure": false,
     "changeOrigin": true
   },
   "/api/v1": {
-    "target": "http://localhost:8081",
+    "target": "http://localhost:8080",
     "secure": false,
     "changeOrigin": true
   },

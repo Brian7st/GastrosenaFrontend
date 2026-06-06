@@ -2,6 +2,7 @@ import { Rol } from '@restaurant/shared/models';
 
 export interface NavItem {
   label: string;
+  tKey?: string;
   ruta: string;
   icono?: string;
   exact?: boolean;
@@ -14,6 +15,7 @@ export interface NavItem {
 
 export interface NavGrupo {
   etiqueta: string;
+  tKey?: string;
   items: NavItem[];
 }
 

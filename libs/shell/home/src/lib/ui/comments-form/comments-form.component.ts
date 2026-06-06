@@ -1,33 +1,57 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  inject,
+  signal,
+} from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { AlertComponent }    from '@restaurant/shared/ui';
-import { CommentsService }   from '../../data-access/comments.service';
+import { DatePipe } from '@angular/common';
+import { AlertComponent } from '@restaurant/shared/ui';
+import { CommentsService, ComentarioResponse } from '../../data-access/comments.service';
 
 @Component({
   selector: 'restaurant-comments-form',
   standalone: true,
-  imports: [ReactiveFormsModule, AlertComponent],
+  imports: [ReactiveFormsModule, AlertComponent, DatePipe],
   templateUrl: './comments-form.component.html',
   styleUrl: './comments-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CommentsFormComponent {
-  private fb              = inject(FormBuilder);
-  private commentsService = inject(CommentsService);
+export class CommentsFormComponent implements OnInit {
+  private readonly fb              = inject(FormBuilder);
+  private readonly commentsService = inject(CommentsService);
 
   isLoading      = signal(false);
+  isLoadingForo  = signal(false);
   successMessage = signal('');
   errorMessage   = signal('');
+  comentarios    = signal<ComentarioResponse[]>([]);
 
   form = this.fb.group({
-    name:    ['', [Validators.required, Validators.minLength(2)]],
-    email:   ['', [Validators.required, Validators.email]],
-    message: ['', [Validators.required, Validators.minLength(10)]],
+    nombre:     ['', [Validators.required, Validators.minLength(3), Validators.maxLength(80)]],
+    titulo:     ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
+    comentario: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(1000)]],
   });
 
-  get name()    { return this.form.get('name')!;    }
-  get email()   { return this.form.get('email')!;   }
-  get message() { return this.form.get('message')!; }
+  get nombre()     { return this.form.get('nombre')!;     }
+  get titulo()     { return this.form.get('titulo')!;     }
+  get comentario() { return this.form.get('comentario')!; }
+
+  ngOnInit(): void {
+    this.cargarComentarios();
+  }
+
+  cargarComentarios(): void {
+    this.isLoadingForo.set(true);
+    this.commentsService.obtenerAprobados().subscribe({
+      next: res => {
+        this.comentarios.set(res.content);
+        this.isLoadingForo.set(false);
+      },
+      error: () => this.isLoadingForo.set(false),
+    });
+  }
 
   onSubmit(): void {
     if (this.form.invalid || this.isLoading()) return;
@@ -36,21 +60,26 @@ export class CommentsFormComponent {
     this.successMessage.set('');
     this.errorMessage.set('');
 
-    const { name, email, message } = this.form.getRawValue();
-    this.commentsService.sendComment({ name: name!, email: email!, message: message! }).subscribe({
-      next: res => {
+    const { nombre, titulo, comentario } = this.form.getRawValue();
+
+    this.commentsService.crearComentario({
+      nombre:     nombre!,
+      titulo:     titulo!,
+      comentario: comentario!,
+    }).subscribe({
+      next: () => {
         this.isLoading.set(false);
-        if (res.success) {
-          this.successMessage.set(res.message);
-          this.form.reset();
-        } else {
-          this.errorMessage.set(res.message);
-        }
+        this.successMessage.set('¡Comentario enviado! Será visible una vez aprobado.');
+        this.form.reset();
       },
       error: () => {
         this.isLoading.set(false);
-        this.errorMessage.set('Ocurrió un error al enviar tu mensaje. Intenta de nuevo.');
+        this.errorMessage.set('Ocurrió un error al enviar tu comentario. Intenta de nuevo.');
       },
     });
+  }
+
+  getInitials(nombre: string): string {
+    return nombre.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   }
 }

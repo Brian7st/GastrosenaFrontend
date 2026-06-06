@@ -19,6 +19,7 @@ import {
 } from '@restaurant/shared/ui';
 import { AuthService } from '@restaurant/shared/auth';
 import { UsuariosService } from '@restaurant/usuarios';
+import { I18nService } from '../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-perfil-page',
@@ -40,6 +41,7 @@ export class PerfilPageComponent implements OnInit {
   private readonly usuariosService = inject(UsuariosService);
   private readonly fb              = inject(FormBuilder);
   private readonly http            = inject(HttpClient);
+  protected readonly i18n = inject(I18nService);
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
@@ -123,13 +125,13 @@ export class PerfilPageComponent implements OnInit {
         },
         error: () => {
           this.subiendo.set(false);
-          alert('Error al guardar la foto');
+          alert(this.i18n.t('perfil.error_foto'));
         }
       });
     },
     error: () => {
       this.subiendo.set(false);
-      alert('Error al subir la foto a Cloudinary');
+      alert(this.i18n.t('perfil.error_cloudinary'));
     },
   });
 }
@@ -160,7 +162,7 @@ export class PerfilPageComponent implements OnInit {
       error: (err) => {
         this.guardando.set(false);
         console.error('Error al actualizar perfil', err);
-        alert('Error al guardar los datos');
+        alert(this.i18n.t('perfil.error_guardar'));
       },
     });
   }
@@ -173,7 +175,7 @@ export class PerfilPageComponent implements OnInit {
     }
     const { contrasenaActual, nuevaContrasena, confirmar } = form.value;
     if (nuevaContrasena !== confirmar) {
-      alert('Las contraseñas nuevas no coinciden');
+      alert(this.i18n.t('perfil.error_contrasenas'));
       return;
     }
     this.guardando.set(true);
@@ -188,7 +190,7 @@ export class PerfilPageComponent implements OnInit {
         },
         error: () => {
           this.guardando.set(false);
-          alert('Error al cambiar contraseña. Verifique la contraseña actual.');
+          alert(this.i18n.t('perfil.error_cambiar_contrasena'));
         },
       });
   }

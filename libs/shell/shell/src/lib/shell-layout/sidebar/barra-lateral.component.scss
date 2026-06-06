@@ -210,8 +210,8 @@ $verde-sena-hover: rgba($verde-sena-nuevo, 0.05);
   }
 
   &__chevron {
-    width: 0.875rem;
-    height: 0.875rem;
+    width: 0.75rem;
+    height: 0.75rem;
     flex-shrink: 0;
     margin-left: auto;
     color: var(--color-pizarra-400);
@@ -236,9 +236,13 @@ $verde-sena-hover: rgba($verde-sena-nuevo, 0.05);
     border-radius: 0.375rem;
     text-decoration: none;
     color: var(--color-pizarra-500);
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
     font-weight: 400;
     transition: all 0.15s ease;
+
+    .barra-lateral__texto {
+      font-size: 0.75rem;
+    }
 
     &:hover {
       background-color: $verde-sena-hover;
@@ -260,8 +264,7 @@ $verde-sena-hover: rgba($verde-sena-nuevo, 0.05);
   }
 
   &__subicono {
-    width: 0.875rem;
-    height: 0.875rem;
+    font-size: 0.75rem;
     flex-shrink: 0;
     color: var(--color-pizarra-400);
     transition: color 0.15s ease;

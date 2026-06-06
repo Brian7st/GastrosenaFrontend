@@ -170,17 +170,19 @@
           </button>
         </div>
 
-        <restaurant-button
-          variant="primary"
-          type="submit"
-          [disabled]="loading()"
-        >
-          @if (!loading()) {
-            Iniciar Sesión
-          } @else {
-            <span class="auth-spinner"></span>
-          }
-        </restaurant-button>
+        <div class="auth-submit">
+          <restaurant-button
+            variant="primary"
+            type="submit"
+            [disabled]="loading()"
+          >
+            @if (!loading()) {
+              Iniciar Sesión
+            } @else {
+              <span class="auth-spinner"></span>
+            }
+          </restaurant-button>
+        </div>
 
       </form>
 

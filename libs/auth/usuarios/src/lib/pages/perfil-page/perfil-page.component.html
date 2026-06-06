@@ -1,8 +1,8 @@
 <div class="perfil-wrapper">
 
   <restaurant-page-header
-    title="Mi Perfil"
-    subtitle="Administra tu información personal y preferencias"
+    [title]="i18n.t('perfil.titulo')"
+    [subtitle]="i18n.t('perfil.subtitulo')"
   />
 
   <!-- Header de perfil -->
@@ -10,7 +10,7 @@
     <div class="perfil-header__avatar-wrapper">
       <div class="perfil-header__avatar" (click)="triggerFileInput()">
         @if (fotoUrl()) {
-          <img [src]="fotoUrl()" alt="Foto de perfil" class="perfil-header__foto"/>
+          <img [src]="fotoUrl()" [alt]="i18n.t('perfil.foto_alt')" class="perfil-header__foto"/>
         } @else {
           {{ iniciales() }}
         }
@@ -32,7 +32,7 @@
         <lucide-icon name="user" [size]="14"></lucide-icon>
         <span>{{ usuario?.rol }}</span>
         <span class="perfil-header__dot">•</span>
-        <restaurant-status-badge label="Activo" variant="success" />
+        <restaurant-status-badge [label]="i18n.t('perfil.activo')" variant="success" />
       </div>
       <p class="perfil-header__email">{{ usuario?.email }}</p>
     </div>
@@ -42,51 +42,51 @@
   <div class="perfil-card">
     <div class="perfil-card__title">
       <lucide-icon name="user" [size]="18"></lucide-icon>
-      <h3>Información Personal</h3>
+      <h3>{{ i18n.t('perfil.info_personal') }}</h3>
     </div>
     <form [formGroup]="infoForm" class="perfil-form">
       <div class="perfil-form__row">
         <restaurant-input
-          label="Nombre"
-          placeholder="Tu nombre"
+          [label]="i18n.t('perfil.nombre')"
+          [placeholder]="i18n.t('perfil.nombre_placeholder')"
           type="text"
           icon="user"
           formControlName="nombre"
-          [error]="infoForm.get('nombre')?.invalid && infoForm.get('nombre')?.touched ? 'Campo requerido' : null"
+          [error]="infoForm.get('nombre')?.invalid && infoForm.get('nombre')?.touched ? i18n.t('perfil.campo_requerido') : null"
         />
         <restaurant-input
-          label="Apellidos"
-          placeholder="Tus apellidos"
+          [label]="i18n.t('perfil.apellidos')"
+          [placeholder]="i18n.t('perfil.apellidos_placeholder')"
           type="text"
           icon="user"
           formControlName="apellidos"
-          [error]="infoForm.get('apellidos')?.invalid && infoForm.get('apellidos')?.touched ? 'Campo requerido' : null"
+          [error]="infoForm.get('apellidos')?.invalid && infoForm.get('apellidos')?.touched ? i18n.t('perfil.campo_requerido') : null"
         />
         <restaurant-input
-          label="Email"
-          placeholder="tu@email.com"
+          [label]="i18n.t('perfil.email')"
+          [placeholder]="i18n.t('perfil.email_placeholder')"
           type="email"
           icon="mail"
           formControlName="email"
-          [error]="infoForm.get('email')?.invalid && infoForm.get('email')?.touched ? 'Email inválido' : null"
+          [error]="infoForm.get('email')?.invalid && infoForm.get('email')?.touched ? i18n.t('perfil.email_invalido') : null"
         />
       </div>
       <div class="perfil-form__row">
         <restaurant-input
-          label="Documento"
-          placeholder="Número de documento"
+          [label]="i18n.t('perfil.documento')"
+          [placeholder]="i18n.t('perfil.documento_placeholder')"
           type="text"
           icon="credit-card"
           formControlName="documento"
-          [error]="infoForm.get('documento')?.invalid && infoForm.get('documento')?.touched ? 'Campo requerido' : null"
+          [error]="infoForm.get('documento')?.invalid && infoForm.get('documento')?.touched ? i18n.t('perfil.campo_requerido') : null"
         />
         <restaurant-input
-          label="Teléfono"
-          placeholder="+57 300 000 0000"
+          [label]="i18n.t('perfil.telefono')"
+          [placeholder]="i18n.t('perfil.telefono_placeholder')"
           type="tel"
           icon="phone"
           formControlName="telefono"
-          [error]="infoForm.get('telefono')?.invalid && infoForm.get('telefono')?.touched ? 'Campo requerido' : null"
+          [error]="infoForm.get('telefono')?.invalid && infoForm.get('telefono')?.touched ? i18n.t('perfil.campo_requerido') : null"
         />
       </div>
     </form>
@@ -96,25 +96,25 @@
   <div class="perfil-card">
     <div class="perfil-card__title">
       <lucide-icon name="shield-check" [size]="18"></lucide-icon>
-      <h3>Cambiar Contraseña</h3>
+      <h3>{{ i18n.t('perfil.cambiar_contrasena') }}</h3>
     </div>
     <form [formGroup]="seguridadForm" class="perfil-form">
       <restaurant-input
-        label="Contraseña Actual"
+        [label]="i18n.t('perfil.contrasena_actual')"
         placeholder="••••••••"
         type="password"
         icon="shield-check"
         formControlName="contrasenaActual"
       />
       <restaurant-input
-        label="Nueva Contraseña"
+        [label]="i18n.t('perfil.nueva_contrasena')"
         placeholder="••••••••"
         type="password"
         icon="shield-check"
         formControlName="nuevaContrasena"
       />
       <restaurant-input
-        label="Confirmar Contraseña"
+        [label]="i18n.t('perfil.confirmar_contrasena')"
         placeholder="••••••••"
         type="password"
         icon="shield-check"
@@ -124,7 +124,7 @@
         <restaurant-button variant="primary" (click)="onCambiarContrasena()" [disabled]="guardando()">
           @if (!guardando()) {
             <lucide-icon name="shield-check" [size]="16"></lucide-icon>
-            Cambiar Contraseña
+            {{ i18n.t('perfil.btn_cambiar_contrasena') }}
           } @else {
             <span class="perfil-spinner"></span>
           }
@@ -135,19 +135,19 @@
 
   <!-- Mensaje de éxito -->
   @if (exito()) {
-    <div class="perfil-exito">¡Cambios guardados exitosamente!</div>
+    <div class="perfil-exito">{{ i18n.t('perfil.exito') }}</div>
   }
 
   <!-- Botones de acción -->
   <div class="perfil-actions">
     <restaurant-button variant="surface" (click)="onCancelar()">
       <lucide-icon name="x" [size]="16"></lucide-icon>
-      Cancelar
+      {{ i18n.t('perfil.cancelar') }}
     </restaurant-button>
     <restaurant-button variant="primary" (click)="onGuardar()" [disabled]="guardando()">
       @if (!guardando()) {
         <lucide-icon name="save" [size]="16"></lucide-icon>
-        Guardar Cambios
+        {{ i18n.t('perfil.guardar') }}
       } @else {
         <span class="perfil-spinner"></span>
       }

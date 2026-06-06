@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
   signal,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
@@ -10,6 +11,7 @@ import {
   DataTableComponent,
   LucideIconComponent,
 } from '@restaurant/shared/ui';
+import { I18nService } from '../../i18n/i18n.service';
 
 export interface Ficha {
   readonly id:          string;
@@ -36,6 +38,7 @@ type EstadoFiltro = 'todos' | 'activas' | 'inactivas';
   styleUrl:    './fichas-page.component.scss',
 })
 export class FichasPageComponent {
+  protected readonly i18n = inject(I18nService);
   readonly fichas = signal<Ficha[]>([]);
 
   readonly busqueda     = signal('');
@@ -125,7 +128,7 @@ export class FichasPageComponent {
   }
 
   onEliminar(id: string): void {
-    if (!confirm('¿Eliminár esta ficha? Esta acción no se puede deshacer.')) { return; }
+    if (!confirm(this.i18n.t('fichas.confirmar_eliminar'))) { return; }
     this.fichas.update(lista => lista.filter(f => f.id !== id));
   }
 }
