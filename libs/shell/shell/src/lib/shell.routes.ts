@@ -64,6 +64,13 @@ export const shellRoutes: Routes = [
         canActivate: [permissionGuard(['USUARIOS_LISTAR', 'USUARIOS_VER'])],
         loadChildren: () => import('@restaurant/usuarios').then(m => m.USUARIOS_ROUTES),
       },
+
+          {
+      path: 'fichas',
+      canActivate: [roleGuard([Rol.ADMINISTRADOR])], // solo admin puede ver fichas
+      loadComponent: () => import('@restaurant/usuarios').then(m => m.FichasPageComponent),
+    },
+    
       {
         path: 'reportes',
         canActivate: [permissionGuard(['MODULO_REPORTES_VER', 'REPORTES_GESTIONAR', 'REPORTES_PEDIDOS_COCINA', 'REPORTES_VENTAS_MESERO'])],

@@ -7,3 +7,4 @@ export * from './lib/data-access/usuarios.service';
 export * from './lib/pages/perfil-page/perfil-page.component';
 export * from './lib/data-access/usuarios.service'; // ← Agrega esta línea
 // el resto de exports...
+export * from './lib/pages/fichas-page/fichas-page.component';
