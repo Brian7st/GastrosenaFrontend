@@ -47,23 +47,25 @@ export class ConciliacionTomaFisicaComponent implements OnInit {
   loading = computed(() => this.facade.loading());
   error   = computed(() => this.facade.error());
 
+  // Los effect() se crean en el inicializador de campo (contexto de inyección).
+  // Crearlos en ngOnInit lanzaría NG0203 y la siembra de datos nunca correría.
+  private readonly seedEffect = effect(() => {
+    const loaded = this.facade.tomaFisicaItems();
+    if (loaded.length > 0 && this.items().length === 0) {
+      this.items.set([...loaded]);
+    }
+  }, { allowSignalWrites: true });
+
+  // Navega al detalle cuando el backend confirma la conciliación creada
+  private readonly navEffect = effect(() => {
+    const id = this.facade.ultimaConciliacionId();
+    if (id) {
+      this.router.navigate(['/inventario/conciliacion', id]);
+    }
+  });
+
   ngOnInit(): void {
     this.facade.cargarTomaFisicaItems();
-
-    effect(() => {
-      const loaded = this.facade.tomaFisicaItems();
-      if (loaded.length > 0 && this.items().length === 0) {
-        this.items.set([...loaded]);
-      }
-    }, { allowSignalWrites: true });
-
-    // Navega al detalle cuando el backend confirma la conciliación creada
-    effect(() => {
-      const id = this.facade.ultimaConciliacionId();
-      if (id) {
-        this.router.navigate(['/inventario/conciliacion', id]);
-      }
-    }, { allowSignalWrites: true });
   }
 
   // ─── Computed stats ───────────────────────────────────────────────
