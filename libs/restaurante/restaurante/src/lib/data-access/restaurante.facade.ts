@@ -179,31 +179,38 @@ export class RestauranteFacade {
     this.iniciarCarrito(mesaId, cantidadComensales);
   }
 
-  eliminarMesa(mesaId: string): void {
-    this.cambiarEstadoActivoMesa(mesaId, false);
+  eliminarMesa(mesaId: string): Observable<boolean | string> {
+    return this.cambiarEstadoActivoMesa(mesaId, false);
   }
 
-  cambiarEstadoActivoMesa(mesaId: string, activo: boolean): void {
-    this.restauranteService.cambiarEstadoActivo(mesaId, activo).subscribe({
-      next: (mesaActualizada) => {
-        this._mesas.update(lista =>
-          lista.map(m => m.id === mesaActualizada.id 
-            ? { ...mesaActualizada, observaciones: m.observaciones } 
-            : m
-          )
-        );
-      },
-      error: (err) => {
-        console.error(
-          `[RestauranteFacade] Error al ${activo ? 'activar' : 'desactivar'} mesa ${mesaId}:`,
-          err
-        );
-      }
+  cambiarEstadoActivoMesa(mesaId: string, activo: boolean): Observable<boolean | string> {
+    return new Observable(observer => {
+      this.restauranteService.cambiarEstadoActivo(mesaId, activo).subscribe({
+        next: (mesaActualizada) => {
+          this._mesas.update(lista =>
+            lista.map(m => m.id === mesaActualizada.id 
+              ? { ...mesaActualizada, observaciones: m.observaciones } 
+              : m
+            )
+          );
+          observer.next(true);
+          observer.complete();
+        },
+        error: (err) => {
+          console.error(
+            `[RestauranteFacade] Error al ${activo ? 'activar' : 'desactivar'} mesa ${mesaId}:`,
+            err
+          );
+          const msg = err.error?.mensaje || err.error?.message || `Error desconocido al ${activo ? 'activar' : 'desactivar'} mesa.`;
+          observer.next(msg);
+          observer.complete();
+        }
+      });
     });
   }
 
-  liberarMesa(mesaId: string): void {
-    this.actualizarEstado(mesaId, 'LIBRE');
+  liberarMesa(mesaId: string): Observable<boolean | string> {
+    return this.actualizarEstado(mesaId, 'LIBRE');
   }
 
   actualizarNotas(_mesaId: string, _notas: string): void {
@@ -238,23 +245,26 @@ export class RestauranteFacade {
     console.warn('[RestauranteFacade] Usa editarMesa(id, cambios) en su lugar.');
   }
 
-  actualizarEstado(mesaId: string, nuevoEstado: EstadoMesa): void {
-    this._mesas.update(lista =>
-      lista.map(m => m.id === mesaId ? { ...m, estado: nuevoEstado } : m)
-    );
-
-    this.restauranteService.cambiarEstadoMesa(mesaId, nuevoEstado).subscribe({
-      next: (mesaActualizada) => {
-        this._mesas.update(lista =>
-          lista.map(m => m.id === mesaActualizada.id ? mesaActualizada : m)
-        );
-      },
-      error: (err) => {
-        console.error(
-          `[RestauranteFacade] Error al cambiar estado de mesa ${mesaId} a ${nuevoEstado}:`,
-          err
-        );
-      }
+  actualizarEstado(mesaId: string, nuevoEstado: EstadoMesa): Observable<boolean | string> {
+    return new Observable(observer => {
+      this.restauranteService.cambiarEstadoMesa(mesaId, nuevoEstado).subscribe({
+        next: (mesaActualizada) => {
+          this._mesas.update(lista =>
+            lista.map(m => m.id === mesaActualizada.id ? mesaActualizada : m)
+          );
+          observer.next(true);
+          observer.complete();
+        },
+        error: (err) => {
+          console.error(
+            `[RestauranteFacade] Error al cambiar estado de mesa ${mesaId} a ${nuevoEstado}:`,
+            err
+          );
+          const msg = err.error?.mensaje || err.error?.message || 'Error desconocido al cambiar estado de la mesa.';
+          observer.next(msg);
+          observer.complete();
+        }
+      });
     });
   }
 

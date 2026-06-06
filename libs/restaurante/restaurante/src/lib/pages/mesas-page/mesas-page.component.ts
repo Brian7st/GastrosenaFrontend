@@ -401,7 +401,13 @@ export class MesasPageComponent {
               'Mesa sin comanda activa',
               `La mesa figura como ${mesa.estado}, pero no tiene ningún pedido en curso.\n\n¿Deseas forzar su liberación para corregir este problema?`,
               () => {
-                this.facade.liberarMesa(id);
+                this.facade.liberarMesa(id).subscribe(res => {
+                  if (res === true) {
+                    this.mostrarExito('Mesa liberada correctamente.');
+                  } else {
+                    this.mostrarError(res as string);
+                  }
+                });
               }
             );
           }
@@ -415,7 +421,13 @@ export class MesasPageComponent {
 
   liberarMesa(id: string) {
     this.cerrarModales();
-    this.facade.liberarMesa(id);
+    this.facade.liberarMesa(id).subscribe(res => {
+      if (res === true) {
+        this.mostrarExito('Mesa liberada correctamente.');
+      } else {
+        this.mostrarError(res as string);
+      }
+    });
   }
 
   // ── ACTIVAR / DESACTIVAR ─────────────────────────────────────────────────────
@@ -431,11 +443,23 @@ export class MesasPageComponent {
         'Desactivar mesa',
         '¿Desactivar esta mesa? Quedará oculta del salón.',
         () => {
-          this.facade.cambiarEstadoActivoMesa(id, activo);
+          this.facade.cambiarEstadoActivoMesa(id, activo).subscribe(res => {
+            if (res === true) {
+              this.mostrarExito('Mesa desactivada correctamente.');
+            } else {
+              this.mostrarError(res as string);
+            }
+          });
         }
       );
     } else {
-      this.facade.cambiarEstadoActivoMesa(id, activo);
+      this.facade.cambiarEstadoActivoMesa(id, activo).subscribe(res => {
+        if (res === true) {
+          this.mostrarExito('Mesa activada correctamente.');
+        } else {
+          this.mostrarError(res as string);
+        }
+      });
     }
   }
 
