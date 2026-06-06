@@ -7,16 +7,17 @@
           <lucide-icon name="arrow-left" [size]="20"></lucide-icon>
         </button>
         @if (mesaActual(); as mesa) {
-          <div class="mesa-info">
-            <h2>{{ mesa.nombre }}</h2>
-            <!-- comensal eliminado del modelo Mesa (TODO: leer del Pedido activo en fase siguiente) -->
-          </div>
+        <div class="mesa-info">
+          <h2>{{ mesa.nombre }}</h2>
+          <!-- comensal eliminado del modelo Mesa (TODO: leer del Pedido activo en fase siguiente) -->
+        </div>
         }
       </div>
 
       <div class="search-bar">
         <lucide-icon name="search" [size]="18" class="search-icon"></lucide-icon>
-        <input type="text" placeholder="Buscar platillo..." [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" />
+        <input type="text" placeholder="Buscar platillo..." [ngModel]="searchTerm()"
+          (ngModelChange)="searchTerm.set($event)" />
       </div>
 
       <div class="historial-action">
@@ -25,7 +26,7 @@
           <span>Historial</span>
         </restaurant-button>
       </div>
-      
+
       <div class="user-profile">
         <div class="user-info">
           <span class="user-name">Cajero Principal</span>
@@ -37,18 +38,16 @@
       </div>
     </header>
 
-    <div [style.pointer-events]="esPedidoSoloLectura() ? 'none' : 'auto'" [style.opacity]="esPedidoSoloLectura() ? '0.5' : '1'">
+    <div [style.pointer-events]="esPedidoSoloLectura() ? 'none' : 'auto'"
+      [style.opacity]="esPedidoSoloLectura() ? '0.5' : '1'">
       <section class="categories-section">
-        <lib-pedidos-categories
-          (categorySelected)="selectedCategory.set($event)"
+        <lib-pedidos-categories (categorySelected)="selectedCategory.set($event)"
           (subcategorySelected)="selectedSubcategory.set($event)">
         </lib-pedidos-categories>
       </section>
 
       <section class="menu-section">
-        <lib-pedidos-menu-grid 
-          [searchTerm]="searchTerm()"
-          [category]="selectedCategory()"
+        <lib-pedidos-menu-grid [searchTerm]="searchTerm()" [category]="selectedCategory()"
           [subcategory]="selectedSubcategory()">
         </lib-pedidos-menu-grid>
       </section>

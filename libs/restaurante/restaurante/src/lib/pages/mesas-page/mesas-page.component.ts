@@ -14,6 +14,7 @@ import {
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
 import { Mesa } from '../../models/restaurante.model';
+import { CurrencyCopPipe } from '@restaurant/shared/util';
 
 @Component({
   selector: 'restaurant-mesas-page',
@@ -28,7 +29,8 @@ import { Mesa } from '../../models/restaurante.model';
     ButtonComponent,
     LucideIconComponent,
     EmptyStateComponent,
-    ConfirmDialogComponent
+    ConfirmDialogComponent,
+    CurrencyCopPipe
   ],
   templateUrl: './mesas-page.component.html',
   styleUrl: './mesas-page.component.scss',
@@ -52,12 +54,33 @@ export class MesasPageComponent {
   mesaSeleccionada = signal<Mesa | null>(null);
   tabActivo        = signal<'desactivar' | 'activar'>('desactivar');
   searchQueryGestionMesas = signal<string>('');
+  filtroEstado = signal<'TODAS' | 'LIBRE' | 'OCUPADA' | 'POR_PAGAR'>('TODAS');
   
   // ── Estado local de la vista principal ───────────────────────────────────────
   searchQueryMain = signal<string>('');
 
   filteredMesasActivasMain = computed(() => {
     return this.mesasActivas().filter(m => this._matchMesa(m.nombre, this.searchQueryMain()));
+  });
+
+  private _sortMesas(mesas: Mesa[]): Mesa[] {
+    return [...mesas].sort((a, b) => {
+      const numA = parseInt(a.nombre.replace(/\D/g, ''), 10) || 0;
+      const numB = parseInt(b.nombre.replace(/\D/g, ''), 10) || 0;
+      return numA - numB;
+    });
+  }
+
+  filteredMesasLibres = computed(() => {
+    return this._sortMesas(this.filteredMesasActivasMain().filter(m => m.estado === 'LIBRE'));
+  });
+
+  filteredMesasOcupadas = computed(() => {
+    return this._sortMesas(this.filteredMesasActivasMain().filter(m => m.estado === 'OCUPADA'));
+  });
+
+  filteredMesasPorPagar = computed(() => {
+    return this._sortMesas(this.filteredMesasActivasMain().filter(m => m.estado === 'POR_PAGAR'));
   });
 
   filteredMesasActivasModal = computed(() => {
@@ -267,9 +290,16 @@ export class MesasPageComponent {
       return;
     }
 
-    this.facade.agregarMesa(nombre, capacidad, zona);
-    this.cerrarModales();
-    this.mostrarExito(`La mesa "${nombre}" ha sido creada correctamente.`);
+    this.facade.agregarMesa(nombre, capacidad, zona).subscribe({
+      next: (resultado) => {
+        if (resultado === true) {
+          this.cerrarModales();
+          this.mostrarExito(`La mesa "${nombre}" ha sido creada correctamente.`);
+        } else {
+          this.mostrarError(resultado as string);
+        }
+      }
+    });
   }
 
   // ── EDITAR ───────────────────────────────────────────────────────────────────
@@ -293,24 +323,30 @@ export class MesasPageComponent {
       return;
     }
 
-    this.cerrarModales();
     this.facade.editarMesa(mesa.id, {
       nombre,
       capacidad,
       zona: zona || null,
       observaciones: obs || null,
-    });
-
-    if (obs && obsCambiada) {
-      if (mesa.estado !== 'LIBRE') {
-        this.mostrarExito('Observaciones actualizadas, pero la mesa no se desactivó porque está ocupada.');
-      } else {
-        this.facade.cambiarEstadoActivoMesa(mesa.id, false);
-        this.mostrarExito('Mesa actualizada y desactivada por daños/observaciones.');
+    }).subscribe({
+      next: (resultado) => {
+        if (resultado === true) {
+          this.cerrarModales();
+          if (obs && obsCambiada) {
+            if (mesa.estado !== 'LIBRE') {
+              this.mostrarExito('Observaciones actualizadas, pero la mesa no se desactivó porque está ocupada.');
+            } else {
+              this.facade.cambiarEstadoActivoMesa(mesa.id, false);
+              this.mostrarExito('Mesa actualizada y desactivada por daños/observaciones.');
+            }
+          } else {
+            this.mostrarExito('Mesa actualizada correctamente.');
+          }
+        } else {
+          this.mostrarError(resultado as string);
+        }
       }
-    } else {
-      this.mostrarExito('Mesa actualizada correctamente.');
-    }
+    });
   }
 
   // ── CONTROLES DE CAPACIDAD ───────────────────────────────────────────────────
@@ -362,13 +398,23 @@ export class MesasPageComponent {
       this.facade.cargarPedidoDeMesaOcupada(id).subscribe({
         next: (exito) => {
           if (exito) {
-            this.router.navigate(['../pedidos'], { relativeTo: this.route });
+            if (mesa.estado === 'POR_PAGAR') {
+              this.abrirModal('ver-cuenta', mesa);
+            } else {
+              this.router.navigate(['../pedidos'], { relativeTo: this.route });
+            }
           } else {
             this.pedirConfirmacion(
               'Mesa sin comanda activa',
               `La mesa figura como ${mesa.estado}, pero no tiene ningún pedido en curso.\n\n¿Deseas forzar su liberación para corregir este problema?`,
               () => {
-                this.facade.liberarMesa(id);
+                this.facade.liberarMesa(id).subscribe(res => {
+                  if (res === true) {
+                    this.mostrarExito('Mesa liberada correctamente.');
+                  } else {
+                    this.mostrarError(res as string);
+                  }
+                });
               }
             );
           }
@@ -382,8 +428,35 @@ export class MesasPageComponent {
 
   liberarMesa(id: string) {
     this.cerrarModales();
-    this.facade.liberarMesa(id);
+    this.facade.liberarMesa(id).subscribe(res => {
+      if (res === true) {
+        this.mostrarExito('Mesa liberada correctamente.');
+      } else {
+        this.mostrarError(res as string);
+      }
+    });
   }
+
+  // ── COMPUTEDS PARA MODAL DE CUENTA ───────────────────────────────────────────
+  pedidoCuenta = computed(() => this.facade.pedidoActivo());
+  comidasPedidoCuenta = computed(() => {
+    const pedido = this.pedidoCuenta();
+    return pedido ? pedido.detalles.filter(d => {
+      const cat = (d.categoria || '').toLowerCase();
+      return cat !== 'bebidas' && cat !== 'bebida';
+    }) : [];
+  });
+  bebidasPedidoCuenta = computed(() => {
+    const pedido = this.pedidoCuenta();
+    return pedido ? pedido.detalles.filter(d => {
+      const cat = (d.categoria || '').toLowerCase();
+      return cat === 'bebidas' || cat === 'bebida';
+    }) : [];
+  });
+  totalCuenta = computed(() => {
+    const detalles = this.pedidoCuenta()?.detalles || [];
+    return detalles.reduce((sum, item) => sum + (item.cantidad * item.precioUnitario), 0);
+  });
 
   // ── ACTIVAR / DESACTIVAR ─────────────────────────────────────────────────────
   cambiarEstadoMesa(id: string, activo: boolean) {
@@ -398,11 +471,23 @@ export class MesasPageComponent {
         'Desactivar mesa',
         '¿Desactivar esta mesa? Quedará oculta del salón.',
         () => {
-          this.facade.cambiarEstadoActivoMesa(id, activo);
+          this.facade.cambiarEstadoActivoMesa(id, activo).subscribe(res => {
+            if (res === true) {
+              this.mostrarExito('Mesa desactivada correctamente.');
+            } else {
+              this.mostrarError(res as string);
+            }
+          });
         }
       );
     } else {
-      this.facade.cambiarEstadoActivoMesa(id, activo);
+      this.facade.cambiarEstadoActivoMesa(id, activo).subscribe(res => {
+        if (res === true) {
+          this.mostrarExito('Mesa activada correctamente.');
+        } else {
+          this.mostrarError(res as string);
+        }
+      });
     }
   }
 

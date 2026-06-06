@@ -8,7 +8,7 @@ import {
 } from '../models/restaurante.model';
 import { RestauranteService } from './restaurante.service';
 import { AuthService } from './auth.service';
-import { catchError, of, Observable } from 'rxjs';
+import { catchError, of, Observable, forkJoin } from 'rxjs';
 
 export interface ItemCarrito {
   productoId: string;
@@ -116,9 +116,12 @@ export class RestauranteFacade {
     this._mesasCargando.set(true);
     this._mesasError.set(null);
 
-    this.restauranteService.obtenerMesas().subscribe({
-      next: (mesas) => {
-        this._mesas.set(mesas);
+    forkJoin([
+      this.restauranteService.obtenerMesas(),
+      this.restauranteService.obtenerMesasInactivas()
+    ]).subscribe({
+      next: ([activas, inactivas]) => {
+        this._mesas.set([...activas, ...inactivas]);
         this._mesasCargando.set(false);
       },
       error: (err) => {
@@ -153,15 +156,22 @@ export class RestauranteFacade {
     localStorage.setItem('gastro_turno_caja', JSON.stringify(this._turnoCaja()));
   }
 
-  agregarMesa(nombre: string, capacidad: number, zona: string): void {
+  agregarMesa(nombre: string, capacidad: number, zona: string): Observable<boolean | string> {
     const request: MesaCreateRequest = { nombre, capacidad, zona: zona || null };
-    this.restauranteService.crearMesa(request).subscribe({
-      next: (mesaNueva) => {
-        this._mesas.update(lista => [...lista, mesaNueva]);
-      },
-      error: (err) => {
-        console.error('[RestauranteFacade] Error al crear mesa:', err);
-      }
+    return new Observable(observer => {
+      this.restauranteService.crearMesa(request).subscribe({
+        next: (mesaNueva) => {
+          this._mesas.update(lista => [...lista, mesaNueva]);
+          observer.next(true);
+          observer.complete();
+        },
+        error: (err) => {
+          console.error('[RestauranteFacade] Error al crear mesa:', err);
+          const msg = err.error?.mensaje || err.error?.message || 'Error desconocido al crear mesa.';
+          observer.next(msg);
+          observer.complete();
+        }
+      });
     });
   }
 
@@ -169,50 +179,64 @@ export class RestauranteFacade {
     this.iniciarCarrito(mesaId, cantidadComensales);
   }
 
-  eliminarMesa(mesaId: string): void {
-    this.cambiarEstadoActivoMesa(mesaId, false);
+  eliminarMesa(mesaId: string): Observable<boolean | string> {
+    return this.cambiarEstadoActivoMesa(mesaId, false);
   }
 
-  cambiarEstadoActivoMesa(mesaId: string, activo: boolean): void {
-    this.restauranteService.cambiarEstadoActivo(mesaId, activo).subscribe({
-      next: (mesaActualizada) => {
-        this._mesas.update(lista =>
-          lista.map(m => m.id === mesaActualizada.id 
-            ? { ...mesaActualizada, observaciones: m.observaciones } 
-            : m
-          )
-        );
-      },
-      error: (err) => {
-        console.error(
-          `[RestauranteFacade] Error al ${activo ? 'activar' : 'desactivar'} mesa ${mesaId}:`,
-          err
-        );
-      }
+  cambiarEstadoActivoMesa(mesaId: string, activo: boolean): Observable<boolean | string> {
+    return new Observable(observer => {
+      this.restauranteService.cambiarEstadoActivo(mesaId, activo).subscribe({
+        next: (mesaActualizada) => {
+          this._mesas.update(lista =>
+            lista.map(m => m.id === mesaActualizada.id 
+              ? { ...mesaActualizada, observaciones: m.observaciones } 
+              : m
+            )
+          );
+          observer.next(true);
+          observer.complete();
+        },
+        error: (err) => {
+          console.error(
+            `[RestauranteFacade] Error al ${activo ? 'activar' : 'desactivar'} mesa ${mesaId}:`,
+            err
+          );
+          const msg = err.error?.mensaje || err.error?.message || `Error desconocido al ${activo ? 'activar' : 'desactivar'} mesa.`;
+          observer.next(msg);
+          observer.complete();
+        }
+      });
     });
   }
 
-  liberarMesa(mesaId: string): void {
-    this.actualizarEstado(mesaId, 'LIBRE');
+  liberarMesa(mesaId: string): Observable<boolean | string> {
+    return this.actualizarEstado(mesaId, 'LIBRE');
   }
 
   actualizarNotas(_mesaId: string, _notas: string): void {
     console.warn('[RestauranteFacade] actualizarNotas() aún no está conectado al backend.');
   }
 
-  editarMesa(mesaId: string, cambios: MesaUpdateRequest): void {
-    this.restauranteService.editarMesa(mesaId, cambios).subscribe({
-      next: (mesaActualizada) => {
-        this._mesas.update(lista =>
-          lista.map(m => m.id === mesaActualizada.id 
-            ? { ...mesaActualizada, observaciones: cambios.observaciones || m.observaciones } 
-            : m
-          )
-        );
-      },
-      error: (err) => {
-        console.error(`[RestauranteFacade] Error al editar mesa ${mesaId}:`, err);
-      }
+  editarMesa(mesaId: string, cambios: MesaUpdateRequest): Observable<boolean | string> {
+    return new Observable(observer => {
+      this.restauranteService.editarMesa(mesaId, cambios).subscribe({
+        next: (mesaActualizada) => {
+          this._mesas.update(lista =>
+            lista.map(m => m.id === mesaActualizada.id 
+              ? { ...mesaActualizada, observaciones: cambios.observaciones || m.observaciones } 
+              : m
+            )
+          );
+          observer.next(true);
+          observer.complete();
+        },
+        error: (err) => {
+          console.error(`[RestauranteFacade] Error al editar mesa ${mesaId}:`, err);
+          const msg = err.error?.mensaje || err.error?.message || 'Error desconocido al editar mesa.';
+          observer.next(msg);
+          observer.complete();
+        }
+      });
     });
   }
 
@@ -221,23 +245,26 @@ export class RestauranteFacade {
     console.warn('[RestauranteFacade] Usa editarMesa(id, cambios) en su lugar.');
   }
 
-  actualizarEstado(mesaId: string, nuevoEstado: EstadoMesa): void {
-    this._mesas.update(lista =>
-      lista.map(m => m.id === mesaId ? { ...m, estado: nuevoEstado } : m)
-    );
-
-    this.restauranteService.cambiarEstadoMesa(mesaId, nuevoEstado).subscribe({
-      next: (mesaActualizada) => {
-        this._mesas.update(lista =>
-          lista.map(m => m.id === mesaActualizada.id ? mesaActualizada : m)
-        );
-      },
-      error: (err) => {
-        console.error(
-          `[RestauranteFacade] Error al cambiar estado de mesa ${mesaId} a ${nuevoEstado}:`,
-          err
-        );
-      }
+  actualizarEstado(mesaId: string, nuevoEstado: EstadoMesa): Observable<boolean | string> {
+    return new Observable(observer => {
+      this.restauranteService.cambiarEstadoMesa(mesaId, nuevoEstado).subscribe({
+        next: (mesaActualizada) => {
+          this._mesas.update(lista =>
+            lista.map(m => m.id === mesaActualizada.id ? mesaActualizada : m)
+          );
+          observer.next(true);
+          observer.complete();
+        },
+        error: (err) => {
+          console.error(
+            `[RestauranteFacade] Error al cambiar estado de mesa ${mesaId} a ${nuevoEstado}:`,
+            err
+          );
+          const msg = err.error?.mensaje || err.error?.message || 'Error desconocido al cambiar estado de la mesa.';
+          observer.next(msg);
+          observer.complete();
+        }
+      });
     });
   }
 
@@ -303,13 +330,13 @@ export class RestauranteFacade {
     });
   }
 
-  cancelarPedidoActivoEnBackend(): Observable<boolean> {
+  cancelarPedidoActivoEnBackend(motivo: string = ''): Observable<boolean> {
     const pedido = this.pedidoActivo();
     if (!pedido || pedido.estado === 'BORRADOR') {
       return of(false);
     }
     return new Observable(observer => {
-      this.restauranteService.cancelarPedido(pedido.id).subscribe({
+      this.restauranteService.cancelarPedido(pedido.id, motivo).subscribe({
         next: () => {
           this.vaciarCarrito();
           this.cargarMesas(); // Recargar mesas para actualizar el mapa
@@ -415,7 +442,6 @@ export class RestauranteFacade {
   confirmarPedidoActivo(notas: string = ''): Observable<boolean> {
     const pedido = this._pedidoActivo();
     if (!pedido || pedido.detalles.length === 0) {
-      alert('No puedes confirmar un pedido vacío');
       return of(false);
     }
 
