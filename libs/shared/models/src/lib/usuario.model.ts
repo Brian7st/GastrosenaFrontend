@@ -12,6 +12,8 @@ export enum Rol {
 export interface Usuario {
   id: string;
   nombre: string;
+  apellidos: string;   // ← agregar
+  documento: string;   // ← agregar
   email: string;
   rol: Rol;
   activo: boolean;

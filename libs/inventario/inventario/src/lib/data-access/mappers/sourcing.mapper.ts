@@ -95,6 +95,7 @@ export function conciliacionGilFromApi(dto: ConciliacionGilResponse): Conciliaci
       diferencia:            (d.precioUnitarioFactura * d.cantidadFactura) - (d.precioUnitarioGil * d.cantidadGil),
       observacion:           d.observacion,
       resuelta:              d.estado !== 'DIFERENCIA_PENDIENTE',
+      cantidadRecibida:      d.cantidadRecibida ?? null,
     })),
   };
 }

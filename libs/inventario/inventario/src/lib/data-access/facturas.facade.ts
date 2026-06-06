@@ -297,10 +297,14 @@ export class FacturasFacade {
       .subscribe(s => this._solicitudGIL.set(s ?? null));
   }
 
-  conciliarEnImportacion(facturaId: string, gilId: string): void {
+  conciliarEnImportacion(
+    facturaId: string,
+    gilId: string,
+    cantidadesRecibidas?: Record<string, number>,
+  ): void {
     this._loading.set(true);
     this._error.set(null);
-    this.svc.conciliarFacturaGil(facturaId, gilId)
+    this.svc.conciliarFacturaGil(facturaId, gilId, cantidadesRecibidas)
       .pipe(
         catchError((error) => {
           this._error.set(this.getConciliacionErrorMessage(error));
@@ -311,10 +315,14 @@ export class FacturasFacade {
       .subscribe(res => { if (res !== null) this._conciliacionImportacion.set(res); });
   }
 
-  conciliarFacturaGil(facturaId: string, gilId: string): void {
+  conciliarFacturaGil(
+    facturaId: string,
+    gilId: string,
+    cantidadesRecibidas?: Record<string, number>,
+  ): void {
     this._loading.set(true);
     this._error.set(null);
-    this.svc.conciliarFacturaGil(facturaId, gilId)
+    this.svc.conciliarFacturaGil(facturaId, gilId, cantidadesRecibidas)
       .pipe(
         catchError(() => {
           this._error.set('Error al conciliar la factura con el GIL');

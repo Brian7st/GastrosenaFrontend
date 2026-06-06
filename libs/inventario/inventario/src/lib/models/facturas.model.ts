@@ -126,6 +126,7 @@ export interface ConciliacionGilDiferencia {
   diferencia:            number;
   observacion?:          string;
   resuelta:              boolean;
+  cantidadRecibida:      number | null;
 }
 
 export interface ConciliacionGil {
