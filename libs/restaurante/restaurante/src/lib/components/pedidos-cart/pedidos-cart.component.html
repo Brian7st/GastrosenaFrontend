@@ -83,17 +83,17 @@
       (click)="iniciarConfirmacion()">
       <span>Confirmar Pedido</span>
     </restaurant-button>
-  } @else if (estadoPedido() === 'ENVIADO_COCINA') {
+  } @else if (estadoPedido() !== 'FACTURADO' && estadoPedido() !== 'CANCELADO' && estadoPedido() !== 'ENTREGADO') {
     <restaurant-button 
       class="action-btn flex-1 btn-anular" 
       variant="primary" 
       (click)="iniciarAnulacionBackend()">
       <lucide-icon name="alert-triangle" [size]="18" class="text-white"></lucide-icon>
-      <span>Anular Pedido</span>
+      <span>Cancelar Pedido</span>
     </restaurant-button>
   } @else {
     <div class="status-badge" style="width: 100%; text-align: center; padding: 12px; background: var(--bg-neutral); border-radius: var(--radius-md); color: var(--text-secondary); font-weight: 500;">
-      No se puede anular (Pedido {{ estadoPedido().replace('_', ' ') | titlecase }})
+      No se puede cancelar (Pedido {{ estadoPedido().replace('_', ' ') | titlecase }})
     </div>
   }
 </div>
@@ -111,9 +111,9 @@
 
 <restaurant-confirm-dialog
   [open]="showAnularBackendModal()"
-  title="Anular Pedido"
-  message="¿Estás seguro de que quieres anular esta comanda? Esto cancelará su preparación en cocina y liberará la mesa."
-  confirmText="Sí, anular pedido"
+  title="Cancelar Pedido"
+  message="¿Estás seguro de que quieres cancelar este pedido? Esto detendrá su preparación y liberará la mesa."
+  confirmText="Sí, cancelar pedido"
   cancelText="No, volver"
   [showCancel]="true"
   (confirm)="ejecutarAnulacionBackend()"
