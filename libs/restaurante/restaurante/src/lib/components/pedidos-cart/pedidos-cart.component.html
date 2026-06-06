@@ -109,16 +109,31 @@
   (cancel)="showCancelModal.set(false)"
 ></restaurant-confirm-dialog>
 
-<restaurant-confirm-dialog
-  [open]="showAnularBackendModal()"
-  title="Cancelar Pedido"
-  message="¿Estás seguro de que quieres cancelar este pedido? Esto detendrá su preparación y liberará la mesa."
-  confirmText="Sí, cancelar pedido"
-  cancelText="No, volver"
-  [showCancel]="true"
-  (confirm)="ejecutarAnulacionBackend()"
-  (cancel)="showAnularBackendModal.set(false)"
-></restaurant-confirm-dialog>
+@if (showAnularBackendModal()) {
+  <div class="custom-modal-backdrop" (click)="showAnularBackendModal.set(false)">
+    <section class="custom-modal-dialog" (click)="$event.stopPropagation()">
+      <strong class="modal-title text-error">Cancelar Pedido</strong>
+      <p class="modal-message">¿Estás seguro de que quieres cancelar este pedido? Esto detendrá su preparación y liberará la mesa.</p>
+      
+      <div class="cancel-reason-container">
+        <label for="motivoAnulacion">Motivo de la cancelación *</label>
+        <textarea 
+          id="motivoAnulacion"
+          [(ngModel)]="motivoAnulacion"
+          placeholder="Ej: El cliente se retiró, error en la comanda..."
+          rows="3"
+          required
+          class="cancel-reason-input"
+        ></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <restaurant-button variant="ghost" (click)="showAnularBackendModal.set(false)">No, volver</restaurant-button>
+        <restaurant-button variant="primary" [disabled]="!motivoAnulacion().trim()" (click)="ejecutarAnulacionBackend()">Sí, cancelar pedido</restaurant-button>
+      </div>
+    </section>
+  </div>
+}
 
 @if (showConfirmModal()) {
   <div class="custom-modal-backdrop" (click)="showConfirmModal.set(false)">

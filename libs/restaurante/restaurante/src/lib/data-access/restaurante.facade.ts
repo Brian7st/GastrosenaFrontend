@@ -330,13 +330,13 @@ export class RestauranteFacade {
     });
   }
 
-  cancelarPedidoActivoEnBackend(): Observable<boolean> {
+  cancelarPedidoActivoEnBackend(motivo: string = ''): Observable<boolean> {
     const pedido = this.pedidoActivo();
     if (!pedido || pedido.estado === 'BORRADOR') {
       return of(false);
     }
     return new Observable(observer => {
-      this.restauranteService.cancelarPedido(pedido.id).subscribe({
+      this.restauranteService.cancelarPedido(pedido.id, motivo).subscribe({
         next: () => {
           this.vaciarCarrito();
           this.cargarMesas(); // Recargar mesas para actualizar el mapa

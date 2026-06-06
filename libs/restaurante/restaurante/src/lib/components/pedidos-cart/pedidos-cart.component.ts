@@ -40,6 +40,7 @@ export class PedidosCartComponent {
   showCancelModal = signal(false);
   showConfirmModal = signal(false);
   showAnularBackendModal = signal(false);
+  motivoAnulacion = signal('');
 
   esPedidoSoloLectura = computed(() => {
     const p = this.pedidoActivo();
@@ -93,9 +94,10 @@ export class PedidosCartComponent {
 
   ejecutarAnulacionBackend() {
     this.showAnularBackendModal.set(false);
-    this.facade.cancelarPedidoActivoEnBackend().subscribe({
+    this.facade.cancelarPedidoActivoEnBackend(this.motivoAnulacion()).subscribe({
       next: (exito) => {
         if (exito) {
+          this.motivoAnulacion.set('');
           this.router.navigate(['/app/restaurante/mesas']);
         }
       }
