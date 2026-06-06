@@ -49,6 +49,12 @@ export class MovimientosListComponent implements OnInit {
   /** true una vez que se cargaron los datos (lazy) */
   private todosLoaded  = signal(false);
 
+  // Paginación de la vista "todos los movimientos"
+  private readonly tamanoTodos = 20;
+  paginaTodos         = signal(0);
+  totalPaginasTodos   = signal(0);
+  totalElementosTodos = signal(0);
+
   // ── Paginación computada ──────────────────────────────────────────────────
   paginaActual    = computed(() => this.paginacion().page);
   totalPaginas    = computed(() => this.paginacion().totalPaginas);
@@ -92,6 +98,29 @@ export class MovimientosListComponent implements OnInit {
   hayPaginaAnterior  = computed(() => this.paginaActual() > 0);
   hayPaginaSiguiente = computed(() => this.paginaActual() < this.totalPaginas() - 1);
 
+  // ── Paginación vista "todos los movimientos" ──────────────────────────────
+  desdeTodos = computed(() =>
+    this.totalElementosTodos() === 0 ? 0 : this.paginaTodos() * this.tamanoTodos + 1
+  );
+  hastaTodos = computed(() =>
+    Math.min(this.paginaTodos() * this.tamanoTodos + this.movimientosTodos().length, this.totalElementosTodos())
+  );
+  paginasTodos = computed(() => {
+    const total  = this.totalPaginasTodos();
+    const actual = this.paginaTodos();
+    if (total === 0) return [];
+    const radio  = 2;
+    let inicio   = Math.max(0, actual - radio);
+    let fin      = Math.min(total - 1, actual + radio);
+    if (fin - inicio < radio * 2) {
+      if (inicio === 0) fin    = Math.min(total - 1, radio * 2);
+      else              inicio = Math.max(0, fin - radio * 2);
+    }
+    return Array.from({ length: fin - inicio + 1 }, (_, i) => inicio + i);
+  });
+  hayPaginaAnteriorTodos  = computed(() => this.paginaTodos() > 0);
+  hayPaginaSiguienteTodos = computed(() => this.paginaTodos() < this.totalPaginasTodos() - 1);
+
   // ── KPIs derivados del listado de documentos ─────────────────────────────
   kpiEntradas      = computed(() => this.documentos().filter(d => d.tipo === 'ENTRADA').length);
   kpiSalidas       = computed(() => this.documentos().filter(d => d.tipo === 'SALIDA').length);
@@ -115,12 +144,15 @@ export class MovimientosListComponent implements OnInit {
     }
   }
 
-  private cargarTodos(): void {
+  private cargarTodos(pagina = 0): void {
     this.loadingTodos.set(true);
     this.errorTodos.set(null);
-    this.movimientosService.getMovimientos(0, 50).subscribe({
-      next: ({ movimientos }) => {
+    this.movimientosService.getMovimientos(pagina, this.tamanoTodos).subscribe({
+      next: ({ movimientos, totalPaginas, totalElementos }) => {
         this.movimientosTodos.set(movimientos);
+        this.paginaTodos.set(pagina);
+        this.totalPaginasTodos.set(totalPaginas);
+        this.totalElementosTodos.set(totalElementos);
         this.todosLoaded.set(true);
         this.loadingTodos.set(false);
       },
@@ -130,6 +162,18 @@ export class MovimientosListComponent implements OnInit {
         this.loadingTodos.set(false);
       },
     });
+  }
+
+  irAPaginaTodos(page: number): void {
+    if (page !== this.paginaTodos()) this.cargarTodos(page);
+  }
+
+  paginaAnteriorTodos(): void {
+    if (this.hayPaginaAnteriorTodos()) this.cargarTodos(this.paginaTodos() - 1);
+  }
+
+  paginaSiguienteTodos(): void {
+    if (this.hayPaginaSiguienteTodos()) this.cargarTodos(this.paginaTodos() + 1);
   }
 
   onSearch(query: string): void {

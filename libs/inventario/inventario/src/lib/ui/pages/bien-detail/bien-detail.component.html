@@ -140,7 +140,7 @@
                     {{ getCantidadPrefix(m) }} {{ m.unidadMedida }}
                   </span>
                 </td>
-                <td class="text-right mov-valor">{{ m.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                <td class="text-right mov-valor" [ngClass]="getCantidadClass(m)">{{ getSigno(m) }}{{ m.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
                 <td class="mov-estado">{{ m.estado }}</td>
               </tr>
             }

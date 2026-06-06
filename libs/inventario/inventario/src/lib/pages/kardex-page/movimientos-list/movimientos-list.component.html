@@ -278,7 +278,7 @@
           </span>
         </td>
         <td style="text-align: center;">
-          <p class="money-val">{{ m.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
+          <p class="money-val" [ngClass]="getCantidadClass(m.tipo)">{{ getCantidadSigno(m.tipo) }}{{ m.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
         </td>
         <td style="text-align: center;">
           <restaurant-status-badge [label]="m.estado" [variant]="getVariant(m.estado)"></restaurant-status-badge>
@@ -296,16 +296,61 @@
       </tr>
       }
     </tbody>
+    }
     <div dtFooter class="dt-footer">
       <span class="dt-page-info">
-        @if (movimientosTodos().length === 0) {
+        @if (totalElementosTodos() === 0) {
           Sin movimientos
         } @else {
-          {{ movimientosTodos().length }} movimiento(s) cargados
+          Mostrando {{ desdeTodos() }}–{{ hastaTodos() }} de {{ totalElementosTodos() }} movimiento(s)
         }
       </span>
+      <div class="dt-pagination">
+
+        <!-- Anterior -->
+        <button class="dt-page-btn"
+                [disabled]="!hayPaginaAnteriorTodos() || loadingTodos()"
+                (click)="paginaAnteriorTodos()">
+          <lucide-icon name="chevron-left" [size]="16"></lucide-icon>
+        </button>
+
+        <!-- Primera página si no está en la ventana -->
+        @if (paginasTodos()[0] > 0) {
+          <button class="dt-page-btn" (click)="irAPaginaTodos(0)">1</button>
+          @if (paginasTodos()[0] > 1) {
+            <span class="pagination-ellipsis">…</span>
+          }
+        }
+
+        <!-- Ventana de páginas -->
+        @for (p of paginasTodos(); track p) {
+          <button class="dt-page-btn"
+                  [class.dt-page-btn--active]="p === paginaTodos()"
+                  [disabled]="loadingTodos()"
+                  (click)="irAPaginaTodos(p)">
+            {{ p + 1 }}
+          </button>
+        }
+
+        <!-- Última página si no está en la ventana -->
+        @if (paginasTodos()[paginasTodos().length - 1] < totalPaginasTodos() - 1) {
+          @if (paginasTodos()[paginasTodos().length - 1] < totalPaginasTodos() - 2) {
+            <span class="pagination-ellipsis">…</span>
+          }
+          <button class="dt-page-btn" (click)="irAPaginaTodos(totalPaginasTodos() - 1)">
+            {{ totalPaginasTodos() }}
+          </button>
+        }
+
+        <!-- Siguiente -->
+        <button class="dt-page-btn"
+                [disabled]="!hayPaginaSiguienteTodos() || loadingTodos()"
+                (click)="paginaSiguienteTodos()">
+          <lucide-icon name="chevron-right" [size]="16"></lucide-icon>
+        </button>
+
+      </div>
     </div>
-    }
   </restaurant-data-table>
   }
 </div>

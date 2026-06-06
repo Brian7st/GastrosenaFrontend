@@ -78,6 +78,10 @@ export class BienDetailPageComponent implements OnInit {
     return this.esNegativo(m.tipo) ? 'cantidad--negativa' : 'cantidad--positiva';
   }
 
+  getSigno(m: Movimiento): string {
+    return this.esNegativo(m.tipo) ? '-' : '+';
+  }
+
   getTipoLabel(tipo: string): string {
     const map: Record<string, string> = {
       ENTRADA: 'Entrada',
