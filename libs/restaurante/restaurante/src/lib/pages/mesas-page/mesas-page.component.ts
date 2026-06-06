@@ -54,6 +54,7 @@ export class MesasPageComponent {
   mesaSeleccionada = signal<Mesa | null>(null);
   tabActivo        = signal<'desactivar' | 'activar'>('desactivar');
   searchQueryGestionMesas = signal<string>('');
+  filtroEstado = signal<'TODAS' | 'LIBRE' | 'OCUPADA' | 'POR_PAGAR'>('TODAS');
   
   // ── Estado local de la vista principal ───────────────────────────────────────
   searchQueryMain = signal<string>('');

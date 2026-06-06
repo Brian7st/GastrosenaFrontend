@@ -107,10 +107,26 @@
     </restaurant-card>
   </ng-template>
 
+  <!-- Filtros de Mesas -->
+  <div class="mesas-filters" style="display: flex; gap: 10px; margin-bottom: 1.5rem;">
+    <restaurant-button [variant]="filtroEstado() === 'TODAS' ? 'primary' : 'outline'" (click)="filtroEstado.set('TODAS')">
+      Todas
+    </restaurant-button>
+    <restaurant-button [variant]="filtroEstado() === 'LIBRE' ? 'primary' : 'outline'" (click)="filtroEstado.set('LIBRE')">
+      Libres
+    </restaurant-button>
+    <restaurant-button [variant]="filtroEstado() === 'OCUPADA' ? 'primary' : 'outline'" (click)="filtroEstado.set('OCUPADA')">
+      Ocupadas
+    </restaurant-button>
+    <restaurant-button [variant]="filtroEstado() === 'POR_PAGAR' ? 'primary' : 'outline'" (click)="filtroEstado.set('POR_PAGAR')">
+      Por Pagar
+    </restaurant-button>
+  </div>
+
   <!-- Grid de Mesas Agrupadas -->
   <section class="mesas-page__content">
     
-    @if (filteredMesasLibres().length > 0) {
+    @if ((filtroEstado() === 'TODAS' || filtroEstado() === 'LIBRE') && filteredMesasLibres().length > 0) {
       <div class="mesas-group mb-4">
         <h3 class="mesas-group__title text-success" style="margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
           <lucide-icon name="check-circle" [size]="20"></lucide-icon> Mesas Libres
@@ -123,8 +139,8 @@
       </div>
     }
 
-    @if (filteredMesasOcupadas().length > 0) {
-      <div class="mesas-group mb-4" [style.marginTop]="filteredMesasLibres().length > 0 ? '2rem' : '0'">
+    @if ((filtroEstado() === 'TODAS' || filtroEstado() === 'OCUPADA') && filteredMesasOcupadas().length > 0) {
+      <div class="mesas-group mb-4" [style.marginTop]="(filtroEstado() === 'TODAS' && filteredMesasLibres().length > 0) ? '2rem' : '0'">
         <h3 class="mesas-group__title text-danger" style="margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
           <lucide-icon name="users" [size]="20"></lucide-icon> Mesas Ocupadas
         </h3>
@@ -136,8 +152,8 @@
       </div>
     }
 
-    @if (filteredMesasPorPagar().length > 0) {
-      <div class="mesas-group mb-4" [style.marginTop]="(filteredMesasLibres().length > 0 || filteredMesasOcupadas().length > 0) ? '2rem' : '0'">
+    @if ((filtroEstado() === 'TODAS' || filtroEstado() === 'POR_PAGAR') && filteredMesasPorPagar().length > 0) {
+      <div class="mesas-group mb-4" [style.marginTop]="(filtroEstado() === 'TODAS' && (filteredMesasLibres().length > 0 || filteredMesasOcupadas().length > 0)) ? '2rem' : '0'">
         <h3 class="mesas-group__title text-warning" style="margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; color: #d97706;">
           <lucide-icon name="receipt" [size]="20"></lucide-icon> Mesas Por Pagar
         </h3>
