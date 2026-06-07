@@ -19,7 +19,7 @@
   <div class="barra-superior__buscador-contenedor">
     <div class="barra-superior__buscador">
       <svg lucideSearch class="barra-superior__buscador-icono"></svg>
-      <input class="barra-superior__buscador-input" [placeholder]="buscarPlaceholder" type="text" />
+      <input class="barra-superior__buscador-input" [placeholder]="buscarPlaceholder || i18n.t('topbar.buscar')" type="text" />
     </div>
   </div>
 
@@ -27,9 +27,7 @@
     <div class="barra-superior__herramientas">
       <button
         class="barra-superior__boton-icono barra-superior__boton-icono--ia"
-        [class.barra-superior__boton-icono--ia-activo]="asistente.panelAbierto()"
-        [attr.aria-pressed]="asistente.panelAbierto()"
-        title="Asistente IA"
+        [title]="i18n.t('topbar.asistente_ia')"
         type="button"
         (click)="asistente.toggle()"
       >
@@ -38,7 +36,7 @@
 
       <button
         class="barra-superior__boton-icono"
-        [title]="esOscuro() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+        [title]="esOscuro() ? i18n.t('topbar.modo_claro') : i18n.t('topbar.modo_oscuro')"
         (click)="alternarTema()"
         type="button"
       >

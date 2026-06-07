@@ -14,6 +14,7 @@ import {
   LucideIconComponent,
 } from '@restaurant/shared/ui';
 import { FichasService } from '../../data-access/fichas.service';
+import { I18nService } from '../../i18n/i18n.service';
 import { Ficha } from '../../models/ficha.model';
 
 type EstadoFiltro = 'todos' | 'activas' | 'inactivas';
@@ -34,6 +35,7 @@ type EstadoFiltro = 'todos' | 'activas' | 'inactivas';
 export class FichasPageComponent implements OnInit {
   private readonly fichasService = inject(FichasService);
   private readonly router = inject(Router);
+  protected readonly i18n = inject(I18nService);
 
   readonly fichas = signal<Ficha[]>([]);
   readonly loading = signal(false);
@@ -138,7 +140,7 @@ export class FichasPageComponent implements OnInit {
   }
 
   onEliminar(id: string): void {
-    if (!confirm('¿Eliminar esta ficha? Esta acción no se puede deshacer.')) { return; }
+    if (!confirm(this.i18n.t('fichas.confirmar_eliminar'))) { return; }
     this.fichasService.eliminarFicha(id).subscribe({
       next: () => this.cargarFichas(),
       error: (err) => console.error(err)

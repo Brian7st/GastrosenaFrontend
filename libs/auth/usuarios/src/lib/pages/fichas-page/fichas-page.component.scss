@@ -85,26 +85,36 @@
   &__kpi {
     display: flex;
     flex-direction: column;
-    gap: var(--space-1);
-    padding: var(--space-4) var(--space-5);
-    background: var(--color-superficie-contenedor-bajo);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
+    gap: var(--space-2);
+    padding: 1.5rem;
+    background: var(--color-superficie-contenedor-mas-bajo);
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-card);
+    transition: box-shadow 0.2s ease;
+
+    &:hover {
+      box-shadow: var(--shadow-card-hover);
+    }
   }
 
   &__kpi-value {
-    font-size: var(--font-size-2xl);
+    font-family: var(--font-family-headline);
+    font-size: 1.875rem;
     font-weight: var(--font-weight-bold);
     color: var(--color-text-heading);
-    line-height: 1;
+    line-height: 1.2;
 
     &--activas  { color: var(--color-success-text); }
     &--inactivas { color: var(--color-error-text); }
   }
 
   &__kpi-label {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
   }
 
   &__filters {
