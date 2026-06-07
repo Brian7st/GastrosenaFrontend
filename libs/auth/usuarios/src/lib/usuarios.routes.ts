@@ -60,8 +60,7 @@ export const USUARIOS_ROUTES: Routes = [
           ),
 
           
-      },
-<<<<<<< HEAD
+            },
       {
         path: 'comentarios-admin',
         loadComponent: () =>
@@ -69,9 +68,7 @@ export const USUARIOS_ROUTES: Routes = [
             m => m.ComentariosAdminComponent
           ),
       },
-=======
-
-            {
+      {
         path: 'fichas/:id/detalle',
         loadComponent: () =>
           import('./pages/fichas-page/ficha-detalle/ficha-detalle.component').then(
@@ -80,7 +77,6 @@ export const USUARIOS_ROUTES: Routes = [
       },
 
       
->>>>>>> origin
     ],
   },
 ];

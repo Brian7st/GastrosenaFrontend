@@ -40,8 +40,8 @@ export class PerfilPageComponent implements OnInit {
   private readonly authService     = inject(AuthService);
   private readonly usuariosService = inject(UsuariosService);
   private readonly fb              = inject(FormBuilder);
+  protected readonly i18n          = inject(I18nService);
   private readonly http            = inject(HttpClient);
-  protected readonly i18n = inject(I18nService);
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
@@ -111,35 +111,6 @@ export class PerfilPageComponent implements OnInit {
     formData.append('file', file);
     formData.append('upload_preset', 'GastroSena');
 
-<<<<<<< HEAD
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', 'GastroSena');
-
-  this.http.post<{ secure_url: string }>(
-    'https://api.cloudinary.com/v1_1/dryhub1jk/image/upload',
-    formData
-  ).subscribe({
-    next: (res) => {
-      // Enviar URL al backend
-      this.usuariosService.actualizarFoto(userId, res.secure_url).subscribe({
-        next: () => {
-          this.subiendo.set(false);
-          this.cargarPerfil();
-        },
-        error: () => {
-          this.subiendo.set(false);
-          alert(this.i18n.t('perfil.error_foto'));
-        }
-      });
-    },
-    error: () => {
-      this.subiendo.set(false);
-      alert(this.i18n.t('perfil.error_cloudinary'));
-    },
-  });
-}
-=======
     fetch('https://api.cloudinary.com/v1_1/dryhub1jk/image/upload', {
       method: 'POST',
       body: formData,
@@ -147,7 +118,8 @@ export class PerfilPageComponent implements OnInit {
       .then(res => res.json())
       .then(data => {
         this.fotoUrl.set(data.secure_url);
-        this.usuariosService.actualizarFoto('', data.secure_url).subscribe({
+        this.usuariosService.
+        actualizarFoto(this.usuario?.id ?? '', data.secure_url).subscribe({
           next: () => {
             this.subiendo.set(false);
             this.cargarPerfil();
@@ -163,7 +135,6 @@ export class PerfilPageComponent implements OnInit {
         alert('Error al subir la foto a Cloudinary');
       });
   }
->>>>>>> origin
 
   onGuardar(): void {
     if (this.infoForm.invalid) {
@@ -191,7 +162,7 @@ export class PerfilPageComponent implements OnInit {
       error: (err) => {
         this.guardando.set(false);
         console.error('Error al actualizar perfil', err);
-        alert(this.i18n.t('perfil.error_guardar'));
+        alert('Error al guardar los datos');
       },
     });
   }
@@ -204,7 +175,7 @@ export class PerfilPageComponent implements OnInit {
     }
     const { contrasenaActual, nuevaContrasena, confirmar } = form.value;
     if (nuevaContrasena !== confirmar) {
-      alert(this.i18n.t('perfil.error_contrasenas'));
+      alert('Las contraseñas nuevas no coinciden');
       return;
     }
     this.guardando.set(true);
@@ -219,7 +190,7 @@ export class PerfilPageComponent implements OnInit {
         },
         error: () => {
           this.guardando.set(false);
-          alert(this.i18n.t('perfil.error_cambiar_contrasena'));
+          alert('Error al cambiar contraseña. Verifique la contraseña actual.');
         },
       });
   }

@@ -1,6 +1,4 @@
 {
-<<<<<<< HEAD
-=======
   "//": "MAPA DE PUERTOS — mantener sincronizado con docker-compose.yml",
   "// restaurante": "8080 | inventario: 8081 | cocina: 8082 | barbarismo: 8086 | usuarios: 8087",
   "// agente": "9000 — API HTTP del agente Gastrosena (IA). DEBE ir antes del catch-all /api",
@@ -15,7 +13,6 @@
     "secure": false,
     "changeOrigin": true
   },
->>>>>>> origin
   "/api/barybarismo": {
     "target": "http://localhost:8086",
     "secure": false,
@@ -23,17 +20,17 @@
     "pathRewrite": { "^/api/barybarismo": "/api/barybarismo" }
   },
   "/api/v1/catalog": {
-    "target": "http://localhost:8080",
+    "target": "http://localhost:8081",
     "secure": false,
     "changeOrigin": true
   },
   "/api/v1/inventory": {
-    "target": "http://localhost:8080",
+    "target": "http://localhost:8081",
     "secure": false,
     "changeOrigin": true
   },
   "/api/v1": {
-    "target": "http://localhost:8080",
+    "target": "http://localhost:8081",
     "secure": false,
     "changeOrigin": true
   },

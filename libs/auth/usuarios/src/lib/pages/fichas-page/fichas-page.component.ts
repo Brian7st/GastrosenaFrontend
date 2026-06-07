@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  inject,
   signal,
   OnInit,
   inject,
@@ -14,21 +13,9 @@ import {
   DataTableComponent,
   LucideIconComponent,
 } from '@restaurant/shared/ui';
-<<<<<<< HEAD
-import { I18nService } from '../../i18n/i18n.service';
-
-export interface Ficha {
-  readonly id:          string;
-  readonly numero:      string;
-  readonly programa:    string;
-  readonly fechaInicio: string;
-  readonly fechaFin:    string;
-  readonly activa:      boolean;
-}
-=======
 import { FichasService } from '../../data-access/fichas.service';
+import { I18nService } from '../../i18n/i18n.service';
 import { Ficha } from '../../models/ficha.model';
->>>>>>> origin
 
 type EstadoFiltro = 'todos' | 'activas' | 'inactivas';
 
@@ -45,15 +32,11 @@ type EstadoFiltro = 'todos' | 'activas' | 'inactivas';
   templateUrl: './fichas-page.component.html',
   styleUrl: './fichas-page.component.scss',
 })
-<<<<<<< HEAD
-export class FichasPageComponent {
-  protected readonly i18n = inject(I18nService);
-=======
 export class FichasPageComponent implements OnInit {
   private readonly fichasService = inject(FichasService);
   private readonly router = inject(Router);
+  protected readonly i18n = inject(I18nService);
 
->>>>>>> origin
   readonly fichas = signal<Ficha[]>([]);
   readonly loading = signal(false);
   readonly error = signal('');
@@ -157,16 +140,11 @@ export class FichasPageComponent implements OnInit {
   }
 
   onEliminar(id: string): void {
-<<<<<<< HEAD
     if (!confirm(this.i18n.t('fichas.confirmar_eliminar'))) { return; }
-    this.fichas.update(lista => lista.filter(f => f.id !== id));
-=======
-    if (!confirm('¿Eliminar esta ficha? Esta acción no se puede deshacer.')) { return; }
     this.fichasService.eliminarFicha(id).subscribe({
       next: () => this.cargarFichas(),
       error: (err) => console.error(err)
     });
->>>>>>> origin
   }
 
   onVerAprendices(id: string) {

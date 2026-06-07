@@ -6,6 +6,7 @@ export interface ComentarioRequest {
   nombre:     string;
   titulo:     string;
   comentario: string;
+  idUsuario?: string;
 }
 
 export interface ComentarioResponse {

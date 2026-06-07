@@ -5,6 +5,7 @@ import { LucideBox, LucideDynamicIcon, LucideLogOut, LucideSettings, LucideUser 
 import { AuthService } from '@restaurant/shared/auth';
 import { BarraLateralConfig } from '../../nav/nav.models';
 import { I18nService } from '../../i18n/i18n.service';
+import { AsistenteUiService } from '../asistente/asistente-ui.service';
 
 @Component({
   selector: 'restaurant-barra-lateral',
@@ -24,6 +25,7 @@ import { I18nService } from '../../i18n/i18n.service';
 export class BarraLateralComponent {
   private readonly authService = inject(AuthService);
   protected readonly i18n = inject(I18nService);
+  protected readonly asistente = inject(AsistenteUiService);
 
   @Input() config: BarraLateralConfig = {
     titulo: 'Mi App',

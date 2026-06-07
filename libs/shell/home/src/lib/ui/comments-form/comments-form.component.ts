@@ -8,6 +8,7 @@ import {
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { AlertComponent } from '@restaurant/shared/ui';
+import { AuthService } from '@restaurant/shared/auth';
 import { CommentsService, ComentarioResponse } from '../../data-access/comments.service';
 
 @Component({
@@ -21,6 +22,7 @@ import { CommentsService, ComentarioResponse } from '../../data-access/comments.
 export class CommentsFormComponent implements OnInit {
   private readonly fb              = inject(FormBuilder);
   private readonly commentsService = inject(CommentsService);
+  private readonly authService     = inject(AuthService);
 
   isLoading      = signal(false);
   isLoadingForo  = signal(false);
@@ -66,6 +68,7 @@ export class CommentsFormComponent implements OnInit {
       nombre:     nombre!,
       titulo:     titulo!,
       comentario: comentario!,
+      idUsuario:  this.authService.currentUser()?.id,
     }).subscribe({
       next: () => {
         this.isLoading.set(false);

@@ -6,6 +6,7 @@ import { PerfilConfig, TopNavLink } from '../../nav/nav.models';
 import { NotificacionesService } from '@restaurant/notificaciones';
 import { I18nService } from '../../i18n/i18n.service';
 import { ThemeService } from '../../services/theme.service';
+import { AsistenteUiService } from '../asistente/asistente-ui.service';
 
 @Component({
   selector: 'restaurant-barra-superior',
@@ -23,6 +24,7 @@ export class BarraSuperiorComponent implements OnInit, OnDestroy {
   readonly contadorNotificaciones = signal(0);
 
   private readonly themeService = inject(ThemeService);
+  protected readonly asistente  = inject(AsistenteUiService);
   private readonly notificacionesService = inject(NotificacionesService);
   private intervalId: any;
 
