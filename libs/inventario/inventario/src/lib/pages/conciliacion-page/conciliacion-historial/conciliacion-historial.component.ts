@@ -27,17 +27,16 @@ export class ConciliacionHistorialComponent implements OnInit {
   private location = inject(Location);
   protected facade = inject(ConciliacionFacade);
 
-  // Signals desde la facade (reemplazan el array plano anterior)
-  registros = this.facade.conciliaciones;
-  loading = this.facade.loading;
-  error = this.facade.error;
-
-  // Datos de UI locales sin gestión de servidor
-  topDiferencias = signal([
-    { producto: 'Aceite Vegetal', dif: '-15 L', icon: 'droplet' },
-    { producto: 'Azúcar Refinada', dif: '-8 Kg', icon: 'package' },
-    { producto: 'Carne de Res', dif: '-5 Kg', icon: 'beef' },
-  ]);
+  // Signals desde la facade
+  registros         = this.facade.conciliaciones;
+  loading           = this.facade.loading;
+  error             = this.facade.error;
+  topDiferencias    = this.facade.topPorDiferencias;
+  tendenciaMensual  = this.facade.tendenciaMensual;
+  ultimaFecha       = this.facade.ultimaFecha;
+  totalConciliaciones = this.facade.totalConciliaciones;
+  diferenciasTotal    = this.facade.diferenciasTotal;
+  precisionPromedio   = this.facade.precisionPromedio;
 
   showExportarModal = signal(false);
 

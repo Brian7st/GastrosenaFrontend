@@ -41,6 +41,7 @@ export class MovimientoAjusteComponent {
   readonly buscando        = signal(false);
   readonly selectorAbierto = signal(false);
   readonly productoSeleccionado = signal<Bien | null>(null);
+  readonly cantidadIngresada    = signal<number | null>(null);
 
   // ── Formulario ───────────────────────────────────────────────────────────────
 
@@ -59,6 +60,18 @@ export class MovimientoAjusteComponent {
     const p = this.productoSeleccionado();
     if (!p) return '';
     return `${p.descripcion} — ${p.codigoSena}`;
+  });
+
+  /** Stock disponible actual del producto seleccionado (null si no hay producto). */
+  readonly stockActual    = computed(() => this.productoSeleccionado()?.stockActual ?? null);
+  readonly unidadProducto = computed(() => this.productoSeleccionado()?.unidadMedida ?? '');
+
+  /** Diferencia entre el stock corregido ingresado y el stock actual (null si falta dato). */
+  readonly ajusteDelta = computed(() => {
+    const actual = this.stockActual();
+    const nueva  = this.cantidadIngresada();
+    if (actual === null || nueva === null || Number.isNaN(nueva)) return null;
+    return nueva - actual;
   });
 
   // ── Búsqueda de productos ────────────────────────────────────────────────────
@@ -104,6 +117,11 @@ export class MovimientoAjusteComponent {
     this.resultados.set([]);
   }
 
+  onCantidadChange(event: Event): void {
+    const valor = (event.target as HTMLInputElement).value;
+    this.cantidadIngresada.set(valor === '' ? null : Number(valor));
+  }
+
   cerrarSelector(): void {
     this.selectorAbierto.set(false);
   }
@@ -136,6 +154,7 @@ export class MovimientoAjusteComponent {
     setTimeout(() => this.successMessage.set(null), 4000);
     this.ajusteForm.reset({ autorizado: true });
     this.limpiarProducto();
+    this.cantidadIngresada.set(null);
   }
 
   closeModal(): void {

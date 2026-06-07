@@ -65,7 +65,28 @@
     </restaurant-kpi-card>
   </div>
 
-  <!-- Main Data Table Container -->
+  <!-- Toggle de vistas -->
+  <div class="vista-toggle" role="group" aria-label="Seleccionar vista">
+    <button
+      class="vista-toggle__btn"
+      [class.vista-toggle__btn--active]="vista() === 'documentos'"
+      (click)="cambiarVista('documentos')"
+      type="button">
+      <lucide-icon name="file-text" [size]="16"></lucide-icon>
+      Por documento
+    </button>
+    <button
+      class="vista-toggle__btn"
+      [class.vista-toggle__btn--active]="vista() === 'todos'"
+      (click)="cambiarVista('todos')"
+      type="button">
+      <lucide-icon name="list" [size]="16"></lucide-icon>
+      Todos los movimientos
+    </button>
+  </div>
+
+  <!-- ── Vista: Por documento ─────────────────────────────────────────────── -->
+  @if (vista() === 'documentos') {
   <restaurant-data-table>
     <div dtHeader class="dt-controls">
       <div class="dt-controls__title">
@@ -79,7 +100,7 @@
         </div>
       </div>
     </div>
-    
+
     <thead>
       <tr>
         <th style="text-align: center;">Tipo</th>
@@ -197,5 +218,140 @@
       </div>
     </div>
   </restaurant-data-table>
+  }
+
+  <!-- ── Vista: Todos los movimientos (flat, incluye ajustes) ─────────────── -->
+  @if (vista() === 'todos') {
+  <restaurant-data-table>
+    <div dtHeader class="dt-controls">
+      <div class="dt-controls__title">
+        <lucide-icon name="list" [size]="22" class="dt-controls__icon"></lucide-icon>
+        <h3 class="dt-controls__heading">Todos los Movimientos</h3>
+      </div>
+    </div>
+
+    @if (loadingTodos()) {
+      <div class="todos-loading">
+        <lucide-icon name="loader-circle" [size]="24" class="todos-loading__icon"></lucide-icon>
+        Cargando movimientos…
+      </div>
+    }
+
+    @if (errorTodos()) {
+      <div class="error-banner" role="alert">
+        <lucide-icon name="alert-triangle" [size]="18"></lucide-icon>
+        {{ errorTodos() }}
+      </div>
+    }
+
+    @if (!loadingTodos()) {
+    <thead>
+      <tr>
+        <th style="text-align: center;">Fecha</th>
+        <th style="text-align: center;">Tipo</th>
+        <th style="text-align: left;">Producto</th>
+        <th style="text-align: center;">Cantidad</th>
+        <th style="text-align: center;">Valor</th>
+        <th style="text-align: center;">Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (m of movimientosTodos(); track m.id) {
+      <tr class="table-row">
+        <td style="text-align: center;">
+          <p class="date-text">{{ m.fechaMovimiento.split('T')[0] }}</p>
+          <p class="time-text">{{ m.fechaMovimiento.split('T')[1]?.slice(0, 5) }}</p>
+        </td>
+        <td style="text-align: center;">
+          <span class="type-badge" [ngClass]="getTipoBadgeClass(m.tipo)">
+            <lucide-icon [name]="getTipoIcon(m.tipo)" [size]="14"></lucide-icon>
+            {{ getTipoLabel(m.tipo) }}
+          </span>
+        </td>
+        <td style="text-align: left; padding-left: 1rem;">
+          <p class="prod-name">{{ m.productoNombre }}</p>
+          <p class="prod-sku">{{ m.codigoSena }}</p>
+        </td>
+        <td style="text-align: center;">
+          <span class="qty-val" [ngClass]="getCantidadClass(m.tipo)">
+            {{ getCantidadSigno(m.tipo) }}{{ m.cantidad }} {{ m.unidadMedida }}
+          </span>
+        </td>
+        <td style="text-align: center;">
+          <p class="money-val" [ngClass]="getCantidadClass(m.tipo)">{{ getCantidadSigno(m.tipo) }}{{ m.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
+        </td>
+        <td style="text-align: center;">
+          <restaurant-status-badge [label]="m.estado" [variant]="getVariant(m.estado)"></restaurant-status-badge>
+        </td>
+      </tr>
+      } @empty {
+      <tr>
+        <td colspan="6">
+          <inventario-empty-state
+            icon="swap_vert"
+            title="Sin movimientos"
+            message="No se encontraron movimientos registrados."
+          />
+        </td>
+      </tr>
+      }
+    </tbody>
+    }
+    <div dtFooter class="dt-footer">
+      <span class="dt-page-info">
+        @if (totalElementosTodos() === 0) {
+          Sin movimientos
+        } @else {
+          Mostrando {{ desdeTodos() }}–{{ hastaTodos() }} de {{ totalElementosTodos() }} movimiento(s)
+        }
+      </span>
+      <div class="dt-pagination">
+
+        <!-- Anterior -->
+        <button class="dt-page-btn"
+                [disabled]="!hayPaginaAnteriorTodos() || loadingTodos()"
+                (click)="paginaAnteriorTodos()">
+          <lucide-icon name="chevron-left" [size]="16"></lucide-icon>
+        </button>
+
+        <!-- Primera página si no está en la ventana -->
+        @if (paginasTodos()[0] > 0) {
+          <button class="dt-page-btn" (click)="irAPaginaTodos(0)">1</button>
+          @if (paginasTodos()[0] > 1) {
+            <span class="pagination-ellipsis">…</span>
+          }
+        }
+
+        <!-- Ventana de páginas -->
+        @for (p of paginasTodos(); track p) {
+          <button class="dt-page-btn"
+                  [class.dt-page-btn--active]="p === paginaTodos()"
+                  [disabled]="loadingTodos()"
+                  (click)="irAPaginaTodos(p)">
+            {{ p + 1 }}
+          </button>
+        }
+
+        <!-- Última página si no está en la ventana -->
+        @if (paginasTodos()[paginasTodos().length - 1] < totalPaginasTodos() - 1) {
+          @if (paginasTodos()[paginasTodos().length - 1] < totalPaginasTodos() - 2) {
+            <span class="pagination-ellipsis">…</span>
+          }
+          <button class="dt-page-btn" (click)="irAPaginaTodos(totalPaginasTodos() - 1)">
+            {{ totalPaginasTodos() }}
+          </button>
+        }
+
+        <!-- Siguiente -->
+        <button class="dt-page-btn"
+                [disabled]="!hayPaginaSiguienteTodos() || loadingTodos()"
+                (click)="paginaSiguienteTodos()">
+          <lucide-icon name="chevron-right" [size]="16"></lucide-icon>
+        </button>
+
+      </div>
+    </div>
+  </restaurant-data-table>
+  }
 </div>
 <router-outlet></router-outlet>

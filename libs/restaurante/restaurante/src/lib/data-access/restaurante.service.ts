@@ -31,6 +31,10 @@ export class RestauranteService {
     return this.http.get<Mesa[]>(this.mesasUrl);
   }
 
+  obtenerMesasInactivas(): Observable<Mesa[]> {
+    return this.http.get<Mesa[]>(`${this.mesasUrl}/inactivas`);
+  }
+
   // ── Mesas — escritura ───────────────────────────────────────────────────────
 
   /**
@@ -102,8 +106,12 @@ export class RestauranteService {
     return this.http.patch<PedidoResponse>(`${this.pedidosUrl}/${id}/entregar`, null);
   }
 
-  cancelarPedido(id: string): Observable<PedidoResponse> {
-    return this.http.patch<PedidoResponse>(`${this.pedidosUrl}/${id}/cancelar`, null);
+  cancelarPedido(id: string, motivo?: string): Observable<PedidoResponse> {
+    let params = new HttpParams();
+    if (motivo) {
+      params = params.set('motivo', motivo);
+    }
+    return this.http.patch<PedidoResponse>(`${this.pedidosUrl}/${id}/cancelar`, null, { params });
   }
 
   // ── Caja y Facturación ───────────────────────────────────────────────────────
