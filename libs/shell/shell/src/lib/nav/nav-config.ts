@@ -1,11 +1,11 @@
-  import { BarraLateralConfig, TopNavLink } from './nav.models';
+import { BarraLateralConfig, TopNavLink } from './nav.models';
 
-  export const TOP_MENU_CONFIG: TopNavLink[] = [];
+export const TOP_MENU_CONFIG: TopNavLink[] = [];
 
-  export const SIDEBAR_CONFIG: BarraLateralConfig = {
-    titulo: 'GastroSena',
-    subtitulo: 'MONOREPO ANGULAR 20',
-    logoUrl: '',
+export const SIDEBAR_CONFIG: BarraLateralConfig = {
+  titulo: 'GastroSena',
+  subtitulo: 'MONOREPO ANGULAR 20',
+  logoUrl: '',
 
   grupos: [
     {
@@ -93,7 +93,14 @@
             { label: 'Comentarios',        tKey: 'nav.comentarios',     ruta: '/app/usuarios/comentarios-admin', icono: 'message-square' },
           ],
         },
-
+        {
+          label: 'Fichas',
+          ruta: '/app/fichas',
+          icono: 'book-open',
+          children: [
+            { label: 'Lista de Fichas', ruta: '/app/fichas', icono: 'list' },
+          ],
+        },
         {
           label: 'Restaurante',
           tKey: 'nav.restaurante',

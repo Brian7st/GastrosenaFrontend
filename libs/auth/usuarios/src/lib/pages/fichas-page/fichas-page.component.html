@@ -92,25 +92,38 @@
             </td>
             <td>
               <div class="fichas-page__actions">
+                <!-- ✅ BOTÓN VER APRENDICES (NUEVO) -->
+                <button
+                  class="fichas-page__action-btn"
+                  type="button"
+                  (click)="onVerAprendices(f.id)"
+                  aria-label="Ver aprendices"
+                  title="Ver aprendices"
+                >
+                  <lucide-icon name="users" [size]="16"></lucide-icon>
+                </button>
+                <!-- BOTÓN EDITAR -->
                 <button
                   class="fichas-page__action-btn"
                   type="button"
                   (click)="onEditarFicha(f)"
-                  [attr.aria-label]="i18n.t('fichas.editar_ficha')"
+                  aria-label="Editar ficha"
+                  title="Editar ficha"
                 >
                   <lucide-icon name="pencil" [size]="16"></lucide-icon>
                 </button>
+                <!-- BOTÓN ELIMINAR -->
                 <button
                   class="fichas-page__action-btn fichas-page__action-btn--danger"
                   type="button"
                   (click)="onEliminar(f.id)"
-                  [attr.aria-label]="i18n.t('fichas.eliminar_ficha')"
-                >
+aria-label="Eliminar ficha"
+                  title="Eliminar ficha"                >
                   <lucide-icon name="trash-2" [size]="16"></lucide-icon>
                 </button>
               </div>
             </td>
-          </tr>
+          
         }
       }
     </tbody>

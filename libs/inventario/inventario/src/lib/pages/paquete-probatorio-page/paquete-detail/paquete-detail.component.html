@@ -1,3 +1,16 @@
+@if (loading() && !paquete()) {
+  <div class="paquete-detail__state">
+    <lucide-icon name="loader-2" [size]="24"></lucide-icon>
+    <p>Cargando paquete...</p>
+  </div>
+} @else if (!paquete()) {
+  <div class="paquete-detail__state">
+    <lucide-icon name="alert-circle" [size]="24"></lucide-icon>
+    <p>{{ facadeError() || 'No se pudo cargar el paquete probatorio.' }}</p>
+    <inventario-back-button (clicked)="volver()" />
+  </div>
+}
+
 @if (paquete(); as p) {
 <div class="paquete-detail">
 

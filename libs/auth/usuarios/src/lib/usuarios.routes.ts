@@ -58,7 +58,10 @@ export const USUARIOS_ROUTES: Routes = [
           import('./pages/fichas-page/fichas-page.component').then(
             m => m.FichasPageComponent,
           ),
+
+          
       },
+<<<<<<< HEAD
       {
         path: 'comentarios-admin',
         loadComponent: () =>
@@ -66,6 +69,18 @@ export const USUARIOS_ROUTES: Routes = [
             m => m.ComentariosAdminComponent
           ),
       },
+=======
+
+            {
+        path: 'fichas/:id/detalle',
+        loadComponent: () =>
+          import('./pages/fichas-page/ficha-detalle/ficha-detalle.component').then(
+            m => m.FichaDetalleComponent,
+          ),
+      },
+
+      
+>>>>>>> origin
     ],
   },
 ];

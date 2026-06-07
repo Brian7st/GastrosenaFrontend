@@ -1,4 +1,7 @@
-<header class="barra-superior">
+<header
+  class="barra-superior"
+  [class.barra-superior--comprimida]="asistente.panelAbierto()"
+>
   @if (enlaces.length > 0) {
     <nav class="barra-superior__nav">
       @for (enlace of enlaces; track enlace.ruta) {
@@ -26,6 +29,7 @@
         class="barra-superior__boton-icono barra-superior__boton-icono--ia"
         [title]="i18n.t('topbar.asistente_ia')"
         type="button"
+        (click)="asistente.toggle()"
       >
         <svg lucideBrainCircuit></svg>
       </button>

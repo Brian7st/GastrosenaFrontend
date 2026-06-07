@@ -4,13 +4,17 @@ import {
   computed,
   inject,
   signal,
+  OnInit,
+  inject,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import {
   DataTableComponent,
   LucideIconComponent,
 } from '@restaurant/shared/ui';
+<<<<<<< HEAD
 import { I18nService } from '../../i18n/i18n.service';
 
 export interface Ficha {
@@ -21,6 +25,10 @@ export interface Ficha {
   readonly fechaFin:    string;
   readonly activa:      boolean;
 }
+=======
+import { FichasService } from '../../data-access/fichas.service';
+import { Ficha } from '../../models/ficha.model';
+>>>>>>> origin
 
 type EstadoFiltro = 'todos' | 'activas' | 'inactivas';
 
@@ -35,11 +43,20 @@ type EstadoFiltro = 'todos' | 'activas' | 'inactivas';
     LucideIconComponent,
   ],
   templateUrl: './fichas-page.component.html',
-  styleUrl:    './fichas-page.component.scss',
+  styleUrl: './fichas-page.component.scss',
 })
+<<<<<<< HEAD
 export class FichasPageComponent {
   protected readonly i18n = inject(I18nService);
+=======
+export class FichasPageComponent implements OnInit {
+  private readonly fichasService = inject(FichasService);
+  private readonly router = inject(Router);
+
+>>>>>>> origin
   readonly fichas = signal<Ficha[]>([]);
+  readonly loading = signal(false);
+  readonly error = signal('');
 
   readonly busqueda     = signal('');
   readonly estadoFiltro = signal<EstadoFiltro>('todos');
@@ -71,6 +88,25 @@ export class FichasPageComponent {
   readonly totalFichas   = computed(() => this.fichas().length);
   readonly totalActivas  = computed(() => this.fichas().filter(f => f.activa).length);
   readonly totalInactivas = computed(() => this.fichas().filter(f => !f.activa).length);
+
+  ngOnInit(): void {
+    this.cargarFichas();
+  }
+
+  cargarFichas(): void {
+    this.loading.set(true);
+    this.fichasService.obtenerFichas().subscribe({
+      next: (data) => {
+        this.fichas.set(data);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.error.set('Error al cargar las fichas');
+        this.loading.set(false);
+        console.error(err);
+      }
+    });
+  }
 
   onNuevaFicha(): void {
     this.fichaEditando.set(null);
@@ -104,31 +140,36 @@ export class FichasPageComponent {
     if (!numero || !programa || !fechaInicio || !fechaFin) { return; }
 
     const editando = this.fichaEditando();
-    if (editando) {
-      this.fichas.update(lista =>
-        lista.map(f =>
-          f.id === editando.id
-            ? { ...f, numero, programa, fechaInicio, fechaFin }
-            : f,
-        ),
-      );
-    } else {
-      const nueva: Ficha = {
-        id:          crypto.randomUUID(),
-        numero,
-        programa,
-        fechaInicio,
-        fechaFin,
-        activa:      true,
-      };
-      this.fichas.update(lista => [...lista, nueva]);
-    }
+    const nuevaFicha = { numero, programa, fechaInicio, fechaFin, activa: true };
 
+    if (editando) {
+      this.fichasService.actualizarFicha(editando.id, nuevaFicha).subscribe({
+        next: () => this.cargarFichas(),
+        error: (err) => console.error(err)
+      });
+    } else {
+      this.fichasService.crearFicha(nuevaFicha).subscribe({
+        next: () => this.cargarFichas(),
+        error: (err) => console.error(err)
+      });
+    }
     this.onCerrarModal();
   }
 
   onEliminar(id: string): void {
+<<<<<<< HEAD
     if (!confirm(this.i18n.t('fichas.confirmar_eliminar'))) { return; }
     this.fichas.update(lista => lista.filter(f => f.id !== id));
+=======
+    if (!confirm('¿Eliminar esta ficha? Esta acción no se puede deshacer.')) { return; }
+    this.fichasService.eliminarFicha(id).subscribe({
+      next: () => this.cargarFichas(),
+      error: (err) => console.error(err)
+    });
+>>>>>>> origin
   }
+
+  onVerAprendices(id: string) {
+  this.router.navigate(['app/usuarios/fichas', id, 'detalle']);
+}
 }

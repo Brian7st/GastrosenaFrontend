@@ -142,9 +142,14 @@
           <lucide-icon name="users" [size]="18" class="acta-create__card-icon"></lucide-icon>
           Asistentes y Firmantes
         </h3>
+        <p class="acta-create__firmantes-hint">
+          El <strong>Instructor Cuentadante</strong> y el <strong>Vocero de Aprendices</strong>
+          son firmantes obligatorios. Podés agregar asistentes adicionales.
+        </p>
         <div class="acta-create__firmantes-list">
           @for (firmante of firmantes(); track $index) {
-            <div class="acta-create__firmante-row">
+            <div class="acta-create__firmante-row"
+                 [class.acta-create__firmante-row--required]="esFirmanteObligatorio($index)">
               <div class="acta-create__firmante-avatar">
                 <lucide-icon name="user" [size]="16"></lucide-icon>
               </div>
@@ -156,20 +161,38 @@
                   [value]="firmante.nombre"
                   (input)="updateFirmante($index, 'nombre', $event)"
                 />
-                <input
-                  type="text"
-                  class="acta-create__firmante-input acta-create__firmante-input--role"
-                  placeholder="Cargo/Rol"
-                  [value]="firmante.dependenciaRol"
-                  (input)="updateFirmante($index, 'dependenciaRol', $event)"
-                />
+                @if (esFirmanteObligatorio($index)) {
+                  <span class="acta-create__firmante-role-badge">{{ firmante.dependenciaRol }}</span>
+                } @else {
+                  <input
+                    type="text"
+                    class="acta-create__firmante-input acta-create__firmante-input--role"
+                    placeholder="Cargo/Rol"
+                    [value]="firmante.dependenciaRol"
+                    (input)="updateFirmante($index, 'dependenciaRol', $event)"
+                  />
+                }
               </div>
+              <label class="acta-create__firmante-aprueba" title="Aprueba el acta">
+                <input
+                  type="checkbox"
+                  [checked]="firmante.aprueba"
+                  (change)="updateFirmante($index, 'aprueba', $event)"
+                />
+                Aprueba
+              </label>
+              @if (!esFirmanteObligatorio($index)) {
+                <button class="acta-create__firmante-remove" type="button"
+                        title="Quitar firmante" (click)="removeFirmante($index)">
+                  <lucide-icon name="trash" [size]="16"></lucide-icon>
+                </button>
+              }
             </div>
           }
         </div>
         <button class="acta-create__add-firmante" type="button" (click)="addFirmante()">
           <lucide-icon name="plus" [size]="16"></lucide-icon>
-          Agregar Firmante
+          Agregar Asistente
         </button>
       </div>
     </div>

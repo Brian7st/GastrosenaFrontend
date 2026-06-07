@@ -11,6 +11,14 @@
   align-items: center;
   padding: 0 1.5rem;
   z-index: 50;
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              right 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  // Panel del asistente abierto: barra lateral colapsada (5rem) + panel (22rem)
+  &--comprimida {
+    right: 22rem;
+    width: calc(100% - 5rem - 22rem);
+  }
 
   &__nav {
     display: flex;
@@ -98,6 +106,16 @@
       &:hover {
         background-color: rgba(57, 169, 0, 0.08);
         color: var(--color-brand-primary-strong);
+      }
+    }
+
+    &--ia-activo {
+      background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-primario-gradient-end) 100%);
+      color: white;
+
+      &:hover {
+        background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-primario-gradient-end) 100%);
+        color: white;
       }
     }
   }

@@ -18,6 +18,7 @@ $verde-sena-hover: rgba($verde-sena-nuevo, 0.05);
   border-right: 1px solid var(--color-pizarra-200);
   z-index: 50;
   overflow: hidden;
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
   &__encabezado {
     padding: 0 1.5rem;
@@ -292,5 +293,49 @@ $verde-sena-hover: rgba($verde-sena-nuevo, 0.05);
     display: flex;
     flex-direction: column;
     gap: 0.125rem;
+  }
+
+  // ====================================================================
+  // ESTADO COLAPSADO — panel del asistente abierto: solo iconos visibles
+  // ====================================================================
+  &--colapsada {
+    width: 5rem;
+
+    .barra-lateral__logo-texto,
+    .barra-lateral__subtitulo,
+    .barra-lateral__etiqueta-grupo,
+    .barra-lateral__texto,
+    .barra-lateral__insignia,
+    .barra-lateral__chevron,
+    .barra-lateral__subgrupo {
+      display: none;
+    }
+
+    .barra-lateral__encabezado {
+      padding: 0;
+    }
+
+    .barra-lateral__logo-contenedor {
+      justify-content: center;
+    }
+
+    .barra-lateral__navegacion {
+      padding: 0 0.5rem;
+    }
+
+    .barra-lateral__enlace,
+    .barra-lateral__enlace--activo {
+      justify-content: center;
+      padding: 0.625rem;
+      border-left: none;
+    }
+
+    .barra-lateral__pie {
+      align-items: center;
+
+      .barra-lateral__enlace {
+        width: 100%;
+      }
+    }
   }
 }

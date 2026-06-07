@@ -11,6 +11,7 @@ import {
 import { AprobarSolicitudModalComponent } from '../../../components/aprobar-solicitud-modal/aprobar-solicitud-modal.component';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 import { SolicitudSesion } from '../../../models/solicitud-sesion.model';
+import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-solicitudes-insumos-list',
@@ -23,7 +24,8 @@ import { SolicitudSesion } from '../../../models/solicitud-sesion.model';
     KpiCardComponent,
     StatusBadgeComponent,
     LucideIconComponent,
-    AprobarSolicitudModalComponent
+    AprobarSolicitudModalComponent,
+    EmptyStateComponent,
   ],
   templateUrl: './solicitudes-insumos-list.component.html',
   styleUrls: ['./solicitudes-insumos-list.component.scss'],
@@ -65,6 +67,13 @@ export class SolicitudesInsumosListComponent implements OnInit {
     { value: '', label: 'Fecha (Rango)' },
   ];
 
+  // ─── Filtros (panel colapsable) ────────────────────────────────────
+  showFilters  = signal(false);
+  filtroEstado = signal<string>('');
+  filtrosActivos = computed(() => (this.filtroEstado() ? 1 : 0));
+
+  onToggleFilters(): void { this.showFilters.update(v => !v); }
+
   // ─── Estado del modal de aprobación ───────────────────────────────
   solicitudSeleccionada = signal<SolicitudSesion | null>(null);
 
@@ -105,9 +114,15 @@ export class SolicitudesInsumosListComponent implements OnInit {
 
   // ─── Handlers ─────────────────────────────────────────────────────
   onSearch(term: string): void     { this.facade.cargarSolicitudesSesion(term ? { instructorId: term } : undefined); }
-  onFilterEstado(v: string): void  { this.facade.cargarSolicitudesSesion(v ? { estado: v } : undefined); }
+  onFilterEstado(v: string): void  {
+    this.filtroEstado.set(v);
+    this.facade.cargarSolicitudesSesion(v ? { estado: v } : undefined);
+  }
   onFilterFecha(): void            { /* date range — pendiente */ }
-  onClearFilters(): void          { this.facade.cargarSolicitudesSesion(); }
+  onClearFilters(): void          {
+    this.filtroEstado.set('');
+    this.facade.cargarSolicitudesSesion();
+  }
 
   onView(id: string): void {
     this.router.navigate(['/app/inventario/solicitudes-insumos-page', id]);

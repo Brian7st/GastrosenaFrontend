@@ -126,6 +126,7 @@ export interface ConciliacionGilDiferencia {
   diferencia:            number;
   observacion?:          string;
   resuelta:              boolean;
+  cantidadRecibida:      number | null;
 }
 
 export interface ConciliacionGil {
@@ -172,4 +173,21 @@ export interface SolicitudGIL {
   comentarios?: string[];
   hashTransaccion: string;
   idTransaccion: string;
+  // Información real del GIL (GET /procurement/giles/{id})
+  numeroGil?: string;
+  codigoGrupo?: string;
+  solicitante?: string;
+  cuentadantes?: string[];
+  bienes?: GilBienDetalle[];
+}
+
+/** Bien (ítem) que compone un GIL, tal como lo devuelve el backend. */
+export interface GilBienDetalle {
+  codigoSena: string;
+  descripcion: string;
+  unidadMedida: string;
+  cantidad: number;
+  valorUnitario: number;
+  iva: number;
+  subtotal: number;
 }

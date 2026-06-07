@@ -99,17 +99,17 @@ export class SolicitudesInsumosFormComponent implements OnInit {
       this.solicitudId.set(id);
       this.facade.cargarSolicitudSesionById(id);
     }
-    this.inventario.cargarBienes({ page: 0, size: 8 });
+    this.inventario.cargarBienes({ estado: 'Activo', page: 0, size: 8 });
   }
 
   // ── Handlers del catálogo ──────────────────────────────────────────────────
   onAbrirSelectorBien(): void {
     this.mostrarSelectorBien.set(true);
-    this.inventario.cargarBienes({ page: 0, size: 8 });
+    this.inventario.cargarBienes({ estado: 'Activo', page: 0, size: 8 });
   }
 
   onBuscarBienCatalogo(term: string): void {
-    this.inventario.cargarBienes({ busqueda: term, page: 0, size: 8 });
+    this.inventario.cargarBienes({ estado: 'Activo', busqueda: term, page: 0, size: 8 });
   }
 
   onSelectorIrAPagina(page: number): void {
@@ -124,6 +124,7 @@ export class SolicitudesInsumosFormComponent implements OnInit {
       codigoSena:              bien.codigoSena ?? '',
       nombreBien:              bien.descripcion ?? '',
       descripcion:             bien.descripcion ?? '',
+      codigoAlmacen:           bien.codigoProveedor ?? '',
       unidadMedida:            bien.unidadMedida,
       cantidad:                1,
       valorUnitario:           bien.valor ?? 0,

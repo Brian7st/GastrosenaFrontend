@@ -489,6 +489,17 @@
   }
 }
 
+.mensaje-eliminar {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--color-success-bg, #e6f7e6);
+  color: var(--color-success-text, #2e7d32);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-align: center;
+}
+
 /* Comanda card row */
 .comanda-lista-card {
   display: flex;

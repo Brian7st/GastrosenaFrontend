@@ -112,16 +112,26 @@
             </div>
           </td>
         </tr>
+      } @empty {
+        <tr>
+          <td colspan="7">
+            <inventario-empty-state
+              icon="description"
+              title="Sin actas"
+              message="No se encontraron actas con los filtros aplicados."
+            />
+          </td>
+        </tr>
       }
     </tbody>
     <div dtFooter class="dt-footer">
-      <span class="table-pagination__info">Mostrando {{ filteredActas().length }} registros de actas</span>
-      <div class="pagination-btns">
-        <button class="pagination-btn" disabled>
+      <span class="dt-page-info">Mostrando {{ filteredActas().length }} registros de actas</span>
+      <div class="dt-pagination">
+        <button class="dt-page-btn" disabled>
           <lucide-icon name="chevron-left" [size]="18"></lucide-icon>
         </button>
-        <button class="pagination-btn pagination-btn--active">1</button>
-        <button class="pagination-btn">
+        <button class="dt-page-btn dt-page-btn--active">1</button>
+        <button class="dt-page-btn">
           <lucide-icon name="chevron-right" [size]="18"></lucide-icon>
         </button>
       </div>
