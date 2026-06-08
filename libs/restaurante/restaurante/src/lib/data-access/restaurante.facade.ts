@@ -8,7 +8,7 @@ import {
 } from '../models/restaurante.model';
 import { RestauranteService } from './restaurante.service';
 import { AuthService } from './auth.service';
-import { catchError, of, Observable, forkJoin } from 'rxjs';
+import { catchError, of, Observable, forkJoin, switchMap } from 'rxjs';
 
 export interface ItemCarrito {
   productoId: string;
@@ -134,13 +134,6 @@ export class RestauranteFacade {
   }
 
   private cargarEstadoLocalNoMesas(): void {
-    const ordenesGuardadas = localStorage.getItem('gastro_ordenes');
-    const turnoGuardado = localStorage.getItem('gastro_turno_caja');
-
-    if (ordenesGuardadas) {
-      this._ordenesHistorial.set(JSON.parse(ordenesGuardadas));
-    }
-
     this.restauranteService.obtenerSesionActiva().pipe(
       catchError((err) => {
         if (err.status !== 404) {
@@ -149,6 +142,71 @@ export class RestauranteFacade {
         return of(null);
       })
     ).subscribe((sesion) => this._turnoCaja.set(sesion));
+  }
+
+  cargarMisOrdenes(): void {
+    this.restauranteService.misPedidos().pipe(
+      switchMap(pedidosResumen => {
+        if (!pedidosResumen || pedidosResumen.length === 0) {
+          return of([]);
+        }
+        const requests = pedidosResumen.map(p => this.restauranteService.obtenerPedidoPorId(p.id).pipe(
+          catchError(err => {
+            console.error(`[RestauranteFacade] Error al cargar detalles del pedido ${p.id}`, err);
+            return of(null);
+          })
+        ));
+        return forkJoin(requests);
+      })
+    ).subscribe({
+      next: (pedidosFull) => {
+        const validPedidos = pedidosFull.filter(p => p !== null);
+        const pedidosMapeados: PedidoCarrito[] = validPedidos.map(p => ({
+          id: p!.id,
+          mesaId: p!.mesaId,
+          meseroId: p!.meseroId,
+          numeroComensales: p!.numeroComensales,
+          estado: p!.estado,
+          fechaCreacion: p!.fechaCreacion,
+          subtotal: p!.subtotal,
+          detalles: p!.detalles.map(d => {
+            const productoCat = this._productosMenu().find(pm => pm.id === d.productoId)?.category || 'COMIDA';
+            return {
+              productoId: d.productoId,
+              nombreProducto: d.nombreProducto,
+              cantidad: d.cantidad,
+              precioUnitario: d.precioUnitario,
+              categoria: productoCat,
+              observaciones: d.observaciones || undefined
+            };
+          })
+        }));
+        
+        const ESTADO_PESO: Record<string, number> = {
+          'LISTO_PARA_SERVIR': 1,
+          'EN_PREPARACION': 2,
+          'ENVIADO_COCINA': 3,
+          'BORRADOR': 4,
+          'ENTREGADO': 5,
+          'FACTURADO': 6,
+          'CANCELADO': 7
+        };
+
+        pedidosMapeados.sort((a, b) => {
+          const pesoA = ESTADO_PESO[a.estado] || 99;
+          const pesoB = ESTADO_PESO[b.estado] || 99;
+          if (pesoA !== pesoB) {
+            return pesoA - pesoB;
+          }
+          return new Date(b.fechaCreacion).getTime() - new Date(a.fechaCreacion).getTime();
+        });
+
+        this._ordenesHistorial.set(pedidosMapeados);
+      },
+      error: (err) => {
+        console.error('[RestauranteFacade] Error al cargar mis órdenes:', err);
+      }
+    });
   }
 
   private guardarEstadoLocal(): void {
@@ -301,14 +359,17 @@ export class RestauranteFacade {
                 estado: pedidoFull.estado,
                 fechaCreacion: pedidoFull.fechaCreacion,
                 subtotal: pedidoFull.subtotal,
-                detalles: pedidoFull.detalles.map(d => ({
-                  productoId: d.productoId,
-                  nombreProducto: d.nombreProducto,
-                  cantidad: d.cantidad,
-                  precioUnitario: d.precioUnitario,
-                  categoria: 'COMIDA', // Valor por defecto visual
-                  observaciones: d.observaciones || undefined
-                }))
+                detalles: pedidoFull.detalles.map(d => {
+                  const prod = this._productosMenu().find(m => m.id === d.productoId || m.name === d.nombreProducto);
+                  return {
+                    productoId: d.productoId,
+                    nombreProducto: d.nombreProducto,
+                    cantidad: d.cantidad,
+                    precioUnitario: d.precioUnitario,
+                    categoria: prod ? prod.category : 'COMIDA', // Mapeo dinámico desde el catálogo
+                    observaciones: d.observaciones || undefined
+                  };
+                })
               };
               this._pedidoActivo.set(pedidoParaCarrito);
               observer.next(true);
@@ -412,6 +473,18 @@ export class RestauranteFacade {
 
       const subtotal = detalles.reduce((sum, it) => sum + (it.precioUnitario * it.cantidad), 0);
       return { ...pedido, detalles, subtotal };
+    });
+  }
+
+  actualizarObservacionesProducto(index: number, observaciones: string) {
+    this._pedidoActivo.update(pedido => {
+      if (!pedido) return null;
+      if (pedido.estado !== 'BORRADOR') return pedido;
+
+      const detalles = [...pedido.detalles];
+      detalles[index] = { ...detalles[index], observaciones };
+
+      return { ...pedido, detalles };
     });
   }
 
