@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, computed, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -28,7 +28,7 @@ import {
   styleUrls: ['./historial-instructor-page.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HistorialInstructorPageComponent {
+export class HistorialInstructorPageComponent implements OnInit {
   public facade = inject(RestauranteFacade);
   
   public todasLasOrdenes = this.facade.ordenesHistorial;
@@ -36,6 +36,10 @@ export class HistorialInstructorPageComponent {
   public terminoBusqueda = signal<string>('');
   public filtroEstado = signal<string>('TODAS');
   public isDropdownOpen = signal<boolean>(false);
+
+  ngOnInit() {
+    this.facade.cargarTodasLasOrdenes();
+  }
 
   public meserosUnicos = computed(() => {
     const ordenes = this.todasLasOrdenes();

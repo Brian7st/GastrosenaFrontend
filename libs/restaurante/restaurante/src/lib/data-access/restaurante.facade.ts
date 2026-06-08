@@ -144,8 +144,8 @@ export class RestauranteFacade {
     ).subscribe((sesion) => this._turnoCaja.set(sesion));
   }
 
-  cargarMisOrdenes(): void {
-    this.restauranteService.misPedidos().pipe(
+  private procesarCargaPedidos(obs$: Observable<PedidoResumenResponse[]>): void {
+    obs$.pipe(
       switchMap(pedidosResumen => {
         if (!pedidosResumen || pedidosResumen.length === 0) {
           return of([]);
@@ -204,9 +204,17 @@ export class RestauranteFacade {
         this._ordenesHistorial.set(pedidosMapeados);
       },
       error: (err) => {
-        console.error('[RestauranteFacade] Error al cargar mis órdenes:', err);
+        console.error('[RestauranteFacade] Error al cargar órdenes:', err);
       }
     });
+  }
+
+  cargarMisOrdenes(): void {
+    this.procesarCargaPedidos(this.restauranteService.misPedidos());
+  }
+
+  cargarTodasLasOrdenes(): void {
+    this.procesarCargaPedidos(this.restauranteService.listarTodosPedidos());
   }
 
   private guardarEstadoLocal(): void {
