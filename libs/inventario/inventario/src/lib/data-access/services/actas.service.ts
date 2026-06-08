@@ -8,7 +8,7 @@ import {
   CompromisoActa,
   FirmanteActa,
 } from '../../models/acta.model';
-import { ActasPageResponse, CrearActaRequest } from '../api/legalization.api';
+import { ActaResponse, ActasPageResponse, CrearActaRequest } from '../api/legalization.api';
 import { actaFromApi } from '../mappers/legalization.mapper';
 
 const API = '/api/v1';
@@ -33,15 +33,12 @@ export class ActasService {
       );
   }
 
-  /** Backend no expone GET /actas/{id}: busca en la lista paginada por ID. */
+  /** GET /legalization/actas/{id} — detalle directo (no depende del tamaño de la lista). */
   getActaById(id: string): Observable<ActaLegalizacion | undefined> {
     return this.http
-      .get<ActasPageResponse>(`${API}/legalization/actas`, { params: { size: 100 } })
+      .get<ActaResponse>(`${API}/legalization/actas/${id}`)
       .pipe(
-        map(resp => {
-          const found = resp.contenido.find(a => a.id === id);
-          return found ? actaFromApi(found) : undefined;
-        }),
+        map(actaFromApi),
         catchError(err => throwError(() => err))
       );
   }
@@ -62,6 +59,16 @@ export class ActasService {
 
     return this.http
       .post<void>(`${API}/legalization/actas/${id}/${accion}`, {})
+      .pipe(
+        map(() => true),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** POST /legalization/actas/{id}/exportar — genera el .docx del acta. */
+  exportarActa(id: string): Observable<boolean> {
+    return this.http
+      .post<void>(`${API}/legalization/actas/${id}/exportar`, {})
       .pipe(
         map(() => true),
         catchError(err => throwError(() => err))
