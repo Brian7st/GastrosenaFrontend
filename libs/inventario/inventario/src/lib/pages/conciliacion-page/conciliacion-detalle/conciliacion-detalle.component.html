@@ -10,7 +10,30 @@
         <inventario-back-button (clicked)="goBack()" />
         <h1 class="page-title">Detalle de Conciliación</h1>
       </div>
+
+      @if (detalle()!.estado !== 'COMPLETADA') {
+        <button
+          class="cerrar-btn"
+          [disabled]="!puedeCerrar() || loading()"
+          [title]="puedeCerrar() ? 'Cerrar y finalizar la conciliación' : 'Resolvé todas las diferencias antes de cerrar'"
+          (click)="cerrar()">
+          <lucide-icon name="lock" [size]="18"></lucide-icon>
+          Cerrar conciliación
+        </button>
+      } @else {
+        <span class="cerrada-badge">
+          <lucide-icon name="check-circle" [size]="18"></lucide-icon>
+          Conciliación cerrada
+        </span>
+      }
     </div>
+
+    @if (detalle()!.estado !== 'COMPLETADA' && diferenciasPendientes() > 0) {
+      <p class="cerrar-hint">
+        <lucide-icon name="info" [size]="14"></lucide-icon>
+        Quedan {{ diferenciasPendientes() }} diferencia(s) por resolver para poder cerrar la conciliación.
+      </p>
+    }
 
     <div class="info-badges-row">
       <div class="info-badge">
@@ -90,6 +113,8 @@
             <th class="text-center">DIF.</th>
             <th class="text-right">VALOR UNIT.</th>
             <th class="text-right">IMPACTO $</th>
+            <th class="text-center">ESTADO</th>
+            <th class="text-center">ACCIÓN</th>
           </tr>
         </thead>
         <tbody>
@@ -110,13 +135,35 @@
               <td class="text-right text-secondary">{{ item.stockSistema }} {{ item.unidad }}</td>
               <td class="text-right font-bold">{{ item.stockFisico }} {{ item.unidad }}</td>
               <td class="text-center">
-                <span class="dif-badge" [ngClass]="item.diferencia >= 0 ? 'dif-badge--pos' : 'dif-badge--neg'">
-                  {{ item.diferencia > 0 ? '+' : '' }}{{ item.diferencia }} {{ item.unidad }}
+                <!-- RF-5.8.4: faltante (sistema > físico → dif positiva) = rojo; sobrante = amarillo -->
+                <span class="dif-badge"
+                      [class.dif-badge--neg]="item.diferencia > 0"
+                      [class.dif-badge--warn]="item.diferencia < 0"
+                      [class.dif-badge--zero]="item.diferencia === 0">
+                  {{ item.diferencia > 0 ? '+' : '' }}{{ item.diferencia }}
                 </span>
               </td>
               <td class="text-right text-secondary">${{ item.valorUnit | number }}</td>
               <td class="text-right font-bold" [ngClass]="item.impacto >= 0 ? 'text-success' : 'text-danger'">
                 {{ item.impacto > 0 ? '+' : '' }}${{ (item.impacto < 0 ? (item.impacto * -1) : item.impacto) | number }}
+              </td>
+              <td class="text-center">
+                <span class="estado-badge"
+                      [class.estado-badge--resuelta]="item.estado === 'RESUELTA'"
+                      [class.estado-badge--pendiente]="item.estado === 'PENDIENTE'"
+                      [class.estado-badge--revisada]="item.estado === 'REVISADA'">
+                  {{ item.estado }}
+                </span>
+              </td>
+              <td class="text-center">
+                @if (item.estado !== 'RESUELTA') {
+                  <button class="resolver-btn" (click)="abrirResolver(item)" [disabled]="loading()">
+                    <lucide-icon name="check" [size]="16"></lucide-icon>
+                    Resolver
+                  </button>
+                } @else {
+                  <lucide-icon name="check-circle" [size]="18" class="text-success"></lucide-icon>
+                }
               </td>
             </tr>
           }
@@ -138,3 +185,49 @@
   }
 
 </div>
+
+<!-- ── MODAL: Resolver diferencia (RF-5.8.4) ── -->
+@if (showResolverModal() && diferenciaSeleccionada()) {
+  <div class="modal-overlay" (click)="cerrarResolver()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">Resolver Diferencia</h3>
+        <button class="modal-close" (click)="cerrarResolver()" aria-label="Cerrar">
+          <lucide-icon name="x" [size]="20"></lucide-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-resumen">
+          <span class="modal-producto">{{ diferenciaSeleccionada()!.producto }}</span>
+          <span class="modal-codigo">{{ diferenciaSeleccionada()!.codigo }}</span>
+          <span class="modal-dif"
+                [class.text-danger]="diferenciaSeleccionada()!.diferencia > 0"
+                [class.text-warning]="diferenciaSeleccionada()!.diferencia < 0">
+            Diferencia: {{ diferenciaSeleccionada()!.diferencia > 0 ? '+' : '' }}{{ diferenciaSeleccionada()!.diferencia }}
+            {{ diferenciaSeleccionada()!.unidad }}
+          </span>
+        </div>
+
+        <label class="modal-label" for="justificacion">Justificación</label>
+        <textarea
+          id="justificacion"
+          class="modal-textarea"
+          rows="4"
+          placeholder="Explique el motivo de la diferencia (merma, error de conteo, ajuste documental...)"
+          [ngModel]="justificacion()"
+          (ngModelChange)="justificacion.set($event)"></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn--ghost" (click)="cerrarResolver()">Cancelar</button>
+        <button
+          class="modal-btn modal-btn--primary"
+          [disabled]="justificacion().trim().length === 0 || loading()"
+          (click)="confirmarResolver()">
+          Confirmar resolución
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -22,11 +22,18 @@
   <!-- KPIs -->
   <div class="detalle__kpis">
     <div class="detalle__kpi">
-      <span class="detalle__kpi-value">{{ aprendices().length }}</span>
-      <span class="detalle__kpi-label">Total Aprendices</span>
+      <div class="detalle__kpi-icon detalle__kpi-icon--neutral">
+        <lucide-icon name="users" [size]="22"></lucide-icon>
+      </div>
+      <div>
+        <span class="detalle__kpi-value">{{ aprendices().length }}</span>
+        <span class="detalle__kpi-label">Total Aprendices</span>
+      </div>
     </div>
     <div class="detalle__kpi detalle__kpi--vocero">
-      <div class="detalle__kpi-icon">⭐</div>
+      <div class="detalle__kpi-icon">
+        <lucide-icon name="star" [size]="22"></lucide-icon>
+      </div>
       <div>
         <span class="detalle__kpi-value">{{ voceroId() ? 1 : 0 }}</span>
         <span class="detalle__kpi-label">Vocero</span>
@@ -38,7 +45,9 @@
       </div>
     </div>
     <div class="detalle__kpi detalle__kpi--subvocero">
-      <div class="detalle__kpi-icon">🟡</div>
+      <div class="detalle__kpi-icon">
+        <lucide-icon name="award" [size]="22"></lucide-icon>
+      </div>
       <div>
         <span class="detalle__kpi-value">{{ subvoceroId() ? 1 : 0 }}</span>
         <span class="detalle__kpi-label">Subvocero</span>
@@ -96,9 +105,9 @@
                 <td class="detalle__td-email">{{ aprendiz.email }}</td>
                 <td>
                   @if (esVocero(aprendiz.id)) {
-                    <span class="detalle__badge detalle__badge--vocero">⭐ Vocero</span>
+                    <span class="detalle__badge detalle__badge--vocero"><lucide-icon name="star" [size]="12"></lucide-icon> Vocero</span>
                   } @else if (esSubvocero(aprendiz.id)) {
-                    <span class="detalle__badge detalle__badge--subvocero">🟡 Subvocero</span>
+                    <span class="detalle__badge detalle__badge--subvocero"><lucide-icon name="award" [size]="12"></lucide-icon> Subvocero</span>
                   } @else {
                     <span class="detalle__badge detalle__badge--ninguno">Sin rol</span>
                   }

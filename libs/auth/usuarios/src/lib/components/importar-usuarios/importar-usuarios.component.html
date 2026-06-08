@@ -7,10 +7,10 @@
         <lucide-icon name="upload" [size]="20"></lucide-icon>
       </div>
       <div>
-        <h2 class="modal__title">Importar Usuarios</h2>
-        <p class="modal__subtitle">Cargá un archivo Excel con los datos del equipo</p>
+        <h2 class="modal__title">{{ i18n.t('importar.titulo') }}</h2>
+        <p class="modal__subtitle">{{ i18n.t('importar.subtitulo') }}</p>
       </div>
-      <button class="modal__close" type="button" (click)="cerrar.emit()" aria-label="Cerrar">
+      <button class="modal__close" type="button" (click)="cerrar.emit()" [attr.aria-label]="i18n.t('importar.cerrar')">
         <lucide-icon name="x" [size]="18"></lucide-icon>
       </button>
     </div>
@@ -20,7 +20,7 @@
 
       <!-- Tipo de usuario (Corrección 2) -->
       <div class="modal__field">
-        <label class="modal__label" for="imp-tipo">Tipo de usuario</label>
+        <label class="modal__label" for="imp-tipo">{{ i18n.t('importar.tipo_usuario') }}</label>
         <div class="modal__select-wrapper">
           <select
             id="imp-tipo"
@@ -28,8 +28,8 @@
             [value]="tipo()"
             (change)="onTipoChange($event)"
           >
-            <option value="INSTRUCTOR">Instructor</option>
-            <option value="APRENDIZ">Aprendiz</option>
+            <option value="INSTRUCTOR">{{ i18n.t('importar.instructor') }}</option>
+            <option value="APRENDIZ">{{ i18n.t('importar.aprendiz') }}</option>
           </select>
           <lucide-icon name="chevron-down" [size]="16" class="modal__select-icon"></lucide-icon>
         </div>
@@ -47,11 +47,11 @@
         @if (archivo()) {
           <lucide-icon name="file-check" [size]="36" class="modal__dropzone-icon modal__dropzone-icon--ready"></lucide-icon>
           <p class="modal__dropzone-text">{{ archivo()!.name }}</p>
-          <p class="modal__dropzone-hint">Archivo listo · clic para cambiar</p>
+          <p class="modal__dropzone-hint">{{ i18n.t('importar.drop_ready') }}</p>
         } @else {
           <lucide-icon name="file-up" [size]="36" class="modal__dropzone-icon"></lucide-icon>
-          <p class="modal__dropzone-text">Arrastrá tu archivo aquí</p>
-          <p class="modal__dropzone-hint">o hacé clic para seleccionar (.xlsx, .xls, .csv)</p>
+          <p class="modal__dropzone-text">{{ i18n.t('importar.drop_text') }}</p>
+          <p class="modal__dropzone-hint">{{ i18n.t('importar.drop_hint') }}</p>
         }
         <input
           type="file"
@@ -65,11 +65,11 @@
       <div class="modal__note">
         <lucide-icon name="triangle-alert" [size]="16" class="modal__note-icon"></lucide-icon>
         <div>
-          <p class="modal__note-title">Formato esperado de columnas:</p>
+          <p class="modal__note-title">{{ i18n.t('importar.note_title') }}</p>
           @if (tipo() === 'INSTRUCTOR') {
-            <p class="modal__note-cols">Documento &middot; Nombre &middot; Apellidos &middot; Email &middot; Teléfono &middot; NombreRol</p>
+            <p class="modal__note-cols">{{ i18n.t('importar.cols_instructor') }}</p>
           } @else {
-            <p class="modal__note-cols">Documento &middot; Nombre &middot; Apellidos &middot; Email &middot; NumeroFicha &middot; Programa</p>
+            <p class="modal__note-cols">{{ i18n.t('importar.cols_aprendiz') }}</p>
           }
         </div>
       </div>
@@ -78,7 +78,7 @@
       @if (importando) {
         <div class="modal__loading">
           <lucide-icon name="loader-circle" [size]="18" class="modal__loading-icon"></lucide-icon>
-          <span>Procesando importación...</span>
+          <span>{{ i18n.t('importar.procesando') }}</span>
         </div>
       }
 
@@ -88,15 +88,16 @@
           <div class="modal__result-row modal__result-row--success">
             <lucide-icon name="check-circle" [size]="16"></lucide-icon>
             <span>
-              {{ resultado.exitosos }} usuario{{ resultado.exitosos === 1 ? '' : 's' }}
-              importado{{ resultado.exitosos === 1 ? '' : 's' }} exitosamente
+              {{ resultado.exitosos }}
+              {{ i18n.t('importar.resultado_exito') }}
             </span>
           </div>
           @if (resultado.fallidos > 0) {
             <div class="modal__result-row modal__result-row--error">
               <lucide-icon name="x-circle" [size]="16"></lucide-icon>
               <span>
-                {{ resultado.fallidos }} error{{ resultado.fallidos === 1 ? '' : 'es' }} encontrado{{ resultado.fallidos === 1 ? '' : 's' }}
+                {{ resultado.fallidos }}
+                {{ i18n.t('importar.resultado_error') }}
               </span>
             </div>
             @if (resultado.errores.length > 0) {
@@ -115,7 +116,7 @@
     <!-- Footer -->
     <div class="modal__footer">
       <button class="modal__btn modal__btn--ghost" type="button" (click)="cerrar.emit()">
-        Cerrar
+        {{ i18n.t('importar.cerrar') }}
       </button>
       <button
         class="modal__btn modal__btn--primary"
@@ -124,7 +125,7 @@
         (click)="onImportar()"
       >
         <lucide-icon name="upload" [size]="16"></lucide-icon>
-        Iniciar Importación
+        {{ i18n.t('importar.iniciar') }}
       </button>
     </div>
 

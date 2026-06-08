@@ -23,6 +23,7 @@ import { UsuarioFormComponent } from '../../components/usuario-form/usuario-form
 import { UsuarioAvatarComponent } from '../../components/usuario-avatar/usuario-avatar.component';
 import { UsuarioRolBadgeComponent } from '../../components/usuario-rol-badge/usuario-rol-badge.component';
 import { UsuariosFacade } from '../../data-access/usuarios.facade';
+import { I18nService } from '../../i18n/i18n.service';
 import {
   ActualizarUsuarioRequest,
   CrearUsuarioRequest,
@@ -53,6 +54,7 @@ import {
 export class ListaPageComponent implements OnInit {
   private readonly facade     = inject(UsuariosFacade);
   private readonly destroyRef = inject(DestroyRef);
+  protected readonly i18n = inject(I18nService);
   private toastTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly usuarios = toSignal(
@@ -154,7 +156,7 @@ onGuardarUsuario(data: CrearUsuarioRequest): void {
     this.facade.actualizarUsuario(editando.id, payload);
   } else {
     this.facade.crearUsuario(data);
-    this.mostrarToast('Usuario creado exitosamente. Revisá tu correo.');
+    this.mostrarToast(this.i18n.t('lista.toast_creado'));
   }
   this.onCerrarFormulario();
 }
@@ -177,7 +179,7 @@ onGuardarUsuario(data: CrearUsuarioRequest): void {
   }
 
   onEliminar(id: string): void {
-    if (!confirm('¿Estás seguro de que querés eliminar este usuario?')) { return; }
+    if (!confirm(this.i18n.t('lista.confirmar_eliminar'))) { return; }
     this.facade.eliminarUsuario(id);
   }
 }

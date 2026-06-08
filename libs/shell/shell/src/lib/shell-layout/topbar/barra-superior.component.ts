@@ -4,6 +4,8 @@ import { RouterModule } from '@angular/router';
 import { LucideBell, LucideBrainCircuit, LucideMoon, LucideSearch, LucideSun, LucideUser } from '@lucide/angular';
 import { PerfilConfig, TopNavLink } from '../../nav/nav.models';
 import { NotificacionesService } from '@restaurant/notificaciones';
+import { I18nService } from '../../i18n/i18n.service';
+import { ThemeService } from '../../services/theme.service';
 import { AsistenteUiService } from '../asistente/asistente-ui.service';
 
 @Component({
@@ -15,18 +17,21 @@ import { AsistenteUiService } from '../asistente/asistente-ui.service';
 })
 export class BarraSuperiorComponent implements OnInit, OnDestroy {
   @Input() perfil: PerfilConfig = {};
-  @Input() buscarPlaceholder = 'Buscar...';
+  @Input() buscarPlaceholder = '';
   @Input() enlaces: TopNavLink[] = [];
 
-  readonly esOscuro = signal(false);
+  protected readonly i18n = inject(I18nService);
   readonly contadorNotificaciones = signal(0);
 
-  protected readonly asistente = inject(AsistenteUiService);
-  private notificacionesService = inject(NotificacionesService);
+  private readonly themeService = inject(ThemeService);
+  protected readonly asistente  = inject(AsistenteUiService);
+  private readonly notificacionesService = inject(NotificacionesService);
   private intervalId: any;
 
+  readonly esOscuro = this.themeService.esOscuro;
+
   alternarTema(): void {
-    this.esOscuro.update(v => !v);
+    this.themeService.alternar();
   }
 
   ngOnInit() {

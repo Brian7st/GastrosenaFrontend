@@ -3,20 +3,18 @@ import {
   Component,
   DestroyRef,
   OnInit,
+  computed,
   inject,
   signal,
 } from '@angular/core';
 import { AlertComponent, LucideIconComponent } from '@restaurant/shared/ui';
 import { ConfigSectionComponent } from '../../components/config-section/config-section.component';
+import { I18nService } from '../../i18n/i18n.service';
 import { ConfiguracionFacade } from '../../data-access/configuracion.facade';
 import {
-  ConfiguracionFacturacion,
-  ConfiguracionGeneral,
-  ConfiguracionInventario,
-  ConfiguracionNotificaciones,
-  ConfiguracionSeguridad,
+  ConfiguracionApariencia,
+  ConfiguracionAvanzado,
 } from '../../models/configuracion.model';
-import { MONEDAS, UNIDADES_MEDIDA, ZONAS_HORARIAS } from '../../util';
 
 @Component({
   selector: 'restaurant-config-page',
@@ -31,6 +29,15 @@ import { MONEDAS, UNIDADES_MEDIDA, ZONAS_HORARIAS } from '../../util';
   styleUrl: './config-page.component.scss',
 })
 export class ConfigPageComponent implements OnInit {
+  private readonly i18n = inject(I18nService);
+  readonly t = this.i18n.t.bind(this.i18n);
+
+  readonly fuenteOptions = computed<{ value: ConfiguracionApariencia['tamanoFuente']; label: string }[]>(() => [
+    { value: 'pequeno', label: this.t('apariencia.small') },
+    { value: 'medio', label: this.t('apariencia.medium') },
+    { value: 'grande', label: this.t('apariencia.large') },
+  ]);
+
   private readonly facade = inject(ConfiguracionFacade);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -40,53 +47,17 @@ export class ConfigPageComponent implements OnInit {
   readonly error = this.facade.error;
   readonly success = this.facade.success;
 
-  readonly zonasHorarias = ZONAS_HORARIAS;
-  readonly monedas = MONEDAS;
-  readonly unidadesMedida = UNIDADES_MEDIDA;
-
   readonly expandedSection = signal<string | null>('general');
 
-  // General
-  readonly generalForm = signal<ConfiguracionGeneral>({
-    nombreRestaurante: '',
-    nit: '',
-    direccion: '',
-    telefono: '',
-    email: '',
-    moneda: 'COP',
-    zonaHoraria: 'America/Bogota',
-  });
+  // Apariencia (desde facade/localStorage)
+  readonly aparienciaForm = signal<ConfiguracionApariencia>(
+    this.facade.apariencia(),
+  );
 
-  // Seguridad
-  readonly seguridadForm = signal<ConfiguracionSeguridad>({
-    longitudMinimaPassword: 8,
-    requiereCaracteresEspeciales: true,
-    tiempoSesionMinutos: 60,
-    intentosMaximosLogin: 5,
-    twoFactorAuth: false,
-  });
-
-  // Facturación
-  readonly facturacionForm = signal<ConfiguracionFacturacion>({
-    prefijoFactura: 'FE',
-    resolucionDian: '',
-    ivaPorcentaje: 19,
-    entornoPruebas: true,
-  });
-
-  // Inventario
-  readonly inventarioForm = signal<ConfiguracionInventario>({
-    umbralStockMinimo: 10,
-    unidadMedidaDefault: 'Unidad',
-  });
-
-  // Notificaciones
-  readonly notificacionesForm = signal<ConfiguracionNotificaciones>({
-    emailRemitente: '',
-    servidorSmtp: '',
-    puertoSmtp: 587,
-    requiereSsl: true,
-  });
+  // Avanzado (desde facade/localStorage)
+  readonly avanzadoForm = signal<ConfiguracionAvanzado>(
+    this.facade.avanzado(),
+  );
 
   ngOnInit(): void {
     this.facade.cargarConfig();
@@ -101,67 +72,25 @@ export class ConfigPageComponent implements OnInit {
     );
   }
 
-  onSaveGeneral(): void {
-    this.facade.actualizarGeneral(this.generalForm());
+  // Apariencia
+  onAparienciaTema(tema: ConfiguracionApariencia['tema']): void {
+    this.aparienciaForm.update(f => ({ ...f, tema }));
   }
 
-  onSaveSeguridad(): void {
-    this.facade.actualizarSeguridad(this.seguridadForm());
+  onAparienciaTamanoFuente(tamano: ConfiguracionApariencia['tamanoFuente']): void {
+    this.aparienciaForm.update(f => ({ ...f, tamanoFuente: tamano }));
   }
 
-  onSaveFacturacion(): void {
-    this.facade.actualizarFacturacion(this.facturacionForm());
+  onSaveApariencia(): void {
+    this.facade.actualizarApariencia(this.aparienciaForm());
   }
 
-  onSaveInventario(): void {
-    this.facade.actualizarInventario(this.inventarioForm());
+  // Avanzado
+  onAvanzadoIdioma(idioma: ConfiguracionAvanzado['idioma']): void {
+    this.avanzadoForm.update(f => ({ ...f, idioma }));
   }
 
-  onSaveNotificaciones(): void {
-    this.facade.actualizarNotificaciones(this.notificacionesForm());
-  }
-
-  onGeneralChange(field: keyof ConfiguracionGeneral, value: string): void {
-    this.generalForm.update(f => ({ ...f, [field]: value }));
-  }
-
-  onSeguridadNumber(field: keyof ConfiguracionSeguridad, value: string): void {
-    this.seguridadForm.update(f => ({ ...f, [field]: +value }));
-  }
-
-  onSeguridadCheck(field: keyof ConfiguracionSeguridad, checked: boolean): void {
-    this.seguridadForm.update(f => ({ ...f, [field]: checked }));
-  }
-
-  onFacturacionInput(field: keyof ConfiguracionFacturacion, value: string): void {
-    this.facturacionForm.update(f => ({ ...f, [field]: value }));
-  }
-
-  onFacturacionNumber(field: keyof ConfiguracionFacturacion, value: string): void {
-    this.facturacionForm.update(f => ({ ...f, [field]: +value }));
-  }
-
-  onFacturacionCheck(field: keyof ConfiguracionFacturacion, checked: boolean): void {
-    this.facturacionForm.update(f => ({ ...f, [field]: checked }));
-  }
-
-  onInventarioNumber(field: keyof ConfiguracionInventario, value: string): void {
-    this.inventarioForm.update(f => ({ ...f, [field]: +value }));
-  }
-
-  onInventarioSelect(field: keyof ConfiguracionInventario, value: string): void {
-    this.inventarioForm.update(f => ({ ...f, [field]: value }));
-  }
-
-  onNotificacionesInput(field: keyof ConfiguracionNotificaciones, value: string): void {
-    this.notificacionesForm.update(f => ({ ...f, [field]: value }));
-  }
-
-  onNotificacionesNumber(field: keyof ConfiguracionNotificaciones, value: string): void {
-    this.notificacionesForm.update(f => ({ ...f, [field]: +value }));
-  }
-
-  onNotificacionesCheck(field: keyof ConfiguracionNotificaciones, checked: boolean): void {
-    this.notificacionesForm.update(f => ({ ...f, [field]: checked }));
+  onSaveAvanzado(): void {
+    this.facade.actualizarAvanzado(this.avanzadoForm());
   }
 }

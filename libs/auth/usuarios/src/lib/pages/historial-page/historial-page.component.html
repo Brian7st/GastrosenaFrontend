@@ -1,22 +1,22 @@
 <div class="historial-page">
 
   <restaurant-page-header
-    title="Historial de Actividades"
-    subtitle="Registro de acciones realizadas por los usuarios del sistema"
+    [title]="i18n.t('historial.titulo')"
+    [subtitle]="i18n.t('historial.subtitulo')"
   ></restaurant-page-header>
 
   <!-- Filtros -->
   <div class="historial-page__filters">
     <restaurant-search-filter
-      label="Buscar usuario"
-      placeholder="Nombre o email..."
+      [label]="i18n.t('historial.buscar_usuario')"
+      [placeholder]="i18n.t('historial.buscar_placeholder')"
       [value]="busqueda()"
       (valueChange)="busqueda.set($event)"
     ></restaurant-search-filter>
     <restaurant-select-filter
-      label="Tipo de acción"
+      [label]="i18n.t('historial.tipo_accion')"
       [value]="filtroAccion()"
-      [options]="accionOpciones"
+      [options]="accionOpcionesTranslated()"
       (valueChange)="filtroAccion.set($event)"
     ></restaurant-select-filter>
   </div>
@@ -27,11 +27,11 @@
     <restaurant-data-table>
       <thead>
         <tr>
-          <th>Usuario</th>
-          <th>Acción</th>
-          <th>Fecha y hora</th>
-          <th>IP</th>
-          <th>Detalles</th>
+          <th>{{ i18n.t('historial.col_usuario') }}</th>
+          <th>{{ i18n.t('historial.col_accion') }}</th>
+          <th>{{ i18n.t('historial.col_fecha') }}</th>
+          <th>{{ i18n.t('historial.col_ip') }}</th>
+          <th>{{ i18n.t('historial.col_detalles') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -58,8 +58,8 @@
           <tr>
             <td colspan="5" class="historial-page__empty-cell">
               <restaurant-empty-state
-                title="Sin actividad registrada"
-                message="No se encontraron registros con los filtros aplicados."
+                [title]="i18n.t('historial.sin_registros')"
+                [message]="i18n.t('historial.sin_registros_msg')"
               ></restaurant-empty-state>
             </td>
           </tr>

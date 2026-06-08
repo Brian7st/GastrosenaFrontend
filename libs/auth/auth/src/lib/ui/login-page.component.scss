@@ -160,7 +160,7 @@
 .auth-card {
   width: 100%;
   max-width: 420px;
-  background: #ffffff;
+  background: var(--color-surface-primary);
   border-radius: var(--radius-xl);
   padding: var(--space-10) 36px;
   box-shadow: var(--shadow-md);
@@ -252,7 +252,7 @@
   padding: 12px 14px 12px 42px;
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-sm);
-  background: #ffffff;
+  background: var(--color-surface-primary);
   color: var(--color-pizarra-800);
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -323,14 +323,8 @@
 
 .auth-submit {
   width: 100%;
-  padding: 13px;
-  margin-top: 4px;
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none !important;
-  }
+  display: flex;
+  justify-content: center;
 }
 
 // ── Spinner ──────────────────────────────────────────────────────────────────
@@ -375,13 +369,13 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #666;
+  color: var(--color-text-secondary);
   display: flex;
   align-items: center;
   padding: 0;
   z-index: 2;
 
   &:hover {
-    color: #000;
+    color: var(--color-pizarra-800);
   }
 }
