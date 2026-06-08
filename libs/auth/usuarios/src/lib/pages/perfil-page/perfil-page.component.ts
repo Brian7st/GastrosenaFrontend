@@ -116,7 +116,7 @@ export class PerfilPageComponent implements OnInit {
       .then(res => res.json())
       .then(data => {
         this.fotoUrl.set(data.secure_url);
-        this.usuariosService.actualizarFoto('', data.secure_url).subscribe({
+        this.usuariosService.actualizarFoto(this.usuario?.id ?? '', data.secure_url).subscribe({
           next: () => {
             this.subiendo.set(false);
             this.cargarPerfil();
