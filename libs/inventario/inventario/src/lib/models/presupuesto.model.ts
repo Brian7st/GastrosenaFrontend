@@ -9,18 +9,27 @@ export type UrgenciaVencimiento = 'critico' | 'proximo' | 'normal';
 /** Estado real del backend. 'VIGENTE' NO EXISTE — usar PENDIENTE|APLICADO|ANULADO */
 export type EstadoCompromiso = 'PENDIENTE' | 'APLICADO' | 'ANULADO';
 
+/** Fuente de financiación SIIF (dimensión presupuestal del backend). */
+export type FuenteFinanciacion = 'NACION' | 'PROPIOS';
+
 export interface Rubro {
   id: string;
   codigo: string;
   descripcion: string;
   fichaId: string;           // propagado desde el presupuesto padre
   programaFormacion: string; // propagado desde el presupuesto padre
+  // ── Dimensión SIIF (backend) ───────────────────────────────────────────────
+  posicionPresupuestal: string;
+  dependencia: string;
+  fuente: FuenteFinanciacion;
+  /** Saldo por cancelar SIIF = montoComprometido (backend). */
+  valorPorCancelar: number;
   montoAsignado: number;
   saldoDisponible: number;   // = montoAsignado - montoComprometido (backend)
   montoComprometido: number;
   montoPagado: number;
   porcentajeEjecucion: number; // COMPUTADO en FE: (montoComprometido+montoPagado)/montoAsignado*100
-  /** FE-only: sin fuente en el backend actual (NO existe en RubroResponse). Siempre 0. */
+  /** FE-only: ZESE no viene en RubroResponse. Siempre 0. */
   retencionZese: number;
 }
 
@@ -35,6 +44,19 @@ export interface GrupoPresupuestal {
   totalMontoPagado: number;
   /** FE-only: siempre 0 (sin fuente en el backend actual). */
   totalZese: number;
+  porcentajeEjecucion: number;
+}
+
+/** Vista agrupada SIIF (Sección B del Excel): por posición presupuestal + fuente. Calculada en cliente. */
+export interface GrupoSiif {
+  posicionPresupuestal: string;
+  fuente: FuenteFinanciacion;
+  rubros: Rubro[];
+  totalMontoAsignado: number;
+  totalMontoComprometido: number;
+  totalMontoPagado: number;
+  totalSaldoDisponible: number;
+  totalValorPorCancelar: number;
   porcentajeEjecucion: number;
 }
 
@@ -129,6 +151,9 @@ export interface RegistrarPresupuestoData {
   rubros: {
     codigo: string;
     descripcion: string;
+    posicionPresupuestal: string;
+    dependencia: string;
+    fuente: FuenteFinanciacion;
     montoAsignado: number;
   }[];
 }
@@ -167,6 +192,8 @@ export interface ComprometerData {
   concepto: string;
   monto: number;
   aplicarZESE: boolean;
+  /** Permite comprometer por encima del saldo del rubro (sobregiro autorizado). */
+  autorizarSobregiro: boolean;
   fecha: string;
 }
 

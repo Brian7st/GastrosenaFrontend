@@ -42,8 +42,11 @@ export class PresupuestoDashboardComponent implements OnInit {
   resumen      = this.facade.resumen;
   resumenGlobal = this.facade.resumenGlobal;
 
-  /** Grupos de rubros agrupados por ficha (tabla colapsable) */
+  /** Grupos de rubros agrupados por ficha (tabla colapsable) — Sección A del Excel */
   grupos = this.facade.grupos;
+
+  /** Grupos de rubros por posición presupuestal + fuente (SIIF) — Sección B del Excel */
+  gruposPorPosicion = this.facade.gruposPorPosicion;
 
   /** Estado de expansión por fichaId */
   expandidos = signal<Record<string, boolean>>({

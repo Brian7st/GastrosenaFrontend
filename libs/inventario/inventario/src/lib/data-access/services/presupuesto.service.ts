@@ -119,10 +119,11 @@ export class PresupuestoService {
       facturaId:     data.facturaId,
       fichaId:       data.fichaId,
       programaId:    data.programaId,
-      concepto:      data.concepto,
-      monto:         data.monto,
-      aplicarZESE:   data.aplicarZESE,
-      fecha:         data.fecha,
+      concepto:           data.concepto,
+      monto:              data.monto,
+      aplicarZESE:        data.aplicarZESE,
+      autorizarSobregiro: data.autorizarSobregiro,
+      fecha:              data.fecha,
     };
     return this.http
       .post<{ id: string }>(`${API}/budget/compromisos`, body)

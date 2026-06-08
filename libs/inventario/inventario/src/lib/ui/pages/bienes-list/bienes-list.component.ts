@@ -3,11 +3,16 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ButtonComponent, DataTableComponent, KpiCardComponent, LoadingSkeletonComponent } from '@restaurant/shared/ui';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
+import { ContratosFacade } from '../../../data-access/contratos.facade';
 import { BienFormComponent } from '../../../ui/modals/bien-form/bien-form.component';
 import { BienImportModalComponent, BienImportPayload } from '../../modals/bien-import/bien-import.component';
+import { ContratoImportModalComponent } from '../../modals/contrato-import/contrato-import.component';
 import { Bien, BienFormDto, EstadoBien, BienFiltros } from '../../../models/inventario.model';
+import { EstadoContrato, RegistrarContratoData } from '../../../models/contrato.model';
 import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 import { CATEGORIAS_BIEN } from '../../../models/categorias.model';
+
+type VistaGestion = 'bienes' | 'contratos';
 
 @Component({
   selector: 'restaurant-bienes-list',
@@ -20,6 +25,7 @@ import { CATEGORIAS_BIEN } from '../../../models/categorias.model';
     LoadingSkeletonComponent,
     BienFormComponent,
     BienImportModalComponent,
+    ContratoImportModalComponent,
     EmptyStateComponent,
   ],
   templateUrl: './bienes-list.component.html',
@@ -28,6 +34,7 @@ import { CATEGORIAS_BIEN } from '../../../models/categorias.model';
 })
 export class BienesListPageComponent implements OnInit {
   private facade = inject(InventarioFacade);
+  private contratosFacade = inject(ContratosFacade);
   private router = inject(Router);
 
   // State signals
@@ -35,6 +42,15 @@ export class BienesListPageComponent implements OnInit {
   kpis        = this.facade.kpis;
   loading     = this.facade.loading;
   paginacion  = this.facade.paginacion;
+
+  // ── Toggle de vistas (Bienes / Contratos) ──────────────────────────────────
+  vista             = signal<VistaGestion>('bienes');
+  contratos         = this.contratosFacade.contratos;
+  loadingContratos  = this.contratosFacade.loading;
+  ultimaImportacion = this.contratosFacade.ultimaImportacion;
+  showImportContratoModal = signal(false);
+  /** Carga lazy: los contratos solo se piden la primera vez que se abre la vista. */
+  private contratosCargados = signal(false);
 
   paginas = computed(() =>
     Array.from({ length: this.paginacion().totalPages }, (_, i) => i)
@@ -64,6 +80,33 @@ export class BienesListPageComponent implements OnInit {
 
   onToggleFilters(): void {
     this.showFilters.update(v => !v);
+  }
+
+  // ── Vistas ────────────────────────────────────────────────────────────────
+
+  cambiarVista(vista: VistaGestion): void {
+    this.vista.set(vista);
+    if (vista === 'contratos' && !this.contratosCargados()) {
+      this.contratosFacade.cargarContratos();
+      this.contratosCargados.set(true);
+    }
+  }
+
+  onCerrarContrato(id: string): void {
+    this.contratosFacade.cerrarContrato(id);
+  }
+
+  onAbrirImportarContrato(): void {
+    this.showImportContratoModal.set(true);
+  }
+
+  onImportarContrato(data: RegistrarContratoData): void {
+    this.contratosFacade.importarContrato(data);
+    this.showImportContratoModal.set(false);
+  }
+
+  getEstadoContratoBadgeClass(estado: EstadoContrato): string {
+    return estado === 'VIGENTE' ? 'estado-badge--activo' : 'estado-badge--inactivo';
   }
 
   onSearch(query: string): void {

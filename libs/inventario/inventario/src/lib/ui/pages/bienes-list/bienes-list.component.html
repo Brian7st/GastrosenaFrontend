@@ -54,6 +54,28 @@
 </div>
 }
 
+<!-- Toggle de vistas: Bienes / Contratos -->
+<div class="vista-toggle" role="group" aria-label="Seleccionar vista">
+  <button
+    class="vista-toggle__btn"
+    [class.vista-toggle__btn--active]="vista() === 'bienes'"
+    (click)="cambiarVista('bienes')"
+    type="button">
+    <span class="material-symbols-outlined">inventory_2</span>
+    Bienes
+  </button>
+  <button
+    class="vista-toggle__btn"
+    [class.vista-toggle__btn--active]="vista() === 'contratos'"
+    (click)="cambiarVista('contratos')"
+    type="button">
+    <span class="material-symbols-outlined">description</span>
+    Contratos
+  </button>
+</div>
+
+<!-- ── Vista: Bienes ──────────────────────────────────────────────────────── -->
+@if (vista() === 'bienes') {
 <!-- Dashboard Card Container (Tabla) -->
 <restaurant-data-table
   tableTitle="Lista de Bienes"
@@ -208,6 +230,93 @@
   </div>
 
 </restaurant-data-table>
+}
+
+<!-- ── Vista: Contratos ───────────────────────────────────────────────────── -->
+@if (vista() === 'contratos') {
+<div class="contratos-toolbar">
+  <restaurant-button variant="primary" (click)="onAbrirImportarContrato()">
+    <span class="material-symbols-outlined">file_upload</span>
+    Importar contrato
+  </restaurant-button>
+</div>
+
+@if (ultimaImportacion(); as imp) {
+<div class="import-result">
+  <span class="material-symbols-outlined">check_circle</span>
+  Contrato importado: {{ imp.productosCreados }} bienes creados, {{ imp.productosActualizados }} actualizados.
+</div>
+}
+
+<restaurant-data-table
+  tableTitle="Contratos de adjudicación"
+  tableIcon="file-text"
+  [showFilterButton]="false"
+>
+  <thead>
+    <tr>
+      <th>N.º Contrato</th>
+      <th>Descripción</th>
+      <th class="text-center">Vigencia</th>
+      <th class="text-center">Ítems</th>
+      <th>Estado</th>
+      <th class="text-center">Acciones</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    @if (loadingContratos()) {
+      <tr>
+        <td colspan="6">
+          <restaurant-loading-skeleton [rows]="5" [columns]="6"></restaurant-loading-skeleton>
+        </td>
+      </tr>
+    } @else {
+      @for (contrato of contratos(); track contrato.id) {
+        <tr class="table-row">
+          <td>
+            <span class="code-mono">{{ contrato.numero }}</span>
+          </td>
+          <td>
+            <p class="bien-desc">{{ contrato.descripcion }}</p>
+          </td>
+          <td class="text-center">
+            <span class="um-value">{{ contrato.vigencia }}</span>
+          </td>
+          <td class="text-center">
+            <span class="stock-value">{{ contrato.items.length }}</span>
+          </td>
+          <td>
+            <span class="estado-badge" [ngClass]="getEstadoContratoBadgeClass(contrato.estado)">
+              <span class="estado-dot"></span>
+              {{ contrato.estado }}
+            </span>
+          </td>
+          <td class="text-center">
+            <div class="actions-row">
+              @if (contrato.estado === 'VIGENTE') {
+                <button class="action-icon action-icon--warning" (click)="onCerrarContrato(contrato.id)" title="Cerrar contrato">
+                  <span class="material-symbols-outlined">lock</span>
+                </button>
+              }
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="6">
+            <inventario-empty-state
+              icon="description"
+              title="Sin contratos registrados"
+              message="Importá un contrato para cargar precios adjudicados y crear bienes automáticamente."
+            />
+          </td>
+        </tr>
+      }
+    }
+  </tbody>
+</restaurant-data-table>
+}
 
 <!-- Modales -->
 @if (showFormModal()) {
@@ -222,8 +331,15 @@
 
 @if (showImportModal()) {
 <restaurant-bien-import
- 
+
   (cancelar)="showImportModal.set(false)"
   (importar)="onProcessImport($event)"
 ></restaurant-bien-import>
+}
+
+@if (showImportContratoModal()) {
+<restaurant-contrato-import
+  (cancelar)="showImportContratoModal.set(false)"
+  (importar)="onImportarContrato($event)"
+></restaurant-contrato-import>
 }

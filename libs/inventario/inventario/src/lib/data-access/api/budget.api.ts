@@ -1,6 +1,6 @@
 // ─── DTOs reales del backend /api/v1/budget ──────────────────────────────────
 
-import { EstadoCompromiso } from '../../models/presupuesto.model';
+import { EstadoCompromiso, FuenteFinanciacion } from '../../models/presupuesto.model';
 
 // ── Shared ────────────────────────────────────────────────────────────────────
 
@@ -16,13 +16,17 @@ export interface PaginatedResponse<T> {
 
 /** Rubro dentro de un presupuesto (GET /budget/presupuestos o /{id}) */
 export interface RubroResponse {
-  id:                 string;
-  codigo:             string;
-  descripcion:        string;
-  montoAsignado:      number;
-  montoComprometido:  number;
-  montoPagado:        number;
-  saldoDisponible:    number;
+  id:                   string;
+  codigo:               string;
+  descripcion:          string;
+  posicionPresupuestal: string;
+  dependencia:          string;
+  fuente:               FuenteFinanciacion;
+  montoAsignado:        number;
+  montoComprometido:    number;
+  montoPagado:          number;
+  saldoDisponible:      number;
+  valorPorCancelar:     number;
   // NOTE: NO retencionZese, NO porcentajeEjecucion — compute on FE
 }
 
@@ -46,9 +50,12 @@ export interface RegistrarPresupuestoRequest {
   vigencia:          number;
   fechaAprobacion:   string; // ISO date
   rubros: {
-    codigo:         string;
-    descripcion:    string;
-    montoAsignado:  number;
+    codigo:               string;
+    descripcion:          string;
+    posicionPresupuestal: string;
+    dependencia:          string;
+    fuente:               FuenteFinanciacion;
+    montoAsignado:        number;
   }[];
 }
 
@@ -80,10 +87,11 @@ export interface ComprometerRequest {
   facturaId?:    string;
   fichaId:       string;
   programaId:    string;
-  concepto:      string;
-  monto:         number;
-  aplicarZESE:   boolean;
-  fecha:         string;
+  concepto:           string;
+  monto:              number;
+  aplicarZESE:        boolean;
+  autorizarSobregiro: boolean;
+  fecha:              string;
 }
 
 /** POST /budget/compromisos/{id}/pagos */

@@ -643,3 +643,25 @@
   font-weight: var(--font-weight-semibold);
   color: var(--color-pizarra-600);
 }
+
+/* ── Badge de fuente de financiación SIIF ──────────────────────────────────── */
+.fuente-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+
+  &--nacion {
+    background: var(--color-estado-activo-bg);
+    color: var(--color-estado-activo);
+  }
+
+  &--propios {
+    background: var(--color-superficie-contenedor-alto);
+    color: var(--color-text-secondary);
+  }
+}

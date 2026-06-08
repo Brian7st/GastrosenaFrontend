@@ -31,11 +31,15 @@ export function rubroFromApi(
     descripcion:        dto.descripcion,
     fichaId,
     programaFormacion,
+    posicionPresupuestal: dto.posicionPresupuestal,
+    dependencia:          dto.dependencia,
+    fuente:               dto.fuente,
+    valorPorCancelar:     dto.valorPorCancelar,
     montoAsignado:      dto.montoAsignado,
     saldoDisponible:    dto.saldoDisponible,
     montoComprometido:  dto.montoComprometido,
     montoPagado:        dto.montoPagado,
-    // retencionZese: no existe en el backend — se mantiene a 0 para compatibilidad UI
+    // retencionZese: ZESE no existe en el backend — se mantiene a 0 para compatibilidad UI
     retencionZese:      0,
     porcentajeEjecucion: computePorcentajeEjecucion(
       dto.montoAsignado, dto.montoComprometido, dto.montoPagado,

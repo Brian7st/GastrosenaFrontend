@@ -73,6 +73,25 @@ export class BienesService {
       );
   }
 
+  /**
+   * Catálogo plano de bienes activos para el typeahead (cascada VLOOKUP).
+   * NO resuelve existencias (evita el N+1): el typeahead solo necesita código,
+   * descripción y precio — el bien ya trae el cód almacén y el precio del contrato.
+   */
+  buscarCatalogo(): Observable<Bien[]> {
+    const params = new HttpParams()
+      .set('activo', 'true')
+      .set('page', '0')
+      .set('size', '1000');
+
+    return this.http
+      .get<PagedResponse<ProductoResponse>>(`${API}/catalog/productos`, { params })
+      .pipe(
+        map(res => res.content.map(bienFromCatalogo)),
+        catchError(err => throwError(() => err)),
+      );
+  }
+
   // ── Detalle enriquecido ──────────────────────────────────────────────────────
 
   /** GET /catalog/productos/{id} + GET /inventory/existencias/{id}

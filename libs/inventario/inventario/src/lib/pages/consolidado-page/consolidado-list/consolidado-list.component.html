@@ -146,37 +146,24 @@
     </div>
   </restaurant-data-table>
 
-  <!-- Contextual Insight / Floating Cards -->
+  <!-- Ejecución presupuestal (dato real: GET /budget/presupuestos/resumen) -->
   <div class="insights-grid">
     <div class="insight-card insight-card--primary">
       <div class="insight-card__content">
-        <h3 class="insight-card__title">Resumen de Cumplimiento</h3>
-        <p class="insight-card__text">La ejecución presupuestal del presente trimestre se encuentra en un 85% de avance respecto a la proyección anual GIL-F014.</p>
-        <button class="insight-card__btn">Ver Auditoría</button>
+        <h3 class="insight-card__title">Ejecución Presupuestal</h3>
+        @if (porcentajeEjecucion() !== null) {
+          <p class="insight-card__text">El presupuesto vigente registra un {{ porcentajeEjecucion() | number:'1.0-1' }}% de ejecución (comprometido + pagado sobre el total asignado).</p>
+        } @else {
+          <p class="insight-card__text">Sin datos de presupuesto para la vigencia actual.</p>
+        }
+        <button class="insight-card__btn" (click)="verPresupuesto()">Ver detalle</button>
       </div>
       <div class="insight-card__visual">
         <div class="progress-circle">
-          <span>85%</span>
+          <span>{{ porcentajeEjecucion() !== null ? (porcentajeEjecucion() | number:'1.0-0') + '%' : '—' }}</span>
         </div>
       </div>
       <div class="insight-card__decor"></div>
-    </div>
-
-    <div class="insight-card insight-card--surface">
-      <div class="insight-card__header">
-        <div class="insight-icon-box">
-          <span class="material-symbols-outlined text-primary">description</span>
-        </div>
-        <div>
-          <h4 class="insight-card__subtitle">Instructivo GIL-F014</h4>
-          <p class="insight-card__date">Actualizado hace 2 días</p>
-        </div>
-      </div>
-      <p class="insight-card__text-dark">Revise los nuevos parámetros de consolidación para el IVA y retención en la fuente según la circular 012-2024.</p>
-      <a class="insight-card__link" href="#">
-        Descargar Guía PDF
-        <span class="material-symbols-outlined">open_in_new</span>
-      </a>
     </div>
   </div>
 

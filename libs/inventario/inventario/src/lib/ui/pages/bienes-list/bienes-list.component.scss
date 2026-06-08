@@ -323,3 +323,65 @@ tbody .table-row td {
     margin: 0;
   }
 }
+
+/* ── Toggle de vistas (Bienes / Contratos) ─────────────────────────────────── */
+.vista-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  background: var(--color-superficie-contenedor-bajo);
+  border: 1px solid var(--color-contorno-variante);
+  border-radius: var(--radius-lg);
+  padding: var(--space-1);
+  margin-bottom: var(--space-6);
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border: none;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-standard),
+                color var(--duration-fast) var(--ease-standard);
+
+    &:hover:not(.vista-toggle__btn--active) {
+      background: var(--color-superficie-contenedor-alto);
+      color: var(--color-en-superficie);
+    }
+
+    &--active {
+      background: var(--color-superficie-contenedor-mas-alto);
+      color: var(--color-en-superficie);
+      font-weight: var(--font-weight-semibold);
+      box-shadow: var(--shadow-xs);
+    }
+  }
+}
+
+/* ── Vista Contratos: toolbar + resultado de importación ───────────────────── */
+.contratos-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-4);
+}
+
+.import-result {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-estado-activo-bg);
+  color: var(--color-estado-activo);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+
+  .material-symbols-outlined { font-size: 20px; }
+}

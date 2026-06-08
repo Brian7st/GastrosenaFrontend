@@ -61,7 +61,7 @@ export class ActasCreateComponent {
     fecha:                 ['', Validators.required],
     horaInicio:            ['', Validators.required],
     horaFin:               ['', Validators.required],
-    fichaId:               ['', [Validators.required, Validators.pattern(/^\d{7}$/)]],
+    fichaId:               ['', Validators.required],
     instructorId:          ['', Validators.required],
     resultadoAprendizaje:  ['', Validators.required],
     actividadesRealizadas: ['', Validators.required],
