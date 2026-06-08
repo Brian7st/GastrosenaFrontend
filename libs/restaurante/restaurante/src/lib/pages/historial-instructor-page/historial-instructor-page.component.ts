@@ -34,6 +34,7 @@ export class HistorialInstructorPageComponent {
   public todasLasOrdenes = this.facade.ordenesHistorial;
   public meseroFiltrado = signal<string>('');
   public terminoBusqueda = signal<string>('');
+  public filtroEstado = signal<string>('TODAS');
   public isDropdownOpen = signal<boolean>(false);
 
   public meserosUnicos = computed(() => {
@@ -57,6 +58,12 @@ export class HistorialInstructorPageComponent {
 
     return ordenes;
   });
+
+  public ordenesListo = computed(() => this.ordenes().filter(o => o.estado === 'LISTO_PARA_SERVIR'));
+  public ordenesPreparacion = computed(() => this.ordenes().filter(o => o.estado === 'EN_PREPARACION'));
+  public ordenesEnviado = computed(() => this.ordenes().filter(o => o.estado === 'ENVIADO_COCINA'));
+  public ordenesBorrador = computed(() => this.ordenes().filter(o => o.estado === 'BORRADOR'));
+  public ordenesOtras = computed(() => this.ordenes().filter(o => ['ENTREGADO', 'FACTURADO', 'CANCELADO'].includes(o.estado)));
 
   toggleDropdown() {
     this.isDropdownOpen.update(v => !v);

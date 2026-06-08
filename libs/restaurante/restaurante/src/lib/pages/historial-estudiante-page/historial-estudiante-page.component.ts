@@ -35,6 +35,7 @@ export class HistorialEstudiantePageComponent implements OnInit {
   private facade = inject(RestauranteFacade);
 
   public terminoBusqueda = signal<string>('');
+  public filtroEstado = signal<string>('TODAS');
 
   ngOnInit() {
     this.facade.cargarMisOrdenes();
@@ -53,6 +54,12 @@ export class HistorialEstudiantePageComponent implements OnInit {
 
     return ordenes;
   });
+
+  public ordenesListo = computed(() => this.misOrdenes().filter(o => o.estado === 'LISTO_PARA_SERVIR'));
+  public ordenesPreparacion = computed(() => this.misOrdenes().filter(o => o.estado === 'EN_PREPARACION'));
+  public ordenesEnviado = computed(() => this.misOrdenes().filter(o => o.estado === 'ENVIADO_COCINA'));
+  public ordenesBorrador = computed(() => this.misOrdenes().filter(o => o.estado === 'BORRADOR'));
+  public ordenesOtras = computed(() => this.misOrdenes().filter(o => ['ENTREGADO', 'FACTURADO', 'CANCELADO'].includes(o.estado)));
 
   getBadgeType(estado: string): 'info' | 'success' | 'warning' | 'danger' {
     switch (estado) {

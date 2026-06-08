@@ -6,7 +6,7 @@
     </restaurant-button>
   </div>
 
-  <restaurant-page-header title="Mis Pedidos (Estudiante)"
+  <restaurant-page-header title="Mis Pedidos (Aprendiz)"
     subtitle="Historial y estado actual de los pedidos que he tomado.">
   </restaurant-page-header>
 
@@ -18,8 +18,7 @@
     </div>
   </div>
 
-  <div class="historial-grid">
-    @for (orden of misOrdenes(); track orden.id) {
+  <ng-template #ordenCardTemplate let-orden="orden">
     <restaurant-card class="ticket-card">
       <div class="ticket-card__header" style="flex-wrap: wrap; gap: var(--space-2);">
         <div class="ticket-card__title">
@@ -94,11 +93,86 @@
       </div>
       }
     </restaurant-card>
-    } @empty {
-    <div class="empty-state">
-      <lucide-icon name="user" [size]="48" color="var(--color-text-tertiary)"></lucide-icon>
-      <p>Aún no has registrado ningún pedido.</p>
-    </div>
+  </ng-template>
+
+  <div class="mesas-filters" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 1.5rem; margin-top: 1rem;">
+    <restaurant-button [variant]="filtroEstado() === 'TODAS' ? 'primary' : 'outline'" (click)="filtroEstado.set('TODAS')">
+      Todas
+    </restaurant-button>
+    <restaurant-button [variant]="filtroEstado() === 'LISTO_PARA_SERVIR' ? 'primary' : 'outline'" (click)="filtroEstado.set('LISTO_PARA_SERVIR')">
+      Listo para Servir
+    </restaurant-button>
+    <restaurant-button [variant]="filtroEstado() === 'EN_PREPARACION' ? 'primary' : 'outline'" (click)="filtroEstado.set('EN_PREPARACION')">
+      En Preparación
+    </restaurant-button>
+    <restaurant-button [variant]="filtroEstado() === 'ENVIADO_COCINA' ? 'primary' : 'outline'" (click)="filtroEstado.set('ENVIADO_COCINA')">
+      Enviado a Cocina
+    </restaurant-button>
+    <restaurant-button [variant]="filtroEstado() === 'OTRAS' ? 'primary' : 'outline'" (click)="filtroEstado.set('OTRAS')">
+      Historial
+    </restaurant-button>
+  </div>
+
+  <div class="mesas-page__content" style="margin-top: var(--space-4);">
+    @if ((filtroEstado() === 'TODAS' || filtroEstado() === 'LISTO_PARA_SERVIR') && ordenesListo().length > 0) {
+      <div class="mesas-group mb-4">
+        <h3 class="mesas-group__title" style="margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; color: #d97706;">
+          <lucide-icon name="bell-ring" [size]="20"></lucide-icon> Listo Para Servir
+        </h3>
+        <div class="historial-grid" style="margin-top: 0;">
+          @for (orden of ordenesListo(); track orden.id) {
+            <ng-container *ngTemplateOutlet="ordenCardTemplate; context: { orden: orden }"></ng-container>
+          }
+        </div>
+      </div>
+    }
+
+    @if ((filtroEstado() === 'TODAS' || filtroEstado() === 'EN_PREPARACION') && ordenesPreparacion().length > 0) {
+      <div class="mesas-group mb-4">
+        <h3 class="mesas-group__title text-warning" style="margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+          <lucide-icon name="chef-hat" [size]="20"></lucide-icon> En Preparación
+        </h3>
+        <div class="historial-grid" style="margin-top: 0;">
+          @for (orden of ordenesPreparacion(); track orden.id) {
+            <ng-container *ngTemplateOutlet="ordenCardTemplate; context: { orden: orden }"></ng-container>
+          }
+        </div>
+      </div>
+    }
+
+    @if ((filtroEstado() === 'TODAS' || filtroEstado() === 'ENVIADO_COCINA') && ordenesEnviado().length > 0) {
+      <div class="mesas-group mb-4">
+        <h3 class="mesas-group__title text-primary" style="margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; color: #3b82f6;">
+          <lucide-icon name="send" [size]="20"></lucide-icon> Enviado a Cocina
+        </h3>
+        <div class="historial-grid" style="margin-top: 0;">
+          @for (orden of ordenesEnviado(); track orden.id) {
+            <ng-container *ngTemplateOutlet="ordenCardTemplate; context: { orden: orden }"></ng-container>
+          }
+        </div>
+      </div>
+    }
+
+
+
+    @if ((filtroEstado() === 'TODAS' || filtroEstado() === 'OTRAS') && ordenesOtras().length > 0) {
+      <div class="mesas-group mb-4">
+        <h3 class="mesas-group__title text-success" style="margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; color: #10b981;">
+          <lucide-icon name="check-circle" [size]="20"></lucide-icon> Historial
+        </h3>
+        <div class="historial-grid" style="margin-top: 0;">
+          @for (orden of ordenesOtras(); track orden.id) {
+            <ng-container *ngTemplateOutlet="ordenCardTemplate; context: { orden: orden }"></ng-container>
+          }
+        </div>
+      </div>
+    }
+
+    @if (misOrdenes().length === 0) {
+      <div class="empty-state">
+        <lucide-icon name="user" [size]="48" color="var(--color-text-tertiary)"></lucide-icon>
+        <p>Aún no has registrado ningún pedido.</p>
+      </div>
     }
   </div>
 </div>

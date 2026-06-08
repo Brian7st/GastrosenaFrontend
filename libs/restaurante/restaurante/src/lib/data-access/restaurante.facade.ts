@@ -182,7 +182,25 @@ export class RestauranteFacade {
           })
         }));
         
-        pedidosMapeados.sort((a, b) => new Date(b.fechaCreacion).getTime() - new Date(a.fechaCreacion).getTime());
+        const ESTADO_PESO: Record<string, number> = {
+          'LISTO_PARA_SERVIR': 1,
+          'EN_PREPARACION': 2,
+          'ENVIADO_COCINA': 3,
+          'BORRADOR': 4,
+          'ENTREGADO': 5,
+          'FACTURADO': 6,
+          'CANCELADO': 7
+        };
+
+        pedidosMapeados.sort((a, b) => {
+          const pesoA = ESTADO_PESO[a.estado] || 99;
+          const pesoB = ESTADO_PESO[b.estado] || 99;
+          if (pesoA !== pesoB) {
+            return pesoA - pesoB;
+          }
+          return new Date(b.fechaCreacion).getTime() - new Date(a.fechaCreacion).getTime();
+        });
+
         this._ordenesHistorial.set(pedidosMapeados);
       },
       error: (err) => {
