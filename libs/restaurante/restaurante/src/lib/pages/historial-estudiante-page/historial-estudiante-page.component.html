@@ -29,7 +29,7 @@
           </h3>
         </div>
         @if (orden.estado) {
-        <restaurant-status-badge [label]="orden.estado"
+        <restaurant-status-badge [label]="formatearEstado(orden.estado)"
           [variant]="getBadgeType(orden.estado)"></restaurant-status-badge>
         }
       </div>
@@ -37,11 +37,11 @@
       <div class="ticket-card__body">
         <div class="ticket-info-row">
           <span class="ticket-label">Mesa:</span>
-          <span class="ticket-value">Mesa {{ orden.mesaId }}</span>
+          <span class="ticket-value">{{ obtenerNombreMesa(orden.mesaId) }}</span>
         </div>
         <div class="ticket-info-row">
           <span class="ticket-label">Fecha:</span>
-          <span class="ticket-value">{{ orden.fechaCreacion | date:'shortTime' }}</span>
+          <span class="ticket-value">{{ orden.fechaCreacion | date:'d/MM/yyyy' }}</span>
         </div>
 
           <div class="ticket-items" *ngIf="orden.detalles && orden.detalles.length > 0">

@@ -53,22 +53,22 @@
             <h3>Pedido {{ orden.id ? orden.id.substring(0, 8) : 'N/A' }}</h3>
           </div>
           @if (orden.estado) {
-            <restaurant-status-badge [label]="orden.estado" [variant]="getBadgeType(orden.estado)"></restaurant-status-badge>
+            <restaurant-status-badge [label]="formatearEstado(orden.estado)" [variant]="getBadgeType(orden.estado)"></restaurant-status-badge>
           }
         </div>
         
         <div class="ticket-card__body">
           <div class="ticket-info-row">
             <span class="ticket-label">Mesa:</span>
-            <span class="ticket-value">Mesa {{ orden.mesaId }}</span>
+            <span class="ticket-value">{{ obtenerNombreMesa(orden.mesaId) }}</span>
           </div>
           <div class="ticket-info-row">
             <span class="ticket-label">Mesero:</span>
-            <span class="ticket-value">{{ orden.meseroId }}</span>
+            <span class="ticket-value">{{ acortarMesero(orden.meseroId) }}</span>
           </div>
           <div class="ticket-info-row">
             <span class="ticket-label">Fecha:</span>
-            <span class="ticket-value">{{ orden.fechaCreacion | date:'medium' }}</span>
+            <span class="ticket-value">{{ orden.fechaCreacion | date:'d/MM/yyyy' }}</span>
           </div>
           
           <div class="ticket-items" *ngIf="orden.detalles && orden.detalles.length > 0">

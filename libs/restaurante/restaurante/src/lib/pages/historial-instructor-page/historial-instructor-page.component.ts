@@ -72,8 +72,24 @@ export class HistorialInstructorPageComponent {
       case 'ENTREGADO': return 'success';
       case 'FACTURADO': return 'success';
       case 'EN_PREPARACION': return 'warning';
+      case 'LISTO_PARA_SERVIR': return 'warning';
       case 'BORRADOR': return 'info';
       default: return 'info';
     }
+  }
+
+  formatearEstado(estado: string): string {
+    if (!estado) return '';
+    return estado.replace(/_/g, ' ');
+  }
+
+  obtenerNombreMesa(mesaId: string): string {
+    const mesa = this.facade.mesas().find(m => m.id === mesaId);
+    return mesa ? mesa.nombre : 'Mesa ' + mesaId.substring(0, 4);
+  }
+
+  acortarMesero(meseroId: string): string {
+    if (!meseroId) return 'N/A';
+    return meseroId.length > 8 ? 'Mesero ' + meseroId.substring(meseroId.length - 8) : meseroId;
   }
 }

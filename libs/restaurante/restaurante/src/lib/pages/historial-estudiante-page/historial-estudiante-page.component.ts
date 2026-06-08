@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, computed, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -31,10 +31,14 @@ import { CurrencyCopPipe } from '@restaurant/shared/util';
   styleUrls: ['../historial-instructor-page/historial-instructor-page.component.scss'], // Estilos compartidos
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HistorialEstudiantePageComponent {
+export class HistorialEstudiantePageComponent implements OnInit {
   private facade = inject(RestauranteFacade);
 
   public terminoBusqueda = signal<string>('');
+
+  ngOnInit() {
+    this.facade.cargarMisOrdenes();
+  }
 
   // Prototipo: mostramos todos los pedidos pero en el futuro aquí se filtrará:
   public todasMisOrdenes = this.facade.ordenesHistorial;
@@ -59,6 +63,16 @@ export class HistorialEstudiantePageComponent {
       case 'BORRADOR': return 'info';
       default: return 'info';
     }
+  }
+
+  formatearEstado(estado: string): string {
+    if (!estado) return '';
+    return estado.replace(/_/g, ' ');
+  }
+
+  obtenerNombreMesa(mesaId: string): string {
+    const mesa = this.facade.mesas().find(m => m.id === mesaId);
+    return mesa ? mesa.nombre : 'Mesa ' + mesaId.substring(0, 4);
   }
 
   marcarEntregado(pedidoId: string): void {
