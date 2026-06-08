@@ -164,10 +164,17 @@
             <h5 class="category-title">Comidas</h5>
             <ul class="summary-list">
               @for (item of comidasPedido(); track item.productoId) {
-                <li>
-                  <span class="qty">{{ item.cantidad }}x</span>
-                  <span class="name">{{ item.nombreProducto }}</span>
-                  <span class="price">{{ (item.cantidad * item.precioUnitario) | currencyCop }}</span>
+                <li class="summary-item-container">
+                  <div class="summary-item-main">
+                    <span class="qty">{{ item.cantidad }}x</span>
+                    <span class="name">{{ item.nombreProducto }}</span>
+                    <span class="price">{{ (item.cantidad * item.precioUnitario) | currencyCop }}</span>
+                  </div>
+                  @if (item.observaciones) {
+                    <div class="summary-item-obs">
+                      {{ item.observaciones }}
+                    </div>
+                  }
                 </li>
               }
             </ul>
@@ -177,10 +184,17 @@
             <h5 class="category-title mt-3">Bebidas</h5>
             <ul class="summary-list">
               @for (item of bebidasPedido(); track item.productoId) {
-                <li>
-                  <span class="qty">{{ item.cantidad }}x</span>
-                  <span class="name">{{ item.nombreProducto }}</span>
-                  <span class="price">{{ (item.cantidad * item.precioUnitario) | currencyCop }}</span>
+                <li class="summary-item-container">
+                  <div class="summary-item-main">
+                    <span class="qty">{{ item.cantidad }}x</span>
+                    <span class="name">{{ item.nombreProducto }}</span>
+                    <span class="price">{{ (item.cantidad * item.precioUnitario) | currencyCop }}</span>
+                  </div>
+                  @if (item.observaciones) {
+                    <div class="summary-item-obs">
+                      {{ item.observaciones }}
+                    </div>
+                  }
                 </li>
               }
             </ul>

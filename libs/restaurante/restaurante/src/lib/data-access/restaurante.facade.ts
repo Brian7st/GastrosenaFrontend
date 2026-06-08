@@ -359,14 +359,17 @@ export class RestauranteFacade {
                 estado: pedidoFull.estado,
                 fechaCreacion: pedidoFull.fechaCreacion,
                 subtotal: pedidoFull.subtotal,
-                detalles: pedidoFull.detalles.map(d => ({
-                  productoId: d.productoId,
-                  nombreProducto: d.nombreProducto,
-                  cantidad: d.cantidad,
-                  precioUnitario: d.precioUnitario,
-                  categoria: 'COMIDA', // Valor por defecto visual
-                  observaciones: d.observaciones || undefined
-                }))
+                detalles: pedidoFull.detalles.map(d => {
+                  const prod = this._productosMenu().find(m => m.id === d.productoId || m.name === d.nombreProducto);
+                  return {
+                    productoId: d.productoId,
+                    nombreProducto: d.nombreProducto,
+                    cantidad: d.cantidad,
+                    precioUnitario: d.precioUnitario,
+                    categoria: prod ? prod.category : 'COMIDA', // Mapeo dinámico desde el catálogo
+                    observaciones: d.observaciones || undefined
+                  };
+                })
               };
               this._pedidoActivo.set(pedidoParaCarrito);
               observer.next(true);
