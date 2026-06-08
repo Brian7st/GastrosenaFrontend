@@ -97,6 +97,7 @@
       font-family: inherit;
       font-size: var(--font-size-sm);
       background-color: var(--color-surface-primary);
+      color: var(--color-text-primary);
       outline: none;
       transition: border-color var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast) var(--ease-standard);
 
@@ -591,6 +592,8 @@
       border: 1px solid var(--color-border);
       border-radius: var(--radius-md);
       font-family: inherit;
+      background-color: var(--color-surface-primary);
+      color: var(--color-text-primary);
       outline: none;
 
       &:focus {
@@ -667,6 +670,8 @@
         border-right: 1px solid var(--color-border);
         text-align: center;
         -moz-appearance: textfield;
+        background-color: var(--color-surface-primary);
+        color: var(--color-text-primary);
         
         &::-webkit-outer-spin-button,
         &::-webkit-inner-spin-button {
@@ -803,6 +808,7 @@
         font-family: inherit;
         font-size: var(--font-size-sm);
         background-color: var(--color-surface-primary);
+        color: var(--color-text-primary);
         outline: none;
         transition: border-color var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast) var(--ease-standard);
 
