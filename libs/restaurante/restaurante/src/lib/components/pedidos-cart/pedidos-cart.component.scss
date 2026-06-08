@@ -69,7 +69,40 @@
         font-family: var(--font-family-base);
         font-size: var(--font-size-sm);
         color: var(--color-text-secondary);
+        margin-bottom: 0;
+        
+        /* Truncate text */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 130px;
+        display: inline-block;
+      }
+
+      .obs-display {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
         margin-bottom: var(--space-2);
+        max-width: 100%;
+
+        .btn-edit-obs {
+          background: none;
+          border: none;
+          color: var(--color-text-tertiary);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 2px;
+          border-radius: var(--radius-sm);
+          transition: background 0.2s, color 0.2s;
+
+          &:hover {
+            color: var(--color-primario);
+            background-color: var(--color-background-soft);
+          }
+        }
       }
 
       .quantity-controls {
@@ -460,6 +493,38 @@
 
   .text-error {
     color: var(--color-error);
+  }
+
+  .obs-textarea-container {
+    margin-bottom: var(--space-5);
+    margin-top: var(--space-4);
+
+    .obs-textarea-input {
+      width: 100%;
+      min-height: 120px;
+      padding: var(--space-4);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-family: var(--font-family-base);
+      font-size: var(--font-size-md);
+      background-color: var(--color-background-soft, #f8fafc);
+      color: var(--color-text-primary);
+      box-sizing: border-box;
+      resize: none;
+      line-height: 1.5;
+      transition: border-color 0.2s, box-shadow 0.2s;
+
+      &:focus {
+        outline: none;
+        border-color: var(--color-primario);
+        box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15); /* Soft green glow */
+      }
+      
+      &::placeholder {
+        color: var(--color-text-tertiary);
+        font-style: italic;
+      }
+    }
   }
 
   .cancel-reason-container {

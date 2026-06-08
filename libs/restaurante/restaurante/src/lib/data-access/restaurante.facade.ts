@@ -415,6 +415,18 @@ export class RestauranteFacade {
     });
   }
 
+  actualizarObservacionesProducto(index: number, observaciones: string) {
+    this._pedidoActivo.update(pedido => {
+      if (!pedido) return null;
+      if (pedido.estado !== 'BORRADOR') return pedido;
+
+      const detalles = [...pedido.detalles];
+      detalles[index] = { ...detalles[index], observaciones };
+
+      return { ...pedido, detalles };
+    });
+  }
+
   eliminarProductoDelPedido(index: number) {
     this._pedidoActivo.update(pedido => {
       if (!pedido) return null;
