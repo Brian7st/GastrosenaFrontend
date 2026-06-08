@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 import { PresupuestoFacade } from '../../../data-access/presupuesto.facade';
-import { RegistrarPresupuestoData } from '../../../models/presupuesto.model';
+import { FuenteFinanciacion, RegistrarPresupuestoData } from '../../../models/presupuesto.model';
 
 @Component({
   selector: 'restaurant-presupuesto-registrar',
@@ -19,9 +19,6 @@ export class PresupuestoRegistrarComponent implements OnInit {
   private fb     = inject(FormBuilder);
   private facade = inject(PresupuestoFacade);
 
-  // Grupos de rubros agrupados por ficha (para el selector de programa)
-  grupos = this.facade.grupos;
-
   readonly VIGENCIAS = [2024, 2025, 2026];
 
   /**
@@ -34,10 +31,15 @@ export class PresupuestoRegistrarComponent implements OnInit {
     vigencia:          [new Date().getFullYear(), Validators.required],
     fechaAprobacion:   ['', Validators.required],
     // Rubro único inline
-    rubroCodigo:       ['', Validators.required],
-    rubroDescripcion:  ['', Validators.required],
-    montoAsignado:     [0, [Validators.required, Validators.min(1)]],
+    rubroCodigo:               ['', Validators.required],
+    rubroDescripcion:          ['', Validators.required],
+    rubroPosicionPresupuestal: ['', Validators.required],
+    rubroDependencia:          ['', Validators.required],
+    rubroFuente:               ['NACION' as FuenteFinanciacion, Validators.required],
+    montoAsignado:             [0, [Validators.required, Validators.min(1)]],
   });
+
+  readonly FUENTES: FuenteFinanciacion[] = ['NACION', 'PROPIOS'];
 
   ngOnInit(): void {
     this.facade.loadAll();
@@ -52,9 +54,12 @@ export class PresupuestoRegistrarComponent implements OnInit {
         vigencia:          v.vigencia,
         fechaAprobacion:   v.fechaAprobacion,
         rubros: [{
-          codigo:        v.rubroCodigo,
-          descripcion:   v.rubroDescripcion,
-          montoAsignado: v.montoAsignado,
+          codigo:               v.rubroCodigo,
+          descripcion:          v.rubroDescripcion,
+          posicionPresupuestal: v.rubroPosicionPresupuestal,
+          dependencia:          v.rubroDependencia,
+          fuente:               v.rubroFuente,
+          montoAsignado:        v.montoAsignado,
         }],
       };
       this.facade.registrarPresupuesto(data);

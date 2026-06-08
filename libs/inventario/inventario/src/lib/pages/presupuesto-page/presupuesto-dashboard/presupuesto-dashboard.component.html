@@ -149,6 +149,59 @@
   </div>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
+       TABLA SIIF (Sección B): por posición presupuestal + fuente
+       ═══════════════════════════════════════════════════════════════════════ -->
+  @if (gruposPorPosicion().length > 0) {
+  <div class="estructura-card">
+    <div class="estructura-header">
+      <div class="estructura-title-group">
+        <lucide-icon name="landmark" [size]="20" class="estructura-icon"></lucide-icon>
+        <h2 class="estructura-title">Ejecución por Posición Presupuestal (SIIF)</h2>
+      </div>
+    </div>
+
+    <div class="estructura-table-wrapper">
+      <table class="estructura-table">
+        <thead>
+          <tr>
+            <th class="col-estructura">Posición presupuestal</th>
+            <th>Fuente</th>
+            <th class="col-money">Apropiación Inicial</th>
+            <th class="col-money">Disponible</th>
+            <th class="col-money">Comprometido</th>
+            <th class="col-money">Por cancelar</th>
+            <th class="col-ejecucion">Ejecución</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (grupo of gruposPorPosicion(); track grupo.posicionPresupuestal + grupo.fuente) {
+          <tr class="grupo-row">
+            <td class="col-estructura">
+              <span class="rubro-codigo">{{ grupo.posicionPresupuestal }}</span>
+            </td>
+            <td>
+              <span class="fuente-badge" [ngClass]="'fuente-badge--' + grupo.fuente.toLowerCase()">
+                {{ grupo.fuente }}
+              </span>
+            </td>
+            <td class="col-money grupo-value">{{ grupo.totalMontoAsignado | formatoMoneda:false }}</td>
+            <td class="col-money grupo-value">{{ grupo.totalSaldoDisponible | formatoMoneda:false }}</td>
+            <td class="col-money grupo-value">{{ grupo.totalMontoComprometido | formatoMoneda:false }}</td>
+            <td class="col-money grupo-value">{{ grupo.totalValorPorCancelar | formatoMoneda:false }}</td>
+            <td class="col-ejecucion">
+              <span class="ejecucion-badge" [ngClass]="getEjecucionClass(grupo.porcentajeEjecucion)">
+                {{ grupo.porcentajeEjecucion }}%
+              </span>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+  }
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
        BENTO GRID: Ejecución Mensual + Próximos Vencimientos
        ═══════════════════════════════════════════════════════════════════════ -->
   <div class="bento-grid">

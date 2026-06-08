@@ -29,7 +29,9 @@ export class BienImportModalComponent {
   readonly INSTRUCCIONES = [
     'Descargue la plantilla y complétela con los datos de sus bienes.',
     'Los únicos campos obligatorios son Nombre y Unidad de Medida.',
-    'Si algún bien tiene errores, se rechaza el lote completo. Corrija antes de importar.',
+    'El IVA se carga como fracción: 0 (exento), 0.05 o 0.19 — no como porcentaje.',
+    'Si un bien ya existe (por código o descripción) se actualiza y se completan los datos faltantes, no se duplica.',
+    'Si alguna fila tiene errores de formato, se rechaza el lote. Corrija antes de importar.',
   ];
 
   onFileSelected(event: Event): void {

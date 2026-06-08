@@ -1,0 +1,34 @@
+<div class="typeahead">
+  <div class="typeahead__field">
+    <span class="material-symbols-outlined typeahead__icon">search</span>
+    <input
+      class="typeahead__input"
+      type="text"
+      [value]="query()"
+      [placeholder]="placeholder"
+      (input)="onInput($any($event.target).value)"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+      (keydown.enter)="onEnter()"
+    />
+    @if (loading()) {
+      <span class="material-symbols-outlined typeahead__spin">progress_activity</span>
+    }
+  </div>
+
+  @if (abierto() && query().trim()) {
+    <ul class="typeahead__panel" role="listbox">
+      @for (bien of sugerencias(); track bien.id) {
+        <li class="typeahead__option" role="option" (mousedown)="onSeleccionar(bien)">
+          <div class="typeahead__option-main">
+            <span class="typeahead__code">{{ bien.codigoSena || '—' }}</span>
+            <span class="typeahead__desc">{{ bien.descripcion }}</span>
+          </div>
+          <span class="typeahead__price">{{ bien.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+        </li>
+      } @empty {
+        <li class="typeahead__empty">Sin coincidencias en el catálogo.</li>
+      }
+    </ul>
+  }
+</div>

@@ -86,6 +86,16 @@ export class PaqueteService {
     return this.archivarPaquete(paqueteId);
   }
 
+  /** PATCH /legalization/paquetes/{id}/revisar — transición COMPLETO → REVISADO. */
+  revisarPaquete(id: string, revisorId: string): Observable<boolean> {
+    return this.http
+      .patch<void>(`${API}/legalization/paquetes/${id}/revisar`, { revisorId })
+      .pipe(
+        map(() => true),
+        catchError(err => throwError(() => err))
+      );
+  }
+
   /** PATCH /legalization/paquetes/{id}/archivar */
   archivarPaquete(id: string): Observable<boolean> {
     return this.http

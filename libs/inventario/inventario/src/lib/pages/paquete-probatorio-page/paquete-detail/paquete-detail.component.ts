@@ -70,6 +70,14 @@ export class PaqueteDetailComponent implements OnInit {
     return p ? (!!p.actaId && !!p.requisicionId && p.registroAsistenciaAdjunto) : false;
   });
 
+  /** El backend exige COMPLETO → REVISADO (revisar) antes de poder archivar. */
+  readonly puedeRevisar = computed(() => this.paquete()?.estado === 'COMPLETO');
+
+  /** Archivar solo es válido en REVISADO y con la trazabilidad vinculada (RF-5.11.7). */
+  readonly puedeArchivar = computed(() =>
+    this.paquete()?.estado === 'REVISADO' && this.trazabilidadRegistrada()
+  );
+
   docsCompletados = computed(() => {
     const p = this.paquete();
     if (!p) return 0;
@@ -208,9 +216,17 @@ export class PaqueteDetailComponent implements OnInit {
     // facade.loading() refleja el estado — facade.error() expone errores del backend
   }
 
+  /** Avanza el paquete de COMPLETO → REVISADO. revisorId provisional: el instructor del paquete. */
+  revisarPaquete(): void {
+    const p = this.paquete();
+    if (p && this.puedeRevisar()) {
+      this.facade.revisarPaquete(p.id, p.instructorId || 'revisor-sena');
+    }
+  }
+
   archivarExpediente(): void {
     const p = this.paquete();
-    if (p) {
+    if (p && this.puedeArchivar()) {
       this.facade.archivarPaquete(p.id);
     }
   }

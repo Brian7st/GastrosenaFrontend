@@ -6,6 +6,7 @@ import { ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { ConfirmarEnvioSolicitudModalComponent } from '../../../components/confirmar-envio-solicitud-modal/confirmar-envio-solicitud-modal.component';
 import { BienTableComponent } from '../../../ui/components/bien-table/bien-table.component';
+import { BienTypeaheadComponent } from '../../../ui/components/bien-typeahead/bien-typeahead.component';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { SolicitudSesionItem } from '../../../models/solicitud-sesion.model';
@@ -14,7 +15,7 @@ import { Bien } from '../../../models/inventario.model';
 @Component({
   selector: 'restaurant-solicitudes-insumos-form',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ButtonComponent, BackButtonComponent, ConfirmarEnvioSolicitudModalComponent, BienTableComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ButtonComponent, BackButtonComponent, ConfirmarEnvioSolicitudModalComponent, BienTableComponent, BienTypeaheadComponent],
   templateUrl: './solicitudes-insumos-form.component.html',
   styleUrl: './solicitudes-insumos-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -130,7 +131,7 @@ export class SolicitudesInsumosFormComponent implements OnInit {
       valorUnitario:           bien.valor ?? 0,
       valorUnitarioAdjudicado: bien.valor ?? 0,
       total:                   bien.valor ?? 0,
-      iva:                     0,
+      iva:                     bien.iva ?? 0,
     }]);
     this.mostrarSelectorBien.set(false);
   }

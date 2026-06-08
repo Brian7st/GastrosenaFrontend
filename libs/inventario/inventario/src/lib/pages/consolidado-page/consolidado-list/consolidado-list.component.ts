@@ -7,6 +7,7 @@ import { ReversarConsolidadoModalComponent } from '../components/reversar-consol
 import { Consolidado } from '../../../models/consolidado.model';
 import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 import { ConsolidadoFacade } from '../../../data-access/consolidado.facade';
+import { PresupuestoFacade } from '../../../data-access/presupuesto.facade';
 
 @Component({
   selector: 'restaurant-consolidado-list',
@@ -19,11 +20,17 @@ import { ConsolidadoFacade } from '../../../data-access/consolidado.facade';
 export class ConsolidadoListComponent implements OnInit {
   private router = inject(Router);
   private facade = inject(ConsolidadoFacade);
+  private presupuestoFacade = inject(PresupuestoFacade);
 
   // ── Estado reactivo desde facade ─────────────────────────────────────────
   consolidados = this.facade.consolidados;
   loading      = this.facade.loading;
   searchText   = signal<string>('');
+
+  // ── Ejecución presupuestal real (GET /budget/presupuestos/resumen) ───────
+  resumenPresupuestal = this.presupuestoFacade.resumenGlobal;
+  /** % de ejecución (comprometido + pagado sobre asignado). null mientras carga. */
+  porcentajeEjecucion = computed(() => this.resumenPresupuestal()?.porcentajeEjecucion ?? null);
 
   showExportModal      = signal(false);
   showReversarModal    = signal(false);
@@ -86,6 +93,11 @@ export class ConsolidadoListComponent implements OnInit {
 
   ngOnInit(): void {
     this.facade.loadAll();
+    this.presupuestoFacade.cargarResumenGlobal();
+  }
+
+  verPresupuesto(): void {
+    this.router.navigate(['/app/inventario/presupuesto']);
   }
 
   onSearch(query: string): void {
