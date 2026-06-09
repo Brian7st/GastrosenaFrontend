@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 @Component({
   selector: 'restaurant-public-footer',
   standalone: true,
-  imports: [RouterLink],
+  imports: [],
   templateUrl: './public-footer.component.html',
   styleUrl: './public-footer.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
