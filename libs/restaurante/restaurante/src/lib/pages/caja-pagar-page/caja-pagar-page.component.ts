@@ -137,25 +137,17 @@ export class CajaPagarPageComponent implements OnInit {
     const metodo = this.metodoSeleccionado();
     if (!metodo) return false;
 
-    if (metodo === 'EFECTIVO') {
-      const monto = this.montoRecibido();
-      const total = this.totalACobrar();
-      if (!monto || monto < total) {
-        return false;
-      }
+    if (this.metodoSeleccionado() === 'EFECTIVO') {
+      return this.montoRecibido() >= this.totalACobrar();
     }
-
     return true;
   }
 
   confirmarPago() {
-    if (!this.esPagoValido()) return;
+    if (!this.esPagoValido() || !this.pedidoSeleccionado()) return;
 
     const pedido = this.pedidoSeleccionado();
-    const metodo = this.metodoSeleccionado();
-    let metodoBackend = metodo;
-
-    this.facade.facturarPedido(pedido.id, metodoBackend as MetodoPago, this.propinaCalculada()).subscribe({
+    this.facade.facturarPedido(pedido.id, this.metodoSeleccionado() as MetodoPago, this.propinaCalculada()).subscribe({
       next: (facturaId) => {
         this.cerrarModal();
         if (facturaId) {
@@ -163,24 +155,39 @@ export class CajaPagarPageComponent implements OnInit {
           this.alertDialog.set({
             open: true,
             title: 'Pago Procesado',
-            message: `El pago del pedido #${pedido.id.substring(0, 8).toUpperCase()} se registró correctamente.`,
-            success: true
+            message: `El pago del pedido #${pedido.id.substring(0, 8).toUpperCase()} se registró correctamente. ¿Deseas descargar la tirilla en PDF?`,
+            type: 'confirm',
+            confirmText: 'Descargar Tirilla',
+            cancelText: 'Cerrar'
           });
         } else {
           this.alertDialog.set({
             open: true,
             title: 'Error de Pago',
             message: 'No se pudo obtener el número de factura. Verifique en Movimientos.',
-            success: false
+            type: 'error'
           });
         }
+      },
+      error: () => {
+        this.cerrarModal();
+        this.alertDialog.set({
+          open: true,
+          title: 'Error de Pago',
+          message: 'No se pudo registrar el pago. Verifique e intente nuevamente.',
+          type: 'error'
+        });
       }
     });
   }
 
-  irAMovimientos() {
-    this.alertDialog.set({ ...this.alertDialog(), open: false });
-    this.router.navigate(['../movimientos'], { relativeTo: this.route });
+  confirmAlertDialog() {
+    const state = this.alertDialog();
+    if (state.type === 'confirm' && state.title === 'Pago Procesado') {
+      this.descargarTirillaYCerrar();
+    } else {
+      this.cerrarAlertDialog();
+    }
   }
 
   descargarTirillaYCerrar() {
@@ -192,8 +199,9 @@ export class CajaPagarPageComponent implements OnInit {
   }
 
   cerrarAlertDialog() {
-    this.alertDialog.set({ ...this.alertDialog(), open: false });
+    this.alertDialog.update(s => ({ ...s, open: false }));
     this.facturaRecienPagadaId.set(null);
+    this.router.navigate(['../movimientos'], { relativeTo: this.route });
   }
 
   preventInvalidChars(event: KeyboardEvent): void {
