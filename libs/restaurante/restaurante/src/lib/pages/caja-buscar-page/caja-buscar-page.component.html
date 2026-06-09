@@ -63,11 +63,11 @@
         </div>
 
         <div class="action-buttons mt-4">
-          <restaurant-button variant="ghost" class="btn-icon-danger" (click)="limpiarFiltros()">
+          <restaurant-button variant="ghost" (click)="limpiarFiltros()">
             <lucide-icon name="x" [size]="18"></lucide-icon>
             <span>Limpiar Filtros</span>
           </restaurant-button>
-          <restaurant-button variant="outline">
+          <restaurant-button variant="surface" (click)="exportarResultados()" [disabled]="facturasFiltradas().length === 0">
             <lucide-icon name="file-text" [size]="18"></lucide-icon>
             <span>Exportar Resultados</span>
           </restaurant-button>

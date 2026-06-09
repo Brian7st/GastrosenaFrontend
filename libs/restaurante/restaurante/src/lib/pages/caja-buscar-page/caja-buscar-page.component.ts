@@ -108,7 +108,8 @@ export class CajaBuscarPageComponent implements OnInit {
     // Filtro por Rango (Usando fechaEmision)
     const fInicio = this.fechaInicio();
     if (fInicio) {
-      const dInicio = new Date(fInicio).getTime();
+      const [year, month, day] = fInicio.split('-');
+      const dInicio = new Date(Number(year), Number(month) - 1, Number(day)).getTime();
       result = result.filter(f => {
         const fechaFac = new Date(f.fechaEmision || '').getTime();
         return fechaFac >= dInicio;
@@ -117,7 +118,8 @@ export class CajaBuscarPageComponent implements OnInit {
 
     const fFin = this.fechaFin();
     if (fFin) {
-      const dFin = new Date(fFin);
+      const [year, month, day] = fFin.split('-');
+      const dFin = new Date(Number(year), Number(month) - 1, Number(day));
       dFin.setHours(23, 59, 59, 999);
       result = result.filter(f => {
         const fechaFac = new Date(f.fechaEmision || '').getTime();
@@ -149,6 +151,34 @@ export class CajaBuscarPageComponent implements OnInit {
     this.filtroCajero.set('');
     this.fechaInicio.set('');
     this.fechaFin.set('');
+  }
+
+  exportarResultados() {
+    const facturas = this.facturasFiltradas();
+    if (facturas.length === 0) return;
+
+    const encabezados = ['N° Factura', 'Mesa', 'Cajero ID', 'Fecha Emision', 'Metodo Pago', 'Total', 'Estado'];
+    const lineas = facturas.map(f => {
+      const fecha = new Date(f.fechaEmision).toLocaleString('es-CO');
+      return [
+        f.numeroFactura,
+        f.nombreMesa || 'Para Llevar',
+        f.cajeroId,
+        fecha,
+        f.metodoPago,
+        f.total,
+        f.estado
+      ].join(',');
+    });
+
+    const csvContent = "data:text/csv;charset=utf-8," + [encabezados.join(','), ...lineas].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "exportacion_facturas.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 
   volver() {
