@@ -5,7 +5,9 @@ import {
   PageHeaderComponent,
   ButtonComponent,
   LucideIconComponent,
-  ConfirmDialogComponent
+  ConfirmDialogComponent,
+  DataTableComponent,
+  EmptyStateComponent
 } from '@restaurant/shared/ui';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
 import { RestauranteService } from '../../data-access/restaurante.service';
@@ -18,7 +20,9 @@ import { RestauranteService } from '../../data-access/restaurante.service';
     PageHeaderComponent,
     ButtonComponent,
     LucideIconComponent,
-    ConfirmDialogComponent
+    ConfirmDialogComponent,
+    DataTableComponent,
+    EmptyStateComponent
   ],
   templateUrl: './caja-movimientos-page.component.html',
   styleUrl: './caja-movimientos-page.component.scss',

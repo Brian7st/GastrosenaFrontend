@@ -7,7 +7,9 @@ import {
   CardComponent,
   ButtonComponent,
   LucideIconComponent,
-  StatusBadgeComponent
+  StatusBadgeComponent,
+  DataTableComponent,
+  EmptyStateComponent
 } from '@restaurant/shared/ui';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
 import { RestauranteService } from '../../data-access/restaurante.service';
@@ -22,7 +24,9 @@ import { RestauranteService } from '../../data-access/restaurante.service';
     CardComponent,
     ButtonComponent,
     LucideIconComponent,
-    StatusBadgeComponent
+    StatusBadgeComponent,
+    DataTableComponent,
+    EmptyStateComponent
   ],
   templateUrl: './caja-buscar-page.component.html',
   styleUrl: './caja-buscar-page.component.scss',

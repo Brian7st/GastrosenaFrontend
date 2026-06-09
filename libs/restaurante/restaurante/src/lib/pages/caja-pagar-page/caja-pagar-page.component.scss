@@ -56,35 +56,6 @@
     }
   }
 
-  /* Estilos de Tabla */
-  .table-responsive { overflow-x: auto; }
-  .restaurant-table {
-    width: 100%;
-    border-collapse: collapse;
-    th, td { padding: var(--space-4) var(--space-3); border-bottom: 1px solid var(--color-border); font-size: var(--font-size-sm); }
-    th { text-align: left; font-weight: var(--font-weight-semibold); color: var(--color-text-secondary); background-color: var(--color-surface-hover); }
-    .text-center { text-align: center; }
-    .amount-pending { font-weight: var(--font-weight-semibold); color: var(--color-text-primary); }
-
-    .action-btn-collect {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-2);
-      background-color: var(--color-brand-primary);
-      border: 1px solid var(--color-brand-primary);
-      border-radius: var(--radius-md);
-      padding: var(--space-2) var(--space-4);
-      font-size: var(--font-size-xs);
-      font-weight: var(--font-weight-medium);
-      color: white;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: var(--shadow-sm);
-
-      &:hover { background-color: #e0532b; border-color: #e0532b; }
-    }
-  }
-
   /* ESTILOS INTERNOS DEL MODAL DE COBRO */
   .modal-overlay {
     position: fixed;
@@ -139,12 +110,12 @@
     color: var(--color-text-secondary); font-size: var(--font-size-sm); font-weight: 500;
 
     &:hover { border-color: var(--color-brand-primary); color: var(--color-brand-primary); background-color: var(--color-surface-hover); }
-    &.active { border-color: var(--color-brand-primary); background-color: #fff4f0; color: var(--color-brand-primary); box-shadow: 0 0 0 1px var(--color-brand-primary); }
+    &.active { border-color: var(--color-brand-primary); background-color: var(--color-brand-primary-soft); color: var(--color-brand-primary); box-shadow: 0 0 0 1px var(--color-brand-primary); }
   }
 
   /* Caja del Calculador de Efectivo */
   .cash-calculator-box {
-    background-color: #fafafa; border: 1px dashed var(--color-border);
+    background-color: var(--color-surface-secondary); border: 1px dashed var(--color-border);
     padding: var(--space-4); border-radius: var(--radius-lg);
     .input-group { display: flex; flex-direction: column; gap: var(--space-2); label { font-size: var(--font-size-xs); font-weight: 600; color: var(--color-text-secondary); } }
     .form-control { padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: var(--font-size-md); outline: none; width: 100%; &:focus { border-color: var(--color-brand-primary); } }
@@ -152,13 +123,13 @@
     .change-row {
       display: flex; justify-content: space-between; align-items: center;
       .change-lbl { font-size: var(--font-size-sm); font-weight: 500; color: var(--color-text-heading); }
-      .change-val { font-size: 1.3rem; font-weight: 700; color: #28a745; &.negative { color: #dc3545; } }
+      .change-val { font-size: 1.3rem; font-weight: 700; color: var(--color-success); &.negative { color: var(--color-danger); } }
     }
   }
 
   .alert {
     padding: var(--space-3); border-radius: var(--radius-md); font-size: var(--font-size-xs); display: flex; align-items: center; gap: var(--space-2);
-    &.alert-info { background-color: #e8f0fe; color: #1a73e8; }
+    &.alert-info { background-color: var(--color-info-bg); color: var(--color-info-text); }
   }
 
   .modal-footer { padding: var(--space-4) var(--space-6); border-top: 1px solid var(--color-border); display: flex; justify-content: flex-end; gap: var(--space-3); }
@@ -166,5 +137,4 @@
   .mt-4 { margin-top: var(--space-4); }
 }
 
-.empty-state-row { padding: var(--space-6); color: var(--color-text-secondary); text-align: center; }
 @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }

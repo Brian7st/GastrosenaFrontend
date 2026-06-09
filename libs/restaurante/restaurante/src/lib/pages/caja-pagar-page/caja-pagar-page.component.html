@@ -10,51 +10,45 @@
     </div>
 
     <div class="main-content-block">
-        <div class="card">
-            <div class="block-header">
-                <div class="title-group">
-                    <h5>Pedidos por Cobrar</h5>
-                </div>
-            </div>
+    <restaurant-data-table tableTitle="Pedidos por Cobrar" tableIcon="dollar-sign" class="mt-4" style="display: block;">
+      <ng-container dtHeader>
+        <span class="subtitle" style="display: block; padding: 0 var(--space-6) var(--space-4) var(--space-6); margin-top: calc(var(--space-2) * -1); font-size: var(--font-size-sm); color: var(--color-text-secondary);">Seleccione el pedido que desea facturar</span>
+      </ng-container>
 
-            <div class="table-responsive mt-4">
-                <table class="restaurant-table">
-                    <thead>
-                    <tr>
-                        <th>N° Pedido (Ref)</th>
-                        <th>Mesa</th>
-                        <th>Mesero (ID)</th>
-                        <th>Total a Pagar</th>
-                        <th class="text-center">Acción</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @for (pedido of pedidosPorPagar(); track pedido.id) {
-                    <tr>
-                        <td title="{{ pedido.id }}"><strong>#{{ pedido.id | slice:0:8 | uppercase }}</strong></td>
-                        <td>{{ pedido.nombreMesa || 'Para Llevar' }}</td>
-                        <td title="{{ pedido.meseroId }}"><span class="badge-count">{{ pedido.meseroId | slice:0:8 }}...</span></td>
-                        <td class="amount-pending">{{ pedido.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
-                        <td class="text-center">
-                            <button class="action-btn-collect" (click)="abrirCobro(pedido)">
-                                <lucide-icon name="dollar-sign" [size]="16"></lucide-icon>
-                                <span>Cobrar</span>
-                            </button>
-                        </td>
-                    </tr>
-                    } @empty {
-                    <tr>
-                        <td colspan="5" class="text-center empty-state-row">
-                            <lucide-icon name="check-circle" [size]="24" class="text-success"></lucide-icon>
-                            <p>¡Excelente! No hay pedidos entregados pendientes por pagar en este momento.</p>
-                        </td>
-                    </tr>
-                    }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+      <thead dtHeader>
+        <tr>
+          <th>Mesa</th>
+          <th>Cajero</th>
+          <th>Total Pedido</th>
+          <th class="text-center">Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (pedido of pedidosPorPagar(); track pedido.id) {
+        <tr>
+          <td><strong>{{ pedido.nombreMesa || 'Para Llevar' }}</strong></td>
+          <td title="{{ pedido.meseroId }}"><span class="badge-count">{{ pedido.meseroId | slice:0:8 }}...</span></td>
+          <td class="amount-pending" style="font-weight: var(--font-weight-semibold); color: var(--color-text-primary);">{{ pedido.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+          <td class="text-center">
+            <restaurant-button variant="primary" (click)="abrirCobro(pedido)" style="font-size: 0.85rem; padding: 0.25rem 0.75rem;">
+              <lucide-icon name="dollar-sign" [size]="16"></lucide-icon>
+              <span>Cobrar</span>
+            </restaurant-button>
+          </td>
+        </tr>
+        } @empty {
+        <tr>
+          <td colspan="4" class="p-0 border-0">
+            <restaurant-empty-state
+                    title="Todo al día"
+                    message="No hay pedidos pendientes por cobrar en este momento.">
+            </restaurant-empty-state>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </restaurant-data-table>
+  </div>
 
     @if (modalAbierto()) {
     <div class="modal-overlay" (click)="cerrarModal()">

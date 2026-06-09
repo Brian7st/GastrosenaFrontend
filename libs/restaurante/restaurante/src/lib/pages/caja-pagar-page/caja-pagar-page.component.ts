@@ -5,7 +5,9 @@ import {
   PageHeaderComponent,
   ButtonComponent,
   LucideIconComponent,
-  ConfirmDialogComponent
+  ConfirmDialogComponent,
+  DataTableComponent,
+  EmptyStateComponent
 } from '@restaurant/shared/ui';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
 import { MetodoPago } from '../../models/restaurante.model';
@@ -19,6 +21,8 @@ import { MetodoPago } from '../../models/restaurante.model';
     ButtonComponent,
     LucideIconComponent,
     ConfirmDialogComponent,
+    DataTableComponent,
+    EmptyStateComponent,
     CurrencyPipe
   ],
   templateUrl: './caja-pagar-page.component.html',
