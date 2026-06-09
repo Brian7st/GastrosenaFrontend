@@ -86,6 +86,7 @@ export interface CerrarSesionRequest {
 export interface FacturarPedidoRequest {
   pedidoId: string;
   metodoPago: MetodoPago;
+  propina: number;
 }
 
 /**

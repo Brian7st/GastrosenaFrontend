@@ -7,6 +7,7 @@ import {
   ResumenPresupuestosGlobal,
   Rubro,
   GrupoPresupuestal,
+  GrupoSiif,
   AfectacionPresupuestal,
   VencimientoProximo,
   EjecucionMensual,
@@ -84,6 +85,45 @@ export class PresupuestoFacade {
     return Array.from(groupMap.values());
   });
 
+  /** Sección B del Excel: rubros agrupados por posición presupuestal + fuente (SIIF). */
+  public gruposPorPosicion = computed<GrupoSiif[]>(() => {
+    const groupMap = new Map<string, GrupoSiif>();
+
+    for (const r of this._rubros()) {
+      const clave = `${r.posicionPresupuestal}|${r.fuente}`;
+      if (!groupMap.has(clave)) {
+        groupMap.set(clave, {
+          posicionPresupuestal:   r.posicionPresupuestal,
+          fuente:                 r.fuente,
+          rubros:                 [],
+          totalMontoAsignado:     0,
+          totalMontoComprometido: 0,
+          totalMontoPagado:       0,
+          totalSaldoDisponible:   0,
+          totalValorPorCancelar:  0,
+          porcentajeEjecucion:    0,
+        });
+      }
+      const g = groupMap.get(clave)!;
+      g.rubros.push(r);
+      g.totalMontoAsignado     += r.montoAsignado;
+      g.totalMontoComprometido += r.montoComprometido;
+      g.totalMontoPagado       += r.montoPagado;
+      g.totalSaldoDisponible   += r.saldoDisponible;
+      g.totalValorPorCancelar  += r.valorPorCancelar;
+    }
+
+    for (const g of groupMap.values()) {
+      g.porcentajeEjecucion = g.totalMontoAsignado > 0
+        ? parseFloat(
+            ((g.totalMontoComprometido + g.totalMontoPagado) / g.totalMontoAsignado * 100).toFixed(1),
+          )
+        : 0;
+    }
+
+    return Array.from(groupMap.values());
+  });
+
   /**
    * Carga inicial de datos para el dashboard:
    * rubros, resumen global, afectaciones, vencimientos, ejecución mensual.
@@ -120,6 +160,17 @@ export class PresupuestoFacade {
         finalize(() => this._loading.set(false)),
       )
       .subscribe(data => this._ejecucionMensual.set(data));
+  }
+
+  /**
+   * Carga SOLO el resumen global (GET /budget/presupuestos/resumen).
+   * Pensado para vistas que necesitan el % de ejecución sin el resto del
+   * dashboard (evita disparar los GET de rubros/afectaciones/vencimientos).
+   */
+  cargarResumenGlobal(vigencia?: number): void {
+    this.presupuestoService.getResumen(vigencia)
+      .pipe(catchError(() => of(null)))
+      .subscribe(data => this._resumenGlobal.set(data));
   }
 
   // ── Compromisos ────────────────────────────────────────────────────────────

@@ -20,6 +20,7 @@ import {
 import { UsuarioAvatarComponent } from '../../components/usuario-avatar/usuario-avatar.component';
 import { UsuarioRolBadgeComponent } from '../../components/usuario-rol-badge/usuario-rol-badge.component';
 import { UsuariosFacade } from '../../data-access/usuarios.facade';
+import { I18nService } from '../../i18n/i18n.service';
 import { UsuarioDetalle } from '../../models/usuarios.model';
 
 @Component({
@@ -42,6 +43,7 @@ import { UsuarioDetalle } from '../../models/usuarios.model';
   styleUrl:    './cuentas-page.component.scss',
 })
 export class CuentasPageComponent implements OnInit {
+  protected readonly i18n = inject(I18nService);
   private readonly facade = inject(UsuariosFacade);
 
   readonly usuarios = toSignal(this.facade.usuarios$, { initialValue: [] as UsuarioDetalle[] });

@@ -108,6 +108,14 @@ export class ActasDetailComponent implements OnInit {
     }
   }
 
+  /** POST /legalization/actas/{id}/exportar — genera el .docx vía backend. */
+  exportarDocx(): void {
+    const id = this.acta()?.id;
+    if (id) {
+      this.facade.exportarActa(id);
+    }
+  }
+
   // ── Navegación ───────────────────────────────────────────────────────────
   volver(): void {
     this.router.navigate(['/app/inventario/actas']);

@@ -1,8 +1,8 @@
 <div class="cuentas-page">
 
   <restaurant-page-header
-    title="Gestión de Cuentas"
-    subtitle="Bloqueo, desbloqueo e historial de accesos por usuario"
+    [title]="i18n.t('cuentas.titulo')"
+    [subtitle]="i18n.t('cuentas.subtitulo')"
   ></restaurant-page-header>
 
   @if (error()) {
@@ -12,13 +12,13 @@
   <!-- KPI Cards -->
   <div class="cuentas-page__kpis">
     <restaurant-kpi-card
-      label="Cuentas Bloqueadas"
+      [label]="i18n.t('cuentas.kpi_bloqueadas')"
       [value]="totalBloqueadas().toString()"
       icon="lock"
       iconColor="red"
     ></restaurant-kpi-card>
     <restaurant-kpi-card
-      label="Cuentas Activas"
+      [label]="i18n.t('cuentas.kpi_activas')"
       [value]="totalActivas().toString()"
       icon="shield-check"
       iconColor="green"
@@ -32,7 +32,7 @@
       <input
         class="cuentas-page__search-input"
         type="text"
-        placeholder="Buscar por nombre o email..."
+        [placeholder]="i18n.t('cuentas.buscar')"
         [value]="busqueda()"
         (input)="busqueda.set($any($event.target).value)"
       >
@@ -40,9 +40,9 @@
     <div class="cuentas-page__filter-selects">
       <div class="cuentas-page__select-wrapper">
         <select class="cuentas-page__select" (change)="filtroEstado.set($any($event.target).value)">
-          <option value="todos">Todos</option>
-          <option value="bloqueados">Bloqueados</option>
-          <option value="activos">Activos</option>
+          <option value="todos">{{ i18n.t('cuentas.filtro_todos') }}</option>
+          <option value="bloqueados">{{ i18n.t('cuentas.filtro_bloqueados') }}</option>
+          <option value="activos">{{ i18n.t('cuentas.filtro_activos') }}</option>
         </select>
         <lucide-icon name="filter" [size]="14" class="cuentas-page__select-icon"></lucide-icon>
       </div>
@@ -55,12 +55,12 @@
     <restaurant-data-table>
       <thead>
         <tr>
-          <th>Usuario</th>
-          <th>Rol</th>
-          <th>Intentos fallidos</th>
-          <th>Estado cuenta</th>
-          <th>Último acceso</th>
-          <th>Acciones</th>
+          <th>{{ i18n.t('cuentas.col_usuario') }}</th>
+          <th>{{ i18n.t('cuentas.col_rol') }}</th>
+          <th>{{ i18n.t('cuentas.col_intentos') }}</th>
+          <th>{{ i18n.t('cuentas.col_estado') }}</th>
+          <th>{{ i18n.t('cuentas.col_ultimo_acceso') }}</th>
+          <th>{{ i18n.t('cuentas.col_acciones') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -95,7 +95,7 @@
                 [class.cuentas-page__estado--bloqueada]="u.cuentaBloqueada"
                 [class.cuentas-page__estado--activa]="!u.cuentaBloqueada"
               >
-                {{ u.cuentaBloqueada ? 'Bloqueada' : 'Activa' }}
+                {{ u.cuentaBloqueada ? i18n.t('cuentas.bloqueada') : i18n.t('cuentas.activa') }}
               </span>
             </td>
             <td class="cuentas-page__last-access">
@@ -109,7 +109,7 @@
                   (click)="onDesbloquear(u.id)"
                 >
                   <lucide-icon name="unlock" [size]="14"></lucide-icon>
-                  Desbloquear
+                  {{ i18n.t('cuentas.desbloquear') }}
                 </button>
               } @else {
                 <button
@@ -118,7 +118,7 @@
                   (click)="onBloquear(u.id)"
                 >
                   <lucide-icon name="lock" [size]="14"></lucide-icon>
-                  Bloquear
+                  {{ i18n.t('cuentas.bloquear') }}
                 </button>
               }
             </td>
@@ -127,8 +127,8 @@
           <tr>
             <td colspan="6" class="cuentas-page__empty-cell">
               <restaurant-empty-state
-                title="Sin resultados"
-                message="No hay cuentas que coincidan con el filtro seleccionado."
+                  [title]="i18n.t('cuentas.sin_resultados')"
+                  [message]="i18n.t('cuentas.sin_resultados_msg')"
               ></restaurant-empty-state>
             </td>
           </tr>

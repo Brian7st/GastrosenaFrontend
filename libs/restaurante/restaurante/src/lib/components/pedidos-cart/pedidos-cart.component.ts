@@ -40,6 +40,11 @@ export class PedidosCartComponent {
   showCancelModal = signal(false);
   showConfirmModal = signal(false);
   showAnularBackendModal = signal(false);
+  showEmptyCartModal = signal(false);
+  motivoAnulacion = signal('');
+  
+  editIndex = signal<number | null>(null);
+  tempObservacion = signal<string>('');
 
   esPedidoSoloLectura = computed(() => {
     const p = this.pedidoActivo();
@@ -62,6 +67,23 @@ export class PedidosCartComponent {
     this.facade.eliminarProductoDelPedido(index);
   }
 
+  iniciarEdicionObservacion(index: number, currentObs: string) {
+    this.editIndex.set(index);
+    this.tempObservacion.set(currentObs || '');
+  }
+
+  guardarObservacion() {
+    const index = this.editIndex();
+    if (index !== null) {
+      this.facade.actualizarObservacionesProducto(index, this.tempObservacion().trim());
+      this.editIndex.set(null);
+    }
+  }
+
+  cancelarEdicionObservacion() {
+    this.editIndex.set(null);
+  }
+
   iniciarCancelacion() {
     this.showCancelModal.set(true);
   }
@@ -73,6 +95,11 @@ export class PedidosCartComponent {
   }
 
   iniciarConfirmacion() {
+    const pedido = this.pedidoActivo();
+    if (!pedido || !pedido.detalles || pedido.detalles.length === 0) {
+      this.showEmptyCartModal.set(true);
+      return;
+    }
     this.showConfirmModal.set(true);
   }
 
@@ -93,9 +120,10 @@ export class PedidosCartComponent {
 
   ejecutarAnulacionBackend() {
     this.showAnularBackendModal.set(false);
-    this.facade.cancelarPedidoActivoEnBackend().subscribe({
+    this.facade.cancelarPedidoActivoEnBackend(this.motivoAnulacion()).subscribe({
       next: (exito) => {
         if (exito) {
+          this.motivoAnulacion.set('');
           this.router.navigate(['/app/restaurante/mesas']);
         }
       }

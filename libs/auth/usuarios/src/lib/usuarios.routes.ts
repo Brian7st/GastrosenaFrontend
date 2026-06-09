@@ -60,9 +60,15 @@ export const USUARIOS_ROUTES: Routes = [
           ),
 
           
+            },
+      {
+        path: 'comentarios-admin',
+        loadComponent: () =>
+          import('./pages/comentarios-admin-page/comentarios-admin.component').then(
+            m => m.ComentariosAdminComponent
+          ),
       },
-
-            {
+      {
         path: 'fichas/:id/detalle',
         loadComponent: () =>
           import('./pages/fichas-page/ficha-detalle/ficha-detalle.component').then(

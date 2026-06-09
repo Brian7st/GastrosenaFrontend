@@ -1,0 +1,175 @@
+<div class="modal-overlay" (click)="cancelar.emit()">
+  <div class="modal-dialog import-dialog" (click)="$event.stopPropagation()">
+    <div class="import-header">
+      <div>
+        <h1 class="import-title">Importar Contrato</h1>
+        <p class="import-subtitle">Registre el contrato y cargue sus ítems para crear o actualizar los bienes.</p>
+      </div>
+      <button class="btn-plantilla" (click)="onDescargarPlantilla()">
+        <span class="material-symbols-outlined">download</span>
+        Descargar Plantilla
+      </button>
+    </div>
+
+    <div class="modal-body-scroll">
+      <!-- Cabecera del contrato -->
+      <div class="contrato-form">
+        <div class="form-field">
+          <label class="form-label">N.º de contrato <span class="req">*</span></label>
+          <input class="form-input" type="text" [value]="numero()"
+            (input)="onNumero($any($event.target).value)" placeholder="CTO-2025-001" />
+        </div>
+        <div class="form-field">
+          <label class="form-label">Vigencia (año) <span class="req">*</span></label>
+          <input class="form-input" type="number" [value]="vigencia()"
+            (input)="onVigencia($any($event.target).value)" placeholder="2025" />
+        </div>
+        <div class="form-field form-field--wide">
+          <label class="form-label">Descripción</label>
+          <input class="form-input" type="text" [value]="descripcion()"
+            (input)="onDescripcion($any($event.target).value)" placeholder="Contrato de insumos 2025" />
+        </div>
+        <div class="form-field">
+          <label class="form-label">Fecha inicio</label>
+          <input class="form-input" type="date" [value]="fechaInicio()"
+            (input)="onFechaInicio($any($event.target).value)" />
+        </div>
+        <div class="form-field">
+          <label class="form-label">Fecha fin</label>
+          <input class="form-input" type="date" [value]="fechaFin()"
+            (input)="onFechaFin($any($event.target).value)" />
+        </div>
+      </div>
+
+      <div class="upload-row">
+        <div class="upload-card">
+          @if (!file()) {
+          <div class="drop-zone" [class.is-dragging]="isDragging()" (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave()" (drop)="onDrop($event)">
+            <div class="drop-icon">
+              <span class="material-symbols-outlined">upload_file</span>
+            </div>
+            <h3>Arrastre su archivo aquí</h3>
+            <p>Archivos <strong>.csv</strong> generados desde la plantilla.</p>
+            <label class="btn-select-file">
+              Seleccionar Archivo
+              <input type="file" accept=".csv" (change)="onFileSelected($event)" />
+            </label>
+          </div>
+          } @else {
+          <div class="file-card">
+            <div class="file-icon">
+              <span class="material-symbols-outlined">description</span>
+            </div>
+            <div class="file-info">
+              <p class="file-name">{{ file()?.name }}</p>
+              <p class="file-size">{{ getFileSize() }}</p>
+            </div>
+            <button class="remove-btn" (click)="removeFile()">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+          }
+        </div>
+
+        <div class="instrucciones-card">
+          <div class="instr-header">
+            <span class="material-symbols-outlined">info</span>
+            <h4>Instrucciones</h4>
+          </div>
+          <ol class="instr-list">
+            @for (item of INSTRUCCIONES; track item; let i = $index) {
+            <li>
+              <span class="instr-num">{{ i + 1 }}</span>
+              <span>{{ item }}</span>
+            </li>
+            }
+          </ol>
+          <div class="server-status">
+            <p class="status-label">CABECERA</p>
+            <div class="status-value">
+              <span class="status-dot" [class.status-dot--off]="!cabeceraValida()"></span>
+              {{ cabeceraValida() ? 'Lista para importar' : 'Falta número o vigencia' }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      @if (statusMessage()) {
+      <div class="preview-card">
+        <div class="processing-indicator">{{ statusMessage() }}</div>
+      </div>
+      }
+
+      @if (previewData().length > 0 || isProcessing()) {
+      <div class="preview-card">
+        <div class="preview-header">
+          <div class="preview-title">
+            <span class="material-symbols-outlined">visibility</span>
+            <h3>Vista Previa de Ítems</h3>
+          </div>
+          @if (!isProcessing()) {
+          <span class="preview-count">{{ previewData().length }} ÍTEMS ENCONTRADOS</span>
+          }
+          @if (isProcessing()) {
+          <span class="preview-count">Procesando...</span>
+          }
+        </div>
+
+        @if (isProcessing()) {
+        <div class="processing-indicator">
+          <span class="material-symbols-outlined spin">sync</span>
+          Analizando archivo...
+        </div>
+        }
+
+        @if (!isProcessing()) {
+        <div class="preview-table-wrap">
+          <table class="preview-table">
+            <thead>
+              <tr>
+                <th>REF. ART.</th>
+                <th>CÓD. SENA</th>
+                <th>DESCRIPCIÓN</th>
+                <th>UND.</th>
+                <th>VLR ADJUDICADO</th>
+                <th>VLR ANTES IVA</th>
+                <th>IVA</th>
+                <th>VALIDACIÓN</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of previewData(); track row) {
+              <tr [class.row-error]="row.error">
+                <td class="code-mono">{{ row.refArticulo || '-' }}</td>
+                <td class="code-mono">{{ row.codigoSena || '-' }}</td>
+                <td>{{ row.descripcion || '-' }}</td>
+                <td>{{ row.unidadMedida || '-' }}</td>
+                <td class="text-end">{{ row.vrlAdjudicado | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                <td class="text-end">{{ row.vrlAntes !== null ? (row.vrlAntes | currency:'COP':'symbol-narrow':'1.0-0') : '-' }}</td>
+                <td class="text-end">{{ row.ivaPorcentaje !== null ? (row.ivaPorcentaje | percent) : '0%' }}</td>
+                <td>
+                  <span class="valid-badge" [ngClass]="getValidacionClass(row.validacion)"
+                    [title]="row.error || ''">
+                    {{ row.validacion }}
+                  </span>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        }
+      </div>
+      }
+    </div>
+
+    <div class="import-footer">
+      <button class="btn-cancel" (click)="cancelar.emit()">Cancelar</button>
+      <button class="btn-procesar" [disabled]="importDeshabilitado()" (click)="onProcesar()">
+        <span class="material-symbols-outlined">check_circle</span>
+        Importar Contrato
+      </button>
+    </div>
+  </div>
+</div>

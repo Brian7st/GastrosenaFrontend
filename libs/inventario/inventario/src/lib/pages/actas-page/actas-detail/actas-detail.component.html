@@ -19,6 +19,12 @@
         <lucide-icon name="printer" [size]="16"></lucide-icon>
         Exportar GOR-F-084
       </button>
+      <button class="acta-detail__export-btn"
+              [disabled]="loading()"
+              (click)="exportarDocx()">
+        <lucide-icon name="file-text" [size]="16"></lucide-icon>
+        Exportar .docx
+      </button>
       @if (a.estado !== 'ARCHIVADA') {
         <button class="acta-detail__status-btn" (click)="cambiarEstado()">
           <lucide-icon name="refresh-cw" [size]="16"></lucide-icon>

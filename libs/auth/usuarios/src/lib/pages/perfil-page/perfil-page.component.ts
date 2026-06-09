@@ -19,6 +19,7 @@ import {
 } from '@restaurant/shared/ui';
 import { AuthService } from '@restaurant/shared/auth';
 import { UsuariosService } from '@restaurant/usuarios';
+import { I18nService } from '../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-perfil-page',
@@ -39,6 +40,7 @@ export class PerfilPageComponent implements OnInit {
   private readonly authService     = inject(AuthService);
   private readonly usuariosService = inject(UsuariosService);
   private readonly fb              = inject(FormBuilder);
+  protected readonly i18n          = inject(I18nService);
   private readonly http            = inject(HttpClient);
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -116,7 +118,8 @@ export class PerfilPageComponent implements OnInit {
       .then(res => res.json())
       .then(data => {
         this.fotoUrl.set(data.secure_url);
-        this.usuariosService.actualizarFoto('', data.secure_url).subscribe({
+        this.usuariosService.
+        actualizarFoto(this.usuario?.id ?? '', data.secure_url).subscribe({
           next: () => {
             this.subiendo.set(false);
             this.cargarPerfil();

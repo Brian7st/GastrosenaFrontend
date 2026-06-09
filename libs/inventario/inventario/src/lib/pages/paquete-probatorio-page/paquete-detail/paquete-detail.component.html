@@ -45,10 +45,32 @@
           <lucide-icon name="download" [size]="16"></lucide-icon>
           Exportar Paquete
         </restaurant-button>
-        <restaurant-button variant="primary" (click)="archivarExpediente()">
-          <lucide-icon name="archive" [size]="16"></lucide-icon>
-          Archivar Expediente
-        </restaurant-button>
+
+        @if (puedeRevisar()) {
+          <restaurant-button variant="primary" [disabled]="loading()" (click)="revisarPaquete()">
+            <lucide-icon name="clipboard-check" [size]="16"></lucide-icon>
+            {{ loading() ? 'Revisando...' : 'Revisar Paquete' }}
+          </restaurant-button>
+        } @else if (puedeArchivar()) {
+          <restaurant-button variant="primary" [disabled]="loading()" (click)="archivarExpediente()">
+            <lucide-icon name="archive" [size]="16"></lucide-icon>
+            Archivar Expediente
+          </restaurant-button>
+        } @else if (paquete()?.estado === 'REVISADO') {
+          <restaurant-button variant="surface" [disabled]="true">
+            <lucide-icon name="archive" [size]="16"></lucide-icon>
+            Archivar Expediente
+          </restaurant-button>
+          <p class="paquete-detail__btn-hint">
+            <lucide-icon name="alert-triangle" [size]="12"></lucide-icon>
+            Vincule la trazabilidad antes de archivar
+          </p>
+        } @else {
+          <restaurant-button variant="surface" [disabled]="true">
+            <lucide-icon name="archive" [size]="16"></lucide-icon>
+            Archivar Expediente
+          </restaurant-button>
+        }
       } @else {
         <restaurant-button variant="surface" [disabled]="true">
           <lucide-icon name="archive" [size]="16"></lucide-icon>
