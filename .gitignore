@@ -39,3 +39,9 @@ BACKLOG_FRONTEND_ORGANIZADO.md
 .ai/domains/inventario.md
 .ai/prompts/vistas/
 .ai/prompts/conectar-vista-backend.md
+
+# Playwright E2E
+/test-results/
+/e2e/.report/
+/e2e/.auth/
+/playwright-report/
