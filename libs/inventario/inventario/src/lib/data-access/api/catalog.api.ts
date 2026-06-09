@@ -21,7 +21,6 @@ export interface ProductoResponse {
   id: string;
   codigoSena: string;
   codigoProveedor?: string;
-  nombre: string;
   descripcion?: string;
   categoria: string;
   unidadMedida: string;

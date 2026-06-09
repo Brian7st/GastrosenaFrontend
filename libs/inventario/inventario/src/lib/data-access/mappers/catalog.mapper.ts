@@ -24,7 +24,6 @@ export function productoFromApi(dto: ProductoResponse): ProductoCatalogo {
     id: dto.id,
     codigoSena: dto.codigoSena,
     codigoProveedor: dto.codigoProveedor,
-    nombre: dto.nombre,
     descripcion: dto.descripcion,
     categoria: dto.categoria,
     unidadMedida: dto.unidadMedida,
