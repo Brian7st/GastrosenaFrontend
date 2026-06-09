@@ -86,7 +86,7 @@
             <td class="amount-positive">{{ (factura.total || factura.subtotal) | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
 
             <td class="text-center">
-              <button class="action-btn-print" (click)="imprimirFactura(factura.pedidoId)" title="Imprimir Factura">
+              <button class="action-btn-print" (click)="imprimirFactura(factura.id, factura.numeroFactura)" title="Imprimir Factura">
                 <lucide-icon name="file-text" [size]="16"></lucide-icon>
                 <span>Imprimir</span>
               </button>

@@ -9,6 +9,8 @@ import {
 } from '@restaurant/shared/ui';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
 
+import { AuthService } from '../../data-access/auth.service';
+
 @Component({
   selector: 'restaurant-caja-apertura-page',
   standalone: true,
@@ -27,6 +29,9 @@ export class CajaAperturaPageComponent {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   facade = inject(RestauranteFacade);
+  authService = inject(AuthService);
+
+  nombreCajero = this.authService.getUsuarioNombre();
 
   baseEfectivoCtrl = new FormControl<number | null>(null, [Validators.required, Validators.min(0)]);
 

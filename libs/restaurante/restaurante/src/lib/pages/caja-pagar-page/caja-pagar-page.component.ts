@@ -37,10 +37,36 @@ export class CajaPagarPageComponent implements OnInit {
   metodoSeleccionado = signal<string>('');
   montoRecibido = signal<number>(0);
 
-  alertDialog = signal<{ open: boolean, title: string, message: string }>({
+  alertDialog = signal<{ open: boolean, title: string, message: string, success: boolean }>({
     open: false,
     title: '',
-    message: ''
+    message: '',
+    success: false
+  });
+
+  facturaRecienPagadaId = signal<string | null>(null);
+
+  // --- Estados de Propina ---
+  tipoPropina = signal<'NADA' | 'DIEZ_PORCIENTO' | 'OTRO'>('NADA');
+  propinaManual = signal<number | null>(null);
+
+  propinaCalculada = computed(() => {
+    const tipo = this.tipoPropina();
+    if (tipo === 'NADA') return 0;
+    
+    const pedido = this.pedidoSeleccionado();
+    const subtotal = pedido ? pedido.subtotal : 0;
+    
+    if (tipo === 'DIEZ_PORCIENTO') return subtotal * 0.10;
+    if (tipo === 'OTRO') return this.propinaManual() || 0;
+    
+    return 0;
+  });
+
+  totalACobrar = computed(() => {
+    const pedido = this.pedidoSeleccionado();
+    if (!pedido) return 0;
+    return pedido.subtotal + this.propinaCalculada();
   });
 
   ngOnInit() {
@@ -63,13 +89,15 @@ export class CajaPagarPageComponent implements OnInit {
     this.pedidoSeleccionado.set(null);
     this.metodoSeleccionado.set('');
     this.montoRecibido.set(0);
+    this.tipoPropina.set('NADA');
+    this.propinaManual.set(null);
   }
 
   seleccionarMetodo(metodo: string) {
     this.metodoSeleccionado.set(metodo);
     // Auto-completamos el monto para evitar errores visuales
     if (metodo !== 'EFECTIVO') {
-      this.montoRecibido.set(this.pedidoSeleccionado()?.subtotal || 0);
+      this.montoRecibido.set(this.totalACobrar());
     } else {
       this.montoRecibido.set(0);
     }
@@ -81,52 +109,68 @@ export class CajaPagarPageComponent implements OnInit {
   }
 
   calcularDevuelta(): number {
-    const pedido = this.pedidoSeleccionado();
-    if (!pedido) return 0;
-
-    // El Math.round previene el bug de decimales infinitos que bloqueaba el botón
-    const devuelta = this.montoRecibido() - pedido.subtotal;
+    const recibido = this.montoRecibido();
+    const total = this.totalACobrar();
+    if (!recibido || !total) return 0;
+    const devuelta = recibido - total;
     return Math.round(devuelta * 100) / 100;
+  }
+
+  seleccionarTipoPropina(tipo: 'NADA' | 'DIEZ_PORCIENTO' | 'OTRO') {
+    this.tipoPropina.set(tipo);
+    if (tipo !== 'OTRO') {
+      this.propinaManual.set(null);
+    }
+  }
+
+  actualizarPropinaManual(event: any) {
+    const value = parseFloat(event.target.value);
+    this.propinaManual.set(isNaN(value) ? null : value);
   }
 
   // Lógica blindada: Autoriza el botón sí o sí según el método
   esPagoValido(): boolean {
     const metodo = this.metodoSeleccionado();
+    if (!metodo) return false;
 
-    // Si es método electrónico, siempre es válido (botón activado)
-    if (metodo === 'TARJETA' || metodo === 'TRANSFERENCIA') {
-      return true;
-    }
-
-    // Si es efectivo, valida que alcance el dinero
     if (metodo === 'EFECTIVO') {
-      return this.calcularDevuelta() >= 0;
+      const monto = this.montoRecibido();
+      const total = this.totalACobrar();
+      if (!monto || monto < total) {
+        return false;
+      }
     }
 
-    // Si no ha seleccionado nada, se bloquea
-    return false;
+    return true;
   }
 
   confirmarPago() {
-    // Doble candado de seguridad antes de enviar al backend
     if (!this.esPagoValido()) return;
 
     const pedido = this.pedidoSeleccionado();
     const metodo = this.metodoSeleccionado();
-
-    // Mapeo exacto de los Enums que exige tu Spring Boot (TARJETA, TRANSFERENCIA, EFECTIVO)
     let metodoBackend = metodo;
 
-    // Enviamos los parámetros separados tal y como los exige tu Facade
-    this.facade.facturarPedido(pedido.id, metodoBackend as MetodoPago);
-
-    this.cerrarModal();
-
-    // Confirmación elegante
-    this.alertDialog.set({
-      open: true,
-      title: 'Pago Procesado',
-      message: `El pago del pedido #${pedido.id.substring(0, 8).toUpperCase()} se registró correctamente.`
+    this.facade.facturarPedido(pedido.id, metodoBackend as MetodoPago, this.propinaCalculada()).subscribe({
+      next: (facturaId) => {
+        this.cerrarModal();
+        if (facturaId) {
+          this.facturaRecienPagadaId.set(facturaId);
+          this.alertDialog.set({
+            open: true,
+            title: 'Pago Procesado',
+            message: `El pago del pedido #${pedido.id.substring(0, 8).toUpperCase()} se registró correctamente.`,
+            success: true
+          });
+        } else {
+          this.alertDialog.set({
+            open: true,
+            title: 'Error de Pago',
+            message: 'No se pudo obtener el número de factura. Verifique en Movimientos.',
+            success: false
+          });
+        }
+      }
     });
   }
 
@@ -135,8 +179,17 @@ export class CajaPagarPageComponent implements OnInit {
     this.router.navigate(['../movimientos'], { relativeTo: this.route });
   }
 
+  descargarTirillaYCerrar() {
+    const id = this.facturaRecienPagadaId();
+    if (id) {
+      this.facade.descargarFacturaPdf(id);
+    }
+    this.cerrarAlertDialog();
+  }
+
   cerrarAlertDialog() {
     this.alertDialog.set({ ...this.alertDialog(), open: false });
+    this.facturaRecienPagadaId.set(null);
   }
 
   preventInvalidChars(event: KeyboardEvent): void {

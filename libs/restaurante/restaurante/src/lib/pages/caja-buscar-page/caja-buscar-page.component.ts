@@ -160,4 +160,11 @@ export class CajaBuscarPageComponent implements OnInit {
     this.mostrarModalDetalle.set(false);
     this.facturaSeleccionada.set(null);
   }
+
+  imprimirFactura() {
+    const factura = this.facturaSeleccionada();
+    if (factura && factura.id) {
+      this.facade.descargarFacturaPdf(factura.id, factura.numeroFactura);
+    }
+  }
 }

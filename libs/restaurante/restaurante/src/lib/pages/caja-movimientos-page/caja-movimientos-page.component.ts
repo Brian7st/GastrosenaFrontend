@@ -90,14 +90,16 @@ export class CajaMovimientosPageComponent implements OnInit {
     this.router.navigate(['/app/restaurante/caja']);
   }
 
-  imprimirFactura(idPedido: string) {
-    const ref = idPedido ? idPedido.substring(0, 8).toUpperCase() : 'DESCONOCIDO';
-
-    this.alertDialog.set({
-      open: true,
-      title: 'Imprimiendo Factura',
-      message: `Enviando orden de impresión de la factura para el pedido #${ref}...`
-    });
+  imprimirFactura(idFactura: string, numeroFactura: string) {
+    if (!idFactura) {
+      this.alertDialog.set({
+        open: true,
+        title: 'Error de Impresión',
+        message: 'No se encontró el identificador de la factura.'
+      });
+      return;
+    }
+    this.facade.descargarFacturaPdf(idFactura, numeroFactura);
   }
 
   generarReporteCuadre() {

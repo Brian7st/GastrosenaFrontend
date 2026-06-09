@@ -43,6 +43,7 @@ export class CajaPageComponent implements OnInit {
   }
 
   irARegistrarPago() {
+    if (!this.facade.isCajaAbierta()) return;
     this.router.navigate(['./pagar'], { relativeTo: this.route });
   }
 
@@ -51,10 +52,12 @@ export class CajaPageComponent implements OnInit {
   }
 
   irACierre() {
+    if (!this.facade.isCajaAbierta()) return;
     this.router.navigate(['./cierre'], { relativeTo: this.route });
   }
 
   irAMovimientos() {
+    if (!this.facade.isCajaAbierta()) return;
     this.router.navigate(['./movimientos'], { relativeTo: this.route });
   }
 }
