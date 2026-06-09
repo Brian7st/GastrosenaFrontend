@@ -3,164 +3,154 @@
         <button class="back-btn" (click)="volver()">
             <lucide-icon name="arrow-left" [size]="20"></lucide-icon>
         </button>
-        <restaurant-page-header
-                title="Registrar Pago"
-                subtitle="Cuentas pendientes por recaudar e imprimir comprobante"
-        ></restaurant-page-header>
+        <restaurant-page-header title="Registrar Pago"
+            subtitle="Cuentas pendientes por recaudar e imprimir comprobante"></restaurant-page-header>
     </div>
 
     <div class="main-content-block">
-    <restaurant-data-table tableTitle="Pedidos por Cobrar" tableIcon="dollar-sign" class="mt-4" style="display: block;">
-      <ng-container dtHeader>
-        <span class="subtitle" style="display: block; padding: 0 var(--space-6) var(--space-4) var(--space-6); margin-top: calc(var(--space-2) * -1); font-size: var(--font-size-sm); color: var(--color-text-secondary);">Seleccione el pedido que desea facturar</span>
-      </ng-container>
+        <restaurant-data-table tableTitle="Pedidos por Cobrar" tableIcon="dollar-sign" class="mt-4 data-table-wrapper">
+            <ng-container dtHeader>
+                <span class="subtitle">Seleccione el pedido que desea facturar</span>
+            </ng-container>
 
-      <thead>
-        <tr>
-          <th>Mesa</th>
-          <th>Cajero</th>
-          <th>Total Pedido</th>
-          <th class="text-center">Acción</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (pedido of pedidosPorPagar(); track pedido.id) {
-        <tr>
-          <td><strong>{{ pedido.nombreMesa || 'Para Llevar' }}</strong></td>
-          <td title="{{ pedido.meseroId }}"><span class="badge-count">{{ pedido.meseroId | slice:0:8 }}...</span></td>
-          <td class="amount-pending" style="font-weight: var(--font-weight-semibold); color: var(--color-text-primary);">{{ pedido.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
-          <td class="text-center">
-            <restaurant-button variant="primary" (click)="abrirCobro(pedido)" style="font-size: 0.85rem; padding: 0.25rem 0.75rem;">
-              <lucide-icon name="dollar-sign" [size]="16"></lucide-icon>
-              <span>Cobrar</span>
-            </restaurant-button>
-          </td>
-        </tr>
-        } @empty {
-        <tr>
-          <td colspan="4" class="p-0 border-0">
-            <restaurant-empty-state
-                    title="Todo al día"
-                    message="No hay pedidos pendientes por cobrar en este momento.">
-            </restaurant-empty-state>
-          </td>
-        </tr>
-        }
-      </tbody>
-    </restaurant-data-table>
-  </div>
+            <thead>
+                <tr>
+                    <th>Mesa</th>
+                    <th>Cajero</th>
+                    <th>Total Pedido</th>
+                    <th class="text-center">Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (pedido of pedidosPorPagar(); track pedido.id) {
+                <tr>
+                    <td><strong>{{ pedido.nombreMesa || 'Para Llevar' }}</strong></td>
+                    <td title="{{ pedido.meseroId }}"><span class="badge-count">{{ pedido.meseroId | slice:0:8
+                            }}...</span></td>
+                    <td class="amount-pending">{{ pedido.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                    <td class="text-center">
+                        <restaurant-button variant="primary" (click)="abrirCobro(pedido)" class="cobrar-btn">
+                            <lucide-icon name="dollar-sign" [size]="16"></lucide-icon>
+                            <span>Cobrar</span>
+                        </restaurant-button>
+                    </td>
+                </tr>
+                } @empty {
+                <tr>
+                    <td colspan="4" class="p-0 border-0">
+                        <restaurant-empty-state title="Todo al día"
+                            message="No hay pedidos pendientes por cobrar en este momento.">
+                        </restaurant-empty-state>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </restaurant-data-table>
+    </div>
 
     @if (modalAbierto()) {
     <div class="modal-overlay" (click)="cerrarModal()">
-        <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-card" (click)="$event.stopPropagation()">
 
-            <div class="modal-header-colored">
+            <div class="modal-header">
                 <h3>Procesar Pago - Pedido #{{ pedidoSeleccionado()?.id | slice:0:8 | uppercase }}</h3>
                 <button class="close-btn" (click)="cerrarModal()">
                     <lucide-icon name="x" [size]="20"></lucide-icon>
                 </button>
             </div>
 
-            <div class="modal-body-custom">
-                <div class="total-badge" style="background: var(--color-surface); padding: 1rem; border-radius: 8px; border: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center;">
-                    <span class="lbl" style="font-size: 0.9rem; font-weight: 600; color: var(--color-text-secondary);">Subtotal Pedido:</span>
-                    <span class="val" style="font-size: 1.1rem; font-weight: 700;">{{ pedidoSeleccionado()?.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+            <div class="modal-body">
+                <div class="total-badge">
+                    <span class="lbl">Subtotal Pedido:</span>
+                    <span class="val">{{ pedidoSeleccionado()?.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
                 </div>
 
-                <div class="tip-section mt-4 mb-4" style="background: var(--color-surface); padding: 1rem; border-radius: 8px; border: 1px solid var(--color-border);">
-                    <span class="section-hint" style="margin-bottom: 0.5rem; display: block; font-weight: 500;">Propina sugerida o voluntaria:</span>
-                    <div class="method-cards-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
-                        <div class="method-card" style="padding: 0.5rem; min-height: unset; height: auto; text-align: center; border: 1px solid var(--color-border); border-radius: 6px; cursor: pointer;" [class.active]="tipoPropina() === 'NADA'" (click)="seleccionarTipoPropina('NADA')">
-                            <span style="font-size: 0.85rem;">$0</span>
+                <div class="tip-section mt-4 mb-4">
+                    <span class="section-hint">Propina sugerida o voluntaria:</span>
+                    <div class="method-cards-grid">
+                        <div class="method-card small"
+                            [class.active]="tipoPropina() === 'NADA'" (click)="seleccionarTipoPropina('NADA')">
+                            <span>$0</span>
                         </div>
-                        <div class="method-card" style="padding: 0.5rem; min-height: unset; height: auto; text-align: center; border: 1px solid var(--color-border); border-radius: 6px; cursor: pointer;" [class.active]="tipoPropina() === 'DIEZ_PORCIENTO'" (click)="seleccionarTipoPropina('DIEZ_PORCIENTO')">
-                            <span style="font-size: 0.85rem;">10% Sugerida</span>
+                        <div class="method-card small"
+                            [class.active]="tipoPropina() === 'DIEZ_PORCIENTO'"
+                            (click)="seleccionarTipoPropina('DIEZ_PORCIENTO')">
+                            <span>10% Sugerida</span>
                         </div>
-                        <div class="method-card" style="padding: 0.5rem; min-height: unset; height: auto; text-align: center; border: 1px solid var(--color-border); border-radius: 6px; cursor: pointer;" [class.active]="tipoPropina() === 'OTRO'" (click)="seleccionarTipoPropina('OTRO')">
-                            <span style="font-size: 0.85rem;">Otro valor</span>
+                        <div class="method-card small"
+                            [class.active]="tipoPropina() === 'OTRO'" (click)="seleccionarTipoPropina('OTRO')">
+                            <span>Otro valor</span>
                         </div>
                     </div>
 
                     @if (tipoPropina() === 'OTRO') {
-                        <div class="input-group mt-3" style="width: 100%;">
-                            <input
-                                type="number"
-                                class="form-control"
-                                placeholder="Monto exacto en pesos ($)"
-                                [value]="propinaManual() || ''"
-                                (input)="actualizarPropinaManual($event)"
-                                style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--color-border); font-size: 1rem; background: var(--color-background);"
-                            />
-                        </div>
+                    <div class="input-group mt-3">
+                        <input type="number" class="form-control" placeholder="Monto exacto en pesos ($)"
+                            [value]="propinaManual() || ''" (input)="actualizarPropinaManual($event)" />
+                    </div>
                     }
 
-                    <div class="total-badge mt-3" style="background: var(--color-primary-transparent); border: 1px solid var(--color-primary); padding: 1rem; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
-                        <span class="lbl" style="color: var(--color-text); font-weight: 600;">Total Final a Cobrar:</span>
-                        <span class="val" style="color: var(--color-primary); font-size: 1.2rem; font-weight: 700;">{{ totalACobrar() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                    <div class="total-badge primary mt-3">
+                        <span class="lbl">Total Final a Cobrar:</span>
+                        <span class="val">{{ totalACobrar() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
                     </div>
                 </div>
 
-                <span class="section-hint" style="font-weight: 500; display: block; margin-bottom: 0.5rem;">Seleccione el método de pago:</span>
+                <span class="section-hint">Seleccione el método de pago:</span>
 
-                <div class="method-cards-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
-                    <div class="method-card" style="padding: 1rem; text-align: center; border: 1px solid var(--color-border); border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;" [class.active]="metodoSeleccionado() === 'EFECTIVO'" (click)="seleccionarMetodo('EFECTIVO')">
+                <div class="method-cards-grid">
+                    <div class="method-card"
+                        [class.active]="metodoSeleccionado() === 'EFECTIVO'" (click)="seleccionarMetodo('EFECTIVO')">
                         <lucide-icon name="banknote" [size]="24"></lucide-icon>
-                        <span style="font-size: 0.9rem;">Efectivo</span>
+                        <span>Efectivo</span>
                     </div>
-                    <div class="method-card" style="padding: 1rem; text-align: center; border: 1px solid var(--color-border); border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;" [class.active]="metodoSeleccionado() === 'TARJETA'" (click)="seleccionarMetodo('TARJETA')">
+                    <div class="method-card"
+                        [class.active]="metodoSeleccionado() === 'TARJETA'" (click)="seleccionarMetodo('TARJETA')">
                         <lucide-icon name="credit-card" [size]="24"></lucide-icon>
-                        <span style="font-size: 0.9rem;">Tarjeta</span>
+                        <span>Tarjeta</span>
                     </div>
-                    <div class="method-card" style="padding: 1rem; text-align: center; border: 1px solid var(--color-border); border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;" [class.active]="metodoSeleccionado() === 'TRANSFERENCIA'" (click)="seleccionarMetodo('TRANSFERENCIA')">
+                    <div class="method-card"
+                        [class.active]="metodoSeleccionado() === 'TRANSFERENCIA'"
+                        (click)="seleccionarMetodo('TRANSFERENCIA')">
                         <lucide-icon name="arrow-right-left" [size]="24"></lucide-icon>
-                        <span style="font-size: 0.9rem;">Transferencia</span>
+                        <span>Transferencia</span>
                     </div>
                 </div>
 
                 @if (metodoSeleccionado() === 'EFECTIVO') {
-                <div class="cash-calculator-box mt-4" style="background: var(--color-surface); padding: 1rem; border-radius: 8px; border: 1px solid var(--color-border);">
-                    <div class="form-group" style="margin-bottom: 1rem;">
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Monto Recibido en Efectivo:</label>
-                        <input
-                                id="cashReceived"
-                                type="number"
-                                class="form-control"
-                                placeholder="¿Con cuánto paga?"
-                                [value]="montoRecibido() === 0 ? '' : montoRecibido()"
-                                (input)="actualizarMontoRecibido($event)"
-                                (keydown)="preventInvalidChars($event)"
-                                style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--color-border); font-size: 1rem;"
-                        />
+                <div class="cash-calculator-box mt-4">
+                    <div class="input-group">
+                        <label>Monto Recibido en Efectivo:</label>
+                        <input id="cashReceived" type="number" class="form-control" placeholder="¿Con cuánto paga?"
+                            [value]="montoRecibido() === 0 ? '' : montoRecibido()"
+                            (input)="actualizarMontoRecibido($event)" (keydown)="preventInvalidChars($event)" />
                     </div>
 
-                    <div class="change-row" style="display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px dashed var(--color-border);">
-                        <span class="change-lbl" style="font-weight: 600; color: var(--color-text-secondary);">Cambio / Devuelta:</span>
-                        <span class="change-val" style="font-size: 1.1rem; font-weight: 700;" [class.text-danger]="calcularDevuelta() < 0" [class.text-success]="calcularDevuelta() >= 0">
-                  {{ calcularDevuelta() | currency:'COP':'symbol-narrow':'1.0-0' }}
-                </span>
+                    <div class="change-row">
+                        <span class="change-lbl">Cambio / Devuelta:</span>
+                        <span class="change-val"
+                            [class.negative]="calcularDevuelta() < 0" [class.positive]="calcularDevuelta() >= 0">
+                            {{ calcularDevuelta() | currency:'COP':'symbol-narrow':'1.0-0' }}
+                        </span>
                     </div>
                 </div>
                 }
 
                 @if (metodoSeleccionado() === 'TARJETA' || metodoSeleccionado() === 'TRANSFERENCIA') {
-                <div class="alert alert-info mt-4" style="display: flex; gap: 0.5rem; align-items: center; padding: 1rem; border-radius: 8px; background: var(--color-surface-hover); color: var(--color-brand-primary); border: 1px solid var(--color-border);">
+                <div class="alert alert-info mt-4">
                     <lucide-icon name="info" [size]="16"></lucide-icon>
-                    <span style="font-size: 0.9rem;">Al confirmar, el sistema procesará la transacción electrónica de forma inmediata.</span>
+                    <span>Al confirmar, el sistema procesará la transacción electrónica de forma inmediata.</span>
                 </div>
                 }
             </div>
 
-            <div class="modal-actions">
+            <div class="modal-footer">
                 <restaurant-button variant="ghost" (click)="cerrarModal()">
                     <span>Cancelar</span>
                 </restaurant-button>
 
-                <restaurant-button
-                        variant="primary"
-                        [disabled]="!esPagoValido()"
-                        (click)="confirmarPago()"
-                >
-                    <div class="btn-content-centered" style="display: flex; gap: 0.5rem; align-items: center;">
+                <restaurant-button variant="primary" [disabled]="!esPagoValido()" (click)="confirmarPago()">
+                    <div class="btn-content-centered">
                         <lucide-icon name="check" [size]="18"></lucide-icon>
                         <span>Confirmar Pago</span>
                     </div>
@@ -170,14 +160,8 @@
     </div>
     }
 
-    <restaurant-confirm-dialog
-            [open]="alertDialog().open"
-            [title]="alertDialog().title"
-            [message]="alertDialog().message"
-            [confirmText]="alertDialog().confirmText || 'Aceptar'"
-            [cancelText]="alertDialog().cancelText || 'Cancelar'"
-            [showCancel]="alertDialog().type === 'confirm'"
-            (confirm)="confirmAlertDialog()"
-            (cancel)="cerrarAlertDialog()"
-    ></restaurant-confirm-dialog>
+    <restaurant-confirm-dialog [open]="alertDialog().open" [title]="alertDialog().title"
+        [message]="alertDialog().message" [confirmText]="alertDialog().confirmText || 'Aceptar'"
+        [cancelText]="alertDialog().cancelText || 'Cancelar'" [showCancel]="alertDialog().type === 'confirm'"
+        (confirm)="confirmAlertDialog()" (cancel)="cerrarAlertDialog()"></restaurant-confirm-dialog>
 </div>
