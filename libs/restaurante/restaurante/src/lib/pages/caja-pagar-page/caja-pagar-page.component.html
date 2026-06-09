@@ -143,7 +143,7 @@
                 }
 
                 @if (metodoSeleccionado() === 'TARJETA' || metodoSeleccionado() === 'TRANSFERENCIA') {
-                <div class="alert alert-info mt-4" style="display: flex; gap: 0.5rem; align-items: center; padding: 1rem; border-radius: 8px; background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                <div class="alert alert-info mt-4" style="display: flex; gap: 0.5rem; align-items: center; padding: 1rem; border-radius: 8px; background: var(--color-surface-hover); color: var(--color-brand-primary); border: 1px solid var(--color-border);">
                     <lucide-icon name="info" [size]="16"></lucide-icon>
                     <span style="font-size: 0.9rem;">Al confirmar, el sistema procesará la transacción electrónica de forma inmediata.</span>
                 </div>
