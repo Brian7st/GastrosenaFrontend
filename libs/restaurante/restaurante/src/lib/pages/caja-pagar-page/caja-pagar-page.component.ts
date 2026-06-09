@@ -41,11 +41,11 @@ export class CajaPagarPageComponent implements OnInit {
   metodoSeleccionado = signal<string>('');
   montoRecibido = signal<number>(0);
 
-  alertDialog = signal<{ open: boolean, title: string, message: string, success: boolean }>({
+  alertDialog = signal<{ open: boolean, title: string, message: string, type: 'success' | 'error' | 'confirm', confirmText?: string, cancelText?: string }>({
     open: false,
     title: '',
     message: '',
-    success: false
+    type: 'success'
   });
 
   facturaRecienPagadaId = signal<string | null>(null);
