@@ -63,11 +63,11 @@
         </div>
 
         <div class="action-buttons mt-4">
-          <restaurant-button variant="ghost" class="btn-icon-danger" (click)="limpiarFiltros()">
+          <restaurant-button variant="ghost" (click)="limpiarFiltros()">
             <lucide-icon name="x" [size]="18"></lucide-icon>
             <span>Limpiar Filtros</span>
           </restaurant-button>
-          <restaurant-button variant="outline">
+          <restaurant-button variant="surface" (click)="exportarResultados()" [disabled]="facturasFiltradas().length === 0">
             <lucide-icon name="file-text" [size]="18"></lucide-icon>
             <span>Exportar Resultados</span>
           </restaurant-button>
@@ -75,67 +75,59 @@
       </div>
     </restaurant-card>
 
-    <restaurant-card class="results-card mt-6">
-      <div class="block-header results-header">
-        <div class="title-group">
-          <h5>Facturas Emitidas</h5>
-          <span class="subtitle">Mostrando resultados de la búsqueda</span>
-        </div>
-        <span class="results-badge">{{ facturasFiltradas().length }} factura(s)</span>
+    <restaurant-data-table tableTitle="Facturas Emitidas" tableIcon="receipt" class="mt-6" style="display: block;">
+      <div dtActions>
+        <span class="results-badge" style="background: var(--color-surface-hover); padding: 0.25rem 0.75rem; border-radius: var(--radius-pill); font-size: var(--font-size-xs); font-weight: var(--font-weight-medium); color: var(--color-text-secondary); border: 1px solid var(--color-border);">{{ facturasFiltradas().length }} factura(s)</span>
       </div>
+      <ng-container dtHeader>
+        <span class="subtitle" style="display: block; padding: 0 var(--space-6) var(--space-4) var(--space-6); margin-top: calc(var(--space-2) * -1); font-size: var(--font-size-sm); color: var(--color-text-secondary);">Mostrando resultados de la búsqueda</span>
+      </ng-container>
 
-      <div class="table-responsive mt-4">
-        <table class="restaurant-table">
-          <thead>
-          <tr>
-            <th>N° Factura</th>
-            <th>Mesa</th>
-            <th>Fecha Emisión</th>
-            <th>Método</th>
-            <th>Total</th>
-            <th>Estado</th>
-            <th class="text-center">Acción</th>
-          </tr>
-          </thead>
-          <tbody>
-          @for (factura of facturasFiltradas(); track factura.id) {
-          <tr>
-            <td><strong>{{ factura.numeroFactura }}</strong></td>
-            <td>{{ factura.nombreMesa || 'Para Llevar' }}</td>
-            <td>{{ factura.fechaEmision | date:'shortDate' }}</td>
-            <td>
-                  <span class="badge" [ngClass]="factura.metodoPago?.includes('EFECTIVO') ? 'badge-cash' : 'badge-card'">
-                    {{ factura.metodoPago?.includes('TARJETA') ? 'TARJETA' : factura.metodoPago }}
-                  </span>
-            </td>
-            <td class="amount-positive">{{ factura.total | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
-            <td>
-              <restaurant-status-badge [label]="factura.estado" variant="success"></restaurant-status-badge>
-            </td>
-            <td class="text-center">
-              <button class="action-btn-view" (click)="verDetalle(factura)" title="Ver Detalle">
-                <lucide-icon name="search" [size]="16"></lucide-icon>
-                <span>Ver</span>
-              </button>
-            </td>
-          </tr>
-          } @empty {
-          <tr>
-            <td colspan="7" class="p-0 border-0">
-              <div class="empty-state-wrapper">
-                <div class="icon-circle">
-                  <lucide-icon name="search" [size]="40"></lucide-icon>
-                </div>
-                <h4>Sin resultados</h4>
-                <p>No se encontraron facturas con los criterios seleccionados.</p>
-              </div>
-            </td>
-          </tr>
-          }
-          </tbody>
-        </table>
-      </div>
-    </restaurant-card>
+      <thead>
+        <tr>
+          <th>N° Factura</th>
+          <th>Mesa</th>
+          <th>Fecha Emisión</th>
+          <th>Método</th>
+          <th>Total</th>
+          <th>Estado</th>
+          <th class="text-center">Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (factura of facturasFiltradas(); track factura.id) {
+        <tr>
+          <td><strong>{{ factura.numeroFactura }}</strong></td>
+          <td>{{ factura.nombreMesa || 'Para Llevar' }}</td>
+          <td>{{ factura.fechaEmision | date:'shortDate' }}</td>
+          <td>
+                <span class="badge" [ngClass]="factura.metodoPago?.includes('EFECTIVO') ? 'badge-cash' : 'badge-card'">
+                  {{ factura.metodoPago?.includes('TARJETA') ? 'TARJETA' : factura.metodoPago }}
+                </span>
+          </td>
+          <td class="amount-positive" style="font-weight: var(--font-weight-semibold); color: var(--color-text-primary);">{{ factura.total | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+          <td>
+            <restaurant-status-badge [label]="factura.estado" variant="success"></restaurant-status-badge>
+          </td>
+          <td class="text-center">
+            <restaurant-button variant="surface" (click)="verDetalle(factura)" style="font-size: 0.85rem; padding: 0.25rem 0.75rem;">
+              <lucide-icon name="eye" [size]="16"></lucide-icon>
+              <span>Ver Detalle</span>
+            </restaurant-button>
+          </td>
+        </tr>
+        } @empty {
+        <tr>
+          <td colspan="7" class="p-0 border-0">
+            <restaurant-empty-state
+                    title="Sin resultados"
+                    message="No se encontraron facturas con los criterios seleccionados.">
+            </restaurant-empty-state>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </restaurant-data-table>
   </div>
 
   @if (mostrarModalDetalle() && facturaSeleccionada()) {
@@ -173,7 +165,7 @@
         <restaurant-button variant="ghost" (click)="cerrarModal()">
           <span>Cerrar</span>
         </restaurant-button>
-        <restaurant-button variant="primary" (click)="cerrarModal()">
+        <restaurant-button variant="primary" (click)="imprimirFactura()">
           <lucide-icon name="file-text" [size]="18"></lucide-icon>
           <span>Imprimir Recibo</span>
         </restaurant-button>

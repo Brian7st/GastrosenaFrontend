@@ -144,8 +144,8 @@ export class RestauranteFacade {
     ).subscribe((sesion) => this._turnoCaja.set(sesion));
   }
 
-  cargarMisOrdenes(): void {
-    this.restauranteService.misPedidos().pipe(
+  private procesarCargaPedidos(obs$: Observable<PedidoResumenResponse[]>): void {
+    obs$.pipe(
       switchMap(pedidosResumen => {
         if (!pedidosResumen || pedidosResumen.length === 0) {
           return of([]);
@@ -204,9 +204,17 @@ export class RestauranteFacade {
         this._ordenesHistorial.set(pedidosMapeados);
       },
       error: (err) => {
-        console.error('[RestauranteFacade] Error al cargar mis órdenes:', err);
+        console.error('[RestauranteFacade] Error al cargar órdenes:', err);
       }
     });
+  }
+
+  cargarMisOrdenes(): void {
+    this.procesarCargaPedidos(this.restauranteService.misPedidos());
+  }
+
+  cargarTodasLasOrdenes(): void {
+    this.procesarCargaPedidos(this.restauranteService.listarTodosPedidos());
   }
 
   private guardarEstadoLocal(): void {
@@ -644,19 +652,42 @@ export class RestauranteFacade {
     });
   }
 
-  facturarPedido(pedidoId: string, metodoPago: MetodoPago): void {
-    const request: FacturarPedidoRequest = { pedidoId, metodoPago };
-    this.restauranteService.facturarPedido(request).subscribe({
-      next: (factura) => {
-        this._pedidosParaCobro.update(lista => lista.filter(p => p.id !== pedidoId));
-        const pedidoOriginal = this._pedidosParaCobro().find(p => p.id === pedidoId);
-        if (pedidoOriginal) {
-          this._historialFacturas.update(lista => [{ ...pedidoOriginal, estado: 'FACTURADO' }, ...lista]);
+  facturarPedido(pedidoId: string, metodoPago: MetodoPago, propina: number = 0): Observable<string | null> {
+    const request: FacturarPedidoRequest = { pedidoId, metodoPago, propina };
+    return new Observable(observer => {
+      this.restauranteService.facturarPedido(request).subscribe({
+        next: (factura) => {
+          const pedidoOriginal = this._pedidosParaCobro().find(p => p.id === pedidoId);
+          this._pedidosParaCobro.update(lista => lista.filter(p => p.id !== pedidoId));
+          
+          if (pedidoOriginal) {
+            this._historialFacturas.update(lista => [{ ...pedidoOriginal, estado: 'FACTURADO' }, ...lista]);
+          }
+          this.cargarMesas();
+          observer.next(factura.id);
+          observer.complete();
+        },
+        error: (err) => {
+          console.error(`[RestauranteFacade] Error al facturar pedido ${pedidoId}:`, err);
+          observer.next(null);
+          observer.complete();
         }
-        this.cargarMesas();
+      });
+    });
+  }
+
+  descargarFacturaPdf(facturaId: string, numeroFactura: string = 'Recibo'): void {
+    this.restauranteService.descargarFacturaPdf(facturaId).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Factura-${numeroFactura}.pdf`;
+        a.click();
+        window.URL.revokeObjectURL(url);
       },
       error: (err) => {
-        console.error(`[RestauranteFacade] Error al facturar pedido ${pedidoId}:`, err);
+        console.error('[RestauranteFacade] Error descargando el PDF de la factura:', err);
       }
     });
   }
@@ -670,6 +701,6 @@ export class RestauranteFacade {
       'Cortesía': 'CORTESIA'
     };
     const metodoPago: MetodoPago = metodoMap[metodo] || 'EFECTIVO';
-    this.facturarPedido(pedidoId, metodoPago);
+    this.facturarPedido(pedidoId, metodoPago).subscribe();
   }
 }

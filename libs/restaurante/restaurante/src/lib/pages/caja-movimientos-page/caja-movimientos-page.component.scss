@@ -66,9 +66,9 @@
       align-items: center;
       justify-content: center;
 
-      &.cash { background-color: #e6f4ea; color: #28a745; }
-      &.card-payment { background-color: #e8f0fe; color: #1a73e8; }
-      &.transfer { background-color: #f3e8fd; color: #9c27b0; }
+      &.cash { background-color: var(--color-success-bg); color: var(--color-success); }
+      &.card-payment { background-color: var(--color-info-bg); color: var(--color-info-text); }
+      &.transfer { background-color: var(--color-surface-hover); color: var(--color-text-secondary); }
     }
 
     .kpi-info {
@@ -130,103 +130,7 @@
     }
   }
 
-  .table-responsive {
-    overflow-x: auto;
-  }
-
-  .restaurant-table {
-    width: 100%;
-    border-collapse: collapse;
-
-    th, td {
-      padding: var(--space-4) var(--space-3);
-      border-bottom: 1px solid var(--color-border);
-      font-size: var(--font-size-sm);
-      color: var(--color-text-primary);
-    }
-
-    th {
-      text-align: left;
-      font-weight: var(--font-weight-semibold);
-      color: var(--color-text-secondary);
-      background-color: var(--color-surface-hover);
-    }
-
-    .text-center { text-align: center; }
-
-    .badge {
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-size: 0.75rem;
-      font-weight: 600;
-
-      &.badge-cash { background: #e6f4ea; color: #28a745; }
-      &.badge-card { background: #e8f0fe; color: #1a73e8; }
-    }
-
-    .action-btn-print {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-2);
-      background-color: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      padding: var(--space-2) var(--space-3);
-      font-size: var(--font-size-xs);
-      font-weight: var(--font-weight-medium);
-      color: var(--color-text-primary);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: var(--shadow-sm);
-
-      &:hover {
-        background-color: var(--color-brand-primary);
-        color: white;
-        border-color: var(--color-brand-primary);
-      }
-    }
-  }
-
   .mt-4 { margin-top: var(--space-4); }
-}
-
-/* ========================================================= */
-/* NUEVOS ESTILOS DEL EMPTY STATE (Como en Imagen 1)        */
-/* ========================================================= */
-.empty-state-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-8) var(--space-4);
-  text-align: center;
-  width: 100%;
-
-  .icon-circle {
-    background-color: var(--color-surface-hover, #f3f4f6);
-    border-radius: 50%;
-    width: 80px;
-    height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: var(--space-4);
-    color: var(--color-text-muted, #9ca3af);
-  }
-
-  h4 {
-    margin: 0 0 var(--space-2) 0;
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-bold);
-    color: var(--color-text-heading);
-  }
-
-  p {
-    margin: 0;
-    font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
-    max-width: 300px;
-  }
 }
 
 .p-0 { padding: 0 !important; }

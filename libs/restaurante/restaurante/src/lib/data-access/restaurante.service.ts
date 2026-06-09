@@ -151,4 +151,8 @@ export class RestauranteService {
   obtenerFacturasDeSesion(sesionId: string): Observable<FacturaResponse[]> {
     return this.http.get<FacturaResponse[]>(`${this.facturasUrl}/sesion/${sesionId}`);
   }
+
+  descargarFacturaPdf(id: string): Observable<Blob> {
+    return this.http.get(`${this.facturasUrl}/${id}/pdf`, { responseType: 'blob' });
+  }
 }
