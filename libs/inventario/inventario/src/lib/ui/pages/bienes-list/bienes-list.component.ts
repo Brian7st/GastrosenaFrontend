@@ -10,6 +10,7 @@ import { ContratoImportModalComponent, ContratoImportPayload } from '../../modal
 import { Bien, BienFormDto, EstadoBien, BienFiltros } from '../../../models/inventario.model';
 import { EstadoContrato } from '../../../models/contrato.model';
 import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
+import { ConfirmarCierreContratoModalComponent } from '../../../components/confirmar-cierre-contrato-modal/confirmar-cierre-contrato-modal.component';
 import { CATEGORIAS_BIEN } from '../../../models/categorias.model';
 
 type VistaGestion = 'bienes' | 'contratos';
@@ -27,6 +28,7 @@ type VistaGestion = 'bienes' | 'contratos';
     BienImportModalComponent,
     ContratoImportModalComponent,
     EmptyStateComponent,
+    ConfirmarCierreContratoModalComponent,
   ],
   templateUrl: './bienes-list.component.html',
   styleUrl: './bienes-list.component.scss',
@@ -49,6 +51,10 @@ export class BienesListPageComponent implements OnInit {
   loadingContratos  = this.contratosFacade.loading;
   ultimaImportacion = this.contratosFacade.ultimaImportacion;
   showImportContratoModal = signal(false);
+  showCierreContratoModal = signal(false);
+  feedbackCierre = signal<string | null>(null);
+  /** ID del contrato pendiente de confirmación de cierre. */
+  private _contratoACerrarId = signal<string | null>(null);
   /** Carga lazy: los contratos solo se piden la primera vez que se abre la vista. */
   private contratosCargados = signal(false);
 
@@ -93,7 +99,34 @@ export class BienesListPageComponent implements OnInit {
   }
 
   onCerrarContrato(id: string): void {
+    this._contratoACerrarId.set(id);
+    this.feedbackCierre.set(null);
+    this.showCierreContratoModal.set(true);
+  }
+
+  onConfirmarCierre(): void {
+    const id = this._contratoACerrarId();
+    if (!id) return;
+    this.showCierreContratoModal.set(false);
     this.contratosFacade.cerrarContrato(id);
+    // El feedback se muestra a través de ultimoCierre signal tras que el facade completa
+    const checkResult = () => {
+      const resultado = this.contratosFacade.ultimoCierre();
+      if (resultado !== null) {
+        const n = resultado.bienesDesactivados;
+        this.feedbackCierre.set(
+          n === 1 ? '1 bien desactivado' : `${n} bienes desactivados`,
+        );
+        this._contratoACerrarId.set(null);
+      }
+    };
+    // Defer one tick so signals settle after subscribe
+    Promise.resolve().then(checkResult);
+  }
+
+  onCancelarCierre(): void {
+    this.showCierreContratoModal.set(false);
+    this._contratoACerrarId.set(null);
   }
 
   onAbrirImportarContrato(): void {

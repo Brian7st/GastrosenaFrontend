@@ -1,0 +1,24 @@
+@if (isOpen) {
+  <div class="modal-backdrop" (click)="cancelled.emit()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      <div class="modal-content">
+        <div class="icon-wrapper icon-wrapper--warning">
+          <span class="material-symbols-outlined">warning</span>
+        </div>
+
+        <h2 class="modal-title">Cerrar contrato</h2>
+        <p class="modal-text">
+          Al cerrar este contrato, <strong>todos los bienes asociados serán desactivados</strong>.
+          Esta acción no se puede deshacer.
+        </p>
+
+        <div class="modal-actions">
+          <button class="btn-cancel" type="button" (click)="cancelled.emit()">Cancelar</button>
+          <button class="btn-confirm btn-confirm--danger" type="button" (click)="confirmed.emit()">
+            Sí, cerrar contrato
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

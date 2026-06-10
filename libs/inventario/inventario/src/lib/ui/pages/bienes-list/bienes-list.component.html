@@ -248,6 +248,13 @@
 </div>
 }
 
+@if (feedbackCierre(); as feedback) {
+<div class="import-result import-result--cierre">
+  <span class="material-symbols-outlined">lock</span>
+  Contrato cerrado: {{ feedback }}.
+</div>
+}
+
 <restaurant-data-table
   tableTitle="Contratos de adjudicación"
   tableIcon="file-text"
@@ -343,3 +350,9 @@
   (importar)="onImportarContrato($event)"
 ></restaurant-contrato-import>
 }
+
+<restaurant-confirmar-cierre-contrato-modal
+  [isOpen]="showCierreContratoModal()"
+  (confirmed)="onConfirmarCierre()"
+  (cancelled)="onCancelarCierre()"
+/>

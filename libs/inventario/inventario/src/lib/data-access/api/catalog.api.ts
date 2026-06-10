@@ -142,6 +142,12 @@ export interface ImportacionContratoResponse {
   productosActualizados: number;
 }
 
+/** PATCH /catalog/contratos/{id}/cerrar — 200 OK */
+export interface CierreContratoResponse {
+  contratoId: string;
+  bienesDesactivados: number;
+}
+
 /** GET /catalog/contratos/precio?codigoSena&vigencia */
 export interface PrecioVigenteResponse {
   codigoSena: string | null;
