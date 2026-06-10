@@ -58,6 +58,12 @@ export class BienFormComponent implements OnInit {
   readonly isEdit = computed(() => this.mode === 'edit');
   readonly umBloqueada = computed(() => this.mode === 'edit' && !!this.bien?.tieneHistorial);
 
+  /**
+   * El código SENA es identidad inmutable: si el bien YA tiene uno, se bloquea.
+   * Si no tiene (ej. nació de un contrato sin código), se permite asignarlo al editar.
+   */
+  codigoSenaBloqueado = false;
+
   ngOnInit(): void {
     this.initForm();
 
@@ -92,8 +98,15 @@ export class BienFormComponent implements OnInit {
         stockMinimo:     bien.stockMinimo ?? null,
       });
 
-      // En edicion el codigo SENA es inmutable - no se puede cambiar
-      this.form.get('codigoSena')?.disable();
+      // El código SENA solo se bloquea si el bien ya tiene uno (inmutable).
+      // Si no tiene, queda editable y opcional para poder asignarlo.
+      this.codigoSenaBloqueado = !!bien.codigoSena;
+      if (this.codigoSenaBloqueado) {
+        this.form.get('codigoSena')?.disable();
+      } else {
+        this.form.get('codigoSena')?.clearValidators();
+        this.form.get('codigoSena')?.updateValueAndValidity();
+      }
       if (this.umBloqueada()) {
         this.form.get('unidadMedida')?.disable();
       }

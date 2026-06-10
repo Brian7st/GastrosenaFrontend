@@ -28,17 +28,22 @@
 
         <div class="field-row">
           <div class="field-group">
-            <label class="field-label">CÓD. INTERNO SENA <span class="required">*</span></label>
+            <label class="field-label">
+              CÓD. INTERNO SENA
+              @if (!isEdit() || codigoSenaBloqueado) {<span class="required">*</span>}
+            </label>
             <input class="field-input"
                    formControlName="codigoSena"
-                   [class.field-input--disabled]="mode === 'edit'"
+                   [class.field-input--disabled]="codigoSenaBloqueado"
                    [class.field-input--error]="hasError('codigoSena')"
-                   [placeholder]="mode === 'create' ? 'Ej. SENA-00123' : ''" />
+                   [placeholder]="codigoSenaBloqueado ? '' : 'Ej. SENA-00123'" />
             @if (hasError('codigoSena')) {
               <p class="field-error">El código SENA es obligatorio</p>
             }
-            @if (mode === 'edit') {
-              <p class="field-hint">El código SENA no puede modificarse una vez creado</p>
+            @if (codigoSenaBloqueado) {
+              <p class="field-hint">El código SENA no puede modificarse una vez asignado</p>
+            } @else if (isEdit()) {
+              <p class="field-hint">Este bien no tiene código SENA. Podés asignarlo ahora (no podrá cambiarse luego).</p>
             }
           </div>
           <div class="field-group">

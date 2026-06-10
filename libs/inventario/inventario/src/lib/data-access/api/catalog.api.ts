@@ -45,6 +45,8 @@ export interface CrearProductoRequest {
 
 export interface ActualizarProductoRequest {
   unidadMedida: string;
+  /** Opcional. El backend lo asigna SOLO si el producto aún no tiene código; si ya tiene, lo ignora. */
+  codigoSena?: string | null;
   descripcion?: string;
   categoria?: string;
   codigoProveedor?: string;
