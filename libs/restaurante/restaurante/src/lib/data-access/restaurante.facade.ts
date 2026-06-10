@@ -348,7 +348,7 @@ export class RestauranteFacade {
       this.restauranteService.pedidosPorMesa(mesaId).subscribe({
         next: (pedidos) => {
           // Filtrar el pedido activo (que no esté pagado ni cancelado)
-          const pedidoActivo = pedidos.find(p => p.estado !== 'FACTURADO' && p.estado !== 'CANCELADO');
+          const pedidoActivo = pedidos.find(p => p.estado !== EstadoPedido.FACTURADO && p.estado !== EstadoPedido.CANCELADO);
           
           if (!pedidoActivo) {
             console.error('[RestauranteFacade] No se encontró pedido activo para la mesa Ocupada.');
@@ -401,7 +401,7 @@ export class RestauranteFacade {
 
   cancelarPedidoActivoEnBackend(motivo: string = ''): Observable<boolean> {
     const pedido = this.pedidoActivo();
-    if (!pedido || pedido.estado === 'BORRADOR') {
+    if (!pedido || pedido.estado === EstadoPedido.BORRADOR) {
       return of(false);
     }
     return new Observable(observer => {
@@ -429,7 +429,7 @@ export class RestauranteFacade {
       mesaId,
       meseroId: usuarioId,
       numeroComensales: numeroComensales || 1,
-      estado: 'BORRADOR',
+      estado: EstadoPedido.BORRADOR,
       fechaCreacion: new Date().toISOString(),
       detalles: [],
       subtotal: 0
@@ -446,7 +446,7 @@ export class RestauranteFacade {
   ) {
     this._pedidoActivo.update(pedido => {
       if (!pedido) return null;
-      if (pedido.estado !== 'BORRADOR') return pedido;
+      if (pedido.estado !== EstadoPedido.BORRADOR) return pedido;
 
       const detalles = [...pedido.detalles];
       const indexExistente = detalles.findIndex(d => d.productoId === productoId && d.observaciones === observaciones);
@@ -470,7 +470,7 @@ export class RestauranteFacade {
   actualizarCantidadProducto(index: number, delta: number) {
     this._pedidoActivo.update(pedido => {
       if (!pedido) return null;
-      if (pedido.estado !== 'BORRADOR') return pedido;
+      if (pedido.estado !== EstadoPedido.BORRADOR) return pedido;
 
       const detalles = [...pedido.detalles];
       detalles[index].cantidad += delta;
@@ -487,7 +487,7 @@ export class RestauranteFacade {
   actualizarObservacionesProducto(index: number, observaciones: string) {
     this._pedidoActivo.update(pedido => {
       if (!pedido) return null;
-      if (pedido.estado !== 'BORRADOR') return pedido;
+      if (pedido.estado !== EstadoPedido.BORRADOR) return pedido;
 
       const detalles = [...pedido.detalles];
       detalles[index] = { ...detalles[index], observaciones };
@@ -499,7 +499,7 @@ export class RestauranteFacade {
   eliminarProductoDelPedido(index: number) {
     this._pedidoActivo.update(pedido => {
       if (!pedido) return null;
-      if (pedido.estado !== 'BORRADOR') return pedido;
+      if (pedido.estado !== EstadoPedido.BORRADOR) return pedido;
 
       const detalles = [...pedido.detalles];
       detalles.splice(index, 1);
@@ -548,7 +548,7 @@ export class RestauranteFacade {
             mesaId: pedidoResponse.mesaId,
             meseroId: pedidoResponse.meseroId,
             numeroComensales: pedidoResponse.numeroComensales,
-            estado: 'EN_PREPARACION',
+            estado: EstadoPedido.EN_PREPARACION,
             fechaCreacion: pedidoResponse.fechaCreacion,
             detalles: pedido.detalles,
             subtotal: pedidoResponse.subtotal
@@ -592,7 +592,7 @@ export class RestauranteFacade {
     this.restauranteService.entregarPedido(pedidoId).subscribe({
       next: (pedidoResponse) => {
         this._ordenesHistorial.update(historial =>
-          historial.map(p => p.id === pedidoId ? { ...p, estado: 'ENTREGADO' } : p)
+          historial.map(p => p.id === pedidoId ? { ...p, estado: EstadoPedido.ENTREGADO } : p)
         );
 
         this._mesas.update(mesas =>
@@ -633,7 +633,7 @@ export class RestauranteFacade {
   }
 
   cargarPedidosParaCobro() {
-    this.restauranteService.pedidosPorEstado('ENTREGADO').subscribe({
+    this.restauranteService.pedidosPorEstado(EstadoPedido.ENTREGADO).subscribe({
       next: (pedidos) => this._pedidosParaCobro.set(pedidos),
       error: (err) => {
         console.error('[RestauranteFacade] Error al cargar pedidos para cobro:', err);
@@ -643,7 +643,7 @@ export class RestauranteFacade {
   }
 
   cargarHistorialFacturas() {
-    this.restauranteService.pedidosPorEstado('FACTURADO').subscribe({
+    this.restauranteService.pedidosPorEstado(EstadoPedido.FACTURADO).subscribe({
       next: (pedidos) => this._historialFacturas.set(pedidos),
       error: (err) => {
         console.error('[RestauranteFacade] Error al cargar historial de facturas:', err);
@@ -661,7 +661,7 @@ export class RestauranteFacade {
           this._pedidosParaCobro.update(lista => lista.filter(p => p.id !== pedidoId));
           
           if (pedidoOriginal) {
-            this._historialFacturas.update(lista => [{ ...pedidoOriginal, estado: 'FACTURADO' }, ...lista]);
+            this._historialFacturas.update(lista => [{ ...pedidoOriginal, estado: EstadoPedido.FACTURADO }, ...lista]);
           }
           this.cargarMesas();
           observer.next(factura.id);

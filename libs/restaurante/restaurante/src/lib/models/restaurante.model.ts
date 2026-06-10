@@ -1,3 +1,6 @@
+import { EstadoPedido } from '@restaurant/shared/models';
+export { EstadoPedido };
+
 export type EstadoMesa = 'LIBRE' | 'OCUPADA' | 'POR_PAGAR' | 'INACTIVA';
 
 export interface Mesa {
@@ -89,18 +92,7 @@ export interface FacturarPedidoRequest {
   propina: number;
 }
 
-/**
- * Espejo exacto de EstadoPedido.java
- * 7 valores — coincide con @Enumerated(EnumType.STRING) del backend.
- */
-export type EstadoPedido =
-  | 'BORRADOR'
-  | 'ENVIADO_COCINA'
-  | 'EN_PREPARACION'
-  | 'LISTO_PARA_SERVIR'
-  | 'ENTREGADO'
-  | 'FACTURADO'
-  | 'CANCELADO';
+
 
 /** Espejo de PedidoResumenResponse.java */
 export interface PedidoResumenResponse {
