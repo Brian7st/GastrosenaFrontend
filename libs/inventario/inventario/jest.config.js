@@ -23,4 +23,13 @@ module.exports = {
     'jest-preset-angular/build/serializers/ng-snapshot',
     'jest-preset-angular/build/serializers/html-comment',
   ],
+  moduleNameMapper: {
+    '@restaurant/inventario': '<rootDir>/src/index.ts',
+    '@restaurant/shared/ui': '<rootDir>/../../../libs/shared/ui/src/index.ts',
+    '@restaurant/shared/auth': '<rootDir>/../../../libs/shared/auth/src/index.ts',
+    '@restaurant/shared/models': '<rootDir>/../../../libs/shared/models/src/index.ts',
+    '@restaurant/shared/state': '<rootDir>/../../../libs/shared/state/src/index.ts',
+    '@restaurant/shared/api': '<rootDir>/../../../libs/shared/api/src/index.ts',
+    '@restaurant/shared/util': '<rootDir>/../../../libs/shared/util/src/index.ts',
+  },
 };

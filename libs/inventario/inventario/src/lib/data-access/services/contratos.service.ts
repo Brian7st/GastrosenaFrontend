@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import {
+  ContratoCabecera,
   Contrato,
   PrecioVigente,
   RegistrarContratoData,
@@ -13,6 +14,7 @@ import {
   ContratoCreatedResponse,
   ImportacionContratoResponse,
   PrecioVigenteResponse,
+  CierreContratoResponse,
 } from '../api/catalog.api';
 import {
   contratoFromApi,
@@ -87,10 +89,34 @@ export class ContratosService {
       );
   }
 
-  /** PATCH /catalog/contratos/{id}/cerrar — marca el contrato como CERRADO. */
-  cerrarContrato(id: string): Observable<void> {
+  /** POST /catalog/contratos/importar-excel — importa contrato desde archivo Excel (multipart).
+   *  Campos de cabecera se envían como campos del FormData junto con el archivo.
+   */
+  importarContratoExcel(archivo: File, cabecera: ContratoCabecera): Observable<ResultadoImportacion> {
+    const form = new FormData();
+    form.append('archivo', archivo);
+    form.append('numero', cabecera.numero);
+    form.append('vigencia', String(cabecera.vigencia));
+    if (cabecera.descripcion != null) form.append('descripcion', cabecera.descripcion);
+    if (cabecera.fechaInicio != null) form.append('fechaInicio', cabecera.fechaInicio);
+    if (cabecera.fechaFin != null) form.append('fechaFin', cabecera.fechaFin);
+
     return this.http
-      .patch<void>(`${API}/catalog/contratos/${id}/cerrar`, {})
+      .post<ImportacionContratoResponse>(`${API}/catalog/contratos/importar-excel`, form)
+      .pipe(
+        map(res => ({
+          contratoId: res.contratoId,
+          productosCreados: res.productosCreados,
+          productosActualizados: res.productosActualizados,
+        })),
+        catchError(err => throwError(() => err)),
+      );
+  }
+
+  /** PATCH /catalog/contratos/{id}/cerrar — cierra el contrato y retorna conteo de bienes desactivados. */
+  cerrarContrato(id: string): Observable<CierreContratoResponse> {
+    return this.http
+      .patch<CierreContratoResponse>(`${API}/catalog/contratos/${id}/cerrar`, {})
       .pipe(catchError(err => throwError(() => err)));
   }
 }

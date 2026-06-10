@@ -7,7 +7,7 @@
   <div class="header-actions">
     <restaurant-button variant="surface" (click)="onImportBienes()">
       <span class="material-symbols-outlined">file_upload</span>
-      Importar
+      Cargar datos internos
     </restaurant-button>
     <restaurant-button variant="surface" (click)="onExportBienes()">
       <span class="material-symbols-outlined">file_download</span>
@@ -248,6 +248,13 @@
 </div>
 }
 
+@if (feedbackCierre(); as feedback) {
+<div class="import-result import-result--cierre">
+  <span class="material-symbols-outlined">lock</span>
+  Contrato cerrado: {{ feedback }}.
+</div>
+}
+
 <restaurant-data-table
   tableTitle="Contratos de adjudicación"
   tableIcon="file-text"
@@ -294,6 +301,9 @@
           </td>
           <td class="text-center">
             <div class="actions-row">
+              <button class="action-icon" (click)="onVerDetalleContrato(contrato.id)" title="Ver detalle">
+                <span class="material-symbols-outlined">visibility</span>
+              </button>
               @if (contrato.estado === 'VIGENTE') {
                 <button class="action-icon action-icon--warning" (click)="onCerrarContrato(contrato.id)" title="Cerrar contrato">
                   <span class="material-symbols-outlined">lock</span>
@@ -342,4 +352,18 @@
   (cancelar)="showImportContratoModal.set(false)"
   (importar)="onImportarContrato($event)"
 ></restaurant-contrato-import>
+}
+
+<restaurant-confirmar-cierre-contrato-modal
+  [isOpen]="showCierreContratoModal()"
+  (confirmed)="onConfirmarCierre()"
+  (cancelled)="onCancelarCierre()"
+/>
+
+@if (showDetalleContratoModal()) {
+<restaurant-contrato-detalle
+  [contrato]="contratosFacade.contratoSeleccionado()"
+  [loading]="contratosFacade.loading()"
+  (cerrar)="showDetalleContratoModal.set(false)"
+></restaurant-contrato-detalle>
 }

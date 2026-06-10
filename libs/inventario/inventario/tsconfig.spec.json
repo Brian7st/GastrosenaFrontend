@@ -1,13 +1,14 @@
 {
-  "extends": "../../../tsconfig.base.json",
+  "extends": "../../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../../dist/out-tsc",
-    "module": "commonjs",
-    "moduleResolution": "node10",
-    "target": "ES2022",
+    "outDir": "./out-tsc/spec",
+    "module": "CommonJS",
+    "moduleResolution": "node",
     "types": ["jest", "node"],
-    "esModuleInterop": true,
-    "allowJs": true
+    "esModuleInterop": true
   },
-  "include": ["src/**/*.spec.ts", "src/**/*.d.ts", "src/test-setup.ts"]
+  "include": [
+    "src/**/*.ts",
+    "jest.config.js"
+  ]
 }

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ButtonComponent, DataTableComponent, KpiCardComponent, LoadingSkeletonComponent } from '@restaurant/shared/ui';
@@ -6,10 +6,12 @@ import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { ContratosFacade } from '../../../data-access/contratos.facade';
 import { BienFormComponent } from '../../../ui/modals/bien-form/bien-form.component';
 import { BienImportModalComponent, BienImportPayload } from '../../modals/bien-import/bien-import.component';
-import { ContratoImportModalComponent } from '../../modals/contrato-import/contrato-import.component';
+import { ContratoImportModalComponent, ContratoImportPayload } from '../../modals/contrato-import/contrato-import.component';
+import { ContratoDetalleComponent } from '../../modals/contrato-detalle/contrato-detalle.component';
 import { Bien, BienFormDto, EstadoBien, BienFiltros } from '../../../models/inventario.model';
-import { EstadoContrato, RegistrarContratoData } from '../../../models/contrato.model';
+import { EstadoContrato } from '../../../models/contrato.model';
 import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
+import { ConfirmarCierreContratoModalComponent } from '../../../components/confirmar-cierre-contrato-modal/confirmar-cierre-contrato-modal.component';
 import { CATEGORIAS_BIEN } from '../../../models/categorias.model';
 
 type VistaGestion = 'bienes' | 'contratos';
@@ -26,7 +28,9 @@ type VistaGestion = 'bienes' | 'contratos';
     BienFormComponent,
     BienImportModalComponent,
     ContratoImportModalComponent,
+    ContratoDetalleComponent,
     EmptyStateComponent,
+    ConfirmarCierreContratoModalComponent,
   ],
   templateUrl: './bienes-list.component.html',
   styleUrl: './bienes-list.component.scss',
@@ -34,7 +38,7 @@ type VistaGestion = 'bienes' | 'contratos';
 })
 export class BienesListPageComponent implements OnInit {
   private facade = inject(InventarioFacade);
-  private contratosFacade = inject(ContratosFacade);
+  readonly contratosFacade = inject(ContratosFacade);
   private router = inject(Router);
 
   // State signals
@@ -49,6 +53,11 @@ export class BienesListPageComponent implements OnInit {
   loadingContratos  = this.contratosFacade.loading;
   ultimaImportacion = this.contratosFacade.ultimaImportacion;
   showImportContratoModal = signal(false);
+  showCierreContratoModal = signal(false);
+  feedbackCierre = signal<string | null>(null);
+  /** ID del contrato pendiente de confirmación de cierre. */
+  private _contratoACerrarId = signal<string | null>(null);
+  showDetalleContratoModal = signal(false);
   /** Carga lazy: los contratos solo se piden la primera vez que se abre la vista. */
   private contratosCargados = signal(false);
 
@@ -74,6 +83,30 @@ export class BienesListPageComponent implements OnInit {
   formMode = signal<'create' | 'edit'>('create');
   selectedBien = signal<Bien | undefined>(undefined);
 
+  constructor() {
+    // Cuando el cierre de contrato resuelve (HTTP async), el facade setea
+    // ultimoCierre: mostramos el conteo de bienes desactivados y refrescamos
+    // la lista (cerrar desactiva los bienes del contrato).
+    effect(() => {
+      const resultado = this.contratosFacade.ultimoCierre();
+      if (resultado !== null) {
+        const n = resultado.bienesDesactivados;
+        this.feedbackCierre.set(
+          n === 1 ? '1 bien desactivado' : `${n} bienes desactivados`,
+        );
+        this.facade.cargarBienes();
+      }
+    });
+
+    // Al importar un contrato con éxito se crean/actualizan bienes del catálogo;
+    // refrescamos la lista de bienes en el acto, sin recargar la página.
+    effect(() => {
+      if (this.contratosFacade.ultimaImportacion()) {
+        this.facade.cargarBienes();
+      }
+    });
+  }
+
   ngOnInit(): void {
     this.facade.loadAll();
   }
@@ -92,16 +125,42 @@ export class BienesListPageComponent implements OnInit {
     }
   }
 
+  onVerDetalleContrato(id: string): void {
+    this.contratosFacade.cargarContratoById(id);
+    this.showDetalleContratoModal.set(true);
+  }
+
   onCerrarContrato(id: string): void {
+    this._contratoACerrarId.set(id);
+    this.feedbackCierre.set(null);
+    this.showCierreContratoModal.set(true);
+  }
+
+  onConfirmarCierre(): void {
+    const id = this._contratoACerrarId();
+    if (!id) return;
+    this.showCierreContratoModal.set(false);
+    this._contratoACerrarId.set(null);
+    // El feedback ("N bienes desactivados") lo dispara el effect que escucha
+    // ultimoCierre cuando el facade resuelve la respuesta HTTP (ver constructor).
     this.contratosFacade.cerrarContrato(id);
+  }
+
+  onCancelarCierre(): void {
+    this.showCierreContratoModal.set(false);
+    this._contratoACerrarId.set(null);
   }
 
   onAbrirImportarContrato(): void {
     this.showImportContratoModal.set(true);
   }
 
-  onImportarContrato(data: RegistrarContratoData): void {
-    this.contratosFacade.importarContrato(data);
+  onImportarContrato(payload: ContratoImportPayload): void {
+    if (payload.tipo === 'excel') {
+      this.contratosFacade.importarExcel(payload.archivo, payload.cabecera);
+    } else {
+      this.contratosFacade.importarContrato(payload.data);
+    }
     this.showImportContratoModal.set(false);
   }
 

@@ -45,6 +45,8 @@ export interface CrearProductoRequest {
 
 export interface ActualizarProductoRequest {
   unidadMedida: string;
+  /** Opcional. El backend lo asigna SOLO si el producto aún no tiene código; si ya tiene, lo ignora. */
+  codigoSena?: string | null;
   descripcion?: string;
   categoria?: string;
   codigoProveedor?: string;
@@ -140,6 +142,12 @@ export interface ImportacionContratoResponse {
   contratoId: string;
   productosCreados: number;
   productosActualizados: number;
+}
+
+/** PATCH /catalog/contratos/{id}/cerrar — 200 OK */
+export interface CierreContratoResponse {
+  contratoId: string;
+  bienesDesactivados: number;
 }
 
 /** GET /catalog/contratos/precio?codigoSena&vigencia */

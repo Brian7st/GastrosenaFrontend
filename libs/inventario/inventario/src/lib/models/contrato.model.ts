@@ -60,6 +60,17 @@ export interface RegistrarContratoData {
   items: RegistrarItemContratoData[];
 }
 
+/** Cabecera del contrato usada para el import multipart Excel.
+ *  numero y vigencia son obligatorios; el resto es opcional.
+ */
+export interface ContratoCabecera {
+  numero: string;
+  vigencia: number;
+  descripcion?: string | null;
+  fechaInicio?: string | null;
+  fechaFin?: string | null;
+}
+
 // ── Resultados ─────────────────────────────────────────────────────────────────
 
 /** Resultado de importar un contrato: cuántos productos del catálogo se crearon/actualizaron. */
