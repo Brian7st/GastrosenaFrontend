@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { ContratosService } from './contratos.service';
-import { ContratoResponse, ImportacionContratoResponse, PrecioVigenteResponse } from '../api/catalog.api';
+import { CierreContratoResponse, ContratoResponse, ImportacionContratoResponse, PrecioVigenteResponse } from '../api/catalog.api';
 import { ContratoCabecera, RegistrarContratoData } from '../../models/contrato.model';
 
 describe('ContratosService', () => {
@@ -135,12 +135,29 @@ describe('ContratosService', () => {
     req.flush(precio);
   });
 
-  it('cerrarContrato issues a PATCH to the cerrar endpoint', () => {
-    service.cerrarContrato('cto-1').subscribe();
+  it('cerrarContrato issues a PATCH to the cerrar endpoint and returns CierreContratoResponse', () => {
+    const cierreResponse: CierreContratoResponse = { contratoId: 'cto-1', bienesDesactivados: 3 };
+    let result: CierreContratoResponse | undefined;
+
+    service.cerrarContrato('cto-1').subscribe(res => { result = res; });
 
     const req = httpMock.expectOne('/api/v1/catalog/contratos/cto-1/cerrar');
     expect(req.request.method).toBe('PATCH');
-    req.flush(null);
+    req.flush(cierreResponse);
+
+    expect(result).toEqual({ contratoId: 'cto-1', bienesDesactivados: 3 });
+  });
+
+  it('cerrarContrato returns bienesDesactivados: 0 when contract has no resolvable items', () => {
+    const cierreResponse: CierreContratoResponse = { contratoId: 'cto-2', bienesDesactivados: 0 };
+    let result: CierreContratoResponse | undefined;
+
+    service.cerrarContrato('cto-2').subscribe(res => { result = res; });
+
+    const req = httpMock.expectOne('/api/v1/catalog/contratos/cto-2/cerrar');
+    req.flush(cierreResponse);
+
+    expect(result?.bienesDesactivados).toBe(0);
   });
 
   // F2 — importarContratoExcel

@@ -14,6 +14,7 @@ import {
   ContratoCreatedResponse,
   ImportacionContratoResponse,
   PrecioVigenteResponse,
+  CierreContratoResponse,
 } from '../api/catalog.api';
 import {
   contratoFromApi,
@@ -112,10 +113,10 @@ export class ContratosService {
       );
   }
 
-  /** PATCH /catalog/contratos/{id}/cerrar — marca el contrato como CERRADO. */
-  cerrarContrato(id: string): Observable<void> {
+  /** PATCH /catalog/contratos/{id}/cerrar — cierra el contrato y retorna conteo de bienes desactivados. */
+  cerrarContrato(id: string): Observable<CierreContratoResponse> {
     return this.http
-      .patch<void>(`${API}/catalog/contratos/${id}/cerrar`, {})
+      .patch<CierreContratoResponse>(`${API}/catalog/contratos/${id}/cerrar`, {})
       .pipe(catchError(err => throwError(() => err)));
   }
 }
