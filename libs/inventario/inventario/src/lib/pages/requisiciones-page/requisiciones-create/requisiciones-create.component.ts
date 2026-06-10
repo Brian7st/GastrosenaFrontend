@@ -3,6 +3,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { DecimalPipe } from '@angular/common';
 import { ButtonComponent, LucideIconComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { BienesService } from '../../../data-access/services/bienes.service';
@@ -25,7 +26,7 @@ interface CatState {
   selector: 'restaurant-requisiciones-create',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, ButtonComponent, LucideIconComponent, BackButtonComponent],
+  imports: [ReactiveFormsModule, DecimalPipe, ButtonComponent, LucideIconComponent, BackButtonComponent],
   templateUrl: './requisiciones-create.component.html',
   styleUrl:    './requisiciones-create.component.scss',
 })
@@ -59,8 +60,7 @@ export class RequisicionesCreateComponent implements OnInit {
   // ── Context form ──────────────────────────────────────────────────────────
   contextForm = this.fb.nonNullable.group({
     fichaId:          ['', Validators.required],
-    instructorId:     ['', Validators.required],
-    instructorNombre: [''],
+    instructorNombre: ['', Validators.required],
     fecha:            [new Date().toISOString().slice(0, 10), Validators.required],
     horaSesion:       ['07:00', Validators.required],
   });
@@ -116,7 +116,9 @@ export class RequisicionesCreateComponent implements OnInit {
     const v = this.contextForm.getRawValue();
     this.draft.setContexto({
       fichaId:          v.fichaId,
-      instructorId:     v.instructorId,
+      // El backend exige instructorId; reutilizamos el nombre capturado como identificador
+      // (la app no maneja un ID de instructor separado en este flujo).
+      instructorId:     v.instructorNombre,
       instructorNombre: v.instructorNombre,
       fecha:            v.fecha,
       horaSesion:       v.horaSesion,
