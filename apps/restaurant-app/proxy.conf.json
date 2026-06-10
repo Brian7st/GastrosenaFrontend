@@ -13,6 +13,11 @@
     "secure": false,
     "changeOrigin": true
   },
+  "/api/usuarios": {
+    "target": "http://localhost:8087",
+    "secure": false,
+    "changeOrigin": true
+  },
   "/api/barybarismo": {
     "target": "http://localhost:8086",
     "secure": false,

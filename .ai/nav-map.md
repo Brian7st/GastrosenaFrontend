@@ -1,52 +1,29 @@
 # GastroSENA — Mapa de Navegación
 
-> Última actualización: 2026-05-20 | Rama: `develop` | Auditoría: RFs Esenciales cruzados con código real
+> Última actualización: 2026-06-09 | Rama: `feat/inventario/playwright-e2e` | Auditoría: rutas reales + capa `data-access` cruzadas con código
 
 ## Leyenda
 
 | Ícono | Significado |
 |-------|-------------|
-| ✅ | RF implementado con lógica real |
-| 🔶 | RF parcialmente implementado — estructura sin funcionalidad completa |
-| ❌ | RF sin implementar — stub o componente faltante |
-| 🔒 | Protegido por `roleGuard` |
+| ✅ | Implementado con lógica real (componente + facade/servicio HTTP cableado) |
+| 🔶 | Parcialmente implementado — estructura presente, lógica o backend incompletos |
+| ❌ | Sin implementar — stub o componente faltante |
+| 🔒 | Protegido por `permissionGuard` / `roleGuard` |
 
 ---
 
-## Progreso general
+## Cambios clave desde la auditoría anterior (2026-05-20)
 
-> Metodología: auditoría RF por RF — cada Requisito Funcional Esencial de `docs/requisitos.md` fue cruzado con el `.ts` y `.html` del componente responsable.
-> Clasificación: **REAL** = RF cumplido (facade + bindings + lógica) | **PARCIAL** = estructura sin funcionalidad completa | **FALTA** = sin implementar
+- **Inventario migró de facade NgRx con mocks a una capa `data-access` HTTP real**: 13 dominios, cada uno con su `*.facade.ts` (signals) + `*.service.ts` (HttpClient) + `api/*.api.ts` (DTOs alineados a Swagger) + `mappers/*.mapper.ts`. **15 servicios usan `HttpClient`**.
+- **Guards**: el mecanismo principal pasó a `permissionGuard([...])` por permisos granulares. `roleGuard` queda para `/app/fichas` y `/app/abastecimiento`. `authGuard` ya está **activo** en `/app`.
+- **i18n**: navegación con `tKey` (claves de traducción) en todo el sidebar.
+- **Módulos nuevos**: `configuracion` (tema + idioma) y `abastecimiento` (ruta protegida ADMIN/CONTADORA).
+- **Auth**: se sumó `reset-password` (flujo de restablecimiento completo).
+- **Dashboard**: `/app` redirige a `/app/dashboard` (no a inventario).
+- **Reportes** y **Notificaciones** dejaron de ser 0% — ya tienen facade/servicio con `HttpClient`.
 
-```mermaid
-pie title Avance por RFs Esenciales (92 auditados)
-    "REAL" : 48
-    "PARCIAL" : 28
-    "FALTA" : 16
-```
-
-### Por módulo
-
-```mermaid
-xychart-beta
-    title "% RFs Esenciales REAL por modulo"
-    x-axis ["Usuarios", "Cocina", "Bar", "Restaurante", "Inventario", "Reportes", "Notificaciones"]
-    y-axis "% Real" 0 --> 100
-    bar [75, 69, 61, 28, 60, 0, 0]
-```
-
-| Módulo | RFs Esenciales | REAL | PARCIAL | FALTA | % Real |
-|--------|---------------|------|---------|-------|--------|
-| Auth/Usuarios | RF1.2, RF2.1–2.6.1 | 6 | 1 | 2 | `███████░░░` **75%** |
-| Cocina | RF-C 4.0–4.4.1 | 11 | 2 | 5 | `██████░░░░` **69%** |
-| Bar | RF-C 4.10–4.19 | 11 | 2 | 5 | `██████░░░░` **61%** |
-| Restaurante | RF3.1.x–RF3.5.x | 5 | 11 | 2 | `███░░░░░░░` **28%** |
-| Inventario | RF-5.1–5.11 | 21 | 14 | 0 | `██████░░░░` **60%** |
-| Reportes | RF6.1.x | 0 | 0 | 13 | `░░░░░░░░░░` **0%** |
-| Notificaciones | RF1.8.x | 0 | 0 | 3 | `░░░░░░░░░░` **0%** |
-| **TOTAL** | **92** | **48** | **28** | **16** | `█████░░░░░` **52%** |
-
-> **Avance real verificado: 52%** — 48 de 92 RFs Esenciales completamente implementados. 28 RFs adicionales con implementación parcial.
+> ⚠️ Alcance de esta auditoría: se verificó **rutas reales + capa de datos cableada a HTTP + existencia y tamaño de componentes**. La profundidad de cada RF a nivel UI no se re-auditó RF por RF; los estados reflejan evidencia estructural.
 
 ---
 
@@ -54,21 +31,26 @@ xychart-beta
 
 ```mermaid
 flowchart TD
-    ROOT["/ — Landing"] --> AUTH["/auth"]
-    ROOT --> APP["/app — Shell autenticado"]
+    ROOT["/ — Landing pública"] --> AUTH["/auth"]
+    ROOT --> APP["/app — Shell autenticado 🔒 authGuard"]
     ROOT --> SHOWCASE["/showcase — Design System"]
 
     AUTH --> LOGIN["/auth/login ✅"]
-    AUTH --> FORGOT["/auth/forgot-password 🔶"]
+    AUTH --> FORGOT["/auth/forgot-password ✅"]
+    AUTH --> RESET["/auth/reset-password ✅"]
 
-    APP -->|redirect| INVENT_ROOT
-    APP --> INVENT_ROOT["/app/inventario 🔒 ADMIN · CONTADORA"]
-    APP --> COCINA["/app/cocina"]
-    APP --> BAR["/app/bar"]
-    APP --> REST["/app/restaurante"]
-    APP --> USERS["/app/usuarios"]
-    APP --> REP["/app/reportes ❌"]
-    APP --> NOTIF["/app/notificaciones ❌"]
+    APP -->|redirect| DASH["/app/dashboard ✅"]
+    APP --> COCINA["/app/cocina 🔒"]
+    APP --> BAR["/app/bar 🔒"]
+    APP --> REST["/app/restaurante 🔒"]
+    APP --> INVENT["/app/inventario 🔒"]
+    APP --> USERS["/app/usuarios 🔒"]
+    APP --> FICHAS["/app/fichas 🔒 ADMIN"]
+    APP --> REP["/app/reportes 🔶"]
+    APP --> ABAST["/app/abastecimiento 🔒 ADMIN·CONTADORA"]
+    APP --> CONFIG["/app/configuracion ✅"]
+    APP --> NOTIF["/app/notificaciones 🔶"]
+    APP --> PERFIL["/app/perfil ✅"]
 ```
 
 ---
@@ -80,7 +62,8 @@ flowchart TD
 | RF | Descripción | Vista | Estado |
 |----|-------------|-------|--------|
 | RF1.2 | Iniciar sesión | `LoginPageComponent` | ✅ Form reactivo + authService.login() |
-| RF1.3 | Restablecer contraseña | `ForgotPasswordPageComponent` | 🔶 Form existe — TODO: conectar endpoint |
+| RF1.3 | Restablecer contraseña | `ForgotPasswordPageComponent` | ✅ Solicitud de restablecimiento |
+| RF1.3.1 | Confirmar nueva contraseña | `ResetPasswordPageComponent` | ✅ Vista de reset con token |
 
 ---
 
@@ -88,172 +71,186 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    U["/app/usuarios"] --> LISTA["/app/usuarios ✅\nListaPageComponent\n— CRUD + filtros + importar masivo"]
-    U -.->|pendiente| ROLES["❌ /roles\nGestión de roles y permisos"]
-    U -.->|pendiente| CUENTAS["❌ /cuentas\nAdministración de cuentas"]
+    U["/app/usuarios"] --> LISTA["/lista ✅\nListaPageComponent"]
+    U --> ROLES["/roles ✅\nRolesPageComponent"]
+    U --> CUENTAS["/cuentas ✅\nCuentasPageComponent"]
+    U --> COMENT["/comentarios-admin ✅\nComentariosAdminComponent"]
+    U --> PERFIL["/app/perfil ✅\nPerfilPageComponent"]
+    U --> FICHAS["/app/fichas 🔒 ADMIN\nFichasPageComponent → ficha-detalle"]
 ```
 
 | RF | Descripción | Estado | Evidencia |
 |----|-------------|--------|-----------|
-| RF2.1 | CRUD usuarios | ✅ | facade cargarUsuarios(), crearUsuario(), eliminarUsuario() |
-| RF2.2 | Registro individual | ✅ | onGuardarUsuario() + modal UsuarioFormComponent |
-| RF2.3/2.3.1 | Registro masivo | ✅ | ImportarUsuariosComponent + facade.importarMasivo() |
-| RF2.4 | Consulta y filtros | ✅ | computed usuariosFiltrados + SearchFilterComponent |
-| RF2.5 | Gestión de perfiles | ❌ | CuentasPageComponent — stub vacío |
-| RF2.6 | Gestión de roles | ❌ | RolesPageComponent — stub vacío |
-| RF2.6.1 | Gestión de permisos | ❌ | No implementado |
+| RF2.1 | CRUD usuarios | ✅ | `ListaPageComponent` + facade |
+| RF2.2 | Registro individual | ✅ | `UsuarioFormComponent` (modal) |
+| RF2.3/2.3.1 | Registro masivo | ✅ | `ImportarUsuariosComponent` |
+| RF2.3.2 | Exportar usuarios | ✅ | `ExportarUsuariosComponent` |
+| RF2.4 | Consulta y filtros | ✅ | usuariosFiltrados + SearchFilter |
+| RF2.5 | Gestión de cuentas/perfiles | ✅ | `CuentasPageComponent` + `PerfilPageComponent` |
+| RF2.6 | Gestión de roles | ✅ | `RolesPageComponent` (182 líneas) |
+| RF2.6.1 | Gestión de permisos | 🔶 | Permisos consumidos por `permissionGuard`; UI de edición parcial |
+| RF2.7 | Gestión de fichas | ✅ | `FichasPageComponent` + `FichaDetalleComponent` (solo ADMIN) |
+| RF2.8 | Historial / comentarios admin | ✅ | `HistorialPageComponent` + `ComentariosAdminComponent` |
 
 ---
 
-### `/app/cocina` — Cocina
+### `/app/cocina` — Cocina 🔒
+
+> `permissionGuard(['RECETAS_GESTIONAR','RECETAS_CONSULTAR','COMANDAS_CONSULTAR','PEDIDOS_ACTIVOS_VISUALIZAR'])`
+> Sidebar: Inicio · Comandas · Recetas · **Evaluar** (nuevo)
 
 | RF | Descripción | Vista | Estado |
 |----|-------------|-------|--------|
-| RF-C 4.0 | Visualización de pedidos | InicioPageComponent | ✅ estadisticas + pedidosPendientes signals |
-| RF-C 4.0.1 | Mostrar número de pedido | InicioPageComponent | ✅ idComanda en pedidosPendientes |
-| RF-C 4.0.2 | Mostrar hora de solicitud | InicioPageComponent | ✅ formatHora() |
-| RF-C 4.1 | Gestión del estado | ComandasPageComponent | ✅ cambiarEstado() |
-| RF-C 4.1.1 | Cambiar estado de orden | ComandasPageComponent | ✅ Espera → Preparando → Listo → Cancelado |
-| RF-C 4.1.2 | Mostrar estado actual | ComandasPageComponent | ✅ computed filtra por estado |
-| RF-C 4.2 | Gestión de recetas | RecetasPageComponent | ✅ RecetaService.listar() + CRUD completo |
-| RF-C 4.2.1 | Crear recetas | RecetasPageComponent | ✅ GestionRecetaComponent modal |
-| RF-C 4.2.2 | Consultar recetas | RecetasPageComponent | ✅ recetasFiltradas computed |
-| RF-C 4.2.3 | Actualizar recetas | RecetasPageComponent | ✅ recetaService.actualizarReceta() |
-| RF-C 4.2.4 | Eliminar recetas | RecetasPageComponent | ✅ recetaService.eliminarReceta() |
-| RF-C 4.3 | Estadísticas de tiempos | InicioPageComponent | 🔶 Datos simulados — sin cálculo real |
-| RF-C 4.4 | Alertas a sala | InicioPageComponent | 🔶 Modal incidencias — sin sistema real |
-| RF-C 4.3.1 | Registrar inicio preparación | — | ❌ No encontrado |
-| RF-C 4.3.2 | Registrar fin preparación | — | ❌ No encontrado |
-| RF-C 4.3.3 | Tiempo promedio | — | ❌ No implementado |
-| RF-C 4.4.1 | Notificar listo | — | ❌ Sin notificaciones automáticas |
+| RF-C 4.0 | Visualización de pedidos | `InicioPageComponent` | ✅ estadísticas + pedidosPendientes |
+| RF-C 4.1 | Gestión del estado de comanda | `ComandasPageComponent` | ✅ cambiarEstado() + `ComandaCardComponent` |
+| RF-C 4.2 | Gestión de recetas | `RecetasPageComponent` | ✅ CRUD completo + `GestionRecetaComponent` |
+| RF-C 4.2.5 | Gestión de categorías | `GestionCategoriasComponent` | ✅ nuevo |
+| RF-C 4.3 | Estadísticas de tiempos | `InicioPageComponent` | 🔶 datos parciales |
+| RF-C 4.4 | Alertas a sala | `InicioPageComponent` | 🔶 modal incidencias |
+| RF-C 4.5 | Actividades de formación | `ActividadesListPageComponent` / `ActividadPageComponent` | ✅ nuevo |
+| RF-C 4.6 | Evaluación individual | `EvaluacionIndividualPageComponent` | ✅ nuevo (184 líneas) |
+| RF-C 4.6.1 | Evaluación masiva | `EvaluacionMasivaPageComponent` | ✅ nuevo (253 líneas) |
 
 ---
 
-### `/app/bar` — Bar
+### `/app/bar` — Bar 🔒
 
-> `BarPageComponent` es un layout shell con `<router-outlet>`. Todas las vistas son hijos de `/app/bar`.
-
-```mermaid
-flowchart LR
-    BAR["/app/bar\nBarPageComponent\nlayout shell"] --> INICIO["/app/bar/inicio 🔶\nInicioPageComponent\n— dashboard con datos mock"]
-    BAR --> COMANDAS["/app/bar/comandas ✅\nComandasPageComponent"]
-    BAR --> RECETAS["/app/bar/recetas ✅\nRecetasPageComponent"]
-    BAR --> MENU["/app/bar/menu 🔶\nMenuPageComponent\n— EmptyState stub"]
-```
+> `permissionGuard(['COMANDAS_CONSULTAR','RECETAS_CONSULTAR','PEDIDOS_ACTIVOS_VISUALIZAR'])`
+> Sidebar: Inicio · Comandas · Recetas · **Estadísticas** (nuevo)
 
 | RF | Descripción | Vista | Estado |
 |----|-------------|-------|--------|
-| RF-C 4.10 | Visualización pedidos bar | ComandasComponent | ✅ listaComandas + formatIdComanda() |
-| RF-C 4.10.1 | Mostrar número de pedido | ComandasComponent | ✅ formatIdComanda(id) → #B*** |
-| RF-C 4.10.2 | Mostrar hora solicitud | ComandasComponent | ✅ formatHora(), formatHoraCompleta() |
-| RF-C 4.11 | Gestión del estado | ComandasComponent | ✅ comenzarPreparacion(), marcarListo() |
-| RF-C 4.11.1 | Cambiar estado | ComandasComponent | ✅ ESPERA → PREPARANDO → TERMINADO |
-| RF-C 4.11.2 | Mostrar estado actual | ComandasComponent | ✅ getters comandasEspera/Preparando/Listo |
-| RF-C 4.12 | Gestión de recetas bar | RecetasPageComponent | ✅ RecetaService + CRUD completo |
-| RF-C 4.12.1 | Crear recetas bar | RecetasPageComponent | ✅ abrirNuevaReceta() + GestionRecetaComponent |
-| RF-C 4.12.2 | Consultar recetas bar | RecetasPageComponent | ✅ recetasFiltradas por nombre/categoría |
-| RF-C 4.12.3 | Actualizar recetas bar | RecetasPageComponent | ✅ recetaService.actualizarReceta() |
-| RF-C 4.12.4 | Eliminar recetas bar | RecetasPageComponent | ✅ confirm dialog + eliminarReceta() |
-| RF-C 4.13.1 | Registrar inicio (bar) | — | ❌ No encontrado |
-| RF-C 4.13.2 | Registrar fin (bar) | — | ❌ No encontrado |
-| RF-C 4.14 | Alertas a sala (bar) | InicioPageComponent | 🔶 Modal incidencias — IncidenciaService inyectado, datos mock |
-| RF-C 4.14.1 | Notificar listo (bar) | — | ❌ Sin notificaciones automáticas |
-| RF-C 4.18 | Modificaciones (bar) | InicioPageComponent | 🔶 Modal tipo MODIFICACION — mockData vacío |
-| RF-C 4.19 | Gestión de menús (bar) | MenuPageComponent | ❌ EmptyState — stub |
+| RF-C 4.10 | Visualización pedidos bar | `ComandasPageComponent` | ✅ + `ComandaCardComponent` |
+| RF-C 4.11 | Gestión del estado | `ComandasPageComponent` | ✅ ESPERA → PREPARANDO → TERMINADO |
+| RF-C 4.12 | Gestión de recetas bar | `RecetasPageComponent` | ✅ CRUD + `GestionRecetaComponent` |
+| RF-C 4.12.5 | Gestión de categorías | `GestionCategoriasComponent` | ✅ nuevo |
+| RF-C 4.14 | Alertas a sala (bar) | `InicioPageComponent` | 🔶 modal incidencias |
+| RF-C 4.15 | Estadísticas de bar | `EstadisticasPageComponent` | ✅ nuevo (170 líneas) |
+| RF-C 4.19 | Gestión de menús (bar) | `MenuPageComponent` | ❌ stub (18 líneas) |
 
 ---
 
-### `/app/restaurante` — Restaurante
+### `/app/restaurante` — Restaurante 🔒
+
+> `permissionGuard(['MODULO_MESAS_VER','MESAS_CONSULTAR','COMANDAS_CREAR','PEDIDOS_ACTIVOS_VISUALIZAR','FACTURAS_GENERAR'])`
+> Sidebar: Mesas · Pedidos · Caja
 
 | RF | Descripción | Vista | Estado |
 |----|-------------|-------|--------|
-| RF3.1.1 | Consultar mapa de mesas | MesasPageComponent | ✅ facade.mesas + computed activas/inactivas |
-| RF3.1.1.1 | Asignar mesas | MesasPageComponent | ✅ abrirMesa(id) → facade.abrirMesa() |
-| RF3.1.1.2 | Liberar mesas | MesasPageComponent | ✅ liberarMesa(id) → facade.liberarMesa() |
-| RF3.1.3 | Agregar mesa | MesasPageComponent | ✅ crearMesa() con número, asientos, zona |
-| RF3.1.4 | Eliminar mesa | MesasPageComponent | ✅ eliminarMesa(id) → facade.eliminarMesa() |
-| RF3.2.1 | Menú digital | PedidosPageComponent | 🔶 PedidosMenuGridComponent sin lógica real |
-| RF3.2.1.1 | Añadir a carrito | PedidosPageComponent | 🔶 Componentes presentes sin binding completo |
-| RF3.2.2 | Gestionar carrito | PedidosPageComponent | 🔶 PedidosCartComponent incompleto |
-| RF3.2.2.1 | Mostrar valores | PedidosPageComponent | 🔶 Sin cálculo de totales |
-| RF3.2.4 | Seguimiento de pedido | PedidosPageComponent | 🔶 Estructura sin status updates |
-| RF3.5.1 | Generar factura | CajaPageComponent | 🔶 irANuevaFactura() — modales no integrados |
-| RF3.5.3 | Registrar pago | CajaPagarPageComponent | 🔶 confirmarPago() + modal éxito — sin backend |
-| RF3.5.3.1 | Pago en efectivo | CajaPagarPageComponent | 🔶 seleccionarMetodo('Efectivo') — UI completa |
-| RF3.5.3.2 | Pago con tarjeta | CajaPagarPageComponent | 🔶 seleccionarMetodo('Tarjeta') — UI completa |
-| RF3.5.3.3 | Pago por consignación | CajaPagarPageComponent | 🔶 seleccionarMetodo('Transferencia') — UI completa |
-| RF3.2.2.2 | Modificar productos carrito | — | ❌ No implementado |
-| RF3.2.2.3 | Eliminar productos carrito | — | ❌ No implementado |
-| RF3.2.3 | Observaciones por producto | — | ❌ No encontrado |
+| RF3.1.1 | Mapa de mesas | `MesasPageComponent` (520 líneas) | ✅ abrir/liberar/crear/eliminar mesa |
+| RF3.2.x | Menú digital y carrito | `PedidosMenuGridComponent` / `PedidosCartComponent` | 🔶 estructura sin flujo completo de pedido |
+| RF3.5.1 | Generar factura / nueva caja | `CajaPageComponent` / `CajaNuevaPageComponent` | 🔶 UI completa, backend parcial |
+| RF3.5.2 | Buscar facturas en caja | `CajaBuscarPageComponent` (203 líneas) | ✅ buscador con filtros |
+| RF3.5.3 | Registrar pago | `CajaPagarPageComponent` (211 líneas) | 🔶 efectivo/tarjeta/transferencia — sin backend confirmado |
+| RF3.5.4 | Cierre de caja | `CajaCierrePageComponent` | 🔶 |
+| RF3.5.5 | Movimientos de caja | `CajaMovimientosPageComponent` | 🔶 |
+| RF3.6.1 | Historial estudiante | `HistorialEstudiantePageComponent` | ✅ |
+| RF3.6.2 | Historial instructor | `HistorialInstructorPageComponent` | ✅ |
 
 ---
 
 ### `/app/inventario` — Inventario 🔒
 
-| RF | Descripción | Vista | Estado |
-|----|-------------|-------|--------|
-| RF-5.1 | Inventario central | BienesListPageComponent | ✅ facade.bienes + loadAll() |
-| RF-5.1.1 | Registro de bienes | BienesListPageComponent | ✅ BienFormComponent + onSaveBien() |
-| RF-5.1.2 | Consulta de catálogo | BienesListPageComponent | ✅ onSearch() → setFiltros() |
-| RF-5.1.3 | Modificación de bienes | BienesListPageComponent | ✅ onEditar() → actualizarBien() |
-| RF-5.1.4 | Eliminación masiva | BienesListPageComponent | ✅ confirmarEliminacion() → eliminarBien() |
-| RF-5.1.5 | Detalle de bien | BienesListPageComponent | ✅ onVerDetalle() navega a detalle |
-| RF-5.2 | Control de facturación | FacturasListPageComponent | ✅ facade.facturas + CRUD |
-| RF-5.2.1 | Registro de factura | FacturasListPageComponent | ✅ FacturaFormComponent + onSaveFactura() |
-| RF-5.2.3 | Buscador de facturas | FacturasListPageComponent | ✅ onSearch() con filtro dinámico |
-| RF-5.2.4 | Detalle de factura | FacturasListPageComponent | ✅ onVerFactura() navega a detalle |
-| RF-5.2.5 | Edición de factura | FacturasListPageComponent | ✅ onEditarFactura() |
-| RF-5.2.6 | Anulación de factura | FacturasListPageComponent | ✅ onAnularFactura() + modal confirmación |
-| RF-5.3 | Gestión GIL | SolicitudesListComponent | ✅ facade.solicitudes + loadAll() |
-| RF-5.3.6 | Historial GIL | SolicitudesListComponent | ✅ lista filtrable por estado/fecha |
-| RF-5.4 | Consolidado de Ejecución | ConsolidadoListComponent | ✅ facade.consolidados + reversarConsolidado() |
-| RF-5.4.2 | Generación de tabla | ConsolidadoListComponent | ✅ DataTableComponent con datos facade |
-| RF-5.5 | Entradas y Salidas | MovimientosListComponent | ✅ facade.movimientos + loadAll() |
-| RF-5.6 | Alertas de Stock | AlertasListComponent | ✅ facade.alertas + computed kpiCriticas |
-| RF-5.7 | Presupuesto General | PresupuestoDashboardComponent | ✅ facade.resumen + programas + afectaciones |
-| RF-5.7.2 | Visibilidad financiera | PresupuestoDashboardComponent | ✅ Saldos: Disponible, Comprometido, Pagado |
-| RF-5.7.3 | Afectación presupuestal | PresupuestoDashboardComponent | ✅ facade.afectaciones (pago, traslado, etc) |
-| RF-5.8 | Conciliación de Inventario | ConciliacionDashboardComponent | ✅ facade.conciliaciones + loadAll() |
-| RF-5.10 | Actas de Legalización | ActasListComponent | ✅ facade.actas + filtrado por estado/ficha |
-| RF-5.10.10 | Estados de acta | ActasListComponent | ✅ borrador → pendiente → firmada → archivada |
-| RF-5.11 | Paquete Probatorio | PaqueteListComponent | ✅ facade.paquetes + KPIs |
-| RF-5.11.1 | Estructura del paquete | PaqueteListComponent | ✅ expediente, responsable, documentos |
-| RF-5.2.2 | Asociación Factura-GIL | FacturasListPageComponent | 🔶 Estructura sin validaciones CUFE |
-| RF-5.3.1 | Registro de solicitud GIL | SolicitudesListComponent | 🔶 Sin todos los campos dinámicos |
-| RF-5.3.2 | Emisión GIL | SolicitudesListComponent | 🔶 Estados parciales — sin flujo completo |
-| RF-5.4.1 | Selección de fuente GIL | ConsolidadoListComponent | 🔶 Lista pero sin selección UI |
-| RF-5.5.1 | Registro de entrada | MovimientosListComponent | 🔶 Componente entrada existe — stub |
-| RF-5.5.3 | Registro de salida | MovimientosListComponent | 🔶 Componente salida existe — stub |
-| RF-5.6.1 | Configurar umbrales | AlertasListComponent | 🔶 irAConfig() navega — sin UI implementada |
-| RF-5.6.2 | Notificación en tiempo real | AlertasListComponent | 🔶 KPIs visibles — sin websocket |
-| RF-5.7.1 | Asignación inicial presupuesto | PresupuestoDashboardComponent | 🔶 Solo visualización — sin UI para editar |
-| RF-5.8.1 | Toma física | ConciliacionDashboardComponent | 🔶 Componente toma-fisica existe — stub |
-| RF-5.8.4 | Detección de brechas | ConciliacionDashboardComponent | 🔶 Datos mock — sin cálculos reales |
-| RF-5.9 | Requisiciones Diarias | RequisicionesDashboardComponent | 🔶 facade.requisiciones — ciclo incompleto |
-| RF-5.9.1 | Apertura de requisición | RequisicionesDashboardComponent | 🔶 Componente create existe — stub |
-| RF-5.10.1 | Apertura de acta | ActasListComponent | 🔶 Componente create existe — stub |
-| RF-5.10.7 | Firmantes de ley | ActasListComponent | 🔶 Modelo incluye instructor — sin flujo de firmas |
-| RF-5.11.3 | Candado de completitud | PaqueteListComponent | 🔶 Modelo incluye documentos — sin validación |
-| RF-5.11.7 | Integridad de datos | PaqueteListComponent | 🔶 Referencias vinculadas — sin trazabilidad visual |
+> `permissionGuard(['bienes:ver','facturas:ver','consolidado:ver','alertas:ver','FACTURAS_GENERAR'])`
+> **Capa de datos refactorizada**: cada dominio expone `*.facade.ts` (signals) → `*.service.ts` (HttpClient) → `api/*.api.ts` (DTOs Swagger) → `mappers/*.mapper.ts`.
+
+```mermaid
+flowchart LR
+    INV["/app/inventario"] --> BIENES["/bienes ✅"]
+    INV --> SINS["/solicitudes-insumos-page ✅"]
+    INV --> SGIL["/solicitudes-gil ✅"]
+    INV --> FAC["/facturas ✅"]
+    INV --> MOV["/movimientos (Kardex) ✅"]
+    INV --> CONS["/consolidado ✅"]
+    INV --> ALE["/alertas ✅"]
+    INV --> PRE["/presupuesto ✅"]
+    INV --> CONC["/conciliacion 🔶"]
+    INV --> REQ["/requisiciones 🔶"]
+    INV --> ACT["/actas 🔶"]
+    INV --> PAQ["/paquete-probatorio 🔶"]
+```
+
+| Dominio / RF | Rutas | Componentes | Estado |
+|--------------|-------|-------------|--------|
+| **Bienes** (RF-5.1.x) | `/bienes`, `/bienes/exportar`, `/bienes/:id` | `BienesListPageComponent`, `BienExportPageComponent`, `BienDetailPageComponent`, modales form/import/delete, contrato-import | ✅ `BienesService` HTTP (`/catalog/productos`) — CRUD, KPIs, import Excel, export async, masivo |
+| **Solicitudes GIL F-014** (RF-5.3.x) | `/solicitudes-gil` (list, generar, :id, editar, exportar) | `SolicitudesListComponent` + generar/detail/edit/export | ✅ `SolicitudesFacade` + `SolicitudesService` (sourcing/procurement HTTP) |
+| **Solicitudes de Insumos** (bandeja aprobación) | `/solicitudes-insumos-page` (list, nueva, :id, editar) | `SolicitudesInsumosListComponent` + form/detail/consolidacion | ✅ aprobar/rechazar sesión + consolidación |
+| **Facturas Electrónicas** (RF-5.2.x) | `/facturas` (import, gil/:id, :id, :id/editar) | `FacturasListPageComponent` + import/detail/edit + gil-detail | ✅ `FacturasFacade` + `FacturasService` HTTP |
+| **Consolidado de Ejecución** (RF-5.4.x) | `/consolidado` (nuevo, :id) | `ConsolidadoListComponent` + create/detail + modales reversar/exportar | ✅ `ConsolidadoFacade` + service |
+| **Kardex / Movimientos** (RF-5.5.x) | `/movimientos` (ajuste, exportar, :id) | `MovimientosListComponent` + ajuste/export/detail | ✅ `KardexFacade` + `MovimientosService` (entradas/salidas/ajustes) |
+| **Alertas de Stock** (RF-5.6.x) | `/alertas` (historial, configuracion, :id/resolver) | `AlertasListComponent` + historial/config/detail/resolver | ✅ `AlertasFacade` + service — incluye config de umbrales y resolución |
+| **Presupuesto General** (RF-5.7.x) | `/presupuesto` (registrar, traslado, exportar, cargar-gil) | `PresupuestoDashboardComponent` + registrar/traslado/exportar/cargar-gil | ✅ `PresupuestoFacade` + service (budget HTTP) |
+| **Conciliación** (RF-5.8.x) | `/conciliacion` (toma-fisica, historial, :id) | `ConciliacionDashboardComponent` + toma-fisica/historial/detalle | 🔶 `ConciliacionFacade` + service; detección de brechas/cálculos pendientes de backend |
+| **Requisiciones (Formato 45-S)** (RF-5.9.x) | `/requisiciones` (nueva, firmar/:id, resumen, detalle/:id, despacho/:id) | `RequisicionesDashboardComponent` + create/firmar/resumen/detalle/despacho | 🔶 `RequisicionesFacade` + service; ciclo de firma/despacho parcial |
+| **Actas de Legalización** (RF-5.10.x) | `/actas` (nueva, :id, :id/imprimir, cargar-firma) | `ActasListComponent` + create/detail/print/upload | 🔶 `ActasFacade` + service; flujo de firmas pendiente de contratos backend |
+| **Paquete Probatorio** (RF-5.11.x) | `/paquete-probatorio` (nuevo, :id, adjuntar, requisicion) | `PaqueteListComponent` + create/detail/upload/req-detail | 🔶 `PaqueteFacade` + service; validación de completitud/trazabilidad parcial |
+
+> Servicios con `.spec.ts` (tests unitarios): `contratos`, `facturas`, `paquete`. Mappers con spec: `inventory`, `sourcing`. Rama actual añade E2E Playwright (umbrales, bienes editar/activar/desactivar).
+>
+> 🔶 en conciliación/requisiciones/actas/paquete = la UI y la capa HTTP existen, pero algunos flujos esperan **contratos de backend confirmados** (ver FASE BACKEND en `CLAUDE.md`).
 
 ---
 
-### Módulos pendientes
+### `/app/reportes` — Reportes 🔶
 
-| Módulo | Ruta | RFs Esenciales | Estado |
-|--------|------|---------------|--------|
-| Reportes | `/app/reportes` | RF6.1–RF6.1.12 (13 RFs) | ❌ Solo landing — sin ningún RF implementado |
-| Notificaciones | `/app/notificaciones` | RF1.8.1–1.8.3 (3 RFs) | ❌ Solo landing — sin ningún RF implementado |
+> `permissionGuard(['MODULO_REPORTES_VER','REPORTES_GESTIONAR','REPORTES_PEDIDOS_COCINA','REPORTES_VENTAS_MESERO'])`
+> Sidebar: Ventas · Inventario · Estadísticas cocina
+
+| RF | Descripción | Vista | Estado |
+|----|-------------|-------|--------|
+| RF6.1 | Panel de reportes | `ReportesPageComponent` + `ReportesFacade` (HttpClient) | 🔶 facade y página presentes |
+| RF6.1.x | Estadísticas de cocina | `EstadisticasPageComponent` | 🔶 implementación inicial |
+| RF6.1.x | Reportes de ventas / inventario | rutas `/reportes/ventas`, `/reportes/inventario` | 🔶 navegación definida, vistas en construcción |
+
+---
+
+### `/app/notificaciones` — Notificaciones 🔶
+
+| RF | Descripción | Vista | Estado |
+|----|-------------|-------|--------|
+| RF1.8.x | Centro de notificaciones | `NotificacionesPageComponent` + `NotificacionesService` (HttpClient) | 🔶 página y servicio presentes — sin tiempo real (websocket) |
+
+---
+
+### `/app/configuracion` — Configuración ✅ (módulo nuevo)
+
+| Función | Vista | Estado |
+|---------|-------|--------|
+| Ajustes generales | `ConfigPageComponent` + `ConfiguracionFacade`/`ConfiguracionService` | ✅ |
+| Tema (claro/oscuro) | `ThemeSettingsService` | ✅ |
+| Idioma (i18n) | `I18nService` + `translations.ts` | ✅ |
+| Eliminación de bien | `BienDeletePageComponent` | ✅ |
+
+---
+
+### `/app/abastecimiento` — Abastecimiento 🔒 (módulo nuevo)
+
+> `roleGuard([ADMINISTRADOR, CONTADORA])` — ruta registrada en el shell; ver `libs/abastecimiento`.
 
 ---
 
 ## Guards activos
 
-| Guard | Aplicado en | Roles permitidos |
-|-------|------------|-----------------|
-| `authGuard` | `/app` (desactivado — ver `shell.routes.ts`) | Todos los autenticados |
-| `roleGuard` | `/app/inventario` | `ADMINISTRADOR`, `CONTADORA` |
-| `roleGuard` | `/app/cocina` (desactivado temporalmente) | `CHEF`, `ADMIN_COCINA`, `AUXILIAR_COCINA` |
-| `roleGuard` | `/app/bar` (desactivado temporalmente) | `LIDER_BAR`, `ADMIN_BAR`, `BARTENDER` |
+| Guard | Aplicado en | Criterio |
+|-------|------------|----------|
+| `authGuard` | `/app` (raíz del shell) | **Activo** — requiere sesión autenticada |
+| `permissionGuard([...])` | cocina, bar, restaurante, inventario, usuarios, reportes | Permisos granulares por módulo |
+| `roleGuard([ADMINISTRADOR])` | `/app/fichas` | Solo administrador |
+| `roleGuard([ADMINISTRADOR, CONTADORA])` | `/app/abastecimiento` | Admin y contadora |
 
-> ⚠️ Los guards de `authGuard` y los de cocina/bar están comentados con `TODO`. Activarlos antes de producción.
+> El mecanismo principal de autorización es ahora `permissionGuard` por permisos (no por rol). `roleGuard` se reserva para fichas y abastecimiento.
+
+---
+
+## Capa de datos de inventario (referencia rápida)
+
+```
+libs/inventario/inventario/src/lib/data-access/
+├── *.facade.ts        ← 13 facades (signals): bienes(inventario), solicitudes, giles,
+│                         facturas, contratos, consolidado, kardex, alertas,
+│                         presupuesto, conciliacion, requisiciones, actas, paquete, reporting
+├── services/          ← 15 servicios con HttpClient (+ specs: contratos, facturas, paquete)
+├── api/               ← DTOs Swagger: catalog, inventory, procurement, sourcing, budget,
+│                         alerts, reconciliation, legalization, reporting, training
+└── mappers/           ← DTO ↔ modelo de dominio (+ specs: inventory, sourcing)
+```
