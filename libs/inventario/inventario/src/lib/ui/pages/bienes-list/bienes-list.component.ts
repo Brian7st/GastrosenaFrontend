@@ -6,9 +6,9 @@ import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { ContratosFacade } from '../../../data-access/contratos.facade';
 import { BienFormComponent } from '../../../ui/modals/bien-form/bien-form.component';
 import { BienImportModalComponent, BienImportPayload } from '../../modals/bien-import/bien-import.component';
-import { ContratoImportModalComponent } from '../../modals/contrato-import/contrato-import.component';
+import { ContratoImportModalComponent, ContratoImportPayload } from '../../modals/contrato-import/contrato-import.component';
 import { Bien, BienFormDto, EstadoBien, BienFiltros } from '../../../models/inventario.model';
-import { EstadoContrato, RegistrarContratoData } from '../../../models/contrato.model';
+import { EstadoContrato } from '../../../models/contrato.model';
 import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 import { CATEGORIAS_BIEN } from '../../../models/categorias.model';
 
@@ -100,8 +100,12 @@ export class BienesListPageComponent implements OnInit {
     this.showImportContratoModal.set(true);
   }
 
-  onImportarContrato(data: RegistrarContratoData): void {
-    this.contratosFacade.importarContrato(data);
+  onImportarContrato(payload: ContratoImportPayload): void {
+    if (payload.tipo === 'excel') {
+      this.contratosFacade.importarExcel(payload.archivo, payload.cabecera);
+    } else {
+      this.contratosFacade.importarContrato(payload.data);
+    }
     this.showImportContratoModal.set(false);
   }
 

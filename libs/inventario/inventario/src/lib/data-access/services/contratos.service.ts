@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import {
+  ContratoCabecera,
   Contrato,
   PrecioVigente,
   RegistrarContratoData,
@@ -83,6 +84,30 @@ export class ContratosService {
       .get<PrecioVigenteResponse>(`${API}/catalog/contratos/precio`, { params })
       .pipe(
         map(precioVigenteFromApi),
+        catchError(err => throwError(() => err)),
+      );
+  }
+
+  /** POST /catalog/contratos/importar-excel — importa contrato desde archivo Excel (multipart).
+   *  Campos de cabecera se envían como campos del FormData junto con el archivo.
+   */
+  importarContratoExcel(archivo: File, cabecera: ContratoCabecera): Observable<ResultadoImportacion> {
+    const form = new FormData();
+    form.append('archivo', archivo);
+    form.append('numero', cabecera.numero);
+    form.append('vigencia', String(cabecera.vigencia));
+    if (cabecera.descripcion != null) form.append('descripcion', cabecera.descripcion);
+    if (cabecera.fechaInicio != null) form.append('fechaInicio', cabecera.fechaInicio);
+    if (cabecera.fechaFin != null) form.append('fechaFin', cabecera.fechaFin);
+
+    return this.http
+      .post<ImportacionContratoResponse>(`${API}/catalog/contratos/importar-excel`, form)
+      .pipe(
+        map(res => ({
+          contratoId: res.contratoId,
+          productosCreados: res.productosCreados,
+          productosActualizados: res.productosActualizados,
+        })),
         catchError(err => throwError(() => err)),
       );
   }

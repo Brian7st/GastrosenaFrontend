@@ -3,7 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { provideHttpClient } from '@angular/common/http';
 import { ContratosService } from './contratos.service';
 import { ContratoResponse, ImportacionContratoResponse, PrecioVigenteResponse } from '../api/catalog.api';
-import { RegistrarContratoData } from '../../models/contrato.model';
+import { ContratoCabecera, RegistrarContratoData } from '../../models/contrato.model';
 
 describe('ContratosService', () => {
   let service: ContratosService;
@@ -141,5 +141,90 @@ describe('ContratosService', () => {
     const req = httpMock.expectOne('/api/v1/catalog/contratos/cto-1/cerrar');
     expect(req.request.method).toBe('PATCH');
     req.flush(null);
+  });
+
+  // F2 — importarContratoExcel
+  describe('importarContratoExcel', () => {
+    const cabecera: ContratoCabecera = {
+      numero: 'CTO-2025-001',
+      vigencia: 2025,
+      descripcion: 'Insumos 2025',
+      fechaInicio: '2025-01-01',
+      fechaFin: '2025-12-31',
+    };
+    const archivo = new File(['data'], 'contrato.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const importResponse: ImportacionContratoResponse = { contratoId: 'cto-1', productosCreados: 3, productosActualizados: 1 };
+
+    it('sends a multipart POST to /contratos/importar-excel', () => {
+      service.importarContratoExcel(archivo, cabecera).subscribe();
+
+      const req = httpMock.expectOne('/api/v1/catalog/contratos/importar-excel');
+      expect(req.request.method).toBe('POST');
+      req.flush(importResponse);
+    });
+
+    it('FormData contains the archivo field', () => {
+      service.importarContratoExcel(archivo, cabecera).subscribe();
+
+      const req = httpMock.expectOne('/api/v1/catalog/contratos/importar-excel');
+      const body: FormData = req.request.body;
+      expect(body.get('archivo')).toBe(archivo);
+      req.flush(importResponse);
+    });
+
+    it('FormData contains numero and vigencia', () => {
+      service.importarContratoExcel(archivo, cabecera).subscribe();
+
+      const req = httpMock.expectOne('/api/v1/catalog/contratos/importar-excel');
+      const body: FormData = req.request.body;
+      expect(body.get('numero')).toBe('CTO-2025-001');
+      expect(body.get('vigencia')).toBe('2025');
+      req.flush(importResponse);
+    });
+
+    it('FormData contains optional fields when provided', () => {
+      service.importarContratoExcel(archivo, cabecera).subscribe();
+
+      const req = httpMock.expectOne('/api/v1/catalog/contratos/importar-excel');
+      const body: FormData = req.request.body;
+      expect(body.get('descripcion')).toBe('Insumos 2025');
+      expect(body.get('fechaInicio')).toBe('2025-01-01');
+      expect(body.get('fechaFin')).toBe('2025-12-31');
+      req.flush(importResponse);
+    });
+
+    it('omits optional fields when not provided', () => {
+      const cabMinima: ContratoCabecera = { numero: 'CTO-001', vigencia: 2025 };
+      service.importarContratoExcel(archivo, cabMinima).subscribe();
+
+      const req = httpMock.expectOne('/api/v1/catalog/contratos/importar-excel');
+      const body: FormData = req.request.body;
+      expect(body.get('descripcion')).toBeNull();
+      expect(body.get('fechaInicio')).toBeNull();
+      req.flush(importResponse);
+    });
+
+    it('maps the response to ResultadoImportacion', () => {
+      service.importarContratoExcel(archivo, cabecera).subscribe(res => {
+        expect(res.contratoId).toBe('cto-1');
+        expect(res.productosCreados).toBe(3);
+        expect(res.productosActualizados).toBe(1);
+      });
+
+      const req = httpMock.expectOne('/api/v1/catalog/contratos/importar-excel');
+      req.flush(importResponse);
+    });
+
+    it('propagates HTTP errors', () => {
+      let caughtError: unknown;
+      service.importarContratoExcel(archivo, cabecera).subscribe({
+        error: err => { caughtError = err; },
+      });
+
+      const req = httpMock.expectOne('/api/v1/catalog/contratos/importar-excel');
+      req.flush({ detail: 'Contrato bloqueado' }, { status: 422, statusText: 'Unprocessable Entity' });
+
+      expect(caughtError).toBeTruthy();
+    });
   });
 });

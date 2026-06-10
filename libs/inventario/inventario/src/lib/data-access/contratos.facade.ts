@@ -2,6 +2,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { catchError, finalize, of } from 'rxjs';
 import { ContratosService } from './services/contratos.service';
 import {
+  ContratoCabecera,
   Contrato,
   RegistrarContratoData,
   ResultadoImportacion,
@@ -86,6 +87,27 @@ export class ContratosFacade {
       .pipe(
         catchError(() => {
           this._error.set('Error al importar el contrato');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false)),
+      )
+      .subscribe(res => {
+        if (res) {
+          this._ultimaImportacion.set(res);
+          this.cargarContratos();
+        }
+      });
+  }
+
+  /** POST /catalog/contratos/importar-excel — importa un contrato desde archivo Excel (multipart). */
+  importarExcel(archivo: File, cabecera: ContratoCabecera): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this._ultimaImportacion.set(null);
+    this.contratosService.importarContratoExcel(archivo, cabecera)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al importar el contrato Excel');
           return of(null);
         }),
         finalize(() => this._loading.set(false)),
