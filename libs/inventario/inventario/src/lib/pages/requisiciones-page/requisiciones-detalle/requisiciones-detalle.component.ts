@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, TitleCasePipe } from '@angular/common';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
 import { RequisicionesService } from '../../../data-access/services/requisiciones.service';
@@ -33,7 +33,7 @@ const ESTADO_CLASS: Record<string, string> = {
 @Component({
   selector: 'restaurant-requisiciones-detalle',
   standalone: true,
-  imports: [RouterModule, LucideIconComponent, DecimalPipe],
+  imports: [RouterModule, LucideIconComponent, DecimalPipe, TitleCasePipe],
   templateUrl: './requisiciones-detalle.component.html',
   styleUrl: './requisiciones-detalle.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -47,6 +47,9 @@ export class RequisicionesDetalleComponent implements OnInit {
   requisicion  = this.facade.requisicionSeleccionada;
   loading      = this.facade.loading;
   error        = this.facade.error;
+
+  /** Aviso local para la descarga del soporte (no usa el error del facade). */
+  readonly descargaAviso = signal<string | null>(null);
 
   reqId        = computed(() => this.requisicion()?.id ?? '');
   estado       = computed(() => this.requisicion()?.estado ?? '');
@@ -88,8 +91,20 @@ export class RequisicionesDetalleComponent implements OnInit {
   exportar(): void {
     const id = this.reqId();
     if (!id) return;
+    this.descargaAviso.set(null);
     this.service.exportarRequisicion(id).subscribe({
-      error: (err) => console.error('[RequisicionesDetalle] Error al exportar:', err),
+      next: (acuse) => {
+        if (acuse?.urlDescarga) {
+          // Abre/baja el soporte generado por el servicio de reportes.
+          window.open(acuse.urlDescarga, '_blank', 'noopener');
+        } else {
+          this.descargaAviso.set('El soporte se generó pero aún no hay URL de descarga disponible.');
+        }
+      },
+      error: (err) => {
+        console.error('[RequisicionesDetalle] Error al exportar:', err);
+        this.descargaAviso.set('No se pudo generar el soporte. Intentá nuevamente.');
+      },
     });
   }
 
