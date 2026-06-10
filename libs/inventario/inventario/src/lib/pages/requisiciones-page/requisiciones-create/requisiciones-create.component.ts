@@ -96,13 +96,19 @@ export class RequisicionesCreateComponent implements OnInit {
   }
 
   // ── Cantidad ──────────────────────────────────────────────────────────────
+  /** Paso del stepper según la unidad: 100 para gramos/mililitros, 1 para el resto. */
+  pasoDe(bien: Bien): number {
+    const u = (bien.unidadMedida ?? '').toUpperCase();
+    return u === 'GR' || u === 'ML' ? 100 : 1;
+  }
+
   incrementar(bien: Bien): void {
-    this.draft.setCantidad(bien, this.draft.getCantidad(bien.codigoSena) + 1);
+    this.draft.setCantidad(bien, this.draft.getCantidad(bien.codigoSena) + this.pasoDe(bien));
   }
 
   decrementar(bien: Bien): void {
     const actual = this.draft.getCantidad(bien.codigoSena);
-    if (actual > 0) this.draft.setCantidad(bien, actual - 1);
+    this.draft.setCantidad(bien, Math.max(0, actual - this.pasoDe(bien)));
   }
 
   onCantidadInput(bien: Bien, event: Event): void {

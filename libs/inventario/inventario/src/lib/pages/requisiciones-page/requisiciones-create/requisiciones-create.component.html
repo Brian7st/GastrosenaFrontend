@@ -99,6 +99,7 @@
                                     (click)="decrementar(bien)"
                                     [disabled]="draft.getCantidad(bien.codigoSena) === 0">-</button>
                             <input class="qty-input" type="number" min="0"
+                                   [step]="pasoDe(bien)"
                                    [value]="draft.getCantidad(bien.codigoSena)"
                                    (input)="onCantidadInput(bien, $event)"/>
                             <button class="qty-btn qty-btn--plus" type="button"
