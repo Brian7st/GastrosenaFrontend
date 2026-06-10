@@ -52,42 +52,38 @@
 <!-- ══════════════════════════════════════════════════════════════════════════
      Tabla con filtros
 ══════════════════════════════════════════════════════════════════════════ -->
-<restaurant-data-table tableTitle="Solicitudes GIL-F-014" tableIcon="clipboard-list">
+<restaurant-data-table
+  tableTitle="Solicitudes GIL-F-014"
+  tableIcon="clipboard-list"
+  searchPlaceholder="Filtrar por Instructor..."
+  [showFilterButton]="true"
+  [filterActive]="showFilters()"
+  [filterCount]="filtrosActivos()"
+  (searchChange)="onSearch($event)"
+  (filterToggle)="onToggleFilters()"
+>
 
-  <!-- Barra de filtros -->
-  <div dtHeader class="table-controls">
-    <div class="filters-left">
-
-      <!-- Filtro Estado -->
-      <div class="select-box">
-        <select #estadoSelect (change)="onFilterEstado(estadoSelect.value)">
-          @for (opt of estadoOptions; track opt) {
-<option [value]="opt.value">{{ opt.label }}</option>
-}
-        </select>
-        <span class="material-symbols-outlined dropdown-icon">expand_more</span>
-      </div>
-
-      <!-- Filtro Fecha -->
-      <div class="select-box">
-        <select #fechaSelect (change)="onFilterFecha(fechaSelect.value)">
-          @for (opt of fechaOptions; track opt) {
-<option [value]="opt.value">{{ opt.label }}</option>
-}
-        </select>
-        <span class="material-symbols-outlined dropdown-icon">calendar_month</span>
-      </div>
-
-      <!-- Buscar por instructor -->
-      <div class="search-box">
-        <span class="material-symbols-outlined search-icon">search</span>
-        <input type="text"
-               placeholder="Filtrar por Instructor..."
-               (input)="onSearch($any($event.target).value)" />
+  <!-- Panel de filtros colapsable (slot [dtHeader]) -->
+  @if (showFilters()) {
+    <div dtHeader class="filter-panel">
+      <div class="filter-panel__row">
+        <div class="filter-group">
+          <label class="filter-label">Estado</label>
+          <select class="filter-select" [value]="filtroEstado()" (change)="onFilterEstado($any($event.target).value)">
+            @for (opt of estadoOptions; track opt) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="filter-group filter-group--actions">
+          <button class="filter-clear-btn" (click)="onLimpiarFiltros()" [disabled]="filtrosActivos() === 0">
+            <span class="material-symbols-outlined">clear_all</span>
+            Limpiar
+          </button>
+        </div>
       </div>
     </div>
-
-  </div>
+  }
 
   <!-- Cabecera de tabla -->
   <thead>
@@ -171,28 +167,38 @@
         </div>
       </td>
     </tr>
+} @empty {
+    <tr>
+      <td colspan="7">
+        <inventario-empty-state
+          icon="assignment"
+          title="Sin solicitudes"
+          message="No se encontraron solicitudes con los filtros aplicados."
+        />
+      </td>
+    </tr>
 }
   </tbody>
 
   <!-- Paginación -->
-  <div dtFooter class="pagination-footer">
-    <p class="results-count">
-      MOSTRANDO {{ solicitudes().length }} DE {{ paginacion().totalElements }} SOLICITUDES
+  <div dtFooter class="dt-footer">
+    <p class="dt-page-info">
+      Mostrando {{ solicitudes().length }} de {{ paginacion().totalElements }} solicitudes
     </p>
-    <div class="page-numbers">
-      <button class="page-btn"
+    <div class="dt-pagination">
+      <button class="dt-page-btn"
         [disabled]="paginacion().page === 0"
         (click)="onIrAPagina(paginacion().page - 1)">
         <span class="material-symbols-outlined">chevron_left</span>
       </button>
       @for (p of paginas(); track p) {
-        <button class="page-btn"
-          [class.page-btn--active]="p === paginacion().page"
+        <button class="dt-page-btn"
+          [class.dt-page-btn--active]="p === paginacion().page"
           (click)="onIrAPagina(p)">
           {{ p + 1 }}
         </button>
       }
-      <button class="page-btn"
+      <button class="dt-page-btn"
         [disabled]="paginacion().page >= paginacion().totalPages - 1"
         (click)="onIrAPagina(paginacion().page + 1)">
         <span class="material-symbols-outlined">chevron_right</span>

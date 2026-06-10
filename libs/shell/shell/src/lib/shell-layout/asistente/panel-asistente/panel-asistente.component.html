@@ -1,0 +1,85 @@
+@if (asistente.panelAbierto()) {
+  <aside class="panel-asistente" role="complementary" aria-label="Asistente GastroIA">
+
+    <!-- Encabezado -->
+    <header class="panel-asistente__encabezado">
+      <div class="panel-asistente__identidad">
+        <div class="panel-asistente__avatar">
+          <svg lucideBrainCircuit></svg>
+        </div>
+        <div class="panel-asistente__titulos">
+          <h2 class="panel-asistente__nombre">{{ perfil.nombre }}</h2>
+          <span class="panel-asistente__estado">
+            <span
+              class="panel-asistente__indicador"
+              [class.panel-asistente__indicador--activo]="perfil.enLinea"
+            ></span>
+            {{ perfil.estado }}
+          </span>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="panel-asistente__cerrar"
+        aria-label="Cerrar asistente"
+        (click)="cerrar()"
+      >
+        <svg lucideX></svg>
+      </button>
+    </header>
+
+    <!-- Conversacion -->
+    <div class="panel-asistente__conversacion">
+      @for (mensaje of mensajes(); track mensaje.id) {
+        <div
+          class="panel-asistente__mensaje"
+          [class.panel-asistente__mensaje--usuario]="mensaje.autor === 'usuario'"
+          [class.panel-asistente__mensaje--asistente]="mensaje.autor === 'asistente'"
+        >
+          @if (mensaje.autor === 'asistente') {
+            <div class="panel-asistente__mensaje-avatar">
+              <svg lucideBrainCircuit></svg>
+            </div>
+          }
+          <div class="panel-asistente__burbuja">
+            @if (mensaje.autor === 'asistente') {
+              <markdown class="panel-asistente__texto panel-asistente__texto--md" [data]="mensaje.texto"></markdown>
+            } @else {
+              <p class="panel-asistente__texto">{{ mensaje.texto }}</p>
+            }
+            @if (mensaje.hora) {
+              <span class="panel-asistente__hora">{{ mensaje.hora }}</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Entrada -->
+    <footer class="panel-asistente__pie">
+      <div class="panel-asistente__campo">
+        <input
+          type="text"
+          class="panel-asistente__input"
+          placeholder="Escribe un mensaje..."
+          aria-label="Escribe un mensaje para GastroIA"
+          [(ngModel)]="texto"
+          [disabled]="enviando()"
+          (keyup.enter)="enviar()"
+        />
+        <button
+          type="button"
+          class="panel-asistente__enviar"
+          aria-label="Enviar mensaje"
+          [disabled]="enviando() || !texto.trim()"
+          (click)="enviar()"
+        >
+          <svg lucideSend></svg>
+        </button>
+      </div>
+      <p class="panel-asistente__aviso">GastroIA puede cometer errores. Verifica la info.</p>
+    </footer>
+
+  </aside>
+}

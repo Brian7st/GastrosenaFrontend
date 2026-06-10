@@ -124,10 +124,11 @@
         }
 
         @empty {
-          <div class="empty-state">
-            <span class="material-symbols-outlined empty-state__icon">check_circle</span>
-            <p class="empty-state__text">No hay alertas activas con los filtros seleccionados.</p>
-          </div>
+          <inventario-empty-state
+            icon="notifications"
+            title="Sin alertas"
+            message="No hay alertas con los filtros seleccionados."
+          />
         }
       </div>
     </div>

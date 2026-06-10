@@ -21,7 +21,6 @@ export interface ProductoResponse {
   id: string;
   codigoSena: string;
   codigoProveedor?: string;
-  nombre: string;
   descripcion?: string;
   categoria: string;
   unidadMedida: string;
@@ -80,4 +79,78 @@ export interface ExportacionProductosResponse {
   estado: string;
   formato: 'CSV';
   totalProductos: number;
+}
+
+// ── Contratos (/catalog/contratos) ─────────────────────────────────────────────
+
+export interface ItemContratoResponse {
+  refArticulo: string;
+  codigoSena: string | null;
+  descripcion: string;
+  unidadMedida: string | null;
+  cantidad: number | null;
+  codigoProveedor: string | null;
+  valorEstimado: number | null;
+  vrlAdjudicado: number;
+  vrlAntes: number | null;
+  ivaPorcentaje: number | null;
+  ivaValor: number | null;
+}
+
+export interface ContratoResponse {
+  id: string;
+  numero: string;
+  descripcion: string | null;
+  vigencia: number;
+  fechaInicio: string | null;
+  fechaFin: string | null;
+  estado: string;
+  items: ItemContratoResponse[];
+}
+
+export interface ItemContratoRequest {
+  refArticulo: string;
+  codigoSena?: string | null;
+  descripcion: string;
+  unidadMedida?: string | null;
+  cantidad?: number | null;
+  codigoProveedor?: string | null;
+  valorEstimado?: number | null;
+  vrlAdjudicado: number;
+  vrlAntes?: number | null;
+  ivaPorcentaje?: number | null;
+}
+
+export interface RegistrarContratoRequest {
+  numero: string;
+  descripcion?: string | null;
+  vigencia: number;
+  fechaInicio?: string | null;
+  fechaFin?: string | null;
+  items: ItemContratoRequest[];
+}
+
+/** POST /catalog/contratos — 201 */
+export interface ContratoCreatedResponse {
+  id: string;
+}
+
+/** POST /catalog/contratos/importar — 201 */
+export interface ImportacionContratoResponse {
+  contratoId: string;
+  productosCreados: number;
+  productosActualizados: number;
+}
+
+/** GET /catalog/contratos/precio?codigoSena&vigencia */
+export interface PrecioVigenteResponse {
+  codigoSena: string | null;
+  refArticulo: string;
+  descripcion: string;
+  numeroContrato: string;
+  vigencia: number;
+  vrlAdjudicado: number;
+  vrlAntes: number | null;
+  ivaPorcentaje: number | null;
+  ivaValor: number | null;
 }

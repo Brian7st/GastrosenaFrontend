@@ -58,7 +58,7 @@ export class RequisicionesCreateComponent implements OnInit {
 
   // ── Context form ──────────────────────────────────────────────────────────
   contextForm = this.fb.nonNullable.group({
-    fichaId:          ['', [Validators.required, Validators.pattern(/^\d{7}$/)]],
+    fichaId:          ['', Validators.required],
     instructorId:     ['', Validators.required],
     instructorNombre: [''],
     fecha:            [new Date().toISOString().slice(0, 10), Validators.required],

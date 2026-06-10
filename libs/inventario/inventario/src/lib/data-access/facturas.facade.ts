@@ -225,6 +225,36 @@ export class FacturasFacade {
       });
   }
 
+  /**
+   * Asocia una línea PENDIENTE-CATALOGO a un bien existente del catálogo.
+   * Propaga el mensaje del backend (p. ej. "el bien no existe") para guiar al usuario.
+   */
+  resolverLineaPendiente(
+    id: string | number,
+    descripcionLinea: string,
+    codigoProductoSena: string,
+  ): void {
+    this._loading.set(true);
+    this.svc.resolverLineaPendiente(id, descripcionLinea, codigoProductoSena)
+      .pipe(
+        catchError((err: unknown) => {
+          this._error.set(this.mensajeResolverPendiente(err));
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => {
+        if (res) { this._facturaSeleccionada.set(res); this.cargarFacturas(); }
+      });
+  }
+
+  private mensajeResolverPendiente(err: unknown): string {
+    const detail = (err as { error?: { detail?: string } } | null)?.error?.detail;
+    return detail && detail.trim().length > 0
+      ? detail
+      : 'No se pudo asociar la línea al bien.';
+  }
+
   marcarPagada(id: string | number): void {
     this._loading.set(true);
     this.svc.marcarPagada(id)
@@ -267,10 +297,14 @@ export class FacturasFacade {
       .subscribe(s => this._solicitudGIL.set(s ?? null));
   }
 
-  conciliarEnImportacion(facturaId: string, gilId: string): void {
+  conciliarEnImportacion(
+    facturaId: string,
+    gilId: string,
+    cantidadesRecibidas?: Record<string, number>,
+  ): void {
     this._loading.set(true);
     this._error.set(null);
-    this.svc.conciliarFacturaGil(facturaId, gilId)
+    this.svc.conciliarFacturaGil(facturaId, gilId, cantidadesRecibidas)
       .pipe(
         catchError((error) => {
           this._error.set(this.getConciliacionErrorMessage(error));
@@ -281,10 +315,14 @@ export class FacturasFacade {
       .subscribe(res => { if (res !== null) this._conciliacionImportacion.set(res); });
   }
 
-  conciliarFacturaGil(facturaId: string, gilId: string): void {
+  conciliarFacturaGil(
+    facturaId: string,
+    gilId: string,
+    cantidadesRecibidas?: Record<string, number>,
+  ): void {
     this._loading.set(true);
     this._error.set(null);
-    this.svc.conciliarFacturaGil(facturaId, gilId)
+    this.svc.conciliarFacturaGil(facturaId, gilId, cantidadesRecibidas)
       .pipe(
         catchError(() => {
           this._error.set('Error al conciliar la factura con el GIL');

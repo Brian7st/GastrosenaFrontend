@@ -53,7 +53,7 @@ export class HomeService {
     return of([
       { id: 'g1', title: 'Cocina Fusión',        description: 'Técnicas modernas aplicadas a ingredientes colombianos.',      category: 'gastronomia', imageUrl: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400' },
       { id: 'g2', title: 'Cocina de Autor',      description: 'Creaciones originales de nuestros aprendices avanzados.',     category: 'gastronomia', imageUrl: 'https://images.unsplash.com/photo-1424847651672-bf20a4b0982b?w=400' },
-      { id: 'g3', title: 'Gastronomía Regional', description: 'Sabores auténticos del Eje Cafetero y el Quindío.',           category: 'gastronomia', imageUrl: 'https://images.unsplash.com/photo-1476224203421-9ac39bcb3df1?w=400' },
+      { id: 'g3', title: 'Gastronomía Regional', description: 'Sabores auténticos del Eje Cafetero y el Quindío.', category: 'gastronomia', imageUrl: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&fit=crop' },
     ]);
   }
 
@@ -61,18 +61,18 @@ export class HomeService {
     return of([
       { id: 'b1', title: 'Cóctel de Maracuyá',  description: 'Refrescante combinación de maracuyá, vodka y menta fresca.',  price: 14000, category: 'bar', imageUrl: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400' },
       { id: 'b2', title: 'Mojito Tropical',      description: 'Ron blanco, limón, hierbabuena y soda con toque de coco.',   price: 15000, category: 'bar', imageUrl: 'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400' },
-      { id: 'b3', title: 'Sangría Colombiana',   description: 'Vino tinto con frutas tropicales de temporada.',             price: 13000, category: 'bar', imageUrl: 'https://images.unsplash.com/photo-1562599838-8cc458014da8?w=400' },
+      { id: 'b3', title: 'Sangría Colombiana', description: 'Vino tinto con frutas tropicales de temporada.', price: 13000, category: 'bar', imageUrl: 'https://images.unsplash.com/photo-1510626176961-4b57d4fbad03?w=400&fit=crop' },
     ]);
   }
 
-  getBarismoItems(): Observable<FeaturedItem[]> {
-    return of([
-      { id: 'ba1', title: 'Espresso Quindío',      description: 'Shot concentrado de café de origen del Quindío, notas cítricas.',    price: 4000, category: 'barismo', imageUrl: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=400' },
-      { id: 'ba2', title: 'Latte de Panela',        description: 'Espresso con leche vaporizada endulzada con panela artesanal.',      price: 7000, category: 'barismo', imageUrl: 'https://images.unsplash.com/photo-1534778101976-62847782c213?w=400' },
-      { id: 'ba3', title: 'Cold Brew Colombiano',   description: 'Infusión en frío de 18 horas con café especial de Armenia.',        price: 8000, category: 'barismo', imageUrl: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400' },
-      { id: 'ba4', title: 'Capuchino Artesanal',    description: 'Espresso doble con leche texturizada y arte latte.',                price: 8500, category: 'barismo', imageUrl: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=400' },
-    ]);
-  }
+getBarismoItems(): Observable<FeaturedItem[]> {
+  return of([
+    { id: 'ba1', title: 'Espresso Quindío',    description: 'Shot concentrado de café de origen del Quindío, notas cítricas.',    price: 4000, category: 'barismo', imageUrl: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=400' },
+    { id: 'ba2', title: 'Latte de Panela',      description: 'Espresso con leche vaporizada endulzada con panela artesanal.',      price: 7000, category: 'barismo', imageUrl: 'https://images.unsplash.com/photo-1534778101976-62847782c213?w=400' },
+    { id: 'ba3', title: 'Cold Brew Colombiano', description: 'Infusión en frío de 18 horas con café especial de Armenia.',        price: 8000, category: 'barismo', imageUrl: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400' },
+    { id: 'ba4', title: 'Capuchino Artesanal',  description: 'Espresso doble con leche texturizada y arte latte.',                price: 8500, category: 'barismo', imageUrl: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=400' },
+  ]);
+}
 
   getContactInfo(): Observable<ContactInfo> {
     return of({

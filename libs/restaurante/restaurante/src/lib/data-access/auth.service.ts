@@ -44,4 +44,25 @@ export class AuthService {
       return this.FALLBACK_ID;
     }
   }
+
+  getUsuarioNombre(): string {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return 'Cajero Activo';
+
+      const parts = token.split('.');
+      if (parts.length !== 3) return 'Cajero Activo';
+
+      const jsonPayload = JSON.parse(atob(parts[1]));
+
+      if (jsonPayload.nombre) return jsonPayload.nombre;
+      if (jsonPayload.name) return jsonPayload.name;
+      if (jsonPayload.username) return jsonPayload.username;
+      if (jsonPayload.email) return jsonPayload.email;
+      
+      return 'Cajero (ID: ' + this.getUsuarioId().substring(0,8) + ')';
+    } catch (e) {
+      return 'Cajero Activo';
+    }
+  }
 }

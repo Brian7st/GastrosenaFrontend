@@ -1,3 +1,86 @@
+/* ── Panel de filtros colapsable (slot [dtHeader]) ──────────────────────────── */
+.filter-panel {
+  background: var(--color-superficie-contenedor-mas-bajo);
+  border-bottom: 1px solid #f3f4f5;
+  padding: 1rem 1.5rem;
+
+  &__row {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  flex: 1;
+  min-width: 10rem;
+
+  &--actions {
+    flex: 0 0 auto;
+    justify-content: flex-end;
+    min-width: auto;
+  }
+}
+
+.filter-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-pizarra-500);
+}
+
+.filter-select {
+  height: 2.25rem;
+  padding: 0 2rem 0 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-superficie-contenedor-mas-bajo);
+  font-size: 0.875rem;
+  color: var(--color-en-superficie);
+  font-family: var(--font-family-base);
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  transition: border-color 0.15s ease;
+
+  &:focus { border-color: var(--color-primario); box-shadow: 0 0 0 3px rgba(57,169,0,0.12); }
+}
+
+.filter-clear-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  height: 2.25rem;
+  padding: 0 0.875rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: transparent;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-pizarra-500);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+
+  .material-symbols-outlined { font-size: 18px; }
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-border-strong);
+    color: var(--color-pizarra-700);
+    background: var(--color-pizarra-100);
+  }
+
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
 .consolidado-page {
   min-height: 100%;
   background: var(--color-superficie, #f8f9fa);
@@ -172,58 +255,6 @@ td {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Pagination (Table Footer)
-// ─────────────────────────────────────────────────────────────────────────────
-.table-pagination__info {
-  font-size: var(--font-size-sm, 0.875rem);
-  color: var(--color-secundario-texto);
-}
-
-.pagination-btns {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2, 0.5rem);
-}
-
-.pagination-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: var(--radius-md, 0.375rem);
-  background: var(--color-superficie-contenedor-bajo);
-  border: 1px solid var(--color-superficie-contenedor);
-  color: var(--color-secundario-texto);
-  font-family: var(--font-family-base);
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover:not(:disabled):not(.pagination-btn--active) {
-    background: var(--color-superficie-contenedor);
-    color: var(--color-en-superficie);
-  }
-
-  &--active {
-    background: var(--color-primario);
-    border-color: var(--color-primario);
-    color: var(--color-en-primario);
-    font-weight: 600;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  .material-symbols-outlined {
-    font-size: 1.25rem;
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 // Insights / Floating Cards (Added top margin to fix spacing)
 // ─────────────────────────────────────────────────────────────────────────────
 .insights-grid {
@@ -360,17 +391,6 @@ td {
       font-size: 0.875rem;
     }
   }
-}
-
-.insight-icon-box {
-  width: 3rem;
-  height: 3rem;
-  border-radius: 0.75rem;
-  background-color: var(--color-superficie-contenedor-mas-bajo);
-  box-shadow: var(--shadow-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .progress-circle {

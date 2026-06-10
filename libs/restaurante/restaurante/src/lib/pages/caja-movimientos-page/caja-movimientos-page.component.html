@@ -12,7 +12,7 @@
   <div class="kpi-cards-grid">
     <div class="kpi-card">
       <div class="kpi-icon cash">
-        <lucide-icon name="inbox" [size]="24"></lucide-icon>
+        <lucide-icon name="banknote" [size]="24"></lucide-icon>
       </div>
       <div class="kpi-info">
         <span class="kpi-label">Efectivo</span>
@@ -42,73 +42,59 @@
   </div>
 
   <div class="main-content-block">
-    <div class="card">
-      <div class="block-header">
-        <div class="title-group">
-          <h5>Pedidos Pagados en el Turno</h5>
-          <span class="subtitle">Consulte las ventas detalladas y genere el cuadre final</span>
-        </div>
-
+    <restaurant-data-table tableTitle="Pedidos Pagados en el Turno" tableIcon="banknote" class="mt-4" style="display: block;">
+      <div dtActions>
         <restaurant-button variant="primary" (click)="generarReporteCuadre()">
           <lucide-icon name="file-text" [size]="18"></lucide-icon>
           <span>Generar Reporte de Cuadre</span>
         </restaurant-button>
       </div>
+      <ng-container dtHeader>
+        <span class="subtitle" style="display: block; padding: 0 var(--space-6) var(--space-4) var(--space-6); margin-top: calc(var(--space-2) * -1); font-size: var(--font-size-sm); color: var(--color-text-secondary);">Consulte las ventas detalladas y genere el cuadre final</span>
+      </ng-container>
 
-      <div class="table-responsive mt-4">
-        <table class="restaurant-table">
-          <thead>
-          <tr>
-            <th>Hora</th>
-            <th>N° Pedido (Ref)</th>
-            <th>N° Factura</th>
-            <th>Método de Pago</th>
-            <th>Total Pagado</th>
-            <th class="text-center">Imprimir</th>
-          </tr>
-          </thead>
-          <tbody>
-          @for (factura of facturas(); track factura.id) {
-          <tr>
-            <td>{{ factura.fechaEmision | date:'shortTime' }}</td>
-
-            <td title="{{ factura.pedidoId }}"><strong>#{{ factura.pedidoId | slice:0:8 | uppercase }}</strong></td>
-
-            <td>{{ factura.numeroFactura }}</td>
-
-            <td>
-                  <span class="badge"
-                        [ngClass]="factura.metodoPago?.includes('EFECTIVO') ? 'badge-cash' : 'badge-card'">
-                    {{ factura.metodoPago?.includes('TARJETA') ? 'TARJETA' : factura.metodoPago }}
-                  </span>
-            </td>
-
-            <td class="amount-positive">{{ (factura.total || factura.subtotal) | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
-
-            <td class="text-center">
-              <button class="action-btn-print" (click)="imprimirFactura(factura.pedidoId)" title="Imprimir Factura">
-                <lucide-icon name="file-text" [size]="16"></lucide-icon>
-                <span>Imprimir</span>
-              </button>
-            </td>
-          </tr>
-          } @empty {
-          <tr>
-            <td colspan="6" class="p-0 border-0">
-              <div class="empty-state-wrapper">
-                <div class="icon-circle">
-                  <lucide-icon name="inbox" [size]="40"></lucide-icon>
-                </div>
-                <h4>Sin pedidos pagados</h4>
-                <p>Aún no hay pedidos pagados registrados en este turno.</p>
-              </div>
-            </td>
-          </tr>
-          }
-          </tbody>
-        </table>
-      </div>
-    </div>
+      <thead>
+        <tr>
+          <th>Hora</th>
+          <th>N° Pedido (Ref)</th>
+          <th>N° Factura</th>
+          <th>Método de Pago</th>
+          <th>Total Pagado</th>
+          <th class="text-center">Imprimir</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (factura of facturas(); track factura.id) {
+        <tr>
+          <td>{{ factura.fechaEmision | date:'shortTime' }}</td>
+          <td title="{{ factura.pedidoId }}"><strong>#{{ factura.pedidoId | slice:0:8 | uppercase }}</strong></td>
+          <td>{{ factura.numeroFactura }}</td>
+          <td>
+                <span class="badge"
+                      [ngClass]="factura.metodoPago?.includes('EFECTIVO') ? 'badge-cash' : 'badge-card'">
+                  {{ factura.metodoPago?.includes('TARJETA') ? 'TARJETA' : factura.metodoPago }}
+                </span>
+          </td>
+          <td class="amount-positive" style="font-weight: var(--font-weight-semibold); color: var(--color-text-primary);">{{ (factura.total || factura.subtotal) | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+          <td class="text-center">
+            <restaurant-button variant="surface" (click)="imprimirFactura(factura.id, factura.numeroFactura)" style="font-size: 0.85rem; padding: 0.25rem 0.75rem;">
+              <lucide-icon name="file-text" [size]="16"></lucide-icon>
+              <span>Imprimir</span>
+            </restaurant-button>
+          </td>
+        </tr>
+        } @empty {
+        <tr>
+          <td colspan="6" class="p-0 border-0">
+            <restaurant-empty-state
+                    title="Sin pedidos pagados"
+                    message="Aún no hay pedidos pagados registrados en este turno.">
+            </restaurant-empty-state>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </restaurant-data-table>
   </div>
 
   <restaurant-confirm-dialog

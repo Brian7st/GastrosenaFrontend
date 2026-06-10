@@ -8,7 +8,14 @@
       <div class="item-row">
         <div class="item-details">
           <h4 class="name">{{ item.nombreProducto }}</h4>
-          <span class="category">{{ item.observaciones || 'Sin observaciones' }}</span>
+            <div class="obs-display">
+              <span class="category" [title]="item.observaciones || 'Sin observaciones'">{{ item.observaciones || 'Sin observaciones' }}</span>
+              @if (!esPedidoSoloLectura()) {
+                <button class="btn-edit-obs" (click)="iniciarEdicionObservacion(i, item.observaciones || '')" title="Agregar/Editar observaciones">
+                  <lucide-icon name="pencil" [size]="14"></lucide-icon>
+                </button>
+              }
+            </div>
           
           <div class="quantity-controls">
             @if (!esPedidoSoloLectura()) {
@@ -83,17 +90,17 @@
       (click)="iniciarConfirmacion()">
       <span>Confirmar Pedido</span>
     </restaurant-button>
-  } @else if (estadoPedido() === 'ENVIADO_COCINA') {
+  } @else if (estadoPedido() !== 'FACTURADO' && estadoPedido() !== 'CANCELADO' && estadoPedido() !== 'ENTREGADO') {
     <restaurant-button 
       class="action-btn flex-1 btn-anular" 
       variant="primary" 
       (click)="iniciarAnulacionBackend()">
       <lucide-icon name="alert-triangle" [size]="18" class="text-white"></lucide-icon>
-      <span>Anular Pedido</span>
+      <span>Cancelar Pedido</span>
     </restaurant-button>
   } @else {
     <div class="status-badge" style="width: 100%; text-align: center; padding: 12px; background: var(--bg-neutral); border-radius: var(--radius-md); color: var(--text-secondary); font-weight: 500;">
-      No se puede anular (Pedido {{ estadoPedido().replace('_', ' ') | titlecase }})
+      No se puede cancelar (Pedido {{ estadoPedido().replace('_', ' ') | titlecase }})
     </div>
   }
 </div>
@@ -110,15 +117,39 @@
 ></restaurant-confirm-dialog>
 
 <restaurant-confirm-dialog
-  [open]="showAnularBackendModal()"
-  title="Anular Pedido"
-  message="¿Estás seguro de que quieres anular esta comanda? Esto cancelará su preparación en cocina y liberará la mesa."
-  confirmText="Sí, anular pedido"
-  cancelText="No, volver"
-  [showCancel]="true"
-  (confirm)="ejecutarAnulacionBackend()"
-  (cancel)="showAnularBackendModal.set(false)"
+  [open]="showEmptyCartModal()"
+  title="Carrito Vacío"
+  message="No puedes confirmar un pedido vacío. Por favor agrega al menos un producto a la comanda antes de enviarla a cocina."
+  confirmText="Entendido"
+  [showCancel]="false"
+  (confirm)="showEmptyCartModal.set(false)"
 ></restaurant-confirm-dialog>
+
+@if (showAnularBackendModal()) {
+  <div class="custom-modal-backdrop" (click)="showAnularBackendModal.set(false)">
+    <section class="custom-modal-dialog" (click)="$event.stopPropagation()">
+      <strong class="modal-title text-error">Cancelar Pedido</strong>
+      <p class="modal-message">¿Estás seguro de que quieres cancelar este pedido? Esto detendrá su preparación y liberará la mesa.</p>
+      
+      <div class="cancel-reason-container">
+        <label for="motivoAnulacion">Motivo de la cancelación *</label>
+        <textarea 
+          id="motivoAnulacion"
+          [(ngModel)]="motivoAnulacion"
+          placeholder="Ej: El cliente se retiró, error en la comanda..."
+          rows="3"
+          required
+          class="cancel-reason-input"
+        ></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <restaurant-button variant="ghost" (click)="showAnularBackendModal.set(false)">No, volver</restaurant-button>
+        <restaurant-button variant="primary" [disabled]="!motivoAnulacion().trim()" (click)="ejecutarAnulacionBackend()">Sí, cancelar pedido</restaurant-button>
+      </div>
+    </section>
+  </div>
+}
 
 @if (showConfirmModal()) {
   <div class="custom-modal-backdrop" (click)="showConfirmModal.set(false)">
@@ -133,10 +164,17 @@
             <h5 class="category-title">Comidas</h5>
             <ul class="summary-list">
               @for (item of comidasPedido(); track item.productoId) {
-                <li>
-                  <span class="qty">{{ item.cantidad }}x</span>
-                  <span class="name">{{ item.nombreProducto }}</span>
-                  <span class="price">{{ (item.cantidad * item.precioUnitario) | currencyCop }}</span>
+                <li class="summary-item-container">
+                  <div class="summary-item-main">
+                    <span class="qty">{{ item.cantidad }}x</span>
+                    <span class="name">{{ item.nombreProducto }}</span>
+                    <span class="price">{{ (item.cantidad * item.precioUnitario) | currencyCop }}</span>
+                  </div>
+                  @if (item.observaciones) {
+                    <div class="summary-item-obs">
+                      {{ item.observaciones }}
+                    </div>
+                  }
                 </li>
               }
             </ul>
@@ -146,10 +184,17 @@
             <h5 class="category-title mt-3">Bebidas</h5>
             <ul class="summary-list">
               @for (item of bebidasPedido(); track item.productoId) {
-                <li>
-                  <span class="qty">{{ item.cantidad }}x</span>
-                  <span class="name">{{ item.nombreProducto }}</span>
-                  <span class="price">{{ (item.cantidad * item.precioUnitario) | currencyCop }}</span>
+                <li class="summary-item-container">
+                  <div class="summary-item-main">
+                    <span class="qty">{{ item.cantidad }}x</span>
+                    <span class="name">{{ item.nombreProducto }}</span>
+                    <span class="price">{{ (item.cantidad * item.precioUnitario) | currencyCop }}</span>
+                  </div>
+                  @if (item.observaciones) {
+                    <div class="summary-item-obs">
+                      {{ item.observaciones }}
+                    </div>
+                  }
                 </li>
               }
             </ul>
@@ -170,6 +215,31 @@
       <div class="modal-actions">
         <restaurant-button variant="ghost" (click)="showConfirmModal.set(false)">Revisar de nuevo</restaurant-button>
         <restaurant-button variant="primary" (click)="ejecutarConfirmacion()">Sí, enviar pedido</restaurant-button>
+      </div>
+    </section>
+  </div>
+}
+
+@if (editIndex() !== null) {
+  <div class="custom-modal-backdrop" (click)="cancelarEdicionObservacion()">
+    <section class="custom-modal-dialog" (click)="$event.stopPropagation()">
+      <strong class="modal-title">Observaciones del Producto</strong>
+      <p class="modal-message">Escribe las indicaciones específicas para este plato.</p>
+      
+      <div class="obs-textarea-container">
+        <textarea 
+          [ngModel]="tempObservacion()" 
+          (ngModelChange)="tempObservacion.set($event)"
+          placeholder="Ej: Sin cebolla, bien asado..."
+          rows="4"
+          class="obs-textarea-input"
+          autofocus
+        ></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <restaurant-button variant="ghost" (click)="cancelarEdicionObservacion()">Cancelar</restaurant-button>
+        <restaurant-button variant="primary" (click)="guardarObservacion()">Guardar</restaurant-button>
       </div>
     </section>
   </div>

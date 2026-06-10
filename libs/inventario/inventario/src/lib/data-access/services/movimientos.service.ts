@@ -4,25 +4,25 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import {
   Movimiento,
-  EntradaMovimientoData,
+  DocumentoMovimiento,
   SalidaMovimientoData,
   ReservaMovimientoData,
   LiberacionMovimientoData,
   AjusteMovimientoData,
 } from '../../models/movimiento.model';
 import { ExistenciaProducto } from '../../models/inventario.model';
-import { MovimientoResponse, MovimientoPageResponse, ExistenciaResponse } from '../api/inventory.api';
+import { MovimientoPageResponse, ExistenciaResponse, DocumentoPageResponse, DocumentoDetalleResponse } from '../api/inventory.api';
 import { KardexValorizadoItemResponse } from '../api/reporting.api';
 import { KardexValorizadoItem } from '../../models/reporting.model';
 import {
   movimientoFromApi,
   existenciaFromApi,
-  entradaToRequest,
   salidaToRequest,
   reservaToRequest,
   liberacionToRequest,
   ajusteToRequest,
   movimientoPageFromApi,
+  documentoPageFromApi,
 } from '../mappers/inventory.mapper';
 import { kardexValorizadoFromApi } from '../mappers/reporting.mapper';
 
@@ -32,22 +32,75 @@ const API = '/api/v1';
 export class MovimientosService {
   private http = inject(HttpClient);
 
-  // ── Kardex ──────────────────────────────────────────────────────────────────
+  // ── Documentos agrupados ────────────────────────────────────────────────────
 
   /**
-   * GET /inventory/movimientos?pagina=0&tamano=50
-   * Listado global de TODOS los movimientos (entradas + salidas + ajustes),
-   * enriquecido por el backend con nombre y unidad de medida del catálogo.
+   * GET /inventory/movimientos?pagina=&tamano=
+   * Listado paginado de documentos de movimiento (agrupados por documento).
    */
-  getMovimientos(
+  getDocumentos(
     pagina = 0,
-    tamano = 50,
-  ): Observable<{ movimientos: Movimiento[]; totalPaginas: number; totalElementos: number }> {
+    tamano = 20,
+  ): Observable<{
+    documentos: DocumentoMovimiento[];
+    totalPaginas: number;
+    totalElementos: number;
+    paginaActual: number;
+    tamano: number;
+  }> {
     const params = new HttpParams()
       .set('pagina', String(pagina))
       .set('tamano', String(tamano));
     return this.http
-      .get<MovimientoPageResponse>(`${API}/inventory/movimientos`, { params })
+      .get<DocumentoPageResponse>(`${API}/inventory/movimientos`, { params })
+      .pipe(
+        map(resp => documentoPageFromApi(resp)),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /**
+   * GET /inventory/movimientos/documento/{documentoId}?tipo=ENTRADA|SALIDA
+   * Retorna los bienes de un documento específico.
+   */
+  getBienesPorDocumento(
+    documentoId: string,
+    tipo: 'ENTRADA' | 'SALIDA',
+  ): Observable<{ tipo: 'ENTRADA' | 'SALIDA'; documentoId: string; numeroDocumento: string | null; bienes: Movimiento[] }> {
+    const params = new HttpParams().set('tipo', tipo);
+    return this.http
+      .get<DocumentoDetalleResponse>(`${API}/inventory/movimientos/documento/${documentoId}`, { params })
+      .pipe(
+        map(resp => ({
+          tipo: resp.tipo,
+          documentoId: resp.documentoId,
+          numeroDocumento: resp.numeroDocumento,
+          bienes: resp.bienes.map(movimientoFromApi),
+        })),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  // ── Kardex ──────────────────────────────────────────────────────────────────
+
+  /**
+   * GET /inventory/movimientos/todos?pagina=0&tamano=50
+   * Listado global PLANO de TODOS los movimientos (entradas + salidas + ajustes),
+   * sin agrupar por documento, enriquecido por el backend con nombre y unidad.
+   */
+  getMovimientos(
+    pagina = 0,
+    tamano = 10,
+    tipo?: string,
+  ): Observable<{ movimientos: Movimiento[]; totalPaginas: number; totalElementos: number }> {
+    let params = new HttpParams()
+      .set('pagina', String(pagina))
+      .set('tamano', String(tamano));
+    if (tipo) {
+      params = params.set('tipo', tipo);
+    }
+    return this.http
+      .get<MovimientoPageResponse>(`${API}/inventory/movimientos/todos`, { params })
       .pipe(
         map(resp => movimientoPageFromApi(resp)),
         catchError(err => throwError(() => err))
@@ -75,15 +128,6 @@ export class MovimientosService {
       );
   }
 
-  getMovimientoById(id: string): Observable<Movimiento | undefined> {
-    return this.http
-      .get<MovimientoResponse>(`${API}/inventory/movimientos/${id}`)
-      .pipe(
-        map(movimientoFromApi),
-        catchError(err => throwError(() => err))
-      );
-  }
-
   // ── Existencias ─────────────────────────────────────────────────────────────
 
   /** Stock de un producto (GET /inventory/existencias/{productoId}) */
@@ -106,14 +150,7 @@ export class MovimientosService {
       );
   }
 
-  // ── Movimientos de entrada / salida ─────────────────────────────────────────
-
-  /** POST /inventory/movimientos/entrada — 201 No Content */
-  registrarEntrada(data: EntradaMovimientoData): Observable<void> {
-    return this.http
-      .post<void>(`${API}/inventory/movimientos/entrada`, entradaToRequest(data))
-      .pipe(catchError(err => throwError(() => err)));
-  }
+  // ── Movimientos de salida ───────────────────────────────────────────────────
 
   /** POST /inventory/movimientos/salida — 201 No Content */
   registrarSalida(data: SalidaMovimientoData): Observable<void> {

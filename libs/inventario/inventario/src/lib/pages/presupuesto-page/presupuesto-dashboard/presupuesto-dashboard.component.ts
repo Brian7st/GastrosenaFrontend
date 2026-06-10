@@ -38,11 +38,15 @@ export class PresupuestoDashboardComponent implements OnInit {
   // ── Modal de exportación ──────────────────────────────────────────────────
   showExportModal = signal(false);
 
-  /** Datos de resumen presupuestal */
-  resumen = this.facade.resumen;
+  /** Resumen global del backend — null hasta que cargue */
+  resumen      = this.facade.resumen;
+  resumenGlobal = this.facade.resumenGlobal;
 
-  /** Grupos de rubros agrupados por ficha (tabla colapsable) */
+  /** Grupos de rubros agrupados por ficha (tabla colapsable) — Sección A del Excel */
   grupos = this.facade.grupos;
+
+  /** Grupos de rubros por posición presupuestal + fuente (SIIF) — Sección B del Excel */
+  gruposPorPosicion = this.facade.gruposPorPosicion;
 
   /** Estado de expansión por fichaId */
   expandidos = signal<Record<string, boolean>>({
@@ -54,17 +58,35 @@ export class PresupuestoDashboardComponent implements OnInit {
   /** Historial de afectaciones — fuente completa */
   afectaciones = this.facade.afectaciones;
 
+  // ── Filtros (panel colapsable) ──────────────────────────────────────────────
+  showFilters  = signal(false);
+  filtroEstado = signal<string>('');
+  filtrosActivos = computed(() => (this.filtroEstado() ? 1 : 0));
+
+  /** Estados de afectación presentes en los datos (para el select) */
+  estadosDisponibles = computed(() => Array.from(new Set(this.afectaciones().map(a => a.estado))));
+
+  /** Afectaciones tras aplicar el filtro de estado */
+  afectacionesFiltradas = computed(() => {
+    const e = this.filtroEstado();
+    return e ? this.afectaciones().filter(a => a.estado === e) : this.afectaciones();
+  });
+
+  onToggleFilters(): void { this.showFilters.update(v => !v); }
+  onFilterEstado(v: string): void { this.filtroEstado.set(v); this.paginaActual.set(1); }
+  onLimpiarFiltros(): void { this.filtroEstado.set(''); this.paginaActual.set(1); }
+
   // ── Paginación ─────────────────────────────────────────────────────────────
   readonly ITEMS_POR_PAGINA = 5;
   paginaActual = signal(1);
 
   totalPaginas = computed(() =>
-    Math.max(1, Math.ceil(this.afectaciones().length / this.ITEMS_POR_PAGINA))
+    Math.max(1, Math.ceil(this.afectacionesFiltradas().length / this.ITEMS_POR_PAGINA))
   );
 
   afectacionesPaginadas = computed(() => {
     const inicio = (this.paginaActual() - 1) * this.ITEMS_POR_PAGINA;
-    return this.afectaciones().slice(inicio, inicio + this.ITEMS_POR_PAGINA);
+    return this.afectacionesFiltradas().slice(inicio, inicio + this.ITEMS_POR_PAGINA);
   });
 
   paginas = computed(() =>

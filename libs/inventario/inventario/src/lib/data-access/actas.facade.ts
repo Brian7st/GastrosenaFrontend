@@ -90,6 +90,20 @@ export class ActasFacade {
       });
   }
 
+  /** POST /legalization/actas/{id}/exportar — genera el .docx del acta. */
+  exportarActa(id: string): void {
+    this._loading.set(true);
+    this.actasService.exportarActa(id)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al exportar el acta');
+          return of(false);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe();
+  }
+
   /** POST /legalization/actas/{id}/revisar — revisorId obligatorio (@NotBlank en backend). */
   revisarActa(id: string, revisorId: string): void {
     this._loading.set(true);

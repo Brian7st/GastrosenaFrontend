@@ -126,6 +126,13 @@
       </restaurant-button>
     </div>
 
+    <!-- Cascada VLOOKUP: tipear código almacén/descripción autollena la fila desde el catálogo -->
+    <div class="contrato-typeahead-row">
+      <restaurant-bien-typeahead
+        (seleccionar)="onSeleccionarBien($event)"
+      ></restaurant-bien-typeahead>
+    </div>
+
     @if (submitAttempted() && errores()['items']) {
       <p class="field-error" style="margin-bottom:0.75rem">{{ errores()['items'] }}</p>
     }

@@ -1,12 +1,19 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { ButtonComponent, KpiCardComponent, LoadingSkeletonComponent } from '@restaurant/shared/ui';
+import { ButtonComponent, DataTableComponent, KpiCardComponent, LoadingSkeletonComponent } from '@restaurant/shared/ui';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
+import { ContratosFacade } from '../../../data-access/contratos.facade';
 import { BienFormComponent } from '../../../ui/modals/bien-form/bien-form.component';
 import { BienImportModalComponent, BienImportPayload } from '../../modals/bien-import/bien-import.component';
-import { BienDeleteModalComponent } from '../../modals/bien-delete-modal/bien-delete-modal.component';
-import { Bien, BienFormDto, EstadoBien } from '../../../models/inventario.model';
+import { ContratoImportModalComponent, ContratoImportPayload } from '../../modals/contrato-import/contrato-import.component';
+import { ContratoDetalleComponent } from '../../modals/contrato-detalle/contrato-detalle.component';
+import { Bien, BienFormDto, EstadoBien, BienFiltros } from '../../../models/inventario.model';
+import { EstadoContrato } from '../../../models/contrato.model';
+import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
+import { CATEGORIAS_BIEN } from '../../../models/categorias.model';
+
+type VistaGestion = 'bienes' | 'contratos';
 
 @Component({
   selector: 'restaurant-bienes-list',
@@ -14,11 +21,14 @@ import { Bien, BienFormDto, EstadoBien } from '../../../models/inventario.model'
   imports: [
     CommonModule,
     ButtonComponent,
+    DataTableComponent,
     KpiCardComponent,
     LoadingSkeletonComponent,
     BienFormComponent,
     BienImportModalComponent,
-    BienDeleteModalComponent,
+    ContratoImportModalComponent,
+    ContratoDetalleComponent,
+    EmptyStateComponent,
   ],
   templateUrl: './bienes-list.component.html',
   styleUrl: './bienes-list.component.scss',
@@ -26,6 +36,7 @@ import { Bien, BienFormDto, EstadoBien } from '../../../models/inventario.model'
 })
 export class BienesListPageComponent implements OnInit {
   private facade = inject(InventarioFacade);
+  readonly contratosFacade = inject(ContratosFacade);
   private router = inject(Router);
 
   // State signals
@@ -34,25 +45,116 @@ export class BienesListPageComponent implements OnInit {
   loading     = this.facade.loading;
   paginacion  = this.facade.paginacion;
 
+  // ── Toggle de vistas (Bienes / Contratos) ──────────────────────────────────
+  vista             = signal<VistaGestion>('bienes');
+  contratos         = this.contratosFacade.contratos;
+  loadingContratos  = this.contratosFacade.loading;
+  ultimaImportacion = this.contratosFacade.ultimaImportacion;
+  showImportContratoModal = signal(false);
+  showDetalleContratoModal = signal(false);
+  /** Carga lazy: los contratos solo se piden la primera vez que se abre la vista. */
+  private contratosCargados = signal(false);
+
   paginas = computed(() =>
     Array.from({ length: this.paginacion().totalPages }, (_, i) => i)
   );
 
-  showFilters = signal(false);
+  readonly CATEGORIAS = CATEGORIAS_BIEN;
+  showFilters     = signal(false);
+  filtroCategoria = signal<string>('');
+  filtroEstado    = signal<EstadoBien | ''>('');
+
+  filtrosActivos = computed(() => {
+    let count = 0;
+    if (this.filtroCategoria()) count++;
+    if (this.filtroEstado())    count++;
+    return count;
+  });
 
   // Modal controls
   showFormModal = signal(false);
-  showDeleteModal = signal(false);
   showImportModal = signal(false);
   formMode = signal<'create' | 'edit'>('create');
   selectedBien = signal<Bien | undefined>(undefined);
+
+  constructor() {
+    // Al importar un contrato con éxito se crean/actualizan bienes del catálogo;
+    // refrescamos la lista de bienes en el acto, sin recargar la página.
+    effect(() => {
+      if (this.contratosFacade.ultimaImportacion()) {
+        this.facade.cargarBienes();
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.facade.loadAll();
   }
 
+  onToggleFilters(): void {
+    this.showFilters.update(v => !v);
+  }
+
+  // ── Vistas ────────────────────────────────────────────────────────────────
+
+  cambiarVista(vista: VistaGestion): void {
+    this.vista.set(vista);
+    if (vista === 'contratos' && !this.contratosCargados()) {
+      this.contratosFacade.cargarContratos();
+      this.contratosCargados.set(true);
+    }
+  }
+
+  onVerDetalleContrato(id: string): void {
+    this.contratosFacade.cargarContratoById(id);
+    this.showDetalleContratoModal.set(true);
+  }
+
+  onCerrarContrato(id: string): void {
+    this.contratosFacade.cerrarContrato(id);
+  }
+
+  onAbrirImportarContrato(): void {
+    this.showImportContratoModal.set(true);
+  }
+
+  onImportarContrato(payload: ContratoImportPayload): void {
+    if (payload.tipo === 'excel') {
+      this.contratosFacade.importarExcel(payload.archivo, payload.cabecera);
+    } else {
+      this.contratosFacade.importarContrato(payload.data);
+    }
+    this.showImportContratoModal.set(false);
+  }
+
+  getEstadoContratoBadgeClass(estado: EstadoContrato): string {
+    return estado === 'VIGENTE' ? 'estado-badge--activo' : 'estado-badge--inactivo';
+  }
+
   onSearch(query: string): void {
     this.facade.cargarBienes({ busqueda: query });
+  }
+
+  onFiltroCategoria(value: string): void {
+    this.filtroCategoria.set(value);
+    const filtros: BienFiltros = {};
+    if (value)                    filtros.categoria = value;
+    if (this.filtroEstado())      filtros.estado    = this.filtroEstado() as EstadoBien;
+    this.facade.cargarBienes(filtros);
+  }
+
+  onFiltroEstado(value: string): void {
+    this.filtroEstado.set(value as EstadoBien | '');
+    const filtros: BienFiltros = {};
+    if (value)                      filtros.estado    = value as EstadoBien;
+    if (this.filtroCategoria())     filtros.categoria = this.filtroCategoria();
+    this.facade.cargarBienes(filtros);
+  }
+
+  onLimpiarFiltros(): void {
+    this.filtroCategoria.set('');
+    this.filtroEstado.set('');
+    this.facade.cargarBienes({ categoria: undefined, estado: undefined, busqueda: undefined });
   }
 
   onIrAPagina(page: number): void {
@@ -116,18 +218,6 @@ export class BienesListPageComponent implements OnInit {
 
   onActivar(bien: Bien): void {
     this.facade.activarBien(bien.id);
-  }
-
-  onEliminar(bien: Bien): void {
-    this.selectedBien.set(bien);
-    this.showDeleteModal.set(true);
-  }
-
-  confirmarEliminacion(): void {
-    if (this.selectedBien()) {
-      this.facade.eliminarBien(this.selectedBien()!.id);
-      this.showDeleteModal.set(false);
-    }
   }
 
   getEstadoBadgeClass(estado: EstadoBien): string {

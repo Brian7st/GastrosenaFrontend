@@ -1,6 +1,6 @@
 import {
   Movimiento,
-  EntradaMovimientoData,
+  DocumentoMovimiento,
   SalidaMovimientoData,
   ReservaMovimientoData,
   LiberacionMovimientoData,
@@ -11,17 +11,20 @@ import {
   MovimientoResponse,
   MovimientoPageResponse,
   ExistenciaResponse,
-  EntradaRequest,
   SalidaRequest,
   ReservaRequest,
   LiberacionRequest,
   AjusteRequest,
+  DocumentoResponse,
+  DocumentoPageResponse,
 } from '../api/inventory.api';
 
 /**
  * Normaliza la respuesta paginada de GET /inventory/movimientos/{productoId}.
- * El backend no documenta el schema en Swagger (type: object genérico) y puede
- * usar convención inglés (content/totalElements) o español (contenido/totalElementos).
+ * El backend no documenta el schema en Swagger (type: object genérico).
+ * La respuesta real expone el array bajo `movimientos` (KardexHttpResponse);
+ * se mantienen los fallbacks inglés (content/totalElements) y español
+ * (contenido/totalElementos) por compatibilidad.
  */
 export function movimientoPageFromApi(resp: MovimientoPageResponse): {
   movimientos:    Movimiento[];
@@ -29,7 +32,7 @@ export function movimientoPageFromApi(resp: MovimientoPageResponse): {
   totalElementos: number;
 } {
   const dtos: MovimientoResponse[] =
-    resp.content ?? resp.contenido ?? [];
+    resp.movimientos ?? resp.content ?? resp.contenido ?? [];
   return {
     movimientos:    dtos.map(movimientoFromApi),
     totalPaginas:   resp.totalPages   ?? resp.totalPaginas   ?? 0,
@@ -52,6 +55,36 @@ export function movimientoFromApi(dto: MovimientoResponse): Movimiento {
   };
 }
 
+export function documentoFromApi(dto: DocumentoResponse): DocumentoMovimiento {
+  return {
+    tipo: dto.tipo,
+    documentoId: dto.documentoId,
+    numeroDocumento: dto.numeroDocumento ?? dto.documentoId,
+    cantidadBienes: dto.cantidadBienes,
+    cantidadTotal: dto.cantidadTotal,
+    valorTotal: dto.valorTotal,
+    fecha: dto.fecha,
+    estado: dto.estado,
+  };
+}
+
+export function documentoPageFromApi(resp: DocumentoPageResponse): {
+  documentos: DocumentoMovimiento[];
+  totalPaginas: number;
+  totalElementos: number;
+  paginaActual: number;
+  tamano: number;
+} {
+  const dtos = resp.documentos ?? [];
+  return {
+    documentos: dtos.map(documentoFromApi),
+    totalPaginas: resp.totalPaginas ?? 0,
+    totalElementos: resp.totalElementos ?? 0,
+    paginaActual: resp.paginaActual ?? 0,
+    tamano: resp.tamano ?? 0,
+  };
+}
+
 export function existenciaFromApi(dto: ExistenciaResponse): ExistenciaProducto {
   return {
     productoId:    dto.productoId,
@@ -60,18 +93,6 @@ export function existenciaFromApi(dto: ExistenciaResponse): ExistenciaProducto {
     stockDisponible: dto.stockDisponible,
     stockMinimo:   dto.stockMinimo,
     bajoMinimo:    dto.bajoMinimo,
-  };
-}
-
-export function entradaToRequest(data: EntradaMovimientoData): EntradaRequest {
-  return {
-    productoId:      data.productoId,
-    cantidad:        data.cantidad,
-    precioUnitario:  data.precioUnitario,
-    facturaId:       data.facturaId,
-    proveedorNit:    data.proveedorNit,
-    gilId:           data.gilId,
-    conciliacionId:  data.conciliacionId,
   };
 }
 
@@ -105,9 +126,10 @@ export function liberacionToRequest(data: LiberacionMovimientoData): LiberacionR
 
 export function ajusteToRequest(data: AjusteMovimientoData): AjusteRequest {
   return {
-    productoId: data.producto,
+    productoId:    data.producto,
     cantidadNueva: data.cantidadNueva,
-    motivo: data.motivo,
-    responsableId: data.responsableId,
+    motivo:        data.motivo,
+    autorizado:    data.autorizado,
+    referenciaId:  data.referenciaId ?? null,
   };
 }

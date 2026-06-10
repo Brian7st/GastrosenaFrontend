@@ -660,3 +660,8 @@ textarea.form-control {
     }
   }
 }
+
+/* Fila del typeahead de contrato (cascada VLOOKUP) */
+.contrato-typeahead-row {
+  margin-bottom: var(--space-4, 1rem);
+}

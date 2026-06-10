@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
+import { RequisicionesService } from '../../../data-access/services/requisiciones.service';
 
 @Component({
   selector: 'restaurant-requisiciones-despacho',
@@ -14,14 +15,21 @@ import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
 export class RequisicionesDespachoComponent implements OnInit {
   private router  = inject(Router);
   private route   = inject(ActivatedRoute);
+  private service = inject(RequisicionesService);
   readonly facade = inject(RequisicionesFacade);
 
   requisicionId       = '';
-  economoSeleccionado = signal('Carlos Rodríguez');
+  // Identificador del ecónomo que despacha (documento o ID). Texto libre,
+  // como la firma del vocero — sin lista hardcodeada.
+  economoId           = signal('');
+  procesando          = signal(false);
+  error               = signal<string | null>(null);
   requisicion         = this.facade.requisicionSeleccionada;
   loading             = this.facade.loading;
 
-  readonly econoOpciones = ['Carlos Rodríguez', 'Marta Lucía Paz', 'Jorge Iván Tobón'];
+  puedeDespachar = computed(() =>
+    this.economoId().trim().length > 0 && !this.procesando()
+  );
 
   ngOnInit(): void {
     this.requisicionId = this.route.snapshot.paramMap.get('id') ?? '';
@@ -33,14 +41,25 @@ export class RequisicionesDespachoComponent implements OnInit {
   }
 
   onEconomo(event: Event): void {
-    const val = (event.target as HTMLSelectElement).value;
-    this.economoSeleccionado.set(val);
+    this.economoId.set((event.target as HTMLInputElement).value);
   }
 
   finalizarEntrega(): void {
-    if (!this.requisicionId || this.loading()) return;
-    this.facade.despacharRequisicion(this.requisicionId, this.economoSeleccionado());
-    this.router.navigate(['/app/inventario/requisiciones']);
+    if (!this.requisicionId || !this.puedeDespachar()) return;
+    this.procesando.set(true);
+    this.error.set(null);
+
+    this.service.despacharRequisicion(this.requisicionId, this.economoId().trim()).subscribe({
+      next: () => {
+        this.facade.cargarRequisicion(this.requisicionId);
+        this.router.navigate(['/app/inventario/requisiciones']);
+      },
+      error: (err) => {
+        this.procesando.set(false);
+        const detalle = (err?.error?.detail as string | undefined) ?? '';
+        this.error.set(detalle || 'No se pudo registrar el despacho. Intentá nuevamente.');
+      },
+    });
   }
 
   close(): void {
