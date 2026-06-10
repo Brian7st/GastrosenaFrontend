@@ -1,13 +1,9 @@
 <div class="caja-page">
   <div class="caja-page__header">
     <restaurant-page-header
-            title="Módulo de Facturación"
+            title="Gestión de Caja"
             subtitle="Panel de control para facturación y procesamiento de pagos"
     ></restaurant-page-header>
-
-    <div class="badge-container">
-      <span class="badge">Instructor</span>
-    </div>
   </div>
 
   <div class="alert alert-danger mt-4" *ngIf="!facade.isCajaAbierta()" style="margin: 0 var(--space-6) var(--space-6);">

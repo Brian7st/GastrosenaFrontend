@@ -16,8 +16,8 @@ export class PedidosCategoriesComponent {
 
   categories = [
     { id: 'all', name: 'Todo', icon: 'layout-grid' },
-    { id: 'entrada', name: 'Entradas', icon: 'salad' },
-    { id: 'plato_fuerte', name: 'Plato Fuerte', icon: 'beef' },
+    { id: 'entrada', name: 'Entradas', icon: 'clipboard-list' },
+    { id: 'plato_fuerte', name: 'Plato Fuerte', icon: 'utensils' },
     { id: 'postre', name: 'Postres', icon: 'cake' },
     { id: 'bebidas', name: 'Bebidas', icon: 'coffee' },
   ];
