@@ -7,6 +7,7 @@ import { ContratosFacade } from '../../../data-access/contratos.facade';
 import { BienFormComponent } from '../../../ui/modals/bien-form/bien-form.component';
 import { BienImportModalComponent, BienImportPayload } from '../../modals/bien-import/bien-import.component';
 import { ContratoImportModalComponent, ContratoImportPayload } from '../../modals/contrato-import/contrato-import.component';
+import { ContratoDetalleComponent } from '../../modals/contrato-detalle/contrato-detalle.component';
 import { Bien, BienFormDto, EstadoBien, BienFiltros } from '../../../models/inventario.model';
 import { EstadoContrato } from '../../../models/contrato.model';
 import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
@@ -27,6 +28,7 @@ type VistaGestion = 'bienes' | 'contratos';
     BienFormComponent,
     BienImportModalComponent,
     ContratoImportModalComponent,
+    ContratoDetalleComponent,
     EmptyStateComponent,
     ConfirmarCierreContratoModalComponent,
   ],
@@ -36,7 +38,7 @@ type VistaGestion = 'bienes' | 'contratos';
 })
 export class BienesListPageComponent implements OnInit {
   private facade = inject(InventarioFacade);
-  private contratosFacade = inject(ContratosFacade);
+  readonly contratosFacade = inject(ContratosFacade);
   private router = inject(Router);
 
   // State signals
@@ -55,6 +57,7 @@ export class BienesListPageComponent implements OnInit {
   feedbackCierre = signal<string | null>(null);
   /** ID del contrato pendiente de confirmación de cierre. */
   private _contratoACerrarId = signal<string | null>(null);
+  showDetalleContratoModal = signal(false);
   /** Carga lazy: los contratos solo se piden la primera vez que se abre la vista. */
   private contratosCargados = signal(false);
 
@@ -82,7 +85,8 @@ export class BienesListPageComponent implements OnInit {
 
   constructor() {
     // Cuando el cierre de contrato resuelve (HTTP async), el facade setea
-    // ultimoCierre y acá mostramos el conteo de bienes desactivados.
+    // ultimoCierre: mostramos el conteo de bienes desactivados y refrescamos
+    // la lista (cerrar desactiva los bienes del contrato).
     effect(() => {
       const resultado = this.contratosFacade.ultimoCierre();
       if (resultado !== null) {
@@ -90,6 +94,15 @@ export class BienesListPageComponent implements OnInit {
         this.feedbackCierre.set(
           n === 1 ? '1 bien desactivado' : `${n} bienes desactivados`,
         );
+        this.facade.cargarBienes();
+      }
+    });
+
+    // Al importar un contrato con éxito se crean/actualizan bienes del catálogo;
+    // refrescamos la lista de bienes en el acto, sin recargar la página.
+    effect(() => {
+      if (this.contratosFacade.ultimaImportacion()) {
+        this.facade.cargarBienes();
       }
     });
   }
@@ -110,6 +123,11 @@ export class BienesListPageComponent implements OnInit {
       this.contratosFacade.cargarContratos();
       this.contratosCargados.set(true);
     }
+  }
+
+  onVerDetalleContrato(id: string): void {
+    this.contratosFacade.cargarContratoById(id);
+    this.showDetalleContratoModal.set(true);
   }
 
   onCerrarContrato(id: string): void {

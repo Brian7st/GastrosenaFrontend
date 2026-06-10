@@ -301,6 +301,9 @@
           </td>
           <td class="text-center">
             <div class="actions-row">
+              <button class="action-icon" (click)="onVerDetalleContrato(contrato.id)" title="Ver detalle">
+                <span class="material-symbols-outlined">visibility</span>
+              </button>
               @if (contrato.estado === 'VIGENTE') {
                 <button class="action-icon action-icon--warning" (click)="onCerrarContrato(contrato.id)" title="Cerrar contrato">
                   <span class="material-symbols-outlined">lock</span>
@@ -356,3 +359,11 @@
   (confirmed)="onConfirmarCierre()"
   (cancelled)="onCancelarCierre()"
 />
+
+@if (showDetalleContratoModal()) {
+<restaurant-contrato-detalle
+  [contrato]="contratosFacade.contratoSeleccionado()"
+  [loading]="contratosFacade.loading()"
+  (cerrar)="showDetalleContratoModal.set(false)"
+></restaurant-contrato-detalle>
+}
