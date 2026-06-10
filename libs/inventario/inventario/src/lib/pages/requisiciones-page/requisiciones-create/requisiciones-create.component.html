@@ -1,6 +1,15 @@
 <div class="page-container">
 
-  <!-- ═══ CONTEXT FORM (reemplaza la context-bar estática) ════════════════ -->
+  <!-- ═══ HEADER ══════════════════════════════════════════════════════════ -->
+  <div class="create-header">
+    <div style="display:flex;justify-content:flex-start;margin-bottom:var(--space-6)">
+      <inventario-back-button (clicked)="goBack()"></inventario-back-button>
+    </div>
+    <h1 class="page-title">Nueva Requisición de Insumos</h1>
+    <p class="page-subtitle">Seleccione los productos necesarios para su práctica formativa</p>
+  </div>
+
+  <!-- ═══ CONTEXT FORM (debajo del título) ═════════════════════════════════ -->
   <form [formGroup]="contextForm" class="context-bar">
     <div class="context-bar__item">
       <lucide-icon name="hash" [size]="16"></lucide-icon>
@@ -10,8 +19,8 @@
     <div class="context-bar__divider"></div>
     <div class="context-bar__item">
       <lucide-icon name="user" [size]="16"></lucide-icon>
-      <input class="context-bar__input" formControlName="instructorId"
-             placeholder="ID Instructor"/>
+      <input class="context-bar__input" formControlName="instructorNombre"
+             placeholder="Nombre del instructor"/>
     </div>
     <div class="context-bar__divider"></div>
     <div class="context-bar__item">
@@ -24,15 +33,6 @@
       <input class="context-bar__input" type="time" formControlName="horaSesion"/>
     </div>
   </form>
-
-  <!-- ═══ HEADER ══════════════════════════════════════════════════════════ -->
-  <div class="create-header">
-    <div style="display:flex;justify-content:flex-start;margin-bottom:var(--space-6)">
-      <inventario-back-button (clicked)="goBack()"></inventario-back-button>
-    </div>
-    <h1 class="page-title">Nueva Requisición de Insumos</h1>
-    <p class="page-subtitle">Seleccione los productos necesarios para su práctica formativa</p>
-  </div>
 
   <!-- ═══ CATEGORY ACCORDIONS (dinámico) ══════════════════════════════════ -->
   <div class="category-list">
@@ -88,12 +88,18 @@
                         <p class="product-card__unit" style="font-family:monospace;font-size:0.7rem;opacity:0.6">
                           {{ bien.codigoSena }}
                         </p>
+                        <p class="product-card__stock">
+                          <lucide-icon name="layers" [size]="13"></lucide-icon>
+                          Stock actual:
+                          <strong>{{ bien.stockActual | number:'1.0-2' }} {{ bien.unidadMedida }}</strong>
+                        </p>
                         <div class="product-card__qty-row">
                           <div class="product-card__qty-controls">
                             <button class="qty-btn qty-btn--minus" type="button"
                                     (click)="decrementar(bien)"
                                     [disabled]="draft.getCantidad(bien.codigoSena) === 0">-</button>
                             <input class="qty-input" type="number" min="0"
+                                   [step]="pasoDe(bien)"
                                    [value]="draft.getCantidad(bien.codigoSena)"
                                    (input)="onCantidadInput(bien, $event)"/>
                             <button class="qty-btn qty-btn--plus" type="button"

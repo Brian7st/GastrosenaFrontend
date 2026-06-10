@@ -109,10 +109,12 @@ export class RequisicionesService {
       );
   }
 
-  /** POST /legalization/requisiciones/{id}/exportar — genera el .docx del acta */
-  exportarRequisicion(id: string): Observable<{ exportId: string }> {
+  /** POST /legalization/requisiciones/{id}/exportar — genera el soporte (.docx) y
+   *  devuelve el acuse con la URL de descarga (urlDescarga) cuando está disponible. */
+  exportarRequisicion(id: string): Observable<{ exportId: string; estado: string; urlDescarga: string | null }> {
     return this.http
-      .post<{ exportId: string }>(`${API}/legalization/requisiciones/${id}/exportar`, {})
+      .post<{ exportId: string; estado: string; urlDescarga: string | null }>(
+        `${API}/legalization/requisiciones/${id}/exportar`, {})
       .pipe(catchError(err => throwError(() => err)));
   }
 
