@@ -150,6 +150,20 @@ tbody .table-row td {
   &:nth-child(8) { width: 7rem;   white-space: nowrap; }  /* Acciones   */
 }
 
+/* La tabla de Contratos tiene 6 columnas (no 8). Sin estos anchos propios,
+   heredaba los de la tabla de Bienes y Estado/Acciones se solapaban. */
+.tabla-contratos {
+  thead th,
+  tbody .table-row td {
+    &:nth-child(1) { width: 9rem;  white-space: nowrap; }  /* N.º Contrato */
+    &:nth-child(2) { width: auto;  min-width: 16rem;     }  /* Descripción  */
+    &:nth-child(3) { width: 6rem;  white-space: nowrap; }  /* Vigencia     */
+    &:nth-child(4) { width: 5rem;  white-space: nowrap; }  /* Ítems        */
+    &:nth-child(5) { width: 9rem;  white-space: nowrap; }  /* Estado       */
+    &:nth-child(6) { width: 7rem;  white-space: nowrap; }  /* Acciones     */
+  }
+}
+
 /* La descripción puede ocupar hasta dos líneas antes de cortar con elipsis */
 .bien-desc {
   display: -webkit-box;

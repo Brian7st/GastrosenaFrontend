@@ -76,6 +76,9 @@ export class ContratoDetalleComponent {
 
   formatPorcentaje(value: number | null): string {
     if (value === null) return '—';
-    return `${(value * 100).toFixed(0)}%`;
+    // El IVA puede venir como fracción (0.19) o como porcentaje (19). Normalizamos:
+    // si es <= 1 lo tratamos como fracción y multiplicamos; si no, ya es porcentaje.
+    const pct = value <= 1 ? value * 100 : value;
+    return `${pct.toFixed(0)}%`;
   }
 }
