@@ -123,7 +123,7 @@
     .timeline-step__icon {
       background: var(--color-primario);
       color: #fff;
-      box-shadow: 0 0 0 4px rgba(57, 169, 0, 0.15);
+      box-shadow: 0 0 0 4px var(--color-estado-listo-bg-soft);
     }
     .timeline-step__label { color: var(--color-primario); }
     .timeline-step__connector { background: var(--color-superficie-contenedor); }
