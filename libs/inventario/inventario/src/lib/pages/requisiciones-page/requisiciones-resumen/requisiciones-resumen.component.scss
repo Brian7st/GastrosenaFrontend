@@ -305,6 +305,20 @@
   margin: 0;
 }
 
+.modal-footer__error-slot {
+  // Espacio reservado siempre presente: aparezca o no el error, los botones no se mueven.
+  min-height: 1.25rem;
+  display: flex;
+  align-items: flex-start;
+}
+
+.modal-footer__error {
+  color: var(--color-danger, #ef4444);
+  font-size: 0.85rem;
+  line-height: 1.25rem;
+  margin: 0;
+}
+
 .modal-footer__actions {
   display: flex;
   flex-direction: column;
