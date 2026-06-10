@@ -97,6 +97,8 @@ export function bienFormToRequest(form: BienFormDto): CrearProductoRequest {
 
 export function bienFormToUpdateRequest(form: BienFormDto): ActualizarProductoRequest {
   return {
+    // El backend solo lo asigna si el producto aún no tiene código; si ya tiene, lo ignora.
+    codigoSena: form.codigoSena || null,
     codigoProveedor: form.codigoProveedor,
     descripcion: form.descripcion,
     categoria: form.categoria,

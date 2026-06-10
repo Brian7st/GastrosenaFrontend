@@ -30,8 +30,39 @@ export class BienFormComponent implements OnInit {
 
   readonly CATEGORIAS = CATEGORIAS_BIEN;
 
+  /**
+   * Categorías a renderizar. Igual que con la UM, los bienes de contrato/import
+   * pueden traer una categoría que no está en la lista canónica; si el valor
+   * guardado no figura, lo agregamos para que el select pueda mostrarlo.
+   */
+  categorias: string[] = [...CATEGORIAS_BIEN];
+
+  /** Opciones canónicas de unidad de medida. */
+  private readonly UM_BASE: ReadonlyArray<{ value: string; label: string }> = [
+    { value: 'UND',  label: 'UND – Unidad' },
+    { value: 'KG',   label: 'KG – Kilogramo' },
+    { value: 'L',    label: 'L – Litro' },
+    { value: 'M',    label: 'M – Metro' },
+    { value: 'SET',  label: 'SET – Set' },
+    { value: 'CAJA', label: 'CAJA – Caja' },
+  ];
+
+  /**
+   * Opciones de UM a renderizar. En edición, los bienes nacidos de contrato o
+   * de imports traen la UM como texto libre (ej. "Kilogramo") que no coincide
+   * con los valores canónicos; sin una opción que matchee, el select queda en
+   * blanco. Por eso, si el valor guardado no está en la lista, lo agregamos.
+   */
+  unidadesMedida: { value: string; label: string }[] = [...this.UM_BASE];
+
   readonly isEdit = computed(() => this.mode === 'edit');
   readonly umBloqueada = computed(() => this.mode === 'edit' && !!this.bien?.tieneHistorial);
+
+  /**
+   * El código SENA es identidad inmutable: si el bien YA tiene uno, se bloquea.
+   * Si no tiene (ej. nació de un contrato sin código), se permite asignarlo al editar.
+   */
+  codigoSenaBloqueado = false;
 
   ngOnInit(): void {
     this.initForm();
@@ -41,6 +72,19 @@ export class BienFormComponent implements OnInit {
         vrlAdjudicado?: number | null;
         vrlAntes?: number | null;
       };
+
+      // Si la UM guardada no está entre las opciones canónicas, la sumamos para
+      // que el select pueda mostrarla (bienes de contrato/import con texto libre).
+      const um = bien.unidadMedida;
+      if (um && !this.unidadesMedida.some(o => o.value === um)) {
+        this.unidadesMedida = [{ value: um, label: um }, ...this.unidadesMedida];
+      }
+
+      // Misma tolerancia para la categoría guardada.
+      const cat = bien.categoria;
+      if (cat && !this.categorias.includes(cat)) {
+        this.categorias = [cat, ...this.categorias];
+      }
 
       this.form.patchValue({
         codigoSena:      bien.codigoSena,
@@ -54,8 +98,15 @@ export class BienFormComponent implements OnInit {
         stockMinimo:     bien.stockMinimo ?? null,
       });
 
-      // En edicion el codigo SENA es inmutable - no se puede cambiar
-      this.form.get('codigoSena')?.disable();
+      // El código SENA solo se bloquea si el bien ya tiene uno (inmutable).
+      // Si no tiene, queda editable y opcional para poder asignarlo.
+      this.codigoSenaBloqueado = !!bien.codigoSena;
+      if (this.codigoSenaBloqueado) {
+        this.form.get('codigoSena')?.disable();
+      } else {
+        this.form.get('codigoSena')?.clearValidators();
+        this.form.get('codigoSena')?.updateValueAndValidity();
+      }
       if (this.umBloqueada()) {
         this.form.get('unidadMedida')?.disable();
       }
