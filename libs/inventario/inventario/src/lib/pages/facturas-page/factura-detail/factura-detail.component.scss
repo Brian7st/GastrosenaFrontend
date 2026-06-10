@@ -792,7 +792,9 @@
 .gil-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 700px;
+  // Ancho suficiente para que la última columna (Observación + botón Resolver)
+  // no se colapse; si no entra, el wrapper hace scroll horizontal.
+  min-width: 1040px;
   font-size: 0.8125rem;
 
   th {
@@ -831,11 +833,12 @@
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  min-width: 14rem;
 }
 
 .gil-obs-input {
   flex: 1;
-  min-width: 0;
+  min-width: 7rem;
   background: var(--color-superficie-contenedor-bajo);
   border: none;
   border-radius: 0.5rem;
