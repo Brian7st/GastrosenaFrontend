@@ -7,6 +7,7 @@ import { ContratosFacade } from '../../../data-access/contratos.facade';
 import { BienFormComponent } from '../../../ui/modals/bien-form/bien-form.component';
 import { BienImportModalComponent, BienImportPayload } from '../../modals/bien-import/bien-import.component';
 import { ContratoImportModalComponent, ContratoImportPayload } from '../../modals/contrato-import/contrato-import.component';
+import { ContratoDetalleComponent } from '../../modals/contrato-detalle/contrato-detalle.component';
 import { Bien, BienFormDto, EstadoBien, BienFiltros } from '../../../models/inventario.model';
 import { EstadoContrato } from '../../../models/contrato.model';
 import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
@@ -26,6 +27,7 @@ type VistaGestion = 'bienes' | 'contratos';
     BienFormComponent,
     BienImportModalComponent,
     ContratoImportModalComponent,
+    ContratoDetalleComponent,
     EmptyStateComponent,
   ],
   templateUrl: './bienes-list.component.html',
@@ -34,7 +36,7 @@ type VistaGestion = 'bienes' | 'contratos';
 })
 export class BienesListPageComponent implements OnInit {
   private facade = inject(InventarioFacade);
-  private contratosFacade = inject(ContratosFacade);
+  readonly contratosFacade = inject(ContratosFacade);
   private router = inject(Router);
 
   // State signals
@@ -49,6 +51,7 @@ export class BienesListPageComponent implements OnInit {
   loadingContratos  = this.contratosFacade.loading;
   ultimaImportacion = this.contratosFacade.ultimaImportacion;
   showImportContratoModal = signal(false);
+  showDetalleContratoModal = signal(false);
   /** Carga lazy: los contratos solo se piden la primera vez que se abre la vista. */
   private contratosCargados = signal(false);
 
@@ -100,6 +103,11 @@ export class BienesListPageComponent implements OnInit {
       this.contratosFacade.cargarContratos();
       this.contratosCargados.set(true);
     }
+  }
+
+  onVerDetalleContrato(id: string): void {
+    this.contratosFacade.cargarContratoById(id);
+    this.showDetalleContratoModal.set(true);
   }
 
   onCerrarContrato(id: string): void {
