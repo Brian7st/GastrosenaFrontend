@@ -1,0 +1,22 @@
+import { createCjsPreset } from 'jest-preset-angular/presets';
+
+const presetConfig = createCjsPreset({
+  tsconfig: '<rootDir>/tsconfig.spec.json',
+  stringifyContentPathRegex: '\\.(html|svg)$',
+});
+
+export default {
+  displayName: 'inventario',
+  ...presetConfig,
+  setupFilesAfterFramework: ['<rootDir>/src/test-setup.ts'],
+  testEnvironment: 'jsdom',
+  moduleNameMapper: {
+    '@restaurant/inventario': '<rootDir>/src/index.ts',
+    '@restaurant/shared/ui': '<rootDir>/../../../libs/shared/ui/src/index.ts',
+    '@restaurant/shared/models': '<rootDir>/../../../libs/shared/models/src/index.ts',
+    '@restaurant/shared/util': '<rootDir>/../../../libs/shared/util/src/index.ts',
+    '@restaurant/shared/api': '<rootDir>/../../../libs/shared/api/src/index.ts',
+    '@restaurant/shared/state': '<rootDir>/../../../libs/shared/state/src/index.ts',
+    '@restaurant/shared/auth': '<rootDir>/../../../libs/shared/auth/src/index.ts',
+  },
+};
