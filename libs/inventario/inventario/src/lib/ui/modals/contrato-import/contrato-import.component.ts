@@ -147,7 +147,6 @@ export class ContratoImportModalComponent {
   onDescargarPlantilla(): void {
     const headers = [
       'refArticulo',
-      'codigoSena',
       'descripcion',
       'unidadMedida',
       'cantidad',
@@ -159,7 +158,6 @@ export class ContratoImportModalComponent {
     ];
     const sampleRow = [
       '1',
-      '',
       'Harina de trigo',
       'Kilogramo',
       '100',
