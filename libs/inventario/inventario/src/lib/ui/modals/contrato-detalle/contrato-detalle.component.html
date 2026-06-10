@@ -1,0 +1,111 @@
+<div class="modal-overlay" (click)="cerrar.emit()">
+  <div class="detalle-dialog" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+
+    <!-- Header -->
+    <div class="detalle-header">
+      <div class="detalle-header__info">
+        <h2 class="detalle-title">
+          @if (contrato) {
+            Contrato {{ contrato.numero }}
+          } @else {
+            Detalle de contrato
+          }
+        </h2>
+        @if (contrato) {
+          <p class="detalle-subtitle">Vigencia {{ contrato.vigencia }}</p>
+        }
+      </div>
+      <div class="detalle-header__actions">
+        @if (contrato) {
+          <span class="estado-badge" [ngClass]="getEstadoBadgeClass(contrato.estado)">
+            <span class="estado-dot"></span>
+            {{ contrato.estado }}
+          </span>
+        }
+        <button class="btn-close" (click)="cerrar.emit()" aria-label="Cerrar">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="detalle-body">
+
+      @if (loading && !contrato) {
+        <restaurant-loading-skeleton [rows]="6" [columns]="4"></restaurant-loading-skeleton>
+      } @else if (contrato) {
+
+        <!-- Metadata grid -->
+        <div class="meta-grid">
+          <div class="meta-field">
+            <span class="meta-label">Descripción</span>
+            <span class="meta-value">{{ contrato.descripcion ?? '—' }}</span>
+          </div>
+          <div class="meta-field">
+            <span class="meta-label">Fecha inicio</span>
+            <span class="meta-value">{{ contrato.fechaInicio ?? '—' }}</span>
+          </div>
+          <div class="meta-field">
+            <span class="meta-label">Fecha fin</span>
+            <span class="meta-value">{{ contrato.fechaFin ?? '—' }}</span>
+          </div>
+          <div class="meta-field">
+            <span class="meta-label">Total ítems</span>
+            <span class="meta-value">{{ contrato.items.length }}</span>
+          </div>
+        </div>
+
+        <!-- Items table -->
+        <div class="items-section">
+          <div class="items-section__header">
+            <span class="material-symbols-outlined">receipt_long</span>
+            <h3 class="items-section__title">Ítems adjudicados</h3>
+            <span class="items-count">{{ contrato.items.length }}</span>
+          </div>
+
+          <div class="table-wrap">
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th>Ref. Artículo</th>
+                  <th>Descripción</th>
+                  <th class="text-center">Unidad</th>
+                  <th class="text-right">Cantidad</th>
+                  <th class="text-right">Vlr. Adjudicado</th>
+                  <th class="text-right">Vlr. Antes</th>
+                  <th class="text-right">IVA</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of contrato.items; track item.refArticulo) {
+                  <tr>
+                    <td><span class="code-mono">{{ item.refArticulo }}</span></td>
+                    <td><span class="item-desc">{{ item.descripcion }}</span></td>
+                    <td class="text-center">{{ item.unidadMedida ?? '—' }}</td>
+                    <td class="text-right">{{ item.cantidad ?? '—' }}</td>
+                    <td class="text-right">{{ formatCurrency(item.vrlAdjudicado) }}</td>
+                    <td class="text-right">{{ formatCurrency(item.vrlAntes) }}</td>
+                    <td class="text-right">{{ formatPorcentaje(item.ivaPorcentaje) }}</td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="7" class="empty-row">Sin ítems registrados</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="detalle-footer">
+      <restaurant-button variant="surface" (click)="cerrar.emit()">
+        Cerrar
+      </restaurant-button>
+    </div>
+
+  </div>
+</div>
