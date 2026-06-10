@@ -1,6 +1,10 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Output, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ContratoImportRow, RegistrarContratoData } from '../../../models/contrato.model';
+import { ContratoCabecera, ContratoImportRow, RegistrarContratoData } from '../../../models/contrato.model';
+
+export type ContratoImportPayload =
+  | { tipo: 'csv'; data: RegistrarContratoData }
+  | { tipo: 'excel'; archivo: File; cabecera: ContratoCabecera };
 
 @Component({
   selector: 'restaurant-contrato-import',
@@ -12,7 +16,7 @@ import { ContratoImportRow, RegistrarContratoData } from '../../../models/contra
 })
 export class ContratoImportModalComponent {
   @Output() cancelar = new EventEmitter<void>();
-  @Output() importar = new EventEmitter<RegistrarContratoData>();
+  @Output() importar = new EventEmitter<ContratoImportPayload>();
 
   // ── Cabecera del contrato ──────────────────────────────────────────────────
   numero       = signal<string>('');
@@ -21,9 +25,10 @@ export class ContratoImportModalComponent {
   fechaInicio  = signal<string>('');
   fechaFin     = signal<string>('');
 
-  // ── Archivo de ítems (cols B-K) ────────────────────────────────────────────
+  // ── Archivo de ítems ────────────────────────────────────────────────────────
   isDragging    = signal(false);
   file          = signal<File | null>(null);
+  isExcel       = signal(false);
   isProcessing  = signal(false);
   previewData   = signal<ContratoImportRow[]>([]);
   hasErrors     = signal(false);
@@ -32,20 +37,19 @@ export class ContratoImportModalComponent {
   readonly INSTRUCCIONES = [
     'Complete el número y la vigencia del contrato; descargue la plantilla y cargue los ítems.',
     'Ref. Artículo, Descripción y Vlr. Adjudicado son obligatorios por ítem. El código SENA es opcional.',
-    'Si algún ítem tiene errores, se rechaza el lote completo. Corrija antes de importar.',
+    'Para Excel (.xlsx/.xls): el archivo debe respetar las columnas de la plantilla.',
+    'Para CSV: si algún ítem tiene errores, se rechaza el lote completo. Corrija antes de importar.',
     'Al importar se crean o actualizan los bienes del catálogo cruzando por descripción.',
   ];
 
   /** La cabecera es válida cuando hay número y un año de vigencia positivo. */
   readonly cabeceraValida = computed(() => this.numero().trim().length > 0 && this.vigencia() > 0);
 
-  readonly importDeshabilitado = computed(() =>
-    !this.cabeceraValida() ||
-    !this.file() ||
-    this.isProcessing() ||
-    this.previewData().length === 0 ||
-    this.hasErrors(),
-  );
+  readonly importDeshabilitado = computed(() => {
+    if (!this.cabeceraValida() || !this.file() || this.isProcessing()) return true;
+    if (this.isExcel()) return false; // Excel: no preview needed
+    return this.previewData().length === 0 || this.hasErrors();
+  });
 
   onNumero(value: string): void { this.numero.set(value); }
   onDescripcion(value: string): void { this.descripcion.set(value); }
@@ -77,6 +81,7 @@ export class ContratoImportModalComponent {
 
   removeFile(): void {
     this.file.set(null);
+    this.isExcel.set(false);
     this.previewData.set([]);
     this.hasErrors.set(false);
     this.statusMessage.set(null);
@@ -98,6 +103,24 @@ export class ContratoImportModalComponent {
   onProcesar(): void {
     if (this.importDeshabilitado()) return;
 
+    const archivo = this.file();
+    if (!archivo) return;
+
+    const fileName = archivo.name.toLowerCase();
+
+    if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+      const cabecera: ContratoCabecera = {
+        numero: this.numero().trim(),
+        vigencia: this.vigencia(),
+        descripcion: this.descripcion().trim() || null,
+        fechaInicio: this.fechaInicio() || null,
+        fechaFin: this.fechaFin() || null,
+      };
+      this.importar.emit({ tipo: 'excel', archivo, cabecera });
+      return;
+    }
+
+    // CSV path — same as before
     const validos = this.previewData().filter(r => !r.error);
     const data: RegistrarContratoData = {
       numero: this.numero().trim(),
@@ -118,7 +141,7 @@ export class ContratoImportModalComponent {
         ivaPorcentaje: r.ivaPorcentaje,
       })),
     };
-    this.importar.emit(data);
+    this.importar.emit({ tipo: 'csv', data });
   }
 
   onDescargarPlantilla(): void {
@@ -135,16 +158,16 @@ export class ContratoImportModalComponent {
       'ivaPorcentaje',
     ];
     const sampleRow = [
-      '1',                          // refArticulo
-      '',                           // codigoSena (opcional — no viene en el contrato)
-      'Harina de trigo',            // descripcion
-      'Kilogramo',                  // unidadMedida
-      '100',                        // cantidad
-      'PROV-900',                   // codigoProveedor
-      '5200.00',                    // valorEstimado
-      '5000.00',                    // vrlAdjudicado
-      '4202.00',                    // vrlAntes
-      '0.19',                       // ivaPorcentaje (0, 0.05 o 0.19)
+      '1',
+      '',
+      'Harina de trigo',
+      'Kilogramo',
+      '100',
+      'PROV-900',
+      '5200.00',
+      '5000.00',
+      '4202.00',
+      '0.19',
     ];
 
     const csvLines = [
@@ -164,6 +187,7 @@ export class ContratoImportModalComponent {
   }
 
   private async processFile(f: File): Promise<void> {
+    this.isExcel.set(false);
     this.file.set(f);
     this.isProcessing.set(true);
     this.previewData.set([]);
@@ -171,8 +195,16 @@ export class ContratoImportModalComponent {
     this.statusMessage.set(null);
 
     const fileName = f.name.toLowerCase();
+
+    if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+      this.isExcel.set(true);
+      this.isProcessing.set(false);
+      return;
+    }
+
     if (!fileName.endsWith('.csv')) {
-      this.statusMessage.set('Formato no soportado. Suba un archivo CSV generado desde la plantilla.');
+      this.statusMessage.set('Formato no soportado. Suba un archivo .xlsx, .xls o .csv.');
+      this.file.set(null);
       this.isProcessing.set(false);
       return;
     }

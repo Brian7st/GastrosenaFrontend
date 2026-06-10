@@ -50,10 +50,10 @@
               <span class="material-symbols-outlined">upload_file</span>
             </div>
             <h3>Arrastre su archivo aquí</h3>
-            <p>Archivos <strong>.csv</strong> generados desde la plantilla.</p>
+            <p>Archivos <strong>.xlsx</strong>, <strong>.xls</strong> o <strong>.csv</strong> generados desde la plantilla.</p>
             <label class="btn-select-file">
               Seleccionar Archivo
-              <input type="file" accept=".csv" (change)="onFileSelected($event)" />
+              <input type="file" accept=".xlsx,.xls,.csv" (change)="onFileSelected($event)" />
             </label>
           </div>
           } @else {
