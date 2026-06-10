@@ -22,6 +22,44 @@ export class ContratoDetalleComponent {
   @Input() loading = false;
   @Output() cerrar = new EventEmitter<void>();
 
+  /** Paginación client-side de la tabla de ítems (el backend trae el contrato completo). */
+  readonly pageSize = 10;
+  pagina = 0;
+
+  get totalItems(): number {
+    return this.contrato?.items.length ?? 0;
+  }
+
+  get totalPaginas(): number {
+    return Math.max(1, Math.ceil(this.totalItems / this.pageSize));
+  }
+
+  get itemsPagina() {
+    const items = this.contrato?.items ?? [];
+    const inicio = this.pagina * this.pageSize;
+    return items.slice(inicio, inicio + this.pageSize);
+  }
+
+  get rangoDesde(): number {
+    return this.totalItems === 0 ? 0 : this.pagina * this.pageSize + 1;
+  }
+
+  get rangoHasta(): number {
+    return Math.min((this.pagina + 1) * this.pageSize, this.totalItems);
+  }
+
+  irAPagina(p: number): void {
+    if (p >= 0 && p < this.totalPaginas) this.pagina = p;
+  }
+
+  paginaAnterior(): void {
+    this.irAPagina(this.pagina - 1);
+  }
+
+  paginaSiguiente(): void {
+    this.irAPagina(this.pagina + 1);
+  }
+
   getEstadoBadgeClass(estado: EstadoContrato): string {
     return estado === 'VIGENTE' ? 'badge--vigente' : 'badge--cerrado';
   }

@@ -77,7 +77,7 @@
                 </tr>
               </thead>
               <tbody>
-                @for (item of contrato.items; track item.refArticulo) {
+                @for (item of itemsPagina; track item.refArticulo) {
                   <tr>
                     <td><span class="code-mono">{{ item.refArticulo }}</span></td>
                     <td><span class="item-desc">{{ item.descripcion }}</span></td>
@@ -95,6 +95,31 @@
               </tbody>
             </table>
           </div>
+
+          @if (totalPaginas > 1) {
+            <div class="items-paginacion">
+              <span class="items-paginacion__info">
+                {{ rangoDesde }}–{{ rangoHasta }} de {{ totalItems }}
+              </span>
+              <div class="items-paginacion__controles">
+                <restaurant-button
+                  variant="surface"
+                  [disabled]="pagina === 0"
+                  (click)="paginaAnterior()">
+                  Anterior
+                </restaurant-button>
+                <span class="items-paginacion__pagina">
+                  {{ pagina + 1 }} / {{ totalPaginas }}
+                </span>
+                <restaurant-button
+                  variant="surface"
+                  [disabled]="pagina >= totalPaginas - 1"
+                  (click)="paginaSiguiente()">
+                  Siguiente
+                </restaurant-button>
+              </div>
+            </div>
+          }
         </div>
 
       }
