@@ -49,10 +49,6 @@ export class GilSolicitudDetailPageComponent implements OnInit {
     this.router.navigate(['/app/inventario/solicitudes-gil', this.gilId, 'editar']);
   }
 
-  onDescargarPDF(): void {
-    // TODO: PDF export — tech debt
-  }
-
   onEnviarAprobacion(): void {
     this.solicitudesFacade.cambiarEstado(this.gilId, 'EMITIDO');
   }
