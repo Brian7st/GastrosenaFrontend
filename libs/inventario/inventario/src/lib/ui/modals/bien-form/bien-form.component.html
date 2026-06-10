@@ -92,12 +92,9 @@
             <select class="field-select" formControlName="unidadMedida"
                     [class.field-input--disabled]="umBloqueada()">
               <option value="" disabled>Seleccionar UM</option>
-              <option value="UND">UND – Unidad</option>
-              <option value="KG">KG – Kilogramo</option>
-              <option value="L">L – Litro</option>
-              <option value="M">M – Metro</option>
-              <option value="SET">SET – Set</option>
-              <option value="CAJA">CAJA – Caja</option>
+              @for (um of unidadesMedida; track um.value) {
+                <option [value]="um.value">{{ um.label }}</option>
+              }
             </select>
           </div>
         </div>

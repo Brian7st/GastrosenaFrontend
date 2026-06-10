@@ -30,6 +30,24 @@ export class BienFormComponent implements OnInit {
 
   readonly CATEGORIAS = CATEGORIAS_BIEN;
 
+  /** Opciones canónicas de unidad de medida. */
+  private readonly UM_BASE: ReadonlyArray<{ value: string; label: string }> = [
+    { value: 'UND',  label: 'UND – Unidad' },
+    { value: 'KG',   label: 'KG – Kilogramo' },
+    { value: 'L',    label: 'L – Litro' },
+    { value: 'M',    label: 'M – Metro' },
+    { value: 'SET',  label: 'SET – Set' },
+    { value: 'CAJA', label: 'CAJA – Caja' },
+  ];
+
+  /**
+   * Opciones de UM a renderizar. En edición, los bienes nacidos de contrato o
+   * de imports traen la UM como texto libre (ej. "Kilogramo") que no coincide
+   * con los valores canónicos; sin una opción que matchee, el select queda en
+   * blanco. Por eso, si el valor guardado no está en la lista, lo agregamos.
+   */
+  unidadesMedida: { value: string; label: string }[] = [...this.UM_BASE];
+
   readonly isEdit = computed(() => this.mode === 'edit');
   readonly umBloqueada = computed(() => this.mode === 'edit' && !!this.bien?.tieneHistorial);
 
@@ -41,6 +59,13 @@ export class BienFormComponent implements OnInit {
         vrlAdjudicado?: number | null;
         vrlAntes?: number | null;
       };
+
+      // Si la UM guardada no está entre las opciones canónicas, la sumamos para
+      // que el select pueda mostrarla (bienes de contrato/import con texto libre).
+      const um = bien.unidadMedida;
+      if (um && !this.unidadesMedida.some(o => o.value === um)) {
+        this.unidadesMedida = [{ value: um, label: um }, ...this.unidadesMedida];
+      }
 
       this.form.patchValue({
         codigoSena:      bien.codigoSena,
