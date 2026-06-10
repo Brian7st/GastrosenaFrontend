@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ButtonComponent, DataTableComponent, KpiCardComponent, LoadingSkeletonComponent } from '@restaurant/shared/ui';
@@ -73,6 +73,16 @@ export class BienesListPageComponent implements OnInit {
   showImportModal = signal(false);
   formMode = signal<'create' | 'edit'>('create');
   selectedBien = signal<Bien | undefined>(undefined);
+
+  constructor() {
+    // Al importar un contrato con éxito se crean/actualizan bienes del catálogo;
+    // refrescamos la lista de bienes en el acto, sin recargar la página.
+    effect(() => {
+      if (this.contratosFacade.ultimaImportacion()) {
+        this.facade.cargarBienes();
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.facade.loadAll();
