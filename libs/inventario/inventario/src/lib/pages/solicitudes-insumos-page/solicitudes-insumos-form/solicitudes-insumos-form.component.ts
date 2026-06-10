@@ -85,7 +85,7 @@ export class SolicitudesInsumosFormComponent implements OnInit {
     if (!this.programaId().trim())
       e['programaId'] = 'El programa de formación es requerido.';
     if (!this.instructorId().trim())
-      e['instructorId'] = 'El ID del instructor es requerido.';
+      e['instructorId'] = 'El nombre del instructor es obligatorio.';
     if (this.items().length === 0)
       e['items'] = 'Debe agregar al menos un ítem.';
     return e;
