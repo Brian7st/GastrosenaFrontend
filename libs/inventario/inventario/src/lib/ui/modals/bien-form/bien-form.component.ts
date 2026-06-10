@@ -30,6 +30,13 @@ export class BienFormComponent implements OnInit {
 
   readonly CATEGORIAS = CATEGORIAS_BIEN;
 
+  /**
+   * Categorías a renderizar. Igual que con la UM, los bienes de contrato/import
+   * pueden traer una categoría que no está en la lista canónica; si el valor
+   * guardado no figura, lo agregamos para que el select pueda mostrarlo.
+   */
+  categorias: string[] = [...CATEGORIAS_BIEN];
+
   /** Opciones canónicas de unidad de medida. */
   private readonly UM_BASE: ReadonlyArray<{ value: string; label: string }> = [
     { value: 'UND',  label: 'UND – Unidad' },
@@ -65,6 +72,12 @@ export class BienFormComponent implements OnInit {
       const um = bien.unidadMedida;
       if (um && !this.unidadesMedida.some(o => o.value === um)) {
         this.unidadesMedida = [{ value: um, label: um }, ...this.unidadesMedida];
+      }
+
+      // Misma tolerancia para la categoría guardada.
+      const cat = bien.categoria;
+      if (cat && !this.categorias.includes(cat)) {
+        this.categorias = [cat, ...this.categorias];
       }
 
       this.form.patchValue({

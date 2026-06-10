@@ -73,7 +73,7 @@
             <select class="field-select" formControlName="categoria"
                     [class.field-input--error]="hasError('categoria')">
               <option value="" disabled>Seleccione una categoría</option>
-              @for (cat of CATEGORIAS; track cat) {
+              @for (cat of categorias; track cat) {
 <option [value]="cat">{{ cat }}</option>
 }
             </select>
