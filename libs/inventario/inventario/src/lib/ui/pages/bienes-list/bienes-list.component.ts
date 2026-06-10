@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ButtonComponent, DataTableComponent, KpiCardComponent, LoadingSkeletonComponent } from '@restaurant/shared/ui';
@@ -80,6 +80,20 @@ export class BienesListPageComponent implements OnInit {
   formMode = signal<'create' | 'edit'>('create');
   selectedBien = signal<Bien | undefined>(undefined);
 
+  constructor() {
+    // Cuando el cierre de contrato resuelve (HTTP async), el facade setea
+    // ultimoCierre y acá mostramos el conteo de bienes desactivados.
+    effect(() => {
+      const resultado = this.contratosFacade.ultimoCierre();
+      if (resultado !== null) {
+        const n = resultado.bienesDesactivados;
+        this.feedbackCierre.set(
+          n === 1 ? '1 bien desactivado' : `${n} bienes desactivados`,
+        );
+      }
+    });
+  }
+
   ngOnInit(): void {
     this.facade.loadAll();
   }
@@ -108,20 +122,10 @@ export class BienesListPageComponent implements OnInit {
     const id = this._contratoACerrarId();
     if (!id) return;
     this.showCierreContratoModal.set(false);
+    this._contratoACerrarId.set(null);
+    // El feedback ("N bienes desactivados") lo dispara el effect que escucha
+    // ultimoCierre cuando el facade resuelve la respuesta HTTP (ver constructor).
     this.contratosFacade.cerrarContrato(id);
-    // El feedback se muestra a través de ultimoCierre signal tras que el facade completa
-    const checkResult = () => {
-      const resultado = this.contratosFacade.ultimoCierre();
-      if (resultado !== null) {
-        const n = resultado.bienesDesactivados;
-        this.feedbackCierre.set(
-          n === 1 ? '1 bien desactivado' : `${n} bienes desactivados`,
-        );
-        this._contratoACerrarId.set(null);
-      }
-    };
-    // Defer one tick so signals settle after subscribe
-    Promise.resolve().then(checkResult);
   }
 
   onCancelarCierre(): void {
