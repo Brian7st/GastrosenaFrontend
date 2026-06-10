@@ -11,7 +11,7 @@
     "test": {
       "executor": "@nx/angular:jest",
       "options": {
-        "jestConfig": "libs/inventario/inventario/jest.config.ts"
+        "jestConfig": "libs/inventario/inventario/jest.config.js"
       }
     }
   }
