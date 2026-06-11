@@ -136,7 +136,7 @@
   @if (mostrarModalDetalle() && facturaSeleccionada()) {
   <div class="modal-overlay" (click)="cerrarModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header-colored blue-bg">
+      <div class="modal-header-custom">
         <h3>Detalle de Factura</h3>
         <button class="close-btn" (click)="cerrarModal()">
           <lucide-icon name="x" [size]="20"></lucide-icon>
