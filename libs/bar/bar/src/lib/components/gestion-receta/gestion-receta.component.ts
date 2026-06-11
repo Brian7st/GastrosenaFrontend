@@ -1,11 +1,29 @@
 import { Component, OnInit, inject, Input, Output, EventEmitter, signal } from '@angular/core';
-import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CategoriaService } from '../../data-access/categoria.service';
 import { RecetaService } from '../../data-access/receta.service';
 import { IngredienteService } from '../../data-access/ingrediente.service';
 import { Receta, Ingrediente, Paso } from '../../models/receta.model';
 import { LucideIconComponent, ButtonComponent, InputComponent, ConfirmDialogComponent } from '@restaurant/shared/ui';
+
+export function soloLetrasValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (!control.value) return null;
+    return /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(control.value) ? null : { soloLetras: true };
+  };
+}
+
+export function noDuplicatesValidator(fieldName: string): ValidatorFn {
+  return (formArray: AbstractControl): ValidationErrors | null => {
+    if (!(formArray instanceof FormArray)) return null;
+    const values = formArray.controls
+      .map(ctrl => ctrl.get(fieldName)?.value?.toString().toLowerCase().trim())
+      .filter(v => !!v);
+    const hasDuplicates = new Set(values).size !== values.length;
+    return hasDuplicates ? { duplicate: true } : null;
+  };
+}
 
 @Component({
   selector: 'bar-gestion-receta',
@@ -16,7 +34,8 @@ import { LucideIconComponent, ButtonComponent, InputComponent, ConfirmDialogComp
 })
 export class GestionRecetaComponent implements OnInit {
   @Input() receta: Receta | null = null;
-  @Output() closeManage = new EventEmitter<boolean>(); // true if saved, false if cancelled
+  // eslint-disable-next-line @angular-eslint/no-output-native
+  @Output() close = new EventEmitter<boolean>();
 
   private fb = inject(FormBuilder);
   public catService = inject(CategoriaService);
@@ -30,13 +49,13 @@ export class GestionRecetaComponent implements OnInit {
 
   recipeForm = this.fb.group({
     idCategoria: ['', Validators.required],        
-    nombreReceta: ['', [Validators.required, Validators.minLength(3)]], 
+    nombreReceta: ['', [Validators.required, Validators.minLength(5)]], 
     tiempoPreparacion: [1, [Validators.required, Validators.min(1), Validators.max(720)]],   
     precioUnitario: [0, [Validators.required, Validators.min(0), Validators.max(1000000)]],    
     temperatura: ['', Validators.required],
     urlImagen: [''],
-    ingredientes: this.fb.array([], Validators.required),
-    pasos: this.fb.array([], Validators.required)
+    ingredientes: this.fb.array([], [Validators.required, noDuplicatesValidator('nombreIngrediente')]),
+    pasos: this.fb.array([], [Validators.required, noDuplicatesValidator('descripcionPaso')])
   });
 
   get ingredientesArr(){
@@ -87,8 +106,8 @@ export class GestionRecetaComponent implements OnInit {
       receta.pasos.forEach((paso: Paso) => {
         const group = this.fb.group({
           orden: [paso.orden],
-          descripcionPaso: [paso.descripcionPaso, [Validators.required, Validators.minLength(3), Validators.maxLength(500)]],
-          notesAdicionales: [paso.notasAdicionales || ''] // keep compatibility
+          descripcionPaso: [paso.descripcionPaso, [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
+          notasAdicionales: [paso.notasAdicionales || '']
         });
         this.pasosArr.push(group);
       });
@@ -107,7 +126,7 @@ export class GestionRecetaComponent implements OnInit {
     }
 
     const nuevoIngrediente = this.fb.group({
-      nombreIngrediente: ['', [Validators.required, Validators.minLength(2)]], 
+      nombreIngrediente: ['', [Validators.required, Validators.minLength(2), soloLetrasValidator()]], 
       cantidadRequerida: [1, [Validators.required, Validators.min(0.1), Validators.max(10000)]],      
       unidadMedida: ['GR', Validators.required]                             
     });
@@ -132,7 +151,7 @@ export class GestionRecetaComponent implements OnInit {
     const orden = this.pasosArr.length + 1;
     const group = this.fb.group({
       orden: [orden],
-      descripcionPaso: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(500)]],
+      descripcionPaso: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
       notasAdicionales: ['']
     });
     this.pasosArr.push(group);
@@ -152,12 +171,12 @@ export class GestionRecetaComponent implements OnInit {
   }
 
   cancelar() {
-    this.closeManage.emit(false);
+    this.close.emit(false);
   }
 
   cerrarExitoModal() {
     this.mostrarExitoModal.set(false);
-    this.closeManage.emit(true);
+    this.close.emit(true);
   }
 
   guardar() {
@@ -173,33 +192,22 @@ export class GestionRecetaComponent implements OnInit {
           return {
             orden: Number(step['orden']),
             descripcionPaso: String(step['descripcionPaso']),
-            notasAdicionales: String(step['notesAdicionales'] || step['notasAdicionales'] || '')
+            notasAdicionales: String(step['notasAdicionales'] || '')
           };
         });
       }
 
-      // Mapear los ingredientes ingresados por texto a su ID correspondiente del backend
+      // Mapear ingredientes: si existe en la lista local se asigna el ID, si no se envía null para que el backend lo cree
       if (formValue.ingredientes) {
-        const ingredientsList = this.ingService.ingredientes();
-        const ingredientesMapeados = [];
-
-        for (const ing of formValue.ingredientes) {
-          const match = ingredientsList.find(
+        formValue.ingredientes = formValue.ingredientes.map(ing => {
+          const match = this.ingService.ingredientes().find(
             i => i.nombreIngrediente.toLowerCase().trim() === ing.nombreIngrediente?.toLowerCase().trim()
           );
-
-          if (!match) {
-            alert(`El ingrediente "${ing.nombreIngrediente}" no es válido o no está registrado en el sistema.`);
-            this.isSaving = false;
-            return;
-          }
-
-          ingredientesMapeados.push({
+          return {
             ...ing,
-            idIngrediente: match.idIngrediente
-          });
-        }
-        formValue.ingredientes = ingredientesMapeados;
+            idIngrediente: match ? match.idIngrediente : null
+          };
+        });
       }
       
       const observable = this.receta?.idReceta 

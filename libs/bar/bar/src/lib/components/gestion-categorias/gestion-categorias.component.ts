@@ -15,7 +15,8 @@ import { LucideIconComponent, ButtonComponent, AlertComponent, InputComponent, C
 export class GestionCategoriasComponent implements OnInit {
   public categoriaService = inject(CategoriaService);
 
-  @Output() closeManage = new EventEmitter<boolean>();
+  // eslint-disable-next-line @angular-eslint/no-output-native
+  @Output() close = new EventEmitter<boolean>();
 
   nuevaCategoriaNombre = '';
   categoriaEnEdicion: Categoria | null = null;
@@ -31,7 +32,7 @@ export class GestionCategoriasComponent implements OnInit {
   }
 
   cerrar() {
-    this.closeManage.emit(true);
+    this.close.emit(true);
   }
 
   guardarCategoria() {

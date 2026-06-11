@@ -85,11 +85,13 @@ export class ComandaService {
     }
 
     iniciarDetalle(idDetalle: string): Observable<unknown> {
-        return this.http.put(`${this.url}/${idDetalle}/iniciar?responsable=1`, {});
+        const idComanda = idDetalle.split('-')[0];
+        return this.http.put(`${this.url}/${idComanda}/iniciar?responsable=1`, {});
     }
 
     finalizarDetalle(idDetalle: string): Observable<unknown> {
-        return this.http.put(`${this.url}/${idDetalle}/finalizar`, {});
+        const idComanda = idDetalle.split('-')[0];
+        return this.http.put(`${this.url}/${idComanda}/finalizar`, {});
     }
 
     eliminarComandaPorId(idComanda: string): Observable<unknown> {

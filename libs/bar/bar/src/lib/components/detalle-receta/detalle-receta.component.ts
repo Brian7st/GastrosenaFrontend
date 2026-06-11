@@ -12,10 +12,11 @@ import { LucideIconComponent } from '@restaurant/shared/ui';
 })
 export class DetalleRecetaComponent {
   @Input({ required: true }) receta!: Receta;
-  @Output() closeDetail = new EventEmitter<void>();
+  // eslint-disable-next-line @angular-eslint/no-output-native
+  @Output() close = new EventEmitter<void>();
 
   cerrar() {
-    this.closeDetail.emit();
+    this.close.emit();
   }
 
   cerrarModal() {

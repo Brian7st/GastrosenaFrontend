@@ -14,7 +14,7 @@
       <div class="form-grid">
         <div class="field Full">
           <restaurant-input formControlName="nombreReceta" label="Nombre de la Receta *" placeholder="Ej: Margarita Tradicional"
-                 [error]="esCampoInvalido('nombreReceta') ? 'El nombre es obligatorio (min 3 letras).' : ''"></restaurant-input>
+                 [error]="esCampoInvalido('nombreReceta') ? 'El nombre es obligatorio (mínimo 5 caracteres).' : ''"></restaurant-input>
         </div>
 
         <div class="field">
@@ -79,9 +79,15 @@
         </div>
 
         <div formArrayName="ingredientes" class="items-list">
+          @if (ingredientesArr.hasError('duplicate')) {
+            <div class="error-banner" style="background: var(--color-error-bg); border: 1px solid var(--color-error-border); color: var(--color-error-text); padding: var(--space-2); border-radius: var(--radius-md); margin-bottom: var(--space-4); font-size: var(--font-size-sm);">
+              ⚠️ Existen ingredientes con el mismo nombre. Por favor, modifícalos o elimínalos para continuar.
+            </div>
+          }
           @for (ing of ingredientesArr.controls; track $index) {
             <div [formGroupName]="$index" class="item-row ingredient-row">
-              <restaurant-input type="text" formControlName="nombreIngrediente" placeholder="Nombre del ingrediente" style="flex: 3;"></restaurant-input>
+              <restaurant-input type="text" formControlName="nombreIngrediente" placeholder="Nombre del ingrediente" style="flex: 3;"
+                [error]="ing.get('nombreIngrediente')?.invalid ? (ing.get('nombreIngrediente')?.hasError('soloLetras') ? 'Solo letras permitidas' : 'Mínimo 2 letras') : ''"></restaurant-input>
               <restaurant-input type="number" formControlName="cantidadRequerida" placeholder="Cantidad" style="flex: 1;"></restaurant-input>
               <select formControlName="unidadMedida" class="flex-1">
                 <option value="GR">Gramos (g)</option>
@@ -107,10 +113,21 @@
         </div>
 
         <div formArrayName="pasos" class="items-list">
+          @if (pasosArr.hasError('duplicate')) {
+            <div class="error-banner" style="background: var(--color-error-bg); border: 1px solid var(--color-error-border); color: var(--color-error-text); padding: var(--space-2); border-radius: var(--radius-md); margin-bottom: var(--space-4); font-size: var(--font-size-sm);">
+              ⚠️ Existen pasos con la misma descripción. Por favor, modifícalos o elimínalos para continuar.
+            </div>
+          }
           @for (paso of pasosArr.controls; track $index) {
             <div [formGroupName]="$index" class="item-row step-row">
               <div class="step-badge">{{ $index + 1 }}</div>
-              <textarea formControlName="descripcionPaso" placeholder="Paso {{ $index + 1 }}..." rows="2" class="flex-1"></textarea>
+              <div style="flex: 1; display: flex; flex-direction: column;">
+                <textarea formControlName="descripcionPaso" placeholder="Paso {{ $index + 1 }}..." rows="2"
+                  [class.error]="paso.get('descripcionPaso')?.invalid && (paso.get('descripcionPaso')?.dirty || paso.get('descripcionPaso')?.touched)"></textarea>
+                @if (paso.get('descripcionPaso')?.invalid && (paso.get('descripcionPaso')?.dirty || paso.get('descripcionPaso')?.touched)) {
+                  <small class="error-text">Mínimo 10 caracteres</small>
+                }
+              </div>
               <restaurant-button type="button" variant="ghost" (click)="removerPaso($index)">
                 <lucide-icon name="trash-2" size="16" style="color: var(--color-danger)"></lucide-icon>
               </restaurant-button>
@@ -123,7 +140,7 @@
 
       <footer class="form-footer">
         <restaurant-button type="button" variant="ghost" (click)="cancelar()">Cancelar</restaurant-button>
-        <restaurant-button type="submit" variant="primary" [disabled]="recipeForm.invalid || isSaving">
+        <restaurant-button type="submit" variant="primary" [disabled]="isSaving">
           @if (isSaving) {
             <span>Guardando...</span>
           } @else {
