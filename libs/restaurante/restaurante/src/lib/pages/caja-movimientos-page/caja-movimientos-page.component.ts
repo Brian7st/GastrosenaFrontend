@@ -39,7 +39,7 @@ export class CajaMovimientosPageComponent implements OnInit {
 
   facturas = signal<any[]>([]);
 
-  alertDialog = signal<{open: boolean, title: string, message: string}>({
+  alertDialog = signal<{ open: boolean, title: string, message: string }>({
     open: false,
     title: '',
     message: ''
@@ -106,13 +106,6 @@ export class CajaMovimientosPageComponent implements OnInit {
     this.facade.descargarFacturaPdf(idFactura, numeroFactura);
   }
 
-  generarReporteCuadre() {
-    this.alertDialog.set({
-      open: true,
-      title: 'Reporte Generado',
-      message: `El reporte de cuadre del turno actual ha sido generado y está listo para impresión.`
-    });
-  }
 
   cerrarAlertDialog() {
     this.alertDialog.set({ ...this.alertDialog(), open: false });

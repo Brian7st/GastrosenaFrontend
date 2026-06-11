@@ -57,13 +57,13 @@ export class CajaPagarPageComponent implements OnInit {
   propinaCalculada = computed(() => {
     const tipo = this.tipoPropina();
     if (tipo === 'NADA') return 0;
-    
+
     const pedido = this.pedidoSeleccionado();
     const subtotal = pedido ? pedido.subtotal : 0;
-    
+
     if (tipo === 'DIEZ_PORCIENTO') return subtotal * 0.10;
     if (tipo === 'OTRO') return this.propinaManual() || 0;
-    
+
     return 0;
   });
 
