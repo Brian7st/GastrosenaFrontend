@@ -18,6 +18,55 @@
     "secure": false,
     "changeOrigin": true
   },
+  "/api/admin": { 
+    "target": "http://localhost:8087", 
+    "secure": false, 
+    "changeOrigin": true },
+  "/api/comentarios": { 
+    "target": "http://localhost:8087", 
+    "secure": false, 
+    "changeOrigin": true 
+  },
+  "/api/configuracion": { 
+    "target": "http://localhost:8087", 
+    "secure": false, 
+    "changeOrigin": true 
+  },
+  "/api/fichas": { 
+    "target": "http://localhost:8087", 
+    "secure": false, 
+    "changeOrigin": true 
+  },
+  "/api/historial": { 
+    "target": "http://localhost:8087", 
+    "secure": false, 
+    "changeOrigin": true 
+  },
+  "/api/home": { 
+    "target": "http://localhost:8087", 
+    "secure": false, 
+    "changeOrigin": true 
+  },
+  "/api/notificaciones": { 
+    "target": "http://localhost:8087", 
+    "secure": false, 
+    "changeOrigin": true 
+  },
+  "/api/perfil": { 
+    "target": "http://localhost:8087", 
+    "secure": false, 
+    "changeOrigin": true 
+  },
+  "/api/roles": { 
+    "target": "http://localhost:8087", 
+    "secure": false, 
+    "changeOrigin": true 
+  },
+  "/api/imagenes": { 
+    "target": "http://localhost:8087", 
+    "secure": false, 
+    "changeOrigin": true 
+  },
   "/api/barybarismo": {
     "target": "http://localhost:8086",
     "secure": false,
