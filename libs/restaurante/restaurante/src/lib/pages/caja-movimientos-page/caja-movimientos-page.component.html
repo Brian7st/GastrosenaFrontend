@@ -47,6 +47,21 @@
         <span class="subtitle"
           style="display: block; padding: 0 var(--space-6) var(--space-4) var(--space-6); margin-top: calc(var(--space-2) * -1); font-size: var(--font-size-sm); color: var(--color-text-secondary);">Consulte
           las ventas detalladas y genere el cuadre final</span>
+        
+        <div style="display: flex; gap: 0.5rem; padding: 0 var(--space-6) var(--space-4) var(--space-6);">
+          <restaurant-button [variant]="filtroPago() === 'TODOS' ? 'primary' : 'surface'" (click)="filtroPago.set('TODOS')" style="font-size: 0.85rem; padding: 0.25rem 0.75rem;">
+            Todos
+          </restaurant-button>
+          <restaurant-button [variant]="filtroPago() === 'EFECTIVO' ? 'primary' : 'surface'" (click)="filtroPago.set('EFECTIVO')" style="font-size: 0.85rem; padding: 0.25rem 0.75rem;">
+            Efectivo
+          </restaurant-button>
+          <restaurant-button [variant]="filtroPago() === 'TARJETA' ? 'primary' : 'surface'" (click)="filtroPago.set('TARJETA')" style="font-size: 0.85rem; padding: 0.25rem 0.75rem;">
+            Tarjeta
+          </restaurant-button>
+          <restaurant-button [variant]="filtroPago() === 'TRANSFERENCIA' ? 'primary' : 'surface'" (click)="filtroPago.set('TRANSFERENCIA')" style="font-size: 0.85rem; padding: 0.25rem 0.75rem;">
+            Transferencia
+          </restaurant-button>
+        </div>
       </ng-container>
 
       <thead>
@@ -60,7 +75,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (factura of facturas(); track factura.id) {
+        @for (factura of facturasFiltradas(); track factura.id) {
         <tr>
           <td>{{ factura.fechaEmision | date:'shortTime' }}</td>
           <td title="{{ factura.pedidoId }}"><strong>#{{ factura.pedidoId | slice:0:8 | uppercase }}</strong></td>
