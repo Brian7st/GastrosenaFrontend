@@ -664,7 +664,7 @@ export class RestauranteFacade {
       this.restauranteService.facturarPedido(request).subscribe({
         next: (factura) => {
           this._pedidosParaCobro.update(lista => lista.filter(p => p.id !== pedidoId));
-          
+
           // Refrescar facturas del turno actual
           this.cargarHistorialFacturas();
 
