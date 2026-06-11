@@ -181,7 +181,7 @@ export class RestauranteFacade {
             };
           })
         }));
-        
+
         const ESTADO_PESO: Record<string, number> = {
           'LISTO_PARA_SERVIR': 1,
           'EN_PREPARACION': 2,
@@ -254,8 +254,8 @@ export class RestauranteFacade {
       this.restauranteService.cambiarEstadoActivo(mesaId, activo).subscribe({
         next: (mesaActualizada) => {
           this._mesas.update(lista =>
-            lista.map(m => m.id === mesaActualizada.id 
-              ? { ...mesaActualizada, observaciones: m.observaciones } 
+            lista.map(m => m.id === mesaActualizada.id
+              ? { ...mesaActualizada, observaciones: m.observaciones }
               : m
             )
           );
@@ -288,8 +288,8 @@ export class RestauranteFacade {
       this.restauranteService.editarMesa(mesaId, cambios).subscribe({
         next: (mesaActualizada) => {
           this._mesas.update(lista =>
-            lista.map(m => m.id === mesaActualizada.id 
-              ? { ...mesaActualizada, observaciones: cambios.observaciones || m.observaciones } 
+            lista.map(m => m.id === mesaActualizada.id
+              ? { ...mesaActualizada, observaciones: cambios.observaciones || m.observaciones }
               : m
             )
           );
@@ -349,7 +349,7 @@ export class RestauranteFacade {
         next: (pedidos) => {
           // Filtrar el pedido activo (que no esté pagado ni cancelado)
           const pedidoActivo = pedidos.find(p => p.estado !== EstadoPedido.FACTURADO && p.estado !== EstadoPedido.CANCELADO);
-          
+
           if (!pedidoActivo) {
             console.error('[RestauranteFacade] No se encontró pedido activo para la mesa Ocupada.');
             observer.next(false);
@@ -557,7 +557,7 @@ export class RestauranteFacade {
           this._ordenesHistorial.update(historial => [pedidoConfirmado, ...historial]);
           this.limpiarPedidoActivo();
           this.guardarEstadoLocal();
-          
+
           this.cargarMesas(); // Importante para actualizar estado OCUPADA
 
           this.enviarPedidoACocina(pedidoResponse.id);
@@ -659,7 +659,7 @@ export class RestauranteFacade {
         next: (factura) => {
           const pedidoOriginal = this._pedidosParaCobro().find(p => p.id === pedidoId);
           this._pedidosParaCobro.update(lista => lista.filter(p => p.id !== pedidoId));
-          
+
           if (pedidoOriginal) {
             this._historialFacturas.update(lista => [{ ...pedidoOriginal, estado: EstadoPedido.FACTURADO }, ...lista]);
           }

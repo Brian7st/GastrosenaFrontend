@@ -13,11 +13,11 @@ import {
 @Injectable({ providedIn: 'root' })
 export class RestauranteService {
   private http = inject(HttpClient);
-  
+
   /** URL del microservicio de restaurante (interceptada por proxy) */
-  private readonly mesasUrl   = '/api/mesas';
+  private readonly mesasUrl = '/api/mesas';
   private readonly pedidosUrl = '/api/pedidos';
-  private readonly cajaUrl    = '/api/caja';
+  private readonly cajaUrl = '/api/caja';
   private readonly facturasUrl = '/api/facturas';
 
   // ── Mesas — lectura ─────────────────────────────────────────────────────────
