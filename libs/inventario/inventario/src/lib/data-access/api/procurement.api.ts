@@ -21,8 +21,8 @@ export interface CuentadanteGilResponse {
   cedula: string;
 }
 
-/** GilResponse — estado: BORRADOR | EMITIDO | ENVIADO_PROVEEDOR | VERIFICADO | CERRADO */
-export type EstadoGil = 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'VERIFICADO' | 'CERRADO';
+/** GilResponse — estado: BORRADOR | EMITIDO | ENVIADO_PROVEEDOR | VERIFICADO | COMPROMETIDO | CERRADO */
+export type EstadoGil = 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'VERIFICADO' | 'COMPROMETIDO' | 'CERRADO';
 
 export interface GilResponse {
   id:                      string;
