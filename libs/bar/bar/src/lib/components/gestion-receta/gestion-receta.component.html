@@ -99,7 +99,7 @@
               </restaurant-button>
             </div>
           } @empty {
-            <p class="empty-list">No hay ingredientes. Haga clic en "+ Agregar Ingrediente".</p>
+            <restaurant-empty-state title='Sin ingredientes' message='No hay ingredientes. Haga clic en "+ Agregar Ingrediente".'></restaurant-empty-state>
           }
         </div>
       </section>
@@ -133,7 +133,7 @@
               </restaurant-button>
             </div>
           } @empty {
-            <p class="empty-list">No hay pasos definidos. Haga clic en "+ Agregar Paso".</p>
+            <restaurant-empty-state title='Sin pasos' message='No hay pasos definidos. Haga clic en "+ Agregar Paso".'></restaurant-empty-state>
           }
         </div>
       </section>

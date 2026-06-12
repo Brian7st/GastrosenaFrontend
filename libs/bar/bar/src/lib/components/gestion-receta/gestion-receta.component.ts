@@ -5,7 +5,7 @@ import { CategoriaService } from '../../data-access/categoria.service';
 import { RecetaService } from '../../data-access/receta.service';
 import { IngredienteService } from '../../data-access/ingrediente.service';
 import { Receta, Ingrediente, Paso } from '../../models/receta.model';
-import { LucideIconComponent, ButtonComponent, InputComponent, ConfirmDialogComponent } from '@restaurant/shared/ui';
+import { LucideIconComponent, ButtonComponent, InputComponent, ConfirmDialogComponent, EmptyStateComponent } from '@restaurant/shared/ui';
 
 export function soloLetrasValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
@@ -28,7 +28,7 @@ export function noDuplicatesValidator(fieldName: string): ValidatorFn {
 @Component({
   selector: 'bar-gestion-receta',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, LucideIconComponent, ButtonComponent, InputComponent, ConfirmDialogComponent],
+  imports: [ReactiveFormsModule, CommonModule, LucideIconComponent, ButtonComponent, InputComponent, ConfirmDialogComponent, EmptyStateComponent],
   templateUrl: './gestion-receta.component.html',
   styleUrl: './gestion-receta.component.scss'
 })
