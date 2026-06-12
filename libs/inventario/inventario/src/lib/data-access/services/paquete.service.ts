@@ -80,12 +80,6 @@ export class PaqueteService {
       );
   }
 
-  /** @deprecated TrazabilidadRequest ahora requiere los 3 campos — usar vincularTrazabilidad directamente */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  incluirRequisicion(paqueteId: string, reqId: string): Observable<boolean> {
-    return this.archivarPaquete(paqueteId);
-  }
-
   /** PATCH /legalization/paquetes/{id}/revisar — transición COMPLETO → REVISADO. */
   revisarPaquete(id: string, revisorId: string): Observable<boolean> {
     return this.http
