@@ -56,7 +56,7 @@ export class RestauranteFacade {
 
   private _turnoCaja = signal<SesionCajaResponse | null>(null);
   private _pedidosParaCobro = signal<PedidoResumenResponse[]>([]);
-  private _historialFacturas = signal<PedidoResumenResponse[]>([]);
+  private _historialFacturas = signal<any[]>([]);
 
   private _productosMenu = signal<ProductoMenu[]>([
     { id: '1', name: 'Coffee Latte', price: 21.20, originalPrice: 26.20, available: 72, sold: 14, discount: '20% OFF', image: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300&q=80', category: 'bebidas', subcategory: 'calientes' },
@@ -643,8 +643,14 @@ export class RestauranteFacade {
   }
 
   cargarHistorialFacturas() {
-    this.restauranteService.pedidosPorEstado(EstadoPedido.FACTURADO).subscribe({
-      next: (pedidos) => this._historialFacturas.set(pedidos),
+    const sesion = this._turnoCaja();
+    if (!sesion || !sesion.id || sesion.estado === 'CERRADA') {
+      this._historialFacturas.set([]);
+      return;
+    }
+
+    this.restauranteService.obtenerFacturasDeSesion(sesion.id).subscribe({
+      next: (facturas) => this._historialFacturas.set(facturas),
       error: (err) => {
         console.error('[RestauranteFacade] Error al cargar historial de facturas:', err);
         this._historialFacturas.set([]);
@@ -657,13 +663,14 @@ export class RestauranteFacade {
     return new Observable(observer => {
       this.restauranteService.facturarPedido(request).subscribe({
         next: (factura) => {
-          const pedidoOriginal = this._pedidosParaCobro().find(p => p.id === pedidoId);
           this._pedidosParaCobro.update(lista => lista.filter(p => p.id !== pedidoId));
 
-          if (pedidoOriginal) {
-            this._historialFacturas.update(lista => [{ ...pedidoOriginal, estado: EstadoPedido.FACTURADO }, ...lista]);
-          }
+          // Refrescar facturas del turno actual
+          this.cargarHistorialFacturas();
+
+          // El backend ya libera la mesa, solo recargamos
           this.cargarMesas();
+
           observer.next(factura.id);
           observer.complete();
         },

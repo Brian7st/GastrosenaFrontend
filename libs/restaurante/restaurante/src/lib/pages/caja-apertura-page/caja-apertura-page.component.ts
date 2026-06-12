@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { 
-  PageHeaderComponent, 
+import {
+  PageHeaderComponent,
   ButtonComponent,
   LucideIconComponent
 } from '@restaurant/shared/ui';
@@ -46,7 +46,7 @@ export class CajaAperturaPageComponent {
     }
   }
 
-preventInvalidChars(event: KeyboardEvent): void {
+  preventInvalidChars(event: KeyboardEvent): void {
     if (['e', 'E', '+', '-'].includes(event.key)) {
       event.preventDefault();
     }
