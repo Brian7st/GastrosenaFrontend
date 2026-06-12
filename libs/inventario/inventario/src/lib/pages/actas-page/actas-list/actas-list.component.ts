@@ -61,6 +61,30 @@ export class ActasListComponent implements OnInit {
     });
   });
 
+  // ── Paginación cliente ─────────────────────────────────────────────────────
+  readonly ITEMS_POR_PAGINA = 10;
+  paginaActual = signal(1);
+
+  totalPaginas = computed(() =>
+    Math.max(1, Math.ceil(this.filteredActas().length / this.ITEMS_POR_PAGINA))
+  );
+
+  actasPaginadas = computed(() => {
+    const inicio = (this.paginaActual() - 1) * this.ITEMS_POR_PAGINA;
+    return this.filteredActas().slice(inicio, inicio + this.ITEMS_POR_PAGINA);
+  });
+
+  paginas = computed(() =>
+    Array.from({ length: this.totalPaginas() }, (_, i) => i + 1)
+  );
+
+  irAPagina(n: number): void {
+    if (n >= 1 && n <= this.totalPaginas()) { this.paginaActual.set(n); }
+  }
+  anterior(): void { this.irAPagina(this.paginaActual() - 1); }
+  siguiente(): void { this.irAPagina(this.paginaActual() + 1); }
+  minOf(a: number, b: number): number { return Math.min(a, b); }
+
   // ── Helpers de UI ────────────────────────────────────────────────────────
   getEstadoLabel(estado: ActaEstado): string {
     const map: Record<ActaEstado, string> = {
@@ -87,20 +111,24 @@ export class ActasListComponent implements OnInit {
   // ── Eventos de filtro ────────────────────────────────────────────────────
   onSearch(event: Event): void {
     this.searchText.set((event.target as HTMLInputElement).value);
+    this.paginaActual.set(1);
   }
 
   onEstadoChange(event: Event): void {
     this.estadoFilter.set((event.target as HTMLSelectElement).value);
+    this.paginaActual.set(1);
   }
 
   onFichaChange(event: Event): void {
     this.fichaFilter.set((event.target as HTMLInputElement).value);
+    this.paginaActual.set(1);
   }
 
   limpiarFiltros(): void {
     this.searchText.set('');
     this.estadoFilter.set('');
     this.fichaFilter.set('');
+    this.paginaActual.set(1);
   }
 
   // ── Navegación ───────────────────────────────────────────────────────────
