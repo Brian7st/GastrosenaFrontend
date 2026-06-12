@@ -9,9 +9,11 @@ import {
   LucideIconComponent
 } from '@restaurant/shared/ui';
 import { AprobarSolicitudModalComponent } from '../../../components/aprobar-solicitud-modal/aprobar-solicitud-modal.component';
+import { RechazarSolicitudModalComponent } from '../../../components/rechazar-solicitud-modal/rechazar-solicitud-modal.component';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 import { SolicitudSesion } from '../../../models/solicitud-sesion.model';
 import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
+import { AuthService } from '@restaurant/shared/auth';
 
 @Component({
   selector: 'app-solicitudes-insumos-list',
@@ -25,6 +27,7 @@ import { EmptyStateComponent } from '../../../components/empty-state/empty-state
     StatusBadgeComponent,
     LucideIconComponent,
     AprobarSolicitudModalComponent,
+    RechazarSolicitudModalComponent,
     EmptyStateComponent,
   ],
   templateUrl: './solicitudes-insumos-list.component.html',
@@ -33,7 +36,13 @@ import { EmptyStateComponent } from '../../../components/empty-state/empty-state
 })
 export class SolicitudesInsumosListComponent implements OnInit {
   private router  = inject(Router);
+  private auth    = inject(AuthService);
   readonly facade = inject(SolicitudesFacade);
+
+  /** Id del usuario autenticado que aprueba/rechaza (auditoría). */
+  private get aprobadorId(): string | null {
+    return this.auth.currentUser()?.id ?? null;
+  }
 
   paginasSesion = computed(() =>
     Array.from({ length: this.facade.paginacionSesion().totalPages }, (_, i) => i)
@@ -74,8 +83,9 @@ export class SolicitudesInsumosListComponent implements OnInit {
 
   onToggleFilters(): void { this.showFilters.update(v => !v); }
 
-  // ─── Estado del modal de aprobación ───────────────────────────────
+  // ─── Estado de los modales de aprobación / rechazo ────────────────
   solicitudSeleccionada = signal<SolicitudSesion | null>(null);
+  solicitudRechazo      = signal<SolicitudSesion | null>(null);
 
   ngOnInit(): void {
     this.facade.cargarSolicitudesSesion();
@@ -141,19 +151,27 @@ export class SolicitudesInsumosListComponent implements OnInit {
   }
 
   onConfirmApprove(id: string): void {
-    // TODO: replace 'current-user' with real auth context (AuthService.currentUserId)
-    this.facade.aprobarSolicitudSesion(id, { aprobadorId: 'current-user' });
+    const aprobadorId = this.aprobadorId;
+    if (!aprobadorId) return; // sin usuario autenticado no se puede atribuir la aprobación
+    this.facade.aprobarSolicitudSesion(id, { aprobadorId });
     this.onCloseModal();
   }
 
-  onReject(id: string): void {
-    const motivo = prompt('Motivo del rechazo:');
-    if (!motivo?.trim()) return;
-    // TODO: replace 'current-user' with real auth context (AuthService.currentUserId)
-    this.facade.rechazarSolicitudSesion(id, {
-      aprobadorId: 'current-user',
-      motivo: motivo.trim(),
-    });
+  // ─── Rechazo (modal con motivo) ───────────────────────────────────
+  onReject(solicitud: SolicitudSesion): void {
+    this.solicitudRechazo.set(solicitud);
+  }
+
+  onCloseRechazo(): void {
+    this.solicitudRechazo.set(null);
+  }
+
+  onConfirmReject(motivo: string): void {
+    const solicitud = this.solicitudRechazo();
+    const aprobadorId = this.aprobadorId;
+    if (!solicitud || !aprobadorId) return;
+    this.facade.rechazarSolicitudSesion(solicitud.id, { aprobadorId, motivo });
+    this.onCloseRechazo();
   }
 
   onComprometer(id: string): void {
