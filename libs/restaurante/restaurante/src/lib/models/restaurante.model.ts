@@ -156,3 +156,32 @@ export interface PedidoResponse {
   fechaCierre: string | null;         // null mientras esté abierto
   detalles: DetallePedidoResponse[];
 }
+
+// --- DTOs provenientes de Cocina (Recetas) ---
+
+export interface RecetaIngredienteResponseDTO {
+  idIngrediente: string;
+  nombreIngrediente: string;
+  cantidad: number;
+  unidadMedida: string;
+}
+
+export interface PasosPreparacionResponseDTO {
+  numeroPaso: number;
+  descripcion: string;
+}
+
+export interface RecetaResponseDTO {
+  idReceta: string;
+  nombreReceta: string;
+  nombreCategoria: string;
+  idCategoria: string;
+  fechaCreacion: string;
+  tiempoPreparacion: number;
+  precioUnitario: number;
+  temperatura: string;
+  urlImagen: string;
+  activo: boolean;
+  ingredientes?: RecetaIngredienteResponseDTO[];
+  pasos?: PasosPreparacionResponseDTO[];
+}

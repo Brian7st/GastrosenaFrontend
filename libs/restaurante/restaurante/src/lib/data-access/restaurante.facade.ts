@@ -58,19 +58,7 @@ export class RestauranteFacade {
   private _pedidosParaCobro = signal<PedidoResumenResponse[]>([]);
   private _historialFacturas = signal<PedidoResumenResponse[]>([]);
 
-  private _productosMenu = signal<ProductoMenu[]>([
-    { id: '1', name: 'Coffee Latte', price: 21.20, originalPrice: 26.20, available: 72, sold: 14, discount: '20% OFF', image: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300&q=80', category: 'bebidas', subcategory: 'calientes' },
-    { id: '2', name: 'Bolognese Spaghetti', price: 21.20, available: 8, sold: 32, image: 'https://images.unsplash.com/photo-1622973536968-3ead9e780960?w=300&q=80', category: 'plato_fuerte' },
-    { id: '3', name: 'Thanos Burger', price: 21.20, available: 12, sold: 73, image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300&q=80', category: 'plato_fuerte' },
-    { id: '4', name: 'Chamomile Tea', price: 21.20, available: 24, sold: 6, image: 'https://images.unsplash.com/photo-1576092762791-dd9e2220cad1?w=300&q=80', category: 'bebidas', subcategory: 'calientes' },
-    { id: '5', name: 'Neck Burner (Alitas)', price: 21.20, originalPrice: 26.20, available: 5, sold: 12, discount: '10% OFF', image: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=300&q=80', category: 'entrada' },
-    { id: '6', name: 'Black Tea', price: 21.20, available: 21, sold: 4, image: 'https://images.unsplash.com/photo-1594631252845-29fc4cc8cde9?w=300&q=80', category: 'bebidas', subcategory: 'frias' },
-    { id: '7', name: 'Otak Udang', price: 21.20, available: 3, sold: 21, discount: '20% OFF', image: 'https://images.unsplash.com/photo-1599487405270-891961f00880?w=300&q=80', category: 'entrada' },
-    { id: '8', name: 'Mie Sedap', price: 21.20, available: 2, sold: 34, image: 'https://images.unsplash.com/photo-1612929633738-8fe01f72810c?w=300&q=80', category: 'plato_fuerte' },
-    { id: '9', name: 'Pastel de Chocolate', price: 15.00, available: 10, sold: 25, image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=300&q=80', category: 'postre' },
-    { id: '10', name: 'Margarita Clásica', price: 30.00, available: 50, sold: 100, image: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=300&q=80', category: 'bebidas', subcategory: 'con_alcohol' },
-    { id: '11', name: 'Jugo Natural', price: 10.00, available: 30, sold: 50, image: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=300&q=80', category: 'bebidas', subcategory: 'sin_alcohol' }
-  ]);
+  private _productosMenu = signal<ProductoMenu[]>([]);
 
   readonly mesas = this._mesas.asReadonly();
   readonly mesasCargando = this._mesasCargando.asReadonly();
@@ -108,8 +96,37 @@ export class RestauranteFacade {
   });
 
   constructor() {
+    this.cargarMenu();
     this.cargarMesas();
     this.cargarEstadoLocalNoMesas();
+  }
+
+  cargarMenu(): void {
+    this.restauranteService.obtenerRecetas().subscribe({
+      next: (recetas) => {
+        const menuMapeado: ProductoMenu[] = recetas.filter(r => r.activo !== false).map(r => {
+          let cat = 'plato_fuerte';
+          const catNombre = (r.nombreCategoria || '').toLowerCase();
+          if (catNombre.includes('bebida')) cat = 'bebidas';
+          else if (catNombre.includes('entrada')) cat = 'entrada';
+          else if (catNombre.includes('postre')) cat = 'postre';
+
+          return {
+            id: r.idReceta,
+            name: r.nombreReceta,
+            price: r.precioUnitario,
+            available: 100,
+            sold: 0,
+            image: r.urlImagen || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&q=80',
+            category: cat
+          };
+        });
+        this._productosMenu.set(menuMapeado);
+      },
+      error: (err) => {
+        console.error('[RestauranteFacade] Error al cargar menú (recetas):', err);
+      }
+    });
   }
 
   cargarMesas(): void {
