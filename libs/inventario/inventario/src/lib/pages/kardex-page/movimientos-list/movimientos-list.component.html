@@ -33,25 +33,25 @@
   <!-- KPIs Bento Grid -->
   <div class="kpi-grid">
     <restaurant-kpi-card
-      label="ENTRADAS"
+      label="ENTRADAS (PÁGINA)"
       [value]="kpiEntradas()"
       icon="log-in"
       iconColor="green">
     </restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="SALIDAS"
+      label="SALIDAS (PÁGINA)"
       [value]="kpiSalidas()"
       icon="log-out"
       iconColor="orange">
     </restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="VALOR ENTRADAS"
+      label="VALOR ENTRADAS (PÁGINA)"
       [value]="kpiValorEntradas() | currency:'COP':'symbol-narrow':'1.0-0'"
       icon="banknote"
       iconColor="blue"
-      trend="Total cargado"
+      trend="En esta página"
       [trendUp]="null">
     </restaurant-kpi-card>
 
