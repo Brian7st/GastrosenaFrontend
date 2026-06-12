@@ -11,9 +11,9 @@
       <div class="info-container">
         <h3 class="product-name">{{ product.name }}</h3>
         <p class="stats">
-          @if (product.tiempoPreparacion) { ⏱️ {{ product.tiempoPreparacion }} min }
+          @if (product.tiempoPreparacion) { {{ product.tiempoPreparacion }} min }
           @if (product.tiempoPreparacion && product.temperatura) { • }
-          @if (product.temperatura) { 🌡️ {{ product.temperatura }} }
+          @if (product.temperatura) { {{ product.temperatura }} }
         </p>
         <div class="price-row">
           <div class="prices">
