@@ -144,6 +144,7 @@ export interface GenerarGilRequest {
   codigoGrupo: string;
   fichaCaracterizacion: string;
   observaciones?: string;
+  programaDefault?: string;
 }
 
 // ─── GIL — Response types (canonical definitions live in procurement.api.ts) ──

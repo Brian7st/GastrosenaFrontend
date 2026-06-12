@@ -2,6 +2,7 @@ import { inject, Injectable, signal, computed } from '@angular/core';
 import { finalize, catchError, of } from 'rxjs';
 import { Factura, FacturaFiltros, FacturaKpis, FacturaPaginacion, SolicitudGIL, ConciliacionGil, FacturaFormDto, GilPickerItem } from '../models/facturas.model';
 import { FacturasService } from './services/facturas.service';
+import { KardexFacade } from './kardex.facade';
 import { ActualizarFacturaRequest } from './api/sourcing.api';
 import { BienGilResponse } from './api/procurement.api';
 
@@ -10,6 +11,7 @@ import { BienGilResponse } from './api/procurement.api';
 })
 export class FacturasFacade {
   private svc = inject(FacturasService);
+  private kardex = inject(KardexFacade);
 
   private _facturas              = signal<Factura[]>([]);
   private _kpis                  = signal<FacturaKpis | null>(null);
@@ -221,7 +223,12 @@ export class FacturasFacade {
         finalize(() => this._loading.set(false))
       )
       .subscribe(res => {
-        if (res) { this._facturaSeleccionada.set(res); this.cargarFacturas(); }
+        if (res) {
+          this._facturaSeleccionada.set(res);
+          this.cargarFacturas();
+          this.intentarCargarConciliacion(String(id)); // refresca el cruce tras verificar
+          this.kardex.loadAll(); // verificar crea la entrada al inventario → refresca movimientos
+        }
       });
   }
 
@@ -244,7 +251,11 @@ export class FacturasFacade {
         finalize(() => this._loading.set(false))
       )
       .subscribe(res => {
-        if (res) { this._facturaSeleccionada.set(res); this.cargarFacturas(); }
+        if (res) {
+          this._facturaSeleccionada.set(res);
+          this.cargarFacturas();
+          this.intentarCargarConciliacion(String(id)); // refresca el cruce con el GIL tras resolver
+        }
       });
   }
 
@@ -330,7 +341,12 @@ export class FacturasFacade {
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe(res => { if (res !== null) this._conciliacionGil.set(res); });
+      .subscribe(res => {
+        if (res !== null) {
+          this._conciliacionGil.set(res);
+          this.cargarFactura(facturaId); // la factura pudo cambiar de estado al conciliar
+        }
+      });
   }
 
   cargarConciliacionGil(params: { facturaId?: string; gilId?: string }): void {

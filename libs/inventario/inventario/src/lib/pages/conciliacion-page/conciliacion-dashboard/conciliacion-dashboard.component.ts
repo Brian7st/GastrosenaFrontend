@@ -34,12 +34,13 @@ export class ConciliacionDashboardComponent implements OnInit {
   // Categorías reales del catálogo de bienes
   categorias = this.facade.categoriasSummary;
 
-  // Mapa de iconos por categoría (coincide con catalog_productos.categoria del seed)
+  // Mapa de iconos por categoría — alineado con los de la requisición (mismas categorías).
   private readonly iconoPorCategoria: Record<string, string> = {
-    'Abarrotes y Secos':       'box',
-    'Bebidas y Liquidos':      'glass-water',
-    'Fruver':                  'leaf',
-    'Reposteria y Congelados': 'snowflake',
+    'Perecederos':             'thermometer',
+    'Fruver':                  'apple',
+    'Abarrotes y Secos':       'package',
+    'Bebidas y Liquidos':      'droplets',
+    'Reposteria y Congelados': 'cake',
   };
 
   iconoDeCategoria(nombre: string): string {

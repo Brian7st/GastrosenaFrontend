@@ -16,10 +16,6 @@
         <lucide-icon name="pencil" [size]="16"></lucide-icon>
         Editar
       </restaurant-button>
-      <restaurant-button variant="surface" (click)="onDescargarPDF()">
-        <lucide-icon name="file-text" [size]="16"></lucide-icon>
-        Descargar PDF
-      </restaurant-button>
       @if (s.estadoSolicitud === 'BORRADOR') {
         <restaurant-button variant="primary" id="btn-enviar-aprobacion" (click)="onEnviarAprobacion()">
           Enviar a Aprobación

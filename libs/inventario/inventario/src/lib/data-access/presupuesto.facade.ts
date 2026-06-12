@@ -1,5 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { catchError, finalize, of } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Observable, catchError, finalize, map, of } from 'rxjs';
 import { PresupuestoService } from './services/presupuesto.service';
 import {
   PresupuestoDetalle,
@@ -32,6 +33,7 @@ export class PresupuestoFacade {
   private _vencimientos            = signal<VencimientoProximo[]>([]);
   private _ejecucionMensual        = signal<EjecucionMensual[]>([]);
   private _presupuestoSeleccionado = signal<PresupuestoDetalle | undefined>(undefined);
+  private _presupuestos            = signal<PresupuestoDetalle[]>([]);
   private _loading                 = signal<boolean>(false);
   private _error                   = signal<string | null>(null);
 
@@ -45,6 +47,7 @@ export class PresupuestoFacade {
   public vencimientos           = computed(() => this._vencimientos());
   public ejecucionMensual       = computed(() => this._ejecucionMensual());
   public presupuestoSeleccionado = computed(() => this._presupuestoSeleccionado());
+  public presupuestos            = computed(() => this._presupuestos());
   public loading                = computed(() => this._loading());
   public error                  = computed(() => this._error());
 
@@ -205,6 +208,30 @@ export class PresupuestoFacade {
       });
   }
 
+  /**
+   * Comprometer + pagar en un solo paso (cuando el CUFE del FEL ya es conocido).
+   *
+   * Un único request al endpoint transaccional del backend: o se compromete y paga, o no
+   * pasa nada (rollback). No hay estado intermedio del lado del cliente. Devuelve un
+   * Observable<boolean> (true = éxito) para que el llamador espere antes de cerrar la vista.
+   */
+  comprometerYPagar(data: ComprometerData, cufe: string): Observable<boolean> {
+    this._error.set(null);
+    this._loading.set(true);
+    return this.presupuestoService.comprometerYPagar(data, cufe).pipe(
+      map(() => {
+        this.loadAll();
+        this.cargarCompromisos(data.presupuestoId);
+        return true;
+      }),
+      catchError((err: HttpErrorResponse) => {
+        this._error.set(err?.error?.detail ?? 'Error al comprometer y registrar el pago');
+        return of(false);
+      }),
+      finalize(() => this._loading.set(false)),
+    );
+  }
+
   /** Anula un compromiso y recarga la lista */
   anularCompromiso(id: string, presupuestoId?: string): void {
     this._loading.set(true);
@@ -233,7 +260,10 @@ export class PresupuestoFacade {
         finalize(() => this._loading.set(false)),
       )
       .subscribe(res => {
-        if (res) this.cargarCompromisos(presupuestoId);
+        if (res) {
+          this.cargarCompromisos(presupuestoId);
+          this.loadAll(); // refresca afectaciones/saldos del dashboard tras el pago
+        }
       });
   }
 
@@ -252,6 +282,13 @@ export class PresupuestoFacade {
       .subscribe(res => {
         if (res) this.loadAll();
       });
+  }
+
+  /** GET /budget/presupuestos — carga la lista de presupuestos con id + rubros (para comprometer) */
+  cargarPresupuestos(): void {
+    this.presupuestoService.getPresupuestos()
+      .pipe(catchError(() => of([])))
+      .subscribe(data => this._presupuestos.set(data));
   }
 
   /** GET /budget/presupuestos/{id} — carga el detalle de un presupuesto */

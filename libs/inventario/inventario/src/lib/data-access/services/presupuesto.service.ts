@@ -65,6 +65,25 @@ export class PresupuestoService {
   }
 
   /**
+   * GET /budget/presupuestos — lista de presupuestos CON su id y sus rubros.
+   * A diferencia de getRubros(), NO aplana: conserva el presupuestoId, necesario
+   * para comprometer.
+   */
+  getPresupuestos(params?: { vigencia?: number; page?: number; size?: number }): Observable<PresupuestoDetalle[]> {
+    let httpParams = new HttpParams();
+    if (params?.vigencia) httpParams = httpParams.set('vigencia', String(params.vigencia));
+    httpParams = httpParams.set('page', String(params?.page ?? 0));
+    httpParams = httpParams.set('size', String(params?.size ?? 100));
+
+    return this.http
+      .get<PaginatedResponse<PresupuestoResponse>>(`${API}/budget/presupuestos`, { params: httpParams })
+      .pipe(
+        map(resp => resp.contenido.map(presupuestoDetalleFromApi)),
+        catchError(err => throwError(() => err)),
+      );
+  }
+
+  /**
    * GET /budget/presupuestos/{id}
    * Un único PresupuestoResponse (misma forma, no paginado).
    */
@@ -127,6 +146,31 @@ export class PresupuestoService {
     };
     return this.http
       .post<{ id: string }>(`${API}/budget/compromisos`, body)
+      .pipe(catchError(err => throwError(() => err)));
+  }
+
+  /**
+   * POST /budget/compromisos/comprometer-y-pagar — comprometer + pagar en una sola
+   * transacción atómica en el backend. Si el pago falla, el backend hace rollback del
+   * compromiso (no queda huérfano). Un solo request, sin estado intermedio en el cliente.
+   */
+  comprometerYPagar(data: ComprometerData, cufeFuenteId: string): Observable<{ compromisoId: string; pagoId: string }> {
+    const body = {
+      presupuestoId: data.presupuestoId,
+      rubroId:       data.rubroId,
+      gilId:         data.gilId,
+      facturaId:     data.facturaId,
+      fichaId:       data.fichaId,
+      programaId:    data.programaId,
+      concepto:           data.concepto,
+      monto:              data.monto,
+      aplicarZESE:        data.aplicarZESE,
+      autorizarSobregiro: data.autorizarSobregiro,
+      fecha:              data.fecha,
+      cufeFuenteId,
+    };
+    return this.http
+      .post<{ compromisoId: string; pagoId: string }>(`${API}/budget/compromisos/comprometer-y-pagar`, body)
       .pipe(catchError(err => throwError(() => err)));
   }
 

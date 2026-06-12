@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import {
   KpiCardComponent,
@@ -7,9 +8,15 @@ import {
   LucideIconComponent,
   ButtonComponent,
   StatusBadgeComponent,
+  InputComponent,
 } from '@restaurant/shared/ui';
+import { AfectacionPresupuestal } from '../../../models/presupuesto.model';
 import { PresupuestoFacade } from '../../../data-access/presupuesto.facade';
+import { GilesService } from '../../../data-access/services/giles.service';
+import { FacturasService } from '../../../data-access/services/facturas.service';
+import { GilResponse } from '../../../data-access/api/procurement.api';
 import { OnInit, inject } from '@angular/core';
+import { forkJoin, switchMap } from 'rxjs';
 import { FormatoMonedaPipe } from '../../../pipes/formato-moneda.pipe';
 import { ExportarComponent } from '../../../components/exportar/exportar.component';
 
@@ -18,6 +25,7 @@ import { ExportarComponent } from '../../../components/exportar/exportar.compone
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     RouterLink,
     RouterOutlet,
     KpiCardComponent,
@@ -25,6 +33,7 @@ import { ExportarComponent } from '../../../components/exportar/exportar.compone
     LucideIconComponent,
     ButtonComponent,
     StatusBadgeComponent,
+    InputComponent,
     FormatoMonedaPipe,
     ExportarComponent,
   ],
@@ -34,6 +43,22 @@ import { ExportarComponent } from '../../../components/exportar/exportar.compone
 })
 export class PresupuestoDashboardComponent implements OnInit {
   public facade = inject(PresupuestoFacade);
+  private gilesService = inject(GilesService);
+  private facturasService = inject(FacturasService);
+
+  /** GILs cargados para mostrar el número (no el UUID) en la tabla de afectaciones. */
+  private giles = signal<GilResponse[]>([]);
+
+  /** Resuelve un rubroId (UUID) a su código legible. */
+  rubroLabel(rubroId: string): string {
+    return this.facade.rubros().find(r => r.id === rubroId)?.codigo ?? rubroId;
+  }
+
+  /** Resuelve un gilId (UUID) a su número de GIL legible. */
+  gilLabel(gilId: string | undefined): string {
+    if (!gilId) return '—';
+    return this.giles().find(g => g.id === gilId)?.numeroGil ?? gilId;
+  }
 
   // ── Modal de exportación ──────────────────────────────────────────────────
   showExportModal = signal(false);
@@ -113,6 +138,16 @@ export class PresupuestoDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.facade.loadAll();
+    // Para mostrar el número de GIL (no el UUID) en la tabla de afectaciones.
+    // Toda afectación nace de comprometer presupuesto, lo que deja el GIL en estado
+    // COMPROMETIDO; su única transición posterior es a CERRADO (al legalizar). Por eso
+    // se piden esos dos estados — nunca VERIFICADO, que no tiene compromiso asociado.
+    forkJoin({
+      comprometidos: this.gilesService.getGiles({ estado: 'COMPROMETIDO', size: 200 }),
+      cerrados:      this.gilesService.getGiles({ estado: 'CERRADO', size: 200 }),
+    }).subscribe(({ comprometidos, cerrados }) =>
+      this.giles.set([...(comprometidos.content ?? []), ...(cerrados.content ?? [])]),
+    );
   }
 
   /** Toggle de grupo colapsable */
@@ -158,6 +193,62 @@ export class PresupuestoDashboardComponent implements OnInit {
       case 'proximo': return 'vencimiento-card--proximo';
       default:        return 'vencimiento-card--normal';
     }
+  }
+
+  // ── Modal de Registrar Pago ─────────────────────────────────────────────────
+  showPagoModal   = signal(false);
+  pagoCompromisoId = signal('');
+  pagoConcepto    = signal('');
+  pagoCufe        = signal('');
+  pagoMonto       = signal('');
+  pagoFecha       = signal(new Date().toISOString().split('T')[0]);
+  /** True mientras se resuelve el CUFE del FEL conciliado al abrir el pago. */
+  pagoCargandoCufe = signal(false);
+
+  /** Sólo se puede pagar un compromiso PENDIENTE. */
+  esPagable(estado: string): boolean {
+    return estado === 'PENDIENTE';
+  }
+
+  abrirPago(a: AfectacionPresupuestal): void {
+    this.pagoCompromisoId.set(a.id);
+    this.pagoConcepto.set(a.concepto);
+    this.pagoMonto.set(String(a.monto));
+    this.pagoCufe.set('');
+    this.pagoFecha.set(new Date().toISOString().split('T')[0]);
+    this.showPagoModal.set(true);
+
+    // El compromiso ya tiene un GIL conciliado con un FEL: el CUFE existe, no hay
+    // por qué pedírselo al usuario. Se resuelve conciliación → factura → CUFE.
+    if (!a.gilId) return;
+    this.pagoCargandoCufe.set(true);
+    this.facturasService.getConciliacionGil({ gilId: a.gilId })
+      .pipe(
+        switchMap(conciliacion => this.facturasService.getFacturaById(conciliacion.facturaId)),
+      )
+      .subscribe({
+        next: factura => {
+          if (factura) this.pagoCufe.set(factura.cufe);
+          this.pagoCargandoCufe.set(false);
+        },
+        error: () => this.pagoCargandoCufe.set(false),
+      });
+  }
+
+  cerrarPago(): void {
+    this.showPagoModal.set(false);
+  }
+
+  pagoValido = computed(() => this.pagoCufe().trim().length > 0 && Number(this.pagoMonto()) > 0);
+
+  confirmarPago(): void {
+    if (!this.pagoValido()) return;
+    this.facade.registrarPago(this.pagoCompromisoId(), {
+      cufeFuenteId: this.pagoCufe().trim(),
+      monto:        Number(this.pagoMonto()),
+      fecha:        this.pagoFecha(),
+    });
+    this.showPagoModal.set(false);
   }
 
   openExportModal(): void {

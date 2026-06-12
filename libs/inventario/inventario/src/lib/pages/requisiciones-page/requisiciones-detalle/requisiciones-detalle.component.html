@@ -70,6 +70,13 @@
             </div>
           </div>
           <div class="info-cell">
+            <div class="info-cell__icon-wrap"><lucide-icon name="calendar" [size]="20"></lucide-icon></div>
+            <div>
+              <p class="info-cell__label">Día</p>
+              <p class="info-cell__value">{{ (requisicion()?.diaSemana | titlecase) || '—' }}</p>
+            </div>
+          </div>
+          <div class="info-cell">
             <div class="info-cell__icon-wrap"><lucide-icon name="clock" [size]="20"></lucide-icon></div>
             <div>
               <p class="info-cell__label">Hora Sesión</p>
@@ -132,6 +139,14 @@
     <div class="sheet-panel__error">
       <lucide-icon name="alert-circle" [size]="16"></lucide-icon>
       {{ error() }}
+    </div>
+  }
+
+  <!-- Aviso de descarga del soporte -->
+  @if (descargaAviso()) {
+    <div class="sheet-panel__error">
+      <lucide-icon name="alert-circle" [size]="16"></lucide-icon>
+      {{ descargaAviso() }}
     </div>
   }
 

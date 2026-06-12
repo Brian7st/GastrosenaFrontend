@@ -181,6 +181,19 @@
           />
         </div>
         <div class="form-group">
+          <label class="form-label">Programa de Formación</label>
+          <select
+            class="form-control"
+            [value]="programaDefault()"
+            (change)="programaDefault.set($any($event.target).value)"
+          >
+            <option value="">Sin asignar</option>
+            @for (programa of programas(); track programa.codigo) {
+              <option [value]="programa.codigo">{{ programa.nombre }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
           <label class="form-label">Solicitante <span class="required-mark">*</span></label>
           <input
             type="text"
