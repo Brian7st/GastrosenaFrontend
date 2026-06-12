@@ -112,10 +112,6 @@
             <span>Subtotal Neto</span>
             <span class="calc-row__value">{{ subtotalNeto() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
           </div>
-          <div class="calc-row text-on-surface">
-            <span>IVA Acumulado</span>
-            <span class="calc-row__value">{{ ivaAcumulado() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-          </div>
           <div class="calc-row text-tertiary">
             <span>Retención ZESE</span>
             <span class="calc-row__value">-{{ retencionZeseTotal() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
