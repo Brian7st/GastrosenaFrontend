@@ -52,7 +52,7 @@ export class GestionRecetaComponent implements OnInit {
     nombreReceta: ['', [Validators.required, Validators.minLength(5)]], 
     tiempoPreparacion: [1, [Validators.required, Validators.min(1), Validators.max(720)]],   
     precioUnitario: [0, [Validators.required, Validators.min(0), Validators.max(1000000)]],    
-    temperatura: ['', Validators.required],
+    temperatura: ['Caliente', Validators.required],
     urlImagen: [''],
     ingredientes: this.fb.array([], [Validators.required, noDuplicatesValidator('nombreIngrediente')]),
     pasos: this.fb.array([], [Validators.required, noDuplicatesValidator('descripcionPaso')])
