@@ -23,10 +23,8 @@ export interface ProductoMenu {
   id: string;
   name: string;
   price: number;
-  originalPrice?: number;
-  available: number;
-  sold: number;
-  discount?: string;
+  tiempoPreparacion?: number;
+  temperatura?: string;
   image: string;
   category: string;
   subcategory?: string;
@@ -115,8 +113,8 @@ export class RestauranteFacade {
             id: r.idReceta,
             name: r.nombreReceta,
             price: r.precioUnitario,
-            available: 100,
-            sold: 0,
+            tiempoPreparacion: r.tiempoPreparacion,
+            temperatura: r.temperatura,
             image: r.urlImagen || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&q=80',
             category: cat
           };

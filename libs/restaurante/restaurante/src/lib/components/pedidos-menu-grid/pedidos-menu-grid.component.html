@@ -7,21 +7,18 @@
     <restaurant-card class="product-card" (click)="agregarProducto(product)">
       <div class="image-container">
         <img [src]="product.image" [alt]="product.name" loading="lazy" />
-        @if (product.discount) {
-          <restaurant-status-badge class="discount-badge" [label]="product.discount" variant="info"></restaurant-status-badge>
-        }
       </div>
       <div class="info-container">
         <h3 class="product-name">{{ product.name }}</h3>
-        <p class="stats">{{ product.available }} Disponibles • {{ product.sold }} Vendidos</p>
+        <p class="stats">
+          @if (product.tiempoPreparacion) { ⏱️ {{ product.tiempoPreparacion }} min }
+          @if (product.tiempoPreparacion && product.temperatura) { • }
+          @if (product.temperatura) { 🌡️ {{ product.temperatura }} }
+        </p>
         <div class="price-row">
           <div class="prices">
-            @if (product.originalPrice) {
-              <span class="original-price">{{ product.originalPrice | currencyCop }}</span>
-            }
             <span class="current-price">{{ product.price | currencyCop }}</span>
           </div>
-          <span class="unit">/ Porción</span>
         </div>
       </div>
     </restaurant-card>
