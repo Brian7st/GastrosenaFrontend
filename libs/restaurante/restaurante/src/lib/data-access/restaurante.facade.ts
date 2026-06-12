@@ -108,8 +108,16 @@ export class RestauranteFacade {
         const todasLasRecetas = [...cocina, ...bar];
         const menuMapeado: ProductoMenu[] = todasLasRecetas.filter(r => r.activo !== false).map(r => {
           let cat = 'plato_fuerte';
+          let subcat: string | undefined = undefined;
           const catNombre = (r.nombreCategoria || '').toLowerCase();
-          if (catNombre.includes('bebida')) cat = 'bebidas';
+          
+          if (catNombre.includes('bebida')) {
+            cat = 'bebidas';
+            if (catNombre.includes('caliente')) subcat = 'calientes';
+            else if (catNombre.includes('fria') || catNombre.includes('fría')) subcat = 'frias';
+            else if (catNombre.includes('sin alcohol')) subcat = 'sin_alcohol';
+            else if (catNombre.includes('con alcohol') || catNombre.includes('licor')) subcat = 'con_alcohol';
+          }
           else if (catNombre.includes('entrada')) cat = 'entrada';
           else if (catNombre.includes('postre')) cat = 'postre';
 
@@ -120,7 +128,8 @@ export class RestauranteFacade {
             tiempoPreparacion: r.tiempoPreparacion,
             temperatura: r.temperatura,
             image: r.urlImagen || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&q=80',
-            category: cat
+            category: cat,
+            subcategory: subcat
           };
         });
         this._productosMenu.set(menuMapeado);
