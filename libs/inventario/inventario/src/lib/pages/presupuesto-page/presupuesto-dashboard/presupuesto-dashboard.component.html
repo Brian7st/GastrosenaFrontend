@@ -255,7 +255,8 @@
     [showFilterButton]="true"
     [filterActive]="showFilters()"
     [filterCount]="filtrosActivos()"
-    (filterToggle)="onToggleFilters()">
+    (filterToggle)="onToggleFilters()"
+    (searchChange)="onSearch($event)">
     <restaurant-button dtActions variant="surface" routerLink="cargar-gil">
       <div class="btn-icon-text">
         <lucide-icon name="upload" [size]="18"></lucide-icon>
@@ -330,6 +331,14 @@
               <div class="btn-icon-text">
                 <lucide-icon name="dollar-sign" [size]="14"></lucide-icon>
                 Pagar
+              </div>
+            </restaurant-button>
+          }
+          @if (esAnulable(a.estado)) {
+            <restaurant-button variant="surface" (click)="onAnular(a)">
+              <div class="btn-icon-text">
+                <lucide-icon name="x-circle" [size]="14"></lucide-icon>
+                Anular
               </div>
             </restaurant-button>
           }

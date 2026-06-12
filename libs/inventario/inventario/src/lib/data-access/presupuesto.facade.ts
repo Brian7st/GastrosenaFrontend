@@ -244,7 +244,10 @@ export class PresupuestoFacade {
         finalize(() => this._loading.set(false)),
       )
       .subscribe(res => {
-        if (res !== null) this.cargarCompromisos(presupuestoId);
+        if (res !== null) {
+          this.cargarCompromisos(presupuestoId);
+          this.loadAll(); // refresca afectaciones/saldos del dashboard tras anular
+        }
       });
   }
 

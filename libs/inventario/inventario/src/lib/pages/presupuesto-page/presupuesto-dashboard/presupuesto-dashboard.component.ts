@@ -16,7 +16,7 @@ import { GilesService } from '../../../data-access/services/giles.service';
 import { FacturasService } from '../../../data-access/services/facturas.service';
 import { GilResponse } from '../../../data-access/api/procurement.api';
 import { OnInit, inject } from '@angular/core';
-import { forkJoin, switchMap } from 'rxjs';
+import { switchMap } from 'rxjs';
 import { FormatoMonedaPipe } from '../../../pipes/formato-moneda.pipe';
 import { ExportarComponent } from '../../../components/exportar/exportar.component';
 
@@ -86,19 +86,33 @@ export class PresupuestoDashboardComponent implements OnInit {
   // ── Filtros (panel colapsable) ──────────────────────────────────────────────
   showFilters  = signal(false);
   filtroEstado = signal<string>('');
+  /** Texto del buscador de la tabla (concepto, GIL, rubro o estado). */
+  filtroBusqueda = signal<string>('');
   filtrosActivos = computed(() => (this.filtroEstado() ? 1 : 0));
 
   /** Estados de afectación presentes en los datos (para el select) */
   estadosDisponibles = computed(() => Array.from(new Set(this.afectaciones().map(a => a.estado))));
 
-  /** Afectaciones tras aplicar el filtro de estado */
+  /** Afectaciones tras aplicar el filtro de estado y el texto del buscador */
   afectacionesFiltradas = computed(() => {
     const e = this.filtroEstado();
-    return e ? this.afectaciones().filter(a => a.estado === e) : this.afectaciones();
+    const q = this.filtroBusqueda().trim().toLowerCase();
+    return this.afectaciones().filter(a => {
+      if (e && a.estado !== e) return false;
+      if (!q) return true;
+      const campos = [
+        a.concepto,
+        this.gilLabel(a.gilId),
+        this.rubroLabel(a.rubroId),
+        a.estado,
+      ];
+      return campos.some(c => c?.toLowerCase().includes(q));
+    });
   });
 
   onToggleFilters(): void { this.showFilters.update(v => !v); }
   onFilterEstado(v: string): void { this.filtroEstado.set(v); this.paginaActual.set(1); }
+  onSearch(v: string): void { this.filtroBusqueda.set(v); this.paginaActual.set(1); }
   onLimpiarFiltros(): void { this.filtroEstado.set(''); this.paginaActual.set(1); }
 
   // ── Paginación ─────────────────────────────────────────────────────────────
@@ -139,14 +153,12 @@ export class PresupuestoDashboardComponent implements OnInit {
   ngOnInit(): void {
     this.facade.loadAll();
     // Para mostrar el número de GIL (no el UUID) en la tabla de afectaciones.
-    // Toda afectación nace de comprometer presupuesto, lo que deja el GIL en estado
-    // COMPROMETIDO; su única transición posterior es a CERRADO (al legalizar). Por eso
-    // se piden esos dos estados — nunca VERIFICADO, que no tiene compromiso asociado.
-    forkJoin({
-      comprometidos: this.gilesService.getGiles({ estado: 'COMPROMETIDO', size: 200 }),
-      cerrados:      this.gilesService.getGiles({ estado: 'CERRADO', size: 200 }),
-    }).subscribe(({ comprometidos, cerrados }) =>
-      this.giles.set([...(comprometidos.content ?? []), ...(cerrados.content ?? [])]),
+    // Un compromiso puede referenciar un GIL en cualquier estado (COMPROMETIDO,
+    // CERRADO e incluso APLICADO/legalizado), así que se cargan TODOS los GILs sin
+    // filtrar por estado: cualquier filtro deja afectaciones mostrando el UUID crudo.
+    // size=100 es el máximo que admite el backend (101+ → 400 Bad Request).
+    this.gilesService.getGiles({ size: 100 }).subscribe(page =>
+      this.giles.set(page.content ?? []),
     );
   }
 
@@ -208,6 +220,17 @@ export class PresupuestoDashboardComponent implements OnInit {
   /** Sólo se puede pagar un compromiso PENDIENTE. */
   esPagable(estado: string): boolean {
     return estado === 'PENDIENTE';
+  }
+
+  /** Sólo se puede anular un compromiso aún no APLICADO (en la práctica, PENDIENTE). */
+  esAnulable(estado: string): boolean {
+    return estado === 'PENDIENTE';
+  }
+
+  /** Anula el compromiso de la afectación y refresca el dashboard. */
+  onAnular(a: AfectacionPresupuestal): void {
+    if (!this.esAnulable(a.estado)) return;
+    this.facade.anularCompromiso(a.id);
   }
 
   abrirPago(a: AfectacionPresupuestal): void {
