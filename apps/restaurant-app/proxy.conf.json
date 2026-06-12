@@ -137,5 +137,36 @@
     "target": "http://localhost:8081",
     "secure": false,
     "changeOrigin": true
+  },
+  "/api/cocina": {
+    "target": "http://localhost:8082",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/actividades": {
+    "target": "http://localhost:8082",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/pasos": {
+    "target": "http://localhost:8082",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/categorias": {
+    "target": "http://localhost:8082",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/ingredientes": {
+    "target": "http://localhost:8082",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/recetas": {
+    "target": "http://localhost:8082",
+    "secure": false,
+    "changeOrigin": true
   }
+
 }
