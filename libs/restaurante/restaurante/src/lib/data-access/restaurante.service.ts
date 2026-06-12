@@ -21,11 +21,16 @@ export class RestauranteService {
   private readonly cajaUrl = '/api/caja';
   private readonly facturasUrl = '/api/facturas';
   private readonly recetasUrl = 'http://localhost:8082/api/recetas';
+  private readonly barRecetasUrl = 'http://localhost:8086/api/barybarismo/recetas';
 
-  // ── Recetas (Cocina) ────────────────────────────────────────────────────────
+  // ── Recetas (Cocina y Bar) ──────────────────────────────────────────────────
 
   obtenerRecetas(): Observable<RecetaResponseDTO[]> {
     return this.http.get<RecetaResponseDTO[]>(this.recetasUrl);
+  }
+
+  obtenerRecetasBar(): Observable<RecetaResponseDTO[]> {
+    return this.http.get<RecetaResponseDTO[]>(this.barRecetasUrl);
   }
 
   // ── Mesas — lectura ─────────────────────────────────────────────────────────

@@ -100,9 +100,13 @@ export class RestauranteFacade {
   }
 
   cargarMenu(): void {
-    this.restauranteService.obtenerRecetas().subscribe({
-      next: (recetas) => {
-        const menuMapeado: ProductoMenu[] = recetas.filter(r => r.activo !== false).map(r => {
+    forkJoin({
+      cocina: this.restauranteService.obtenerRecetas().pipe(catchError(() => of([]))),
+      bar: this.restauranteService.obtenerRecetasBar().pipe(catchError(() => of([])))
+    }).subscribe({
+      next: ({ cocina, bar }) => {
+        const todasLasRecetas = [...cocina, ...bar];
+        const menuMapeado: ProductoMenu[] = todasLasRecetas.filter(r => r.activo !== false).map(r => {
           let cat = 'plato_fuerte';
           const catNombre = (r.nombreCategoria || '').toLowerCase();
           if (catNombre.includes('bebida')) cat = 'bebidas';
@@ -122,7 +126,7 @@ export class RestauranteFacade {
         this._productosMenu.set(menuMapeado);
       },
       error: (err) => {
-        console.error('[RestauranteFacade] Error al cargar menú (recetas):', err);
+        console.error('[RestauranteFacade] Error fatal al cargar menú:', err);
       }
     });
   }
