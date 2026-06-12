@@ -246,6 +246,17 @@
             </span>
           </div>
 
+          @if (f.estado === 'REGISTRADA') {
+            <div class="gil-reconciliar-row">
+              <p class="gil-reconciliar-hint">
+                ¿Faltó el conteo físico? Rehacé la conciliación: el conteo se carga con lo facturado y podés ajustarlo.
+              </p>
+              <restaurant-button variant="surface" [disabled]="loading()" (click)="reconciliar()">
+                Rehacer conciliación (con conteo)
+              </restaurant-button>
+            </div>
+          }
+
           @if (c.diferencias.length === 0) {
             <p class="gil-conciliacion__empty">Todos los ítems coinciden con el GIL.</p>
           } @else {
