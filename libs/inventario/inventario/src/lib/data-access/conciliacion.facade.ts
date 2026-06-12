@@ -58,26 +58,34 @@ export class ConciliacionFacade {
       }))
   );
 
-  /** Fecha de la conciliación más reciente (o null si no hay ninguna) */
-  public ultimaFecha = computed(() => {
+  /** Conciliación más reciente por fecha (o null si no hay ninguna). */
+  private ultimaConciliacion = computed(() => {
     const list = this._conciliaciones();
     if (list.length === 0) return null;
-    return list.reduce((prev, cur) => (cur.fecha > prev.fecha ? cur : prev)).fecha;
+    return list.reduce((prev, cur) => (cur.fecha > prev.fecha ? cur : prev));
   });
+
+  /** Fecha de la conciliación más reciente (o null si no hay ninguna) */
+  public ultimaFecha = computed(() => this.ultimaConciliacion()?.fecha ?? null);
+
+  /** Id de la conciliación más reciente — para el enlace "Ver detalle". */
+  public ultimaId = computed(() => this.ultimaConciliacion()?.id ?? null);
 
   /**
    * Tendencia mensual: agrupa conciliaciones por mes (últimos 6 meses),
-   * calcula promedio de precisión y suma de ítems totales por mes.
+   * calcula promedio de precisión, total de ítems y % de merma (ítems en
+   * diferencia sobre el total contado) por mes.
    */
   public tendenciaMensual = computed(() => {
-    const meses: Record<string, { sumaPrecision: number; sumaItems: number; count: number }> = {};
+    const meses: Record<string, { sumaPrecision: number; sumaItems: number; sumaDif: number; count: number }> = {};
 
     for (const c of this._conciliaciones()) {
       const mes = c.fecha.slice(0, 7); // 'YYYY-MM'
-      if (!meses[mes]) meses[mes] = { sumaPrecision: 0, sumaItems: 0, count: 0 };
+      if (!meses[mes]) meses[mes] = { sumaPrecision: 0, sumaItems: 0, sumaDif: 0, count: 0 };
       meses[mes].sumaPrecision += c.precision;
-      meses[mes].sumaItems    += c.itemsTotal;
-      meses[mes].count        += 1;
+      meses[mes].sumaItems     += c.itemsTotal;
+      meses[mes].sumaDif       += c.itemsDif;
+      meses[mes].count         += 1;
     }
 
     return Object.entries(meses)
@@ -88,10 +96,28 @@ export class ConciliacionFacade {
         label:     new Date(mes + '-01').toLocaleString('es-CO', { month: 'short' }),
         precision: Math.round(v.sumaPrecision / v.count),
         items:     v.sumaItems,
+        merma:     v.sumaItems > 0 ? Math.round((v.sumaDif / v.sumaItems) * 100) : 0,
         isCurrent: false,
       }))
       .map((entry, _i, arr) => ({ ...entry, isCurrent: entry.mes === arr[arr.length - 1].mes }));
   });
+
+  /**
+   * Actividad reciente: las conciliaciones más recientes (máx. 4) mapeadas a
+   * entradas de timeline. Deriva todo del historial real, sin datos inventados.
+   */
+  public actividadReciente = computed(() =>
+    [...this._conciliaciones()]
+      .sort((a, b) => b.fecha.localeCompare(a.fecha))
+      .slice(0, 4)
+      .map(c => ({
+        id:        c.id,
+        ubicacion: c.ubicacion,
+        detalle:   c.itemsDif > 0 ? `${c.itemsDif} ítem(s) en diferencia` : 'Sin diferencias',
+        fecha:     c.fecha,
+        estado:    (c.itemsDif === 0 ? 'ok' : c.precision < 90 ? 'alert' : 'neutral') as 'ok' | 'alert' | 'neutral',
+      }))
+  );
 
   /**
    * Agrupa los ítems del catálogo por categoría.

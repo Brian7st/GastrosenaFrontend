@@ -81,12 +81,13 @@ export interface EjecucionMensualResponse {
   montoPagado:        number;
 }
 
-/** GET /reporting/alertas/resumen?destinatarioId? */
+/** GET /reporting/alertas/resumen?destinatarioId?
+ *  Forma real del backend: { totalActivas, totalCriticas, totalResueltas, porTipo: {}, porEstado: {} } */
 export interface ResumenAlertasResponse {
-  totalAlertas:       number;
-  alertasPendientes:  number;
-  alertasResueltas:   number;
-  productosCriticos:  number;
-  alertasPorTipo:     { tipo: string; cantidad: number }[];
-  ultimaAlerta?:      string;
+  totalActivas:   number;
+  totalCriticas:  number;
+  totalResueltas: number;
+  porTipo:        Record<string, number>;
+  porEstado:      Record<string, number>;
+  ultimaAlerta?:  string;
 }

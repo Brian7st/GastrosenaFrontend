@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { LucideIconComponent, ButtonComponent, KpiCardComponent } from '@restaurant/shared/ui';
@@ -34,6 +34,11 @@ export class ConciliacionDashboardComponent implements OnInit {
   // Categorías reales del catálogo de bienes
   categorias = this.facade.categoriasSummary;
 
+  // Tendencia de merma y actividad reciente — derivadas del historial real
+  tendencias = this.facade.tendenciaMensual;
+  actividades = this.facade.actividadReciente;
+  ultimaId    = this.facade.ultimaId;
+
   // Mapa de iconos por categoría — alineado con los de la requisición (mismas categorías).
   private readonly iconoPorCategoria: Record<string, string> = {
     'Perecederos':             'thermometer',
@@ -46,23 +51,6 @@ export class ConciliacionDashboardComponent implements OnInit {
   iconoDeCategoria(nombre: string): string {
     return this.iconoPorCategoria[nombre] ?? 'package';
   }
-
-  // ─── Datos de UI locales (decoración) ───
-  tendencias = signal([
-    { mes: 'Ene', valor: 60, isCurrent: false },
-    { mes: 'Feb', valor: 50, isCurrent: false },
-    { mes: 'Mar', valor: 55, isCurrent: false },
-    { mes: 'Abr', valor: 40, isCurrent: false },
-    { mes: 'May', valor: 30, isCurrent: false },
-    { mes: 'Jun', valor: 25, isCurrent: true },
-  ]);
-
-  actividades = signal([
-    { id: 1, ubicacion: 'Cocina Principal',    detalle: 'Conciliación cerrada',           tiempo: 'Hace 10 min',  estado: 'ok'      },
-    { id: 2, ubicacion: 'Almacén de Insumos',  detalle: 'Ajuste de inventario (#AJ-102)', tiempo: 'Hace 45 min',  estado: 'neutral' },
-    { id: 3, ubicacion: 'Bodega Refrigerados', detalle: 'Toma física iniciada',           tiempo: 'Hace 2 horas', estado: 'neutral' },
-    { id: 4, ubicacion: 'Área de Carnes',      detalle: 'Discrepancia detectada > 5%',    tiempo: 'Ayer, 16:30',  estado: 'alert'   },
-  ]);
 
   ngOnInit(): void {
     this.facade.loadAll();
