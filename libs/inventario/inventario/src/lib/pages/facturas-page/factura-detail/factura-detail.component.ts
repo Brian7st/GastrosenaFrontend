@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
@@ -31,9 +31,27 @@ export class FacturaDetailPageComponent implements OnInit {
   conciliacionGil      = this.facade.conciliacionGil;
   conciliacionCargada  = this.facade.conciliacionCargada;
   gilesDisponibles     = this.facade.gilesDisponibles;
+  gilBienes            = this.facade.gilBienes;
 
   observaciones   = signal<Record<string, string>>({});
   gilParaVincular = signal('');
+
+  constructor() {
+    // Cargar los ítems del GIL conciliado para poder re-conciliar con conteo físico.
+    effect(() => {
+      const c = this.conciliacionGil();
+      if (c?.gilId) this.facade.cargarGilBienes(c.gilId);
+    });
+  }
+
+  /** Conteo físico por defecto = lo facturado (editable en un flujo posterior). */
+  private buildConteoMap(): Record<string, number> {
+    const map: Record<string, number> = {};
+    this.gilBienes().forEach(b => {
+      if (b.productoId) map[b.productoId] = b.cantidad;
+    });
+    return map;
+  }
 
   showConfirmVerificar  = signal(false);
   showConfirmPagada     = signal(false);
@@ -117,15 +135,25 @@ export class FacturaDetailPageComponent implements OnInit {
   }
 
   onGilVincularChange(event: Event): void {
-    this.gilParaVincular.set((event.target as HTMLSelectElement).value);
+    const gilId = (event.target as HTMLSelectElement).value;
+    this.gilParaVincular.set(gilId);
+    if (gilId) this.facade.cargarGilBienes(gilId); // pre-carga ítems para el conteo
   }
 
   vincularGil(): void {
     const factura = this.factura();
     const gilId   = this.gilParaVincular();
     if (!factura || !gilId) return;
-    this.facade.conciliarFacturaGil(String(factura.id), gilId);
+    this.facade.conciliarFacturaGil(String(factura.id), gilId, this.buildConteoMap());
     this.gilParaVincular.set('');
+  }
+
+  /** Re-concilia la factura con su GIL actual, enviando el conteo (default = facturado). */
+  reconciliar(): void {
+    const factura = this.factura();
+    const c = this.conciliacionGil();
+    if (!factura || !c?.gilId) return;
+    this.facade.conciliarFacturaGil(String(factura.id), c.gilId, this.buildConteoMap());
   }
 
   estaConciliada(diferencias: ConciliacionGilDiferencia[]): boolean {

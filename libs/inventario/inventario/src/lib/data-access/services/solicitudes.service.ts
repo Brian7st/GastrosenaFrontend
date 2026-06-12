@@ -165,6 +165,7 @@ export class SolicitudesService {
       codigoGrupo:            data.codigoGrupo,
       fichaCaracterizacion:   data.codigoGrupo,
       observaciones:          data.observaciones,
+      programaDefault:        data.programaDefault,
     };
     return this.http
       .post<GilResponse>(`${API}/procurement/giles/generar`, body)

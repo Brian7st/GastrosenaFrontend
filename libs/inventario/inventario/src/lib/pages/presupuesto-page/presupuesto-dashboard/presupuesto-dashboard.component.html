@@ -290,11 +290,12 @@
       <tr>
         <th class="text-center">Fecha</th>
         <th class="text-center">Estado</th>
-        <th class="text-center">Documento</th>
-        <th class="text-center">Programa</th>
+        <th class="text-center">GIL</th>
+        <th class="text-center">Concepto</th>
         <th class="text-center">Rubro</th>
-        <th style="text-align: right;">Valor</th>
-        <th style="text-align: right;">Saldo Resultante</th>
+        <th style="text-align: right;">Monto</th>
+        <th style="text-align: right;">Ret. ZESE</th>
+        <th class="text-center">Acción</th>
       </tr>
     </thead>
     <tbody>
@@ -307,24 +308,31 @@
           <restaurant-status-badge [status]="getTipoConfig(a.estado).status" [class]="getTipoConfig(a.estado).cssClass" [label]="a.estado"></restaurant-status-badge>
         </td>
         <td class="text-center">
-          <a href="javascript:void(0)" class="doc-link">
-            <lucide-icon name="external-link" [size]="14"></lucide-icon>
-            {{ a.documentoId }}
-          </a>
+          <span class="rubro-code">{{ gilLabel(a.gilId) }}</span>
         </td>
         <td class="text-center">
-          <span class="programa-text">{{ a.programa }}</span>
+          <span class="programa-text">{{ a.concepto }}</span>
         </td>
         <td class="text-center">
-          <span class="rubro-code">{{ a.rubro }}</span>
+          <span class="rubro-code">{{ rubroLabel(a.rubroId) }}</span>
         </td>
         <td style="text-align: right;">
-          <span class="money-val" [class.money-val--negativo]="a.valor < 0">
-            {{ a.valor | formatoMoneda:false }}
+          <span class="money-val" [class.money-val--negativo]="a.monto < 0">
+            {{ a.monto | formatoMoneda:false }}
           </span>
         </td>
         <td style="text-align: right;">
-          <span class="saldo-text">{{ a.saldoResultante | formatoMoneda:false }}</span>
+          <span class="saldo-text">{{ a.montoRetencionZese | formatoMoneda:false }}</span>
+        </td>
+        <td class="text-center">
+          @if (esPagable(a.estado)) {
+            <restaurant-button variant="primary" (click)="abrirPago(a)">
+              <div class="btn-icon-text">
+                <lucide-icon name="dollar-sign" [size]="14"></lucide-icon>
+                Pagar
+              </div>
+            </restaurant-button>
+          }
         </td>
       </tr>
       }
@@ -375,6 +383,54 @@
   (exportar)="onExport($event)"
   (cerrar)="closeExportModal()">
 </inventario-exportar>
+}
+
+<!-- Modal: Registrar Pago de un compromiso PENDIENTE -->
+@if (showPagoModal()) {
+<div class="pago-overlay" (click)="cerrarPago()">
+  <div class="pago-card" (click)="$event.stopPropagation()">
+    <div class="pago-header">
+      <div>
+        <h3 class="pago-title">Registrar Pago</h3>
+        <p class="pago-sub">{{ pagoConcepto() }}</p>
+      </div>
+      <button class="pago-close" (click)="cerrarPago()" aria-label="Cerrar">
+        <lucide-icon name="x" [size]="18"></lucide-icon>
+      </button>
+    </div>
+
+    <div class="pago-body">
+      <restaurant-input
+        label="CUFE de la fuente de pago"
+        placeholder="CUFE de la factura electrónica…"
+        [ngModel]="pagoCufe()" (ngModelChange)="pagoCufe.set($event)">
+      </restaurant-input>
+      @if (pagoCargandoCufe()) {
+        <p class="pago-cufe-hint">Cargando CUFE del FEL conciliado…</p>
+      } @else if (pagoCufe()) {
+        <p class="pago-cufe-hint pago-cufe-hint--ok">CUFE cargado automáticamente desde el FEL vinculado.</p>
+      }
+      <restaurant-input
+        label="Monto" type="number" placeholder="0"
+        [ngModel]="pagoMonto()" (ngModelChange)="pagoMonto.set($event)">
+      </restaurant-input>
+      <restaurant-input
+        label="Fecha de pago" type="text"
+        [ngModel]="pagoFecha()" (ngModelChange)="pagoFecha.set($event)">
+      </restaurant-input>
+    </div>
+
+    <div class="pago-actions">
+      <restaurant-button variant="surface" (click)="cerrarPago()">Cancelar</restaurant-button>
+      <restaurant-button variant="primary" [disabled]="!pagoValido()" (click)="confirmarPago()">
+        <div class="btn-icon-text">
+          <lucide-icon name="dollar-sign" [size]="16"></lucide-icon>
+          Confirmar pago
+        </div>
+      </restaurant-button>
+    </div>
+  </div>
+</div>
 }
 
 <!-- Router outlet para modales (registrar, traslado, cargar-gil) -->

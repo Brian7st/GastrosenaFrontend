@@ -55,8 +55,16 @@ export class FacturaImportPageComponent implements OnInit {
       const bienes = this.gilBienes();
       const factura = this.facturaImportada();
       if (bienes.length > 0 && factura) {
-        this.manualLinks.set(this.buildAutoLinks(bienes, factura.lineas));
-        this.cantidadesRecibidas.set(bienes.map(() => null));
+        const links = this.buildAutoLinks(bienes, factura.lineas);
+        this.manualLinks.set(links);
+        // Pre-llenar el conteo con la cantidad de la línea FEL matcheada (caso común:
+        // se recibió lo facturado). Editable si hubo faltante. Evita el dead-end de
+        // conciliar con conteo nulo. Fallback: la cantidad del ítem GIL.
+        this.cantidadesRecibidas.set(bienes.map((bien, i) => {
+          const felIdx = links[i];
+          const felLinea = (felIdx !== null && felIdx !== undefined) ? factura.lineas[felIdx] : undefined;
+          return felLinea?.cantidad ?? bien.cantidad ?? null;
+        }));
       } else {
         this.manualLinks.set([]);
         this.cantidadesRecibidas.set([]);

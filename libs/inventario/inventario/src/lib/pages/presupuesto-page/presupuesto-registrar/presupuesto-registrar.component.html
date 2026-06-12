@@ -26,10 +26,15 @@
       <!-- Programa de formación -->
       <div class="form-field">
         <label class="field-label">NOMBRE DEL PROGRAMA <span class="required">*</span></label>
-        <div class="input-wrapper">
+        <div class="select-wrapper">
           <lucide-icon name="building-2" [size]="18" class="field-icon"></lucide-icon>
-          <input type="text" formControlName="programaFormacion" class="form-input"
-                 placeholder="Ej: Tecnólogo en Gastronomía">
+          <select formControlName="programaFormacion" class="form-select">
+            <option value="" disabled>Seleccione un programa…</option>
+            @for (programa of programas(); track programa.codigo) {
+              <option [value]="programa.codigo">{{ programa.nombre }}</option>
+            }
+          </select>
+          <lucide-icon name="chevron-down" [size]="18" class="select-chevron"></lucide-icon>
         </div>
       </div>
 
