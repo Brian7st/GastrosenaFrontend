@@ -33,10 +33,11 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
           icono: 'chef-hat',
           permisos: ['RECETAS_GESTIONAR', 'RECETAS_CONSULTAR', 'COMANDAS_CONSULTAR'],
           children: [
-            { label: 'Inicio',       tKey: 'nav.inicio',    ruta: '/app/cocina/inicio',       icono: 'layout-dashboard' },
-            { label: 'Comandas',     tKey: 'nav.comandas',  ruta: '/app/cocina/comandas',     icono: 'clipboard-list'   },
-            { label: 'Recetas',      tKey: 'nav.recetas',   ruta: '/app/cocina/recetas',      icono: 'book-open'        },
-            { label: 'Evaluar',      tKey: 'nav.evaluar',   ruta: '/app/cocina/actividad',    icono: 'graduation-cap'   },
+            { label: 'Inicio',        tKey: 'nav.inicio',        ruta: '/app/cocina/inicio',       icono: 'layout-dashboard' },
+            { label: 'Comandas',     tKey: 'nav.comandas',      ruta: '/app/cocina/comandas',     icono: 'clipboard-list'   },
+            { label: 'Recetas',      tKey: 'nav.recetas',       ruta: '/app/cocina/recetas',      icono: 'book-open'        },
+            { label: 'Evaluar',      tKey: 'nav.evaluar',       ruta: '/app/cocina/actividad',    icono: 'graduation-cap'   },
+            { label: 'Estadísticas', tKey: 'nav.estadisticas',  ruta: '/app/cocina/estadisticas', icono: 'bar-chart-2'      },
           ],
         },
 
@@ -155,12 +156,7 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
               ruta: '/app/reportes/inventario',
               icono: 'warehouse',
             },
-            {
-              label: 'Estadísticas cocina',
-              tKey: 'nav.estadisticas_cocina',
-              ruta: '/app/reportes/estadisticas-cocina',
-              icono: 'bar-chart-2',
-            },
+
           ],
         },
       ],
