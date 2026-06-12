@@ -7,7 +7,8 @@ import {
   PedidoCreateRequest, PedidoResponse, PedidoResumenResponse,
   DetallePedidoResponse,
   SesionCajaResponse, FacturaResponse,
-  AbrirSesionRequest, CerrarSesionRequest, FacturarPedidoRequest
+  AbrirSesionRequest, CerrarSesionRequest, FacturarPedidoRequest,
+  RecetaResponseDTO
 } from '../models/restaurante.model';
 
 @Injectable({ providedIn: 'root' })
@@ -19,6 +20,13 @@ export class RestauranteService {
   private readonly pedidosUrl = '/api/pedidos';
   private readonly cajaUrl = '/api/caja';
   private readonly facturasUrl = '/api/facturas';
+  private readonly recetasUrl = 'http://localhost:8082/api/recetas';
+
+  // ── Recetas (Cocina) ────────────────────────────────────────────────────────
+
+  obtenerRecetas(): Observable<RecetaResponseDTO[]> {
+    return this.http.get<RecetaResponseDTO[]>(this.recetasUrl);
+  }
 
   // ── Mesas — lectura ─────────────────────────────────────────────────────────
 
