@@ -87,7 +87,6 @@ export class ConsolidadoListComponent implements OnInit {
   kpiTotalEjecutado = computed(() =>
     this.consolidados().reduce((acc, c) => acc + c.totales.valorNeto, 0)
   );
-  kpiContabilizados = computed(() => 0);
   kpiGenerados      = computed(() => this.consolidados().filter(c => c.estado === 'GENERADO').length);
   kpiReversados     = computed(() => this.consolidados().filter(c => c.estado === 'REVERSADO').length);
 

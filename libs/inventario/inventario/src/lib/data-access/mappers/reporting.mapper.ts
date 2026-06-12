@@ -158,12 +158,14 @@ export function trazabilidadFromApi(
 }
 
 export function resumenAlertasFromApi(dto: ResumenAlertasResponse): ResumenAlertas {
+  const porTipo = dto.porTipo ?? {};
   return {
-    totalAlertas:      dto.totalAlertas,
-    alertasPendientes: dto.alertasPendientes,
-    alertasResueltas:  dto.alertasResueltas,
-    productosCriticos: dto.productosCriticos,
-    alertasPorTipo:    dto.alertasPorTipo.map(a => ({ tipo: a.tipo, cantidad: a.cantidad })),
+    // Pendientes = sin resolver (activas + críticas); el backend no manda un total directo.
+    totalAlertas:      (dto.totalActivas ?? 0) + (dto.totalCriticas ?? 0) + (dto.totalResueltas ?? 0),
+    alertasPendientes: (dto.totalActivas ?? 0) + (dto.totalCriticas ?? 0),
+    alertasResueltas:  dto.totalResueltas ?? 0,
+    productosCriticos: dto.totalCriticas ?? 0,
+    alertasPorTipo:    Object.entries(porTipo).map(([tipo, cantidad]) => ({ tipo, cantidad })),
     ultimaAlerta:      dto.ultimaAlerta,
   };
 }
