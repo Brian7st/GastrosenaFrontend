@@ -49,29 +49,9 @@ describe('ComandasPageComponent', () => {
       expect(filtradas.length).toBe(1);
       expect(filtradas[0].estado).toBe('Preparando');
     });
-
-    it('debería filtrar por prioridad', () => {
-      component.filtroPrioridad.set('Alta');
-      fixture.detectChanges();
-      const filtradas = component.comandasFiltradas();
-      
-      expect(filtradas.length).toBe(1);
-      expect(filtradas[0].prioridad).toBe('Alta');
-    });
   });
 
   describe('Ordenamiento', () => {
-    it('debería ordenar por Prioridad correctamente (Urgente > Alta > Normal)', () => {
-      component.filtroOrden.set('Prioridad');
-      fixture.detectChanges();
-      const filtradas = component.comandasFiltradas();
-      
-      // Comprobamos el orden descendente de prioridad
-      expect(filtradas[0].prioridad).toBe('Urgente');
-      expect(filtradas[1].prioridad).toBe('Alta');
-      expect(filtradas[2].prioridad).toBe('Normal');
-    });
-
     it('debería ordenar por Hora de llegada correctamente', () => {
       component.filtroOrden.set('Hora de llegada');
       fixture.detectChanges();

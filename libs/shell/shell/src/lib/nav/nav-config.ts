@@ -29,10 +29,11 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
           icono: 'chef-hat',
 
           children: [
-            { label: 'Inicio',       ruta: '/app/cocina/inicio',       icono: 'layout-dashboard' },
-            { label: 'Comandas',     ruta: '/app/cocina/comandas',     icono: 'clipboard-list'   },
-            { label: 'Recetas',      ruta: '/app/cocina/recetas',      icono: 'book-open'        },
-            { label: 'Evaluar',      ruta: '/app/cocina/actividad',    icono: 'graduation-cap'   },
+            { label: 'Inicio',          ruta: '/app/cocina/inicio',        icono: 'layout-dashboard' },
+            { label: 'Comandas',        ruta: '/app/cocina/comandas',      icono: 'clipboard-list'   },
+            { label: 'Recetas',         ruta: '/app/cocina/recetas',       icono: 'book-open'        },
+            { label: 'Evaluar',         ruta: '/app/cocina/actividad',     icono: 'graduation-cap'   },
+            { label: 'Estadísticas',    ruta: '/app/cocina/estadisticas',  icono: 'bar-chart-2'      },
           ],
         },
 
@@ -154,11 +155,6 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
               label: 'Inventario',
               ruta: '/app/reportes/inventario',
               icono: 'warehouse',
-            },
-            {
-              label: 'Estadísticas cocina',
-              ruta: '/app/reportes/estadisticas-cocina',
-              icono: 'bar-chart-2',
             },
           ],
         },
