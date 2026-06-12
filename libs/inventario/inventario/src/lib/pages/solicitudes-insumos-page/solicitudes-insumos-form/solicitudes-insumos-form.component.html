@@ -63,13 +63,16 @@
 
         <div class="form-group">
           <label class="form-label">Programa de Formación <span class="required-mark">*</span></label>
-          <input
-            type="text"
+          <select
             class="form-control"
-            placeholder="Ej. GASTRONOMÍA"
             [value]="programaId()"
-            (input)="programaId.set($any($event.target).value)"
-          />
+            (change)="programaId.set($any($event.target).value)"
+          >
+            <option value="" disabled>Seleccione un programa…</option>
+            @for (programa of programas(); track programa.codigo) {
+              <option [value]="programa.codigo">{{ programa.nombre }}</option>
+            }
+          </select>
           @if (submitAttempted() && errores()['programaId']) {
             <p class="field-error">{{ errores()['programaId'] }}</p>
           }

@@ -9,6 +9,7 @@ import { BienTableComponent } from '../../../ui/components/bien-table/bien-table
 import { BienTypeaheadComponent } from '../../../ui/components/bien-typeahead/bien-typeahead.component';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
+import { ProgramasService, Programa } from '../../../data-access/services/programas.service';
 import { SolicitudSesionItem } from '../../../models/solicitud-sesion.model';
 import { Bien } from '../../../models/inventario.model';
 
@@ -25,8 +26,12 @@ export class SolicitudesInsumosFormComponent implements OnInit {
   private route          = inject(ActivatedRoute);
   readonly facade        = inject(SolicitudesFacade);
   readonly inventario    = inject(InventarioFacade);
+  private programasService = inject(ProgramasService);
 
   isEdit          = signal(false);
+
+  /** Catálogo de los 5 programas válidos para el selector. */
+  programas       = signal<Programa[]>([]);
 
   constructor() {
     effect(() => {
@@ -101,6 +106,7 @@ export class SolicitudesInsumosFormComponent implements OnInit {
       this.facade.cargarSolicitudSesionById(id);
     }
     this.inventario.cargarBienes({ estado: 'Activo', page: 0, size: 8 });
+    this.programasService.getProgramas().subscribe(p => this.programas.set(p));
   }
 
   // ── Handlers del catálogo ──────────────────────────────────────────────────

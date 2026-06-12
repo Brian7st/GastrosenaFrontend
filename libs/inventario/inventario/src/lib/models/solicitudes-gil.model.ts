@@ -100,4 +100,6 @@ export interface GenerarGilData {
   solicitante: string;
   codigoGrupo: string;
   observaciones?: string;
+  /** Programa de Formación por defecto del GIL (código del catálogo). */
+  programaDefault?: string;
 }
