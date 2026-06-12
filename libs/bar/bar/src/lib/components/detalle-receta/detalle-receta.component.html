@@ -39,7 +39,7 @@
                   <span class="cantidad">{{ ing.cantidadRequerida }} {{ ing.unidadMedida }}</span>
                 </div>
               } @empty {
-                <p class="empty-msg">No hay ingredientes registrados.</p>
+                <restaurant-empty-state title="Sin ingredientes" message="No hay ingredientes registrados."></restaurant-empty-state>
               }
             </div>
           </section>
@@ -64,7 +64,7 @@
                   </div>
                 </div>
               } @empty {
-                <p class="empty-msg">No hay pasos registrados.</p>
+                <restaurant-empty-state title="Sin pasos" message="No hay pasos registrados."></restaurant-empty-state>
               }
             </div>
           </section>

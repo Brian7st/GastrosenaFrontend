@@ -4,12 +4,12 @@ import { ComandaBarYBarismo, ComandaItem } from '../../models/comanda.model';
 import { ComandaService } from '../../data-access/comanda.service';
 import { RecetaService } from '../../data-access/receta.service';
 import { Receta } from '../../models/receta.model';
-import { ButtonComponent, LucideIconComponent } from '@restaurant/shared/ui';
+import { ButtonComponent, LucideIconComponent, EmptyStateComponent } from '@restaurant/shared/ui';
 
 @Component({
   selector: 'restaurant-comanda-card',
   standalone: true,
-  imports: [CommonModule, ButtonComponent, LucideIconComponent],
+  imports: [CommonModule, ButtonComponent, LucideIconComponent, EmptyStateComponent],
   templateUrl: './comanda-card.component.html',
   styleUrl: './comanda-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

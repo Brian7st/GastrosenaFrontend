@@ -44,9 +44,10 @@
         <h3 style="margin-top: 0; font-size: 1.1rem; color: #1e293b; font-weight: 600; margin-bottom: 16px;">Categorías Existentes</h3>
 
         @if (categoriaService.categorias().length === 0) {
-          <div style="text-align: center; color: #94a3b8; padding: 24px; background: #ffffff; border-radius: 12px; border: 1px dashed #cbd5e1;">
-            No hay categorías registradas.
-          </div>
+          <restaurant-empty-state
+            title="Sin categorías"
+            message="No hay categorías registradas."
+          ></restaurant-empty-state>
         }
 
         <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
