@@ -1,4 +1,4 @@
-export type EstadoGil = 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'VERIFICADO' | 'CERRADO';
+export type EstadoGil = 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'VERIFICADO' | 'COMPROMETIDO' | 'CERRADO';
 
 export interface CuentadanteGil {
   id?: string | number;

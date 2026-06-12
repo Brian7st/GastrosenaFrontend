@@ -139,13 +139,14 @@ export class PresupuestoDashboardComponent implements OnInit {
   ngOnInit(): void {
     this.facade.loadAll();
     // Para mostrar el número de GIL (no el UUID) en la tabla de afectaciones.
-    // Un GIL comprometido está en estado VERIFICADO o CERRADO (ya pasó conciliación);
-    // el GET sin estado no garantiza traerlos, así que se piden ambos explícitamente.
+    // Toda afectación nace de comprometer presupuesto, lo que deja el GIL en estado
+    // COMPROMETIDO; su única transición posterior es a CERRADO (al legalizar). Por eso
+    // se piden esos dos estados — nunca VERIFICADO, que no tiene compromiso asociado.
     forkJoin({
-      verificados: this.gilesService.getGiles({ estado: 'VERIFICADO', size: 200 }),
-      cerrados:    this.gilesService.getGiles({ estado: 'CERRADO', size: 200 }),
-    }).subscribe(({ verificados, cerrados }) =>
-      this.giles.set([...(verificados.content ?? []), ...(cerrados.content ?? [])]),
+      comprometidos: this.gilesService.getGiles({ estado: 'COMPROMETIDO', size: 200 }),
+      cerrados:      this.gilesService.getGiles({ estado: 'CERRADO', size: 200 }),
+    }).subscribe(({ comprometidos, cerrados }) =>
+      this.giles.set([...(comprometidos.content ?? []), ...(cerrados.content ?? [])]),
     );
   }
 
