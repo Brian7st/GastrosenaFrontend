@@ -13,9 +13,8 @@ function buildXlsx(rows: Record<string, string | number>[]): Buffer {
 
 async function abrirImportar(page: import('@playwright/test').Page) {
   await page.goto('/app/inventario/bienes');
-  const importar = page.getByRole('button', { name: /Importar/i }).first();
-  await expect(importar).toBeVisible();
-  await importar.click();
+  await page.getByRole('button', { name: /Cargar datos internos/i }).click();
+  await expect(page.getByRole('heading', { name: /Cargar datos internos/i })).toBeVisible();
   await expect(page.locator('input[type="file"]')).toBeAttached();
 }
 
@@ -32,7 +31,7 @@ test.describe('Inventario · Bienes · Importar Excel (contra backend real)', ()
       name: 'bienes-e2e.xlsx', mimeType: XLSX_MIME, buffer: xlsx,
     });
 
-    const procesar = page.getByRole('button', { name: /Procesar|Importar/i }).last();
+    const procesar = page.locator('.import-dialog').getByRole('button', { name: /Cargar datos internos/i });
     const [resp] = await Promise.all([
       page.waitForResponse(
         (r) => r.url().includes('/api/v1/catalog/productos/importar-excel') && r.request().method() === 'POST',
@@ -53,7 +52,7 @@ test.describe('Inventario · Bienes · Importar Excel (contra backend real)', ()
       name: 'bienes-malo.xlsx', mimeType: XLSX_MIME, buffer: xlsx,
     });
 
-    const procesar = page.getByRole('button', { name: /Procesar|Importar/i }).last();
+    const procesar = page.locator('.import-dialog').getByRole('button', { name: /Cargar datos internos/i });
     const [resp] = await Promise.all([
       page.waitForResponse(
         (r) => r.url().includes('/api/v1/catalog/productos/importar-excel') && r.request().method() === 'POST',
