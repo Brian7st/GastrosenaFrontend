@@ -38,6 +38,8 @@ export interface Requisicion {
   horaSesion:       string;
   fecha:            string;
   estado:           RequisicionEstado;
+  /** Documento/ID del vocero que firmó la recepción (vacío si aún no firmada). */
+  voceroId:         string;
   items:            RequisicionItem[];
 }
 
@@ -55,6 +57,7 @@ export const MOCK_REQUISICIONES: Requisicion[] = [
     horaSesion: '08:00 - 12:00',
     fecha: '10/04/2026',
     estado: 'BORRADOR',
+    voceroId: '',
     items: [
       { productoId: 'SENA-INS-001', productoNombre: 'Harina de Trigo', cantidad: 5, unidadMedida: 'kg', categoria: 'ABARROTES' },
       { productoId: 'SENA-INS-002', productoNombre: 'Aceite de Oliva', cantidad: 2, unidadMedida: 'L', categoria: 'ABARROTES' },
@@ -71,6 +74,7 @@ export const MOCK_REQUISICIONES: Requisicion[] = [
     horaSesion: '14:00 - 18:00',
     fecha: '08/04/2026',
     estado: 'ENVIADA',
+    voceroId: '',
     items: [
       { productoId: 'SENA-INS-003', productoNombre: 'Mantequilla sin sal', cantidad: 3, unidadMedida: 'kg', categoria: 'LACTEOS' },
     ],
@@ -86,6 +90,7 @@ export const MOCK_REQUISICIONES: Requisicion[] = [
     horaSesion: '07:00 - 11:00',
     fecha: '05/04/2026',
     estado: 'DESPACHADA',
+    voceroId: '',
     items: [
       { productoId: 'SENA-INS-004', productoNombre: 'Azúcar Glass', cantidad: 4, unidadMedida: 'kg', categoria: 'ABARROTES' },
     ],
@@ -101,6 +106,7 @@ export const MOCK_REQUISICIONES: Requisicion[] = [
     horaSesion: '10:00 - 14:00',
     fecha: '01/04/2026',
     estado: 'FIRMADA',
+    voceroId: 'CC 1094-vocero',
     items: [
       { productoId: 'SENA-INS-005', productoNombre: 'Vino Tinto Selección', cantidad: 2, unidadMedida: 'botella', categoria: 'ABARROTES' },
     ],
