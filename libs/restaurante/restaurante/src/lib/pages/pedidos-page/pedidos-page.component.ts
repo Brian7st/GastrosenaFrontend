@@ -46,6 +46,8 @@ export class PedidosPageComponent {
     return p ? p.estado !== 'BORRADOR' : false;
   });
 
+  nombreUsuario = this.facade.nombreUsuario;
+
   fechaActual = new Date();
 
   volverAMesas() {

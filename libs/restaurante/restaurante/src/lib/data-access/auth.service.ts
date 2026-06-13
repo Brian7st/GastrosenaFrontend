@@ -13,7 +13,7 @@ export class AuthService {
    */
   getUsuarioId(): string {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
       if (!token) {
         return this.FALLBACK_ID;
       }
@@ -47,28 +47,39 @@ export class AuthService {
 
   getUsuarioNombre(): string {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) return 'Cajero Activo';
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
+      if (!token) return 'Usuario Activo';
 
       const parts = token.split('.');
-      if (parts.length !== 3) return 'Cajero Activo';
+      if (parts.length !== 3) return 'Usuario Activo';
 
       const jsonPayload = JSON.parse(atob(parts[1]));
 
       if (jsonPayload.nombre) return jsonPayload.nombre;
+      if (jsonPayload.nombreCompleto) return jsonPayload.nombreCompleto;
       if (jsonPayload.name) return jsonPayload.name;
       if (jsonPayload.username) return jsonPayload.username;
       if (jsonPayload.email) return jsonPayload.email;
+      if (jsonPayload.preferred_username) return jsonPayload.preferred_username;
+      if (jsonPayload.given_name) return jsonPayload.given_name;
       
-      return 'Cajero (ID: ' + this.getUsuarioId().substring(0,8) + ')';
+      const nombreGuardado = localStorage.getItem('auth_nombre');
+      if (nombreGuardado) return nombreGuardado;
+
+      if (jsonPayload.sub) {
+        const namePart = jsonPayload.sub.split('@')[0];
+        return namePart.charAt(0).toUpperCase() + namePart.slice(1).replace(/\./g, ' ');
+      }
+
+      return 'Usuario (ID: ' + this.getUsuarioId().substring(0,8) + ')';
     } catch (e) {
-      return 'Cajero Activo';
+      return 'Usuario Activo';
     }
   }
 
   getRoles(): string[] {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
       if (!token) return [];
 
       const parts = token.split('.');

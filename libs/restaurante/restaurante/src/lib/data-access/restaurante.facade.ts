@@ -73,6 +73,10 @@ export class RestauranteFacade {
     return this.authService.hasAnyRole(['ROLE_ADMIN', 'ADMINISTRADOR', 'ROLE_ADMINISTRADOR', 'ROLE_INSTRUCTOR', 'INSTRUCTOR']);
   });
 
+  readonly nombreUsuario = computed(() => {
+    return this.authService.getUsuarioNombre();
+  });
+
   readonly stats = computed<RestauranteStats>(() => {
     const mesasActivas = this._mesas().filter(m => m.activo);
     const totalMesas = mesasActivas.length;
