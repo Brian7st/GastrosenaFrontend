@@ -69,6 +69,10 @@ export class RestauranteFacade {
   readonly historialFacturas = this._historialFacturas.asReadonly();
   readonly productosMenu = this._productosMenu.asReadonly();
 
+  readonly puedeAdministrarMesas = computed(() => {
+    return this.authService.hasAnyRole(['ROLE_ADMIN', 'ADMINISTRADOR', 'ROLE_ADMINISTRADOR', 'ROLE_INSTRUCTOR', 'INSTRUCTOR']);
+  });
+
   readonly stats = computed<RestauranteStats>(() => {
     const mesasActivas = this._mesas().filter(m => m.activo);
     const totalMesas = mesasActivas.length;

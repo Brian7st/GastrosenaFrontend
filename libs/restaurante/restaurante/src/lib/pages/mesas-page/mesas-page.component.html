@@ -27,10 +27,12 @@
         <lucide-icon name="layout-grid" [size]="18"></lucide-icon>
         <span>Mesas</span>
       </restaurant-button>
-      <restaurant-button (click)="abrirModal('agregar')">
-        <lucide-icon name="plus" [size]="18"></lucide-icon>
-        <span>Agregar Mesa</span>
-      </restaurant-button>
+      @if (puedeAdministrarMesas()) {
+        <restaurant-button (click)="abrirModal('agregar')">
+          <lucide-icon name="plus" [size]="18"></lucide-icon>
+          <span>Agregar Mesa</span>
+        </restaurant-button>
+      }
     </div>
   </div>
 

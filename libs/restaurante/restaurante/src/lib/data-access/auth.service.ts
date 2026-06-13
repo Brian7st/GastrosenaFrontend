@@ -65,4 +65,40 @@ export class AuthService {
       return 'Cajero Activo';
     }
   }
+
+  getRoles(): string[] {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return [];
+
+      const parts = token.split('.');
+      if (parts.length !== 3) return [];
+
+      const jsonPayload = JSON.parse(atob(parts[1]));
+
+      let roles: any = [];
+      if (jsonPayload.authorities) roles = jsonPayload.authorities;
+      else if (jsonPayload.roles) roles = jsonPayload.roles;
+      else if (jsonPayload.role) roles = [jsonPayload.role];
+      else if (jsonPayload.realm_access?.roles) roles = jsonPayload.realm_access.roles;
+
+      if (!Array.isArray(roles)) {
+        if (typeof roles === 'string') {
+          roles = [roles];
+        } else {
+          roles = [];
+        }
+      }
+
+      return roles.map((r: string) => r.toUpperCase());
+    } catch (e) {
+      console.error('[AuthService] Error al extraer roles del token JWT', e);
+      return [];
+    }
+  }
+
+  hasAnyRole(allowedRoles: string[]): boolean {
+    const userRoles = this.getRoles();
+    return allowedRoles.some(r => userRoles.includes(r.toUpperCase()));
+  }
 }

@@ -45,6 +45,7 @@ export class MesasPageComponent {
   mesas = this.facade.mesas;
   mesasCargando = this.facade.mesasCargando;
   mesasError = this.facade.mesasError;
+  puedeAdministrarMesas = this.facade.puedeAdministrarMesas;
   mesasActivas = computed(() => this.mesas().filter(m => m.activo));
   mesasInactivas = computed(() => this.mesas().filter(m => !m.activo));
   stats = this.facade.stats;
