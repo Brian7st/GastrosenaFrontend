@@ -261,7 +261,7 @@ export class RestauranteFacade {
         },
         error: (err) => {
           console.error('[RestauranteFacade] Error al crear mesa:', err);
-          const msg = err.error?.mensaje || err.error?.message || 'Error desconocido al crear mesa.';
+          const msg = err.error?.error || err.error?.mensaje || err.error?.message || 'Error desconocido al crear mesa.';
           observer.next(msg);
           observer.complete();
         }
@@ -295,7 +295,7 @@ export class RestauranteFacade {
             `[RestauranteFacade] Error al ${activo ? 'activar' : 'desactivar'} mesa ${mesaId}:`,
             err
           );
-          const msg = err.error?.mensaje || err.error?.message || `Error desconocido al ${activo ? 'activar' : 'desactivar'} mesa.`;
+          const msg = err.error?.error || err.error?.mensaje || err.error?.message || `Error desconocido al ${activo ? 'activar' : 'desactivar'} mesa.`;
           observer.next(msg);
           observer.complete();
         }
@@ -326,7 +326,7 @@ export class RestauranteFacade {
         },
         error: (err) => {
           console.error(`[RestauranteFacade] Error al editar mesa ${mesaId}:`, err);
-          const msg = err.error?.mensaje || err.error?.message || 'Error desconocido al editar mesa.';
+          const msg = err.error?.error || err.error?.mensaje || err.error?.message || 'Error desconocido al editar mesa.';
           observer.next(msg);
           observer.complete();
         }
@@ -354,7 +354,7 @@ export class RestauranteFacade {
             `[RestauranteFacade] Error al cambiar estado de mesa ${mesaId} a ${nuevoEstado}:`,
             err
           );
-          const msg = err.error?.mensaje || err.error?.message || 'Error desconocido al cambiar estado de la mesa.';
+          const msg = err.error?.error || err.error?.mensaje || err.error?.message || 'Error desconocido al cambiar estado de la mesa.';
           observer.next(msg);
           observer.complete();
         }
@@ -594,7 +594,8 @@ export class RestauranteFacade {
         },
         error: (err) => {
           console.error('[RestauranteFacade] Error al crear pedido:', err);
-          alert('Hubo un error de comunicación al crear el pedido.');
+          const msg = err.error?.error || err.error?.mensaje || err.error?.message || 'Hubo un error de comunicación al crear el pedido.';
+          alert(msg);
           observer.next(false);
           observer.complete();
         }
