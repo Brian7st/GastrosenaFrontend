@@ -17,20 +17,8 @@
       <button class="acta-detail__export-btn"
               [routerLink]="['/app/inventario/actas', a.id, 'imprimir']">
         <lucide-icon name="printer" [size]="16"></lucide-icon>
-        Exportar GOR-F-084
+        Imprimir / Descargar
       </button>
-      <button class="acta-detail__export-btn"
-              [disabled]="loading()"
-              (click)="exportarDocx()">
-        <lucide-icon name="file-text" [size]="16"></lucide-icon>
-        Exportar .docx
-      </button>
-      @if (a.estado !== 'ARCHIVADA') {
-        <button class="acta-detail__status-btn" (click)="cambiarEstado()">
-          <lucide-icon name="refresh-cw" [size]="16"></lucide-icon>
-          Cambiar Estado
-        </button>
-      }
     </div>
   </header>
 
@@ -47,22 +35,6 @@
         ></restaurant-status-badge>
       </div>
       <div class="acta-detail__action-bar-right">
-
-        <!-- BORRADOR → Enviar a Firmas (paso explícito, no genérico) -->
-        @if (a.estado === 'BORRADOR') {
-          <button class="acta-detail__btn-cargar" (click)="cambiarEstado('PENDIENTE_FIRMAS')">
-            <lucide-icon name="send" [size]="16"></lucide-icon>
-            Enviar a Firmas
-          </button>
-        }
-
-        <!-- PENDIENTE_FIRMAS → Cargar Acta Firmada -->
-        @if (a.estado === 'PENDIENTE_FIRMAS') {
-          <button class="acta-detail__btn-cargar" (click)="cargarFirma()">
-            <lucide-icon name="upload-cloud" [size]="16"></lucide-icon>
-            Cargar Acta Firmada
-          </button>
-        }
 
         <!-- FIRMADA → Aprobar + Crear Paquete -->
         @if (a.estado === 'FIRMADA') {
@@ -89,164 +61,9 @@
       </div>
     </div>
 
-    <!-- ── Documento estilo papel A4 ──────────────────────────────────── -->
-    <article class="acta-detail__paper">
+    <!-- ── Documento oficial GOR-F-084 ────────────────────────────────── -->
+    <inventario-acta-documento [acta]="a" />
 
-      <!-- Cabecera del documento -->
-      <header class="acta-detail__doc-header">
-        <div class="acta-detail__doc-logo">
-          <lucide-icon name="graduation-cap" [size]="40"></lucide-icon>
-        </div>
-        <h1 class="acta-detail__doc-institution">SERVICIO NACIONAL DE APRENDIZAJE — SENA</h1>
-        <h2 class="acta-detail__doc-regional">{{ (a.regional ?? 'Regional Quindío – CCYT') | uppercase }}</h2>
-        <div class="acta-detail__doc-badge">
-          <h3 class="acta-detail__doc-badge-text">{{ a.numeroActa | uppercase }}</h3>
-        </div>
-        <p class="acta-detail__doc-comite">
-          <span class="acta-detail__doc-comite-label">Comité:</span>
-          Legalización Materiales de Formación por Sesión
-        </p>
-      </header>
-
-      <!-- Cuerpo del documento -->
-      <div class="acta-detail__doc-body">
-
-        <!-- Sección: Datos Sesión -->
-        <section class="acta-detail__section-card">
-          <div class="acta-detail__session-grid">
-            <div>
-              <span class="acta-detail__field-label">Ciudad</span>
-              <span class="acta-detail__field-value">{{ a.ciudad }}</span>
-            </div>
-            <div>
-              <span class="acta-detail__field-label">Fecha</span>
-              <span class="acta-detail__field-value">{{ a.fecha }}</span>
-            </div>
-            <div>
-              <span class="acta-detail__field-label">Lugar</span>
-              <span class="acta-detail__field-value">{{ a.lugar }}</span>
-            </div>
-          </div>
-        </section>
-
-        <!-- Sección: Agenda de la Sesión (texto fijo institucional) -->
-        <section class="acta-detail__section">
-          <h4 class="acta-detail__section-title">
-            <span class="acta-detail__section-indicator"></span>
-            Agenda de la Sesión
-          </h4>
-          <div class="acta-detail__section-content">
-            <p class="acta-detail__section-text">
-              1. Descripción sesión de formación.<br>
-              2. Listado de materiales utilizados.
-            </p>
-          </div>
-        </section>
-
-        <!-- Sección: Desarrollo -->
-        <section class="acta-detail__section">
-          <h4 class="acta-detail__section-title">
-            <span class="acta-detail__section-indicator"></span>
-            Desarrollo de la Sesión
-          </h4>
-          <div class="acta-detail__section-content">
-            <div class="acta-detail__desarrollo-card">
-              <div class="acta-detail__desarrollo-grid">
-                <div>
-                  <span class="acta-detail__field-label">Instructor a Cargo</span>
-                  <span class="acta-detail__field-value acta-detail__field-value--medium">{{ instructorNombre() }}</span>
-                </div>
-                <div>
-                  <span class="acta-detail__field-label">Documento Soporte</span>
-                  <span class="acta-detail__doc-soporte">
-                    <lucide-icon name="file-text" [size]="14"></lucide-icon>
-                    Requisición {{ a.requisicionId }}
-                  </span>
-                </div>
-                <div class="acta-detail__desarrollo-full">
-                  <span class="acta-detail__field-label">Resultado de Aprendizaje (RA)</span>
-                  <span class="acta-detail__field-value">{{ a.resultadoAprendizaje }}</span>
-                </div>
-                <div class="acta-detail__desarrollo-full">
-                  <span class="acta-detail__field-label">Actividades Realizadas</span>
-                  <span class="acta-detail__field-value">{{ a.actividadesRealizadas ?? '—' }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Sección: Materiales — los ítems viven en la requisición vinculada -->
-        <section class="acta-detail__section">
-          <h4 class="acta-detail__section-title">
-            <span class="acta-detail__section-indicator"></span>
-            Materiales de Formación
-          </h4>
-          <div class="acta-detail__requisicion-ref">
-            <lucide-icon name="file-text" [size]="16"></lucide-icon>
-            Los materiales se detallan en la
-            <a [routerLink]="['/app/inventario/requisiciones']"
-               [queryParams]="{ id: a.requisicionId }"
-               class="acta-detail__link">
-              requisición vinculada
-            </a>
-            adjunta a esta acta.
-          </div>
-        </section>
-
-        <!-- Sección: Compromisos -->
-        <section class="acta-detail__section">
-          <h4 class="acta-detail__section-title">
-            <span class="acta-detail__section-indicator"></span>
-            Compromisos
-          </h4>
-          <div class="acta-detail__compromisos-table-wrapper">
-            <table class="acta-detail__compromisos-table">
-              <thead>
-                <tr>
-                  <th>Actividad</th>
-                  <th>Responsable</th>
-                  <th>Fecha Límite</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (comp of (a.compromisos ?? []); track comp.actividad) {
-                  <tr>
-                    <td>{{ comp.actividad }}</td>
-                    <td>{{ comp.responsable }}</td>
-                    <td class="acta-detail__compromiso-fecha">{{ comp.fechaLimite }}</td>
-                  </tr>
-                }
-                @if ((a.compromisos ?? []).length === 0) {
-                  <tr>
-                    <td colspan="3" class="acta-detail__empty-row">Sin compromisos registrados</td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <!-- Sección: Asistentes y Aprobación -->
-        <section class="acta-detail__firmas-section">
-          <h4 class="acta-detail__firmas-title">Asistentes y Aprobación</h4>
-          <div class="acta-detail__firmas-grid">
-            @for (asistente of (a.asistentes ?? []); track asistente.nombre) {
-              <div class="acta-detail__firma-block">
-                <div class="acta-detail__firma-line"></div>
-                <span class="acta-detail__firma-nombre">{{ asistente.nombre }}</span>
-                <span class="acta-detail__firma-cargo">{{ asistente.dependenciaRol }}</span>
-                <span class="acta-detail__firma-aprueba">{{ asistente.aprueba ? 'Aprueba ✓' : 'No aprueba' }}</span>
-              </div>
-            }
-            @if ((a.asistentes ?? []).length === 0) {
-              <p class="acta-detail__empty-row">Sin asistentes registrados</p>
-            }
-          </div>
-        </section>
-
-      </div>
-    </article>
   </main>
 
 } @else {
@@ -258,5 +75,5 @@
   </div>
 }
 
-<!-- Child route outlet para modales (cargar firma) — siempre activo -->
+<!-- Child route outlet para modales — siempre activo -->
 <router-outlet></router-outlet>
