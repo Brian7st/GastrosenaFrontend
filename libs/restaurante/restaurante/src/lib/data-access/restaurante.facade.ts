@@ -74,7 +74,7 @@ export class RestauranteFacade {
   readonly mostrarModalAccesoDenegado = computed(() => this._mostrarModalAccesoDenegado());
 
   readonly puedeAdministrarMesas = computed(() => {
-    return this.authService.hasAnyRole(['ROLE_ADMIN', 'ADMINISTRADOR', 'ROLE_ADMINISTRADOR', 'ROLE_INSTRUCTOR', 'INSTRUCTOR']);
+    return this.authService.hasAnyRole(['ROLE_ADMIN', 'ADMINISTRADOR', 'ROLE_ADMINISTRADOR', 'ROLE_INSTRUCTOR', 'INSTRUCTOR', 'ADMINISTRADOR_SISTEMA', 'ROLE_ADMINISTRADOR_SISTEMA', 'ADMIN']);
   });
 
   readonly nombreUsuario = computed(() => {

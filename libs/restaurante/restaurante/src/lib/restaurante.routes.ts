@@ -29,7 +29,7 @@ import { RestauranteFacade } from './data-access/restaurante.facade';
 const cajaGuard = () => {
   const auth = inject(AuthService);
   const facade = inject(RestauranteFacade);
-  const permitidos = ['ROLE_CAJERO', 'CAJERO', 'ROLE_ADMIN', 'ADMINISTRADOR', 'ROLE_INSTRUCTOR', 'INSTRUCTOR'];
+  const permitidos = ['ROLE_CAJERO', 'CAJERO', 'ROLE_ADMIN', 'ADMINISTRADOR', 'ROLE_ADMINISTRADOR', 'ROLE_INSTRUCTOR', 'INSTRUCTOR', 'ADMINISTRADOR_SISTEMA', 'ROLE_ADMINISTRADOR_SISTEMA', 'ADMIN'];
   if (auth.hasAnyRole(permitidos)) {
     return true;
   }
