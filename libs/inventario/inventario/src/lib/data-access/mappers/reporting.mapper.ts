@@ -80,14 +80,17 @@ export function ejecucionMensualListFromApi(dtos: EjecucionMensualResponse[]): E
   }));
 }
 
-/** Computa porcentajeEjecucion: guard divide-by-zero. */
+/**
+ * Computa porcentajeEjecucion sin redondear: la precisión de visualización
+ * se decide UNA sola vez en el template con el pipe `number`.
+ */
 function computePorcentajeEjecucion(
   montoAsignado: number,
   montoComprometido: number,
   montoPagado: number,
 ): number {
   if (montoAsignado <= 0) return 0;
-  return parseFloat(((montoComprometido + montoPagado) / montoAsignado * 100).toFixed(2));
+  return (montoComprometido + montoPagado) / montoAsignado * 100;
 }
 
 export function ejecucionPresupuestalFromApi(

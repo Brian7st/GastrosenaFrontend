@@ -9,14 +9,19 @@ import {
   ElegibleConsolidadoResponse,
 } from '../api/budget.api';
 
-/** Computa porcentajeEjecucion: guard divide-by-zero. */
+/**
+ * Computa porcentajeEjecucion sin redondear: la precisión de visualización
+ * se decide UNA sola vez en el template con el pipe `number`. Redondear acá
+ * (lossy) provocaba que distintas vistas mostraran el mismo % con caras
+ * distintas (17.5 vs 17.52).
+ */
 function computePorcentajeEjecucion(
   montoAsignado: number,
   montoComprometido: number,
   montoPagado: number,
 ): number {
   if (montoAsignado <= 0) return 0;
-  return parseFloat(((montoComprometido + montoPagado) / montoAsignado * 100).toFixed(2));
+  return (montoComprometido + montoPagado) / montoAsignado * 100;
 }
 
 /** Mapea RubroResponse + contexto del presupuesto padre → Rubro del modelo. */

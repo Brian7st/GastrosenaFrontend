@@ -78,10 +78,9 @@ export class PresupuestoFacade {
     }
 
     for (const g of groupMap.values()) {
+      // Sin redondear: el formato se aplica una sola vez en el template (pipe number).
       g.porcentajeEjecucion = g.totalMontoAsignado > 0
-        ? parseFloat(
-            ((g.totalMontoComprometido + g.totalMontoPagado) / g.totalMontoAsignado * 100).toFixed(1),
-          )
+        ? (g.totalMontoComprometido + g.totalMontoPagado) / g.totalMontoAsignado * 100
         : 0;
     }
 
@@ -117,10 +116,9 @@ export class PresupuestoFacade {
     }
 
     for (const g of groupMap.values()) {
+      // Sin redondear: el formato se aplica una sola vez en el template (pipe number).
       g.porcentajeEjecucion = g.totalMontoAsignado > 0
-        ? parseFloat(
-            ((g.totalMontoComprometido + g.totalMontoPagado) / g.totalMontoAsignado * 100).toFixed(1),
-          )
+        ? (g.totalMontoComprometido + g.totalMontoPagado) / g.totalMontoAsignado * 100
         : 0;
     }
 

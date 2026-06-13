@@ -52,7 +52,7 @@ export class ConsolidadoListComponent implements OnInit {
     const estado = this.filtroEstado();
     return this.consolidados().filter(c => {
       const matchQ = !q ||
-        String(c.id).toLowerCase().includes(q) ||
+        String(c.numero).includes(q) ||
         c.fechaGeneracion.toLowerCase().includes(q) ||
         c.estado.toLowerCase().includes(q);
       const matchEstado = !estado || c.estado === estado;
@@ -118,8 +118,9 @@ export class ConsolidadoListComponent implements OnInit {
     this.showExportModal.set(false);
   }
 
-  goToDetail(id: string): void {
-    this.router.navigate(['/app/inventario/consolidado', id]);
+  goToDetail(numero: number): void {
+    // El detalle resuelve por NÚMERO (no UUID): getConsolidadoPorNumero / GET /budget/consolidados/{numero}.
+    this.router.navigate(['/app/inventario/consolidado', numero]);
   }
 
   reversar(id: string): void {
