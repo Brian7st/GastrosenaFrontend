@@ -82,7 +82,7 @@
 
     <restaurant-kpi-card
       label="Valoración monetaria"
-      [value]="'-$' + (detalle()!.valorTotalDiferencias * -1)"
+      [value]="valoracionMonetaria()"
       iconName="trending-down"
       iconVariant="alert">
     </restaurant-kpi-card>
@@ -144,8 +144,8 @@
                 </span>
               </td>
               <td class="text-right text-secondary">${{ item.valorUnit | number }}</td>
-              <td class="text-right font-bold" [ngClass]="item.impacto >= 0 ? 'text-success' : 'text-danger'">
-                {{ item.impacto > 0 ? '+' : '' }}${{ (item.impacto < 0 ? (item.impacto * -1) : item.impacto) | number }}
+              <td class="text-right font-bold" [ngClass]="item.impacto < 0 ? 'text-danger' : 'text-success'">
+                {{ item.impacto > 0 ? '+' : (item.impacto < 0 ? '-' : '') }}${{ (item.impacto < 0 ? (item.impacto * -1) : item.impacto) | number }}
               </td>
               <td class="text-center">
                 <span class="estado-badge"
@@ -174,7 +174,7 @@
       <div class="table-aggregates">
         <div class="aggregate-neto">
           <span class="aggregate-label">VALOR TOTAL DIFERENCIAS</span>
-          <span class="aggregate-value text-danger">-${{ (detalle()!.valorTotalDiferencias * -1) | number }}</span>
+          <span class="aggregate-value text-danger">{{ valoracionMonetaria() }}</span>
         </div>
       </div>
     </div>
