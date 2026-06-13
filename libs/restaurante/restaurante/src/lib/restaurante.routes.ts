@@ -29,7 +29,8 @@ import { RestauranteFacade } from './data-access/restaurante.facade';
 const cajaGuard = () => {
   const auth = inject(AuthService);
   const facade = inject(RestauranteFacade);
-  const permitidos = ['ROLE_CAJERO', 'CAJERO', 'ROLE_ADMIN', 'ADMINISTRADOR', 'ROLE_ADMINISTRADOR', 'ROLE_INSTRUCTOR', 'INSTRUCTOR', 'ADMINISTRADOR_SISTEMA', 'ROLE_ADMINISTRADOR_SISTEMA', 'ADMIN'];
+  // Se añaden permisos explícitos (MODULO_FACTURACION_VER) que envía el backend real
+  const permitidos = ['ROLE_CAJERO', 'CAJERO', 'ROLE_ADMIN', 'ADMINISTRADOR', 'ROLE_INSTRUCTOR', 'INSTRUCTOR', 'ADMINISTRADOR_SISTEMA', 'ROLE_ADMINISTRADOR_SISTEMA', 'ADMIN', 'MODULO_FACTURACION_VER'];
   if (auth.hasAnyRole(permitidos)) {
     return true;
   }

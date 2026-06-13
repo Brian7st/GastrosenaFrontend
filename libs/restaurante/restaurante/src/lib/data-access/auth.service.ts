@@ -79,19 +79,45 @@ export class AuthService {
 
   getRoles(): string[] {
     try {
+      // 1. Intentar leer desde el objeto 'user' del localStorage (usado por ga-web-inicio-general y mocks)
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        try {
+          const userObj = JSON.parse(userStr);
+          if (userObj && userObj.rol) {
+            return [userObj.rol.toUpperCase()];
+          }
+        } catch(e) {}
+      }
+
+      // 2. Intentar extraer del JWT real
       const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
-      if (!token) return [];
-
-      const parts = token.split('.');
-      if (parts.length !== 3) return [];
-
-      const jsonPayload = JSON.parse(atob(parts[1]));
-
       let roles: any = [];
-      if (jsonPayload.authorities) roles = jsonPayload.authorities;
-      else if (jsonPayload.roles) roles = jsonPayload.roles;
-      else if (jsonPayload.role) roles = [jsonPayload.role];
-      else if (jsonPayload.realm_access?.roles) roles = jsonPayload.realm_access.roles;
+
+      if (token) {
+        const parts = token.split('.');
+        if (parts.length === 3) {
+          try {
+            const jsonPayload = JSON.parse(atob(parts[1]));
+            if (jsonPayload.authorities) roles = roles.concat(jsonPayload.authorities);
+            if (jsonPayload.roles) roles = roles.concat(jsonPayload.roles);
+            if (jsonPayload.role) roles.push(jsonPayload.role);
+            if (jsonPayload.realm_access?.roles) roles = roles.concat(jsonPayload.realm_access.roles);
+            if (jsonPayload.rol) roles.push(jsonPayload.rol);
+          } catch(e) {}
+        }
+      }
+
+      // 3. Fallback: extraer desde auth_permisos (shared auth service de Gastrosena guarda permisos aquí)
+      const authPermisosStr = localStorage.getItem('auth_permisos');
+      if (authPermisosStr) {
+        try {
+          const permisosObj = JSON.parse(authPermisosStr);
+          if (Array.isArray(permisosObj)) {
+            roles = roles.concat(permisosObj);
+          }
+        } catch(e) {}
+      }
 
       if (!Array.isArray(roles)) {
         if (typeof roles === 'string') {
