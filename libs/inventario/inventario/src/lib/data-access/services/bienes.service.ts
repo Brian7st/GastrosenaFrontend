@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of, throwError, forkJoin } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { Bien, BienFiltros, BienKpis, BienFormDto, BienPaginacion } from '../../models/inventario.model';
 import {
@@ -53,21 +53,24 @@ export class BienesService {
         })),
         switchMap(({ productos, paginacion }) => {
           if (!productos.length) return of({ bienes: [] as Bien[], paginacion });
-          const existencias$ = productos.map(p =>
-            this.http
-              // El backend llavea la existencia por codigoSena (productoId canónico),
-              // no por el id (UUID) del catálogo. Ver JpaGilSolicitudQueryAdapter.findByCodigoSena.
-              .get<ExistenciaResponse>(`${API}/inventory/existencias/${p.codigoSena}`)
-              .pipe(catchError(() => of(null)))
-          );
-          return forkJoin(existencias$).pipe(
-            map(existencias => ({
-              bienes: productos.map((p, i) =>
-                existencias[i] ? bienFromCatalogoYExistencia(p, existencias[i]) : bienFromCatalogo(p)
-              ),
-              paginacion,
-            }))
-          );
+          // Una sola llamada bulk en vez de N (evita el N+1 de HTTP). El backend llavea
+          // la existencia por codigoSena (productoId canónico) y omite los que no tienen.
+          const params = new HttpParams().set('codigosSena', productos.map(p => p.codigoSena).join(','));
+          return this.http
+            .get<ExistenciaResponse[]>(`${API}/inventory/existencias`, { params })
+            .pipe(
+              catchError(() => of([] as ExistenciaResponse[])),
+              map(existencias => {
+                const porCodigo = new Map(existencias.map(e => [e.productoId, e]));
+                return {
+                  bienes: productos.map(p => {
+                    const ex = porCodigo.get(p.codigoSena);
+                    return ex ? bienFromCatalogoYExistencia(p, ex) : bienFromCatalogo(p);
+                  }),
+                  paginacion,
+                };
+              })
+            );
         }),
         catchError(err => throwError(() => err))
       );

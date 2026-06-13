@@ -4,6 +4,8 @@ import { RouterModule } from '@angular/router';
 import { LucideBell, LucideBrainCircuit, LucideMoon, LucideSearch, LucideSun, LucideUser } from '@lucide/angular';
 import { PerfilConfig, TopNavLink } from '../../nav/nav.models';
 import { NotificacionesService } from '@restaurant/notificaciones';
+import { AlertasContadorService } from '@restaurant/inventario';
+import { forkJoin, of, catchError } from 'rxjs';
 import { I18nService } from '../../i18n/i18n.service';
 import { ThemeService } from '../../services/theme.service';
 import { AsistenteUiService } from '../asistente/asistente-ui.service';
@@ -26,7 +28,8 @@ export class BarraSuperiorComponent implements OnInit, OnDestroy {
   private readonly themeService = inject(ThemeService);
   protected readonly asistente  = inject(AsistenteUiService);
   private readonly notificacionesService = inject(NotificacionesService);
-  private intervalId: any;
+  private readonly alertasContadorService = inject(AlertasContadorService);
+  private intervalId: ReturnType<typeof setInterval> | undefined;
 
   readonly esOscuro = this.themeService.esOscuro;
 
@@ -45,9 +48,17 @@ export class BarraSuperiorComponent implements OnInit, OnDestroy {
   }
 
   cargarContador() {
-    this.notificacionesService.contarNoLeidas().subscribe({
-      next: (res) => this.contadorNotificaciones.set(res.count),
-      error: () => this.contadorNotificaciones.set(0)
+    // Badge agregado: notificaciones genéricas no leídas + alertas de stock activas.
+    forkJoin({
+      noLeidas: this.notificacionesService.contarNoLeidas().pipe(
+        catchError(() => of({ count: 0 })),
+      ),
+      alertas: this.alertasContadorService.contarActivas().pipe(
+        catchError(() => of(0)),
+      ),
+    }).subscribe({
+      next: ({ noLeidas, alertas }) => this.contadorNotificaciones.set(noLeidas.count + alertas),
+      error: () => this.contadorNotificaciones.set(0),
     });
   }
 }

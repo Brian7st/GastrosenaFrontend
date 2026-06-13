@@ -55,10 +55,6 @@ export class ConsolidadoDetailComponent implements OnInit {
     this.router.navigate(['/app/inventario/consolidado']);
   }
 
-  goToGilDetail(codigo: string): void {
-    this.router.navigate(['/app/inventario/solicitudes-gil', codigo]);
-  }
-
   openExportModal(): void {
     this.showExportModal.set(true);
   }
