@@ -59,3 +59,12 @@
     <lib-pedidos-cart></lib-pedidos-cart>
   </aside>
 </div>
+
+<restaurant-confirm-dialog
+  [open]="mostrarModalAccesoDenegado()"
+  title="Acceso Denegado"
+  message="Tu rol no te permite ingresar al módulo de Caja."
+  confirmText="Aceptar"
+  [showCancel]="false"
+  (confirm)="cerrarModalAccesoDenegado()"
+></restaurant-confirm-dialog>

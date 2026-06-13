@@ -22,6 +22,20 @@ import {
   LucideFileCheck2, LucidePrinter, LucideSend, LucideCheckCircle2,
   LucideReceipt, LucideDownload
 } from '@lucide/angular';
+import { inject } from '@angular/core';
+import { AuthService } from './data-access/auth.service';
+import { RestauranteFacade } from './data-access/restaurante.facade';
+
+const cajaGuard = () => {
+  const auth = inject(AuthService);
+  const facade = inject(RestauranteFacade);
+  const permitidos = ['ROLE_CAJERO', 'CAJERO', 'ROLE_ADMIN', 'ADMINISTRADOR', 'ROLE_INSTRUCTOR', 'INSTRUCTOR'];
+  if (auth.hasAnyRole(permitidos)) {
+    return true;
+  }
+  facade.abrirModalAccesoDenegado();
+  return false;
+};
 
 export const RESTAURANTE_ROUTES: Routes = [
   {
@@ -67,30 +81,37 @@ export const RESTAURANTE_ROUTES: Routes = [
       {
         path: 'caja',
         component: CajaPageComponent,
+        canActivate: [cajaGuard]
       },
       {
         path: 'caja/nueva',
         component: CajaNuevaPageComponent,
+        canActivate: [cajaGuard]
       },
       {
         path: 'caja/buscar',
         component: CajaBuscarPageComponent,
+        canActivate: [cajaGuard]
       },
       {
         path: 'caja/pagar',
         component: CajaPagarPageComponent,
+        canActivate: [cajaGuard]
       },
       {
         path: 'caja/apertura',
         component: CajaAperturaPageComponent,
+        canActivate: [cajaGuard]
       },
       {
         path: 'caja/cierre',
         component: CajaCierrePageComponent,
+        canActivate: [cajaGuard]
       },
       {
         path: 'caja/movimientos',
         component: CajaMovimientosPageComponent,
+        canActivate: [cajaGuard]
       },
     ]
   }

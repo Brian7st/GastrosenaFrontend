@@ -41,6 +41,9 @@ export class MesasPageComponent {
   private router  = inject(Router);
   private route   = inject(ActivatedRoute);
 
+  mostrarModalAccesoDenegado = this.facade.mostrarModalAccesoDenegado;
+  cerrarModalAccesoDenegado = () => this.facade.cerrarModalAccesoDenegado();
+
   // ── Signals del Facade ──────────────────────────────────────────────────────
   mesas = this.facade.mesas;
   mesasCargando = this.facade.mesasCargando;

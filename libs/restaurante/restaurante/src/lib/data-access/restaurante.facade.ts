@@ -51,12 +51,14 @@ export class RestauranteFacade {
   private _mesasError = signal<string | null>(null);
   private _ordenesHistorial = signal<PedidoCarrito[]>([]);
   private _pedidoActivo = signal<PedidoCarrito | null>(null);
+  private _errorGeneral = signal<string | null>(null);
 
   private _turnoCaja = signal<SesionCajaResponse | null>(null);
   private _pedidosParaCobro = signal<PedidoResumenResponse[]>([]);
   private _historialFacturas = signal<any[]>([]);
 
   private _productosMenu = signal<ProductoMenu[]>([]);
+  private readonly _mostrarModalAccesoDenegado = signal<boolean>(false);
 
   readonly mesas = this._mesas.asReadonly();
   readonly mesasCargando = this._mesasCargando.asReadonly();
@@ -68,6 +70,8 @@ export class RestauranteFacade {
   readonly pedidosParaCobro = this._pedidosParaCobro.asReadonly();
   readonly historialFacturas = this._historialFacturas.asReadonly();
   readonly productosMenu = this._productosMenu.asReadonly();
+  readonly errorGeneral = computed(() => this._errorGeneral());
+  readonly mostrarModalAccesoDenegado = computed(() => this._mostrarModalAccesoDenegado());
 
   readonly puedeAdministrarMesas = computed(() => {
     return this.authService.hasAnyRole(['ROLE_ADMIN', 'ADMINISTRADOR', 'ROLE_ADMINISTRADOR', 'ROLE_INSTRUCTOR', 'INSTRUCTOR']);
@@ -105,6 +109,14 @@ export class RestauranteFacade {
     this.cargarMenu();
     this.cargarMesas();
     this.cargarEstadoLocalNoMesas();
+  }
+
+  abrirModalAccesoDenegado(): void {
+    this._mostrarModalAccesoDenegado.set(true);
+  }
+
+  cerrarModalAccesoDenegado(): void {
+    this._mostrarModalAccesoDenegado.set(false);
   }
 
   cargarMenu(): void {
