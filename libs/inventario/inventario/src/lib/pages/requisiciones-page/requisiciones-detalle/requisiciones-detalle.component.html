@@ -142,14 +142,6 @@
     </div>
   }
 
-  <!-- Aviso de descarga del soporte -->
-  @if (descargaAviso()) {
-    <div class="sheet-panel__error">
-      <lucide-icon name="alert-circle" [size]="16"></lucide-icon>
-      {{ descargaAviso() }}
-    </div>
-  }
-
   <!-- Footer Actions -->
   <footer class="sheet-panel__footer">
 
@@ -167,14 +159,6 @@
               [routerLink]="['/app/inventario/requisiciones/despacho', reqId()]">
         <lucide-icon name="truck" [size]="18"></lucide-icon>
         Registrar Despacho
-      </button>
-    }
-
-    <!-- Exportar .docx — disponible desde FIRMADA -->
-    @if (estado() === 'FIRMADA' || estado() === 'LEGALIZADA') {
-      <button class="btn-outline" (click)="exportar()">
-        <lucide-icon name="download" [size]="18"></lucide-icon>
-        Descargar Soporte
       </button>
     }
 
