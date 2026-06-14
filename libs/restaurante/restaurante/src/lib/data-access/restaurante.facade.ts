@@ -51,12 +51,14 @@ export class RestauranteFacade {
   private _mesasError = signal<string | null>(null);
   private _ordenesHistorial = signal<PedidoCarrito[]>([]);
   private _pedidoActivo = signal<PedidoCarrito | null>(null);
+  private _errorGeneral = signal<string | null>(null);
 
   private _turnoCaja = signal<SesionCajaResponse | null>(null);
   private _pedidosParaCobro = signal<PedidoResumenResponse[]>([]);
   private _historialFacturas = signal<any[]>([]);
 
   private _productosMenu = signal<ProductoMenu[]>([]);
+  private readonly _mostrarModalAccesoDenegado = signal<boolean>(false);
 
   readonly mesas = this._mesas.asReadonly();
   readonly mesasCargando = this._mesasCargando.asReadonly();
@@ -68,6 +70,16 @@ export class RestauranteFacade {
   readonly pedidosParaCobro = this._pedidosParaCobro.asReadonly();
   readonly historialFacturas = this._historialFacturas.asReadonly();
   readonly productosMenu = this._productosMenu.asReadonly();
+  readonly errorGeneral = computed(() => this._errorGeneral());
+  readonly mostrarModalAccesoDenegado = computed(() => this._mostrarModalAccesoDenegado());
+
+  readonly puedeAdministrarMesas = computed(() => {
+    return this.authService.hasAnyRole(['ROLE_ADMIN', 'ADMINISTRADOR', 'ROLE_ADMINISTRADOR', 'ROLE_INSTRUCTOR', 'INSTRUCTOR', 'ADMINISTRADOR_SISTEMA', 'ROLE_ADMINISTRADOR_SISTEMA', 'ADMIN', 'MESAS_AGREGAR']);
+  });
+
+  readonly nombreUsuario = computed(() => {
+    return this.authService.getUsuarioNombre();
+  });
 
   readonly stats = computed<RestauranteStats>(() => {
     const mesasActivas = this._mesas().filter(m => m.activo);
@@ -97,6 +109,14 @@ export class RestauranteFacade {
     this.cargarMenu();
     this.cargarMesas();
     this.cargarEstadoLocalNoMesas();
+  }
+
+  abrirModalAccesoDenegado(): void {
+    this._mostrarModalAccesoDenegado.set(true);
+  }
+
+  cerrarModalAccesoDenegado(): void {
+    this._mostrarModalAccesoDenegado.set(false);
   }
 
   cargarMenu(): void {
@@ -261,7 +281,7 @@ export class RestauranteFacade {
         },
         error: (err) => {
           console.error('[RestauranteFacade] Error al crear mesa:', err);
-          const msg = err.error?.mensaje || err.error?.message || 'Error desconocido al crear mesa.';
+          const msg = err.error?.error || err.error?.mensaje || err.error?.message || 'Error desconocido al crear mesa.';
           observer.next(msg);
           observer.complete();
         }
@@ -295,7 +315,7 @@ export class RestauranteFacade {
             `[RestauranteFacade] Error al ${activo ? 'activar' : 'desactivar'} mesa ${mesaId}:`,
             err
           );
-          const msg = err.error?.mensaje || err.error?.message || `Error desconocido al ${activo ? 'activar' : 'desactivar'} mesa.`;
+          const msg = err.error?.error || err.error?.mensaje || err.error?.message || `Error desconocido al ${activo ? 'activar' : 'desactivar'} mesa.`;
           observer.next(msg);
           observer.complete();
         }
@@ -326,7 +346,7 @@ export class RestauranteFacade {
         },
         error: (err) => {
           console.error(`[RestauranteFacade] Error al editar mesa ${mesaId}:`, err);
-          const msg = err.error?.mensaje || err.error?.message || 'Error desconocido al editar mesa.';
+          const msg = err.error?.error || err.error?.mensaje || err.error?.message || 'Error desconocido al editar mesa.';
           observer.next(msg);
           observer.complete();
         }
@@ -354,7 +374,7 @@ export class RestauranteFacade {
             `[RestauranteFacade] Error al cambiar estado de mesa ${mesaId} a ${nuevoEstado}:`,
             err
           );
-          const msg = err.error?.mensaje || err.error?.message || 'Error desconocido al cambiar estado de la mesa.';
+          const msg = err.error?.error || err.error?.mensaje || err.error?.message || 'Error desconocido al cambiar estado de la mesa.';
           observer.next(msg);
           observer.complete();
         }
@@ -594,7 +614,8 @@ export class RestauranteFacade {
         },
         error: (err) => {
           console.error('[RestauranteFacade] Error al crear pedido:', err);
-          alert('Hubo un error de comunicación al crear el pedido.');
+          const msg = err.error?.error || err.error?.mensaje || err.error?.message || 'Hubo un error de comunicación al crear el pedido.';
+          alert(msg);
           observer.next(false);
           observer.complete();
         }
