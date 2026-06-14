@@ -45,7 +45,6 @@ export class AuthService {
         };
         localStorage.setItem('auth_token', response.token);
         localStorage.setItem('auth_permisos', JSON.stringify(response.permisos ?? []));
-        localStorage.setItem('auth_nombre', response.nombreCompleto);
         currentUserSignal.set(usuario);
         return usuario;
       } else {
@@ -66,7 +65,6 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_permisos');
-    localStorage.removeItem('auth_nombre');
     currentUserSignal.set(null);
   }
 

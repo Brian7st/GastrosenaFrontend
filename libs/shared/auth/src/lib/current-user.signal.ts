@@ -8,11 +8,10 @@ function getUserFromStorage(): AuthenticatedUser | null {
 
     const payload = JSON.parse(atob(token.split('.')[1]));
     const permisosGuardados = localStorage.getItem('auth_permisos');
-    const nombreGuardado = localStorage.getItem('auth_nombre');
 
     return {
       id:       payload.userId,
-      nombre:   nombreGuardado || payload.sub,
+      nombre:   payload.sub,
       email:    payload.sub,
       rol:      payload.nombreRol,
       permisos: permisosGuardados ? JSON.parse(permisosGuardados) : [],
