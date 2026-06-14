@@ -47,6 +47,15 @@ export class AuthService {
 
   getUsuarioNombre(): string {
     try {
+      // 1. Intentar leer desde el objeto 'user' del localStorage (usado por ga-web-inicio-general y mocks)
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        try {
+          const userObj = JSON.parse(userStr);
+          if (userObj && userObj.nombreCompleto) return userObj.nombreCompleto;
+        } catch(e) {}
+      }
+
       const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
       if (!token) return 'Usuario Activo';
 
@@ -62,9 +71,6 @@ export class AuthService {
       if (jsonPayload.email) return jsonPayload.email;
       if (jsonPayload.preferred_username) return jsonPayload.preferred_username;
       if (jsonPayload.given_name) return jsonPayload.given_name;
-      
-      const nombreGuardado = localStorage.getItem('auth_nombre');
-      if (nombreGuardado) return nombreGuardado;
 
       if (jsonPayload.sub) {
         const namePart = jsonPayload.sub.split('@')[0];
