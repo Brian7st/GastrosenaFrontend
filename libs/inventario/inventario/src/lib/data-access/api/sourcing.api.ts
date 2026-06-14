@@ -15,6 +15,45 @@ export interface FacturaLineaResponse {
   total: number;
 }
 
+export interface NotaCreditoLineaResponse {
+  productoId:    string;
+  cantidad:      number;
+  valorUnitario: number;
+  valorTotal:    number;
+}
+
+export interface NotaCreditoResponse {
+  id:           string;
+  facturaId:    string;
+  cufeOrigen:   string;
+  motivo:       string;
+  fechaEmision: string;
+  estado:       string;
+  valorTotal:   number;
+  lineas:       NotaCreditoLineaResponse[];
+}
+
+export interface RegistrarNotaCreditoApiRequest {
+  facturaId:    string;
+  cufeOrigen:   string;
+  motivo:       string;
+  fechaEmision: string;
+  lineas: Array<{
+    productoId:    string;
+    cantidad:      number;
+    valorUnitario: number;
+  }>;
+}
+
+export interface ResolverNotaCreditoRequest {
+  notaCreditoIds: string[];
+}
+
+export interface ResolverNotaCreditoResponse {
+  conciliacionId: string;
+  estado:         string;
+}
+
 export interface FacturaResponse {
   id: string;
   numeroFactura: string;
@@ -36,6 +75,7 @@ export interface FacturaResponse {
   total: number;
   instructorId?: string;
   motivoAnulacion?: string | null;
+  valorNetoAPagar?: number;
 }
 
 export interface FacturaPagedResponse {
