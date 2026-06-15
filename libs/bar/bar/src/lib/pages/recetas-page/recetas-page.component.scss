@@ -31,7 +31,7 @@
     flex: 1;
 
     .search-bar {
-        background: white;
+        background: var(--color-surface-primary);
         display: flex;
         align-items: center;
         padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
@@ -65,7 +65,7 @@
 }
 
 .receta-card {
-    background: white;
+    background: var(--color-surface-primary);
     border-radius: var(--radius-lg, 16px);
     padding: var(--space-4, 1.1rem);
     position: relative;
@@ -263,7 +263,7 @@
                     justify-content: center;
                     border-radius: var(--radius-md, 8px);
                     border: 1px solid var(--color-surface, #f1f5f9);
-                    background: white;
+                    background: var(--color-surface-primary);
                     color: var(--color-text-secondary, #64748b);
                     cursor: pointer;
                     transition: 0.2s;

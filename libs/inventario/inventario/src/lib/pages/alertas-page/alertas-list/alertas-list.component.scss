@@ -3,24 +3,11 @@
    Diseño: SENA Emerald Logic / The Precision Ledger
    ========================================================================== */
 
-// ── Variables locales (alias a tokens globales) ────────────────────────────
-$primary:       #006e25;
-$primary-light: #28a745;
-$surface:       #f8f9fa;
-$surface-low:   #f3f4f5;
-$surface-high:  #e7e8e9;
-$surface-highest: #e1e3e4;
-$on-surface:    #191c1d;
-$on-surface-variant: #3e4a3c;
-$tertiary:      #ba1830;
-$orange:        #f97316;
-$yellow:        #eab308;
-
 // ── Contenedor principal ───────────────────────────────────────────────────
 .page-container {
   padding: 0;
   min-height: 100%;
-  background: $surface;
+  background: var(--color-superficie-contenedor-bajo);
 }
 
 // ── Page Header Row (patrón estándar del proyecto) ────────────────────────
@@ -39,12 +26,12 @@ $yellow:        #eab308;
   gap: 0.375rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: $on-surface-variant;
+  color: var(--color-contorno);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.5rem;
 
-  .active { color: $on-surface; }
+  .active { color: var(--color-en-superficie); }
   lucide-icon { opacity: 0.5; }
 }
 
@@ -52,7 +39,7 @@ $yellow:        #eab308;
   font-family: 'Manrope', sans-serif;
   font-size: 2rem;
   font-weight: 800;
-  color: $on-surface;
+  color: var(--color-en-superficie);
   letter-spacing: -0.02em;
   margin: 0 0 0.25rem;
 
@@ -60,7 +47,7 @@ $yellow:        #eab308;
 }
 
 .page-subtitle {
-  color: $on-surface-variant;
+  color: var(--color-contorno);
   font-size: 0.9375rem;
   margin: 0;
 }
@@ -109,8 +96,8 @@ $yellow:        #eab308;
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background: white;
-  border: 1px solid $surface-highest;
+  background: var(--color-surface-primary);
+  border: 1px solid var(--color-superficie-contenedor-mas-alto);
   border-radius: 0.75rem;
   padding: 0.875rem 1rem;
   margin-bottom: 1rem;
@@ -128,13 +115,13 @@ $yellow:        #eab308;
     position: absolute;
     left: 0.75rem;
     font-size: 1rem;
-    color: $on-surface-variant;
+    color: var(--color-contorno);
     pointer-events: none;
   }
 
   &__input {
     width: 100%;
-    background: $surface-low;
+    background: var(--color-superficie-contenedor-bajo);
     border: none;
     border-radius: 0.5rem;
     padding: 0.5rem 1rem 0.5rem 2.25rem;
@@ -142,20 +129,20 @@ $yellow:        #eab308;
     outline: none;
     transition: box-shadow 0.2s;
 
-    &:focus { box-shadow: 0 0 0 2px rgba($primary-light, 0.4); }
+    &:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primario-gradient-end) 40%, transparent); }
   }
 
   &__select {
-    background: $surface-low;
+    background: var(--color-superficie-contenedor-bajo);
     border: none;
     border-radius: 0.5rem;
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
-    color: $on-surface;
+    color: var(--color-en-superficie);
     cursor: pointer;
     outline: none;
 
-    &:focus { box-shadow: 0 0 0 2px rgba($primary-light, 0.4); }
+    &:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primario-gradient-end) 40%, transparent); }
   }
 }
 
@@ -167,7 +154,7 @@ $yellow:        #eab308;
 }
 
 .alerta-card {
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: 0.75rem;
   padding: 1.25rem;
   border: 1px solid transparent;
@@ -177,13 +164,13 @@ $yellow:        #eab308;
   cursor: pointer;
   transition: background 0.2s, border-color 0.2s;
 
-  &:hover { background: $surface-low; }
+  &:hover { background: var(--color-superficie-contenedor-bajo); }
 
   // Colores de borde por prioridad
-  &--critica { border-color: rgba($tertiary, 0.2); }
-  &--alta    { border-color: rgba($orange, 0.2); }
-  &--media   { border-color: rgba($yellow, 0.2); }
-  &--baja    { border-color: rgba($surface-highest, 0.8); }
+  &--critica { border-color: color-mix(in srgb, var(--color-terciario, #ba1830) 20%, transparent); }
+  &--alta    { border-color: color-mix(in srgb, var(--color-warning-interactive-dark, #f97316) 20%, transparent); }
+  &--media   { border-color: color-mix(in srgb, var(--color-warning) 20%, transparent); }
+  &--baja    { border-color: color-mix(in srgb, var(--color-superficie-contenedor-mas-alto) 80%, transparent); }
 
   &__icon {
     width: 2.5rem;
@@ -197,10 +184,10 @@ $yellow:        #eab308;
 
     .material-symbols-outlined { font-size: 1.25rem; }
 
-    &--critica { background: rgba($tertiary, 0.1);      color: $tertiary; }
-    &--alta    { background: rgba($orange, 0.1);        color: $orange; }
-    &--media   { background: rgba($yellow, 0.1);        color: #b08800; }
-    &--baja    { background: rgba($primary, 0.1);       color: var(--color-primario); }
+    &--critica { background: color-mix(in srgb, var(--color-terciario, #ba1830) 10%, transparent);      color: var(--color-terciario, #ba1830); }
+    &--alta    { background: color-mix(in srgb, var(--color-warning-interactive-dark, #f97316) 10%, transparent);        color: var(--color-warning-interactive-dark, #f97316); }
+    &--media   { background: color-mix(in srgb, var(--color-warning) 10%, transparent);        color: var(--color-warning-text, #b08800); }
+    &--baja    { background: color-mix(in srgb, var(--color-primario) 10%, transparent);       color: var(--color-primario); }
   }
 
   &__body { flex: 1; min-width: 0; }
@@ -218,13 +205,13 @@ $yellow:        #eab308;
     font-family: 'Manrope', sans-serif;
     font-size: 1.0625rem;
     font-weight: 700;
-    color: $on-surface;
+    color: var(--color-en-superficie);
     margin: 0 0 0.25rem;
   }
 
   &__codigo {
     font-size: 0.75rem;
-    color: $on-surface-variant;
+    color: var(--color-contorno);
     font-family: monospace;
     margin: 0;
   }
@@ -256,7 +243,7 @@ $yellow:        #eab308;
   font-size: 0.625rem;
   font-weight: 600;
   color: var(--color-primario);
-  background: rgba($primary, 0.1);
+  background: color-mix(in srgb, var(--color-primario) 10%, transparent);
   padding: 0.125rem 0.5rem;
   border-radius: 9999px;
   width: fit-content;
@@ -269,7 +256,7 @@ $yellow:        #eab308;
 .alerta-stat {
   &__label {
     font-size: 0.75rem;
-    color: $on-surface-variant;
+    color: var(--color-contorno);
     margin: 0 0 0.25rem;
   }
 
@@ -277,18 +264,18 @@ $yellow:        #eab308;
     font-weight: 700;
     font-size: 0.9375rem;
     margin: 0;
-    color: $on-surface;
+    color: var(--color-en-superficie);
 
-    &--critica { color: $tertiary; }
-    &--alta    { color: $orange; }
-    &--media   { color: #9a7700; }
+    &--critica { color: var(--color-terciario, #ba1830); }
+    &--alta    { color: var(--color-warning-interactive-dark, #f97316); }
+    &--media   { color: var(--color-warning-text, #9a7700); }
   }
 }
 
 // ── Botón Resolver ────────────────────────────────────────────────────────
 .btn-resolver {
-  background: $surface-highest;
-  color: $on-surface;
+  background: var(--color-superficie-contenedor-mas-alto);
+  color: var(--color-en-superficie);
   border: none;
   border-radius: 0.5rem;
   padding: 0.5rem 1rem;
@@ -300,7 +287,7 @@ $yellow:        #eab308;
 
   &:hover {
     background: var(--color-primario);
-    color: white;
+    color: var(--color-en-primario);
   }
 }
 
@@ -308,11 +295,11 @@ $yellow:        #eab308;
 .empty-state {
   text-align: center;
   padding: 3rem 1rem;
-  color: $on-surface-variant;
+  color: var(--color-contorno);
 
   &__icon {
     font-size: 3rem;
-    color: $primary;
+    color: var(--color-primario);
     display: block;
     margin-bottom: 0.75rem;
   }
@@ -325,36 +312,36 @@ $yellow:        #eab308;
 
 // ── Panel lateral ─────────────────────────────────────────────────────────
 .lateral-card {
-  background: white;
-  border: 1px solid $surface-highest;
+  background: var(--color-surface-primary);
+  border: 1px solid var(--color-superficie-contenedor-mas-alto);
   border-radius: 0.75rem;
   overflow: hidden;
   margin-bottom: 1.5rem;
 
   &__header {
     padding: 1rem 1.25rem;
-    border-bottom: 1px solid $surface-highest;
+    border-bottom: 1px solid var(--color-superficie-contenedor-mas-alto);
     display: flex;
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
     transition: background 0.2s;
 
-    &:hover { background: $surface-low; }
+    &:hover { background: var(--color-superficie-contenedor-bajo); }
   }
 
   &__title {
     font-family: 'Manrope', sans-serif;
     font-size: 1rem;
     font-weight: 700;
-    color: $on-surface;
+    color: var(--color-en-superficie);
     margin: 0;
 
     &--pad { padding: 1rem 1.25rem 0.75rem; }
   }
 
   &__chevron {
-    color: $on-surface-variant;
+    color: var(--color-contorno);
     font-size: 1.25rem;
   }
 
@@ -376,11 +363,11 @@ $yellow:        #eab308;
     width: 2rem;
     height: 2rem;
     border-radius: 50%;
-    background: rgba($primary, 0.15);
+    background: color-mix(in srgb, var(--color-primario) 15%, transparent);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: $primary;
+    color: var(--color-primario);
     flex-shrink: 0;
     margin-top: 0.125rem;
 
@@ -390,19 +377,19 @@ $yellow:        #eab308;
   &__bien {
     font-size: 0.875rem;
     font-weight: 700;
-    color: $on-surface;
+    color: var(--color-en-superficie);
     margin: 0 0 0.25rem;
   }
 
   &__accion {
     font-size: 0.75rem;
-    color: $on-surface-variant;
+    color: var(--color-contorno);
     margin: 0 0 0.375rem;
   }
 
   &__tiempo {
     font-size: 0.625rem;
-    color: $on-surface-variant;
+    color: var(--color-contorno);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     font-weight: 600;
@@ -423,7 +410,7 @@ $yellow:        #eab308;
   align-items: center;
   gap: 0.75rem;
   padding: 0.625rem 0;
-  border-bottom: 1px solid $surface-highest;
+  border-bottom: 1px solid var(--color-superficie-contenedor-mas-alto);
 
   &:last-child { border-bottom: none; }
 
@@ -433,20 +420,20 @@ $yellow:        #eab308;
     border-radius: 50%;
     flex-shrink: 0;
 
-    &--entrada { background: $primary; }
-    &--salida  { background: $tertiary; }
+    &--entrada { background: var(--color-primario); }
+    &--salida  { background: var(--color-terciario, #ba1830); }
   }
 
   &__nombre {
     flex: 1;
     font-size: 0.875rem;
-    color: $on-surface;
+    color: var(--color-en-superficie);
     font-weight: 500;
   }
 
   &__cantidad {
     font-size: 0.75rem;
-    color: $on-surface-variant;
+    color: var(--color-contorno);
     font-weight: 600;
   }
 }

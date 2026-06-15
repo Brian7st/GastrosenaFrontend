@@ -27,11 +27,11 @@
   gap: 0.5rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #94a3b8;
+  color: var(--color-pizarra-400);
   margin-bottom: 0.5rem;
   
   .active {
-    color: #047857;
+    color: var(--color-esmeralda-600);
   }
 }
 
@@ -39,13 +39,13 @@
   font-family: 'Manrope', sans-serif;
   font-size: 2.25rem;
   font-weight: 800;
-  color: #191c1d;
+  color: var(--color-en-fondo);
   letter-spacing: -0.02em;
   margin: 0;
 }
 
 .page-subtitle {
-  color: #64748b;
+  color: var(--color-pizarra-500);
   font-weight: 500;
   margin: 0.375rem 0 0;
   font-size: 0.9375rem;
@@ -60,8 +60,8 @@
 
 /* ── Botones especiales en el header ────────────────────────────────────────── */
 .btn-gil {
-  background-color: #d1fae5 !important;
-  color: #065f46 !important;
+  background-color: var(--color-esmeralda-200) !important;
+  color: var(--color-esmeralda-700) !important;
   border-color: transparent !important;
   font-weight: 700 !important;
   display: inline-flex !important;
@@ -69,7 +69,7 @@
   gap: 0.5rem !important;
 
   &:hover {
-    background-color: #a7f3d0 !important;
+    background-color: var(--color-esmeralda-200) !important;
   }
 }
 
@@ -99,7 +99,7 @@
 /* ── Controles de Tabla ─────────────────────────────────────────────────────── */
 .dt-header-controls {
   padding: 1.5rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--color-pizarra-100);
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -115,11 +115,11 @@
       font-size: 1.25rem;
       font-weight: 700;
       margin: 0;
-      color: #191c1d;
+      color: var(--color-en-fondo);
     }
     p {
       font-size: 0.875rem;
-      color: #64748b;
+      color: var(--color-pizarra-500);
       margin: 0.25rem 0 0;
     }
   }
@@ -133,16 +133,16 @@
       align-items: center;
       gap: 0.5rem;
       padding: 0.5rem 1rem;
-      background: #f1f5f9;
+      background: var(--color-pizarra-100);
       border-radius: 0.75rem;
       border: none;
       font-size: 0.875rem;
       font-weight: 600;
-      color: #475569;
+      color: var(--color-pizarra-600);
       cursor: pointer;
       transition: background-color 0.2s;
 
-      &:hover { background: #e2e8f0; }
+      &:hover { background: var(--color-pizarra-200); }
     }
   }
 }
@@ -232,23 +232,23 @@
 
 .prod-name {
   font-weight: 700;
-  color: #191c1d;
+  color: var(--color-en-fondo);
   margin: 0 0 0.25rem;
 }
 .prod-sku {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: var(--color-pizarra-400);
   margin: 0;
 }
 
 .code-sena {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #475569;
-  background: #f1f5f9;
+  color: var(--color-pizarra-600);
+  background: var(--color-pizarra-100);
   padding: 0.25rem 0.625rem;
   border-radius: 0.375rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-pizarra-200);
 }
 
 .qty-val {
@@ -256,14 +256,14 @@
   font-size: 1.125rem;
   display: block;
 
-  &--entrada { color: #059669; }
-  &--salida  { color: #ba1830; }
+  &--entrada { color: var(--color-esmeralda-600); }
+  &--salida  { color: var(--color-terciario); }
 }
 
 .qty-unit {
   font-size: 0.625rem;
   display: block;
-  color: #94a3b8;
+  color: var(--color-pizarra-400);
   text-transform: uppercase;
   font-weight: 700;
 }
@@ -272,39 +272,39 @@
   font-size: 0.875rem;
   margin: 0 0 0.125rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--color-pizarra-800);
 }
 
 .time-text {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: var(--color-pizarra-400);
   margin: 0;
 }
 
 .origin-text {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #334155;
+  color: var(--color-pizarra-700);
   margin: 0;
 }
 
 .doc-link {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #047857;
+  color: var(--color-esmeralda-600);
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
   text-decoration: none;
 
-  &:hover { text-decoration: underline; color: #065f46; }
+  &:hover { text-decoration: underline; color: var(--color-esmeralda-700); }
 }
 
 .money-val {
   font-weight: 700;
   font-size: 0.875rem;
   margin: 0;
-  color: #1e293b;
+  color: var(--color-pizarra-800);
 }
 
 /* Estilos eliminados (reemplazado por restaurant-status-badge) */
@@ -325,21 +325,21 @@
   border-radius: 0.5rem;
   border: none;
   background: transparent;
-  color: #94a3b8;
+  color: var(--color-pizarra-400);
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background: white;
+    background: var(--color-surface-primary);
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    color: #006e25;
+    color: var(--color-primario);
   }
 }
 
 /* ── Paginación ────────────────────────────────────────────────────────────── */
 .table-pagination__info {
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--color-pizarra-500);
   font-weight: 500;
 }
 
@@ -356,28 +356,28 @@
   width: 2rem;
   height: 2rem;
   border-radius: 0.375rem;
-  border: 1px solid #e2e8f0;
-  background: white;
-  color: #475569;
+  border: 1px solid var(--color-pizarra-200);
+  background: var(--color-surface-primary);
+  color: var(--color-pizarra-600);
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover:not(:disabled):not(.pagination-btn--active) {
-    background: #f8fafc;
-    border-color: #cbd5e1;
+    background: var(--color-pizarra-50);
+    border-color: var(--color-pizarra-300);
   }
 
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    background: #f1f5f9;
+    background: var(--color-pizarra-100);
   }
 
   &--active {
     background: var(--color-primario);
-    color: white;
+    color: var(--color-en-primario);
     border-color: var(--color-primario);
   }
 

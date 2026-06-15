@@ -860,7 +860,7 @@
   border-radius: 0.5rem;
   border: none;
   background: var(--color-primario);
-  color: #fff;
+  color: var(--color-en-primario);
   font-size: 0.75rem;
   font-weight: 700;
   cursor: pointer;
@@ -1022,7 +1022,7 @@
   &--warning {
     background-color: rgba(255, 152, 0, 0.1);
 
-    .material-symbols-outlined { color: #f57c00; }
+    .material-symbols-outlined { color: var(--color-warning-interactive-dark); }
   }
 }
 
@@ -1076,7 +1076,7 @@
 
 .btn-confirm {
   background-color: var(--color-primario, #39a900);
-  color: #ffffff;
+  color: var(--color-en-primario);
   border: none;
 
   &:hover { filter: brightness(0.92); box-shadow: 0 4px 12px rgba(57, 169, 0, 0.25); }
