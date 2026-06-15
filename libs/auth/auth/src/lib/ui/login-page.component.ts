@@ -79,7 +79,7 @@ export class LoginPageComponent {
           destino = '/app/restaurante';
           break;
         case 'CAJERO':
-          destino = '/app/restaurante/facturacion'; // o donde manejes facturación
+          destino = '/app/restaurante/caja'; // o donde manejes facturación
           break;
         case 'AUXILIAR_COCINA':
           destino = '/app/cocina';
