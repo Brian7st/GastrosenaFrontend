@@ -284,7 +284,7 @@
 
   &--danger {
     background-color: var(--color-terciario, #ba1830);
-    color: #ffffff;
+    color: var(--color-en-primario);
     box-shadow: 0 4px 6px -1px rgba(var(--color-terciario-rgb, 186, 24, 48), 0.2);
 
     &:hover:not(:disabled) {

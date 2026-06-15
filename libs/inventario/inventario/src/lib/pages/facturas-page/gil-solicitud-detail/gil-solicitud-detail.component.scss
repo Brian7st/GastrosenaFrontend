@@ -26,7 +26,7 @@
     align-items: center;
     gap: 0.5rem;
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--color-pizarra-500);
   }
 
   &__actions {
@@ -53,8 +53,8 @@
   lucide-icon { color: var(--color-primario); }
 }
 
-.breadcrumb-sep { color: #d1d5db; }
-.breadcrumb-label { color: #374151; font-weight: 500; }
+.breadcrumb-sep { color: var(--color-pizarra-300); }
+.breadcrumb-label { color: var(--color-pizarra-700); font-weight: 500; }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GIL Title
@@ -122,7 +122,7 @@
   &--active {
     .timeline-step__icon {
       background: var(--color-primario);
-      color: #fff;
+      color: var(--color-en-primario);
       box-shadow: 0 0 0 4px rgba(57, 169, 0, 0.15);
     }
     .timeline-step__label { color: var(--color-primario); }
@@ -132,7 +132,7 @@
   &--done {
     .timeline-step__icon {
       background: var(--color-primario);
-      color: #fff;
+      color: var(--color-en-primario);
     }
     .timeline-step__label { color: var(--color-en-superficie); }
     .timeline-step__connector { background: var(--color-primario); }
@@ -142,9 +142,9 @@
     .timeline-step__icon {
       background: transparent;
       border: 2px solid var(--color-superficie-contenedor);
-      color: #d1d5db;
+      color: var(--color-pizarra-300);
     }
-    .timeline-step__label { color: #9ca3af; }
+    .timeline-step__label { color: var(--color-pizarra-400); }
     .timeline-step__connector { background: var(--color-superficie-contenedor); }
   }
 }
@@ -232,7 +232,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.07em;
-    color: #9ca3af;
+    color: var(--color-pizarra-400);
   }
 
   &__value {
@@ -248,7 +248,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: #6b7280;
+  color: var(--color-pizarra-500);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -276,7 +276,7 @@
 
 .status-date {
   font-size: 0.8125rem;
-  color: #6b7280;
+  color: var(--color-pizarra-500);
 }
 
 .total-amount {
@@ -288,7 +288,7 @@
 
 .total-label {
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: var(--color-pizarra-400);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: 600;
@@ -306,7 +306,7 @@
   height: 2rem;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-primario-contenedor) 100%);
-  color: #fff;
+  color: var(--color-en-primario);
   font-size: 0.6875rem;
   font-weight: 700;
   display: flex;
@@ -323,7 +323,7 @@
 
 .responsable-rol {
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: var(--color-pizarra-400);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -331,7 +331,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 .count-badge {
   background: var(--color-primario);
-  color: #fff;
+  color: var(--color-en-primario);
   font-size: 0.625rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -366,7 +366,7 @@
     align-items: center;
     gap: 0.75rem;
 
-    .material-symbols-outlined { color: #6b7280; font-size: 1.25rem; }
+    .material-symbols-outlined { color: var(--color-pizarra-500); font-size: 1.25rem; }
   }
 }
 
@@ -379,7 +379,7 @@
 
 .prefactura-proveedor {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--color-pizarra-500);
   margin: 0;
 }
 
@@ -401,14 +401,14 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #9ca3af;
+    color: var(--color-pizarra-400);
     text-align: left;
   }
 
   td {
     padding: 0.625rem 0.875rem;
     font-size: 0.8125rem;
-    color: #374151;
+    color: var(--color-pizarra-700);
     border-top: 1px solid var(--color-superficie-contenedor);
   }
 
@@ -444,7 +444,7 @@
   border-radius: 0 0.5rem 0.5rem 0;
   padding: 1rem 1.25rem;
   font-size: 0.9375rem;
-  color: #374151;
+  color: var(--color-pizarra-700);
   line-height: 1.7;
   font-style: italic;
   margin: 0;
@@ -462,7 +462,7 @@
   border-radius: 9999px;
   padding: 0.25rem 0.75rem;
   font-size: 0.8125rem;
-  color: #374151;
+  color: var(--color-pizarra-700);
   font-weight: 500;
 }
 
@@ -490,7 +490,7 @@
   border-top: 1px solid var(--color-superficie-contenedor);
   border-radius: 0.5rem;
   font-size: 0.6875rem;
-  color: #9ca3af;
+  color: var(--color-pizarra-400);
   font-family: 'Courier New', monospace;
 }
 
@@ -520,7 +520,7 @@
   justify-content: center;
   min-height: 60vh;
   gap: 1rem;
-  color: #6b7280;
+  color: var(--color-pizarra-500);
   font-size: 0.875rem;
 }
 

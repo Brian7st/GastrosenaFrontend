@@ -7,7 +7,7 @@
 /* ── Panel de filtros colapsable (slot [dtHeader]) ──────────────────────────── */
 .filter-panel {
   background: var(--color-superficie-contenedor-mas-bajo);
-  border-bottom: 1px solid #f3f4f5;
+  border-bottom: 1px solid var(--color-superficie-contenedor-bajo);
   padding: 1rem 1.5rem;
 
   &__row {

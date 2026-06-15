@@ -434,7 +434,7 @@
   max-width: 800px;
   width: calc(100% - var(--space-16));
   padding: var(--space-4) var(--space-6);
-  background-color: rgba(255, 255, 255, 0.92);
+  background-color: rgba(var(--color-superficie-contenedor-bajo-rgb), 0.92);
   backdrop-filter: blur(12px);
   border: 1px solid var(--color-contorno-variante);
   border-radius: var(--radius-xl);

@@ -32,7 +32,7 @@
   border: none;
   border-radius: var(--radius-sm, 6px);
   background: var(--color-primario, #16a34a);
-  color: #fff;
+  color: var(--color-en-primario);
   font-weight: 600;
   font-size: var(--font-size-sm);
   cursor: pointer;
@@ -48,8 +48,8 @@
   gap: var(--space-2);
   padding: 8px 16px;
   border-radius: var(--radius-sm, 6px);
-  background: #d1fae5;
-  color: #065f46;
+  background: var(--color-esmeralda-200);
+  color: var(--color-esmeralda-700);
   font-weight: 600;
   font-size: var(--font-size-sm);
 }
@@ -244,7 +244,7 @@
 .bien-icon {
   width: 2.5rem;
   height: 2.5rem;
-  background: #e6f6ec;
+  background: var(--color-success-bg);
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
@@ -277,11 +277,11 @@
   font-size: 0.75rem;
 
   &--neg {
-    background: #ffebe9;
+    background: var(--color-error-bg);
     color: var(--color-terciario);
   }
   &--pos {
-    background: #e6f6ec;
+    background: var(--color-success-bg);
     color: var(--color-primario);
   }
 }
@@ -345,9 +345,9 @@
   font-weight: 600;
   text-transform: capitalize;
 }
-.estado-badge--pendiente { background: #fef3c7; color: #92400e; }
-.estado-badge--revisada  { background: #dbeafe; color: #1e40af; }
-.estado-badge--resuelta  { background: #d1fae5; color: #065f46; }
+.estado-badge--pendiente { background: var(--color-warning-bg); color: var(--color-warning-text); }
+.estado-badge--revisada  { background: var(--color-info-border); color: var(--color-info-text); }
+.estado-badge--resuelta  { background: var(--color-esmeralda-200); color: var(--color-esmeralda-700); }
 
 /* ── Botón resolver ── */
 .resolver-btn {
@@ -364,11 +364,11 @@
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
 
-  &:hover:not(:disabled) { background: var(--color-primario, #16a34a); color: #fff; }
+  &:hover:not(:disabled) { background: var(--color-primario, #16a34a); color: var(--color-en-primario); }
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
-.text-warning { color: #d97706; }
+.text-warning { color: var(--color-warning-interactive); }
 
 /* ── Modal ── */
 .modal-overlay {
@@ -431,6 +431,6 @@
 }
 .modal-btn--ghost { background: transparent; border-color: var(--color-pizarra-200, #cbd5e1); }
 .modal-btn--primary {
-  background: var(--color-primario, #16a34a); color: #fff;
+  background: var(--color-primario, #16a34a); color: var(--color-en-primario);
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 }

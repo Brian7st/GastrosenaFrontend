@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
   DataTableComponent,
+  KpiCardComponent,
   LucideIconComponent,
 } from '@restaurant/shared/ui';
 import { FichasService } from '../../data-access/fichas.service';
@@ -27,6 +28,7 @@ type EstadoFiltro = 'todos' | 'activas' | 'inactivas';
     DatePipe,
     FormsModule,
     DataTableComponent,
+    KpiCardComponent,
     LucideIconComponent,
   ],
   templateUrl: './fichas-page.component.html',

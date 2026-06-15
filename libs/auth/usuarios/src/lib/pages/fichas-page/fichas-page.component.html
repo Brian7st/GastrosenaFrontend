@@ -16,18 +16,24 @@
 
   <!-- KPIs -->
   <div class="fichas-page__kpis">
-    <div class="fichas-page__kpi">
-      <span class="fichas-page__kpi-value">{{ totalFichas() }}</span>
-      <span class="fichas-page__kpi-label">{{ i18n.t('fichas.kpi_total') }}</span>
-    </div>
-    <div class="fichas-page__kpi">
-      <span class="fichas-page__kpi-value fichas-page__kpi-value--activas">{{ totalActivas() }}</span>
-      <span class="fichas-page__kpi-label">{{ i18n.t('fichas.kpi_activas') }}</span>
-    </div>
-    <div class="fichas-page__kpi">
-      <span class="fichas-page__kpi-value fichas-page__kpi-value--inactivas">{{ totalInactivas() }}</span>
-      <span class="fichas-page__kpi-label">{{ i18n.t('fichas.kpi_inactivas') }}</span>
-    </div>
+    <restaurant-kpi-card
+      [label]="i18n.t('fichas.kpi_total')"
+      [value]="totalFichas().toString()"
+      icon="book-open"
+      iconColor="blue"
+    ></restaurant-kpi-card>
+    <restaurant-kpi-card
+      [label]="i18n.t('fichas.kpi_activas')"
+      [value]="totalActivas().toString()"
+      icon="user-check"
+      iconColor="green"
+    ></restaurant-kpi-card>
+    <restaurant-kpi-card
+      [label]="i18n.t('fichas.kpi_inactivas')"
+      [value]="totalInactivas().toString()"
+      icon="user-x"
+      iconColor="red"
+    ></restaurant-kpi-card>
   </div>
 
   <!-- Filtros -->

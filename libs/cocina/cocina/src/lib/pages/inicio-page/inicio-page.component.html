@@ -93,7 +93,7 @@
                <div class="modal-controls" style="display: flex; gap: 10px; margin-top: 10px; align-items: center; flex-wrap: wrap;">
                  <input type="text" [ngModel]="busquedaModal()" (ngModelChange)="busquedaModal.set($event)" placeholder="Buscar por fecha, mesero o #comanda..." class="form-input" style="flex: 1; padding: 6px 12px; border-radius: 4px; border: 1px solid var(--color-border);" />
                  
-                 <div class="delete-range-controls" style="display: flex; gap: 8px; align-items: center; border: 1px solid var(--color-danger, #d63031); padding: 6px 10px; border-radius: 20px; background: white;">
+                 <div class="delete-range-controls" style="display: flex; gap: 8px; align-items: center; border: 1px solid var(--color-danger, #d63031); padding: 6px 10px; border-radius: 20px; background: var(--color-surface-primary);">
                    <span style="font-size: 12px; color: var(--color-text-muted); font-weight: 500;">Eliminar entre:</span>
                    <input type="date" [ngModel]="fechaInicioEliminar()" (ngModelChange)="fechaInicioEliminar.set($event)" [min]="minDateAnioActual" [max]="maxDateAnioActual" class="form-input form-date" style="border: none; outline: none; background: transparent; cursor: pointer; font-size: 12px;" />
                    <span style="color: var(--color-text-muted);">-</span>

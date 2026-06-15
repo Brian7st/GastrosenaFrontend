@@ -16,28 +16,30 @@
 
   <!-- KPIs -->
   <div class="admin-comentarios__kpis">
-    <div class="kpi-card kpi-card--orange">
-      <span class="kpi-card__value">{{ comentarios().length }}</span>
-      <span class="kpi-card__label">{{ i18n.t('comentarios.kpi_total') }}</span>
-    </div>
-    <div class="kpi-card kpi-card--yellow">
-      <span class="kpi-card__value">
-        {{ totalPendientes() }}
-      </span>
-      <span class="kpi-card__label">{{ i18n.t('comentarios.kpi_pendientes') }}</span>
-    </div>
-    <div class="kpi-card kpi-card--green">
-      <span class="kpi-card__value">
-        {{ totalAprobados() }}
-      </span>
-      <span class="kpi-card__label">{{ i18n.t('comentarios.kpi_aprobados') }}</span>
-    </div>
-    <div class="kpi-card kpi-card--red">
-      <span class="kpi-card__value">
-        {{ totalRechazados() }}
-      </span>
-      <span class="kpi-card__label">{{ i18n.t('comentarios.kpi_rechazados') }}</span>
-    </div>
+    <restaurant-kpi-card
+      [label]="i18n.t('comentarios.kpi_total')"
+      [value]="comentarios().length.toString()"
+      icon="message-square"
+      iconColor="blue"
+    ></restaurant-kpi-card>
+    <restaurant-kpi-card
+      [label]="i18n.t('comentarios.kpi_pendientes')"
+      [value]="totalPendientes().toString()"
+      icon="clock"
+      iconColor="orange"
+    ></restaurant-kpi-card>
+    <restaurant-kpi-card
+      [label]="i18n.t('comentarios.kpi_aprobados')"
+      [value]="totalAprobados().toString()"
+      icon="check-circle"
+      iconColor="green"
+    ></restaurant-kpi-card>
+    <restaurant-kpi-card
+      [label]="i18n.t('comentarios.kpi_rechazados')"
+      [value]="totalRechazados().toString()"
+      icon="x-circle"
+      iconColor="red"
+    ></restaurant-kpi-card>
   </div>
 
   <!-- Filtros -->
