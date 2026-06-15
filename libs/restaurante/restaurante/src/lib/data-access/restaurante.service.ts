@@ -7,18 +7,31 @@ import {
   PedidoCreateRequest, PedidoResponse, PedidoResumenResponse,
   DetallePedidoResponse,
   SesionCajaResponse, FacturaResponse,
-  AbrirSesionRequest, CerrarSesionRequest, FacturarPedidoRequest
+  AbrirSesionRequest, CerrarSesionRequest, FacturarPedidoRequest,
+  RecetaResponseDTO
 } from '../models/restaurante.model';
 
 @Injectable({ providedIn: 'root' })
 export class RestauranteService {
   private http = inject(HttpClient);
-  
+
   /** URL del microservicio de restaurante (interceptada por proxy) */
-  private readonly mesasUrl   = '/api/mesas';
+  private readonly mesasUrl = '/api/mesas';
   private readonly pedidosUrl = '/api/pedidos';
-  private readonly cajaUrl    = '/api/caja';
+  private readonly cajaUrl = '/api/caja';
   private readonly facturasUrl = '/api/facturas';
+  private readonly recetasUrl = 'http://localhost:8082/api/recetas';
+  private readonly barRecetasUrl = 'http://localhost:8086/api/barybarismo/recetas';
+
+  // ── Recetas (Cocina y Bar) ──────────────────────────────────────────────────
+
+  obtenerRecetas(): Observable<RecetaResponseDTO[]> {
+    return this.http.get<RecetaResponseDTO[]>(this.recetasUrl);
+  }
+
+  obtenerRecetasBar(): Observable<RecetaResponseDTO[]> {
+    return this.http.get<RecetaResponseDTO[]>(this.barRecetasUrl);
+  }
 
   // ── Mesas — lectura ─────────────────────────────────────────────────────────
 

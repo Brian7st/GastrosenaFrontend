@@ -19,6 +19,10 @@
   background-color: var(--color-superficie-contenedor-mas-bajo);
   width: 100%;
   max-width: 560px;
+  /* Nunca más alto que el viewport: el contenido scrollea en vez de desbordar */
+  max-height: calc(100vh - var(--space-8));
+  display: flex;
+  flex-direction: column;
   border-radius: var(--radius-xl);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   overflow: hidden;
@@ -31,6 +35,7 @@
 }
 
 .modal-header {
+  flex-shrink: 0;
   padding: var(--space-8) var(--space-8) var(--space-4);
   display: flex;
   justify-content: space-between;
@@ -77,6 +82,10 @@
 }
 
 .modal-body {
+  /* Permite que el form scrollee cuando supera la altura del modal */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
   padding: var(--space-4) var(--space-8) var(--space-8);
   display: flex;
   flex-direction: column;

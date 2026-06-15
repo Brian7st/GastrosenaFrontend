@@ -45,12 +45,8 @@ export class ConsolidadoService {
   /**
    * POST /budget/consolidados → 201 { id }
    * Body: { lineas: LineaConsolidadoInput[], generadoPor: string }
-   *
-   * TODO: El backend NO tiene un endpoint "GILs elegibles para consolidar" que
-   * provea facturaId/cufe/numeroFactura. La fuente más cercana es
-   * GET /budget/compromisos?estado=APLICADO (da id, gilId, concepto, monto,
-   * montoRetencionZese, fecha) pero NO tiene facturaId/cufe/numeroFactura.
-   * Los campos completos deben venir de otra fuente (gap de backend).
+   * Las líneas elegibles (con facturaId/cufe/numeroFactura) provienen de
+   * GET /budget/consolidados/elegibles (ver getElegibles).
    */
   generarConsolidado(data: GenerarConsolidadoData): Observable<{ id: string }> {
     const body: GenerarConsolidadoRequest = {

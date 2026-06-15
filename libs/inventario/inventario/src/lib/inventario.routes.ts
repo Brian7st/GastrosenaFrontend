@@ -197,13 +197,6 @@ export const INVENTARIO_ROUTES: Routes = [
           ),
       },
       {
-        path: 'historial',
-        loadComponent: () =>
-          import('./pages/alertas-page/alertas-historial/alertas-historial.component').then(
-            m => m.AlertasHistorialComponent
-          ),
-      },
-      {
         path: 'configuracion',
         loadComponent: () =>
           import('./pages/alertas-page/alertas-config/alertas-config.component').then(

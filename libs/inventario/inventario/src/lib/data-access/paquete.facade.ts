@@ -136,17 +136,4 @@ export class PaqueteFacade {
       .subscribe(ok => { if (ok) this.cargarPaquete(id); });
   }
 
-  /** Incluye una requisición en el paquete y recarga su detalle. */
-  incluirRequisicion(paqueteId: string, reqId: string): void {
-    this.paqueteService.incluirRequisicion(paqueteId, reqId)
-      .pipe(
-        catchError(() => {
-          this._error.set('Error al incluir la requisición');
-          return of(false);
-        })
-      )
-      .subscribe(ok => {
-        if (ok) this.cargarPaquete(paqueteId);
-      });
-  }
 }

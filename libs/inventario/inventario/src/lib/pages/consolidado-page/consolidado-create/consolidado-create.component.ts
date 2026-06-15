@@ -86,14 +86,13 @@ export class ConsolidadoCreateComponent implements OnInit {
     this._rows().filter(r => r.selected).reduce((acc, r) => acc + r.data.monto, 0),
   );
 
-  ivaAcumulado     = computed(() => this.subtotalNeto() * 0.19);
-
   retencionZeseTotal = computed(() =>
     this._rows().filter(r => r.selected).reduce((acc, r) => acc + r.data.retencionZese, 0),
   );
 
+  /** Valor neto = montos − retención ZESE (igual que `valorNeto` del backend). */
   totalConsolidado = computed(() =>
-    this.subtotalNeto() + this.ivaAcumulado() - this.retencionZeseTotal(),
+    this.subtotalNeto() - this.retencionZeseTotal(),
   );
 
   toggleSelection(row: SelectableRow): void {

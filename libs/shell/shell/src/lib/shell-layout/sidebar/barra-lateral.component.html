@@ -4,7 +4,7 @@
 >
   <div class="barra-lateral__encabezado">
     <div class="barra-lateral__logo-contenedor">
-      <div class="barra-lateral__logo-icono barra-lateral__logo-icono--imagen">
+      <div class="barra-lateral__logo-icono" [class.barra-lateral__logo-icono--imagen]="!!config.logoUrl">
         @if (config.logoUrl) {
           <img [src]="config.logoUrl" [alt]="config.titulo" class="barra-lateral__logo-img" />
         } @else {

@@ -13,7 +13,7 @@ export class AuthService {
    */
   getUsuarioId(): string {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
       if (!token) {
         return this.FALLBACK_ID;
       }
@@ -47,22 +47,101 @@ export class AuthService {
 
   getUsuarioNombre(): string {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) return 'Cajero Activo';
+      // 1. Intentar leer desde el objeto 'user' del localStorage (usado por ga-web-inicio-general y mocks)
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        try {
+          const userObj = JSON.parse(userStr);
+          if (userObj && userObj.nombreCompleto) return userObj.nombreCompleto;
+        } catch(e) {}
+      }
+
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
+      if (!token) return 'Usuario Activo';
 
       const parts = token.split('.');
-      if (parts.length !== 3) return 'Cajero Activo';
+      if (parts.length !== 3) return 'Usuario Activo';
 
       const jsonPayload = JSON.parse(atob(parts[1]));
 
       if (jsonPayload.nombre) return jsonPayload.nombre;
+      if (jsonPayload.nombreCompleto) return jsonPayload.nombreCompleto;
       if (jsonPayload.name) return jsonPayload.name;
       if (jsonPayload.username) return jsonPayload.username;
       if (jsonPayload.email) return jsonPayload.email;
-      
-      return 'Cajero (ID: ' + this.getUsuarioId().substring(0,8) + ')';
+      if (jsonPayload.preferred_username) return jsonPayload.preferred_username;
+      if (jsonPayload.given_name) return jsonPayload.given_name;
+
+      if (jsonPayload.sub) {
+        const namePart = jsonPayload.sub.split('@')[0];
+        return namePart.charAt(0).toUpperCase() + namePart.slice(1).replace(/\./g, ' ');
+      }
+
+      return 'Usuario (ID: ' + this.getUsuarioId().substring(0,8) + ')';
     } catch (e) {
-      return 'Cajero Activo';
+      return 'Usuario Activo';
     }
+  }
+
+  getRoles(): string[] {
+    try {
+      // 1. Intentar leer desde el objeto 'user' del localStorage (usado por ga-web-inicio-general y mocks)
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        try {
+          const userObj = JSON.parse(userStr);
+          if (userObj && userObj.rol) {
+            return [userObj.rol.toUpperCase()];
+          }
+        } catch(e) {}
+      }
+
+      // 2. Intentar extraer del JWT real
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
+      let roles: any = [];
+
+      if (token) {
+        const parts = token.split('.');
+        if (parts.length === 3) {
+          try {
+            const jsonPayload = JSON.parse(atob(parts[1]));
+            if (jsonPayload.authorities) roles = roles.concat(jsonPayload.authorities);
+            if (jsonPayload.roles) roles = roles.concat(jsonPayload.roles);
+            if (jsonPayload.role) roles.push(jsonPayload.role);
+            if (jsonPayload.realm_access?.roles) roles = roles.concat(jsonPayload.realm_access.roles);
+            if (jsonPayload.rol) roles.push(jsonPayload.rol);
+          } catch(e) {}
+        }
+      }
+
+      // 3. Fallback: extraer desde auth_permisos (shared auth service de Gastrosena guarda permisos aquí)
+      const authPermisosStr = localStorage.getItem('auth_permisos');
+      if (authPermisosStr) {
+        try {
+          const permisosObj = JSON.parse(authPermisosStr);
+          if (Array.isArray(permisosObj)) {
+            roles = roles.concat(permisosObj);
+          }
+        } catch(e) {}
+      }
+
+      if (!Array.isArray(roles)) {
+        if (typeof roles === 'string') {
+          roles = [roles];
+        } else {
+          roles = [];
+        }
+      }
+
+      return roles.map((r: string) => r.toUpperCase());
+    } catch (e) {
+      console.error('[AuthService] Error al extraer roles del token JWT', e);
+      return [];
+    }
+  }
+
+  hasAnyRole(allowedRoles: string[]): boolean {
+    const userRoles = this.getRoles();
+    return allowedRoles.some(r => userRoles.includes(r.toUpperCase()));
   }
 }

@@ -342,6 +342,20 @@
   margin: var(--space-1) 0 0;
 }
 
+.product-card__stock {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 11px;
+  color: var(--color-pizarra-500);
+  margin: var(--space-2) 0 0;
+
+  strong {
+    color: var(--color-pizarra-700);
+    font-weight: 600;
+  }
+}
+
 .product-card__qty-row {
   display: flex;
   align-items: center;

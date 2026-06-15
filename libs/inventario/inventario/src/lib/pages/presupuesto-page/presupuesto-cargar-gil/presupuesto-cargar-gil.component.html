@@ -13,21 +13,93 @@
 
     <!-- Body -->
     <div class="slideover-body">
-      <p class="placeholder-text">
-        Lista de solicitudes GIL — en construcción (Fase 4)
-      </p>
+      @if (error()) {
+        <p class="field-error">{{ error() }}</p>
+      }
+
+      <div class="form-group">
+        <label class="form-label">Presupuesto (Programa / Ficha) <span class="required-mark">*</span></label>
+        <select class="form-control" [value]="presupuestoId()"
+                (change)="onPresupuestoChange($any($event.target).value)">
+          <option value="" disabled>Seleccione un presupuesto…</option>
+          @for (p of presupuestos(); track p.id) {
+            <option [value]="p.id">{{ p.programaFormacion }} — Ficha {{ p.fichaId }} ({{ p.vigencia }})</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Rubro <span class="required-mark">*</span></label>
+        <select class="form-control" [value]="rubroId()"
+                (change)="rubroId.set($any($event.target).value)"
+                [disabled]="!presupuestoId()">
+          <option value="" disabled>Seleccione un rubro…</option>
+          @for (r of rubrosDelPresupuesto(); track r.id) {
+            <option [value]="r.id">{{ r.codigo }} — {{ r.descripcion }} (disp: {{ r.saldoDisponible | number }})</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">GIL verificado <span class="required-mark">*</span></label>
+        <select class="form-control" [value]="gilId()" (change)="onGilChange($any($event.target).value)">
+          <option value="" disabled>Seleccione un GIL…</option>
+          @for (g of gilesVerificados(); track g.id) {
+            <option [value]="g.id">{{ g.numeroGil }}</option>
+          }
+        </select>
+        @if (gilesVerificados().length === 0) {
+          <p class="hint-text">No hay GILs verificados (requiere conciliación FEL↔GIL completa).</p>
+        }
+        @if (cargandoFel()) {
+          <p class="hint-text">Buscando FEL vinculado…</p>
+        } @else if (felNumero()) {
+          <div class="fel-vinculado">
+            <lucide-icon name="file-check" [size]="14"></lucide-icon>
+            <span>FEL vinculado: <strong>{{ felNumero() }}</strong></span>
+            <span class="fel-badge fel-badge--auto">Pago automático</span>
+          </div>
+        } @else if (gilId()) {
+          <p class="hint-text">Sin FEL conciliado — el pago se registrará manualmente desde el dashboard.</p>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Concepto <span class="required-mark">*</span></label>
+        <input type="text" class="form-control" placeholder="Concepto del compromiso"
+               [value]="concepto()" (input)="concepto.set($any($event.target).value)" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Monto <span class="required-mark">*</span></label>
+        <input type="number" class="form-control" placeholder="0"
+               [value]="monto()" (input)="monto.set(+$any($event.target).value)" />
+      </div>
+
+      <div class="form-check">
+        <label><input type="checkbox" [checked]="aplicarZESE()"
+                      (change)="aplicarZESE.set($any($event.target).checked)" /> Aplicar retención ZESE</label>
+      </div>
+      <div class="form-check">
+        <label><input type="checkbox" [checked]="autorizarSobregiro()"
+                      (change)="autorizarSobregiro.set($any($event.target).checked)" /> Autorizar sobregiro</label>
+      </div>
+
+      @if (submitAttempted() && !formularioValido()) {
+        <p class="field-error">Completá presupuesto, rubro, GIL, concepto y un monto mayor a 0.</p>
+      }
     </div>
 
     <!-- Footer -->
     <div class="slideover-footer">
       <div class="footer-summary">
-        <span class="footer-label">Seleccionados (0)</span>
-        <span class="footer-total">$0</span>
+        <span class="footer-label">Monto a comprometer</span>
+        <span class="footer-total">{{ monto() | number }}</span>
       </div>
-      <restaurant-button variant="primary" [disabled]="true">
+      <restaurant-button variant="primary" [disabled]="loading()" (click)="onComprometer()">
         <div class="btn-icon-text">
-          <lucide-icon name="clipboard-check" [size]="18"></lucide-icon>
-          Comprometer al Presupuesto
+          <lucide-icon [name]="felCufe() ? 'circle-check-big' : 'clipboard-check'" [size]="18"></lucide-icon>
+          {{ felCufe() ? 'Comprometer y Pagar' : 'Comprometer al Presupuesto' }}
         </div>
       </restaurant-button>
     </div>

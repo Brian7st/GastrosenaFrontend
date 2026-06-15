@@ -6,7 +6,7 @@
       "localStorage": [
         {
           "name": "auth_token",
-          "value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xJZCI6ImJkMDExNzRlLTVjOWEtMTFmMS1hMDM4LThhMTdkM2RkZDEyMyIsIm5vbWJyZVJvbCI6IkFETUlOSVNUUkFET1IiLCJ1c2VySWQiOiJlMDA4MzE4NS02ODA5LTRlZDItYmQzYS1jY2Q2ODY4ZDJmNzYiLCJzdWIiOiJhZG1pbkBzZW5hLmVkdS5jbyIsImlhdCI6MTc4MTAyMDgyMCwiZXhwIjoxNzgxMDI0NDIwfQ.GAxl3_E-0yHdqH3Jok8tVXFcnPReLwu3UNa0zktJhbM"
+          "value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xJZCI6ImJkMDExNzRlLTVjOWEtMTFmMS1hMDM4LThhMTdkM2RkZDEyMyIsIm5vbWJyZVJvbCI6IkFETUlOSVNUUkFET1IiLCJ1c2VySWQiOiJlMDA4MzE4NS02ODA5LTRlZDItYmQzYS1jY2Q2ODY4ZDJmNzYiLCJzdWIiOiJhZG1pbkBzZW5hLmVkdS5jbyIsImlhdCI6MTc4MTEzNDM1MywiZXhwIjoxNzgxMTM3OTUzfQ.Qgunq9vYT871B44J-e2wOAOPKjoxaHl19xdp7AnmNQA"
         },
         {
           "name": "gastrosena-tema",

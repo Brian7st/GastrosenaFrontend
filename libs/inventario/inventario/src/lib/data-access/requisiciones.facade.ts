@@ -89,10 +89,18 @@ export class RequisicionesFacade {
         finalize(() => this._loading.set(false))
       )
       .subscribe(ok => {
-        if (ok) {
-          this.loadAll();
-          this.cargarRequisicion(id);
-        }
+        if (!ok) return;
+        // Actualización optimista: tras el PATCH /enviar, la proyección de lista del backend
+        // puede tardar en reflejar ENVIADA, lo que dejaba el tablero desactualizado hasta
+        // recargar. Reflejamos el nuevo estado de inmediato (kanban) y reconciliamos el
+        // detalle con el backend por-id (la lista se revalida en el próximo montaje del tablero).
+        this._requisiciones.update(list =>
+          list.map(r => r.id === id ? { ...r, estado: 'ENVIADA' as const } : r)
+        );
+        this._requisicionSeleccionada.update(r =>
+          r && r.id === id ? { ...r, estado: 'ENVIADA' as const } : r
+        );
+        this.cargarRequisicion(id);
       });
   }
 

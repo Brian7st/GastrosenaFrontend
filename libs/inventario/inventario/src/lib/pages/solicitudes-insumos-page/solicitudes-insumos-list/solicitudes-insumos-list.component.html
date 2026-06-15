@@ -179,7 +179,7 @@
                 <button class="action-icon action-icon--approve" (click)="onApprove(s); $event.stopPropagation()" title="Aprobar Solicitud">
                   <lucide-icon name="check-circle" [size]="16"></lucide-icon>
                 </button>
-                <button class="action-icon action-icon--reject" (click)="onReject(s.id); $event.stopPropagation()" title="Rechazar Solicitud">
+                <button class="action-icon action-icon--reject" (click)="onReject(s); $event.stopPropagation()" title="Rechazar Solicitud">
                   <lucide-icon name="x" [size]="16"></lucide-icon>
                 </button>
               }
@@ -237,3 +237,11 @@
   (cancel)="onCloseModal()"
   (confirm)="onConfirmApprove($event)">
 </restaurant-aprobar-solicitud-modal>
+
+<!-- Modal de rechazo -->
+<restaurant-rechazar-solicitud-modal
+  [isOpen]="solicitudRechazo() !== null"
+  [solicitud]="solicitudRechazo()"
+  (cancelar)="onCloseRechazo()"
+  (confirmar)="onConfirmReject($event)">
+</restaurant-rechazar-solicitud-modal>

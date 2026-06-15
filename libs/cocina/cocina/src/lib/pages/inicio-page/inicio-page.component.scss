@@ -393,6 +393,32 @@
     font-size: var(--font-size-sm);
     color: var(--color-error-text);
   }
+
+  /* Variante DEVOLUCION - color hueso/marfil */
+  &.motivo-devolucion {
+    background: #f7f3ee;
+    border-left-color: #b5a48b;
+
+    .motivo-label { color: #8a7560; }
+    .motivo-text { color: #5c4d3c; }
+  }
+
+  /* Variante LISTAS - verde */
+  &.motivo-listas {
+    background: var(--color-estado-activo-bg, #e6f6eb);
+    border-left-color: var(--color-brand-primary, #39a900);
+
+    .motivo-label { color: var(--color-brand-primary, #39a900); }
+    .motivo-text { color: var(--color-text-primary, #1e293b); }
+  }
+}
+
+/* Variante de tarjeta tipo-devolucion - color hueso */
+.incidencia-card.tipo-devolucion {
+  .comanda-id {
+    background: #f7f3ee;
+    color: #8a7560;
+  }
 }
 
 /* --- Estados vacío y cargando --- */
@@ -454,4 +480,99 @@
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* ===== MODAL DE CONFIRMACIÓN PERSONALIZADO ===== */
+.confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.2s ease;
+}
+
+.confirm-modal {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 36px 32px 28px;
+  width: 400px;
+  max-width: 92vw;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+  animation: slideUp 0.28s ease;
+
+  .confirm-icon-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+
+  .confirm-titulo {
+    margin: 0 0 10px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-text-primary, #1e293b);
+  }
+
+  .confirm-mensaje {
+    margin: 0 0 28px;
+    font-size: 0.875rem;
+    color: var(--color-text-secondary, #64748b);
+    line-height: 1.6;
+
+    strong {
+      color: var(--color-text-primary, #1e293b);
+    }
+  }
+
+  .confirm-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .confirm-btn {
+    padding: 10px 28px;
+    border-radius: 999px;
+    border: none;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.2px;
+
+    &.confirm-btn-cancel {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1.5px solid #e2e8f0;
+
+      &:hover {
+        background: #e2e8f0;
+        transform: translateY(-1px);
+      }
+    }
+
+    &.confirm-btn-confirm {
+      background: var(--color-brand-primary, #39a900);
+      color: #ffffff;
+
+      &:hover {
+        filter: brightness(1.08);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba(57, 169, 0, 0.35);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
 }

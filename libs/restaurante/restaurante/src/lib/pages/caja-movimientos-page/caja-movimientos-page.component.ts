@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import {
@@ -38,8 +38,21 @@ export class CajaMovimientosPageComponent implements OnInit {
   totalTransferencia = signal<number>(0);
 
   facturas = signal<any[]>([]);
+  filtroPago = signal<string>('TODOS');
 
-  alertDialog = signal<{open: boolean, title: string, message: string}>({
+  facturasFiltradas = computed(() => {
+    const data = this.facturas();
+    const filtro = this.filtroPago();
+    
+    if (filtro === 'TODOS') return data;
+    
+    return data.filter(f => {
+      const metodo = f.metodoPago ? f.metodoPago.toUpperCase() : '';
+      return metodo.includes(filtro);
+    });
+  });
+
+  alertDialog = signal<{ open: boolean, title: string, message: string }>({
     open: false,
     title: '',
     message: ''
@@ -106,13 +119,6 @@ export class CajaMovimientosPageComponent implements OnInit {
     this.facade.descargarFacturaPdf(idFactura, numeroFactura);
   }
 
-  generarReporteCuadre() {
-    this.alertDialog.set({
-      open: true,
-      title: 'Reporte Generado',
-      message: `El reporte de cuadre del turno actual ha sido generado y está listo para impresión.`
-    });
-  }
 
   cerrarAlertDialog() {
     this.alertDialog.set({ ...this.alertDialog(), open: false });

@@ -317,3 +317,18 @@
 .text-tertiary {
   color: var(--color-danger, #ba1a1a);
 }
+
+/* CUFE: cadena de 96 chars — truncar con elipsis para no romper la tabla.
+   El valor completo queda accesible en el atributo title (hover). */
+.cufe-cell {
+  max-width: 16rem;
+}
+
+.cufe-text {
+  display: block;
+  max-width: 16rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: help;
+}

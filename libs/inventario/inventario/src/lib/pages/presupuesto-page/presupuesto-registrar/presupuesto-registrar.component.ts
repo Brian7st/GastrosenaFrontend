@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 import { PresupuestoFacade } from '../../../data-access/presupuesto.facade';
+import { ProgramasService, Programa } from '../../../data-access/services/programas.service';
 import { FuenteFinanciacion, RegistrarPresupuestoData } from '../../../models/presupuesto.model';
 
 @Component({
@@ -18,8 +19,16 @@ export class PresupuestoRegistrarComponent implements OnInit {
   private router = inject(Router);
   private fb     = inject(FormBuilder);
   private facade = inject(PresupuestoFacade);
+  private programasService = inject(ProgramasService);
 
-  readonly VIGENCIAS = [2024, 2025, 2026];
+  /** Catálogo de los 5 programas para el selector. */
+  programas = signal<Programa[]>([]);
+
+  /** Vigencias seleccionables: año en curso y los próximos dos. Se calcula en runtime para no quedar desactualizado. */
+  readonly VIGENCIAS = Array.from(
+    { length: 3 },
+    (_, offset) => new Date().getFullYear() + offset,
+  );
 
   /**
    * Formulario alineado con el payload real POST /budget/presupuestos.
@@ -43,6 +52,7 @@ export class PresupuestoRegistrarComponent implements OnInit {
 
   ngOnInit(): void {
     this.facade.loadAll();
+    this.programasService.getProgramas().subscribe(p => this.programas.set(p));
   }
 
   onSubmit(): void {

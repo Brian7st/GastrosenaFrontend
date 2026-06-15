@@ -1,7 +1,8 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
-import { finalize, catchError, of } from 'rxjs';
-import { Factura, FacturaFiltros, FacturaKpis, FacturaPaginacion, SolicitudGIL, ConciliacionGil, FacturaFormDto, GilPickerItem } from '../models/facturas.model';
+import { finalize, catchError, of, Observable } from 'rxjs';
+import { Factura, FacturaFiltros, FacturaKpis, FacturaPaginacion, SolicitudGIL, ConciliacionGil, FacturaFormDto, GilPickerItem, NotaCredito, RegistrarNotaCreditoRequest } from '../models/facturas.model';
 import { FacturasService } from './services/facturas.service';
+import { KardexFacade } from './kardex.facade';
 import { ActualizarFacturaRequest } from './api/sourcing.api';
 import { BienGilResponse } from './api/procurement.api';
 
@@ -10,6 +11,7 @@ import { BienGilResponse } from './api/procurement.api';
 })
 export class FacturasFacade {
   private svc = inject(FacturasService);
+  private kardex = inject(KardexFacade);
 
   private _facturas              = signal<Factura[]>([]);
   private _kpis                  = signal<FacturaKpis | null>(null);
@@ -221,7 +223,12 @@ export class FacturasFacade {
         finalize(() => this._loading.set(false))
       )
       .subscribe(res => {
-        if (res) { this._facturaSeleccionada.set(res); this.cargarFacturas(); }
+        if (res) {
+          this._facturaSeleccionada.set(res);
+          this.cargarFacturas();
+          this.intentarCargarConciliacion(String(id)); // refresca el cruce tras verificar
+          this.kardex.loadAll(); // verificar crea la entrada al inventario → refresca movimientos
+        }
       });
   }
 
@@ -244,7 +251,11 @@ export class FacturasFacade {
         finalize(() => this._loading.set(false))
       )
       .subscribe(res => {
-        if (res) { this._facturaSeleccionada.set(res); this.cargarFacturas(); }
+        if (res) {
+          this._facturaSeleccionada.set(res);
+          this.cargarFacturas();
+          this.intentarCargarConciliacion(String(id)); // refresca el cruce con el GIL tras resolver
+        }
       });
   }
 
@@ -330,7 +341,12 @@ export class FacturasFacade {
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe(res => { if (res !== null) this._conciliacionGil.set(res); });
+      .subscribe(res => {
+        if (res !== null) {
+          this._conciliacionGil.set(res);
+          this.cargarFactura(facturaId); // la factura pudo cambiar de estado al conciliar
+        }
+      });
   }
 
   cargarConciliacionGil(params: { facturaId?: string; gilId?: string }): void {
@@ -359,6 +375,42 @@ export class FacturasFacade {
         finalize(() => this._loading.set(false))
       )
       .subscribe(res => { if (res !== null) this._conciliacionGil.set(res); });
+  }
+
+  registrarNotaCredito(req: RegistrarNotaCreditoRequest): Observable<NotaCredito> {
+    return this.svc.registrarNotaCredito(req).pipe(
+      catchError(() => {
+        this._error.set('Error al registrar la nota crédito');
+        return of(null as unknown as NotaCredito);
+      }),
+    );
+  }
+
+  resolverConNotaCredito(
+    conciliacionId: string,
+    gilItemId:      string,
+    notaCreditoIds: string[],
+  ): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this.svc.resolverConNotaCredito(conciliacionId, gilItemId, notaCreditoIds)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al resolver la diferencia con nota crédito');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false)),
+      )
+      .subscribe(res => {
+        if (res !== null) {
+          // Reload both factura and conciliacion to reflect valorNetoAPagar and resuelta state
+          const factura = this._facturaSeleccionada();
+          if (factura) {
+            this.cargarFactura(String(factura.id));
+            this.intentarCargarConciliacion(String(factura.id));
+          }
+        }
+      });
   }
 
   vincularInstructorOrden(ordenCompra: string, instructorId: string): void {
