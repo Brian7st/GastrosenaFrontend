@@ -44,7 +44,7 @@ async function crearSolicitudConBien(page: Page): Promise<{ instructor: string; 
   await expect(page.getByRole('heading', { name: /Nueva Solicitud de Insumos/i })).toBeVisible();
 
   await page.getByPlaceholder(/Ej\. 2560892/i).fill(ficha);
-  await page.getByPlaceholder(/Ej\. GASTRONOMÍA/i).fill(`Programa E2E ${suffix}`);
+  await page.locator('select').first().selectOption({ index: 1 });
   await page.getByPlaceholder(/Ej\. Carlos Rodríguez/i).fill(instructor);
   await page.getByPlaceholder(/Ej\. 1234567890/i).fill(`10${suffix}`.slice(0, 10));
 
