@@ -292,15 +292,6 @@ export const INVENTARIO_ROUTES: Routes = [
           import('./pages/actas-page/actas-detail/actas-detail.component').then(
             m => m.ActasDetailComponent
           ),
-        children: [
-          {
-            path: 'cargar-firma',
-            loadComponent: () =>
-              import('./pages/actas-page/actas-upload/actas-upload.component').then(
-                m => m.ActasUploadComponent
-              ),
-          },
-        ],
       },
     ]
   },
