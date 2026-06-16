@@ -72,9 +72,6 @@
     <div class="main-content">
       <div class="section-header">
         <h2 class="section-title">Toma Física por Categoría</h2>
-        @if (ultimaId(); as id) {
-          <a [routerLink]="id" class="link-action">Ver detalle</a>
-        }
       </div>
 
       <div class="categorias-grid">
@@ -84,7 +81,11 @@
           <p class="text-secondary">Sin productos en el catálogo.</p>
         } @else {
           @for (cat of categorias(); track cat.nombre) {
-            <div class="categoria-card">
+            <a
+              class="categoria-card"
+              routerLink="toma-fisica"
+              [queryParams]="{ categoria: cat.nombre }"
+              [attr.aria-label]="'Iniciar toma física de ' + cat.nombre">
               <div class="categoria-icon-box">
                 <lucide-icon [name]="iconoDeCategoria(cat.nombre)" [size]="24"></lucide-icon>
               </div>
@@ -95,7 +96,7 @@
               <div class="categoria-arrow">
                 <lucide-icon name="chevron-right" [size]="20"></lucide-icon>
               </div>
-            </div>
+            </a>
           }
         }
       </div>

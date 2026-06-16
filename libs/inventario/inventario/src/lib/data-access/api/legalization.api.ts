@@ -139,6 +139,7 @@ export interface RequisicionResponse {
   instructorId?:     string;
   instructorNombre?: string;
   estado?:           'BORRADOR' | 'ENVIADA' | 'DESPACHADA' | 'FIRMADA' | 'LEGALIZADA';
+  voceroId?:         string;
   items?:            RequisicionItemResponse[];
 }
 

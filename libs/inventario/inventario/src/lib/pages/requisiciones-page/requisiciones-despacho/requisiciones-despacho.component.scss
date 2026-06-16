@@ -297,6 +297,13 @@
   margin-bottom: var(--space-1);
 }
 
+.checklist-item__delivery-value {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-en-superficie);
+  text-align: right;
+}
+
 .checklist-item__delivery-input {
   width: 80px;
   background-color: var(--color-superficie-contenedor-mas-bajo);

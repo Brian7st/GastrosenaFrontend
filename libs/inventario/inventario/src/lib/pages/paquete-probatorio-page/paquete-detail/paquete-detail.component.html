@@ -56,15 +56,6 @@
             <lucide-icon name="archive" [size]="16"></lucide-icon>
             Archivar Expediente
           </restaurant-button>
-        } @else if (paquete()?.estado === 'REVISADO') {
-          <restaurant-button variant="surface" [disabled]="true">
-            <lucide-icon name="archive" [size]="16"></lucide-icon>
-            Archivar Expediente
-          </restaurant-button>
-          <p class="paquete-detail__btn-hint">
-            <lucide-icon name="alert-triangle" [size]="12"></lucide-icon>
-            Vincule la trazabilidad antes de archivar
-          </p>
         } @else {
           <restaurant-button variant="surface" [disabled]="true">
             <lucide-icon name="archive" [size]="16"></lucide-icon>
@@ -89,94 +80,6 @@
 
     <!-- Left Column (8/12) -->
     <div class="paquete-detail__main">
-
-      <!-- Trazabilidad GIL / CUFE -->
-      <section class="paquete-detail__section">
-        <div class="paquete-detail__section-header">
-          <lucide-icon name="git-branch" [size]="18" class="paquete-detail__section-icon"></lucide-icon>
-          <h3 class="paquete-detail__section-title">Trazabilidad GIL / CUFE</h3>
-          @if (!trazabilidadRegistrada()) {
-            <span class="paquete-detail__trace-badge paquete-detail__trace-badge--pending">
-              <lucide-icon name="alert-circle" [size]="12"></lucide-icon>
-              Pendiente
-            </span>
-          } @else {
-            <span class="paquete-detail__trace-badge paquete-detail__trace-badge--ok">
-              <lucide-icon name="check-circle" [size]="12"></lucide-icon>
-              Vinculada
-            </span>
-          }
-        </div>
-
-        <!-- Si ya está vinculada — solo lectura -->
-        @if (trazabilidadRegistrada()) {
-          <div class="paquete-detail__trace-grid">
-            <div class="paquete-detail__trace-card">
-              <p class="paquete-detail__trace-label">GIL</p>
-              <p class="paquete-detail__trace-value">{{ p.gilId }}</p>
-            </div>
-            <div class="paquete-detail__trace-card">
-              <p class="paquete-detail__trace-label">CUFE</p>
-              <p class="paquete-detail__trace-cufe">{{ p.cufeFuenteId }}</p>
-            </div>
-          </div>
-        }
-
-        <!-- Si NO está vinculada — formulario inline (RF-5.11.7) -->
-        @if (!trazabilidadRegistrada()) {
-          <div class="paquete-detail__trace-form">
-            <p class="paquete-detail__trace-hint">
-              Vincule la trazabilidad antes de archivar el expediente (RF-5.11.7).
-            </p>
-            <div class="paquete-detail__trace-inputs">
-              <div class="paquete-detail__trace-field">
-                <label class="paquete-detail__trace-label">GIL (Guía de Inspección de Lote)</label>
-                <input
-                  class="paquete-detail__trace-input"
-                  type="text"
-                  placeholder="Ej. GIL-F-014-2026-001"
-                  [value]="gilId()"
-                  (input)="setGilId($event)"
-                />
-              </div>
-              <div class="paquete-detail__trace-field">
-                <label class="paquete-detail__trace-label">CUFE (Código Único Factura Electrónica)</label>
-                <input
-                  class="paquete-detail__trace-input"
-                  type="text"
-                  placeholder="Ej. abc123def456..."
-                  [value]="cufe()"
-                  (input)="setCufe($event)"
-                />
-              </div>
-              <div class="paquete-detail__trace-field">
-                <label class="paquete-detail__trace-label">Compromiso Presupuestal</label>
-                <input
-                  class="paquete-detail__trace-input"
-                  type="text"
-                  placeholder="Ej. CP-2026-0042"
-                  [value]="compromisoId()"
-                  (input)="setCompromisoId($event)"
-                />
-              </div>
-            </div>
-
-            @if (facadeError()) {
-              <p class="paquete-detail__trace-error">{{ facadeError() }}</p>
-            }
-
-            <button
-              class="paquete-detail__trace-btn"
-              type="button"
-              [disabled]="!trazabilidadCompleta() || loading()"
-              (click)="vincularTrazabilidad()"
-            >
-              <lucide-icon name="link" [size]="16"></lucide-icon>
-              {{ loading() ? 'Vinculando...' : 'Vincular Trazabilidad' }}
-            </button>
-          </div>
-        }
-      </section>
 
       <!-- Documentos del Paquete -->
       <section>
@@ -217,7 +120,7 @@
             </div>
             <h4 class="paquete-detail__doc-name">Requisición</h4>
             @if (p.requisicionId) {
-              <p class="paquete-detail__doc-sub">{{ p.requisicionId }}</p>
+              <p class="paquete-detail__doc-sub">Documento vinculado</p>
               <div class="paquete-detail__doc-footer">
                 <a class="paquete-detail__doc-link" [routerLink]="['./requisicion']">
                   Ver documento <lucide-icon name="arrow-right" [size]="14"></lucide-icon>

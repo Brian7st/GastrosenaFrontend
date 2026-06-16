@@ -1,5 +1,5 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
-import { finalize, catchError, of } from 'rxjs';
+import { finalize, catchError, of, tap, throwError, Observable } from 'rxjs';
 import { RequisicionesService } from './services/requisiciones.service';
 import { Requisicion } from '../models/requisicion.model';
 
@@ -104,32 +104,56 @@ export class RequisicionesFacade {
       });
   }
 
-  /** PATCH /legalization/requisiciones/{id}/despachar — economoId obligatorio */
-  despacharRequisicion(id: string, economoId: string): void {
+  /**
+   * PATCH /legalization/requisiciones/{id}/despachar — economoId obligatorio.
+   * Devuelve el observable para que la pantalla controle navegación/errores; al
+   * confirmar, refleja la transición en el kanban sin recargar la página.
+   */
+  despacharRequisicion(id: string, economoId: string): Observable<boolean> {
     this._loading.set(true);
-    this.requisicionesService.despacharRequisicion(id, economoId)
-      .pipe(
-        catchError(() => {
-          this._error.set('Error al despachar la requisición');
-          return of(false);
-        }),
-        finalize(() => this._loading.set(false))
-      )
-      .subscribe(ok => { if (ok) this.loadAll(); });
+    this._error.set(null);
+    return this.requisicionesService.despacharRequisicion(id, economoId).pipe(
+      tap(ok => { if (ok) this.aplicarTransicion(id, 'DESPACHADA'); }),
+      catchError(err => {
+        this._error.set('Error al despachar la requisición');
+        return throwError(() => err);
+      }),
+      finalize(() => this._loading.set(false))
+    );
   }
 
-  /** PATCH /legalization/requisiciones/{id}/firmar — voceroId obligatorio */
-  firmarRequisicion(id: string, voceroId: string): void {
+  /**
+   * PATCH /legalization/requisiciones/{id}/firmar — voceroId obligatorio.
+   * Devuelve el observable para que la pantalla controle navegación/errores; al
+   * confirmar, refleja la transición en el kanban sin recargar la página.
+   */
+  firmarRequisicion(id: string, voceroId: string): Observable<boolean> {
     this._loading.set(true);
-    this.requisicionesService.firmarRequisicion(id, voceroId)
-      .pipe(
-        catchError(() => {
-          this._error.set('Error al firmar la requisición');
-          return of(false);
-        }),
-        finalize(() => this._loading.set(false))
-      )
-      .subscribe(ok => { if (ok) this.loadAll(); });
+    this._error.set(null);
+    return this.requisicionesService.firmarRequisicion(id, voceroId).pipe(
+      tap(ok => { if (ok) this.aplicarTransicion(id, 'FIRMADA'); }),
+      catchError(err => {
+        this._error.set('Error al firmar la requisición');
+        return throwError(() => err);
+      }),
+      finalize(() => this._loading.set(false))
+    );
+  }
+
+  /**
+   * Refleja un cambio de estado de inmediato en la lista y el detalle (kanban
+   * reactivo, sin recargar la página). La proyección de lista del backend puede
+   * tardar en reflejar la transición, por eso actualizamos el signal de forma
+   * optimista y reconciliamos el detalle por-id.
+   */
+  private aplicarTransicion(id: string, estado: Requisicion['estado']): void {
+    this._requisiciones.update(list =>
+      list.map(r => r.id === id ? { ...r, estado } : r)
+    );
+    this._requisicionSeleccionada.update(r =>
+      r && r.id === id ? { ...r, estado } : r
+    );
+    this.cargarRequisicion(id);
   }
 
   /** POST /legalization/requisiciones/{id}/exportar — genera el .docx */

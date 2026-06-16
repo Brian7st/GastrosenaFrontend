@@ -63,6 +63,7 @@ export function requisicionFromApi(dto: RequisicionResponse): Requisicion {
     horaSesion:       dto.horaSesion       ?? '',
     fecha:            dto.fecha            ?? '',
     estado:           dto.estado           ?? 'BORRADOR',
+    voceroId:         dto.voceroId         ?? '',
     items: (dto.items ?? []).map((i): RequisicionItem => ({
       productoId:     i.productoId     ?? '',
       productoNombre: i.productoNombre ?? '',

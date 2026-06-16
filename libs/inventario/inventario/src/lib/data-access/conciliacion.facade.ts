@@ -187,11 +187,14 @@ export class ConciliacionFacade {
       });
   }
 
-  /** Carga los ítems de la sesión de toma física activa. */
-  cargarTomaFisicaItems(): void {
+  /**
+   * Carga los ítems de la sesión de toma física activa.
+   * Si se indica `categoria`, solo trae los bienes de esa categoría.
+   */
+  cargarTomaFisicaItems(categoria?: string): void {
     this._loading.set(true);
     this.conciliacionService
-      .getTomaFisicaItems()
+      .getTomaFisicaItems(categoria)
       .pipe(
         catchError(() => {
           this._error.set('Error al cargar los ítems de toma física');

@@ -49,6 +49,10 @@ export class ConciliacionTomaFisicaComponent implements OnInit {
   responsable = signal('Instructor');
   activeTab   = signal<TabActivo>('todos');
 
+  // Categoría seleccionada desde el dashboard (toma física por categoría).
+  // Si está vacía, se cuenta todo el catálogo.
+  categoria   = signal<string>('');
+
   items = signal<TomaFisicaItem[]>([]);
 
   loading = computed(() => this.facade.loading());
@@ -73,7 +77,9 @@ export class ConciliacionTomaFisicaComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.facade.cargarTomaFisicaItems();
+    const cat = this.route.snapshot.queryParamMap.get('categoria') ?? '';
+    this.categoria.set(cat);
+    this.facade.cargarTomaFisicaItems(cat);
   }
 
   // ─── Computed stats ───────────────────────────────────────────────
