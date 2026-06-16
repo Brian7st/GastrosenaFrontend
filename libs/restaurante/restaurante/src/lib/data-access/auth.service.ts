@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { currentUserSignal } from '@restaurant/shared/auth';
 
 @Injectable({
   providedIn: 'root'
@@ -85,6 +86,20 @@ export class AuthService {
 
   getRoles(): string[] {
     try {
+      // 0. Intentar extraer del shared signal (fuente principal de verdad)
+      try {
+        const signalUser = currentUserSignal();
+        if (signalUser) {
+          let rolesAndPerms = [...(signalUser.permisos || [])];
+          if (signalUser.rol) {
+            rolesAndPerms.push(signalUser.rol);
+          }
+          if (rolesAndPerms.length > 0) {
+            return rolesAndPerms.map((r: string) => r.toUpperCase());
+          }
+        }
+      } catch (e) {}
+
       // 1. Intentar leer desde el objeto 'user' del localStorage (usado por ga-web-inicio-general y mocks)
       const userStr = localStorage.getItem('user');
       if (userStr) {
@@ -110,6 +125,7 @@ export class AuthService {
             if (jsonPayload.role) roles.push(jsonPayload.role);
             if (jsonPayload.realm_access?.roles) roles = roles.concat(jsonPayload.realm_access.roles);
             if (jsonPayload.rol) roles.push(jsonPayload.rol);
+            if (jsonPayload.nombreRol) roles.push(jsonPayload.nombreRol);
           } catch(e) {}
         }
       }
