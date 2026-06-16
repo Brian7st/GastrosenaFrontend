@@ -83,17 +83,25 @@
         <div class="modal-title-row" style="width: 100%;">
           @if (modalTipo() === 'LISTAS') {
             <lucide-icon name="check-circle" size="24" class="modal-icon-success" style="color: var(--color-brand-primary); margin-top: var(--space-1);"></lucide-icon>
+          } @else if (modalTipo() === 'CANCELACION') {
+            <lucide-icon name="x-circle" size="24" style="color: #dc2626; margin-top: var(--space-1);"></lucide-icon>
           } @else {
-            <lucide-icon name="x-circle" size="24" class="modal-icon-error" style="color: var(--color-error-text); margin-top: var(--space-1);"></lucide-icon>
+            <lucide-icon name="rotate-ccw" size="24" style="color: #b5a48b; margin-top: var(--space-1);"></lucide-icon>
           }
           <div style="flex: 1;">
             <h2>{{ modalTitulo() }}</h2>
-            @if (modalTipo() === 'LISTAS') {
+            @if (modalTipo() === 'CANCELACION') {
+               <p class="modal-subtitle" style="color: #dc2626;">Listado de pedidos cancelados con motivos y detalles</p>
+            } @else if (modalTipo() === 'DEVOLUCION') {
+               <p class="modal-subtitle" style="color: #b5a48b;">Listado de pedidos devueltos con motivos y detalles</p>
+            }
+
+            @if (modalTipo() === 'LISTAS' || modalTipo() === 'CANCELACION' || modalTipo() === 'DEVOLUCION') {
                <!-- Controles de filtrado y eliminación de fechas -->
                <div class="modal-controls" style="display: flex; gap: 10px; margin-top: 10px; align-items: center; flex-wrap: wrap;">
                  <input type="text" [ngModel]="busquedaModal()" (ngModelChange)="busquedaModal.set($event)" placeholder="Buscar por fecha, mesero o #comanda..." class="form-input" style="flex: 1; padding: 6px 12px; border-radius: 4px; border: 1px solid var(--color-border);" />
                  
-                 <div class="delete-range-controls" style="display: flex; gap: 8px; align-items: center; border: 1px solid var(--color-danger, #d63031); padding: 6px 10px; border-radius: 20px; background: white;">
+                 <div class="delete-range-controls" style="display: flex; gap: 8px; align-items: center; border: 1px solid var(--color-danger, #d63031); padding: 6px 10px; border-radius: 20px; background: var(--color-surface-primary);">
                    <span style="font-size: 12px; color: var(--color-text-muted); font-weight: 500;">Eliminar entre:</span>
                    <input type="date" [ngModel]="fechaInicioEliminar()" (ngModelChange)="fechaInicioEliminar.set($event)" [min]="minDateAnioActual" [max]="maxDateAnioActual" class="form-input form-date" style="border: none; outline: none; background: transparent; cursor: pointer; font-size: 12px;" />
                    <span style="color: var(--color-text-muted);">-</span>
@@ -105,8 +113,6 @@
                    </button>
                  </div>
                </div>
-            } @else {
-               <p class="modal-subtitle">Listado completo de pedidos cancelados con motivos y detalles</p>
             }
           </div>
         </div>
@@ -119,7 +125,7 @@
         @if (cargando()) {
           <div class="modal-loading">
             <div class="spinner"></div>
-            <p>Cargando incidencias...</p>
+            <p>Cargando datos...</p>
           </div>
         } @else if (incidenciasFiltradas().length === 0) {
           <div class="modal-empty">
@@ -132,7 +138,7 @@
               <div class="incidencia-left">
                 <div class="incidencia-meta">
                   <span class="comanda-id">#{{ inc.comanda.idComanda | slice:0:6 | uppercase }}</span>
-                  <span class="mesa-badge">Mesa {{ inc.comanda.mesa?.numeroMesa ?? '—' }}</span>
+                  <span class="mesa-badge">Mesa {{ inc.comanda.numeroMesa ?? inc.comanda.mesa?.numeroMesa ?? '—' }}</span>
                 </div>
                 <div class="incidencia-info">
                   <span class="hora"><lucide-icon name="clock" size="14"></lucide-icon> {{ formatHora(inc.fechaRegistro) }}</span>
@@ -141,10 +147,10 @@
               </div>
 
               <div class="incidencia-right" style="position: relative;">
-                @if (modalTipo() === 'LISTAS') {
+                @if (modalTipo() === 'LISTAS' || modalTipo() === 'CANCELACION' || modalTipo() === 'DEVOLUCION') {
                   <button class="btn-delete-item" (click)="eliminarComandaIndividual(inc.idAuditoria)"
                     style="position: absolute; right: 0; top: 0; background: none; border: none; color: #d63031; cursor: pointer; padding: 2px;"
-                    title="Eliminar esta comanda">
+                    title="Eliminar registro">
                     <lucide-icon name="trash-2" [size]="20"></lucide-icon>
                   </button>
                 }
@@ -152,7 +158,7 @@
                   <p class="platos-label">Platos:</p>
                   <p class="platos-text">{{ inc.detalleModificado }}</p>
                 }
-                <div class="motivo-box">
+                <div class="motivo-box" [ngClass]="'motivo-' + inc.tipoIncidencia.toLowerCase()">
                   <p class="motivo-label">{{ getEtiquetaTipo(inc.tipoIncidencia) }}</p>
                   <p class="motivo-text">{{ inc.motivo }}</p>
                 </div>
@@ -164,6 +170,35 @@
 
       <div class="modal-footer">
         Total mostrado: <strong>{{ incidenciasFiltradas().length }} pedidos</strong>
+      </div>
+
+    </div>
+  </div>
+}
+
+<!-- ===== MODAL DE CONFIRMACIÓN PERSONALIZADO ===== -->
+@if (confirmModalAbierto()) {
+  <div class="confirm-overlay" (click)="$event.stopPropagation()">
+    <div class="confirm-modal" role="dialog" aria-modal="true">
+
+      <div class="confirm-icon-wrap">
+        @if (confirmAccion() === 'info') {
+          <lucide-icon name="info" size="28" style="color: #3b82f6;"></lucide-icon>
+        } @else {
+          <lucide-icon name="trash-2" size="28" style="color: #dc2626;"></lucide-icon>
+        }
+      </div>
+
+      <h3 class="confirm-titulo">{{ confirmTitulo() }}</h3>
+      <p class="confirm-mensaje" [innerHTML]="confirmMensaje()"></p>
+
+      <div class="confirm-actions">
+        @if (confirmAccion() !== 'info') {
+          <button class="confirm-btn confirm-btn-cancel" (click)="cancelarConfirm()">Cancelar</button>
+          <button class="confirm-btn confirm-btn-confirm" (click)="confirmarAccion()">Confirmar</button>
+        } @else {
+          <button class="confirm-btn confirm-btn-confirm" (click)="cancelarConfirm()">Entendido</button>
+        }
       </div>
 
     </div>

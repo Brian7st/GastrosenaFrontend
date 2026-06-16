@@ -7,10 +7,10 @@
         <lucide-icon name="download" [size]="20"></lucide-icon>
       </div>
       <div>
-        <h2 class="modal__title">Exportar Usuarios</h2>
-        <p class="modal__subtitle">Descargá el listado en el formato que necesitás</p>
+        <h2 class="modal__title">{{ i18n.t('exportar.titulo') }}</h2>
+        <p class="modal__subtitle">{{ i18n.t('exportar.subtitulo') }}</p>
       </div>
-      <button class="modal__close" type="button" (click)="cerrar.emit()" aria-label="Cerrar">
+      <button class="modal__close" type="button" (click)="cerrar.emit()" [attr.aria-label]="i18n.t('exportar.cerrar')">
         <lucide-icon name="x" [size]="18"></lucide-icon>
       </button>
     </div>
@@ -20,7 +20,7 @@
 
       <!-- Formato -->
       <div class="modal__field">
-        <label class="modal__label" for="exp-formato">Formato de exportación</label>
+        <label class="modal__label" for="exp-formato">{{ i18n.t('exportar.formato') }}</label>
         <div class="modal__select-wrapper">
           <select
             id="exp-formato"
@@ -28,8 +28,8 @@
             [value]="formato()"
             (change)="onFormatoChange($event)"
           >
-            <option value="excel">Excel (.xlsx)</option>
-            <option value="csv">CSV (.csv)</option>
+            <option value="excel">{{ i18n.t('exportar.excel') }}</option>
+            <option value="csv">{{ i18n.t('exportar.csv') }}</option>
           </select>
           <lucide-icon name="chevron-down" [size]="16" class="modal__select-icon"></lucide-icon>
         </div>
@@ -37,7 +37,7 @@
 
       <!-- Filtro por rol -->
       <div class="modal__field">
-        <label class="modal__label" for="exp-rol">Filtrar por rol</label>
+        <label class="modal__label" for="exp-rol">{{ i18n.t('exportar.filtrar_rol') }}</label>
         <div class="modal__select-wrapper">
           <select
             id="exp-rol"
@@ -45,7 +45,7 @@
             [value]="filtroRol()"
             (change)="onRolChange($event)"
           >
-            @for (opcion of rolOpciones; track opcion.value) {
+            @for (opcion of rolOpciones(); track opcion.value) {
               <option [value]="opcion.value">{{ opcion.label }}</option>
             }
           </select>
@@ -61,16 +61,16 @@
           [checked]="incluirInactivos()"
           (change)="onInactivosChange($event)"
         />
-        <span class="modal__checkbox-label">Incluir usuarios inactivos</span>
+        <span class="modal__checkbox-label">{{ i18n.t('exportar.incluir_inactivos') }}</span>
       </label>
 
       <!-- Info -->
       <div class="modal__info">
         <lucide-icon name="info" [size]="16" class="modal__info-icon"></lucide-icon>
         <p class="modal__info-text">
-          Se exportarán
-          <strong>{{ totalUsuarios }} usuario{{ totalUsuarios === 1 ? '' : 's' }}</strong>
-          con los filtros seleccionados.
+          {{ i18n.t('exportar.info') }}
+          <strong>{{ totalUsuarios }} {{ i18n.t('exportar.usuarios') }}</strong>
+          {{ i18n.t('exportar.con_filtros') }}
         </p>
       </div>
 
@@ -79,11 +79,11 @@
     <!-- Footer -->
     <div class="modal__footer">
       <button class="modal__btn modal__btn--ghost" type="button" (click)="cerrar.emit()">
-        Cancelar
+        {{ i18n.t('exportar.cancelar') }}
       </button>
       <button class="modal__btn modal__btn--primary" type="button" (click)="onExportar()">
         <lucide-icon name="download" [size]="16"></lucide-icon>
-        Exportar
+        {{ i18n.t('exportar.exportar') }}
       </button>
     </div>
 

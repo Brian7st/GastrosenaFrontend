@@ -16,7 +16,7 @@
 }
 
 .import-dialog {
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: 1.5rem;
   width: 100%;
   max-width: 1100px;
@@ -101,7 +101,7 @@
 
 /* Drop Zone */
 .upload-card {
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: 1.25rem;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
   overflow: hidden;
@@ -120,7 +120,7 @@
   cursor: default;
 
   &.is-dragging {
-    border-color: #006e25;
+    border-color: var(--color-primario);
     background: rgba(0, 110, 37, 0.03);
   }
 
@@ -148,7 +148,7 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 1.25rem;
-  color: #006e25;
+  color: var(--color-primario);
 
   .material-symbols-outlined { font-size: 36px; }
 }
@@ -182,7 +182,7 @@
   height: 48px;
   border-radius: 0.75rem;
   background: rgba(0, 110, 37, 0.1);
-  color: #006e25;
+  color: var(--color-primario);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -226,7 +226,7 @@
 
 /* Instrucciones */
 .instrucciones-card {
-  background: linear-gradient(135deg, #1a5c2a 0%, #006e25 60%, #28a745 100%);
+  background: linear-gradient(135deg, var(--color-primario-contenedor) 0%, var(--color-primario) 60%, var(--color-primario-gradient-end) 100%);
   border-radius: 1.25rem;
   padding: 1.5rem;
   color: white;
@@ -307,13 +307,13 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #5dff8a;
+  background: var(--color-success-vivid);
   box-shadow: 0 0 0 3px rgba(93, 255, 138, 0.25);
 }
 
 /* ── Preview Card ─────────────────────────────────────────────────────────────── */
 .preview-card {
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: 1.25rem;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
   overflow: hidden;
@@ -348,7 +348,7 @@
   padding: 0.25rem 0.75rem;
   border-radius: 999px;
   background: rgba(0, 110, 37, 0.08);
-  color: #006e25;
+  color: var(--color-primario);
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -363,7 +363,7 @@
   color: var(--color-pizarra-500);
   font-weight: 600;
 
-  .material-symbols-outlined { font-size: 24px; color: #006e25; }
+  .material-symbols-outlined { font-size: 24px; color: var(--color-primario); }
 }
 
 .spin {
@@ -422,7 +422,7 @@
   font-size: 11px;
   font-weight: 700;
 
-  &--activo { background: rgba(0, 110, 37, 0.08); color: #006e25; }
+  &--activo { background: rgba(0, 110, 37, 0.08); color: var(--color-primario); }
   &--bajo { background: rgba(186, 24, 48, 0.08); color: var(--color-terciario); }
 }
 
@@ -433,7 +433,7 @@
   font-size: 11px;
   font-weight: 700;
 
-  &.valid--ok { background: rgba(0, 110, 37, 0.08); color: #006e25; }
+  &.valid--ok { background: rgba(0, 110, 37, 0.08); color: var(--color-primario); }
   &.valid--error { background: rgba(186, 24, 48, 0.08); color: var(--color-terciario); }
 }
 
@@ -468,7 +468,7 @@
   gap: 0.5rem;
   padding: 0.75rem 2rem;
   border-radius: 999px;
-  background: linear-gradient(135deg, #006e25 0%, #28a745 100%);
+  background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-primario-gradient-end) 100%);
   color: white;
   font-weight: 700;
   font-size: 0.875rem;

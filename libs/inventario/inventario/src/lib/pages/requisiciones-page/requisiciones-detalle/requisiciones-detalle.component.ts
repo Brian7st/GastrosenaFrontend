@@ -1,9 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, TitleCasePipe } from '@angular/common';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
-import { RequisicionesService } from '../../../data-access/services/requisiciones.service';
 import { RequisicionItem } from '../../../models/requisicion.model';
 
 const CATEGORIA_LABELS: Record<string, string> = {
@@ -33,7 +32,7 @@ const ESTADO_CLASS: Record<string, string> = {
 @Component({
   selector: 'restaurant-requisiciones-detalle',
   standalone: true,
-  imports: [RouterModule, LucideIconComponent, DecimalPipe],
+  imports: [RouterModule, LucideIconComponent, DecimalPipe, TitleCasePipe],
   templateUrl: './requisiciones-detalle.component.html',
   styleUrl: './requisiciones-detalle.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,7 +41,6 @@ export class RequisicionesDetalleComponent implements OnInit {
   private router  = inject(Router);
   private route   = inject(ActivatedRoute);
   private facade  = inject(RequisicionesFacade);
-  private service = inject(RequisicionesService);
 
   requisicion  = this.facade.requisicionSeleccionada;
   loading      = this.facade.loading;
@@ -83,14 +81,6 @@ export class RequisicionesDetalleComponent implements OnInit {
     const id = this.reqId();
     if (!id) return;
     this.facade.enviarRequisicion(id);
-  }
-
-  exportar(): void {
-    const id = this.reqId();
-    if (!id) return;
-    this.service.exportarRequisicion(id).subscribe({
-      error: (err) => console.error('[RequisicionesDetalle] Error al exportar:', err),
-    });
   }
 
   close(): void {

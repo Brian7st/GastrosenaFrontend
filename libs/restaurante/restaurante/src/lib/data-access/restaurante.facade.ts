@@ -8,7 +8,7 @@ import {
 } from '../models/restaurante.model';
 import { RestauranteService } from './restaurante.service';
 import { AuthService } from './auth.service';
-import { catchError, of, Observable } from 'rxjs';
+import { catchError, of, Observable, forkJoin, switchMap } from 'rxjs';
 
 export interface ItemCarrito {
   productoId: string;
@@ -23,10 +23,8 @@ export interface ProductoMenu {
   id: string;
   name: string;
   price: number;
-  originalPrice?: number;
-  available: number;
-  sold: number;
-  discount?: string;
+  tiempoPreparacion?: number;
+  temperatura?: string;
   image: string;
   category: string;
   subcategory?: string;
@@ -53,24 +51,14 @@ export class RestauranteFacade {
   private _mesasError = signal<string | null>(null);
   private _ordenesHistorial = signal<PedidoCarrito[]>([]);
   private _pedidoActivo = signal<PedidoCarrito | null>(null);
+  private _errorGeneral = signal<string | null>(null);
 
   private _turnoCaja = signal<SesionCajaResponse | null>(null);
   private _pedidosParaCobro = signal<PedidoResumenResponse[]>([]);
-  private _historialFacturas = signal<PedidoResumenResponse[]>([]);
+  private _historialFacturas = signal<any[]>([]);
 
-  private _productosMenu = signal<ProductoMenu[]>([
-    { id: '1', name: 'Coffee Latte', price: 21.20, originalPrice: 26.20, available: 72, sold: 14, discount: '20% OFF', image: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300&q=80', category: 'bebidas', subcategory: 'calientes' },
-    { id: '2', name: 'Bolognese Spaghetti', price: 21.20, available: 8, sold: 32, image: 'https://images.unsplash.com/photo-1622973536968-3ead9e780960?w=300&q=80', category: 'plato_fuerte' },
-    { id: '3', name: 'Thanos Burger', price: 21.20, available: 12, sold: 73, image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300&q=80', category: 'plato_fuerte' },
-    { id: '4', name: 'Chamomile Tea', price: 21.20, available: 24, sold: 6, image: 'https://images.unsplash.com/photo-1576092762791-dd9e2220cad1?w=300&q=80', category: 'bebidas', subcategory: 'calientes' },
-    { id: '5', name: 'Neck Burner (Alitas)', price: 21.20, originalPrice: 26.20, available: 5, sold: 12, discount: '10% OFF', image: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=300&q=80', category: 'entrada' },
-    { id: '6', name: 'Black Tea', price: 21.20, available: 21, sold: 4, image: 'https://images.unsplash.com/photo-1594631252845-29fc4cc8cde9?w=300&q=80', category: 'bebidas', subcategory: 'frias' },
-    { id: '7', name: 'Otak Udang', price: 21.20, available: 3, sold: 21, discount: '20% OFF', image: 'https://images.unsplash.com/photo-1599487405270-891961f00880?w=300&q=80', category: 'entrada' },
-    { id: '8', name: 'Mie Sedap', price: 21.20, available: 2, sold: 34, image: 'https://images.unsplash.com/photo-1612929633738-8fe01f72810c?w=300&q=80', category: 'plato_fuerte' },
-    { id: '9', name: 'Pastel de Chocolate', price: 15.00, available: 10, sold: 25, image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=300&q=80', category: 'postre' },
-    { id: '10', name: 'Margarita Clásica', price: 30.00, available: 50, sold: 100, image: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=300&q=80', category: 'bebidas', subcategory: 'con_alcohol' },
-    { id: '11', name: 'Jugo Natural', price: 10.00, available: 30, sold: 50, image: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=300&q=80', category: 'bebidas', subcategory: 'sin_alcohol' }
-  ]);
+  private _productosMenu = signal<ProductoMenu[]>([]);
+  private readonly _mostrarModalAccesoDenegado = signal<boolean>(false);
 
   readonly mesas = this._mesas.asReadonly();
   readonly mesasCargando = this._mesasCargando.asReadonly();
@@ -82,6 +70,16 @@ export class RestauranteFacade {
   readonly pedidosParaCobro = this._pedidosParaCobro.asReadonly();
   readonly historialFacturas = this._historialFacturas.asReadonly();
   readonly productosMenu = this._productosMenu.asReadonly();
+  readonly errorGeneral = computed(() => this._errorGeneral());
+  readonly mostrarModalAccesoDenegado = computed(() => this._mostrarModalAccesoDenegado());
+
+  readonly puedeAdministrarMesas = computed(() => {
+    return this.authService.hasAnyRole(['ROLE_ADMIN', 'ADMINISTRADOR', 'ROLE_ADMINISTRADOR', 'ROLE_INSTRUCTOR', 'INSTRUCTOR', 'ADMINISTRADOR_SISTEMA', 'ROLE_ADMINISTRADOR_SISTEMA', 'ADMIN', 'MESAS_AGREGAR']);
+  });
+
+  readonly nombreUsuario = computed(() => {
+    return this.authService.getUsuarioNombre();
+  });
 
   readonly stats = computed<RestauranteStats>(() => {
     const mesasActivas = this._mesas().filter(m => m.activo);
@@ -108,17 +106,70 @@ export class RestauranteFacade {
   });
 
   constructor() {
+    this.cargarMenu();
     this.cargarMesas();
     this.cargarEstadoLocalNoMesas();
+  }
+
+  abrirModalAccesoDenegado(): void {
+    this._mostrarModalAccesoDenegado.set(true);
+  }
+
+  cerrarModalAccesoDenegado(): void {
+    this._mostrarModalAccesoDenegado.set(false);
+  }
+
+  cargarMenu(): void {
+    forkJoin({
+      cocina: this.restauranteService.obtenerRecetas().pipe(catchError(() => of([]))),
+      bar: this.restauranteService.obtenerRecetasBar().pipe(catchError(() => of([])))
+    }).subscribe({
+      next: ({ cocina, bar }) => {
+        const todasLasRecetas = [...cocina, ...bar];
+        const menuMapeado: ProductoMenu[] = todasLasRecetas.filter(r => r.activo !== false).map(r => {
+          let cat = 'plato_fuerte';
+          let subcat: string | undefined = undefined;
+          const catNombre = (r.nombreCategoria || '').toLowerCase();
+          
+          if (catNombre.includes('bebida')) {
+            cat = 'bebidas';
+            if (catNombre.includes('caliente')) subcat = 'calientes';
+            else if (catNombre.includes('fria') || catNombre.includes('fría')) subcat = 'frias';
+            else if (catNombre.includes('sin alcohol')) subcat = 'sin_alcohol';
+            else if (catNombre.includes('con alcohol') || catNombre.includes('licor')) subcat = 'con_alcohol';
+          }
+          else if (catNombre.includes('entrada')) cat = 'entrada';
+          else if (catNombre.includes('postre')) cat = 'postre';
+
+          return {
+            id: r.idReceta,
+            name: r.nombreReceta,
+            price: r.precioUnitario,
+            tiempoPreparacion: r.tiempoPreparacion,
+            temperatura: r.temperatura,
+            image: r.urlImagen || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&q=80',
+            category: cat,
+            subcategory: subcat
+          };
+        });
+        this._productosMenu.set(menuMapeado);
+      },
+      error: (err) => {
+        console.error('[RestauranteFacade] Error fatal al cargar menú:', err);
+      }
+    });
   }
 
   cargarMesas(): void {
     this._mesasCargando.set(true);
     this._mesasError.set(null);
 
-    this.restauranteService.obtenerMesas().subscribe({
-      next: (mesas) => {
-        this._mesas.set(mesas);
+    forkJoin([
+      this.restauranteService.obtenerMesas(),
+      this.restauranteService.obtenerMesasInactivas()
+    ]).subscribe({
+      next: ([activas, inactivas]) => {
+        this._mesas.set([...activas, ...inactivas]);
         this._mesasCargando.set(false);
       },
       error: (err) => {
@@ -131,13 +182,6 @@ export class RestauranteFacade {
   }
 
   private cargarEstadoLocalNoMesas(): void {
-    const ordenesGuardadas = localStorage.getItem('gastro_ordenes');
-    const turnoGuardado = localStorage.getItem('gastro_turno_caja');
-
-    if (ordenesGuardadas) {
-      this._ordenesHistorial.set(JSON.parse(ordenesGuardadas));
-    }
-
     this.restauranteService.obtenerSesionActiva().pipe(
       catchError((err) => {
         if (err.status !== 404) {
@@ -148,20 +192,100 @@ export class RestauranteFacade {
     ).subscribe((sesion) => this._turnoCaja.set(sesion));
   }
 
+  private procesarCargaPedidos(obs$: Observable<PedidoResumenResponse[]>): void {
+    obs$.pipe(
+      switchMap(pedidosResumen => {
+        if (!pedidosResumen || pedidosResumen.length === 0) {
+          return of([]);
+        }
+        const requests = pedidosResumen.map(p => this.restauranteService.obtenerPedidoPorId(p.id).pipe(
+          catchError(err => {
+            console.error(`[RestauranteFacade] Error al cargar detalles del pedido ${p.id}`, err);
+            return of(null);
+          })
+        ));
+        return forkJoin(requests);
+      })
+    ).subscribe({
+      next: (pedidosFull) => {
+        const validPedidos = pedidosFull.filter(p => p !== null);
+        const pedidosMapeados: PedidoCarrito[] = validPedidos.map(p => ({
+          id: p!.id,
+          mesaId: p!.mesaId,
+          meseroId: p!.meseroId,
+          numeroComensales: p!.numeroComensales,
+          estado: p!.estado,
+          fechaCreacion: p!.fechaCreacion,
+          subtotal: p!.subtotal,
+          detalles: p!.detalles.map(d => {
+            const productoCat = this._productosMenu().find(pm => pm.id === d.productoId)?.category || 'COMIDA';
+            return {
+              productoId: d.productoId,
+              nombreProducto: d.nombreProducto,
+              cantidad: d.cantidad,
+              precioUnitario: d.precioUnitario,
+              categoria: productoCat,
+              observaciones: d.observaciones || undefined
+            };
+          })
+        }));
+
+        const ESTADO_PESO: Record<string, number> = {
+          'LISTO_PARA_SERVIR': 1,
+          'EN_PREPARACION': 2,
+          'ENVIADO_COCINA': 3,
+          'BORRADOR': 4,
+          'ENTREGADO': 5,
+          'FACTURADO': 6,
+          'CANCELADO': 7
+        };
+
+        pedidosMapeados.sort((a, b) => {
+          const pesoA = ESTADO_PESO[a.estado] || 99;
+          const pesoB = ESTADO_PESO[b.estado] || 99;
+          if (pesoA !== pesoB) {
+            return pesoA - pesoB;
+          }
+          return new Date(b.fechaCreacion).getTime() - new Date(a.fechaCreacion).getTime();
+        });
+
+        this._ordenesHistorial.set(pedidosMapeados);
+      },
+      error: (err) => {
+        console.error('[RestauranteFacade] Error al cargar órdenes:', err);
+      }
+    });
+  }
+
+  cargarMisOrdenes(): void {
+    this.procesarCargaPedidos(this.restauranteService.misPedidos());
+  }
+
+  cargarTodasLasOrdenes(): void {
+    this.procesarCargaPedidos(this.restauranteService.listarTodosPedidos());
+  }
+
   private guardarEstadoLocal(): void {
     localStorage.setItem('gastro_ordenes', JSON.stringify(this._ordenesHistorial()));
     localStorage.setItem('gastro_turno_caja', JSON.stringify(this._turnoCaja()));
   }
 
-  agregarMesa(nombre: string, capacidad: number, zona: string): void {
+  agregarMesa(nombre: string, capacidad: number, zona: string): Observable<boolean | string> {
     const request: MesaCreateRequest = { nombre, capacidad, zona: zona || null };
-    this.restauranteService.crearMesa(request).subscribe({
-      next: (mesaNueva) => {
-        this._mesas.update(lista => [...lista, mesaNueva]);
-      },
-      error: (err) => {
-        console.error('[RestauranteFacade] Error al crear mesa:', err);
-      }
+    return new Observable(observer => {
+      this.restauranteService.crearMesa(request).subscribe({
+        next: (mesaNueva) => {
+          this._mesas.update(lista => [...lista, mesaNueva]);
+          observer.next(true);
+          observer.complete();
+        },
+        error: (err) => {
+          console.error('[RestauranteFacade] Error al crear mesa:', err);
+          const msg = err.error?.error || err.error?.mensaje || err.error?.message || 'Error desconocido al crear mesa.';
+          observer.next(msg);
+          observer.complete();
+        }
+      });
     });
   }
 
@@ -169,50 +293,64 @@ export class RestauranteFacade {
     this.iniciarCarrito(mesaId, cantidadComensales);
   }
 
-  eliminarMesa(mesaId: string): void {
-    this.cambiarEstadoActivoMesa(mesaId, false);
+  eliminarMesa(mesaId: string): Observable<boolean | string> {
+    return this.cambiarEstadoActivoMesa(mesaId, false);
   }
 
-  cambiarEstadoActivoMesa(mesaId: string, activo: boolean): void {
-    this.restauranteService.cambiarEstadoActivo(mesaId, activo).subscribe({
-      next: (mesaActualizada) => {
-        this._mesas.update(lista =>
-          lista.map(m => m.id === mesaActualizada.id 
-            ? { ...mesaActualizada, observaciones: m.observaciones } 
-            : m
-          )
-        );
-      },
-      error: (err) => {
-        console.error(
-          `[RestauranteFacade] Error al ${activo ? 'activar' : 'desactivar'} mesa ${mesaId}:`,
-          err
-        );
-      }
+  cambiarEstadoActivoMesa(mesaId: string, activo: boolean): Observable<boolean | string> {
+    return new Observable(observer => {
+      this.restauranteService.cambiarEstadoActivo(mesaId, activo).subscribe({
+        next: (mesaActualizada) => {
+          this._mesas.update(lista =>
+            lista.map(m => m.id === mesaActualizada.id
+              ? { ...mesaActualizada, observaciones: m.observaciones }
+              : m
+            )
+          );
+          observer.next(true);
+          observer.complete();
+        },
+        error: (err) => {
+          console.error(
+            `[RestauranteFacade] Error al ${activo ? 'activar' : 'desactivar'} mesa ${mesaId}:`,
+            err
+          );
+          const msg = err.error?.error || err.error?.mensaje || err.error?.message || `Error desconocido al ${activo ? 'activar' : 'desactivar'} mesa.`;
+          observer.next(msg);
+          observer.complete();
+        }
+      });
     });
   }
 
-  liberarMesa(mesaId: string): void {
-    this.actualizarEstado(mesaId, 'LIBRE');
+  liberarMesa(mesaId: string): Observable<boolean | string> {
+    return this.actualizarEstado(mesaId, 'LIBRE');
   }
 
   actualizarNotas(_mesaId: string, _notas: string): void {
     console.warn('[RestauranteFacade] actualizarNotas() aún no está conectado al backend.');
   }
 
-  editarMesa(mesaId: string, cambios: MesaUpdateRequest): void {
-    this.restauranteService.editarMesa(mesaId, cambios).subscribe({
-      next: (mesaActualizada) => {
-        this._mesas.update(lista =>
-          lista.map(m => m.id === mesaActualizada.id 
-            ? { ...mesaActualizada, observaciones: cambios.observaciones || m.observaciones } 
-            : m
-          )
-        );
-      },
-      error: (err) => {
-        console.error(`[RestauranteFacade] Error al editar mesa ${mesaId}:`, err);
-      }
+  editarMesa(mesaId: string, cambios: MesaUpdateRequest): Observable<boolean | string> {
+    return new Observable(observer => {
+      this.restauranteService.editarMesa(mesaId, cambios).subscribe({
+        next: (mesaActualizada) => {
+          this._mesas.update(lista =>
+            lista.map(m => m.id === mesaActualizada.id
+              ? { ...mesaActualizada, observaciones: cambios.observaciones || m.observaciones }
+              : m
+            )
+          );
+          observer.next(true);
+          observer.complete();
+        },
+        error: (err) => {
+          console.error(`[RestauranteFacade] Error al editar mesa ${mesaId}:`, err);
+          const msg = err.error?.error || err.error?.mensaje || err.error?.message || 'Error desconocido al editar mesa.';
+          observer.next(msg);
+          observer.complete();
+        }
+      });
     });
   }
 
@@ -221,23 +359,26 @@ export class RestauranteFacade {
     console.warn('[RestauranteFacade] Usa editarMesa(id, cambios) en su lugar.');
   }
 
-  actualizarEstado(mesaId: string, nuevoEstado: EstadoMesa): void {
-    this._mesas.update(lista =>
-      lista.map(m => m.id === mesaId ? { ...m, estado: nuevoEstado } : m)
-    );
-
-    this.restauranteService.cambiarEstadoMesa(mesaId, nuevoEstado).subscribe({
-      next: (mesaActualizada) => {
-        this._mesas.update(lista =>
-          lista.map(m => m.id === mesaActualizada.id ? mesaActualizada : m)
-        );
-      },
-      error: (err) => {
-        console.error(
-          `[RestauranteFacade] Error al cambiar estado de mesa ${mesaId} a ${nuevoEstado}:`,
-          err
-        );
-      }
+  actualizarEstado(mesaId: string, nuevoEstado: EstadoMesa): Observable<boolean | string> {
+    return new Observable(observer => {
+      this.restauranteService.cambiarEstadoMesa(mesaId, nuevoEstado).subscribe({
+        next: (mesaActualizada) => {
+          this._mesas.update(lista =>
+            lista.map(m => m.id === mesaActualizada.id ? mesaActualizada : m)
+          );
+          observer.next(true);
+          observer.complete();
+        },
+        error: (err) => {
+          console.error(
+            `[RestauranteFacade] Error al cambiar estado de mesa ${mesaId} a ${nuevoEstado}:`,
+            err
+          );
+          const msg = err.error?.error || err.error?.mensaje || err.error?.message || 'Error desconocido al cambiar estado de la mesa.';
+          observer.next(msg);
+          observer.complete();
+        }
+      });
     });
   }
 
@@ -255,8 +396,8 @@ export class RestauranteFacade {
       this.restauranteService.pedidosPorMesa(mesaId).subscribe({
         next: (pedidos) => {
           // Filtrar el pedido activo (que no esté pagado ni cancelado)
-          const pedidoActivo = pedidos.find(p => p.estado !== 'FACTURADO' && p.estado !== 'CANCELADO');
-          
+          const pedidoActivo = pedidos.find(p => p.estado !== EstadoPedido.FACTURADO && p.estado !== EstadoPedido.CANCELADO);
+
           if (!pedidoActivo) {
             console.error('[RestauranteFacade] No se encontró pedido activo para la mesa Ocupada.');
             observer.next(false);
@@ -274,14 +415,17 @@ export class RestauranteFacade {
                 estado: pedidoFull.estado,
                 fechaCreacion: pedidoFull.fechaCreacion,
                 subtotal: pedidoFull.subtotal,
-                detalles: pedidoFull.detalles.map(d => ({
-                  productoId: d.productoId,
-                  nombreProducto: d.nombreProducto,
-                  cantidad: d.cantidad,
-                  precioUnitario: d.precioUnitario,
-                  categoria: 'COMIDA', // Valor por defecto visual
-                  observaciones: d.observaciones || undefined
-                }))
+                detalles: pedidoFull.detalles.map(d => {
+                  const prod = this._productosMenu().find(m => m.id === d.productoId || m.name === d.nombreProducto);
+                  return {
+                    productoId: d.productoId,
+                    nombreProducto: d.nombreProducto,
+                    cantidad: d.cantidad,
+                    precioUnitario: d.precioUnitario,
+                    categoria: prod ? prod.category : 'COMIDA', // Mapeo dinámico desde el catálogo
+                    observaciones: d.observaciones || undefined
+                  };
+                })
               };
               this._pedidoActivo.set(pedidoParaCarrito);
               observer.next(true);
@@ -303,13 +447,13 @@ export class RestauranteFacade {
     });
   }
 
-  cancelarPedidoActivoEnBackend(): Observable<boolean> {
+  cancelarPedidoActivoEnBackend(motivo: string = ''): Observable<boolean> {
     const pedido = this.pedidoActivo();
-    if (!pedido || pedido.estado === 'BORRADOR') {
+    if (!pedido || pedido.estado === EstadoPedido.BORRADOR) {
       return of(false);
     }
     return new Observable(observer => {
-      this.restauranteService.cancelarPedido(pedido.id).subscribe({
+      this.restauranteService.cancelarPedido(pedido.id, motivo).subscribe({
         next: () => {
           this.vaciarCarrito();
           this.cargarMesas(); // Recargar mesas para actualizar el mapa
@@ -333,7 +477,7 @@ export class RestauranteFacade {
       mesaId,
       meseroId: usuarioId,
       numeroComensales: numeroComensales || 1,
-      estado: 'BORRADOR',
+      estado: EstadoPedido.BORRADOR,
       fechaCreacion: new Date().toISOString(),
       detalles: [],
       subtotal: 0
@@ -350,7 +494,7 @@ export class RestauranteFacade {
   ) {
     this._pedidoActivo.update(pedido => {
       if (!pedido) return null;
-      if (pedido.estado !== 'BORRADOR') return pedido;
+      if (pedido.estado !== EstadoPedido.BORRADOR) return pedido;
 
       const detalles = [...pedido.detalles];
       const indexExistente = detalles.findIndex(d => d.productoId === productoId && d.observaciones === observaciones);
@@ -374,7 +518,7 @@ export class RestauranteFacade {
   actualizarCantidadProducto(index: number, delta: number) {
     this._pedidoActivo.update(pedido => {
       if (!pedido) return null;
-      if (pedido.estado !== 'BORRADOR') return pedido;
+      if (pedido.estado !== EstadoPedido.BORRADOR) return pedido;
 
       const detalles = [...pedido.detalles];
       detalles[index].cantidad += delta;
@@ -388,10 +532,22 @@ export class RestauranteFacade {
     });
   }
 
+  actualizarObservacionesProducto(index: number, observaciones: string) {
+    this._pedidoActivo.update(pedido => {
+      if (!pedido) return null;
+      if (pedido.estado !== EstadoPedido.BORRADOR) return pedido;
+
+      const detalles = [...pedido.detalles];
+      detalles[index] = { ...detalles[index], observaciones };
+
+      return { ...pedido, detalles };
+    });
+  }
+
   eliminarProductoDelPedido(index: number) {
     this._pedidoActivo.update(pedido => {
       if (!pedido) return null;
-      if (pedido.estado !== 'BORRADOR') return pedido;
+      if (pedido.estado !== EstadoPedido.BORRADOR) return pedido;
 
       const detalles = [...pedido.detalles];
       detalles.splice(index, 1);
@@ -415,7 +571,6 @@ export class RestauranteFacade {
   confirmarPedidoActivo(notas: string = ''): Observable<boolean> {
     const pedido = this._pedidoActivo();
     if (!pedido || pedido.detalles.length === 0) {
-      alert('No puedes confirmar un pedido vacío');
       return of(false);
     }
 
@@ -441,7 +596,7 @@ export class RestauranteFacade {
             mesaId: pedidoResponse.mesaId,
             meseroId: pedidoResponse.meseroId,
             numeroComensales: pedidoResponse.numeroComensales,
-            estado: 'EN_PREPARACION',
+            estado: EstadoPedido.EN_PREPARACION,
             fechaCreacion: pedidoResponse.fechaCreacion,
             detalles: pedido.detalles,
             subtotal: pedidoResponse.subtotal
@@ -450,7 +605,7 @@ export class RestauranteFacade {
           this._ordenesHistorial.update(historial => [pedidoConfirmado, ...historial]);
           this.limpiarPedidoActivo();
           this.guardarEstadoLocal();
-          
+
           this.cargarMesas(); // Importante para actualizar estado OCUPADA
 
           this.enviarPedidoACocina(pedidoResponse.id);
@@ -459,7 +614,8 @@ export class RestauranteFacade {
         },
         error: (err) => {
           console.error('[RestauranteFacade] Error al crear pedido:', err);
-          alert('Hubo un error de comunicación al crear el pedido.');
+          const msg = err.error?.error || err.error?.mensaje || err.error?.message || 'Hubo un error de comunicación al crear el pedido.';
+          alert(msg);
           observer.next(false);
           observer.complete();
         }
@@ -485,7 +641,7 @@ export class RestauranteFacade {
     this.restauranteService.entregarPedido(pedidoId).subscribe({
       next: (pedidoResponse) => {
         this._ordenesHistorial.update(historial =>
-          historial.map(p => p.id === pedidoId ? { ...p, estado: 'ENTREGADO' } : p)
+          historial.map(p => p.id === pedidoId ? { ...p, estado: EstadoPedido.ENTREGADO } : p)
         );
 
         this._mesas.update(mesas =>
@@ -526,7 +682,7 @@ export class RestauranteFacade {
   }
 
   cargarPedidosParaCobro() {
-    this.restauranteService.pedidosPorEstado('ENTREGADO').subscribe({
+    this.restauranteService.pedidosPorEstado(EstadoPedido.ENTREGADO).subscribe({
       next: (pedidos) => this._pedidosParaCobro.set(pedidos),
       error: (err) => {
         console.error('[RestauranteFacade] Error al cargar pedidos para cobro:', err);
@@ -536,8 +692,14 @@ export class RestauranteFacade {
   }
 
   cargarHistorialFacturas() {
-    this.restauranteService.pedidosPorEstado('FACTURADO').subscribe({
-      next: (pedidos) => this._historialFacturas.set(pedidos),
+    const sesion = this._turnoCaja();
+    if (!sesion || !sesion.id || sesion.estado === 'CERRADA') {
+      this._historialFacturas.set([]);
+      return;
+    }
+
+    this.restauranteService.obtenerFacturasDeSesion(sesion.id).subscribe({
+      next: (facturas) => this._historialFacturas.set(facturas),
       error: (err) => {
         console.error('[RestauranteFacade] Error al cargar historial de facturas:', err);
         this._historialFacturas.set([]);
@@ -545,19 +707,43 @@ export class RestauranteFacade {
     });
   }
 
-  facturarPedido(pedidoId: string, metodoPago: MetodoPago): void {
-    const request: FacturarPedidoRequest = { pedidoId, metodoPago };
-    this.restauranteService.facturarPedido(request).subscribe({
-      next: (factura) => {
-        this._pedidosParaCobro.update(lista => lista.filter(p => p.id !== pedidoId));
-        const pedidoOriginal = this._pedidosParaCobro().find(p => p.id === pedidoId);
-        if (pedidoOriginal) {
-          this._historialFacturas.update(lista => [{ ...pedidoOriginal, estado: 'FACTURADO' }, ...lista]);
+  facturarPedido(pedidoId: string, metodoPago: MetodoPago, propina: number = 0): Observable<string | null> {
+    const request: FacturarPedidoRequest = { pedidoId, metodoPago, propina };
+    return new Observable(observer => {
+      this.restauranteService.facturarPedido(request).subscribe({
+        next: (factura) => {
+          this._pedidosParaCobro.update(lista => lista.filter(p => p.id !== pedidoId));
+
+          // Refrescar facturas del turno actual
+          this.cargarHistorialFacturas();
+
+          // El backend ya libera la mesa, solo recargamos
+          this.cargarMesas();
+
+          observer.next(factura.id);
+          observer.complete();
+        },
+        error: (err) => {
+          console.error(`[RestauranteFacade] Error al facturar pedido ${pedidoId}:`, err);
+          observer.next(null);
+          observer.complete();
         }
-        this.cargarMesas();
+      });
+    });
+  }
+
+  descargarFacturaPdf(facturaId: string, numeroFactura: string = 'Recibo'): void {
+    this.restauranteService.descargarFacturaPdf(facturaId).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Factura-${numeroFactura}.pdf`;
+        a.click();
+        window.URL.revokeObjectURL(url);
       },
       error: (err) => {
-        console.error(`[RestauranteFacade] Error al facturar pedido ${pedidoId}:`, err);
+        console.error('[RestauranteFacade] Error descargando el PDF de la factura:', err);
       }
     });
   }
@@ -571,6 +757,6 @@ export class RestauranteFacade {
       'Cortesía': 'CORTESIA'
     };
     const metodoPago: MetodoPago = metodoMap[metodo] || 'EFECTIVO';
-    this.facturarPedido(pedidoId, metodoPago);
+    this.facturarPedido(pedidoId, metodoPago).subscribe();
   }
 }

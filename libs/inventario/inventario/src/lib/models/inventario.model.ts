@@ -113,7 +113,6 @@ export interface ProductoCatalogo {
   id: string | number;
   codigoSena: string;
   codigoProveedor?: string;
-  nombre: string;
   descripcion?: string;
   categoria: string;
   unidadMedida: string;

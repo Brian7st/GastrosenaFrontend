@@ -108,6 +108,20 @@ export class PaqueteFacade {
       .subscribe(ok => { if (ok) this.cargarPaquete(id); });
   }
 
+  /** PATCH /legalization/paquetes/{id}/revisar — avanza COMPLETO → REVISADO y recarga el detalle. */
+  revisarPaquete(id: string, revisorId: string): void {
+    this._loading.set(true);
+    this.paqueteService.revisarPaquete(id, revisorId)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al revisar el paquete');
+          return of(false);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(ok => { if (ok) this.cargarPaquete(id); });
+  }
+
   /** Archiva el paquete y recarga su detalle. */
   archivarPaquete(id: string): void {
     this._loading.set(true);
@@ -122,17 +136,4 @@ export class PaqueteFacade {
       .subscribe(ok => { if (ok) this.cargarPaquete(id); });
   }
 
-  /** Incluye una requisición en el paquete y recarga su detalle. */
-  incluirRequisicion(paqueteId: string, reqId: string): void {
-    this.paqueteService.incluirRequisicion(paqueteId, reqId)
-      .pipe(
-        catchError(() => {
-          this._error.set('Error al incluir la requisición');
-          return of(false);
-        })
-      )
-      .subscribe(ok => {
-        if (ok) this.cargarPaquete(paqueteId);
-      });
-  }
 }

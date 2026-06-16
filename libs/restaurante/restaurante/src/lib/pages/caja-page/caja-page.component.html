@@ -1,13 +1,7 @@
 <div class="caja-page">
   <div class="caja-page__header">
-    <restaurant-page-header
-            title="Módulo de Facturación"
-            subtitle="Panel de control para facturación y procesamiento de pagos"
-    ></restaurant-page-header>
-
-    <div class="badge-container">
-      <span class="badge">Instructor</span>
-    </div>
+    <restaurant-page-header title="Gestión de Caja"
+      subtitle="Panel de control para facturación y procesamiento de pagos"></restaurant-page-header>
   </div>
 
   <div class="alert alert-danger mt-4" *ngIf="!facade.isCajaAbierta()" style="margin: 0 var(--space-6) var(--space-6);">
@@ -15,33 +9,18 @@
   </div>
 
   <div class="caja-page__stats">
-    <restaurant-kpi-card
-            label="Pedidos Listos"
-            [value]="facade.cajaStats().pedidosListos.toString()"
-            icon="check-circle"
-            iconColor="green"
-    ></restaurant-kpi-card>
+    <restaurant-kpi-card label="Pedidos Listos" [value]="facade.cajaStats().pedidosListos.toString()"
+      icon="check-circle" iconColor="green"></restaurant-kpi-card>
 
-    <restaurant-kpi-card
-            label="Mesas por Pagar"
-            [value]="facade.cajaStats().mesasPorPagar.toString()"
-            icon="credit-card"
-            iconColor="blue"
-    ></restaurant-kpi-card>
+    <restaurant-kpi-card label="Mesas por Pagar" [value]="facade.cajaStats().mesasPorPagar.toString()"
+      icon="credit-card" iconColor="blue"></restaurant-kpi-card>
 
-    <restaurant-kpi-card
-            label="Facturas Hoy"
-            [value]="facade.cajaStats().facturasHoy.toString()"
-            icon="file-text"
-            iconColor="red"
-    ></restaurant-kpi-card>
+    <restaurant-kpi-card label="Facturas Hoy" [value]="facade.cajaStats().facturasHoy.toString()" icon="file-text"
+      iconColor="red"></restaurant-kpi-card>
 
-    <restaurant-kpi-card
-            label="Total Facturado"
-            [value]="(facade.cajaStats().totalFacturado | currency:'USD':'symbol':'1.0-0') || '$0'"
-            icon="check-circle"
-            iconColor="orange"
-    ></restaurant-kpi-card>
+    <restaurant-kpi-card label="Total Facturado"
+      [value]="(facade.cajaStats().totalFacturado | currency:'USD':'symbol':'1.0-0') || '$0'" icon="check-circle"
+      iconColor="orange"></restaurant-kpi-card>
   </div>
 
   <section class="caja-page__actions">
@@ -72,7 +51,8 @@
           <span>Mesas por pagar:</span>
           <span class="badge-count">{{ facade.cajaStats().mesasPorPagar }}</span>
         </div>
-        <restaurant-button variant="primary" class="full-width" (click)="irARegistrarPago()" [disabled]="!facade.isCajaAbierta()">
+        <restaurant-button variant="primary" class="full-width" (click)="irARegistrarPago()"
+          [disabled]="!facade.isCajaAbierta()">
           <lucide-icon name="credit-card" [size]="18"></lucide-icon>
           <span>Procesar Pagos</span>
         </restaurant-button>
@@ -104,7 +84,8 @@
           <h3 class="text-gray">Movimientos</h3>
         </div>
         <p class="action-desc">Historial de pedidos facturados</p>
-        <restaurant-button variant="primary" class="full-width" (click)="irAMovimientos()" [disabled]="!facade.isCajaAbierta()">
+        <restaurant-button variant="primary" class="full-width" (click)="irAMovimientos()"
+          [disabled]="!facade.isCajaAbierta()">
           <lucide-icon name="arrow-left-right" [size]="18"></lucide-icon>
           <span>Movimientos registrados</span>
         </restaurant-button>
@@ -116,7 +97,8 @@
           <h3 class="text-red">Cierre de Caja</h3>
         </div>
         <p class="action-desc">Arqueo ciego y reporte Z del turno</p>
-        <restaurant-button variant="primary" class="full-width" (click)="irACierre()" [disabled]="!facade.isCajaAbierta()">
+        <restaurant-button variant="primary" class="full-width" (click)="irACierre()"
+          [disabled]="!facade.isCajaAbierta()">
           <lucide-icon name="x" [size]="18"></lucide-icon>
           <span>Cerrar Caja</span>
         </restaurant-button>

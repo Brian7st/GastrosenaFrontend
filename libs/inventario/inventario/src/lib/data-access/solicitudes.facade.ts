@@ -10,7 +10,7 @@ import {
 } from '../models/solicitud-sesion.model';
 import { SolicitudesService } from './services/solicitudes.service';
 import { EnviarProveedorRequest } from './api/sourcing.api';
-import { finalize, catchError, of, map, EMPTY } from 'rxjs';
+import { finalize, catchError, of, map, EMPTY, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -311,6 +311,7 @@ export class SolicitudesFacade {
     this._error.set(null);
     return this.solicitudesService.actualizarSolicitudSesion(id, data)
       .pipe(
+        tap(res => { if (res) this.cargarSolicitudesSesion(); }), // refresca la tabla al editar
         catchError(() => {
           this._error.set('Error al actualizar la solicitud de sesión');
           return of(null);
@@ -325,6 +326,7 @@ export class SolicitudesFacade {
     this._error.set(null);
     return this.solicitudesService.crearSolicitudSesion(data)
       .pipe(
+        tap(res => { if (res) this.cargarSolicitudesSesion(); }), // refresca la tabla al crear
         catchError(() => {
           this._error.set('Error al crear la solicitud de sesión');
           return of(null);

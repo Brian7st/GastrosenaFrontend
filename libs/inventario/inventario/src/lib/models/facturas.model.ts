@@ -51,6 +51,7 @@ export interface Factura {
   valorRetencionZese?: number;
   motivoAnulacion?: string;
   proveedorBeneficiarioZese?: boolean;
+  valorNetoAPagar?: number;
   infoBancariaBanco?: string;
   infoBancariaCuenta?: string;
   infoBancariaTipo?: InfoBancariaTipo;
@@ -114,6 +115,44 @@ export interface FacturaFormDto {
   }>;
 }
 
+// ─── Nota Crédito ────────────────────────────────────────────────────────────
+
+export type MotivoNotaCredito =
+  | 'SOBREFACTURACION'
+  | 'DEVOLUCION'
+  | 'DESCUENTO'
+  | 'ANULACION_PARCIAL';
+
+export interface LineaNotaCredito {
+  productoId:    string;
+  cantidad:      number;
+  valorUnitario: number;
+  valorTotal:    number;
+}
+
+export interface NotaCredito {
+  id:            string;
+  facturaId:     string;
+  cufeOrigen:    string;
+  motivo:        MotivoNotaCredito;
+  fechaEmision:  string;
+  estado:        string;
+  valorTotal:    number;
+  lineas:        LineaNotaCredito[];
+}
+
+export interface RegistrarNotaCreditoRequest {
+  facturaId:    string;
+  cufeOrigen:   string;
+  motivo:       MotivoNotaCredito;
+  fechaEmision: string;
+  lineas: Array<{
+    productoId:    string;
+    cantidad:      number;
+    valorUnitario: number;
+  }>;
+}
+
 // ─── Conciliación Factura-GIL ───────────────────────────────────────────────
 
 export interface ConciliacionGilDiferencia {
@@ -126,6 +165,7 @@ export interface ConciliacionGilDiferencia {
   diferencia:            number;
   observacion?:          string;
   resuelta:              boolean;
+  cantidadRecibida:      number | null;
 }
 
 export interface ConciliacionGil {

@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { ButtonComponent, DataTableComponent, ConfirmDialogComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
+import { ProgramasService, Programa } from '../../../data-access/services/programas.service';
 import { GenerarGilData } from '../../../models/solicitudes-gil.model';
 import { GIL_DEFAULTS } from '../../../util/gil-defaults.config';
 
@@ -28,6 +29,11 @@ export class SolicitudesGenerarComponent implements OnInit {
 
   private router = inject(Router);
   private facade = inject(SolicitudesFacade);
+  private programasService = inject(ProgramasService);
+
+  /** Catálogo de programas para el selector del GIL. */
+  programas       = signal<Programa[]>([]);
+  programaDefault = signal('');
 
   solicitudesSesion = this.facade.solicitudesSesion;
   isSaving = this.facade.loading;
@@ -63,6 +69,7 @@ export class SolicitudesGenerarComponent implements OnInit {
 
   ngOnInit(): void {
     this.facade.cargarSolicitudesSesion({ estado: 'APROBADA' });
+    this.programasService.getProgramas().subscribe(p => this.programas.set(p));
   }
 
   filteredSolicitudes = computed(() => {
@@ -148,6 +155,7 @@ export class SolicitudesGenerarComponent implements OnInit {
       cuentadantes:           this.cuentadantes(),
       solicitante:            this.solicitante(),
       codigoGrupo:            this.codigoGrupo(),
+      programaDefault:        this.programaDefault() || undefined,
     };
     this.showModal.set(false);
     this.facade.generarGils(data).subscribe({

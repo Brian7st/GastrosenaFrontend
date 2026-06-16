@@ -43,13 +43,15 @@ export class ActasCreateComponent {
 
   // ── Stepper ─────────────────────────────────────────────────────────────
   currentStep = signal(1);
-  readonly totalSteps = 4;
+  readonly totalSteps = 3;
 
+  // El acta nace firmada con las firmas que vienen de la recepción de la
+  // requisición (instructor + vocero), por eso el flujo ya no tiene paso de
+  // Firmantes: Apertura → Desarrollo → Cierre.
   readonly steps: WizardStep[] = [
     { number: 1, label: 'Apertura' },
     { number: 2, label: 'Desarrollo' },
-    { number: 3, label: 'Firmantes' },
-    { number: 4, label: 'Cierre' },
+    { number: 3, label: 'Cierre' },
   ];
 
   stepProgress = computed(() => `${((this.currentStep() - 1) / (this.totalSteps - 1)) * 100}%`);
@@ -61,7 +63,7 @@ export class ActasCreateComponent {
     fecha:                 ['', Validators.required],
     horaInicio:            ['', Validators.required],
     horaFin:               ['', Validators.required],
-    fichaId:               ['', [Validators.required, Validators.pattern(/^\d{7}$/)]],
+    fichaId:               ['', Validators.required],
     instructorId:          ['', Validators.required],
     resultadoAprendizaje:  ['', Validators.required],
     actividadesRealizadas: ['', Validators.required],
@@ -88,42 +90,17 @@ export class ActasCreateComponent {
             instructorId: req.instructorId ?? '',
             fecha:        req.fecha        ?? '',
           });
+          // Firmas heredadas de la recepción de la requisición ya firmada:
+          // instructor cuentadante y vocero de aprendices.
           this.firmantes.update(list => {
             const updated = [...list];
             updated[0] = { ...updated[0], nombre: req.instructorNombre || req.instructorId || '' };
+            updated[1] = { ...updated[1], nombre: req.voceroId || '' };
             return updated;
           });
         }
       }, { allowSignalWrites: true });
     }
-  }
-
-  // ── Firmantes helpers ────────────────────────────────────────────────────
-  updateFirmante(index: number, field: keyof AsistenteRequest, event: Event): void {
-    const value = field === 'aprueba'
-      ? (event.target as HTMLInputElement).checked
-      : (event.target as HTMLInputElement).value;
-    this.firmantes.update(list => {
-      const updated = [...list];
-      updated[index] = { ...updated[index], [field]: value };
-      return updated;
-    });
-  }
-
-  addFirmante(): void {
-    this.firmantes.update(list => [...list, { nombre: '', dependenciaRol: '', aprueba: true }]);
-  }
-
-  /** Quita un firmante adicional. Los dos primeros (Instructor Cuentadante y
-   *  Vocero de Aprendices) son obligatorios y no se pueden eliminar (RF-5.10.7). */
-  removeFirmante(index: number): void {
-    if (index < 2) return;
-    this.firmantes.update(list => list.filter((_, i) => i !== index));
-  }
-
-  /** true para los dos firmantes obligatorios (instructor y vocero). */
-  esFirmanteObligatorio(index: number): boolean {
-    return index < 2;
   }
 
   // ── Navegación del wizard ────────────────────────────────────────────────

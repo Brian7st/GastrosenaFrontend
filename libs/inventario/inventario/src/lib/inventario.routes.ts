@@ -171,19 +171,14 @@ export const INVENTARIO_ROUTES: Routes = [
     loadComponent: () => import('./pages/kardex-page/movimientos-list/movimientos-list.component').then(m => m.MovimientosListComponent),
     children: [
       {
-        path: 'entrada',
-        loadComponent: () => import('./pages/kardex-page/movimiento-entrada/movimiento-entrada.component').then(m => m.MovimientoEntradaComponent)
+        path: 'ajuste',
+        loadComponent: () => import('./pages/kardex-page/movimiento-ajuste/movimiento-ajuste.component').then(m => m.MovimientoAjusteComponent)
       },
       {
         path: 'exportar',
         loadComponent: () => import('./pages/kardex-page/movimiento-export/movimiento-export.component').then(m => m.MovimientoExportComponent)
       }
     ]
-  },
-  // entrada-gil is a standalone page — NOT a child of movimientos to avoid rendering inside the list.
-  {
-    path: 'movimientos/entrada-gil',
-    loadComponent: () => import('./pages/kardex-page/movimiento-entrada-gil/movimiento-entrada-gil.component').then(m => m.MovimientoEntradaGilComponent)
   },
   {
     path: 'movimientos/:id',
@@ -199,13 +194,6 @@ export const INVENTARIO_ROUTES: Routes = [
         loadComponent: () =>
           import('./pages/alertas-page/alertas-list/alertas-list.component').then(
             m => m.AlertasListComponent
-          ),
-      },
-      {
-        path: 'historial',
-        loadComponent: () =>
-          import('./pages/alertas-page/alertas-historial/alertas-historial.component').then(
-            m => m.AlertasHistorialComponent
           ),
       },
       {
@@ -304,15 +292,6 @@ export const INVENTARIO_ROUTES: Routes = [
           import('./pages/actas-page/actas-detail/actas-detail.component').then(
             m => m.ActasDetailComponent
           ),
-        children: [
-          {
-            path: 'cargar-firma',
-            loadComponent: () =>
-              import('./pages/actas-page/actas-upload/actas-upload.component').then(
-                m => m.ActasUploadComponent
-              ),
-          },
-        ],
       },
     ]
   },

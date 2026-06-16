@@ -5,7 +5,6 @@ import { catchError, map } from 'rxjs/operators';
 import {
   Movimiento,
   DocumentoMovimiento,
-  EntradaMovimientoData,
   SalidaMovimientoData,
   ReservaMovimientoData,
   LiberacionMovimientoData,
@@ -18,7 +17,6 @@ import { KardexValorizadoItem } from '../../models/reporting.model';
 import {
   movimientoFromApi,
   existenciaFromApi,
-  entradaToRequest,
   salidaToRequest,
   reservaToRequest,
   liberacionToRequest,
@@ -86,9 +84,9 @@ export class MovimientosService {
   // ── Kardex ──────────────────────────────────────────────────────────────────
 
   /**
-   * GET /inventory/movimientos?pagina=0&tamano=50
-   * Listado global de TODOS los movimientos (entradas + salidas + ajustes),
-   * enriquecido por el backend con nombre y unidad de medida del catálogo.
+   * GET /inventory/movimientos/todos?pagina=0&tamano=50
+   * Listado global PLANO de TODOS los movimientos (entradas + salidas + ajustes),
+   * sin agrupar por documento, enriquecido por el backend con nombre y unidad.
    */
   getMovimientos(
     pagina = 0,
@@ -102,7 +100,7 @@ export class MovimientosService {
       params = params.set('tipo', tipo);
     }
     return this.http
-      .get<MovimientoPageResponse>(`${API}/inventory/movimientos`, { params })
+      .get<MovimientoPageResponse>(`${API}/inventory/movimientos/todos`, { params })
       .pipe(
         map(resp => movimientoPageFromApi(resp)),
         catchError(err => throwError(() => err))
@@ -152,14 +150,7 @@ export class MovimientosService {
       );
   }
 
-  // ── Movimientos de entrada / salida ─────────────────────────────────────────
-
-  /** POST /inventory/movimientos/entrada — 201 No Content */
-  registrarEntrada(data: EntradaMovimientoData): Observable<void> {
-    return this.http
-      .post<void>(`${API}/inventory/movimientos/entrada`, entradaToRequest(data))
-      .pipe(catchError(err => throwError(() => err)));
-  }
+  // ── Movimientos de salida ───────────────────────────────────────────────────
 
   /** POST /inventory/movimientos/salida — 201 No Content */
   registrarSalida(data: SalidaMovimientoData): Observable<void> {

@@ -3,6 +3,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { DecimalPipe } from '@angular/common';
 import { ButtonComponent, LucideIconComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { BienesService } from '../../../data-access/services/bienes.service';
@@ -25,7 +26,7 @@ interface CatState {
   selector: 'restaurant-requisiciones-create',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, ButtonComponent, LucideIconComponent, BackButtonComponent],
+  imports: [ReactiveFormsModule, DecimalPipe, ButtonComponent, LucideIconComponent, BackButtonComponent],
   templateUrl: './requisiciones-create.component.html',
   styleUrl:    './requisiciones-create.component.scss',
 })
@@ -58,9 +59,10 @@ export class RequisicionesCreateComponent implements OnInit {
 
   // ── Context form ──────────────────────────────────────────────────────────
   contextForm = this.fb.nonNullable.group({
-    fichaId:          ['', [Validators.required, Validators.pattern(/^\d{7}$/)]],
-    instructorId:     ['', Validators.required],
-    instructorNombre: [''],
+    // La ficha del SENA es numérica y de longitud variable (6, 7, 8, 9 dígitos):
+    // solo se exige que sea numérica, sin límite de longitud.
+    fichaId:          ['', [Validators.required, Validators.pattern(/^\d+$/)]],
+    instructorNombre: ['', Validators.required],
     fecha:            [new Date().toISOString().slice(0, 10), Validators.required],
     horaSesion:       ['07:00', Validators.required],
   });
@@ -96,13 +98,19 @@ export class RequisicionesCreateComponent implements OnInit {
   }
 
   // ── Cantidad ──────────────────────────────────────────────────────────────
+  /** Paso del stepper según la unidad: 100 para gramos/mililitros, 1 para el resto. */
+  pasoDe(bien: Bien): number {
+    const u = (bien.unidadMedida ?? '').toUpperCase();
+    return u === 'GR' || u === 'ML' ? 100 : 1;
+  }
+
   incrementar(bien: Bien): void {
-    this.draft.setCantidad(bien, this.draft.getCantidad(bien.codigoSena) + 1);
+    this.draft.setCantidad(bien, this.draft.getCantidad(bien.codigoSena) + this.pasoDe(bien));
   }
 
   decrementar(bien: Bien): void {
     const actual = this.draft.getCantidad(bien.codigoSena);
-    if (actual > 0) this.draft.setCantidad(bien, actual - 1);
+    this.draft.setCantidad(bien, Math.max(0, actual - this.pasoDe(bien)));
   }
 
   onCantidadInput(bien: Bien, event: Event): void {
@@ -116,7 +124,9 @@ export class RequisicionesCreateComponent implements OnInit {
     const v = this.contextForm.getRawValue();
     this.draft.setContexto({
       fichaId:          v.fichaId,
-      instructorId:     v.instructorId,
+      // El backend exige instructorId; reutilizamos el nombre capturado como identificador
+      // (la app no maneja un ID de instructor separado en este flujo).
+      instructorId:     v.instructorNombre,
       instructorNombre: v.instructorNombre,
       fecha:            v.fecha,
       horaSesion:       v.horaSesion,

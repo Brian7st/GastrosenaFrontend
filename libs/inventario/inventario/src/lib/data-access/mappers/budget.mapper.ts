@@ -9,14 +9,19 @@ import {
   ElegibleConsolidadoResponse,
 } from '../api/budget.api';
 
-/** Computa porcentajeEjecucion: guard divide-by-zero. */
+/**
+ * Computa porcentajeEjecucion sin redondear: la precisión de visualización
+ * se decide UNA sola vez en el template con el pipe `number`. Redondear acá
+ * (lossy) provocaba que distintas vistas mostraran el mismo % con caras
+ * distintas (17.5 vs 17.52).
+ */
 function computePorcentajeEjecucion(
   montoAsignado: number,
   montoComprometido: number,
   montoPagado: number,
 ): number {
   if (montoAsignado <= 0) return 0;
-  return parseFloat(((montoComprometido + montoPagado) / montoAsignado * 100).toFixed(2));
+  return (montoComprometido + montoPagado) / montoAsignado * 100;
 }
 
 /** Mapea RubroResponse + contexto del presupuesto padre → Rubro del modelo. */
@@ -31,11 +36,15 @@ export function rubroFromApi(
     descripcion:        dto.descripcion,
     fichaId,
     programaFormacion,
+    posicionPresupuestal: dto.posicionPresupuestal,
+    dependencia:          dto.dependencia,
+    fuente:               dto.fuente,
+    valorPorCancelar:     dto.valorPorCancelar,
     montoAsignado:      dto.montoAsignado,
     saldoDisponible:    dto.saldoDisponible,
     montoComprometido:  dto.montoComprometido,
     montoPagado:        dto.montoPagado,
-    // retencionZese: no existe en el backend — se mantiene a 0 para compatibilidad UI
+    // retencionZese: ZESE no existe en el backend — se mantiene a 0 para compatibilidad UI
     retencionZese:      0,
     porcentajeEjecucion: computePorcentajeEjecucion(
       dto.montoAsignado, dto.montoComprometido, dto.montoPagado,

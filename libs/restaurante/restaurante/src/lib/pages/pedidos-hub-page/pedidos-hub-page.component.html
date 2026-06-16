@@ -12,22 +12,24 @@
   </restaurant-page-header>
 
   <div class="pedidos-hub-page__grid">
-    <restaurant-card class="hub-card" routerLink="../historial-instructor">
-      <div class="hub-card__content">
-        <div class="hub-card__icon-wrapper instructor-icon">
-          <lucide-icon name="clipboard-list" [size]="48"></lucide-icon>
+    @if (puedeAdministrarMesas()) {
+      <restaurant-card class="hub-card" routerLink="../historial-instructor">
+        <div class="hub-card__content">
+          <div class="hub-card__icon-wrapper instructor-icon">
+            <lucide-icon name="clipboard-list" [size]="48"></lucide-icon>
+          </div>
+          <h3 class="hub-card__title">Ver pedidos (Instructor)</h3>
+          <p class="hub-card__description">Supervisa y administra todos los pedidos realizados por los aprendices en el salón.</p>
         </div>
-        <h3 class="hub-card__title">Ver pedidos (Instructor)</h3>
-        <p class="hub-card__description">Supervisa y administra todos los pedidos realizados por los aprendices en el salón.</p>
-      </div>
-    </restaurant-card>
+      </restaurant-card>
+    }
 
     <restaurant-card class="hub-card" routerLink="../historial-estudiante">
       <div class="hub-card__content">
         <div class="hub-card__icon-wrapper student-icon">
           <lucide-icon name="user" [size]="48"></lucide-icon>
         </div>
-        <h3 class="hub-card__title">Mis Pedidos (Estudiante)</h3>
+        <h3 class="hub-card__title">Mis Pedidos (Aprendiz)</h3>
         <p class="hub-card__description">Revisa el historial de pedidos que has tomado durante tu turno actual.</p>
       </div>
     </restaurant-card>

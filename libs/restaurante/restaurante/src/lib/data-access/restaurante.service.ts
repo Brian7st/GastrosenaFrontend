@@ -7,18 +7,31 @@ import {
   PedidoCreateRequest, PedidoResponse, PedidoResumenResponse,
   DetallePedidoResponse,
   SesionCajaResponse, FacturaResponse,
-  AbrirSesionRequest, CerrarSesionRequest, FacturarPedidoRequest
+  AbrirSesionRequest, CerrarSesionRequest, FacturarPedidoRequest,
+  RecetaResponseDTO
 } from '../models/restaurante.model';
 
 @Injectable({ providedIn: 'root' })
 export class RestauranteService {
   private http = inject(HttpClient);
-  
+
   /** URL del microservicio de restaurante (interceptada por proxy) */
-  private readonly mesasUrl   = '/api/mesas';
+  private readonly mesasUrl = '/api/mesas';
   private readonly pedidosUrl = '/api/pedidos';
-  private readonly cajaUrl    = '/api/caja';
+  private readonly cajaUrl = '/api/caja';
   private readonly facturasUrl = '/api/facturas';
+  private readonly recetasUrl = 'http://localhost:8082/api/recetas';
+  private readonly barRecetasUrl = 'http://localhost:8086/api/barybarismo/recetas';
+
+  // ── Recetas (Cocina y Bar) ──────────────────────────────────────────────────
+
+  obtenerRecetas(): Observable<RecetaResponseDTO[]> {
+    return this.http.get<RecetaResponseDTO[]>(this.recetasUrl);
+  }
+
+  obtenerRecetasBar(): Observable<RecetaResponseDTO[]> {
+    return this.http.get<RecetaResponseDTO[]>(this.barRecetasUrl);
+  }
 
   // ── Mesas — lectura ─────────────────────────────────────────────────────────
 
@@ -29,6 +42,10 @@ export class RestauranteService {
    */
   obtenerMesas(): Observable<Mesa[]> {
     return this.http.get<Mesa[]>(this.mesasUrl);
+  }
+
+  obtenerMesasInactivas(): Observable<Mesa[]> {
+    return this.http.get<Mesa[]>(`${this.mesasUrl}/inactivas`);
   }
 
   // ── Mesas — escritura ───────────────────────────────────────────────────────
@@ -102,8 +119,12 @@ export class RestauranteService {
     return this.http.patch<PedidoResponse>(`${this.pedidosUrl}/${id}/entregar`, null);
   }
 
-  cancelarPedido(id: string): Observable<PedidoResponse> {
-    return this.http.patch<PedidoResponse>(`${this.pedidosUrl}/${id}/cancelar`, null);
+  cancelarPedido(id: string, motivo?: string): Observable<PedidoResponse> {
+    let params = new HttpParams();
+    if (motivo) {
+      params = params.set('motivo', motivo);
+    }
+    return this.http.patch<PedidoResponse>(`${this.pedidosUrl}/${id}/cancelar`, null, { params });
   }
 
   // ── Caja y Facturación ───────────────────────────────────────────────────────
@@ -142,5 +163,9 @@ export class RestauranteService {
 
   obtenerFacturasDeSesion(sesionId: string): Observable<FacturaResponse[]> {
     return this.http.get<FacturaResponse[]>(`${this.facturasUrl}/sesion/${sesionId}`);
+  }
+
+  descargarFacturaPdf(id: string): Observable<Blob> {
+    return this.http.get(`${this.facturasUrl}/${id}/pdf`, { responseType: 'blob' });
   }
 }

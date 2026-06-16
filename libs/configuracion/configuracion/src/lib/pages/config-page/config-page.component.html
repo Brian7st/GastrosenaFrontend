@@ -9,8 +9,8 @@
 
   <div class="config-page__header">
     <div class="config-page__header-text">
-      <h1 class="config-page__title">Configuración</h1>
-      <p class="config-page__subtitle">Administrá la configuración general del sistema</p>
+      <h1 class="config-page__title">{{ t('config.title') }}</h1>
+      <p class="config-page__subtitle">{{ t('config.subtitle') }}</p>
     </div>
   </div>
 
@@ -21,356 +21,114 @@
   @if (loading()) {
     <div class="config-page__loading">
       <lucide-icon name="loader-circle" [size]="20"></lucide-icon>
-      Cargando configuración...
+      {{ t('load.title') }}
     </div>
   } @else {
     <div class="config-page__sections">
 
       <!-- GENERAL -->
       <restaurant-config-section
-        titulo="General"
-        subtitulo="Información básica del restaurante"
+        [titulo]="t('general.title')"
+        [subtitulo]="t('general.subtitle')"
         icono="building-2"
         [expanded]="expandedSection() === 'general'"
-        [guardando]="saving()"
+        [guardando]="false"
         (toggleSection)="onToggleSection('general')"
       >
         <div class="config-page__form">
+          <div class="config-page__info-row">
+            <span class="config-page__info-label">{{ t('general.nombre') }}</span>
+            <span class="config-page__info-value">{{ t('gastrosena') }}</span>
+          </div>
+          <div class="config-page__info-row">
+            <span class="config-page__info-label">{{ t('general.ciudad') }}</span>
+            <span class="config-page__info-value">{{ t('ciudad.ar') }}</span>
+          </div>
+          <div class="config-page__info-row">
+            <span class="config-page__info-label">{{ t('general.centro') }}</span>
+            <span class="config-page__info-value">{{ t('centro') }}</span>
+          </div>
+        </div>
+      </restaurant-config-section>
+
+      <!-- APARIENCIA -->
+      <restaurant-config-section
+        [titulo]="t('apariencia.title')"
+        [subtitulo]="t('apariencia.subtitle')"
+        icono="palette"
+        [expanded]="expandedSection() === 'apariencia'"
+        [guardando]="false"
+        (toggleSection)="onToggleSection('apariencia')"
+      >
+        <div class="config-page__form">
           <div class="config-page__field">
-            <label class="config-page__label">Nombre del restaurante</label>
-            <input
-              class="config-page__input"
-              type="text"
-              [value]="generalForm().nombreRestaurante"
-              (input)="onGeneralChange('nombreRestaurante', $any($event.target).value)"
-              placeholder="Ej: GastroSENA"
-            >
-          </div>
-          <div class="config-page__field">
-            <label class="config-page__label">NIT</label>
-            <input
-              class="config-page__input"
-              type="text"
-              [value]="generalForm().nit"
-              (input)="onGeneralChange('nit', $any($event.target).value)"
-              placeholder="Ej: 900123456-7"
-            >
-          </div>
-          <div class="config-page__field">
-            <label class="config-page__label">Dirección</label>
-            <input
-              class="config-page__input"
-              type="text"
-              [value]="generalForm().direccion"
-              (input)="onGeneralChange('direccion', $any($event.target).value)"
-              placeholder="Ej: Cra 30 #45-67"
-            >
-          </div>
-          <div class="config-page__row">
-            <div class="config-page__field">
-              <label class="config-page__label">Teléfono</label>
-              <input
-                class="config-page__input"
-                type="text"
-                [value]="generalForm().telefono"
-                (input)="onGeneralChange('telefono', $any($event.target).value)"
-                placeholder="Ej: 3001234567"
-              >
-            </div>
-            <div class="config-page__field">
-              <label class="config-page__label">Email</label>
-              <input
-                class="config-page__input"
-                type="email"
-                [value]="generalForm().email"
-                (input)="onGeneralChange('email', $any($event.target).value)"
-                placeholder="Ej: info@gastrosena.com"
-              >
-            </div>
-          </div>
-          <div class="config-page__row">
-            <div class="config-page__field">
-              <label class="config-page__label">Moneda predeterminada</label>
-              <div class="config-page__select-wrapper">
-                <select
-                  class="config-page__select"
-                  [value]="generalForm().moneda"
-                  (change)="onGeneralChange('moneda', $any($event.target).value)"
+            <label class="config-page__label">{{ t('apariencia.modo') }}</label>
+            <div class="config-page__toggles">
+              <label class="config-page__toggle">
+                <input
+                  type="checkbox"
+                  [checked]="aparienciaForm().tema === 'dark'"
+                  (change)="onAparienciaTema($any($event.target).checked ? 'dark' : 'light')"
                 >
-                  @for (m of monedas; track m.codigo) {
-                    <option [value]="m.codigo">{{ m.nombre }} ({{ m.simbolo }})</option>
-                  }
-                </select>
-                <lucide-icon name="chevron-down" [size]="14" class="config-page__select-icon"></lucide-icon>
-              </div>
-            </div>
-            <div class="config-page__field">
-              <label class="config-page__label">Zona horaria</label>
-              <div class="config-page__select-wrapper">
-                <select
-                  class="config-page__select"
-                  [value]="generalForm().zonaHoraria"
-                  (change)="onGeneralChange('zonaHoraria', $any($event.target).value)"
-                >
-                  @for (z of zonasHorarias; track z) {
-                    <option [value]="z">{{ z.replace('_', ' ').replace('/', ' / ') }}</option>
-                  }
-                </select>
-                <lucide-icon name="chevron-down" [size]="14" class="config-page__select-icon"></lucide-icon>
-              </div>
-            </div>
-          </div>
-          <div class="config-page__actions">
-            <button class="config-page__btn config-page__btn--primary" type="button" (click)="onSaveGeneral()">
-              <lucide-icon name="save" [size]="16"></lucide-icon>
-              Guardar
-            </button>
-          </div>
-        </div>
-      </restaurant-config-section>
-
-      <!-- SEGURIDAD -->
-      <restaurant-config-section
-        titulo="Seguridad"
-        subtitulo="Políticas de contraseñas y acceso"
-        icono="shield"
-        [expanded]="expandedSection() === 'seguridad'"
-        [guardando]="saving()"
-        (toggleSection)="onToggleSection('seguridad')"
-      >
-        <div class="config-page__form">
-          <div class="config-page__row">
-            <div class="config-page__field">
-              <label class="config-page__label">Longitud mínima de contraseña</label>
-              <input
-                class="config-page__input"
-                type="number"
-                min="4"
-                max="32"
-                [value]="seguridadForm().longitudMinimaPassword"
-                (input)="onSeguridadNumber('longitudMinimaPassword', $any($event.target).value)"
-              >
-            </div>
-            <div class="config-page__field">
-              <label class="config-page__label">Tiempo de sesión (minutos)</label>
-              <input
-                class="config-page__input"
-                type="number"
-                min="5"
-                max="1440"
-                [value]="seguridadForm().tiempoSesionMinutos"
-                (input)="onSeguridadNumber('tiempoSesionMinutos', $any($event.target).value)"
-              >
-            </div>
-          </div>
-          <div class="config-page__row">
-            <div class="config-page__field">
-              <label class="config-page__label">Intentos máximos de login</label>
-              <input
-                class="config-page__input"
-                type="number"
-                min="1"
-                max="20"
-                [value]="seguridadForm().intentosMaximosLogin"
-                (input)="onSeguridadNumber('intentosMaximosLogin', $any($event.target).value)"
-              >
-            </div>
-          </div>
-          <div class="config-page__toggles">
-            <label class="config-page__toggle">
-              <input
-                type="checkbox"
-                [checked]="seguridadForm().requiereCaracteresEspeciales"
-                (change)="onSeguridadCheck('requiereCaracteresEspeciales', $any($event.target).checked)"
-              >
-              <span class="config-page__toggle-slider"></span>
-              <span class="config-page__toggle-label">Requerir caracteres especiales</span>
-            </label>
-            <label class="config-page__toggle">
-              <input
-                type="checkbox"
-                [checked]="seguridadForm().twoFactorAuth"
-                (change)="onSeguridadCheck('twoFactorAuth', $any($event.target).checked)"
-              >
-              <span class="config-page__toggle-slider"></span>
-              <span class="config-page__toggle-label">Autenticación de dos factores (2FA)</span>
-            </label>
-          </div>
-          <div class="config-page__actions">
-            <button class="config-page__btn config-page__btn--primary" type="button" (click)="onSaveSeguridad()">
-              <lucide-icon name="save" [size]="16"></lucide-icon>
-              Guardar
-            </button>
-          </div>
-        </div>
-      </restaurant-config-section>
-
-      <!-- FACTURACIÓN -->
-      <restaurant-config-section
-        titulo="Facturación"
-        subtitulo="Configuración de facturación electrónica"
-        icono="file-spreadsheet"
-        [expanded]="expandedSection() === 'facturacion'"
-        [guardando]="saving()"
-        (toggleSection)="onToggleSection('facturacion')"
-      >
-        <div class="config-page__form">
-          <div class="config-page__row">
-            <div class="config-page__field">
-              <label class="config-page__label">Prefijo de factura</label>
-              <input
-                class="config-page__input"
-                type="text"
-                [value]="facturacionForm().prefijoFactura"
-                (input)="onFacturacionInput('prefijoFactura', $any($event.target).value)"
-                placeholder="Ej: FE"
-              >
-            </div>
-            <div class="config-page__field">
-              <label class="config-page__label">% IVA</label>
-              <input
-                class="config-page__input"
-                type="number"
-                min="0"
-                max="100"
-                step="0.01"
-                [value]="facturacionForm().ivaPorcentaje"
-                (input)="onFacturacionNumber('ivaPorcentaje', $any($event.target).value)"
-              >
+                <span class="config-page__toggle-slider"></span>
+                <span class="config-page__toggle-label">{{ t('apariencia.oscuro') }}</span>
+              </label>
             </div>
           </div>
           <div class="config-page__field">
-            <label class="config-page__label">Resolución DIAN</label>
-            <input
-              class="config-page__input"
-              type="text"
-              [value]="facturacionForm().resolucionDian"
-              (input)="onFacturacionInput('resolucionDian', $any($event.target).value)"
-              placeholder="Ej: 18760000001"
-            >
-          </div>
-          <div class="config-page__toggles">
-            <label class="config-page__toggle">
-              <input
-                type="checkbox"
-                [checked]="facturacionForm().entornoPruebas"
-                (change)="onFacturacionCheck('entornoPruebas', $any($event.target).checked)"
-              >
-              <span class="config-page__toggle-slider"></span>
-              <span class="config-page__toggle-label">Entorno de pruebas</span>
-            </label>
+            <label class="config-page__label">{{ t('apariencia.fuente') }}</label>
+            <div class="config-page__radio-group">
+              @for (opt of fuenteOptions(); track opt.value) {
+                <label class="config-page__radio">
+                  <input
+                    type="radio"
+                    name="tamanoFuente"
+                    [value]="opt.value"
+                    [checked]="aparienciaForm().tamanoFuente === opt.value"
+                    (change)="onAparienciaTamanoFuente(opt.value)"
+                  >
+                  <span class="config-page__radio-label">{{ opt.label }}</span>
+                </label>
+              }
+            </div>
           </div>
           <div class="config-page__actions">
-            <button class="config-page__btn config-page__btn--primary" type="button" (click)="onSaveFacturacion()">
+            <button class="config-page__btn config-page__btn--primary" type="button" (click)="onSaveApariencia()">
               <lucide-icon name="save" [size]="16"></lucide-icon>
-              Guardar
+              {{ t('btn.guardar') }}
             </button>
           </div>
         </div>
       </restaurant-config-section>
 
-      <!-- INVENTARIO -->
+      <!-- AVANZADO -->
       <restaurant-config-section
-        titulo="Inventario"
-        subtitulo="Configuración de inventario y bienes"
-        icono="warehouse"
-        [expanded]="expandedSection() === 'inventario'"
-        [guardando]="saving()"
-        (toggleSection)="onToggleSection('inventario')"
-      >
-        <div class="config-page__form">
-          <div class="config-page__row">
-            <div class="config-page__field">
-              <label class="config-page__label">Umbral de stock mínimo</label>
-              <input
-                class="config-page__input"
-                type="number"
-                min="0"
-                [value]="inventarioForm().umbralStockMinimo"
-                (input)="onInventarioNumber('umbralStockMinimo', $any($event.target).value)"
-              >
-            </div>
-            <div class="config-page__field">
-              <label class="config-page__label">Unidad de medida predeterminada</label>
-              <div class="config-page__select-wrapper">
-                <select
-                  class="config-page__select"
-                  [value]="inventarioForm().unidadMedidaDefault"
-                  (change)="onInventarioSelect('unidadMedidaDefault', $any($event.target).value)"
-                >
-                  @for (u of unidadesMedida; track u) {
-                    <option [value]="u">{{ u }}</option>
-                  }
-                </select>
-                <lucide-icon name="chevron-down" [size]="14" class="config-page__select-icon"></lucide-icon>
-              </div>
-            </div>
-          </div>
-          <div class="config-page__actions">
-            <button class="config-page__btn config-page__btn--primary" type="button" (click)="onSaveInventario()">
-              <lucide-icon name="save" [size]="16"></lucide-icon>
-              Guardar
-            </button>
-          </div>
-        </div>
-      </restaurant-config-section>
-
-      <!-- NOTIFICACIONES -->
-      <restaurant-config-section
-        titulo="Notificaciones"
-        subtitulo="Configuración de correo electrónico y alertas"
-        icono="bell"
-        [expanded]="expandedSection() === 'notificaciones'"
-        [guardando]="saving()"
-        (toggleSection)="onToggleSection('notificaciones')"
+        [titulo]="t('avanzado.title')"
+        [subtitulo]="t('avanzado.subtitle')"
+        icono="settings-2"
+        [expanded]="expandedSection() === 'avanzado'"
+        [guardando]="false"
+        (toggleSection)="onToggleSection('avanzado')"
       >
         <div class="config-page__form">
           <div class="config-page__field">
-            <label class="config-page__label">Correo remitente</label>
-            <input
-              class="config-page__input"
-              type="email"
-              [value]="notificacionesForm().emailRemitente"
-              (input)="onNotificacionesInput('emailRemitente', $any($event.target).value)"
-              placeholder="Ej: notificaciones@gastrosena.com"
-            >
-          </div>
-          <div class="config-page__row">
-            <div class="config-page__field">
-              <label class="config-page__label">Servidor SMTP</label>
-              <input
-                class="config-page__input"
-                type="text"
-                [value]="notificacionesForm().servidorSmtp"
-                (input)="onNotificacionesInput('servidorSmtp', $any($event.target).value)"
-                placeholder="Ej: smtp.gmail.com"
+            <label class="config-page__label">{{ t('avanzado.idioma') }}</label>
+            <div class="config-page__select-wrapper">
+              <select
+                class="config-page__select"
+                [value]="avanzadoForm().idioma"
+                (change)="onAvanzadoIdioma($any($event.target).value)"
               >
+                <option value="es">{{ t('idioma.es') }}</option>
+                <option value="en">{{ t('idioma.en') }}</option>
+              </select>
+              <lucide-icon class="config-page__select-icon" name="chevron-down" [size]="14"></lucide-icon>
             </div>
-            <div class="config-page__field">
-              <label class="config-page__label">Puerto SMTP</label>
-              <input
-                class="config-page__input"
-                type="number"
-                [value]="notificacionesForm().puertoSmtp"
-                (input)="onNotificacionesNumber('puertoSmtp', $any($event.target).value)"
-              >
-            </div>
-          </div>
-          <div class="config-page__toggles">
-            <label class="config-page__toggle">
-              <input
-                type="checkbox"
-                [checked]="notificacionesForm().requiereSsl"
-                (change)="onNotificacionesCheck('requiereSsl', $any($event.target).checked)"
-              >
-              <span class="config-page__toggle-slider"></span>
-              <span class="config-page__toggle-label">Usar SSL/TLS</span>
-            </label>
           </div>
           <div class="config-page__actions">
-            <button class="config-page__btn config-page__btn--primary" type="button" (click)="onSaveNotificaciones()">
+            <button class="config-page__btn config-page__btn--primary" type="button" (click)="onSaveAvanzado()">
               <lucide-icon name="save" [size]="16"></lucide-icon>
-              Guardar
+              {{ t('btn.guardar') }}
             </button>
           </div>
         </div>
@@ -378,8 +136,8 @@
 
       <!-- SISTEMA -->
       <restaurant-config-section
-        titulo="Sistema"
-        subtitulo="Información de la aplicación y mantenimiento"
+        [titulo]="t('sistema.title')"
+        [subtitulo]="t('sistema.subtitle')"
         icono="terminal"
         [expanded]="expandedSection() === 'sistema'"
         [guardando]="false"
@@ -387,22 +145,22 @@
       >
         <div class="config-page__form">
           <div class="config-page__info-row">
-            <span class="config-page__info-label">Versión</span>
+            <span class="config-page__info-label">{{ t('sistema.version') }}</span>
             <span class="config-page__info-value">{{ config()?.sistema?.version ?? '—' }}</span>
           </div>
           <div class="config-page__info-row">
-            <span class="config-page__info-label">Último backup</span>
-            <span class="config-page__info-value">{{ config()?.sistema?.ultimoBackup ?? 'Sin respaldo' }}</span>
+            <span class="config-page__info-label">{{ t('sistema.backup') }}</span>
+            <span class="config-page__info-value">{{ config()?.sistema?.ultimoBackup ?? t('sistema.backup.empty') }}</span>
           </div>
           <div class="config-page__info-row">
-            <span class="config-page__info-label">Modo mantenimiento</span>
+            <span class="config-page__info-label">{{ t('sistema.mantenimiento') }}</span>
             <span class="config-page__info-value">
               <span
                 class="config-page__badge"
                 [class.config-page__badge--activo]="config()?.sistema?.modoMantenimiento"
                 [class.config-page__badge--inactivo]="!config()?.sistema?.modoMantenimiento"
               >
-                {{ config()?.sistema?.modoMantenimiento ? 'Activo' : 'Inactivo' }}
+                {{ config()?.sistema?.modoMantenimiento ? t('sistema.activo') : t('sistema.inactivo') }}
               </span>
             </span>
           </div>

@@ -49,7 +49,7 @@
   .header-left {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
 
     .header-title {
       display: flex;
@@ -62,11 +62,18 @@
         font-weight: 700;
         margin: 0;
       }
+    }
 
-      .hora-text {
-        color: var(--color-pizarra-400, #94a3b8);
-        font-size: 0.85rem;
+    .mesero-text {
+      font-size: 0.72rem;
+
+      .mesero-label {
+        color: var(--color-pizarra-500, #64748b);
         font-weight: 500;
+      }
+      .mesero-name {
+        color: var(--color-pizarra-700, #334155);
+        font-weight: 600;
       }
     }
   }
@@ -81,17 +88,11 @@
       align-items: flex-start;
     }
 
-    .mesero-text {
-      font-size: 0.8rem;
-
-      .mesero-label {
-        color: var(--color-pizarra-500, #64748b);
-        font-weight: 500;
-      }
-      .mesero-name {
-        color: var(--color-pizarra-700, #334155);
-        font-weight: 600;
-      }
+    .hora-text {
+      color: var(--color-pizarra-400, #94a3b8);
+      font-size: 0.85rem;
+      font-weight: 500;
+      align-self: center;
     }
   }
 }
@@ -458,31 +459,6 @@
 
 // ── Badges ────────────────────────────────────────────────────────────────────
 
-.prioridad-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 12px;
-  border-radius: var(--radius-pill, 999px);
-  font-size: 0.65rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-
-  &.badge-normal {
-    background-color: var(--color-info-bg, #eff6ff);
-    color: var(--color-info, #0984e3);
-    border: 1px solid var(--color-info-border);
-  }
-  &.badge-alta {
-    background-color: var(--color-warning-bg, #fefce8);
-    color: var(--color-warning, #fdcb6e);
-  }
-  &.badge-urgente {
-    background-color: var(--color-error-bg, #fee2e2);
-    color: var(--color-danger, #d63031);
-  }
-}
-
 .comanda-estado-badge {
   display: inline-block;
   padding: 4px 12px;
@@ -504,24 +480,13 @@
     background-color: var(--color-brand-primary, #39a900);
     color: var(--color-surface-primary, #fff);
   }
+  &.estado-devolucion {
+    background-color: #e7dcc4; /* beige */
+    color: #7a6543;
+  }
 }
 
-/* COLORES DINÁMICOS DE PRIORIDAD */
-.prioridad-normal { 
-  background-color: var(--color-prioridad-normal-bg) !important; 
-  color: var(--color-info) !important; 
-  border: none !important;
-}
-.prioridad-urgente { 
-  background-color: var(--color-prioridad-urgente-bg) !important; 
-  color: var(--color-danger) !important; 
-  border: none !important;
-}
-.prioridad-alta { 
-  background-color: var(--color-prioridad-alta-bg) !important; 
-  color: var(--color-prioridad-alta-text) !important;
-  border: none !important;
-}
+
 
 /* COLORES DINÁMICOS DE ESTADO DEL PLATO (Forma de Píldora) */
 .estado-espera {
@@ -548,6 +513,11 @@
   background-color: var(--color-estado-listo-bg-soft) !important;
   color: var(--color-primario) !important;
   border: 1px solid var(--color-primario) !important;
+}
+.estado-devolucion {
+  background-color: #e7dcc4 !important; /* beige */
+  color: #7a6543 !important;
+  border: none !important;
 }
 
 /* COLORES PARA LAS CÁPSULAS DE ESTADO DEL PLATO (badge-estado-*) */
@@ -626,7 +596,7 @@
   padding: 32px 40px;
   border-radius: 12px;
   border: none;
-  background: white;
+  background: var(--color-surface-primary);
   box-shadow: 0 10px 25px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
@@ -638,7 +608,7 @@
   padding: 32px 40px;
   border-radius: 12px;
   border: none;
-  background: white;
+  background: var(--color-surface-primary);
   box-shadow: 0 10px 25px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
@@ -734,8 +704,8 @@
 }
 
 .modal-nota-caja {
-  background-color: #fffdf0;
-  border: 1px solid #fef08a;
+  background-color: var(--color-warning-bg);
+  border: 1px solid var(--color-warning-border);
   border-radius: 8px;
   padding: 12px 16px;
   margin-bottom: 24px;
@@ -784,8 +754,8 @@
     gap: 12px;
 
     .item-time {
-      border: 1px solid #e2e8f0;
-      background: white;
+      border: 1px solid var(--color-border);
+      background: var(--color-surface-primary);
       border-radius: 4px;
       padding: 4px 12px;
       color: var(--color-pizarra-500);
@@ -871,8 +841,8 @@
     justify-content: center;
     width: 28px;
     height: 28px;
-    background-color: #39a900;
-    color: white;
+    background-color: var(--color-primario);
+    color: var(--color-en-primario);
     border-radius: 50%;
     font-weight: 700;
     flex-shrink: 0;

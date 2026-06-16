@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 import { BaseHttpService } from '@restaurant/shared/api';
 import { PaginatedResponse } from '@restaurant/shared/models';
 import { AuthService } from '@restaurant/shared/auth';
+import { Usuario } from '@restaurant/shared/models';
 import {
   ActualizarUsuarioRequest,
   AsignacionMasivaRequest,
@@ -152,6 +153,20 @@ export class UsuariosService extends BaseHttpService {
     return this.http.patch<void>(
       this.buildUrl(`${this.resource}/${userId}/foto`),
       { fotoUrl }
+    );
+  }
+
+  obtenerAprendices(): Observable<Usuario[]> {
+    return this.http.get<any>(this.buildUrl(`${this.resource}?rol=APRENDIZ`)).pipe(
+      map((res: any) => {
+        const raw: any[] = Array.isArray(res) ? res : (res.content ?? []);
+        return raw.map((u: any) => ({
+          ...u,
+          id:     u.idUsuario ?? u.id,
+          activo: u.estado    ?? u.activo,
+          rol:    u.rol?.nombreRol ?? u.rol,
+        }));
+      })
     );
   }
 }

@@ -18,6 +18,7 @@ import {
   SelectFilterComponent,
 } from '@restaurant/shared/ui';
 import { UsuariosFacade } from '../../data-access/usuarios.facade';
+import { I18nService } from '../../i18n/i18n.service';
 import { HistorialItem } from '../../models/usuarios.model';
 
 @Component({
@@ -29,7 +30,6 @@ import { HistorialItem } from '../../models/usuarios.model';
     DataTableComponent,
     EmptyStateComponent,
     LoadingSkeletonComponent,
-    LucideIconComponent,
     PageHeaderComponent,
     SearchFilterComponent,
     SelectFilterComponent,
@@ -38,6 +38,7 @@ import { HistorialItem } from '../../models/usuarios.model';
   styleUrl:    './historial-page.component.scss',
 })
 export class HistorialPageComponent implements OnInit {
+  protected readonly i18n = inject(I18nService);
   private readonly facade = inject(UsuariosFacade);
 
   readonly historial = toSignal(this.facade.historial$,        { initialValue: [] as HistorialItem[] });
@@ -46,15 +47,19 @@ export class HistorialPageComponent implements OnInit {
   readonly busqueda     = signal('');
   readonly filtroAccion = signal('');
 
-  readonly accionOpciones: { value: string; label: string }[] = [
-    { value: '',         label: 'Todas las acciones' },
-    { value: 'LOGIN',    label: 'Inicio de sesión'   },
-    { value: 'LOGOUT',   label: 'Cierre de sesión'   },
-    { value: 'CREAR',    label: 'Creación'            },
-    { value: 'EDITAR',   label: 'Edición'             },
-    { value: 'ELIMINAR', label: 'Eliminación'         },
-    { value: 'BLOQUEO',  label: 'Bloqueo'             },
+  readonly accionOpciones: { value: string; label: string; tKey: string }[] = [
+    { value: '',         label: 'Todas las acciones', tKey: 'historial.accion_todas' },
+    { value: 'LOGIN',    label: 'Inicio de sesión',   tKey: 'historial.accion_login'  },
+    { value: 'LOGOUT',   label: 'Cierre de sesión',   tKey: 'historial.accion_logout' },
+    { value: 'CREAR',    label: 'Creación',            tKey: 'historial.accion_crear'  },
+    { value: 'EDITAR',   label: 'Edición',             tKey: 'historial.accion_editar' },
+    { value: 'ELIMINAR', label: 'Eliminación',         tKey: 'historial.accion_eliminar' },
+    { value: 'BLOQUEO',  label: 'Bloqueo',             tKey: 'historial.accion_bloqueo' },
   ];
+
+  readonly accionOpcionesTranslated = computed(() =>
+    this.accionOpciones.map(o => ({ value: o.value, label: this.i18n.t(o.tKey) })),
+  );
 
   readonly historialFiltrado = computed(() => {
     const q      = this.busqueda().toLowerCase();

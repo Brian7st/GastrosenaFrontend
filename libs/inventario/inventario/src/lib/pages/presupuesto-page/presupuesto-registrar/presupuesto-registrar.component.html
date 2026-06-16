@@ -13,15 +13,25 @@
 
     <!-- Modal Form -->
     <form [formGroup]="registroForm" (ngSubmit)="onSubmit()" class="modal-body">
-      <!-- Programa -->
+      <!-- Ficha de caracterización -->
       <div class="form-field">
-        <label class="field-label">NOMBRE DEL PROGRAMA</label>
+        <label class="field-label">FICHA DE CARACTERIZACIÓN <span class="required">*</span></label>
+        <div class="input-wrapper">
+          <lucide-icon name="hash" [size]="18" class="field-icon"></lucide-icon>
+          <input type="text" formControlName="fichaId" class="form-input"
+                 placeholder="Ej: 2556789">
+        </div>
+      </div>
+
+      <!-- Programa de formación -->
+      <div class="form-field">
+        <label class="field-label">NOMBRE DEL PROGRAMA <span class="required">*</span></label>
         <div class="select-wrapper">
           <lucide-icon name="building-2" [size]="18" class="field-icon"></lucide-icon>
-          <select formControlName="programaId" class="form-select">
-            <option value="" disabled>Seleccione un programa administrativo</option>
-            @for (g of grupos(); track g.fichaId) {
-              <option [value]="g.fichaId">{{ g.programaFormacion }}</option>
+          <select formControlName="programaFormacion" class="form-select">
+            <option value="" disabled>Seleccione un programa…</option>
+            @for (programa of programas(); track programa.codigo) {
+              <option [value]="programa.codigo">{{ programa.nombre }}</option>
             }
           </select>
           <lucide-icon name="chevron-down" [size]="18" class="select-chevron"></lucide-icon>
@@ -33,7 +43,7 @@
         <label class="field-label">VIGENCIA FISCAL <span class="required">*</span></label>
         <div class="select-wrapper">
           <lucide-icon name="calendar" [size]="18" class="field-icon"></lucide-icon>
-          <select formControlName="vigenciaFiscal" class="form-select">
+          <select formControlName="vigencia" class="form-select">
             @for (v of VIGENCIAS; track v) {
               <option [value]="v">{{ v }}</option>
             }
@@ -42,32 +52,75 @@
         </div>
       </div>
 
+      <!-- Fecha de aprobación -->
+      <div class="form-field">
+        <label class="field-label">FECHA DE APROBACIÓN <span class="required">*</span></label>
+        <div class="input-wrapper">
+          <lucide-icon name="calendar-check" [size]="18" class="field-icon"></lucide-icon>
+          <input type="date" formControlName="fechaAprobacion" class="form-input">
+        </div>
+      </div>
+
       <!-- Nombre del Rubro -->
       <div class="form-field">
-        <label class="field-label">NOMBRE DEL RUBRO</label>
+        <label class="field-label">NOMBRE DEL RUBRO <span class="required">*</span></label>
         <div class="input-wrapper">
           <lucide-icon name="tag" [size]="18" class="field-icon"></lucide-icon>
-          <input type="text" formControlName="nombreRubro" class="form-input"
+          <input type="text" formControlName="rubroDescripcion" class="form-input"
                  placeholder="Ej: Adquisición de Materiales de Formación">
         </div>
       </div>
 
-      <!-- Código Presupuestal -->
+      <!-- Código del Rubro -->
       <div class="form-field">
-        <label class="field-label">CÓDIGO PRESUPUESTAL</label>
+        <label class="field-label">CÓDIGO DEL RUBRO <span class="required">*</span></label>
         <div class="input-wrapper">
           <lucide-icon name="hash" [size]="18" class="field-icon"></lucide-icon>
-          <input type="text" formControlName="codigoPresupuestal" class="form-input"
-                 placeholder="Ej: XXX-XX-XX-XX">
+          <input type="text" formControlName="rubroCodigo" class="form-input"
+                 placeholder="Ej: 2-0-4-01">
+        </div>
+      </div>
+
+      <!-- Dimensión SIIF: posición presupuestal -->
+      <div class="form-field">
+        <label class="field-label">POSICIÓN PRESUPUESTAL (SIIF) <span class="required">*</span></label>
+        <div class="input-wrapper">
+          <lucide-icon name="list-tree" [size]="18" class="field-icon"></lucide-icon>
+          <input type="text" formControlName="rubroPosicionPresupuestal" class="form-input"
+                 placeholder="Ej: A-02-02-02-008">
+        </div>
+      </div>
+
+      <!-- Dimensión SIIF: dependencia -->
+      <div class="form-field">
+        <label class="field-label">DEPENDENCIA (SIIF) <span class="required">*</span></label>
+        <div class="input-wrapper">
+          <lucide-icon name="building" [size]="18" class="field-icon"></lucide-icon>
+          <input type="text" formControlName="rubroDependencia" class="form-input"
+                 placeholder="Ej: Regional Quindío">
+        </div>
+      </div>
+
+      <!-- Dimensión SIIF: fuente de financiación -->
+      <div class="form-field">
+        <label class="field-label">FUENTE DE FINANCIACIÓN (SIIF) <span class="required">*</span></label>
+        <div class="select-wrapper">
+          <lucide-icon name="landmark" [size]="18" class="field-icon"></lucide-icon>
+          <select formControlName="rubroFuente" class="form-select">
+            @for (f of FUENTES; track f) {
+              <option [value]="f">{{ f }}</option>
+            }
+          </select>
+          <lucide-icon name="chevron-down" [size]="18" class="select-chevron"></lucide-icon>
         </div>
       </div>
 
       <!-- Bolsa de Dinero Inicial -->
       <div class="form-field">
-        <label class="field-label">BOLSA DE DINERO INICIAL</label>
+        <label class="field-label">BOLSA DE DINERO INICIAL <span class="required">*</span></label>
         <div class="money-input-wrapper">
           <span class="money-prefix">$</span>
-          <input type="number" formControlName="bolsaInicial" class="form-input form-input--money"
+          <input type="number" formControlName="montoAsignado" class="form-input form-input--money"
                  placeholder="0.00">
           <span class="money-suffix">COP</span>
         </div>

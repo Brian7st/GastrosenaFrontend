@@ -1,4 +1,4 @@
-export type EstadoGil = 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'VERIFICADO' | 'CERRADO';
+export type EstadoGil = 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'VERIFICADO' | 'COMPROMETIDO' | 'CERRADO';
 
 export interface CuentadanteGil {
   id?: string | number;
@@ -100,4 +100,6 @@ export interface GenerarGilData {
   solicitante: string;
   codigoGrupo: string;
   observaciones?: string;
+  /** Programa de Formación por defecto del GIL (código del catálogo). */
+  programaDefault?: string;
 }

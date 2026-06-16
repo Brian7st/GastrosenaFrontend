@@ -1,0 +1,139 @@
+<div class="admin-comentarios">
+
+  <!-- Header -->
+  <div class="admin-comentarios__header">
+    <div>
+      <h2 class="admin-comentarios__title">{{ i18n.t('comentarios.titulo') }}</h2>
+      <p class="admin-comentarios__subtitle">{{ i18n.t('comentarios.subtitulo') }}</p>
+    </div>
+    <button class="btn btn-ghost" (click)="cargarComentarios()">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/>
+      </svg>
+      {{ i18n.t('comentarios.actualizar') }}
+    </button>
+  </div>
+
+  <!-- KPIs -->
+  <div class="admin-comentarios__kpis">
+    <restaurant-kpi-card
+      [label]="i18n.t('comentarios.kpi_total')"
+      [value]="comentarios().length.toString()"
+      icon="message-square"
+      iconColor="blue"
+    ></restaurant-kpi-card>
+    <restaurant-kpi-card
+      [label]="i18n.t('comentarios.kpi_pendientes')"
+      [value]="totalPendientes().toString()"
+      icon="clock"
+      iconColor="orange"
+    ></restaurant-kpi-card>
+    <restaurant-kpi-card
+      [label]="i18n.t('comentarios.kpi_aprobados')"
+      [value]="totalAprobados().toString()"
+      icon="check-circle"
+      iconColor="green"
+    ></restaurant-kpi-card>
+    <restaurant-kpi-card
+      [label]="i18n.t('comentarios.kpi_rechazados')"
+      [value]="totalRechazados().toString()"
+      icon="x-circle"
+      iconColor="red"
+    ></restaurant-kpi-card>
+  </div>
+
+  <!-- Filtros -->
+  <div class="admin-comentarios__filtros">
+    @for (f of ['TODOS', 'PENDIENTE', 'APROBADO', 'RECHAZADO']; track f) {
+      <button
+        class="filtro-btn"
+        [class.filtro-btn--active]="filtroEstado() === f"
+        (click)="setFiltro(f)"
+      >
+        {{ f === 'TODOS' ? i18n.t('comentarios.filtro_todos') : f | titlecase }}
+        @if (f === 'PENDIENTE' && totalPendientes() > 0) {
+          <span class="filtro-btn__badge">{{ totalPendientes() }}</span>
+        }
+      </button>
+    }
+  </div>
+
+  <!-- Lista -->
+  @if (isLoading()) {
+    <div class="admin-comentarios__loading">
+      <span class="spinner spinner--dark"></span>
+      {{ i18n.t('comentarios.cargando') }}
+    </div>
+  } @else if (comentariosFiltrados().length === 0) {
+  <div class="admin-comentarios__empty">
+    <lucide-icon name="file-text" [size]="32"></lucide-icon>
+    <p>{{ i18n.t('comentarios.sin_comentarios') }} <strong>{{ filtroEstado() }}</strong></p>
+  </div>
+  } @else {
+    <div class="comentarios-list">
+      @for (c of comentariosFiltrados(); track c.idComentario) {
+        <div class="comentario-card" [class.comentario-card--procesando]="procesando() === c.idComentario">
+
+          <div class="comentario-card__left">
+            <div class="comentario-card__avatar">
+              {{ getInitials(c.usuarioNombre) }}
+            </div>
+          </div>
+
+          <div class="comentario-card__body">
+            <div class="comentario-card__header">
+              <div>
+                <span class="comentario-card__nombre">{{ c.usuarioNombre }}</span>
+                <span class="comentario-card__fecha">
+                  {{ c.fechaCreacion | date:'dd MMM yyyy · HH:mm' }}
+                </span>
+              </div>
+              <span
+                class="estado-badge"
+                [class.estado-badge--pendiente]="c.estado === 'PENDIENTE'"
+                [class.estado-badge--aprobado]="c.estado === 'APROBADO'"
+                [class.estado-badge--rechazado]="c.estado === 'RECHAZADO'"
+              >
+                {{ c.estado }}
+              </span>
+            </div>
+
+            <p class="comentario-card__titulo">{{ c.titulo }}</p>
+            <p class="comentario-card__texto">{{ c.comentario }}</p>
+
+            @if (c.estado === 'PENDIENTE') {
+              <div class="comentario-card__actions">
+                <button
+                  class="btn btn-aprobar"
+                  [disabled]="procesando() === c.idComentario"
+                  (click)="aprobar(c.idComentario)"
+                >
+                  @if (procesando() === c.idComentario) {
+                    <span class="spinner"></span>
+                  } @else {
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                  }
+                  {{ i18n.t('comentarios.aprobar') }}
+                </button>
+                <button
+                  class="btn btn-rechazar"
+                  [disabled]="procesando() === c.idComentario"
+                  (click)="rechazar(c.idComentario)"
+                >
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                  {{ i18n.t('comentarios.rechazar') }}
+                </button>
+              </div>
+            }
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
+</div>

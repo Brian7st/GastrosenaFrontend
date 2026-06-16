@@ -44,15 +44,70 @@ export class FacturaImportPageComponent implements OnInit {
   showManualMapping = computed(() => this.fileLoaded() && this.gilBienes().length > 0);
 
   manualLinks = signal<(number | null)[]>([]);
+  cantidadesRecibidas = signal<(number | null)[]>([]);
+
+  missingCounts = computed(() =>
+    this.gilBienes().some((_, i) => this.cantidadesRecibidas()[i] === null)
+  );
+
+  // ── Wizard de pasos ─────────────────────────────────────────────────────────
+  readonly pasos = [
+    { n: 1, label: 'Subir XML' },
+    { n: 2, label: 'Revisar datos' },
+    { n: 3, label: 'Vincular y cruzar' },
+    { n: 4, label: 'Resultado' },
+  ];
+  paso = signal(1);
+  // Latches: el auto-avance ocurre UNA sola vez por hito, así "Atrás" no rebota.
+  private latchImport = false;
+  private latchConciliar = false;
+
+  /** Un paso es alcanzable solo si su precondición de datos se cumple. */
+  puedeAvanzar(n: number): boolean {
+    if (n <= 1) return true;
+    if (n === 2 || n === 3) return !!this.facturaImportada();
+    if (n === 4) return !!this.conciliacionImportacion();
+    return false;
+  }
+
+  irAPaso(n: number): void {
+    if (n >= 1 && n <= this.pasos.length && this.puedeAvanzar(n)) this.paso.set(n);
+  }
+  siguiente(): void { this.irAPaso(this.paso() + 1); }
+  atras(): void { this.paso.update(p => Math.max(1, p - 1)); }
 
   constructor() {
+    // Auto-avance guiado: al importar → paso 2; al conciliar → paso 4.
+    effect(() => {
+      const factura = this.facturaImportada();
+      const conciliacion = this.conciliacionImportacion();
+      if (factura && !this.latchImport) {
+        this.latchImport = true;
+        this.paso.set(2);
+      }
+      if (conciliacion && !this.latchConciliar) {
+        this.latchConciliar = true;
+        this.paso.set(4);
+      }
+    });
+
     effect(() => {
       const bienes = this.gilBienes();
       const factura = this.facturaImportada();
       if (bienes.length > 0 && factura) {
-        this.manualLinks.set(this.buildAutoLinks(bienes, factura.lineas));
+        const links = this.buildAutoLinks(bienes, factura.lineas);
+        this.manualLinks.set(links);
+        // Pre-llenar el conteo con la cantidad de la línea FEL matcheada (caso común:
+        // se recibió lo facturado). Editable si hubo faltante. Evita el dead-end de
+        // conciliar con conteo nulo. Fallback: la cantidad del ítem GIL.
+        this.cantidadesRecibidas.set(bienes.map((bien, i) => {
+          const felIdx = links[i];
+          const felLinea = (felIdx !== null && felIdx !== undefined) ? factura.lineas[felIdx] : undefined;
+          return felLinea?.cantidad ?? bien.cantidad ?? null;
+        }));
       } else {
         this.manualLinks.set([]);
+        this.cantidadesRecibidas.set([]);
       }
     });
   }
@@ -87,6 +142,17 @@ export class FacturaImportPageComponent implements OnInit {
     const select = event.target as HTMLSelectElement;
     this.gilId.set(select.value);
     this.facade.cargarGilBienes(select.value);
+  }
+
+  onCantidadRecibidaChange(i: number, event: Event): void {
+    const raw = (event.target as HTMLInputElement).value;
+    const num = raw === '' ? null : Number(raw);
+    const val = num === null || Number.isNaN(num) || num < 0 ? null : num;
+    this.cantidadesRecibidas.update(c => {
+      const copy = [...c];
+      copy[i] = val;
+      return copy;
+    });
   }
 
   onLinkChange(gilIdx: number, event: Event): void {
@@ -168,13 +234,30 @@ export class FacturaImportPageComponent implements OnInit {
   onConciliar(): void {
     const factura = this.facturaImportada();
     if (!factura || !this.gilId()) return;
-    this.facade.conciliarEnImportacion(String(factura.id), this.gilId());
+
+    const cantidadesMap: Record<string, number> = {};
+    let droppedCount = false;
+    this.gilBienes().forEach((bien, i) => {
+      const val = this.cantidadesRecibidas()[i];
+      if (val === null) return;
+      if (!bien.productoId) { droppedCount = true; return; }
+      cantidadesMap[bien.productoId] = val;
+    });
+
+    if (droppedCount) {
+      this.localError.set('Algunos conteos no se enviaron: ítems sin producto vinculado.');
+    }
+
+    this.facade.conciliarEnImportacion(String(factura.id), this.gilId(), cantidadesMap);
   }
 
   resetImport(): void {
     this.fileName.set('');
     this.gilId.set('');
     this.localError.set(null);
+    this.latchImport = false;
+    this.latchConciliar = false;
+    this.paso.set(1);
     this.facade.limpiarImportacionFactura();
   }
 

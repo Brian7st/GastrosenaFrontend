@@ -45,17 +45,6 @@ export interface MovimientoResponse {
   estado: 'Completado' | 'Pendiente' | 'Cancelado';
 }
 
-/** RegistrarEntradaHttpRequest — POST /api/v1/inventory/movimientos/entrada */
-export interface EntradaRequest {
-  productoId:      string;
-  cantidad:        number;
-  precioUnitario:  number;
-  facturaId?:      string;
-  proveedorNit?:   string;
-  gilId?:          string;
-  conciliacionId?: string;
-}
-
 /** RegistrarSalidaHttpRequest — POST /api/v1/inventory/movimientos/salida */
 export interface SalidaRequest {
   productoId:    string;
@@ -79,11 +68,13 @@ export interface LiberacionRequest {
   motivo: string;
 }
 
+/** AjustarInventarioHttpRequest — POST /api/v1/inventory/movimientos/ajuste */
 export interface AjusteRequest {
   productoId: string;
   cantidadNueva: number;
   motivo: string;
-  responsableId: string;
+  autorizado: boolean;
+  referenciaId: string | null;
 }
 
 // ── Documentos agrupados (GET /inventory/movimientos) ─────────────────────

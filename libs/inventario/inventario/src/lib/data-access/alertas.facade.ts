@@ -1,6 +1,6 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
 import { AlertasService } from './services/alertas.service';
-import { Alerta, RegistroHistorial, UmbralConfig } from '../models/alerta.model';
+import { Alerta, UmbralConfig } from '../models/alerta.model';
 import { ResumenAlertas } from '../models/reporting.model';
 import { finalize, catchError, of, firstValueFrom, forkJoin } from 'rxjs';
 
@@ -13,7 +13,6 @@ export class AlertasFacade {
   // ── Estado interno ────────────────────────────────────────────────────────
   private _alertas              = signal<Alerta[]>([]);
   private _alertaSeleccionada   = signal<Alerta | undefined>(undefined);
-  private _historial            = signal<RegistroHistorial[]>([]); // legacy, mantenido por compat
   private _resumenAlertas       = signal<ResumenAlertas | null>(null);
   private _umbrales             = signal<UmbralConfig[]>([]);
   private _loading              = signal<boolean>(false);
@@ -22,7 +21,6 @@ export class AlertasFacade {
   // ── Exposición pública ────────────────────────────────────────────────────
   public alertas            = computed(() => this._alertas());
   public alertaSeleccionada = computed(() => this._alertaSeleccionada());
-  public historial          = computed(() => this._historial());
   public resumenAlertas     = computed(() => this._resumenAlertas());
   public umbrales           = computed(() => this._umbrales());
   public loading            = computed(() => this._loading());
@@ -61,8 +59,8 @@ export class AlertasFacade {
     }
   }
 
-  /** GET /reporting/alertas/resumen — carga el resumen de alertas */
-  cargarHistorial(destinatarioId?: string): void {
+  /** GET /reporting/alertas/resumen — carga el resumen real de alertas (conteos + por tipo). */
+  cargarResumen(destinatarioId?: string): void {
     this._loading.set(true);
     this._error.set(null);
     this.alertasService.getResumenAlertas(destinatarioId)

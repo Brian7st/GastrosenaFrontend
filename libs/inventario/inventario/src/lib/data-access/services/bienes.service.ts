@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of, throwError, forkJoin } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { Bien, BienFiltros, BienKpis, BienFormDto, BienPaginacion } from '../../models/inventario.model';
 import {
@@ -31,7 +31,7 @@ export class BienesService {
   /** GET /catalog/productos — lista paginada (page 0-based, size por defecto 20). */
   getBienes(filtros?: BienFiltros): Observable<{ bienes: Bien[]; paginacion: BienPaginacion }> {
     let params = new HttpParams();
-    if (filtros?.busqueda)              params = params.set('nombre', filtros.busqueda);
+    if (filtros?.busqueda)              params = params.set('descripcion', filtros.busqueda);
     if (filtros?.categoria)             params = params.set('categoria', filtros.categoria);
     if (filtros?.estado === 'Activo')   params = params.set('activo', 'true');
     if (filtros?.estado === 'Inactivo') params = params.set('activo', 'false');
@@ -53,21 +53,45 @@ export class BienesService {
         })),
         switchMap(({ productos, paginacion }) => {
           if (!productos.length) return of({ bienes: [] as Bien[], paginacion });
-          const existencias$ = productos.map(p =>
-            this.http
-              .get<ExistenciaResponse>(`${API}/inventory/existencias/${p.id}`)
-              .pipe(catchError(() => of(null)))
-          );
-          return forkJoin(existencias$).pipe(
-            map(existencias => ({
-              bienes: productos.map((p, i) =>
-                existencias[i] ? bienFromCatalogoYExistencia(p, existencias[i]) : bienFromCatalogo(p)
-              ),
-              paginacion,
-            }))
-          );
+          // Una sola llamada bulk en vez de N (evita el N+1 de HTTP). El backend llavea
+          // la existencia por codigoSena (productoId canónico) y omite los que no tienen.
+          const params = new HttpParams().set('codigosSena', productos.map(p => p.codigoSena).join(','));
+          return this.http
+            .get<ExistenciaResponse[]>(`${API}/inventory/existencias`, { params })
+            .pipe(
+              catchError(() => of([] as ExistenciaResponse[])),
+              map(existencias => {
+                const porCodigo = new Map(existencias.map(e => [e.productoId, e]));
+                return {
+                  bienes: productos.map(p => {
+                    const ex = porCodigo.get(p.codigoSena);
+                    return ex ? bienFromCatalogoYExistencia(p, ex) : bienFromCatalogo(p);
+                  }),
+                  paginacion,
+                };
+              })
+            );
         }),
         catchError(err => throwError(() => err))
+      );
+  }
+
+  /**
+   * Catálogo plano de bienes activos para el typeahead (cascada VLOOKUP).
+   * NO resuelve existencias (evita el N+1): el typeahead solo necesita código,
+   * descripción y precio — el bien ya trae el cód almacén y el precio del contrato.
+   */
+  buscarCatalogo(): Observable<Bien[]> {
+    const params = new HttpParams()
+      .set('activo', 'true')
+      .set('page', '0')
+      .set('size', '1000');
+
+    return this.http
+      .get<PagedResponse<ProductoResponse>>(`${API}/catalog/productos`, { params })
+      .pipe(
+        map(res => res.content.map(bienFromCatalogo)),
+        catchError(err => throwError(() => err)),
       );
   }
 
@@ -76,21 +100,23 @@ export class BienesService {
   /** GET /catalog/productos/{id} + GET /inventory/existencias/{id}
    *  Compone el Bien con estado de stock real (Agotado / Bajo Stock / Activo). */
   getBienById(id: string | number): Observable<Bien | undefined> {
-    const catalogo$ = this.http
+    return this.http
       .get<ProductoResponse>(`${API}/catalog/productos/${id}`)
-      .pipe(catchError(() => of(undefined)));
-
-    const existencia$ = this.http
-      .get<ExistenciaResponse>(`${API}/inventory/existencias/${id}`)
-      .pipe(catchError(() => of(null)));
-
-    return forkJoin([catalogo$, existencia$]).pipe(
-      map(([cat, ex]) => {
-        if (!cat) return undefined;
-        return bienFromCatalogoYExistencia(cat, ex ?? null);
-      }),
-      catchError(err => throwError(() => err))
-    );
+      .pipe(
+        catchError(() => of(undefined)),
+        // La existencia se consulta por codigoSena (productoId canónico), obtenido del
+        // catálogo — no por el id (UUID), que nunca matchea la existencia almacenada.
+        switchMap(cat => {
+          if (!cat) return of<Bien | undefined>(undefined);
+          return this.http
+            .get<ExistenciaResponse>(`${API}/inventory/existencias/${cat.codigoSena}`)
+            .pipe(
+              catchError(() => of(null)),
+              map(ex => bienFromCatalogoYExistencia(cat, ex ?? null))
+            );
+        }),
+        catchError(err => throwError(() => err))
+      );
   }
 
   // ── KPIs ─────────────────────────────────────────────────────────────────────

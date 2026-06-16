@@ -15,7 +15,7 @@ import {
   selector: 'restaurant-comandas-page',
   standalone: true,
   imports: [
-    CommonModule, 
+    CommonModule,
     FormsModule,
     ComandaCardComponent,
     PageHeaderComponent,
@@ -32,8 +32,7 @@ export class ComandasPageComponent implements OnInit, OnDestroy {
 
   searchTerm = signal('');
   filtroEstado = signal('Todos los estados');
-  filtroPrioridad = signal('Todas las prioridades');
-  filtroOrden = signal('Prioridad');
+  filtroOrden = signal('Hora de llegada');
 
   comandas = signal<Comanda[]>([]);
   errorToast = signal<string | null>(null);
@@ -44,16 +43,8 @@ export class ComandasPageComponent implements OnInit, OnDestroy {
     { label: 'PREPARANDO', value: 'PREPARANDO' },
     { label: 'LISTO', value: 'LISTO' }
   ];
-  
-  opcionesPrioridad = [
-    { label: 'Todas las prioridades', value: 'Todas las prioridades' },
-    { label: 'URGENTE', value: 'URGENTE' },
-    { label: 'ALTA', value: 'ALTA' },
-    { label: 'NORMAL', value: 'NORMAL' }
-  ];
-  
+
   opcionesOrden = [
-    { label: 'Prioridad', value: 'Prioridad' },
     { label: 'Hora de llegada', value: 'Hora de llegada' },
     { label: 'Tiempo estimado', value: 'Tiempo estimado' }
   ];
@@ -73,15 +64,36 @@ export class ComandasPageComponent implements OnInit, OnDestroy {
     this.comandaService.getComandas().subscribe({
       next: (data) => {
         const now = new Date();
+
         const comandasFiltradas = data.filter(c => {
-          if (c.estado === 'LISTO') {
+          const estado = (c.estado || '').toUpperCase();
+
+          // Comandas CANCELADAS por completo → no aparecen en el kanban (van a Inicio > Canceladas)
+          if (estado === 'CANCELADO' || estado === 'CANCELADA') {
+            return false;
+          }
+
+          // Comandas de DEVOLUCIÓN ya LISTAS → salen del tablero (van a Inicio > Devueltos).
+          // Mientras no estén listas, se quedan en el tablero para re-cocinarse.
+          if (c.esDevolucion && estado === 'LISTO') {
+            return false;
+          }
+
+          // Comandas LISTO → solo del día actual
+          if (estado === 'LISTO') {
             const fechaComanda = new Date(c.horaEntrada);
             return fechaComanda.getDate() === now.getDate() &&
                    fechaComanda.getMonth() === now.getMonth() &&
                    fechaComanda.getFullYear() === now.getFullYear();
           }
+
+          // Si la comanda tiene algún plato CANCELADO pero la comanda NO está cancelada completa,
+          // la comanda permanece en el kanban con los platos NO cancelados (los cancelados
+          // se duplican y van a Inicio > Canceladas).
+          // → La comanda sigue mostrándose normalmente con todos sus platos.
           return true;
         });
+
         this.comandas.set(comandasFiltradas);
       },
       error: (err) => {
@@ -122,11 +134,11 @@ export class ComandasPageComponent implements OnInit, OnDestroy {
         const detalles = c.detalles.map(d => {
           if (d.idDetalleComanda === idDetalle) {
             const horaFin = nuevoEstado === 'LISTO' ? new Date().toISOString() : d.horaFinPreparacion;
-            const duracion = nuevoEstado === 'LISTO' && d.horaInicioPreparacion 
-                             ? Math.floor((new Date().getTime() - new Date(d.horaInicioPreparacion).getTime()) / 60000) 
+            const duracion = nuevoEstado === 'LISTO' && d.horaInicioPreparacion
+                             ? Math.floor((new Date().getTime() - new Date(d.horaInicioPreparacion).getTime()) / 60000)
                              : d.duracionMinutos;
-            return { 
-              ...d, 
+            return {
+              ...d,
               estado: nuevoEstado,
               horaInicioPreparacion: nuevoEstado === 'PREPARANDO' ? new Date().toISOString() : d.horaInicioPreparacion,
               horaFinPreparacion: horaFin,
@@ -144,11 +156,16 @@ export class ComandasPageComponent implements OnInit, OnDestroy {
   private evaluarEstadoComanda(idComanda: string) {
     this.comandas.update(comandas => comandas.map(c => {
       if (c.idComanda === idComanda) {
-        const todosListos = c.detalles.every(d => d.estado === 'LISTO');
-        const algunoPreparandoOlisto = c.detalles.some(d => d.estado === 'PREPARANDO' || d.estado === 'LISTO');
-        
+        // Solo considerar platos activos (no cancelados/devueltos) para el estado
+        const platosActivos = c.detalles.filter(d => {
+          const e = (d.estado || '').toUpperCase();
+          return e !== 'CANCELADO' && e !== 'DEVUELTO';
+        });
+        const todosListos = platosActivos.length > 0 && platosActivos.every(d => d.estado === 'LISTO');
+        const algunoPreparandoOlisto = platosActivos.some(d => d.estado === 'PREPARANDO' || d.estado === 'LISTO');
+
         let nuevoEstado = c.estado;
-        if (c.estado === 'LISTO' || (todosListos && c.detalles.length > 0)) {
+        if (c.estado === 'LISTO' || (todosListos && platosActivos.length > 0)) {
           nuevoEstado = 'LISTO';
         } else if (algunoPreparandoOlisto) {
           nuevoEstado = 'PREPARANDO';
@@ -162,21 +179,14 @@ export class ComandasPageComponent implements OnInit, OnDestroy {
   }
 
   comandasFiltradas = computed(() => {
-    let filtrados = this.comandas().filter(c => {
+    const filtrados = this.comandas().filter(c => {
       const term = this.searchTerm().toLowerCase();
-      const matchBusqueda = c.numeroMesa.toString().includes(term) || 
+      const matchBusqueda = c.numeroMesa.toString().includes(term) ||
                             c.nombreMesero.toLowerCase().includes(term) ||
                             c.idComanda.toLowerCase().includes(term);
       const matchEstado = this.filtroEstado() === 'Todos los estados' || c.estado === this.filtroEstado();
-      const matchPrioridad = this.filtroPrioridad() === 'Todas las prioridades' || c.prioridad === this.filtroPrioridad();
-      return matchBusqueda && matchEstado && matchPrioridad;
+      return matchBusqueda && matchEstado;
     });
-
-    const criterio = this.filtroOrden();
-    if (criterio === 'Prioridad') {
-      const niveles: Record<string, number> = { 'URGENTE': 3, 'ALTA': 2, 'NORMAL': 1 };
-      filtrados.sort((a, b) => niveles[b.prioridad] - niveles[a.prioridad]);
-    }
 
     return filtrados;
   });
@@ -185,54 +195,15 @@ export class ComandasPageComponent implements OnInit, OnDestroy {
     const s = c.estado?.toUpperCase() || '';
     return s.includes('PENDIENTE') || s.includes('ESPERA');
   }));
+
   preparando = computed(() => this.comandasFiltradas().filter(c => {
     const s = c.estado?.toUpperCase() || '';
     return s.includes('PREPARAN') || s.includes('PROCESO');
   }));
+
   listos = computed(() => this.comandasFiltradas().filter(c => {
     const s = c.estado?.toUpperCase() || '';
     return s.includes('LISTO') || s.includes('TERMINAD');
   }));
 
-  getMockComandas(): Comanda[] {
-    const now = new Date();
-    const minus10 = new Date(now.getTime() - 10 * 60000).toISOString();
-    const minus25 = new Date(now.getTime() - 25 * 60000).toISOString();
-    return [
-      {
-        idComanda: 'uuid-comanda-1',
-        numeroMesa: 5,
-        nombreMesero: 'María G.',
-        prioridad: 'ALTA',
-        estado: 'PENDIENTE',
-        fechaPedido: minus25,
-        horaEntrada: minus10,
-        notasAdicionales: 'Mesa exterior',
-        detalles: [
-          { idDetalleComanda: 'uuid-det-101', idReceta: 'uuid-rec-1', receta: { nombre: 'Pasta Carbonara' }, cantidad: 1, estado: 'ESPERA', notas: 'Sin queso' },
-          { idDetalleComanda: 'uuid-det-102', idReceta: 'uuid-rec-2', receta: { nombre: 'Jugo de Mora' }, cantidad: 2, estado: 'ESPERA', notas: 'En agua' }
-        ]
-      },
-      {
-        idComanda: 'uuid-comanda-2',
-        numeroMesa: 2,
-        nombreMesero: 'Juan P.',
-        prioridad: 'URGENTE',
-        estado: 'PREPARANDO',
-        fechaPedido: minus25,
-        horaEntrada: minus25,
-        notasAdicionales: '',
-        detalles: [
-          { idDetalleComanda: 'uuid-det-201', idReceta: 'uuid-rec-3', receta: { nombre: 'Hamburguesa' }, cantidad: 1, estado: 'PREPARANDO', notas: 'Término medio', horaInicioPreparacion: minus10 },
-          { idDetalleComanda: 'uuid-det-202', idReceta: 'uuid-rec-4', receta: { nombre: 'Papas Fritas' }, cantidad: 1, estado: 'ESPERA', notas: '' }
-        ]
-      }
-    ];
-  }
-
-  getBadgeVariant(prioridad: string): 'danger' | 'warning' | 'info' | 'success' {
-    if (prioridad === 'Urgente') return 'danger';
-    if (prioridad === 'Alta') return 'warning';
-    return 'info';
-  }
 }

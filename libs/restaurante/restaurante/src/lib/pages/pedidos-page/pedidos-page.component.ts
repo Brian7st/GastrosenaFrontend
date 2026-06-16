@@ -6,7 +6,7 @@ import { PedidosCategoriesComponent } from '../../components/pedidos-categories/
 import { PedidosMenuGridComponent } from '../../components/pedidos-menu-grid/pedidos-menu-grid.component';
 import { PedidosCartComponent } from '../../components/pedidos-cart/pedidos-cart.component';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
-import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
+import { LucideIconComponent, ButtonComponent, ConfirmDialogComponent } from '@restaurant/shared/ui';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -20,7 +20,8 @@ import { RouterLink } from '@angular/router';
     PedidosMenuGridComponent,
     PedidosCartComponent,
     LucideIconComponent,
-    ButtonComponent
+    ButtonComponent,
+    ConfirmDialogComponent
   ],
   templateUrl: './pedidos-page.component.html',
   styleUrls: ['./pedidos-page.component.scss'],
@@ -45,6 +46,10 @@ export class PedidosPageComponent {
     const p = this.facade.pedidoActivo();
     return p ? p.estado !== 'BORRADOR' : false;
   });
+
+  nombreUsuario = this.facade.nombreUsuario;
+  mostrarModalAccesoDenegado = this.facade.mostrarModalAccesoDenegado;
+  cerrarModalAccesoDenegado = () => this.facade.cerrarModalAccesoDenegado();
 
   fechaActual = new Date();
 
