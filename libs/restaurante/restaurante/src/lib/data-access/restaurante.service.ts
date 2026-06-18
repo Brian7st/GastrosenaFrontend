@@ -20,8 +20,8 @@ export class RestauranteService {
   private readonly pedidosUrl = '/api/pedidos';
   private readonly cajaUrl = '/api/caja';
   private readonly facturasUrl = '/api/facturas';
-  private readonly recetasUrl = 'http://localhost:8082/api/recetas';
-  private readonly barRecetasUrl = 'http://localhost:8086/api/barybarismo/recetas';
+  private readonly recetasUrl = '/api/recetas';
+  private readonly barRecetasUrl = '/api/barybarismo/recetas';
 
   // ── Recetas (Cocina y Bar) ──────────────────────────────────────────────────
 
