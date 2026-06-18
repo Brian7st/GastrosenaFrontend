@@ -36,10 +36,19 @@
           <div class="prices">
             <span class="current">{{ item.precioUnitario | currencyCop }}</span>
           </div>
-          @if (!esPedidoSoloLectura()) {
+          @if (estadoPedido() === 'BORRADOR') {
             <button class="btn-delete" (click)="eliminarItem(i)" title="Eliminar producto">
               <lucide-icon name="trash-2" [size]="16"></lucide-icon>
             </button>
+          } @else if (estadoPedido() !== 'FACTURADO' && estadoPedido() !== 'CANCELADO') {
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-delete" style="color: var(--color-error);" (click)="iniciarAccionItem(item.id, item.nombreProducto, 'CANCELAR')" title="Cancelar producto">
+                <lucide-icon name="x-circle" [size]="16"></lucide-icon>
+              </button>
+              <button class="btn-delete" style="color: var(--color-warning);" (click)="iniciarAccionItem(item.id, item.nombreProducto, 'DEVOLVER')" title="Devolver producto">
+                <lucide-icon name="rotate-ccw" [size]="16"></lucide-icon>
+              </button>
+            </div>
           }
         </div>
       </div>
@@ -90,14 +99,23 @@
       (click)="iniciarConfirmacion()">
       <span>Confirmar Pedido</span>
     </restaurant-button>
-  } @else if (estadoPedido() !== 'FACTURADO' && estadoPedido() !== 'CANCELADO' && estadoPedido() !== 'ENTREGADO') {
-    <restaurant-button 
-      class="action-btn flex-1 btn-anular" 
-      variant="primary" 
-      (click)="iniciarAnulacionBackend()">
-      <lucide-icon name="alert-triangle" [size]="18" class="text-white"></lucide-icon>
-      <span>Cancelar Pedido</span>
-    </restaurant-button>
+  } @else if (estadoPedido() !== 'FACTURADO' && estadoPedido() !== 'CANCELADO') {
+    <div style="display: flex; gap: 8px; width: 100%;">
+      <restaurant-button 
+        class="action-btn flex-1 btn-anular" 
+        variant="primary" 
+        (click)="iniciarAnulacionBackend()">
+        <lucide-icon name="alert-triangle" [size]="18" class="text-white"></lucide-icon>
+        <span>Cancelar</span>
+      </restaurant-button>
+      <restaurant-button 
+        class="action-btn flex-1 btn-devolver" 
+        variant="primary" 
+        (click)="iniciarDevolucionBackend()">
+        <lucide-icon name="rotate-ccw" [size]="18" class="text-white"></lucide-icon>
+        <span>Devolver</span>
+      </restaurant-button>
+    </div>
   } @else {
     <div class="status-badge" style="width: 100%; text-align: center; padding: 12px; background: var(--bg-neutral); border-radius: var(--radius-md); color: var(--text-secondary); font-weight: 500;">
       No se puede cancelar (Pedido {{ estadoPedido().replace('_', ' ') | titlecase }})
@@ -146,6 +164,68 @@
       <div class="modal-actions">
         <restaurant-button variant="ghost" (click)="showAnularBackendModal.set(false)">No, volver</restaurant-button>
         <restaurant-button variant="primary" [disabled]="!motivoAnulacion().trim()" (click)="ejecutarAnulacionBackend()">Sí, cancelar pedido</restaurant-button>
+      </div>
+    </section>
+  </div>
+}
+
+@if (showDevolverBackendModal()) {
+  <div class="custom-modal-backdrop" (click)="showDevolverBackendModal.set(false)">
+    <section class="custom-modal-dialog" (click)="$event.stopPropagation()">
+      <strong class="modal-title" style="color: var(--color-warning);">Devolver Pedido</strong>
+      <p class="modal-message">¿Estás seguro de que quieres devolver TODO este pedido entregado? Se requerirá un motivo y la orden será anulada.</p>
+      
+      <div class="cancel-reason-container">
+        <label for="motivoDevolucion">Motivo de la devolución *</label>
+        <textarea 
+          id="motivoDevolucion"
+          [(ngModel)]="motivoDevolucion"
+          placeholder="Ej: El cliente no quedó conforme, comida fría..."
+          rows="3"
+          required
+          class="cancel-reason-input"
+        ></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <restaurant-button variant="ghost" (click)="showDevolverBackendModal.set(false)">No, volver</restaurant-button>
+        <restaurant-button class="btn-devolver" variant="primary" [disabled]="!motivoDevolucion().trim()" (click)="ejecutarDevolucionBackend()">Sí, devolver pedido</restaurant-button>
+      </div>
+    </section>
+  </div>
+}
+
+@if (showItemActionModal() && itemAccionActual(); as accionItem) {
+  <div class="custom-modal-backdrop" (click)="limpiarAccionItem()">
+    <section class="custom-modal-dialog" (click)="$event.stopPropagation()">
+      <strong class="modal-title" [ngStyle]="{'color': accionItem.tipo === 'CANCELAR' ? 'var(--color-error)' : 'var(--color-warning)'}">
+        {{ accionItem.tipo === 'CANCELAR' ? 'Cancelar Producto' : 'Devolver Producto' }}
+      </strong>
+      <p class="modal-message">
+        ¿Estás seguro de que quieres {{ accionItem.tipo === 'CANCELAR' ? 'cancelar' : 'devolver' }} el producto <strong>{{ accionItem.nombre }}</strong>?
+      </p>
+      
+      <div class="cancel-reason-container">
+        <label for="motivoItem">Motivo de la {{ accionItem.tipo === 'CANCELAR' ? 'cancelación' : 'devolución' }} *</label>
+        <textarea 
+          id="motivoItem"
+          [(ngModel)]="motivoItem"
+          placeholder="Ej: Cambio de opinión, error en el plato..."
+          rows="3"
+          required
+          class="cancel-reason-input"
+        ></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <restaurant-button variant="ghost" (click)="limpiarAccionItem()">No, volver</restaurant-button>
+        <restaurant-button 
+          [class]="accionItem.tipo === 'DEVOLVER' ? 'btn-devolver' : 'btn-anular'"
+          variant="primary" 
+          [disabled]="!motivoItem().trim()" 
+          (click)="ejecutarAccionItem()">
+          Sí, {{ accionItem.tipo === 'CANCELAR' ? 'cancelar' : 'devolver' }} ítem
+        </restaurant-button>
       </div>
     </section>
   </div>

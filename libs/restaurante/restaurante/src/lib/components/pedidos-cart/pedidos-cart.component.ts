@@ -41,8 +41,15 @@ export class PedidosCartComponent {
   showConfirmModal = signal(false);
   showAnularBackendModal = signal(false);
   showEmptyCartModal = signal(false);
-  motivoAnulacion = signal('');
+  showDevolverBackendModal = signal(false);
+  showItemActionModal = signal(false);
   
+  motivoAnulacion = signal('');
+  motivoDevolucion = signal('');
+  motivoItem = signal('');
+  
+  itemAccionActual = signal<{id: string, nombre: string, tipo: 'CANCELAR' | 'DEVOLVER'} | null>(null);
+
   editIndex = signal<number | null>(null);
   tempObservacion = signal<string>('');
 
@@ -128,6 +135,57 @@ export class PedidosCartComponent {
         }
       }
     });
+  }
+
+  iniciarDevolucionBackend() {
+    this.showDevolverBackendModal.set(true);
+  }
+
+  ejecutarDevolucionBackend() {
+    this.showDevolverBackendModal.set(false);
+    this.facade.devolverPedidoActivoEnBackend(this.motivoDevolucion()).subscribe({
+      next: (exito) => {
+        if (exito) {
+          this.motivoDevolucion.set('');
+          this.router.navigate(['/app/restaurante/mesas']);
+        }
+      }
+    });
+  }
+
+  iniciarAccionItem(id: string | undefined, nombre: string, tipo: 'CANCELAR' | 'DEVOLVER') {
+    if (!id) return;
+    this.itemAccionActual.set({ id, nombre, tipo });
+    this.motivoItem.set('');
+    this.showItemActionModal.set(true);
+  }
+
+  ejecutarAccionItem() {
+    const accion = this.itemAccionActual();
+    if (!accion) return;
+    
+    this.showItemActionModal.set(false);
+    const motivo = this.motivoItem();
+
+    if (accion.tipo === 'CANCELAR') {
+      this.facade.cancelarItemPedido(accion.id, motivo).subscribe({
+        next: (exito) => {
+          if (exito) this.limpiarAccionItem();
+        }
+      });
+    } else {
+      this.facade.devolverItemPedido(accion.id, motivo).subscribe({
+        next: (exito) => {
+          if (exito) this.limpiarAccionItem();
+        }
+      });
+    }
+  }
+
+  limpiarAccionItem() {
+    this.itemAccionActual.set(null);
+    this.motivoItem.set('');
+    this.showItemActionModal.set(false);
   }
 }
 
