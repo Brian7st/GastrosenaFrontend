@@ -126,6 +126,7 @@ export class PedidosCartComponent {
   }
 
   ejecutarAnulacionBackend() {
+    if (!this.motivoAnulacion().trim()) return;
     this.showAnularBackendModal.set(false);
     this.facade.cancelarPedidoActivoEnBackend(this.motivoAnulacion()).subscribe({
       next: (exito) => {
@@ -142,6 +143,7 @@ export class PedidosCartComponent {
   }
 
   ejecutarDevolucionBackend() {
+    if (!this.motivoDevolucion().trim()) return;
     this.showDevolverBackendModal.set(false);
     this.facade.devolverPedidoActivoEnBackend(this.motivoDevolucion()).subscribe({
       next: (exito) => {
@@ -164,8 +166,10 @@ export class PedidosCartComponent {
     const accion = this.itemAccionActual();
     if (!accion) return;
     
-    this.showItemActionModal.set(false);
     const motivo = this.motivoItem();
+    if (!motivo.trim()) return;
+
+    this.showItemActionModal.set(false);
 
     if (accion.tipo === 'CANCELAR') {
       this.facade.cancelarItemPedido(accion.id, motivo).subscribe({

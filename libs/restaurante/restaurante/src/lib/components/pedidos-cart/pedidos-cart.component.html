@@ -168,7 +168,7 @@
 
       <div class="modal-actions">
         <restaurant-button variant="ghost" (click)="showAnularBackendModal.set(false)">No, volver</restaurant-button>
-        <restaurant-button variant="primary" [disabled]="!motivoAnulacion().trim()" (click)="ejecutarAnulacionBackend()">Sí, cancelar pedido</restaurant-button>
+        <restaurant-button class="btn-anular" variant="primary" [disabled]="!motivoAnulacion().trim()" (click)="ejecutarAnulacionBackend()">Sí, cancelar pedido</restaurant-button>
       </div>
     </section>
   </div>
