@@ -65,7 +65,6 @@
         <th>ID Expediente</th>
         <th>Detalle / Ficha</th>
         <th class="text-center">Estado</th>
-        <th>GIL Vinculado</th>
         <th>Documentos Base</th>
         <th>Responsable</th>
         <th>Fecha</th>
@@ -97,11 +96,6 @@
               [label]="getEstadoLabel(paquete.estado)"
               [variant]="getEstadoVariant(paquete.estado)"
             ></restaurant-status-badge>
-          </td>
-
-          <!-- GIL Vinculado -->
-          <td>
-            <span class="paquete-table__gil">{{ paquete.gilId }}</span>
           </td>
 
           <!-- Documentos Base (Checklist) -->
@@ -171,7 +165,7 @@
         </tr>
       } @empty {
         <tr>
-          <td colspan="8">
+          <td colspan="7">
             <inventario-empty-state
               icon="folder"
               title="Sin paquetes"

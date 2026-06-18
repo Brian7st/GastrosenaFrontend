@@ -73,6 +73,7 @@ export interface PaqueteResponse {
   compromisoPresupuestalId?: string;
   titulo: string;
   expediente: string;
+  fechaCreacion?: string;   // ISO "yyyy-MM-dd" enviado por el backend
 }
 
 export interface PaquetesPageResponse {
