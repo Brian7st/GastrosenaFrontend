@@ -47,7 +47,7 @@
               </button>
               @if (estadoPedido() === 'ENTREGADO' || estadoPedido() === 'LISTO_PARA_SERVIR') {
                 <button class="btn-delete" style="color: var(--color-warning);" (click)="iniciarAccionItem(item.id, item.nombreProducto, 'DEVOLVER')" title="Devolver producto">
-                  <lucide-icon name="rotate-ccw" [size]="16"></lucide-icon>
+                  <lucide-icon name="arrow-left" [size]="16"></lucide-icon>
                 </button>
               }
             </div>
@@ -116,7 +116,7 @@
           class="action-btn flex-1 btn-devolver" 
           variant="primary" 
           (click)="iniciarDevolucionBackend()">
-          <lucide-icon name="rotate-ccw" [size]="18" class="text-white"></lucide-icon>
+          <lucide-icon name="arrow-left" [size]="18" class="text-white"></lucide-icon>
           <span>Devolver</span>
         </restaurant-button>
       }
