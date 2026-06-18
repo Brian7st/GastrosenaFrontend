@@ -127,6 +127,30 @@ export class RestauranteService {
     return this.http.patch<PedidoResponse>(`${this.pedidosUrl}/${id}/cancelar`, null, { params });
   }
 
+  devolverPedido(id: string, motivo?: string): Observable<PedidoResponse> {
+    let params = new HttpParams();
+    if (motivo) {
+      params = params.set('motivo', motivo);
+    }
+    return this.http.patch<PedidoResponse>(`${this.pedidosUrl}/${id}/devolver`, null, { params });
+  }
+
+  cancelarDetallePedido(idDetalle: string, motivo?: string): Observable<PedidoResponse> {
+    let params = new HttpParams();
+    if (motivo) {
+      params = params.set('motivo', motivo);
+    }
+    return this.http.patch<PedidoResponse>(`${this.pedidosUrl}/detalle/${idDetalle}/cancelar`, null, { params });
+  }
+
+  devolverDetallePedido(idDetalle: string, motivo?: string): Observable<PedidoResponse> {
+    let params = new HttpParams();
+    if (motivo) {
+      params = params.set('motivo', motivo);
+    }
+    return this.http.patch<PedidoResponse>(`${this.pedidosUrl}/detalle/${idDetalle}/devolver`, null, { params });
+  }
+
   // ── Caja y Facturación ───────────────────────────────────────────────────────
 
   abrirSesion(request: AbrirSesionRequest): Observable<SesionCajaResponse> {
