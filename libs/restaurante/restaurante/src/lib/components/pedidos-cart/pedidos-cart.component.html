@@ -45,9 +45,11 @@
               <button class="btn-delete" style="color: var(--color-error);" (click)="iniciarAccionItem(item.id, item.nombreProducto, 'CANCELAR')" title="Cancelar producto">
                 <lucide-icon name="x-circle" [size]="16"></lucide-icon>
               </button>
-              <button class="btn-delete" style="color: var(--color-warning);" (click)="iniciarAccionItem(item.id, item.nombreProducto, 'DEVOLVER')" title="Devolver producto">
-                <lucide-icon name="rotate-ccw" [size]="16"></lucide-icon>
-              </button>
+              @if (estadoPedido() === 'ENTREGADO' || estadoPedido() === 'LISTO_PARA_SERVIR') {
+                <button class="btn-delete" style="color: var(--color-warning);" (click)="iniciarAccionItem(item.id, item.nombreProducto, 'DEVOLVER')" title="Devolver producto">
+                  <lucide-icon name="rotate-ccw" [size]="16"></lucide-icon>
+                </button>
+              }
             </div>
           }
         </div>
@@ -108,13 +110,16 @@
         <lucide-icon name="alert-triangle" [size]="18" class="text-white"></lucide-icon>
         <span>Cancelar</span>
       </restaurant-button>
-      <restaurant-button 
-        class="action-btn flex-1 btn-devolver" 
-        variant="primary" 
-        (click)="iniciarDevolucionBackend()">
-        <lucide-icon name="rotate-ccw" [size]="18" class="text-white"></lucide-icon>
-        <span>Devolver</span>
-      </restaurant-button>
+      
+      @if (estadoPedido() === 'ENTREGADO' || estadoPedido() === 'LISTO_PARA_SERVIR') {
+        <restaurant-button 
+          class="action-btn flex-1 btn-devolver" 
+          variant="primary" 
+          (click)="iniciarDevolucionBackend()">
+          <lucide-icon name="rotate-ccw" [size]="18" class="text-white"></lucide-icon>
+          <span>Devolver</span>
+        </restaurant-button>
+      }
     </div>
   } @else {
     <div class="status-badge" style="width: 100%; text-align: center; padding: 12px; background: var(--bg-neutral); border-radius: var(--radius-md); color: var(--text-secondary); font-weight: 500;">

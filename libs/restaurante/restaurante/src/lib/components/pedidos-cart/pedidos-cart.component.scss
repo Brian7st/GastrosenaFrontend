@@ -348,29 +348,17 @@
 
 ::ng-deep {
   .btn-anular {
-    button.app-btn {
-      background-color: var(--color-error, #ba1a1a);
-      color: var(--color-en-primario, #ffffff);
-      border-color: transparent;
-
-      &:hover {
-        background-color: var(--color-danger, #d63031);
-        transform: scale(1.02);
-      }
-    }
+    --color-primario: var(--color-error);
+    --color-primario-gradient-end: var(--color-error);
+    --shadow-primary: none;
+    --shadow-primary-hover: none;
   }
 
   .btn-devolver {
-    button.app-btn {
-      background-color: var(--color-warning, #f59e0b);
-      color: var(--color-en-primario, #ffffff);
-      border-color: transparent;
-
-      &:hover {
-        background-color: #d97706;
-        transform: scale(1.02);
-      }
-    }
+    --color-primario: var(--color-warning);
+    --color-primario-gradient-end: var(--color-warning);
+    --shadow-primary: none;
+    --shadow-primary-hover: none;
   }
   
   .full-width-btn {
