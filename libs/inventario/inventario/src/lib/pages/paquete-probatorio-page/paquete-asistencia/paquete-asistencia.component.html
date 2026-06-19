@@ -1,24 +1,11 @@
 @if (paquete(); as p) {
 <div class="asistencia-page">
 
-  <!-- ── Breadcrumb ────────────────────────────────────────────────────── -->
-  <nav class="asistencia-page__breadcrumb">
-    <span class="asistencia-page__breadcrumb-item">Paquete probatorio</span>
-    <lucide-icon name="chevron-right" [size]="14" class="asistencia-page__breadcrumb-sep"></lucide-icon>
-    <span class="asistencia-page__breadcrumb-item">{{ p.expediente }}</span>
-    <lucide-icon name="chevron-right" [size]="14" class="asistencia-page__breadcrumb-sep"></lucide-icon>
-    <span class="asistencia-page__breadcrumb-item asistencia-page__breadcrumb-item--active">
-      Llamado de asistencia
-    </span>
-  </nav>
-
-  <!-- ── Header ────────────────────────────────────────────────────────── -->
+  <!-- ── Header (volver + título) ──────────────────────────────────────── -->
   <div class="asistencia-page__header">
     <div class="asistencia-page__header-text">
+      <inventario-back-button (clicked)="volver()" />
       <h1 class="asistencia-page__title">Llamado de asistencia</h1>
-      <p class="asistencia-page__subtitle">
-        Registre la asistencia de los aprendices para la sesión del paquete probatorio.
-      </p>
     </div>
     <restaurant-status-badge label="Pendiente de registro" variant="warning"></restaurant-status-badge>
   </div>

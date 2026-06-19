@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   OnInit,
   signal,
@@ -14,6 +15,7 @@ import {
   ButtonComponent,
   LucideIconComponent,
 } from '@restaurant/shared/ui';
+import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { PaqueteFacade } from '../../../data-access/paquete.facade';
 import { AsistenciaFacade } from '../../../data-access/asistencia.facade';
 import {
@@ -43,6 +45,7 @@ interface AprendizRow {
     KpiCardComponent,
     ButtonComponent,
     LucideIconComponent,
+    BackButtonComponent,
   ],
   templateUrl: './paquete-asistencia.component.html',
   styleUrl: './paquete-asistencia.component.scss',
@@ -92,11 +95,27 @@ export class PaqueteAsistenciaComponent implements OnInit {
   kpiExcusa    = computed(() => this._rows().filter(r => r.estado === 'EXCUSA').length);
   kpiNoAsistio = computed(() => this._rows().filter(r => r.estado === 'NO_ASISTIO').length);
 
+  // Precarga la ficha del paquete una sola vez, cuando el paquete esté disponible.
+  private _fichaInicializada = false;
+
+  constructor() {
+    effect(() => {
+      const p = this.paquete();
+      if (p && !this._fichaInicializada) {
+        this._fichaInicializada = true;
+        this.fichaSeleccionadaNumero.set(p.fichaId);
+      }
+    });
+  }
+
   // ── Lifecycle ─────────────────────────────────────────────────────────────
   ngOnInit(): void {
-    const p = this.paquete();
-    if (p) {
-      this.fichaSeleccionadaNumero.set(p.fichaId);
+    // Vista de página completa: si el paquete no fue cargado por el detalle, lo
+    // cargamos desde el :id de la ruta.
+    const id = this.route.snapshot.paramMap.get('id');
+    const actual = this.paquete();
+    if (id && (!actual || actual.id !== id)) {
+      this.paqueteFacade.cargarPaquete(id);
     }
     // Carga mock de aprendices (backend no desplegado aún)
     this._cargarAprendicesMock();
@@ -201,6 +220,11 @@ export class PaqueteAsistenciaComponent implements OnInit {
     } else {
       this.router.navigate(['/app/inventario/paquete-probatorio']);
     }
+  }
+
+  /** Botón de volver del header — regresa al detalle del paquete. */
+  volver(): void {
+    this.cancelar();
   }
 
   private _hoy(): string {
