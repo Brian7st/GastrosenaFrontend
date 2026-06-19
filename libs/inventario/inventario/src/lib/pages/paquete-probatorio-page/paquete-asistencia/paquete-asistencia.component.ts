@@ -23,10 +23,6 @@ import {
   UsuarioResponseDTO,
   AsistenciaItemRequest,
 } from '../../../data-access/api/legalization.api';
-import {
-  MOCK_FICHAS,
-  MOCK_APRENDICES,
-} from '../../../models/asistencia.mock';
 
 /** Estado de un aprendiz en la sesión actual. */
 interface AprendizRow {
@@ -60,8 +56,9 @@ export class PaqueteAsistenciaComponent implements OnInit {
   paquete = this.paqueteFacade.paqueteSeleccionado;
   loading = this.asistenciaFacade.loading;
 
-  // ── Fichas disponibles (mock hasta que el backend esté desplegado) ────────
-  readonly fichasDisponibles = signal(MOCK_FICHAS);
+  // ── Fichas y aprendices (datos reales desde el facade) ───────────────────
+  readonly fichasDisponibles = this.asistenciaFacade.fichas;
+  private readonly aprendices = this.asistenciaFacade.aprendices;
 
   // ── Ficha seleccionada (se pre-carga desde el paquete) ──────────────────
   readonly fichaSeleccionadaNumero = signal<string>('');
@@ -73,37 +70,66 @@ export class PaqueteAsistenciaComponent implements OnInit {
   // ── Fecha de sesión ──────────────────────────────────────────────────────
   readonly fechaSesion = signal<string>(this._hoy());
 
-  // ── Rows de aprendices con estado reactivo ───────────────────────────────
-  private _rows = signal<AprendizRow[]>([]);
+  // ── Estado por aprendiz (aprendizId → estado). Fuente de verdad del llamado.
+  private readonly _estados = signal<Record<string, EstadoAsistencia>>({});
 
   // ── Búsqueda ─────────────────────────────────────────────────────────────
   readonly searchText = signal<string>('');
 
+  // ── Rows derivadas: aprendices reales + estado seleccionado ──────────────
+  readonly rows = computed<AprendizRow[]>(() =>
+    this.aprendices().map(a => ({
+      aprendiz: a,
+      nombreCompleto: `${a.nombre} ${a.apellidos}`.trim(),
+      estado: this._estados()[a.idUsuario] ?? 'ASISTIO',
+    }))
+  );
+
   rowsFiltradas = computed(() => {
     const text = this.searchText().toLowerCase().trim();
-    if (!text) return this._rows();
-    return this._rows().filter(r =>
+    if (!text) return this.rows();
+    return this.rows().filter(r =>
       r.nombreCompleto.toLowerCase().includes(text) ||
       r.aprendiz.documento.includes(text)
     );
   });
 
   // ── KPIs ─────────────────────────────────────────────────────────────────
-  kpiTotal     = computed(() => this._rows().length);
-  kpiAsistio   = computed(() => this._rows().filter(r => r.estado === 'ASISTIO').length);
-  kpiTarde     = computed(() => this._rows().filter(r => r.estado === 'TARDE').length);
-  kpiExcusa    = computed(() => this._rows().filter(r => r.estado === 'EXCUSA').length);
-  kpiNoAsistio = computed(() => this._rows().filter(r => r.estado === 'NO_ASISTIO').length);
+  kpiTotal     = computed(() => this.rows().length);
+  kpiAsistio   = computed(() => this.rows().filter(r => r.estado === 'ASISTIO').length);
+  kpiTarde     = computed(() => this.rows().filter(r => r.estado === 'TARDE').length);
+  kpiExcusa    = computed(() => this.rows().filter(r => r.estado === 'EXCUSA').length);
+  kpiNoAsistio = computed(() => this.rows().filter(r => r.estado === 'NO_ASISTIO').length);
 
   // Precarga la ficha del paquete una sola vez, cuando el paquete esté disponible.
   private _fichaInicializada = false;
 
   constructor() {
+    // Precarga la ficha del paquete cuando el paquete esté disponible.
     effect(() => {
       const p = this.paquete();
       if (p && !this._fichaInicializada) {
         this._fichaInicializada = true;
         this.fichaSeleccionadaNumero.set(p.fichaId);
+      }
+    });
+
+    // Carga los aprendices cada vez que cambia la ficha seleccionada.
+    effect(() => {
+      const numero = this.fichaSeleccionadaNumero();
+      if (numero) {
+        this.asistenciaFacade.cargarAprendicesPorFichaNumero(numero);
+      }
+    });
+
+    // Prefill: si el paquete ya tiene una asistencia registrada, refleja sus estados.
+    effect(() => {
+      const registro = this.asistenciaFacade.asistencia();
+      if (registro) {
+        this._estados.set(
+          Object.fromEntries(registro.items.map(i => [i.aprendizId, i.estado]))
+        );
+        this.fechaSesion.set(registro.fecha);
       }
     });
   }
@@ -117,19 +143,11 @@ export class PaqueteAsistenciaComponent implements OnInit {
     if (id && (!actual || actual.id !== id)) {
       this.paqueteFacade.cargarPaquete(id);
     }
-    // Carga mock de aprendices (backend no desplegado aún)
-    this._cargarAprendicesMock();
-  }
-
-  private _cargarAprendicesMock(): void {
-    const rows: AprendizRow[] = MOCK_APRENDICES
-      .filter(a => a.estado)
-      .map(a => ({
-        aprendiz: a,
-        nombreCompleto: `${a.nombre} ${a.apellidos}`,
-        estado: 'ASISTIO' as EstadoAsistencia,
-      }));
-    this._rows.set(rows);
+    // Catálogo de fichas para el selector + asistencia previa (reabrir).
+    this.asistenciaFacade.cargarFichas();
+    if (id) {
+      this.asistenciaFacade.cargarAsistencia(id);
+    }
   }
 
   // ── Helpers de UI ─────────────────────────────────────────────────────────
@@ -176,6 +194,7 @@ export class PaqueteAsistenciaComponent implements OnInit {
   }
 
   onFichaChange(event: Event): void {
+    this._estados.set({});
     this.fichaSeleccionadaNumero.set((event.target as HTMLSelectElement).value);
   }
 
@@ -184,22 +203,20 @@ export class PaqueteAsistenciaComponent implements OnInit {
   }
 
   setEstado(aprendizId: string, estado: EstadoAsistencia): void {
-    this._rows.update(rows =>
-      rows.map(r =>
-        r.aprendiz.idUsuario === aprendizId ? { ...r, estado } : r
-      )
-    );
+    this._estados.update(estados => ({ ...estados, [aprendizId]: estado }));
   }
 
   marcarTodosAsistio(): void {
-    this._rows.update(rows => rows.map(r => ({ ...r, estado: 'ASISTIO' as EstadoAsistencia })));
+    this._estados.set(
+      Object.fromEntries(this.aprendices().map(a => [a.idUsuario, 'ASISTIO' as EstadoAsistencia]))
+    );
   }
 
   guardar(): void {
     const p = this.paquete();
     if (!p) return;
 
-    const items: AsistenciaItemRequest[] = this._rows().map(r => ({
+    const items: AsistenciaItemRequest[] = this.rows().map(r => ({
       aprendizId:     r.aprendiz.idUsuario,
       nombreAprendiz: r.nombreCompleto,
       documento:      r.aprendiz.documento,
