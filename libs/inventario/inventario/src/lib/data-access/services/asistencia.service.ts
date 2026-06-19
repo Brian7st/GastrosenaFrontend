@@ -17,6 +17,16 @@ const API_V1       = '/api/v1';
 export class AsistenciaService {
   private http = inject(HttpClient);
 
+  // ── Perfil (usuario logueado) ─────────────────────────────────────────────
+
+  /** Perfil del usuario autenticado — GET /api/perfil. Habilitado para
+   *  INSTRUCTOR/CONTADORA/ADMIN; sirve como "/me" (trae nombre + apellidos). */
+  getPerfil(): Observable<UsuarioResponseDTO> {
+    return this.http
+      .get<UsuarioResponseDTO>(`${API_USUARIOS}/perfil`)
+      .pipe(catchError(err => throwError(() => err)));
+  }
+
   // ── Fichas ──────────────────────────────────────────────────────────────
 
   getFichas(): Observable<FichaResponseDTO[]> {

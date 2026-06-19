@@ -56,6 +56,17 @@ export class PaqueteAsistenciaComponent implements OnInit {
   paquete = this.paqueteFacade.paqueteSeleccionado;
   loading = this.asistenciaFacade.loading;
 
+  /** Nombre del instructor del paquete: usa el perfil del usuario logueado
+   *  (GET /api/perfil) cuando es el mismo instructor; si no, cae al instructorId. */
+  instructorNombre = computed(() => {
+    const p = this.paquete();
+    const perfil = this.asistenciaFacade.perfil();
+    if (p && perfil && perfil.idUsuario === p.instructorId) {
+      return `${perfil.nombre} ${perfil.apellidos}`.trim();
+    }
+    return p?.instructorId ?? '—';
+  });
+
   // ── Fichas y aprendices (datos reales desde el facade) ───────────────────
   readonly fichasDisponibles = this.asistenciaFacade.fichas;
   private readonly aprendices = this.asistenciaFacade.aprendices;
@@ -143,6 +154,8 @@ export class PaqueteAsistenciaComponent implements OnInit {
     if (id && (!actual || actual.id !== id)) {
       this.paqueteFacade.cargarPaquete(id);
     }
+    // Perfil del usuario logueado (para mostrar el nombre del instructor).
+    this.asistenciaFacade.cargarPerfil();
     // Catálogo de fichas para el selector + asistencia previa (reabrir).
     this.asistenciaFacade.cargarFichas();
     if (id) {
@@ -163,8 +176,7 @@ export class PaqueteAsistenciaComponent implements OnInit {
   }
 
   getInicialesPaquete(): string {
-    const p = this.paquete();
-    return p ? this.getIniciales(p.instructorId) : '--';
+    return this.getIniciales(this.instructorNombre());
   }
 
   estadoLabel(estado: EstadoAsistencia): string {

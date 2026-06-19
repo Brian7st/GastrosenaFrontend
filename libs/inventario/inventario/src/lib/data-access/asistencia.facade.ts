@@ -14,6 +14,7 @@ export class AsistenciaFacade {
   private service = inject(AsistenciaService);
 
   // ── Estado interno ───────────────────────────────────────────────────────
+  private _perfil       = signal<UsuarioResponseDTO | null>(null);
   private _fichas       = signal<FichaResponseDTO[]>([]);
   private _aprendices   = signal<UsuarioResponseDTO[]>([]);
   private _asistencia   = signal<AsistenciaResponse | null>(null);
@@ -21,11 +22,21 @@ export class AsistenciaFacade {
   private _error        = signal<string | null>(null);
 
   // ── Exposición pública ───────────────────────────────────────────────────
+  readonly perfil     = computed(() => this._perfil());
   readonly fichas     = computed(() => this._fichas());
   readonly aprendices = computed(() => this._aprendices());
   readonly asistencia = computed(() => this._asistencia());
   readonly loading    = computed(() => this._loading());
   readonly error      = computed(() => this._error());
+
+  // ── Perfil ───────────────────────────────────────────────────────────────
+
+  /** Carga el perfil del usuario logueado (para resolver su nombre). */
+  cargarPerfil(): void {
+    this.service.getPerfil()
+      .pipe(catchError(() => of(null)))
+      .subscribe(perfil => this._perfil.set(perfil));
+  }
 
   // ── Fichas ───────────────────────────────────────────────────────────────
 
