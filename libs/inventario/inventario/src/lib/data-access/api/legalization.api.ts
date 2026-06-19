@@ -191,6 +191,12 @@ export interface RegistrarAsistenciaRequest {
   items: AsistenciaItemRequest[];
 }
 
+/** PUT corregir — el backend (CorregirAsistenciaHttpRequest) solo recibe items;
+ *  ficha y fecha no se reenvían en la corrección. */
+export interface CorregirAsistenciaRequest {
+  items: AsistenciaItemRequest[];
+}
+
 export interface AsistenciaResumen {
   total: number;
   asistio: number;

@@ -6,6 +6,7 @@ import {
   UsuarioResponseDTO,
   AsistenciaResponse,
   RegistrarAsistenciaRequest,
+  CorregirAsistenciaRequest,
 } from './api/legalization.api';
 
 @Injectable({ providedIn: 'root' })
@@ -104,7 +105,7 @@ export class AsistenciaFacade {
 
   actualizarAsistencia(
     paqueteId: string,
-    request: RegistrarAsistenciaRequest
+    request: CorregirAsistenciaRequest
   ): void {
     this._loading.set(true);
     this.service.actualizarAsistencia(paqueteId, request)

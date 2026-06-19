@@ -6,6 +6,7 @@ import {
   FichaResponseDTO,
   UsuarioResponseDTO,
   RegistrarAsistenciaRequest,
+  CorregirAsistenciaRequest,
   AsistenciaResponse,
 } from '../api/legalization.api';
 
@@ -65,7 +66,7 @@ export class AsistenciaService {
 
   actualizarAsistencia(
     paqueteId: string,
-    request: RegistrarAsistenciaRequest
+    request: CorregirAsistenciaRequest
   ): Observable<AsistenciaResponse> {
     return this.http
       .put<AsistenciaResponse>(
