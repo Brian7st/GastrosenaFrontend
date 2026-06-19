@@ -159,7 +159,7 @@ export class PaqueteDetailComponent implements OnInit {
   irAdjuntar(): void {
     const p = this.paquete();
     if (p) {
-      this.router.navigate(['/app/inventario/paquete-probatorio', p.id, 'adjuntar']);
+      this.router.navigate(['/app/inventario/paquete-probatorio', p.id, 'asistencia']);
     }
   }
 
@@ -198,7 +198,7 @@ export class PaqueteDetailComponent implements OnInit {
   cambiarDocumento(tipo: string): void {
     const p = this.paquete();
     if (p) {
-      this.router.navigate(['/app/inventario/paquete-probatorio', p.id, 'adjuntar'], {
+      this.router.navigate(['/app/inventario/paquete-probatorio', p.id, 'asistencia'], {
         queryParams: { tipo },
       });
     }

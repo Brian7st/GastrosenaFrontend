@@ -322,10 +322,10 @@ export const INVENTARIO_ROUTES: Routes = [
           ),
         children: [
           {
-            path: 'adjuntar',
+            path: 'asistencia',
             loadComponent: () =>
-              import('./pages/paquete-probatorio-page/paquete-upload/paquete-upload.component').then(
-                m => m.PaqueteUploadComponent
+              import('./pages/paquete-probatorio-page/paquete-asistencia/paquete-asistencia.component').then(
+                m => m.PaqueteAsistenciaComponent
               ),
           },
           {
