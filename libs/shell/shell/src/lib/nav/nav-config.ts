@@ -145,16 +145,9 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
           permisos: ['MODULO_REPORTES_VER', 'REPORTES_GESTIONAR', 'generar_reporte_facturacion'],
           children: [
             {
-              label: 'Ventas',
-              tKey: 'nav.ventas',
-              ruta: '/app/reportes/ventas',
-              icono: 'trending-up',
-            },
-            {
-              label: 'Inventario',
-              tKey: 'nav.inventario_reportes',
-              ruta: '/app/reportes/inventario',
-              icono: 'warehouse',
+              label: 'Todos  los reportes',
+              ruta: '/app/reportes',
+              icono: 'file-text',
             },
 
           ],
