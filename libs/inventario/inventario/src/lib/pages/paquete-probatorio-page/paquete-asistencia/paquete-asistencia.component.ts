@@ -67,6 +67,17 @@ export class PaqueteAsistenciaComponent implements OnInit {
     return p?.instructorId ?? '—';
   });
 
+  /** Indica si el paquete ya tiene asistencia registrada (badge de estado). */
+  readonly asistenciaRegistrada = computed(() =>
+    !!this.asistenciaFacade.asistencia() || (this.paquete()?.registroAsistenciaAdjunto ?? false)
+  );
+  readonly badgeLabel = computed(() =>
+    this.asistenciaRegistrada() ? 'Asistencia registrada' : 'Pendiente de registro'
+  );
+  readonly badgeVariant = computed<'success' | 'warning'>(() =>
+    this.asistenciaRegistrada() ? 'success' : 'warning'
+  );
+
   // ── Fichas y aprendices (datos reales desde el facade) ───────────────────
   readonly fichasDisponibles = this.asistenciaFacade.fichas;
   private readonly aprendices = this.asistenciaFacade.aprendices;

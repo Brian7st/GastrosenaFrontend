@@ -188,11 +188,13 @@ export class PaqueteDetailComponent implements OnInit {
   verDocumento(tipo: string): void {
     const p = this.paquete();
     if (!p) return;
-    // 'requisicion' y 'asistencia' tienen vista propia; 'acta' aún no.
     if (tipo === 'requisicion') {
       this.router.navigate(['/app/inventario/paquete-probatorio', p.id, 'requisicion']);
     } else if (tipo === 'asistencia') {
       this.router.navigate(['/app/inventario/paquete-probatorio', p.id, 'asistencia']);
+    } else if (tipo === 'acta' && p.actaId) {
+      // El acta vive en su propia página: /app/inventario/actas/:id
+      this.router.navigate(['/app/inventario/actas', p.actaId]);
     }
   }
 

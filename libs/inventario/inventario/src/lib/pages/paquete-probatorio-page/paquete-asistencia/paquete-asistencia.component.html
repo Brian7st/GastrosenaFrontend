@@ -7,7 +7,7 @@
       <inventario-back-button (clicked)="volver()" />
       <h1 class="asistencia-page__title">Llamado de asistencia</h1>
     </div>
-    <restaurant-status-badge label="Pendiente de registro" variant="warning"></restaurant-status-badge>
+    <restaurant-status-badge [label]="badgeLabel()" [variant]="badgeVariant()"></restaurant-status-badge>
   </div>
 
   <!-- ── Tarjeta de Contexto ────────────────────────────────────────────── -->
