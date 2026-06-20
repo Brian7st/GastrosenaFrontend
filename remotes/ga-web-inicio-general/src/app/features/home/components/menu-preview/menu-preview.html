@@ -24,7 +24,7 @@
 
     @if (activeTab() === 'platos') {
       <div class="menu-grid">
-        @for (p of platos; track p.name) {
+        @for (p of platos(); track p.name) {
           <div class="menu-card">
             <div class="menu-card__img">
               <img [src]="p.img" [alt]="p.name" loading="lazy">

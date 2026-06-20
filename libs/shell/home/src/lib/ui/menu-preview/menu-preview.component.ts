@@ -6,13 +6,15 @@ import { catchError, of } from 'rxjs';
 interface MenuItem  { name: string; desc: string; price: number; category: string; img: string; }
 interface DrinkItem { name: string; desc: string; price: number; }
 
-interface RecetaDTO {
+interface RecetaMenuDTO {
+  idReceta: string;
   nombreReceta: string;
   nombreCategoria: string;
   precioUnitario: number;
-  urlImagen: string;
-  activo: boolean;
-  ingredientes?: Array<{ nombre: string }>;
+  urlImagen?: string;
+  temperatura?: string;
+  tiempoPreparacion?: number;
+  disponible?: boolean;
 }
 
 const PLATOS_FALLBACK: MenuItem[] = [
@@ -58,23 +60,22 @@ export class MenuPreviewComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    // El jwtInterceptor añade automáticamente el token si hay sesión activa.
-    // Si cocina está caído o el usuario no está autenticado, catchError mantiene el fallback.
-    this.http.get<RecetaDTO[]>('/api/recetas')
+    // Carta PÚBLICA de cocina: no requiere login (en /api/recetas/menu).
+    // Si cocina está caído o aún no tiene carta, catchError mantiene el fallback.
+    this.http.get<RecetaMenuDTO[]>('/api/recetas/menu')
       .pipe(catchError(() => of(null)))
       .subscribe(recetas => {
-        if (recetas && recetas.length > 0) {
+        const disponibles = (recetas ?? []).filter(r => r.disponible !== false);
+        if (disponibles.length > 0) {
           this.platos.set(
-            recetas
-              .filter(r => r.activo)
-              .slice(0, 6)
-              .map(r => ({
-                name: r.nombreReceta,
-                category: r.nombreCategoria ?? 'Especial',
-                price: r.precioUnitario ?? 0,
-                img: r.urlImagen || PLATOS_FALLBACK[0].img,
-                desc: r.ingredientes?.map(i => i.nombre).join(', ') || '',
-              }))
+            disponibles.slice(0, 6).map(r => ({
+              name: r.nombreReceta,
+              category: r.nombreCategoria ?? 'Especial',
+              price: r.precioUnitario ?? 0,
+              img: r.urlImagen || PLATOS_FALLBACK[0].img,
+              desc: [r.temperatura, r.tiempoPreparacion ? `${r.tiempoPreparacion} min` : null]
+                .filter(Boolean).join(' · ') || (r.nombreCategoria ?? ''),
+            }))
           );
         }
       });
