@@ -322,13 +322,6 @@ export const INVENTARIO_ROUTES: Routes = [
           ),
         children: [
           {
-            path: 'adjuntar',
-            loadComponent: () =>
-              import('./pages/paquete-probatorio-page/paquete-upload/paquete-upload.component').then(
-                m => m.PaqueteUploadComponent
-              ),
-          },
-          {
             path: 'requisicion',
             loadComponent: () =>
               import('./pages/paquete-probatorio-page/paquete-req-detail/paquete-req-detail.component').then(
@@ -336,6 +329,13 @@ export const INVENTARIO_ROUTES: Routes = [
               ),
           },
         ],
+      },
+      {
+        path: ':id/asistencia',
+        loadComponent: () =>
+          import('./pages/paquete-probatorio-page/paquete-asistencia/paquete-asistencia.component').then(
+            m => m.PaqueteAsistenciaComponent
+          ),
       },
     ],
   },

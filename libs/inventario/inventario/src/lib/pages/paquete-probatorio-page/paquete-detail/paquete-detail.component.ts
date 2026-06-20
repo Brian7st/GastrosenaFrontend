@@ -159,7 +159,7 @@ export class PaqueteDetailComponent implements OnInit {
   irAdjuntar(): void {
     const p = this.paquete();
     if (p) {
-      this.router.navigate(['/app/inventario/paquete-probatorio', p.id, 'adjuntar']);
+      this.router.navigate(['/app/inventario/paquete-probatorio', p.id, 'asistencia']);
     }
   }
 
@@ -188,17 +188,20 @@ export class PaqueteDetailComponent implements OnInit {
   verDocumento(tipo: string): void {
     const p = this.paquete();
     if (!p) return;
-    // Solo 'requisicion' tiene ruta hija de detalle. Acta/asistencia aún no
-    // exponen vista propia — evitamos navegar a una ruta inexistente (pantalla en blanco).
     if (tipo === 'requisicion') {
       this.router.navigate(['/app/inventario/paquete-probatorio', p.id, 'requisicion']);
+    } else if (tipo === 'asistencia') {
+      this.router.navigate(['/app/inventario/paquete-probatorio', p.id, 'asistencia']);
+    } else if (tipo === 'acta' && p.actaId) {
+      // El acta vive en su propia página: /app/inventario/actas/:id
+      this.router.navigate(['/app/inventario/actas', p.actaId]);
     }
   }
 
   cambiarDocumento(tipo: string): void {
     const p = this.paquete();
     if (p) {
-      this.router.navigate(['/app/inventario/paquete-probatorio', p.id, 'adjuntar'], {
+      this.router.navigate(['/app/inventario/paquete-probatorio', p.id, 'asistencia'], {
         queryParams: { tipo },
       });
     }

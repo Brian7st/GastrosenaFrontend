@@ -137,7 +137,7 @@
             }
           </div>
 
-          <!-- Registro de Asistencia -->
+          <!-- Registro de Asistencia — navega a /asistencia -->
           <div class="paquete-detail__doc-card" [class.paquete-detail__doc-card--missing]="!p.registroAsistenciaAdjunto">
             <div class="paquete-detail__doc-icon-wrapper" [class.paquete-detail__doc-icon-wrapper--missing]="!p.registroAsistenciaAdjunto">
               <lucide-icon name="users" [size]="20"></lucide-icon>
@@ -154,9 +154,9 @@
                 </button>
               </div>
             } @else {
-              <p class="paquete-detail__doc-missing-text">Falta adjuntar</p>
+              <p class="paquete-detail__doc-missing-text">Falta tomar asistencia</p>
               <button class="paquete-detail__doc-upload-btn" (click)="irAdjuntar()">
-                <lucide-icon name="upload" [size]="14"></lucide-icon> Adjuntar
+                <lucide-icon name="users" [size]="14"></lucide-icon> Tomar asistencia
               </button>
             }
           </div>
