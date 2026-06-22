@@ -22,7 +22,7 @@ export type CreateActividadDTO = Omit<ActividadDTO, 'id' | 'estado'>;
 @Injectable({ providedIn: 'root' })
 export class ActividadService {
   private http = inject(HttpClient);
-  private readonly BASE = 'http://localhost:8082/api/actividades';
+  private readonly BASE = '/api/actividades';
 
   /** Obtiene todas las actividades ordenadas por fecha desc */
   getAll(): Observable<ActividadDTO[]> {

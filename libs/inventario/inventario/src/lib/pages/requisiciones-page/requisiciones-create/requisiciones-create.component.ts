@@ -59,7 +59,9 @@ export class RequisicionesCreateComponent implements OnInit {
 
   // ── Context form ──────────────────────────────────────────────────────────
   contextForm = this.fb.nonNullable.group({
-    fichaId:          ['', Validators.required],
+    // La ficha del SENA es numérica y de longitud variable (6, 7, 8, 9 dígitos):
+    // solo se exige que sea numérica, sin límite de longitud.
+    fichaId:          ['', [Validators.required, Validators.pattern(/^\d+$/)]],
     instructorNombre: ['', Validators.required],
     fecha:            [new Date().toISOString().slice(0, 10), Validators.required],
     horaSesion:       ['07:00', Validators.required],

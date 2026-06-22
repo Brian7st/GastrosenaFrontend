@@ -12,8 +12,14 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error) => {
       console.error('HTTP error captured by shared/api:', error);
       
-      // Si es 401 y la petición NO es de login (para evitar bucle)
-      if (error.status === 401 && !req.url.includes('/auth/login')) {
+      // Solo expulsamos al login si el 401 ocurre DENTRO del área protegida (/app).
+      // En páginas públicas (home, etc.) un 401 de un endpoint no debe sacar al visitante.
+      const enAreaProtegida = router.url.startsWith('/app');
+      if (
+        error.status === 401 &&
+        !req.url.includes('/auth/login') &&
+        enAreaProtegida
+      ) {
         authService.logout();
         router.navigate(['/auth/login']);
       }

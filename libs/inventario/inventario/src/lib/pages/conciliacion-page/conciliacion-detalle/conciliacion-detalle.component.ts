@@ -51,6 +51,15 @@ export class ConciliacionDetalleComponent implements OnInit {
     this.diferenciasList().filter(d => d.estado !== 'RESUELTA').length
   );
 
+  // El valor total de diferencias es una magnitud (≥ 0) que representa una pérdida:
+  // se muestra como negativo. Antes se anteponía '-$' a un valor ya negado, lo que
+  // producía el doble signo "-$-19200".
+  valoracionMonetaria = computed(() => {
+    const total = this.detalle()?.valorTotalDiferencias ?? 0;
+    if (total === 0) return '$0';
+    return '-$' + new Intl.NumberFormat('es-CO').format(total);
+  });
+
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) {

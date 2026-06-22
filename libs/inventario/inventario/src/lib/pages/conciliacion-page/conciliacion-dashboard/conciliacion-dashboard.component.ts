@@ -37,7 +37,6 @@ export class ConciliacionDashboardComponent implements OnInit {
   // Tendencia de merma y actividad reciente — derivadas del historial real
   tendencias = this.facade.tendenciaMensual;
   actividades = this.facade.actividadReciente;
-  ultimaId    = this.facade.ultimaId;
 
   // Mapa de iconos por categoría — alineado con los de la requisición (mismas categorías).
   private readonly iconoPorCategoria: Record<string, string> = {

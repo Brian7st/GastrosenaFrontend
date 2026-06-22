@@ -53,7 +53,9 @@ export function diferenciaFromApi(dto: DiferenciaBackendResponse): DiferenciaIte
     diferencia,
     unidad:      dto.unidad ?? '',
     valorUnit:   dto.valorUnitario,
-    impacto:     dto.valorMonetario,
+    // El backend entrega valorMonetario como magnitud absoluta. Le damos signo:
+    // faltante (sistema > físico → diferencia > 0) es una pérdida → impacto negativo.
+    impacto:     diferencia > 0 ? -dto.valorMonetario : dto.valorMonetario,
     estado:      dto.estado,
     justificacion: dto.justificacion ?? null,
   };

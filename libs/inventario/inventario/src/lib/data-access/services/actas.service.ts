@@ -65,15 +65,6 @@ export class ActasService {
       );
   }
 
-  /** POST /legalization/actas/{id}/exportar — genera el .docx del acta y devuelve el
-   *  acuse con la URL de descarga (urlDescarga) cuando está disponible. */
-  exportarActa(id: string): Observable<{ exportId: string; estado: string; urlDescarga: string | null }> {
-    return this.http
-      .post<{ exportId: string; estado: string; urlDescarga: string | null }>(
-        `${API}/legalization/actas/${id}/exportar`, {})
-      .pipe(catchError(err => throwError(() => err)));
-  }
-
   /** POST /legalization/actas/{id}/revisar — revisorId es @NotBlank en backend */
   revisarActa(id: string, revisorId: string): Observable<boolean> {
     return this.http

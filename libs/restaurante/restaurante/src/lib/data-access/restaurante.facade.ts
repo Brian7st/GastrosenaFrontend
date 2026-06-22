@@ -11,6 +11,7 @@ import { AuthService } from './auth.service';
 import { catchError, of, Observable, forkJoin, switchMap } from 'rxjs';
 
 export interface ItemCarrito {
+  id?: string; // UUID del detalle en base de datos
   productoId: string;
   nombreProducto: string;
   cantidad: number;
@@ -220,6 +221,7 @@ export class RestauranteFacade {
           detalles: p!.detalles.map(d => {
             const productoCat = this._productosMenu().find(pm => pm.id === d.productoId)?.category || 'COMIDA';
             return {
+              id: d.id,
               productoId: d.productoId,
               nombreProducto: d.nombreProducto,
               cantidad: d.cantidad,
@@ -418,6 +420,7 @@ export class RestauranteFacade {
                 detalles: pedidoFull.detalles.map(d => {
                   const prod = this._productosMenu().find(m => m.id === d.productoId || m.name === d.nombreProducto);
                   return {
+                    id: d.id,
                     productoId: d.productoId,
                     nombreProducto: d.nombreProducto,
                     cantidad: d.cantidad,
@@ -467,6 +470,99 @@ export class RestauranteFacade {
         }
       });
     });
+  }
+
+  devolverPedidoActivoEnBackend(motivo: string = ''): Observable<boolean> {
+    const pedido = this.pedidoActivo();
+    if (!pedido || pedido.estado === EstadoPedido.BORRADOR) {
+      return of(false);
+    }
+    return new Observable(observer => {
+      this.restauranteService.devolverPedido(pedido.id, motivo).subscribe({
+        next: () => {
+          this.vaciarCarrito();
+          this.cargarMesas(); // Recargar mesas para actualizar el mapa
+          observer.next(true);
+          observer.complete();
+        },
+        error: (err) => {
+          console.error('[RestauranteFacade] Error al devolver pedido en backend:', err);
+          observer.next(false);
+          observer.complete();
+        }
+      });
+    });
+  }
+
+  cancelarItemPedido(idDetalle: string, motivo: string = ''): Observable<boolean> {
+    return new Observable(observer => {
+      this.restauranteService.cancelarDetallePedido(idDetalle, motivo).subscribe({
+        next: (pedidoFull) => {
+          this.actualizarPedidoActivoDesdeRespuesta(pedidoFull);
+          observer.next(true);
+          observer.complete();
+        },
+        error: (err) => {
+          console.error('[RestauranteFacade] Error al cancelar ítem:', err);
+          observer.next(false);
+          observer.complete();
+        }
+      });
+    });
+  }
+
+  devolverItemPedido(idDetalle: string, motivo: string = ''): Observable<boolean> {
+    return new Observable(observer => {
+      this.restauranteService.devolverDetallePedido(idDetalle, motivo).subscribe({
+        next: (pedidoFull) => {
+          this.actualizarPedidoActivoDesdeRespuesta(pedidoFull);
+          observer.next(true);
+          observer.complete();
+        },
+        error: (err) => {
+          console.error('[RestauranteFacade] Error al devolver ítem:', err);
+          observer.next(false);
+          observer.complete();
+        }
+      });
+    });
+  }
+
+  private actualizarPedidoActivoDesdeRespuesta(pedidoFull: PedidoResponse): void {
+    // Si el backend devuelve un pedido cancelado o devuelto totalmente (porque era el último ítem)
+    if (pedidoFull.estado === EstadoPedido.CANCELADO) {
+      this.vaciarCarrito();
+      this.cargarMesas();
+      return;
+    }
+
+    const pedidoParaCarrito: PedidoCarrito = {
+      id: pedidoFull.id,
+      mesaId: pedidoFull.mesaId,
+      meseroId: pedidoFull.meseroId,
+      numeroComensales: pedidoFull.numeroComensales,
+      estado: pedidoFull.estado,
+      fechaCreacion: pedidoFull.fechaCreacion,
+      subtotal: pedidoFull.subtotal,
+      detalles: pedidoFull.detalles.map(d => {
+        const prod = this._productosMenu().find(m => m.id === d.productoId || m.name === d.nombreProducto);
+        return {
+          id: d.id,
+          productoId: d.productoId,
+          nombreProducto: d.nombreProducto,
+          cantidad: d.cantidad,
+          precioUnitario: d.precioUnitario,
+          categoria: prod ? prod.category : 'COMIDA',
+          observaciones: d.observaciones || undefined
+        };
+      })
+    };
+    
+    this._pedidoActivo.set(pedidoParaCarrito);
+    this._ordenesHistorial.update(historial =>
+      historial.map(p => p.id === pedidoFull.id ? pedidoParaCarrito : p)
+    );
+    this.guardarEstadoLocal();
   }
 
   private iniciarCarrito(mesaId: string, numeroComensales: number): void {

@@ -342,26 +342,29 @@
         flex: 1;
         width: 100%;
       }
-
-      &.btn-anular {
-        button.app-btn {
-          background-color: var(--color-error, #ba1a1a);
-          color: var(--color-en-primario, #ffffff);
-          border-color: transparent;
-
-          &:hover {
-            background-color: var(--color-danger, #d63031);
-            transform: scale(1.02);
-          }
-        }
-      }
     }
   }
 }
 
-::ng-deep .full-width-btn {
-  width: 100%;
-  display: block;
+::ng-deep {
+  .btn-anular {
+    --color-primario: var(--color-error);
+    --color-primario-gradient-end: var(--color-error);
+    --shadow-primary: none;
+    --shadow-primary-hover: none;
+  }
+
+  .btn-devolver {
+    --color-primario: var(--color-warning);
+    --color-primario-gradient-end: var(--color-warning);
+    --shadow-primary: none;
+    --shadow-primary-hover: none;
+  }
+  
+  .full-width-btn {
+    width: 100%;
+    display: block;
+  }
 }
 
 /* Modal personalizado para confirmación de pedido */

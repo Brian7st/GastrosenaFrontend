@@ -90,28 +90,6 @@ export class ActasFacade {
       });
   }
 
-  /** POST /legalization/actas/{id}/exportar — genera el .docx y dispara la descarga. */
-  exportarActa(id: string): void {
-    this._loading.set(true);
-    this._error.set(null);
-    this.actasService.exportarActa(id)
-      .pipe(
-        catchError(() => {
-          this._error.set('Error al exportar el acta');
-          return of(null);
-        }),
-        finalize(() => this._loading.set(false))
-      )
-      .subscribe(acuse => {
-        if (acuse?.urlDescarga) {
-          // Abre/baja el .docx generado por el servicio de reportes.
-          window.open(acuse.urlDescarga, '_blank', 'noopener');
-        } else if (acuse) {
-          this._error.set('El acta se generó pero aún no hay URL de descarga disponible.');
-        }
-      });
-  }
-
   /** POST /legalization/actas/{id}/revisar — revisorId obligatorio (@NotBlank en backend). */
   revisarActa(id: string, revisorId: string): void {
     this._loading.set(true);

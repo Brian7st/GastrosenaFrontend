@@ -142,26 +142,11 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
         },
 
         {
-          label: 'Reportes y estadísticas',
-          tKey: 'nav.reportes',
+          label: 'Reportes',
+          //tKey: 'nav.reportes',
           ruta: '/app/reportes',
           icono: 'pie-chart',
           permisos: ['MODULO_REPORTES_VER', 'REPORTES_GESTIONAR', 'generar_reporte_facturacion'],
-          children: [
-            {
-              label: 'Ventas',
-              tKey: 'nav.ventas',
-              ruta: '/app/reportes/ventas',
-              icono: 'trending-up',
-            },
-            {
-              label: 'Inventario',
-              tKey: 'nav.inventario_reportes',
-              ruta: '/app/reportes/inventario',
-              icono: 'warehouse',
-            },
-
-          ],
         },
       ],
     },
