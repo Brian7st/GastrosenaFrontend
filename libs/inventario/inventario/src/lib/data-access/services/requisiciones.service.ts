@@ -109,12 +109,13 @@ export class RequisicionesService {
       );
   }
 
-  /** POST /legalization/requisiciones/{id}/exportar — genera el soporte (.docx) y
-   *  devuelve el acuse con la URL de descarga (urlDescarga) cuando está disponible. */
-  exportarRequisicion(id: string): Observable<{ exportId: string; estado: string; urlDescarga: string | null }> {
+  /** GET /api/reportes/requisicion — el PDF lo genera el microservicio de reportes. */
+  exportarRequisicion(id: string): Observable<Blob> {
     return this.http
-      .post<{ exportId: string; estado: string; urlDescarga: string | null }>(
-        `${API}/legalization/requisiciones/${id}/exportar`, {})
+      .get(`/api/reportes/requisicion`, {
+        params: { id, formato: 'PDF' },
+        responseType: 'blob',
+      })
       .pipe(catchError(err => throwError(() => err)));
   }
 
