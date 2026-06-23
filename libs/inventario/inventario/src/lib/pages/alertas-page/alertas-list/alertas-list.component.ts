@@ -107,6 +107,11 @@ export class AlertasListComponent implements OnInit {
     this.router.navigate(['/app/inventario/alertas/configuracion']);
   }
 
+  /** Descarga el historial de alertas en CSV (generado en cliente). */
+  onExportarCSV(): void {
+    this.facade.exportarHistorialCSV();
+  }
+
   onSearch(event: Event): void {
     this.searchText.set((event.target as HTMLInputElement).value);
   }

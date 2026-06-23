@@ -257,9 +257,18 @@ export class PresupuestoService {
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  /** TODO FE-06 — exportar: endpoint pendiente */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  exportar(_formato: string): Observable<Blob> {
-    return throwError(() => new Error('exportar: endpoint no disponible — pendiente FE-06'));
+  /**
+   * GET /api/reportes/presupuesto-general — el documento lo genera ga-ms-reportes.
+   * `anio` es obligatorio en el backend; `mes` es opcional. formato: PDF (default) o EXCEL → xlsx.
+   */
+  exportar(anio: number, formato: string, mes?: number): Observable<Blob> {
+    const fmt = formato.toLowerCase() === 'pdf' ? 'PDF' : 'EXCEL';
+    let params = new HttpParams().set('anio', String(anio)).set('formato', fmt);
+    if (mes != null) {
+      params = params.set('mes', String(mes));
+    }
+    return this.http
+      .get(`/api/reportes/presupuesto-general`, { params, responseType: 'blob' })
+      .pipe(catchError(err => throwError(() => err)));
   }
 }

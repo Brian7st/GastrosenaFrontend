@@ -37,6 +37,14 @@ export class ActasPrintComponent implements OnInit {
     window.print();
   }
 
+  /** Descarga el PDF oficial del acta generado por ga-ms-reportes. */
+  exportarPdf(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.facade.exportarActaPdf(id);
+    }
+  }
+
   volver(): void {
     const id = this.route.snapshot.paramMap.get('id');
     this.router.navigate(['/app/inventario/actas', id]);

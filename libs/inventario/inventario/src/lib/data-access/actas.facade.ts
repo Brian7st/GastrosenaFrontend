@@ -8,6 +8,7 @@ import {
   FirmanteActa,
 } from '../models/acta.model';
 import { CrearActaRequest } from './api/legalization.api';
+import { descargarBlob } from '../util';
 
 @Injectable({ providedIn: 'root' })
 export class ActasFacade {
@@ -102,5 +103,19 @@ export class ActasFacade {
         finalize(() => this._loading.set(false))
       )
       .subscribe(ok => { if (ok) this.cargarActa(id); });
+  }
+
+  /** Descarga el PDF del acta (lo genera ga-ms-reportes vía /api/reportes/acta). */
+  exportarActaPdf(id: string): void {
+    this._loading.set(true);
+    this.actasService.exportarActa(id)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al exportar el acta a PDF');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false)),
+      )
+      .subscribe(blob => { if (blob) descargarBlob(blob, `acta_${id}.pdf`); });
   }
 }

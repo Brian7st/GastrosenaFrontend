@@ -34,6 +34,25 @@ import { solicitudSesionFromApi } from '../mappers/training.mapper';
 
 const API = '/api/v1';
 
+/** Ítem del PDF del GIL que espera ga-ms-reportes (GilPdfRequest.Item). */
+export interface GilPdfItem {
+  codigo: string;
+  descripcion: string;
+  cantidad: string;
+  unidad: string;
+}
+
+/** Body que ga-ms-reportes espera en POST /api/reportes/gil/pdf (GilPdfRequest). */
+export interface GilPdfBody {
+  gilId: string;
+  numeroGil: string;
+  regionalNombre: string;
+  centroNombre: string;
+  solicitante: string;
+  fecha: string;
+  items: GilPdfItem[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class SolicitudesService {
   private http = inject(HttpClient);
@@ -312,5 +331,12 @@ export class SolicitudesService {
         map(solicitudSesionFromApi),
         catchError(err => throwError(() => err))
       );
+  }
+
+  /** POST /api/reportes/gil/pdf — reportes genera el PDF del GIL (GIL-F-014). */
+  exportarGilPdf(body: GilPdfBody): Observable<Blob> {
+    return this.http
+      .post(`/api/reportes/gil/pdf`, body, { responseType: 'blob' })
+      .pipe(catchError(err => throwError(() => err)));
   }
 }

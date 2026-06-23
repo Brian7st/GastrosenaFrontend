@@ -115,4 +115,19 @@ export class ConciliacionService {
         catchError(err => throwError(() => err))
       );
   }
+
+  /**
+   * GET /api/reportes/conciliacion — el documento lo genera ga-ms-reportes.
+   * fechaInicio/fechaFin en formato ISO (YYYY-MM-DD); formato: PDF (default) o EXCEL → xlsx.
+   */
+  exportarConciliacion(fechaInicio: string, fechaFin: string, formato: string): Observable<Blob> {
+    const fmt = formato.toLowerCase() === 'pdf' ? 'PDF' : 'EXCEL';
+    const params = new HttpParams()
+      .set('fechaInicio', fechaInicio)
+      .set('fechaFin', fechaFin)
+      .set('formato', fmt);
+    return this.http
+      .get(`/api/reportes/conciliacion`, { params, responseType: 'blob' })
+      .pipe(catchError(err => throwError(() => err)));
+  }
 }
