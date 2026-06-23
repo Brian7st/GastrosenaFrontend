@@ -14,6 +14,8 @@ import {
   KpiCardComponent,
   LucideIconComponent,
 } from '@restaurant/shared/ui';
+import { AuthService } from '@restaurant/shared/auth';
+import { Rol } from '@restaurant/shared/models';
 import { FichasService } from '../../data-access/fichas.service';
 import { I18nService } from '../../i18n/i18n.service';
 import { Ficha } from '../../models/ficha.model';
@@ -37,7 +39,11 @@ type EstadoFiltro = 'todos' | 'activas' | 'inactivas';
 export class FichasPageComponent implements OnInit {
   private readonly fichasService = inject(FichasService);
   private readonly router = inject(Router);
+  private readonly auth = inject(AuthService);
   protected readonly i18n = inject(I18nService);
+
+  // Crear/editar/borrar fichas: solo ADMINISTRADOR. El INSTRUCTOR solo consulta.
+  readonly esAdmin = computed(() => this.auth.currentUser()?.rol === Rol.ADMINISTRADOR);
 
   readonly fichas = signal<Ficha[]>([]);
   readonly loading = signal(false);
