@@ -1,3 +1,4 @@
+import { Rol } from '@restaurant/shared/models';
 import { BarraLateralConfig, TopNavLink } from './nav.models';
 
 export const TOP_MENU_CONFIG: TopNavLink[] = [];
@@ -98,6 +99,9 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
           label: 'Fichas',
           ruta: '/app/fichas',
           icono: 'book-open',
+          // Solo ADMINISTRADOR e INSTRUCTOR pueden ver/gestionar fichas
+          // (coincide con @RequireRole del FichaController en usuarios).
+          roles: [Rol.ADMINISTRADOR, Rol.INSTRUCTOR],
           children: [
             { label: 'Lista de Fichas', ruta: '/app/fichas', icono: 'list' },
           ],
