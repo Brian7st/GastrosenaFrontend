@@ -19,6 +19,7 @@ import {
   PagoData,
   EstadoCompromiso,
 } from '../models/presupuesto.model';
+import { descargarBlob } from '../util';
 
 @Injectable({ providedIn: 'root' })
 export class PresupuestoFacade {
@@ -321,17 +322,23 @@ export class PresupuestoFacade {
       .subscribe(() => this.loadAll());
   }
 
-  /** Exportar — pendiente backend (FE-06) */
+  /**
+   * Exporta el presupuesto general (lo genera ga-ms-reportes).
+   * El año se toma del presupuesto seleccionado (`vigencia`); si no hay uno
+   * cargado, cae al año actual.
+   */
   exportar(formato: string): void {
+    const anio = this._presupuestoSeleccionado()?.vigencia ?? new Date().getFullYear();
+    const ext = formato.toLowerCase() === 'pdf' ? 'pdf' : 'xlsx';
     this._loading.set(true);
-    this.presupuestoService.exportar(formato)
+    this.presupuestoService.exportar(anio, formato)
       .pipe(
         catchError(() => {
-          this._error.set('Exportación pendiente de implementación en backend');
+          this._error.set('Error al exportar el presupuesto');
           return of(null);
         }),
         finalize(() => this._loading.set(false)),
       )
-      .subscribe();
+      .subscribe(blob => { if (blob) descargarBlob(blob, `presupuesto_${anio}.${ext}`); });
   }
 }

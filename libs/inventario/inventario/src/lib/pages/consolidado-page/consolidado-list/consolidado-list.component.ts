@@ -112,9 +112,8 @@ export class ConsolidadoListComponent implements OnInit {
     this.showExportModal.set(false);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onExport(_format: 'excel' | 'pdf'): void {
-    // Exportación real pendiente de integración HTTP
+  onExport(format: 'excel' | 'pdf'): void {
+    this.facade.exportarReporte(format);
     this.showExportModal.set(false);
   }
 

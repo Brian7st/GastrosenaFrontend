@@ -1,14 +1,17 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { catchError, finalize, of } from 'rxjs';
 import { ConsolidadoService } from './services/consolidado.service';
+import { ConciliacionService } from './services/conciliacion.service';
 import { Consolidado, GenerarConsolidadoData, ElegibleConsolidado } from '../models/consolidado.model';
 import { EjecucionPresupuestal } from '../models/reporting.model';
+import { descargarBlob } from '../util';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ConsolidadoFacade {
   private consolidadoService = inject(ConsolidadoService);
+  private conciliacionService = inject(ConciliacionService);
 
   private _consolidados            = signal<Consolidado[]>([]);
   private _consolidadoSeleccionado = signal<Consolidado | null>(null);
@@ -35,6 +38,28 @@ export class ConsolidadoFacade {
         finalize(() => this._loading.set(false)),
       )
       .subscribe(data => this._consolidados.set(data));
+  }
+
+  /**
+   * Exporta el reporte contable vía ga-ms-reportes (GET /api/reportes/conciliacion).
+   * El backend exige un rango de fechas; por defecto se toma el MES ACTUAL
+   * (del día 1 a hoy). Si se necesita otro rango, agregar un selector al modal.
+   */
+  exportarReporte(formato: string): void {
+    const hoy = new Date();
+    const inicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+    const iso = (d: Date) => d.toISOString().slice(0, 10);
+    const ext = formato.toLowerCase() === 'pdf' ? 'pdf' : 'xlsx';
+    this._loading.set(true);
+    this.conciliacionService.exportarConciliacion(iso(inicio), iso(hoy), formato)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al exportar el reporte del consolidado');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false)),
+      )
+      .subscribe(blob => { if (blob) descargarBlob(blob, `consolidado_${iso(hoy)}.${ext}`); });
   }
 
   /**

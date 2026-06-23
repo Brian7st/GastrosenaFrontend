@@ -3,6 +3,7 @@ import { Component, inject, ChangeDetectionStrategy, signal } from '@angular/cor
 import { Router, RouterModule } from '@angular/router';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { KardexFacade } from '../../../data-access/kardex.facade';
 
 @Component({
   selector: 'restaurant-movimiento-export',
@@ -15,6 +16,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 export class MovimientoExportComponent {
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private facade = inject(KardexFacade);
 
   exportForm: FormGroup = this.fb.group({
     fechaInicio: ['', Validators.required],
@@ -34,7 +36,8 @@ export class MovimientoExportComponent {
 
   onSubmit(): void {
     if (this.exportForm.valid) {
-      // TODO: llamar a movimientosService.exportar(config)
+      const { fechaInicio, fechaFin } = this.exportForm.value;
+      this.facade.exportarUsoBienes(fechaInicio, fechaFin, this.formatoSeleccionado());
       this.closeModal();
     }
   }

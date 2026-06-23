@@ -75,6 +75,16 @@ export class ActasService {
       );
   }
 
+  /** GET /api/reportes/acta — el PDF lo genera el microservicio de reportes. */
+  exportarActa(id: string): Observable<Blob> {
+    return this.http
+      .get(`/api/reportes/acta`, {
+        params: { id, formato: 'PDF' },
+        responseType: 'blob',
+      })
+      .pipe(catchError(err => throwError(() => err)));
+  }
+
   /** TODO: insumos/compromisos/firmantes — verificar si el backend los expone por separado */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getInsumosByActa(_id: string): Observable<InsumoActa[]> {

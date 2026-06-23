@@ -77,12 +77,12 @@ export class BienExportPageComponent {
         : undefined,
     };
 
-    const bienesParaExportar = this.facade.bienes();
-
     if (config.formato === 'csv') {
-      this.bienExportService.exportToCsv(bienesParaExportar);
+      // CSV se arma en cliente con la lista filtrada en pantalla.
+      this.bienExportService.exportToCsv(this.facade.bienes());
     } else {
-      this.bienExportService.exportToPdf(bienesParaExportar);
+      // PDF/Excel: el reporte lo genera ga-ms-reportes (server-side).
+      this.bienExportService.exportToPdf(config.formato, !config.soloActivos);
     }
 
     this.isGenerating.set(false);

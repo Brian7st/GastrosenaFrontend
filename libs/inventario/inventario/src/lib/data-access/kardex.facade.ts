@@ -11,6 +11,7 @@ import {
 import { ExistenciaProducto } from '../models/inventario.model';
 import { KardexValorizadoItem } from '../models/reporting.model';
 import { MovimientosService } from './services/movimientos.service';
+import { descargarBlob } from '../util';
 
 @Injectable({ providedIn: 'root' })
 export class KardexFacade {
@@ -46,6 +47,21 @@ export class KardexFacade {
   public loading                  = computed(() => this._loading());
   public error                    = computed(() => this._error());
   public paginacion               = computed(() => this._paginacion());
+
+  /** Descarga el reporte de uso/movimientos de bienes (lo genera ga-ms-reportes). */
+  exportarUsoBienes(fechaInicio: string, fechaFin: string, formato: string): void {
+    const ext = formato.toLowerCase() === 'pdf' ? 'pdf' : 'xlsx';
+    this._loading.set(true);
+    this.movimientosService.exportarUsoBienes(fechaInicio, fechaFin, formato)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al exportar el reporte de uso de bienes');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false)),
+      )
+      .subscribe(blob => { if (blob) descargarBlob(blob, `uso_bienes_${fechaInicio}_${fechaFin}.${ext}`); });
+  }
 
   // ── Documentos agrupados ─────────────────────────────────────────────────────
 
