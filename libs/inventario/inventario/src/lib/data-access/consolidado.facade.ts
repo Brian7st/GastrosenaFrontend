@@ -1,7 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { catchError, finalize, of } from 'rxjs';
 import { ConsolidadoService } from './services/consolidado.service';
-import { ConciliacionService } from './services/conciliacion.service';
+import { PresupuestoService } from './services/presupuesto.service';
 import { Consolidado, GenerarConsolidadoData, ElegibleConsolidado } from '../models/consolidado.model';
 import { EjecucionPresupuestal } from '../models/reporting.model';
 import { descargarBlob } from '../util';
@@ -11,7 +11,7 @@ import { descargarBlob } from '../util';
 })
 export class ConsolidadoFacade {
   private consolidadoService = inject(ConsolidadoService);
-  private conciliacionService = inject(ConciliacionService);
+  private presupuestoService = inject(PresupuestoService);
 
   private _consolidados            = signal<Consolidado[]>([]);
   private _consolidadoSeleccionado = signal<Consolidado | null>(null);
@@ -41,17 +41,15 @@ export class ConsolidadoFacade {
   }
 
   /**
-   * Exporta el reporte contable vía ga-ms-reportes (GET /api/reportes/conciliacion).
-   * El backend exige un rango de fechas; por defecto se toma el MES ACTUAL
-   * (del día 1 a hoy). Si se necesita otro rango, agregar un selector al modal.
+   * Exporta el reporte de Ejecución Presupuestal del año en curso vía ga-ms-reportes
+   * (GET /api/reportes/presupuesto-general). El backend genera el documento por AÑO;
+   * no existe export por-consolidado individual.
    */
   exportarReporte(formato: string): void {
-    const hoy = new Date();
-    const inicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-    const iso = (d: Date) => d.toISOString().slice(0, 10);
+    const anio = new Date().getFullYear();
     const ext = formato.toLowerCase() === 'pdf' ? 'pdf' : 'xlsx';
     this._loading.set(true);
-    this.conciliacionService.exportarConciliacion(iso(inicio), iso(hoy), formato)
+    this.presupuestoService.exportar(anio, formato)
       .pipe(
         catchError(() => {
           this._error.set('Error al exportar el reporte del consolidado');
@@ -59,7 +57,7 @@ export class ConsolidadoFacade {
         }),
         finalize(() => this._loading.set(false)),
       )
-      .subscribe(blob => { if (blob) descargarBlob(blob, `consolidado_${iso(hoy)}.${ext}`); });
+      .subscribe(blob => { if (blob) descargarBlob(blob, `ejecucion_presupuestal_${anio}.${ext}`); });
   }
 
   /**
