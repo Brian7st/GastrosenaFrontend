@@ -116,7 +116,7 @@ describe('FacturaImportPageComponent — cantidadesRecibidas logic', () => {
       ]);
       component['cantidadesRecibidas'].set([10, null]);
 
-      const spy = jasmine.createSpy();
+      const spy = jest.fn();
       facadeMock.conciliarEnImportacion = spy;
 
       component.onConciliar();
@@ -130,7 +130,7 @@ describe('FacturaImportPageComponent — cantidadesRecibidas logic', () => {
       ]);
       component['cantidadesRecibidas'].set([5]);
 
-      const spy = jasmine.createSpy();
+      const spy = jest.fn();
       facadeMock.conciliarEnImportacion = spy;
 
       component.onConciliar();
@@ -148,7 +148,7 @@ describe('FacturaImportPageComponent — cantidadesRecibidas logic', () => {
       ]);
       component['cantidadesRecibidas'].set([7, 99]);
 
-      const spy = jasmine.createSpy();
+      const spy = jest.fn();
       facadeMock.conciliarEnImportacion = spy;
 
       component.onConciliar();
