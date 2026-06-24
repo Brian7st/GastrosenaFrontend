@@ -211,6 +211,11 @@
     <div class="perfil-exito">{{ i18n.t('perfil.exito') }}</div>
   }
 
+  <!-- Mensaje de error -->
+  @if (errorMsg()) {
+  <div class="perfil-error">{{ errorMsg() }}</div>
+  }
+
   <!-- Botones de acción -->
   <div class="perfil-actions">
     <restaurant-button variant="surface" (click)="onCancelar()">
