@@ -6,7 +6,7 @@ test.describe('Inventario · Presupuesto (registrar contra backend real)', () =>
 
     await expect(page.locator('input[formcontrolname="fichaId"]')).toBeVisible();
     await page.locator('input[formcontrolname="fichaId"]').fill(`${Date.now()}`.slice(-7));
-    await page.locator('input[formcontrolname="programaFormacion"]').fill('Cocina E2E');
+    await page.locator('select[formcontrolname="programaFormacion"]').selectOption({ index: 1 });
     await page.locator('select[formcontrolname="vigencia"]').selectOption({ index: 1 });
     await page.locator('input[formcontrolname="fechaAprobacion"]').fill('2026-06-09');
     await page.locator('input[formcontrolname="rubroDescripcion"]').fill('Insumos de cocina');

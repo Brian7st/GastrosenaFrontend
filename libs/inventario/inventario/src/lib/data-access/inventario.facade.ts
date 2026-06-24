@@ -1,6 +1,5 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
 import { Bien, BienFiltros, BienKpis, BienFormDto, BienPaginacion } from '../models/inventario.model';
-import { ExportacionProductosResponse } from './api/catalog.api';
 import { BienesService } from './services/bienes.service';
 import { finalize, catchError, of, switchMap, forkJoin } from 'rxjs';
 
@@ -17,7 +16,6 @@ export class InventarioFacade {
   private _filtros             = signal<BienFiltros>({ page: 0, size: 10 });
   private _paginacion          = signal<BienPaginacion>({ totalElements: 0, totalPages: 1, page: 0, size: 10 });
   private _bienSeleccionado    = signal<Bien | undefined>(undefined);
-  private _exportacionPendiente = signal<ExportacionProductosResponse | null>(null);
   private _error               = signal<string | null>(null);
 
   // Exposición pública (Solo lectura)
@@ -27,7 +25,6 @@ export class InventarioFacade {
   public filtros              = computed(() => this._filtros());
   public paginacion           = computed(() => this._paginacion());
   public bienSeleccionado     = computed(() => this._bienSeleccionado());
-  public exportacionPendiente = computed(() => this._exportacionPendiente());
   public error                = computed(() => this._error());
 
   /**
@@ -251,19 +248,5 @@ export class InventarioFacade {
         finalize(() => this._loading.set(false))
       )
       .subscribe(res => { if (res !== null) this.loadAll(); });
-  }
-
-  /** POST /catalog/productos/exportaciones (202 Accepted — async) */
-  solicitarExportacion(formato: 'CSV'): void {
-    this._loading.set(true);
-    this.bienesService.solicitarExportacion(formato)
-      .pipe(
-        catchError(() => {
-          this._error.set('Error al solicitar la exportación');
-          return of(null);
-        }),
-        finalize(() => this._loading.set(false))
-      )
-      .subscribe(res => { if (res !== null) this._exportacionPendiente.set(res); });
   }
 }

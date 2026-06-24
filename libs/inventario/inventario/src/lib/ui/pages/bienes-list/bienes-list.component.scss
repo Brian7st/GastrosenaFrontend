@@ -43,7 +43,7 @@
 /* ── Panel de filtros colapsable ───────────────────────────────────────────── */
 .filter-panel {
   background: var(--color-superficie-contenedor-mas-bajo);
-  border-bottom: 1px solid #f3f4f5;
+  border-bottom: 1px solid var(--color-superficie-contenedor-bajo);
   padding: 1rem 1.5rem;
 
   &__row {
@@ -129,6 +129,8 @@
   font-size: 0.75rem;
   font-weight: 700;
   color: var(--color-pizarra-400);
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .bien-desc {
@@ -140,7 +142,8 @@
 /* ── Anchos de columna — prioridad a Descripción ──────────────────────────── */
 thead th,
 tbody .table-row td {
-  &:nth-child(1) { width: 6.5rem; white-space: nowrap; }  /* CÓD. SENA  */
+  /* CÓD. SENA — ancho acotado; los códigos largos envuelven (no se desbordan). */
+  &:nth-child(1) { width: 6.5rem; overflow-wrap: anywhere; word-break: break-word; }
   &:nth-child(2) { width: auto;   min-width: 18rem;     }  /* Descripción (absorbe el resto) */
   &:nth-child(3) { width: 5rem;   white-space: nowrap; }  /* Stock      */
   &:nth-child(4) { width: 6rem;   white-space: nowrap; }  /* Stock Mín. */

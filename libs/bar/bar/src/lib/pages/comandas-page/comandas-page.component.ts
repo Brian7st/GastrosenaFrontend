@@ -5,8 +5,7 @@ import { interval, Subscription } from 'rxjs';
 import {
   PageHeaderComponent,
   SearchFilterComponent,
-  SelectFilterComponent,
-  SectionTitleComponent
+  SelectFilterComponent
 } from '@restaurant/shared/ui';
 import { ComandaService } from '../../data-access/comanda.service';
 import { ComandaBarYBarismo, ComandaItem } from '../../models/comanda.model';
@@ -21,7 +20,6 @@ import { ComandaCardComponent } from '../../components/comanda-card/comanda-card
     PageHeaderComponent,
     SearchFilterComponent,
     SelectFilterComponent,
-    SectionTitleComponent,
     ComandaCardComponent
   ],
   templateUrl: './comandas-page.component.html',

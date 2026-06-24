@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LucideIconComponent, CardComponent, PageHeaderComponent, ButtonComponent } from '@restaurant/shared/ui';
+import { inject } from '@angular/core';
+import { RestauranteFacade } from '../../data-access/restaurante.facade';
 
 @Component({
   selector: 'restaurant-pedidos-hub-page',
@@ -18,4 +20,7 @@ import { LucideIconComponent, CardComponent, PageHeaderComponent, ButtonComponen
   styleUrls: ['./pedidos-hub-page.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PedidosHubPageComponent {}
+export class PedidosHubPageComponent {
+  private facade = inject(RestauranteFacade);
+  puedeAdministrarMesas = this.facade.puedeAdministrarMesas;
+}

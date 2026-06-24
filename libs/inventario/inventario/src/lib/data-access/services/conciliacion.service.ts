@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import {
@@ -98,13 +98,36 @@ export class ConciliacionService {
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  /** GET /reconciliation/conciliaciones/catalogo — catálogo activo con stock del sistema */
-  getTomaFisicaItems(): Observable<TomaFisicaItem[]> {
+  /**
+   * GET /reconciliation/conciliaciones/catalogo — catálogo activo con stock del sistema.
+   * Si se indica `categoria`, el backend devuelve solo los bienes de esa categoría
+   * (toma física por categoría).
+   */
+  getTomaFisicaItems(categoria?: string): Observable<TomaFisicaItem[]> {
+    let params = new HttpParams();
+    if (categoria && categoria.trim().length > 0) {
+      params = params.set('categoria', categoria.trim());
+    }
     return this.http
-      .get<CatalogoItemResponse[]>(`${API}/reconciliation/conciliaciones/catalogo`)
+      .get<CatalogoItemResponse[]>(`${API}/reconciliation/conciliaciones/catalogo`, { params })
       .pipe(
         map(list => list.map(catalogoItemToTomaFisicaItem)),
         catchError(err => throwError(() => err))
       );
+  }
+
+  /**
+   * GET /api/reportes/conciliacion — el documento lo genera ga-ms-reportes.
+   * fechaInicio/fechaFin en formato ISO (YYYY-MM-DD); formato: PDF (default) o EXCEL → xlsx.
+   */
+  exportarConciliacion(fechaInicio: string, fechaFin: string, formato: string): Observable<Blob> {
+    const fmt = formato.toLowerCase() === 'pdf' ? 'PDF' : 'EXCEL';
+    const params = new HttpParams()
+      .set('fechaInicio', fechaInicio)
+      .set('fechaFin', fechaFin)
+      .set('formato', fmt);
+    return this.http
+      .get(`/api/reportes/conciliacion`, { params, responseType: 'blob' })
+      .pipe(catchError(err => throwError(() => err)));
   }
 }

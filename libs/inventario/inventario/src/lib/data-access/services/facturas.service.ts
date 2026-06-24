@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { forkJoin, Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { Factura, FacturaFiltros, FacturaKpis, FacturaPaginacion, SolicitudGIL, EstadoGIL, ConciliacionGil, FacturaFormDto, GilPickerItem } from '../../models/facturas.model';
+import { Factura, FacturaFiltros, FacturaKpis, FacturaPaginacion, SolicitudGIL, EstadoGIL, ConciliacionGil, FacturaFormDto, GilPickerItem, NotaCredito, RegistrarNotaCreditoRequest } from '../../models/facturas.model';
 import {
   ActualizarFacturaRequest,
   AnularFacturaRequest,
@@ -13,15 +13,33 @@ import {
   ConciliarRequest,
   ResolverDiferenciaGilRequest,
   VincularInstructorRequest,
+  NotaCreditoResponse,
+  RegistrarNotaCreditoApiRequest,
+  ResolverNotaCreditoRequest,
+  ResolverNotaCreditoResponse,
 } from '../api/sourcing.api';
 import { BienGilResponse, GilResponse } from '../api/procurement.api';
-import { facturaFromApi, conciliacionGilFromApi, facturaFormToRequest } from '../mappers/sourcing.mapper';
+import { facturaFromApi, conciliacionGilFromApi, facturaFormToRequest, notaCreditoFromApi } from '../mappers/sourcing.mapper';
 
 const API = '/api/v1';
 
 @Injectable({ providedIn: 'root' })
 export class FacturasService {
   private http = inject(HttpClient);
+
+  /**
+   * GET /api/reportes/facturacion — reporte GENERAL de facturación por rango de fechas.
+   * Lo genera ga-ms-reportes (server-side). No existe export por-factura en el backend.
+   */
+  exportarFacturacion(fechaInicio: string, fechaFin: string, formato: 'PDF' | 'EXCEL'): Observable<Blob> {
+    const params = new HttpParams()
+      .set('fechaInicio', fechaInicio)
+      .set('fechaFin', fechaFin)
+      .set('formato', formato);
+    return this.http
+      .get('/api/reportes/facturacion', { params, responseType: 'blob' })
+      .pipe(catchError(err => throwError(() => err)));
+  }
 
   getFacturas(filtros?: FacturaFiltros): Observable<{ facturas: Factura[]; paginacion: FacturaPaginacion }> {
     let params = new HttpParams();
@@ -249,6 +267,38 @@ export class FacturasService {
       }),
       catchError(err => throwError(() => err))
     );
+  }
+
+  /** POST /api/v1/notas-credito — registra una nota crédito por sobre-facturación */
+  registrarNotaCredito(req: RegistrarNotaCreditoRequest): Observable<NotaCredito> {
+    const body: RegistrarNotaCreditoApiRequest = {
+      facturaId:    req.facturaId,
+      cufeOrigen:   req.cufeOrigen,
+      motivo:       req.motivo,
+      fechaEmision: req.fechaEmision,
+      lineas:       req.lineas,
+    };
+    return this.http
+      .post<NotaCreditoResponse>(`${API}/notas-credito`, body)
+      .pipe(
+        map(notaCreditoFromApi),
+        catchError(err => throwError(() => err)),
+      );
+  }
+
+  /** POST /api/v1/conciliaciones/{conciliacionId}/detalles/{gilItemId}/resolver-nota-credito */
+  resolverConNotaCredito(
+    conciliacionId: string,
+    gilItemId:      string,
+    notaCreditoIds: string[],
+  ): Observable<ResolverNotaCreditoResponse> {
+    const body: ResolverNotaCreditoRequest = { notaCreditoIds };
+    return this.http
+      .post<ResolverNotaCreditoResponse>(
+        `${API}/conciliaciones/${conciliacionId}/detalles/${gilItemId}/resolver-nota-credito`,
+        body,
+      )
+      .pipe(catchError(err => throwError(() => err)));
   }
 
   /** Mapea GilResponse al tipo SolicitudGIL que usa la FacturasFacade.

@@ -80,14 +80,17 @@ export function ejecucionMensualListFromApi(dtos: EjecucionMensualResponse[]): E
   }));
 }
 
-/** Computa porcentajeEjecucion: guard divide-by-zero. */
+/**
+ * Computa porcentajeEjecucion sin redondear: la precisión de visualización
+ * se decide UNA sola vez en el template con el pipe `number`.
+ */
 function computePorcentajeEjecucion(
   montoAsignado: number,
   montoComprometido: number,
   montoPagado: number,
 ): number {
   if (montoAsignado <= 0) return 0;
-  return parseFloat(((montoComprometido + montoPagado) / montoAsignado * 100).toFixed(2));
+  return (montoComprometido + montoPagado) / montoAsignado * 100;
 }
 
 export function ejecucionPresupuestalFromApi(
@@ -158,12 +161,14 @@ export function trazabilidadFromApi(
 }
 
 export function resumenAlertasFromApi(dto: ResumenAlertasResponse): ResumenAlertas {
+  const porTipo = dto.porTipo ?? {};
   return {
-    totalAlertas:      dto.totalAlertas,
-    alertasPendientes: dto.alertasPendientes,
-    alertasResueltas:  dto.alertasResueltas,
-    productosCriticos: dto.productosCriticos,
-    alertasPorTipo:    dto.alertasPorTipo.map(a => ({ tipo: a.tipo, cantidad: a.cantidad })),
+    // Pendientes = sin resolver (activas + críticas); el backend no manda un total directo.
+    totalAlertas:      (dto.totalActivas ?? 0) + (dto.totalCriticas ?? 0) + (dto.totalResueltas ?? 0),
+    alertasPendientes: (dto.totalActivas ?? 0) + (dto.totalCriticas ?? 0),
+    alertasResueltas:  dto.totalResueltas ?? 0,
+    productosCriticos: dto.totalCriticas ?? 0,
+    alertasPorTipo:    Object.entries(porTipo).map(([tipo, cantidad]) => ({ tipo, cantidad })),
     ultimaAlerta:      dto.ultimaAlerta,
   };
 }

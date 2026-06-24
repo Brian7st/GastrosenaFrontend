@@ -1,0 +1,38 @@
+@if (isOpen) {
+<div class="modal-overlay" (click)="onCancel()">
+  <div class="modal-dialog" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <header class="modal-header">
+      <div class="modal-title-wrapper">
+        <span class="material-symbols-outlined reject-icon">cancel</span>
+        <h2 class="modal-title">Rechazar solicitud #{{ solicitud?.numeroSolicitud }}</h2>
+      </div>
+      <button type="button" class="close-btn" (click)="onCancel()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </header>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <section class="info-section">
+        <h3 class="section-title">Motivo del rechazo</h3>
+        <textarea
+          class="motivo-input"
+          rows="4"
+          placeholder="Describa el motivo del rechazo…"
+          [ngModel]="motivo()"
+          (ngModelChange)="motivo.set($event)"></textarea>
+      </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="modal-footer">
+      <button type="button" class="btn btn-cancel" (click)="onCancel()">Cancelar</button>
+      <button type="button" class="btn btn-reject" [disabled]="!motivo().trim()" (click)="onConfirm()">
+        Confirmar rechazo
+        <span class="material-symbols-outlined">cancel</span>
+      </button>
+    </footer>
+  </div>
+</div>
+}

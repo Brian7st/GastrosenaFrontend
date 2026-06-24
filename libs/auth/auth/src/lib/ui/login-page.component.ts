@@ -57,41 +57,11 @@ export class LoginPageComponent {
 
     try {
       const { email, contrasena } = this.form.getRawValue();
-      const user = await this.authService.login(email!, contrasena!);
+      await this.authService.login(email!, contrasena!);
 
-      const rol = user?.rol;
-      let destino = '/app/perfil'; // valor por defecto
-
-      // Redirección por rol (según los roles definidos en backend)
-      switch (rol) {
-        case 'ADMINISTRADOR':
-          destino = '/app/usuarios';
-          break;
-        case 'INSTRUCTOR':
-        case 'CHEF':
-          destino = '/app/cocina';
-          break;
-        case 'CONTADORA':
-          destino = '/app/inventario';
-          break;
-        case 'MESERO':
-        case 'BARTENDER':
-          destino = '/app/restaurante';
-          break;
-        case 'CAJERO':
-          destino = '/app/restaurante/facturacion'; // o donde manejes facturación
-          break;
-        case 'AUXILIAR_COCINA':
-          destino = '/app/cocina';
-          break;
-        case 'APRENDIZ':
-          destino = '/app/perfil';
-          break;
-        default:
-          destino = '/app/perfil';
-      }
-
-      await this.router.navigateByUrl(destino);
+      // Todos los roles aterrizan en el dashboard tras el login.
+      // El menú/guards ya filtran qué módulos ve cada rol.
+      await this.router.navigateByUrl('/app/dashboard');
     } catch (err) {
       this.errorMsg.set('Credenciales inválidas. Verificá tu correo y contraseña.');
     } finally {

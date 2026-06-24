@@ -1,6 +1,6 @@
-import { Factura, FacturaFormDto, ConciliacionGil } from '../../models/facturas.model';
+import { Factura, FacturaFormDto, ConciliacionGil, NotaCredito, MotivoNotaCredito } from '../../models/facturas.model';
 import { SolicitudGil, BienSolicitud, CuentadanteGil } from '../../models/solicitudes-gil.model';
-import { BackendDateArray, FacturaLineaResponse, FacturaResponse, GilResponse, RegistrarFacturaRequest, ConciliacionGilResponse, DetalleGilResponse } from '../api/sourcing.api';
+import { BackendDateArray, FacturaLineaResponse, FacturaResponse, GilResponse, RegistrarFacturaRequest, ConciliacionGilResponse, DetalleGilResponse, NotaCreditoResponse } from '../api/sourcing.api';
 
 function backendDateToIso(date: BackendDateArray | string | undefined | null): string {
   if (!date) return '';
@@ -48,6 +48,25 @@ export function facturaFromApi(dto: FacturaResponse): Factura {
     infoBancariaBanco: dto.infoBancariaBanco ?? undefined,
     infoBancariaCuenta: dto.infoBancariaCuenta ?? undefined,
     infoBancariaTipo: dto.infoBancariaTipo ?? undefined,
+    valorNetoAPagar: dto.valorNetoAPagar,
+  };
+}
+
+export function notaCreditoFromApi(dto: NotaCreditoResponse): NotaCredito {
+  return {
+    id:           dto.id,
+    facturaId:    dto.facturaId,
+    cufeOrigen:   dto.cufeOrigen,
+    motivo:       dto.motivo as MotivoNotaCredito,
+    fechaEmision: dto.fechaEmision,
+    estado:       dto.estado,
+    valorTotal:   dto.valorTotal,
+    lineas: dto.lineas.map(l => ({
+      productoId:    l.productoId,
+      cantidad:      l.cantidad,
+      valorUnitario: l.valorUnitario,
+      valorTotal:    l.valorTotal,
+    })),
   };
 }
 

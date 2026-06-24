@@ -25,13 +25,6 @@
     </restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="Contabilizados"
-      [value]="kpiContabilizados()"
-      icon="check-circle"
-      iconColor="green">
-    </restaurant-kpi-card>
-
-    <restaurant-kpi-card
       label="Generados"
       [value]="kpiGenerados()"
       icon="file-text"
@@ -92,7 +85,7 @@
       @for (item of consolidadosPaginados(); track item.id) {
       <tr>
           <td>
-            <span class="td-value-primary td-mono">#{{ item.id }}</span>
+            <span class="td-value-primary td-mono">#{{ item.numero }}</span>
           </td>
           <td>
             <div class="td-flex-col">
@@ -108,7 +101,7 @@
           </td>
           <td class="text-center">
             <div class="action-buttons justify-center">
-              <button class="icon-btn-action" title="Ver Detalles" (click)="goToDetail(item.id)">
+              <button class="icon-btn-action" title="Ver Detalles" (click)="goToDetail(item.numero)">
                 <span class="material-symbols-outlined">visibility</span>
               </button>
               <button class="icon-btn-action icon-btn-action--danger" title="Reversar / Eliminar" (click)="reversar(item.id)">
@@ -152,7 +145,7 @@
       <div class="insight-card__content">
         <h3 class="insight-card__title">Ejecución Presupuestal</h3>
         @if (porcentajeEjecucion() !== null) {
-          <p class="insight-card__text">El presupuesto vigente registra un {{ porcentajeEjecucion() | number:'1.0-1' }}% de ejecución (comprometido + pagado sobre el total asignado).</p>
+          <p class="insight-card__text">El presupuesto vigente registra un {{ porcentajeEjecucion() | number:'1.2-2' }}% de ejecución (comprometido + pagado sobre el total asignado).</p>
         } @else {
           <p class="insight-card__text">Sin datos de presupuesto para la vigencia actual.</p>
         }
@@ -160,7 +153,7 @@
       </div>
       <div class="insight-card__visual">
         <div class="progress-circle">
-          <span>{{ porcentajeEjecucion() !== null ? (porcentajeEjecucion() | number:'1.0-0') + '%' : '—' }}</span>
+          <span>{{ porcentajeEjecucion() !== null ? (porcentajeEjecucion() | number:'1.2-2') + '%' : '—' }}</span>
         </div>
       </div>
       <div class="insight-card__decor"></div>

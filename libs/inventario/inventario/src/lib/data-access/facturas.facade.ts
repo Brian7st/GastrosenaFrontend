@@ -1,8 +1,9 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
-import { finalize, catchError, of } from 'rxjs';
-import { Factura, FacturaFiltros, FacturaKpis, FacturaPaginacion, SolicitudGIL, ConciliacionGil, FacturaFormDto, GilPickerItem } from '../models/facturas.model';
+import { finalize, catchError, of, Observable } from 'rxjs';
+import { Factura, FacturaFiltros, FacturaKpis, FacturaPaginacion, SolicitudGIL, ConciliacionGil, FacturaFormDto, GilPickerItem, NotaCredito, RegistrarNotaCreditoRequest } from '../models/facturas.model';
 import { FacturasService } from './services/facturas.service';
 import { KardexFacade } from './kardex.facade';
+import { descargarBlob } from '../util';
 import { ActualizarFacturaRequest } from './api/sourcing.api';
 import { BienGilResponse } from './api/procurement.api';
 
@@ -46,6 +47,28 @@ export class FacturasFacade {
   loadAll(): void {
     this.cargarFacturas();
     this.cargarKpis();
+  }
+
+  /**
+   * Exporta el reporte GENERAL de facturación (año en curso) vía ga-ms-reportes.
+   * El backend solo ofrece reporte general por rango; no hay export por-factura.
+   */
+  exportarPanel(formato: string): void {
+    const fmt = formato.toLowerCase() === 'pdf' ? 'PDF' : 'EXCEL';
+    const ext = fmt === 'PDF' ? 'pdf' : 'xlsx';
+    const hoy = new Date();
+    const fechaInicio = `${hoy.getFullYear()}-01-01`;
+    const fechaFin = hoy.toISOString().slice(0, 10);
+    this._loading.set(true);
+    this.svc.exportarFacturacion(fechaInicio, fechaFin, fmt)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al exportar el reporte de facturación');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false)),
+      )
+      .subscribe(blob => { if (blob) descargarBlob(blob, `facturacion_${fechaFin}.${ext}`); });
   }
 
   cargarFacturas(filtros?: FacturaFiltros): void {
@@ -375,6 +398,42 @@ export class FacturasFacade {
         finalize(() => this._loading.set(false))
       )
       .subscribe(res => { if (res !== null) this._conciliacionGil.set(res); });
+  }
+
+  registrarNotaCredito(req: RegistrarNotaCreditoRequest): Observable<NotaCredito> {
+    return this.svc.registrarNotaCredito(req).pipe(
+      catchError(() => {
+        this._error.set('Error al registrar la nota crédito');
+        return of(null as unknown as NotaCredito);
+      }),
+    );
+  }
+
+  resolverConNotaCredito(
+    conciliacionId: string,
+    gilItemId:      string,
+    notaCreditoIds: string[],
+  ): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this.svc.resolverConNotaCredito(conciliacionId, gilItemId, notaCreditoIds)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al resolver la diferencia con nota crédito');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false)),
+      )
+      .subscribe(res => {
+        if (res !== null) {
+          // Reload both factura and conciliacion to reflect valorNetoAPagar and resuelta state
+          const factura = this._facturaSeleccionada();
+          if (factura) {
+            this.cargarFactura(String(factura.id));
+            this.intentarCargarConciliacion(String(factura.id));
+          }
+        }
+      });
   }
 
   vincularInstructorOrden(ordenCompra: string, instructorId: string): void {

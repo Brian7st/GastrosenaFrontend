@@ -10,7 +10,7 @@ import {
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ButtonComponent, DataTableComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
+import { ButtonComponent, DataTableComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { ElegibleConsolidado } from '../../../models/consolidado.model';
 import { ConsolidadoFacade } from '../../../data-access/consolidado.facade';
@@ -33,7 +33,6 @@ interface SelectableRow {
     ReactiveFormsModule,
     ButtonComponent,
     DataTableComponent,
-    StatusBadgeComponent,
     BackButtonComponent,
   ],
   templateUrl: './consolidado-create.component.html',
@@ -86,14 +85,13 @@ export class ConsolidadoCreateComponent implements OnInit {
     this._rows().filter(r => r.selected).reduce((acc, r) => acc + r.data.monto, 0),
   );
 
-  ivaAcumulado     = computed(() => this.subtotalNeto() * 0.19);
-
   retencionZeseTotal = computed(() =>
     this._rows().filter(r => r.selected).reduce((acc, r) => acc + r.data.retencionZese, 0),
   );
 
+  /** Valor neto = montos − retención ZESE (igual que `valorNeto` del backend). */
   totalConsolidado = computed(() =>
-    this.subtotalNeto() + this.ivaAcumulado() - this.retencionZeseTotal(),
+    this.subtotalNeto() - this.retencionZeseTotal(),
   );
 
   toggleSelection(row: SelectableRow): void {

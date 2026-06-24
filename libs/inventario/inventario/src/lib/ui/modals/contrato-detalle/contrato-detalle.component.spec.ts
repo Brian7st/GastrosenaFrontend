@@ -46,7 +46,7 @@ describe('ContratoDetalleComponent', () => {
   });
 
   it('emits cerrar when close button is clicked', () => {
-    component.contrato = CONTRATO_MOCK;
+    fixture.componentRef.setInput('contrato', CONTRATO_MOCK);
     fixture.detectChanges();
 
     let emitted = false;
@@ -59,8 +59,8 @@ describe('ContratoDetalleComponent', () => {
   });
 
   it('shows LoadingSkeletonComponent when loading=true and no contrato', () => {
-    component.loading = true;
-    component.contrato = undefined;
+    fixture.componentRef.setInput('loading', true);
+    fixture.componentRef.setInput('contrato', undefined);
     fixture.detectChanges();
 
     const skeleton = fixture.nativeElement.querySelector('restaurant-loading-skeleton');
@@ -68,7 +68,7 @@ describe('ContratoDetalleComponent', () => {
   });
 
   it('renders contrato numero and vigencia in the header', () => {
-    component.contrato = CONTRATO_MOCK;
+    fixture.componentRef.setInput('contrato', CONTRATO_MOCK);
     fixture.detectChanges();
 
     const header = fixture.nativeElement.querySelector('.detalle-header') as HTMLElement;
@@ -77,7 +77,7 @@ describe('ContratoDetalleComponent', () => {
   });
 
   it('renders item rows in the table', () => {
-    component.contrato = CONTRATO_MOCK;
+    fixture.componentRef.setInput('contrato', CONTRATO_MOCK);
     fixture.detectChanges();
 
     const rows = fixture.nativeElement.querySelectorAll('.items-table tbody tr') as NodeList;

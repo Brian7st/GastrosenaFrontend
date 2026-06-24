@@ -70,7 +70,6 @@
                   <th>Ref. Artículo</th>
                   <th>Descripción</th>
                   <th class="text-center">Unidad</th>
-                  <th class="text-right">Cantidad</th>
                   <th class="text-right">Vlr. Adjudicado</th>
                   <th class="text-right">Vlr. Antes</th>
                   <th class="text-right">IVA</th>
@@ -82,14 +81,13 @@
                     <td><span class="code-mono">{{ item.refArticulo }}</span></td>
                     <td><span class="item-desc">{{ item.descripcion }}</span></td>
                     <td class="text-center">{{ item.unidadMedida ?? '—' }}</td>
-                    <td class="text-right">{{ item.cantidad ?? '—' }}</td>
                     <td class="text-right">{{ formatCurrency(item.vrlAdjudicado) }}</td>
                     <td class="text-right">{{ formatCurrency(item.vrlAntes) }}</td>
                     <td class="text-right">{{ formatPorcentaje(item.ivaPorcentaje) }}</td>
                   </tr>
                 } @empty {
                   <tr>
-                    <td colspan="7" class="empty-row">Sin ítems registrados</td>
+                    <td colspan="6" class="empty-row">Sin ítems registrados</td>
                   </tr>
                 }
               </tbody>

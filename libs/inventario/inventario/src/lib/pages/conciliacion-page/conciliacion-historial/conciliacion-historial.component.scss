@@ -111,7 +111,7 @@
 }
 
 .dif-mini-badge {
-  background: #ffebe9;
+  background: var(--color-error-bg);
   color: var(--color-terciario);
   padding: 2px 6px;
   border-radius: 4px;
@@ -138,8 +138,8 @@
   border-radius: 999px;
 
   &.fill--success { background: var(--color-primario); }
-  &.fill--info { background: #1976d2; }
-  &.fill--warning { background: #e65100; }
+  &.fill--info { background: var(--color-info); }
+  &.fill--warning { background: var(--color-warning-interactive-dark); }
 }
 
 .status-badge {
@@ -149,9 +149,9 @@
   font-size: 0.75rem;
   font-weight: 600;
 
-  &--success { background: #e6f6ec; color: var(--color-primario); }
-  &--info { background: #e3f2fd; color: #1976d2; }
-  &--warning { background: #fff3e0; color: #e65100; }
+  &--success { background: var(--color-success-bg); color: var(--color-primario); }
+  &--info { background: var(--color-info-bg); color: var(--color-info); }
+  &--warning { background: var(--color-warning-bg); color: var(--color-warning-interactive-dark); }
 }
 
 .action-btn {
@@ -272,7 +272,7 @@
   width: 12px;
   border-radius: 2px 2px 0 0;
   
-  &.vol { background: #a5d6a7; }
+  &.vol { background: var(--color-esmeralda-200, #a5d6a7); }
   &.prec { background: var(--color-primario); }
 }
 

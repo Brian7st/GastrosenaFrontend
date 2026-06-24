@@ -124,6 +124,7 @@ export interface DetallePedidoResponse {
   precioUnitario: number;     // BigDecimal → number
   subtotalLinea: number;      // cantidad * precioUnitario (calculado por backend)
   observaciones?: string | null;
+  estadoDetalle?: string;     // PENDIENTE, PREPARANDO, TERMINADO, CANCELADO
 }
 
 /**

@@ -24,7 +24,11 @@ export class PresupuestoRegistrarComponent implements OnInit {
   /** Catálogo de los 5 programas para el selector. */
   programas = signal<Programa[]>([]);
 
-  readonly VIGENCIAS = [2024, 2025, 2026];
+  /** Vigencias seleccionables: año en curso y los próximos dos. Se calcula en runtime para no quedar desactualizado. */
+  readonly VIGENCIAS = Array.from(
+    { length: 3 },
+    (_, offset) => new Date().getFullYear() + offset,
+  );
 
   /**
    * Formulario alineado con el payload real POST /budget/presupuestos.

@@ -134,72 +134,8 @@
     </div>
   }
 
-  <!-- ── Paso 3: Firmantes ───────────────────────────────────────────── -->
+  <!-- ── Paso 3: Vista Previa / Cierre ───────────────────────────────── -->
   @if (currentStep() === 3) {
-    <div class="acta-create__grid acta-create__grid--single">
-      <div class="acta-create__card acta-create__card--full">
-        <h3 class="acta-create__card-title">
-          <lucide-icon name="users" [size]="18" class="acta-create__card-icon"></lucide-icon>
-          Asistentes y Firmantes
-        </h3>
-        <p class="acta-create__firmantes-hint">
-          El <strong>Instructor Cuentadante</strong> y el <strong>Vocero de Aprendices</strong>
-          son firmantes obligatorios. Podés agregar asistentes adicionales.
-        </p>
-        <div class="acta-create__firmantes-list">
-          @for (firmante of firmantes(); track $index) {
-            <div class="acta-create__firmante-row"
-                 [class.acta-create__firmante-row--required]="esFirmanteObligatorio($index)">
-              <div class="acta-create__firmante-avatar">
-                <lucide-icon name="user" [size]="16"></lucide-icon>
-              </div>
-              <div class="acta-create__firmante-info">
-                <input
-                  type="text"
-                  class="acta-create__firmante-input"
-                  placeholder="Nombre completo"
-                  [value]="firmante.nombre"
-                  (input)="updateFirmante($index, 'nombre', $event)"
-                />
-                @if (esFirmanteObligatorio($index)) {
-                  <span class="acta-create__firmante-role-badge">{{ firmante.dependenciaRol }}</span>
-                } @else {
-                  <input
-                    type="text"
-                    class="acta-create__firmante-input acta-create__firmante-input--role"
-                    placeholder="Cargo/Rol"
-                    [value]="firmante.dependenciaRol"
-                    (input)="updateFirmante($index, 'dependenciaRol', $event)"
-                  />
-                }
-              </div>
-              <label class="acta-create__firmante-aprueba" title="Aprueba el acta">
-                <input
-                  type="checkbox"
-                  [checked]="firmante.aprueba"
-                  (change)="updateFirmante($index, 'aprueba', $event)"
-                />
-                Aprueba
-              </label>
-              @if (!esFirmanteObligatorio($index)) {
-                <button class="acta-create__firmante-remove" type="button"
-                        title="Quitar firmante" (click)="removeFirmante($index)">
-                  <lucide-icon name="trash" [size]="16"></lucide-icon>
-                </button>
-              }
-            </div>
-          }
-        </div>
-        <button class="acta-create__add-firmante" type="button" (click)="addFirmante()">
-          <lucide-icon name="plus" [size]="16"></lucide-icon>
-          Agregar Asistente
-        </button>
-      </div>
-    </div>
-  }
-
-  <!-- ── Paso 4: Vista Previa / Cierre ───────────────────────────────── -->
-  @if (currentStep() === 4) {
     <div class="acta-create__grid acta-create__grid--single">
       <div class="acta-create__card acta-create__card--full acta-create__card--preview">
         <h3 class="acta-create__card-title">
@@ -208,19 +144,19 @@
         </h3>
         <div class="acta-create__preview-notice">
           <lucide-icon name="info" [size]="18"></lucide-icon>
-          <p>Revise la información antes de generar el acta. Una vez generada, se asignará un consecutivo y quedará en estado <strong>Borrador</strong>.</p>
+          <p>Revise la información antes de generar el acta. Una vez generada, se asignará un consecutivo y quedará en estado <strong>Firmada</strong>, con las firmas del instructor y el vocero tomadas de la recepción de la requisición.</p>
         </div>
         <div class="acta-create__preview-summary">
           <div class="acta-create__preview-item">
             <span class="acta-create__preview-label">Estado inicial</span>
-            <restaurant-status-badge label="Borrador" variant="info"></restaurant-status-badge>
+            <restaurant-status-badge label="Firmada" variant="success"></restaurant-status-badge>
           </div>
           <div class="acta-create__preview-item">
             <span class="acta-create__preview-label">Ficha</span>
             <span class="acta-create__preview-value">{{ form.get('fichaId')?.value }}</span>
           </div>
           <div class="acta-create__preview-item">
-            <span class="acta-create__preview-label">Firmantes registrados</span>
+            <span class="acta-create__preview-label">Firmantes</span>
             <span class="acta-create__preview-value">{{ firmantes().length }} persona(s)</span>
           </div>
         </div>
@@ -240,7 +176,7 @@
     @if (error()) {
       <p class="acta-create__error">{{ error() }}</p>
     }
-    @if (currentStep() < 4) {
+    @if (currentStep() < 3) {
       <button class="acta-create__btn-next" type="button" (click)="nextStep()">
         Siguiente
         <lucide-icon name="arrow-right" [size]="18"></lucide-icon>

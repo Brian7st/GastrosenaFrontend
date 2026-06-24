@@ -71,9 +71,9 @@
                 <td>
                   <span class="td-bold">{{ row.data.gilId }}</span>
                 </td>
-                <td>
+                <td class="cufe-cell">
                   <div class="td-bold font-mono">{{ row.data.numeroFactura }}</div>
-                  <div class="td-muted text-xs">{{ row.data.cufe }}</div>
+                  <div class="td-muted text-xs cufe-text" [title]="row.data.cufe">{{ row.data.cufe }}</div>
                 </td>
                 <td>
                   <span class="td-medium">{{ row.data.concepto }}</span>
@@ -111,10 +111,6 @@
           <div class="calc-row text-on-surface">
             <span>Subtotal Neto</span>
             <span class="calc-row__value">{{ subtotalNeto() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-          </div>
-          <div class="calc-row text-on-surface">
-            <span>IVA Acumulado</span>
-            <span class="calc-row__value">{{ ivaAcumulado() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
           </div>
           <div class="calc-row text-tertiary">
             <span>Retención ZESE</span>

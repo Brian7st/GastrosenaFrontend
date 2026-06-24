@@ -62,10 +62,10 @@
   }
 }
 
-.comanda-card-wrapper { display: block; background: white; border-radius: var(--radius-lg, 12px); padding: var(--space-3, 15px); margin-bottom: var(--space-3, 15px); border: 1px solid var(--color-border, #e2e8f0);
+.comanda-card-wrapper { display: block; background: var(--color-surface-primary); border-radius: var(--radius-lg, 12px); padding: var(--space-3, 15px); margin-bottom: var(--space-3, 15px); border: 1px solid var(--color-border, #e2e8f0);
   &.card-completed { border-color: var(--color-pizarra-300, #cbd5e1); background-color: var(--color-pizarra-50, #f8fafc); }
 }
 
-.toast-error { position: fixed; bottom: 20px; right: 20px; background-color: #DC3545; color: white; padding: 15px 20px; border-radius: 8px; z-index: 9999; font-weight: 600; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); animation: slideIn 0.3s ease-out; }
+.toast-error { position: fixed; bottom: 20px; right: 20px; background-color: var(--color-danger); color: var(--color-en-primario); padding: 15px 20px; border-radius: 8px; z-index: 9999; font-weight: 600; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); animation: slideIn 0.3s ease-out; }
 
 @keyframes slideIn { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }

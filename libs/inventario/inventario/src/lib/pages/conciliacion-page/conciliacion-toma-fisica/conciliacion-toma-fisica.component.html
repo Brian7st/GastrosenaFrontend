@@ -7,7 +7,9 @@
     <div>
       <div class="title-group">
         <inventario-back-button (clicked)="goBack()" />
-        <h1 class="page-title">Toma Física de Inventario</h1>
+        <h1 class="page-title">
+          Toma Física de Inventario@if (categoria()) {<span class="page-title-cat"> · {{ categoria() }}</span>}
+        </h1>
       </div>
       <div class="header-meta">
         <div class="meta-item">

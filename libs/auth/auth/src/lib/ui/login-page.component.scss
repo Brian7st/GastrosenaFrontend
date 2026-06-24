@@ -368,19 +368,27 @@
 
 .auth-input-wrap {
   position: relative;
+   display: flex;
+  flex-direction: column;
+}
+
+::ng-deep restaurant-input {
+  display: block;
+  width: 100%;
 }
 
 .auth-input-toggle {
   position: absolute;
   right: 12px;
-  bottom: 12px;
+  top: 30px; // ← Ajusta este valor según necesites
   background: none;
   border: none;
   cursor: pointer;
   color: var(--color-text-secondary);
   display: flex;
   align-items: center;
-  padding: 0;
+  justify-content: center;
+  padding: 4px;
   z-index: 2;
 
   &:hover {

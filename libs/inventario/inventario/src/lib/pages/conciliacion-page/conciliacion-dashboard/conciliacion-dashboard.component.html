@@ -72,7 +72,6 @@
     <div class="main-content">
       <div class="section-header">
         <h2 class="section-title">Toma Física por Categoría</h2>
-        <a routerLink="CONC-2024-012" class="link-action">Ver detalle</a>
       </div>
 
       <div class="categorias-grid">
@@ -82,7 +81,11 @@
           <p class="text-secondary">Sin productos en el catálogo.</p>
         } @else {
           @for (cat of categorias(); track cat.nombre) {
-            <div class="categoria-card">
+            <a
+              class="categoria-card"
+              routerLink="toma-fisica"
+              [queryParams]="{ categoria: cat.nombre }"
+              [attr.aria-label]="'Iniciar toma física de ' + cat.nombre">
               <div class="categoria-icon-box">
                 <lucide-icon [name]="iconoDeCategoria(cat.nombre)" [size]="24"></lucide-icon>
               </div>
@@ -93,7 +96,7 @@
               <div class="categoria-arrow">
                 <lucide-icon name="chevron-right" [size]="20"></lucide-icon>
               </div>
-            </div>
+            </a>
           }
         }
       </div>
@@ -111,10 +114,12 @@
           @for (item of tendencias(); track item.mes) {
             <div class="chart-col">
               <div class="chart-bar-container">
-                <div class="chart-bar" [class.chart-bar--current]="item.isCurrent" [style.height.%]="item.valor"></div>
+                <div class="chart-bar" [class.chart-bar--current]="item.isCurrent" [style.height.%]="item.merma"></div>
               </div>
-              <span class="chart-label" [class.chart-label--current]="item.isCurrent">{{ item.mes }}</span>
+              <span class="chart-label" [class.chart-label--current]="item.isCurrent">{{ item.label }}</span>
             </div>
+          } @empty {
+            <p class="text-secondary">Sin conciliaciones registradas.</p>
           }
         </div>
       </div>
@@ -131,16 +136,17 @@
                 <div class="indicator-ring" [ngClass]="'indicator-ring--' + act.estado">
                   <div class="indicator-dot"></div>
                 </div>
-                <!-- Line connection could be added via CSS if needed, but keeping it simple as per prototype -->
               </div>
               <div class="actividad-content">
                 <p class="actividad-ubicacion">{{ act.ubicacion }}</p>
                 <p class="actividad-detalle" [ngClass]="{'actividad-detalle--alert': act.estado === 'alert'}">
                   {{ act.detalle }}
                 </p>
-                <p class="actividad-tiempo">{{ act.tiempo }}</p>
+                <p class="actividad-tiempo">{{ act.fecha }}</p>
               </div>
             </div>
+          } @empty {
+            <p class="text-secondary">Sin actividad reciente.</p>
           }
         </div>
         <div class="sidebar-card-footer">

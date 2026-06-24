@@ -36,7 +36,7 @@
       iconColor="blue" trend="Apropiación total" [trendUp]="null"></restaurant-kpi-card>
 
     <restaurant-kpi-card label="COMPROMETIDO" [value]="resumenGlobal()!.totalComprometido | formatoMoneda" icon="file-check"
-      iconColor="orange" [trend]="resumenGlobal()!.porcentajeEjecucion + '% ejecutado'" [trendUp]="null"></restaurant-kpi-card>
+      iconColor="orange" [trend]="(resumenGlobal()!.porcentajeEjecucion | number:'1.2-2') + '% ejecutado'" [trendUp]="null"></restaurant-kpi-card>
 
     <restaurant-kpi-card label="PAGADO REAL" [value]="resumenGlobal()!.totalPagado | formatoMoneda" icon="banknote"
       iconColor="green" trend="Verificado a la fecha" [trendUp]="null"></restaurant-kpi-card>
@@ -97,7 +97,7 @@
             <td class="col-money grupo-value">{{ grupo.totalZese | formatoMoneda:false }}</td>
             <td class="col-ejecucion">
               <span class="ejecucion-badge" [ngClass]="getEjecucionClass(grupo.porcentajeEjecucion)">
-                {{ grupo.porcentajeEjecucion }}%
+                {{ grupo.porcentajeEjecucion | number:'1.2-2' }}%
               </span>
             </td>
           </tr>
@@ -120,7 +120,7 @@
               <div class="ejecucion-bar-container">
                 <div class="ejecucion-bar" [style.width.%]="rubro.porcentajeEjecucion"></div>
               </div>
-              <span class="ejecucion-text">{{ rubro.porcentajeEjecucion }}%</span>
+              <span class="ejecucion-text">{{ rubro.porcentajeEjecucion | number:'1.2-2' }}%</span>
             </td>
           </tr>
           }
@@ -138,7 +138,7 @@
             <td class="col-money total-value">—</td>
             <td class="col-ejecucion">
               <span class="ejecucion-badge" [ngClass]="getEjecucionClass(resumenGlobal()!.porcentajeEjecucion)">
-                {{ resumenGlobal()!.porcentajeEjecucion }}%
+                {{ resumenGlobal()!.porcentajeEjecucion | number:'1.2-2' }}%
               </span>
             </td>
           </tr>
@@ -190,7 +190,7 @@
             <td class="col-money grupo-value">{{ grupo.totalValorPorCancelar | formatoMoneda:false }}</td>
             <td class="col-ejecucion">
               <span class="ejecucion-badge" [ngClass]="getEjecucionClass(grupo.porcentajeEjecucion)">
-                {{ grupo.porcentajeEjecucion }}%
+                {{ grupo.porcentajeEjecucion | number:'1.2-2' }}%
               </span>
             </td>
           </tr>
@@ -255,7 +255,8 @@
     [showFilterButton]="true"
     [filterActive]="showFilters()"
     [filterCount]="filtrosActivos()"
-    (filterToggle)="onToggleFilters()">
+    (filterToggle)="onToggleFilters()"
+    (searchChange)="onSearch($event)">
     <restaurant-button dtActions variant="surface" routerLink="cargar-gil">
       <div class="btn-icon-text">
         <lucide-icon name="upload" [size]="18"></lucide-icon>
@@ -330,6 +331,14 @@
               <div class="btn-icon-text">
                 <lucide-icon name="dollar-sign" [size]="14"></lucide-icon>
                 Pagar
+              </div>
+            </restaurant-button>
+          }
+          @if (esAnulable(a.estado)) {
+            <restaurant-button variant="surface" (click)="onAnular(a)">
+              <div class="btn-icon-text">
+                <lucide-icon name="x-circle" [size]="14"></lucide-icon>
+                Anular
               </div>
             </restaurant-button>
           }

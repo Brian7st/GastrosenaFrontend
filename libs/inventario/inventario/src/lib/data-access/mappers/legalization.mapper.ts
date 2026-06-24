@@ -47,7 +47,7 @@ export function paqueteFromApi(dto: PaqueteResponse): PaqueteProbatorio {
     requisicionId: dto.requisicionId,
     registroAsistenciaAdjunto: dto.registroAsistenciaAdjunto,
     instructorId: dto.instructorId,
-    // fecha no está en la respuesta del backend
+    fecha: dto.fechaCreacion,
   };
 }
 
@@ -63,6 +63,7 @@ export function requisicionFromApi(dto: RequisicionResponse): Requisicion {
     horaSesion:       dto.horaSesion       ?? '',
     fecha:            dto.fecha            ?? '',
     estado:           dto.estado           ?? 'BORRADOR',
+    voceroId:         dto.voceroId         ?? '',
     items: (dto.items ?? []).map((i): RequisicionItem => ({
       productoId:     i.productoId     ?? '',
       productoNombre: i.productoNombre ?? '',

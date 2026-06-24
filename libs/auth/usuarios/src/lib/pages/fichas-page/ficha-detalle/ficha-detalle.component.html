@@ -21,41 +21,38 @@
  
   <!-- KPIs -->
   <div class="detalle__kpis">
-    <div class="detalle__kpi">
-      <div class="detalle__kpi-icon detalle__kpi-icon--neutral">
-        <lucide-icon name="users" [size]="22"></lucide-icon>
-      </div>
-      <div>
-        <span class="detalle__kpi-value">{{ aprendices().length }}</span>
-        <span class="detalle__kpi-label">Total Aprendices</span>
-      </div>
-    </div>
+    <restaurant-kpi-card
+      label="Total Aprendices"
+      [value]="aprendices().length.toString()"
+      icon="users"
+      iconColor="blue"
+    ></restaurant-kpi-card>
     <div class="detalle__kpi detalle__kpi--vocero">
-      <div class="detalle__kpi-icon">
-        <lucide-icon name="star" [size]="22"></lucide-icon>
-      </div>
-      <div>
-        <span class="detalle__kpi-value">{{ voceroId() ? 1 : 0 }}</span>
+      <div class="detalle__kpi-body">
         <span class="detalle__kpi-label">Vocero</span>
+        <span class="detalle__kpi-value">{{ voceroId() ? 1 : 0 }}</span>
         @if (voceroId()) {
           <span class="detalle__kpi-nombre">
             {{ getNombreAprendiz(voceroId()!) }}
           </span>
         }
       </div>
+      <div class="detalle__kpi-icon">
+        <lucide-icon name="star" [size]="22"></lucide-icon>
+      </div>
     </div>
     <div class="detalle__kpi detalle__kpi--subvocero">
-      <div class="detalle__kpi-icon">
-        <lucide-icon name="award" [size]="22"></lucide-icon>
-      </div>
-      <div>
-        <span class="detalle__kpi-value">{{ subvoceroId() ? 1 : 0 }}</span>
+      <div class="detalle__kpi-body">
         <span class="detalle__kpi-label">Subvocero</span>
+        <span class="detalle__kpi-value">{{ subvoceroId() ? 1 : 0 }}</span>
         @if (subvoceroId()) {
           <span class="detalle__kpi-nombre">
             {{ getNombreAprendiz(subvoceroId()!) }}
           </span>
         }
+      </div>
+      <div class="detalle__kpi-icon">
+        <lucide-icon name="award" [size]="22"></lucide-icon>
       </div>
     </div>
   </div>

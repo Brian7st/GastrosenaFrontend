@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } 
 import { Router, ActivatedRoute } from '@angular/router';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
-import { RequisicionesService } from '../../../data-access/services/requisiciones.service';
 
 @Component({
   selector: 'restaurant-requisiciones-despacho',
@@ -15,7 +14,6 @@ import { RequisicionesService } from '../../../data-access/services/requisicione
 export class RequisicionesDespachoComponent implements OnInit {
   private router  = inject(Router);
   private route   = inject(ActivatedRoute);
-  private service = inject(RequisicionesService);
   readonly facade = inject(RequisicionesFacade);
 
   requisicionId       = '';
@@ -49,9 +47,8 @@ export class RequisicionesDespachoComponent implements OnInit {
     this.procesando.set(true);
     this.error.set(null);
 
-    this.service.despacharRequisicion(this.requisicionId, this.economoId().trim()).subscribe({
+    this.facade.despacharRequisicion(this.requisicionId, this.economoId().trim()).subscribe({
       next: () => {
-        this.facade.cargarRequisicion(this.requisicionId);
         this.router.navigate(['/app/inventario/requisiciones']);
       },
       error: (err) => {
