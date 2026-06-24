@@ -47,7 +47,7 @@ export function paqueteFromApi(dto: PaqueteResponse): PaqueteProbatorio {
     requisicionId: dto.requisicionId,
     registroAsistenciaAdjunto: dto.registroAsistenciaAdjunto,
     instructorId: dto.instructorId,
-    // fecha no está en la respuesta del backend
+    fecha: dto.fechaCreacion,
   };
 }
 

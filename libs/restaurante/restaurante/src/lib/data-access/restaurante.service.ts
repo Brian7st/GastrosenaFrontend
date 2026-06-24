@@ -20,8 +20,8 @@ export class RestauranteService {
   private readonly pedidosUrl = '/api/pedidos';
   private readonly cajaUrl = '/api/caja';
   private readonly facturasUrl = '/api/facturas';
-  private readonly recetasUrl = 'http://localhost:8082/api/recetas';
-  private readonly barRecetasUrl = 'http://localhost:8086/api/barybarismo/recetas';
+  private readonly recetasUrl = '/api/recetas';
+  private readonly barRecetasUrl = '/api/barybarismo/recetas';
 
   // ── Recetas (Cocina y Bar) ──────────────────────────────────────────────────
 
@@ -125,6 +125,30 @@ export class RestauranteService {
       params = params.set('motivo', motivo);
     }
     return this.http.patch<PedidoResponse>(`${this.pedidosUrl}/${id}/cancelar`, null, { params });
+  }
+
+  devolverPedido(id: string, motivo?: string): Observable<PedidoResponse> {
+    let params = new HttpParams();
+    if (motivo) {
+      params = params.set('motivo', motivo);
+    }
+    return this.http.patch<PedidoResponse>(`${this.pedidosUrl}/${id}/devolver`, null, { params });
+  }
+
+  cancelarDetallePedido(idDetalle: string, motivo?: string): Observable<PedidoResponse> {
+    let params = new HttpParams();
+    if (motivo) {
+      params = params.set('motivo', motivo);
+    }
+    return this.http.patch<PedidoResponse>(`${this.pedidosUrl}/detalle/${idDetalle}/cancelar`, null, { params });
+  }
+
+  devolverDetallePedido(idDetalle: string, motivo?: string): Observable<PedidoResponse> {
+    let params = new HttpParams();
+    if (motivo) {
+      params = params.set('motivo', motivo);
+    }
+    return this.http.patch<PedidoResponse>(`${this.pedidosUrl}/detalle/${idDetalle}/devolver`, null, { params });
   }
 
   // ── Caja y Facturación ───────────────────────────────────────────────────────

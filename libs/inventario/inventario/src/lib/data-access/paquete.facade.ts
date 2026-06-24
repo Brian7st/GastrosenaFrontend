@@ -2,6 +2,7 @@ import { inject, Injectable, signal, computed } from '@angular/core';
 import { finalize, catchError, of } from 'rxjs';
 import { PaqueteService } from './services/paquete.service';
 import { PaqueteProbatorio } from '../models/paquete.model';
+import { descargarBlob } from '../util';
 
 @Injectable({ providedIn: 'root' })
 export class PaqueteFacade {
@@ -77,18 +78,20 @@ export class PaqueteFacade {
       });
   }
 
-  /** Exporta el paquete — POST /legalization/paquetes/{id}/exportar. */
+  /** Exporta el paquete — descarga el PDF generado por el microservicio de reportes. */
   exportarPaquete(id: string): void {
     this._loading.set(true);
     this.paqueteService.exportarPaquete(id)
       .pipe(
         catchError(() => {
           this._error.set('Error al exportar el paquete');
-          return of(false);
+          return of(null);
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe();
+      .subscribe(blob => {
+        if (blob) descargarBlob(blob, `paquete_${id}.pdf`);
+      });
   }
 
   /** PATCH /legalization/paquetes/{id}/trazabilidad — vincula GIL, CUFE y compromiso. */

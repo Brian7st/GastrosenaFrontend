@@ -21,6 +21,9 @@
         {{ requisicion()?.numero ?? reqId() }}
       </h2>
     </div>
+    <button class="sheet-panel__close" (click)="exportarPdf()" [disabled]="loading()" title="Exportar PDF">
+      <lucide-icon name="download" [size]="20"></lucide-icon>
+    </button>
     <button class="sheet-panel__close" (click)="close()">
       <lucide-icon name="x" [size]="20"></lucide-icon>
     </button>

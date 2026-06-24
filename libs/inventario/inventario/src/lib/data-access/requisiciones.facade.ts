@@ -2,6 +2,7 @@ import { inject, Injectable, signal, computed } from '@angular/core';
 import { finalize, catchError, of, tap, throwError, Observable } from 'rxjs';
 import { RequisicionesService } from './services/requisiciones.service';
 import { Requisicion } from '../models/requisicion.model';
+import { descargarBlob } from '../util';
 
 @Injectable({ providedIn: 'root' })
 export class RequisicionesFacade {
@@ -156,11 +157,13 @@ export class RequisicionesFacade {
     this.cargarRequisicion(id);
   }
 
-  /** POST /legalization/requisiciones/{id}/exportar — genera el .docx */
+  /** Exporta la requisición — descarga el PDF generado por el microservicio de reportes. */
   exportarRequisicion(id: string): void {
     this.requisicionesService.exportarRequisicion(id)
       .pipe(catchError(() => { this._error.set('Error al exportar la requisición'); return of(null); }))
-      .subscribe();
+      .subscribe(blob => {
+        if (blob) descargarBlob(blob, `requisicion_${id}.pdf`);
+      });
   }
 
   /** POST /legalization/requisiciones — crea una nueva requisición */

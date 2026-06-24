@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { ConfirmarEnvioSolicitudModalComponent } from '../../../components/confirmar-envio-solicitud-modal/confirmar-envio-solicitud-modal.component';
-import { BienTableComponent } from '../../../ui/components/bien-table/bien-table.component';
 import { BienTypeaheadComponent } from '../../../ui/components/bien-typeahead/bien-typeahead.component';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
@@ -16,7 +15,7 @@ import { Bien } from '../../../models/inventario.model';
 @Component({
   selector: 'restaurant-solicitudes-insumos-form',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ButtonComponent, BackButtonComponent, ConfirmarEnvioSolicitudModalComponent, BienTableComponent, BienTypeaheadComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ButtonComponent, BackButtonComponent, ConfirmarEnvioSolicitudModalComponent, BienTypeaheadComponent],
   templateUrl: './solicitudes-insumos-form.component.html',
   styleUrl: './solicitudes-insumos-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -3,6 +3,7 @@ import { AlertasService } from './services/alertas.service';
 import { Alerta, UmbralConfig } from '../models/alerta.model';
 import { ResumenAlertas } from '../models/reporting.model';
 import { finalize, catchError, of, firstValueFrom, forkJoin } from 'rxjs';
+import { descargarBlob } from '../util';
 
 @Injectable({
   providedIn: 'root'
@@ -111,18 +112,30 @@ export class AlertasFacade {
       });
   }
 
-  /** Exporta el historial de alertas en formato CSV. */
+  /**
+   * Exporta el historial de alertas a CSV. Se genera en el cliente a partir de
+   * la lista ya cargada (GET /alerts/alertas trae todas, sin paginar), porque no
+   * hay endpoint de reporte de alertas en ga-ms-reportes.
+   */
   exportarHistorialCSV(): void {
-    this._loading.set(true);
-    this.alertasService.exportarHistorialCSV()
-      .pipe(
-        catchError(() => {
-          this._error.set('Error al exportar el historial');
-          return of(null);
-        }),
-        finalize(() => this._loading.set(false))
-      )
-      .subscribe();
+    const alertas = this._alertas();
+    if (alertas.length === 0) {
+      this._error.set('No hay alertas para exportar');
+      return;
+    }
+    const headers = [
+      'ID', 'Tipo', 'Prioridad', 'Descripción', 'Estado', 'Fecha generación',
+      'Código SENA', 'Bien', 'Stock actual', 'Stock mínimo', 'Unidad',
+    ];
+    const escape = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const filas = alertas.map(a => [
+      a.id, a.tipo, a.prioridad, a.descripcion, a.estado, a.fechaGeneracion,
+      a.codigoSena ?? '', a.nombreBien ?? '', a.stockActual ?? '', a.stockMinimo ?? '', a.unidad ?? '',
+    ].map(escape).join(','));
+    const csv = [headers.map(escape).join(','), ...filas].join('\n');
+    // BOM (﻿) para que Excel respete acentos/UTF-8.
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    descargarBlob(blob, `historial_alertas_${new Date().toISOString().slice(0, 10)}.csv`);
   }
 
   /** Resuelve una alerta con datos tipados. */

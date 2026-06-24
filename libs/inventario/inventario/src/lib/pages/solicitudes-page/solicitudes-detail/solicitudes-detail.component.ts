@@ -75,7 +75,8 @@ export class SolicitudesDetailComponent implements OnInit {
   }
 
   onDownloadPdf(): void {
-    // TODO: PDF export — tech debt
+    // Genera y descarga el PDF del GIL vía ga-ms-reportes (POST /api/reportes/gil/pdf).
+    this.facade.exportarGilPdf();
   }
 
   onEnviarAprobacion(): void {

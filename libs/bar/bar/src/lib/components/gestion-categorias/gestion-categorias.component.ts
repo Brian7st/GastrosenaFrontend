@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CategoriaService } from '../../data-access/categoria.service';
 import { Categoria } from '../../models/receta.model';
-import { LucideIconComponent, ButtonComponent, AlertComponent, InputComponent, ConfirmDialogComponent, EmptyStateComponent } from '@restaurant/shared/ui';
+import { LucideIconComponent, ButtonComponent, AlertComponent, InputComponent, ConfirmDialogComponent } from '@restaurant/shared/ui';
 
 @Component({
   selector: 'restaurant-bar-gestion-categorias',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideIconComponent, ButtonComponent, AlertComponent, InputComponent, ConfirmDialogComponent, EmptyStateComponent],
+  imports: [CommonModule, FormsModule, LucideIconComponent, ButtonComponent, AlertComponent, InputComponent, ConfirmDialogComponent],
   templateUrl: './gestion-categorias.component.html',
   styleUrl: './gestion-categorias.component.scss',
 })

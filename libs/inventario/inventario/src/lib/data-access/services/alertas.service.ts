@@ -78,8 +78,4 @@ export class AlertasService {
       );
   }
 
-  /** TODO FE-05 — sin endpoint de exportación CSV confirmado con backend */
-  exportarHistorialCSV(): Observable<never> {
-    return throwError(() => new Error('exportarHistorialCSV: endpoint no disponible — pendiente confirmación backend'));
-  }
 }

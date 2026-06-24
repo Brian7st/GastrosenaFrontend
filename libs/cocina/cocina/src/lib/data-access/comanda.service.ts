@@ -81,8 +81,8 @@ export class ComandaService {
   private http = inject(HttpClient);
   
   // Endpoints reales indicados por el usuario
-  private baseUrlComandas = 'http://localhost:8082/api/cocina/comandas';
-  private baseUrlEstadisticas = 'http://localhost:8082/api/cocina/estadisticas';
+  private baseUrlComandas = '/api/cocina/comandas';
+  private baseUrlEstadisticas = '/api/cocina/estadisticas';
 
   iniciarDetalle(idDetalle: string): Observable<any> {
     return this.http.patch(`${this.baseUrlComandas}/detalle/${idDetalle}/iniciar?idResponsable=550e8400-e29b-41d4-a716-446655440000`, {});
@@ -111,18 +111,18 @@ export class ComandaService {
   }
 
   getIncidenciasPorTipo(tipo: 'CANCELACION' | 'DEVOLUCION' | 'MODIFICACION'): Observable<any[]> {
-    return this.http.get<any[]>(`http://localhost:8082/api/cocina/incidencias/tipo/${tipo}`);
+    return this.http.get<any[]>(`/api/cocina/incidencias/tipo/${tipo}`);
   }
 
   getConteoIncidencias(): Observable<{ canceladas: number; devueltas: number }> {
     return this.http.get<{ canceladas: number; devueltas: number }>(
-      `http://localhost:8082/api/cocina/incidencias/conteo`
+      `/api/cocina/incidencias/conteo`
     );
   }
 
   getRecetaById(idReceta: string): Observable<Receta> {
     // Las recetas viven en el microservicio de cocina (puerto 8082), no en 8080.
-    return this.http.get<Receta>(`http://localhost:8082/api/recetas/${idReceta}`);
+    return this.http.get<Receta>(`/api/recetas/${idReceta}`);
   }
 
   limpiarComandas(fechaInicio: string, fechaFin: string): Observable<void> {
@@ -136,7 +136,7 @@ export class ComandaService {
   }
 
   // ── Incidencias (Cancelados / Devueltos): borran incidencia + comanda ──────────
-  private baseUrlIncidencias = 'http://localhost:8082/api/cocina/incidencias';
+  private baseUrlIncidencias = '/api/cocina/incidencias';
 
   eliminarIncidencia(idAuditoria: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrlIncidencias}/${idAuditoria}`);

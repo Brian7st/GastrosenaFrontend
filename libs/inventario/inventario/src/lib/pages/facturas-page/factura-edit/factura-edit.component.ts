@@ -79,10 +79,6 @@ export class FacturaEditPageComponent implements OnInit {
     this.router.navigate(['/app/inventario/facturas']);
   }
 
-  onExportar(): void {
-    // Exportación pendiente de integración HTTP
-  }
-
   onAgregarItem(): void {
     this.localItems.update((items) => [
       ...items,

@@ -6,6 +6,13 @@
   <button class="print-toolbar__btn print-toolbar__btn--print" (click)="imprimir()">
     🖨 Imprimir / Guardar PDF
   </button>
+  <button
+    class="print-toolbar__btn print-toolbar__btn--print"
+    [disabled]="loading()"
+    (click)="exportarPdf()"
+  >
+    📄 Descargar PDF oficial
+  </button>
 </div>
 
 @if (loading()) {

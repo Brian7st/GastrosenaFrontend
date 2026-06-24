@@ -196,4 +196,20 @@ export class MovimientosService {
         catchError(err => throwError(() => err))
       );
   }
+
+  /**
+   * GET /api/reportes/uso-bienes — reporte de uso/movimientos de bienes en un
+   * rango de fechas. Lo genera ga-ms-reportes. formato: PDF (default) o EXCEL → xlsx.
+   */
+  exportarUsoBienes(fechaInicio: string, fechaFin: string, formato: string, tipo?: 'ENTRADA' | 'SALIDA'): Observable<Blob> {
+    const fmt = formato.toLowerCase() === 'pdf' ? 'PDF' : 'EXCEL';
+    let params = new HttpParams()
+      .set('fechaInicio', fechaInicio)
+      .set('fechaFin', fechaFin)
+      .set('formato', fmt);
+    if (tipo) params = params.set('tipo', tipo);
+    return this.http
+      .get(`/api/reportes/uso-bienes`, { params, responseType: 'blob' })
+      .pipe(catchError(err => throwError(() => err)));
+  }
 }

@@ -11,6 +11,7 @@ import {
 import { SolicitudesService } from './services/solicitudes.service';
 import { EnviarProveedorRequest } from './api/sourcing.api';
 import { finalize, catchError, of, map, EMPTY, tap } from 'rxjs';
+import { descargarBlob } from '../util';
 
 @Injectable({
   providedIn: 'root'
@@ -384,5 +385,40 @@ export class SolicitudesFacade {
       .subscribe(res => {
         if (res !== null) this.cargarSolicitudesSesion();
       });
+  }
+
+  /**
+   * Descarga el PDF del GIL (GIL-F-014). Arma el body desde la solicitud
+   * seleccionada y lo envía a ga-ms-reportes (POST /api/reportes/gil/pdf).
+   */
+  exportarGilPdf(): void {
+    const s = this._solicitudSeleccionada();
+    if (!s) {
+      return;
+    }
+    const body = {
+      gilId: String(s.id),
+      numeroGil: s.numeroGil,
+      regionalNombre: s.regionalNombre,
+      centroNombre: s.centroCostosNombre,
+      solicitante: s.solicitante,
+      fecha: s.fechaSolicitud,
+      items: (s.bienes ?? []).map(b => ({
+        codigo: b.codigoSena,
+        descripcion: b.descripcion,
+        cantidad: String(b.cantidad),
+        unidad: b.unidadMedida,
+      })),
+    };
+    this._loading.set(true);
+    this.solicitudesService.exportarGilPdf(body)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al exportar el PDF del GIL');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false)),
+      )
+      .subscribe(blob => { if (blob) descargarBlob(blob, `gil_${s.numeroGil}.pdf`); });
   }
 }

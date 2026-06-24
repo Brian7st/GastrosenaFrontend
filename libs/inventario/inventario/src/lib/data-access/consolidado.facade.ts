@@ -1,14 +1,17 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { catchError, finalize, of } from 'rxjs';
 import { ConsolidadoService } from './services/consolidado.service';
+import { PresupuestoService } from './services/presupuesto.service';
 import { Consolidado, GenerarConsolidadoData, ElegibleConsolidado } from '../models/consolidado.model';
 import { EjecucionPresupuestal } from '../models/reporting.model';
+import { descargarBlob } from '../util';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ConsolidadoFacade {
   private consolidadoService = inject(ConsolidadoService);
+  private presupuestoService = inject(PresupuestoService);
 
   private _consolidados            = signal<Consolidado[]>([]);
   private _consolidadoSeleccionado = signal<Consolidado | null>(null);
@@ -35,6 +38,26 @@ export class ConsolidadoFacade {
         finalize(() => this._loading.set(false)),
       )
       .subscribe(data => this._consolidados.set(data));
+  }
+
+  /**
+   * Exporta el reporte de Ejecución Presupuestal del año en curso vía ga-ms-reportes
+   * (GET /api/reportes/presupuesto-general). El backend genera el documento por AÑO;
+   * no existe export por-consolidado individual.
+   */
+  exportarReporte(formato: string): void {
+    const anio = new Date().getFullYear();
+    const ext = formato.toLowerCase() === 'pdf' ? 'pdf' : 'xlsx';
+    this._loading.set(true);
+    this.presupuestoService.exportar(anio, formato)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al exportar el reporte del consolidado');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false)),
+      )
+      .subscribe(blob => { if (blob) descargarBlob(blob, `ejecucion_presupuestal_${anio}.${ext}`); });
   }
 
   /**

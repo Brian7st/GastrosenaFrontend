@@ -67,7 +67,7 @@ export const shellRoutes: Routes = [
 
           {
       path: 'fichas',
-      canActivate: [roleGuard([Rol.ADMINISTRADOR])], // solo admin puede ver fichas
+      canActivate: [roleGuard([Rol.ADMINISTRADOR, Rol.INSTRUCTOR])], // solo ADMINISTRADOR e INSTRUCTOR pueden ver fichas
       loadComponent: () => import('@restaurant/usuarios').then(m => m.FichasPageComponent),
     },
     

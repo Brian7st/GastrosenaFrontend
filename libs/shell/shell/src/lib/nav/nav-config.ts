@@ -1,3 +1,4 @@
+import { Rol } from '@restaurant/shared/models';
 import { BarraLateralConfig, TopNavLink } from './nav.models';
 
 export const TOP_MENU_CONFIG: TopNavLink[] = [];
@@ -98,6 +99,9 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
           label: 'Fichas',
           ruta: '/app/fichas',
           icono: 'book-open',
+          // Solo ADMINISTRADOR e INSTRUCTOR pueden ver/gestionar fichas
+          // (coincide con @RequireRole del FichaController en usuarios).
+          roles: [Rol.ADMINISTRADOR, Rol.INSTRUCTOR],
           children: [
             { label: 'Lista de Fichas', ruta: '/app/fichas', icono: 'list' },
           ],
@@ -138,26 +142,11 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
         },
 
         {
-          label: 'Reportes y estadísticas',
-          tKey: 'nav.reportes',
+          label: 'Reportes',
+          //tKey: 'nav.reportes',
           ruta: '/app/reportes',
           icono: 'pie-chart',
           permisos: ['MODULO_REPORTES_VER', 'REPORTES_GESTIONAR', 'generar_reporte_facturacion'],
-          children: [
-            {
-              label: 'Ventas',
-              tKey: 'nav.ventas',
-              ruta: '/app/reportes/ventas',
-              icono: 'trending-up',
-            },
-            {
-              label: 'Inventario',
-              tKey: 'nav.inventario_reportes',
-              ruta: '/app/reportes/inventario',
-              icono: 'warehouse',
-            },
-
-          ],
         },
       ],
     },

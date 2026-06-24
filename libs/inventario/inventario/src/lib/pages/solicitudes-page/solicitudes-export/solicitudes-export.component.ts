@@ -31,4 +31,9 @@ export class SolicitudesExportComponent implements OnInit {
     const rawId = this.route.snapshot.paramMap.get('id') ?? '';
     this.router.navigate(['/app/inventario/solicitudes-gil', rawId]);
   }
+
+  /** Descarga el PDF del GIL generado por ga-ms-reportes. */
+  onExportarPdf(): void {
+    this.facade.exportarGilPdf();
+  }
 }

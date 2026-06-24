@@ -283,7 +283,8 @@ export class PresupuestoDashboardComponent implements OnInit {
   }
 
   onExport(formato: string): void {
-    console.log('Exportar presupuesto:', formato);
+    // Reporte de Presupuesto General / Ejecución (lo genera ga-ms-reportes).
+    this.facade.exportar(formato);
     this.closeExportModal();
   }
 }

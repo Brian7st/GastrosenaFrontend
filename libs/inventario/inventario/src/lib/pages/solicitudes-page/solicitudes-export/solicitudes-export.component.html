@@ -23,7 +23,7 @@
         <span class="material-symbols-outlined text-lg">description</span>
         Descargar .docx
       </button>
-      <button class="btn-download">
+      <button class="btn-download" [disabled]="loading()" (click)="onExportarPdf()">
         <span class="material-symbols-outlined text-lg">download</span>
         Descargar Ahora
       </button>
