@@ -24,8 +24,7 @@
             <restaurant-input
               label="Nombre de la Categoría"
               placeholder="Ej: Cócteles"
-              [ngModel]="nuevaCategoriaNombre"
-              (ngModelChange)="nuevaCategoriaNombre = $event"
+              [(ngModel)]="nuevaCategoriaNombre"
               (keyup.enter)="guardarCategoria()"
             ></restaurant-input>
           </div>
