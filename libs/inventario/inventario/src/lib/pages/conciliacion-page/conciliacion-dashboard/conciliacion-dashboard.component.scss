@@ -96,6 +96,8 @@
   cursor: pointer;
   transition: box-shadow var(--transition-fast);
   border: 1px solid transparent;
+  text-decoration: none;
+  color: inherit;
 
   &:hover {
     box-shadow: var(--shadow-sm);
@@ -118,7 +120,7 @@
   flex-shrink: 0;
 
   &--alert {
-    background: #ffebe9; /* light red */
+    background: var(--color-error-bg); /* light red */
     color: var(--color-terciario);
   }
 }

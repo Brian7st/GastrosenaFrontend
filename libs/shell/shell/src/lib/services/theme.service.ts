@@ -38,7 +38,10 @@ const VARS_OSCURO: Record<string, string> = {
   '--color-surface-secondary': '#252526',
   '--color-surface-tertiary': '#2d2d2d',
   '--color-surface-hover': '#2a2d2e',
+  '--color-surface-active': '#374151',
   '--color-surface': '#1e1e1e',
+  '--color-background': '#1e1e1e',
+  '--color-background-soft': '#252526',
   '--color-border': '#3c3c3c',
   '--color-border-strong': '#4a4a4a',
   '--color-contorno': '#808080',
@@ -56,6 +59,39 @@ const VARS_OSCURO: Record<string, string> = {
   '--color-skeleton-shimmer': '#2d2d2d',
   '--color-table-row-hover': 'rgba(45, 45, 45, 0.8)',
   '--color-table-footer-bg': 'rgba(37, 37, 38, 0.3)',
+  '--color-superficie-contenedor-bajo-rgb': '30, 30, 30',
+  '--color-primario-rgb': '57, 169, 0',
+  '--color-primario-contenedor-rgb': '57, 169, 0',
+  '--color-contorno-variante-rgb': '90, 90, 90',
+  '--color-error-rgb': '186, 26, 26',
+
+  '--color-warning-bg': '#3a2e14',
+  '--color-warning-text': '#fbbf24',
+  '--color-warning-border': '#3c3c3c',
+  '--color-warning-badge-bg': 'rgba(251, 191, 36, 0.15)',
+  '--color-warning-badge-text': '#fbbf24',
+  '--color-warning-interactive': '#fbbf24',
+  '--color-info-bg': '#1a2a4a',
+  '--color-info-text': '#60a5fa',
+  '--color-info-border': '#3c3c3c',
+
+  '--color-brand-primary-soft': '#1a2e14',
+  '--color-brand-primary-strong': '#4ade80',
+
+  '--color-warning': '#fbbf24',
+  '--color-info': '#60a5fa',
+
+  '--color-kpi-green-bg': '#1a3a1a',
+  '--color-kpi-green': '#4ade80',
+  '--color-kpi-blue-bg': '#1a2a3a',
+  '--color-kpi-blue': '#60a5fa',
+  '--color-kpi-red-bg': '#3a1a1a',
+  '--color-kpi-red': '#f87171',
+  '--color-kpi-orange-bg': '#3a2a1a',
+  '--color-kpi-orange': '#fb923c',
+
+  '--color-success-bg': '#1a3a1a',
+  '--color-success-text': '#4ade80',
 };
 
 const VARS_CLARO: Record<string, string> = {
@@ -92,7 +128,10 @@ const VARS_CLARO: Record<string, string> = {
   '--color-surface-secondary': '#f8f9fa',
   '--color-surface-tertiary': '#f1f3f5',
   '--color-surface-hover': '#f3f4f6',
+  '--color-surface-active': '#1e293b',
   '--color-surface': '#ffffff',
+  '--color-background': '#f8fafc',
+  '--color-background-soft': '#f1f5f9',
   '--color-border': '#dee2e6',
   '--color-border-strong': '#adb5bd',
   '--color-contorno': '#6e7b6b',
@@ -110,6 +149,39 @@ const VARS_CLARO: Record<string, string> = {
   '--color-skeleton-shimmer': '#f8fbf6',
   '--color-table-row-hover': 'rgba(248, 250, 252, 0.8)',
   '--color-table-footer-bg': 'rgba(248, 250, 252, 0.3)',
+  '--color-superficie-contenedor-bajo-rgb': '243, 244, 245',
+  '--color-primario-rgb': '57, 169, 0',
+  '--color-primario-contenedor-rgb': '57, 169, 0',
+  '--color-contorno-variante-rgb': '189, 202, 185',
+  '--color-error-rgb': '186, 26, 26',
+
+  '--color-warning-bg': '#fffbeb',
+  '--color-warning-text': '#92400e',
+  '--color-warning-border': '#fde68a',
+  '--color-warning-badge-bg': 'rgba(253, 203, 110, 0.2)',
+  '--color-warning-badge-text': '#8a5b00',
+  '--color-warning-interactive': '#d97a00',
+  '--color-info-bg': '#eff6ff',
+  '--color-info-text': '#1e40af',
+  '--color-info-border': '#bfdbfe',
+
+  '--color-brand-primary-soft': '#e9f8dd',
+  '--color-brand-primary-strong': '#2f7f00',
+
+  '--color-warning': '#fdcb6e',
+  '--color-info': '#0984e3',
+
+  '--color-kpi-green-bg': '#f0fdf4',
+  '--color-kpi-green': '#16a34a',
+  '--color-kpi-blue-bg': '#eff6ff',
+  '--color-kpi-blue': '#2563eb',
+  '--color-kpi-red-bg': '#fef2f2',
+  '--color-kpi-red': '#dc2626',
+  '--color-kpi-orange-bg': '#fff7ed',
+  '--color-kpi-orange': '#ea580c',
+
+  '--color-success-bg': '#f0fdf4',
+  '--color-success-text': '#166534',
 };
 
 @Injectable({ providedIn: 'root' })

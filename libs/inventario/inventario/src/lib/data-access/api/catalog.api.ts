@@ -71,18 +71,6 @@ export interface ImportarProductosRequest {
   productos: CrearProductoRequest[];
 }
 
-/** POST /catalog/productos/exportaciones (202 Accepted — async) */
-export interface SolicitarExportacionRequest {
-  formato: 'CSV';
-}
-
-export interface ExportacionProductosResponse {
-  exportId: string;
-  estado: string;
-  formato: 'CSV';
-  totalProductos: number;
-}
-
 // ── Contratos (/catalog/contratos) ─────────────────────────────────────────────
 
 export interface ItemContratoResponse {

@@ -43,6 +43,8 @@ const VARS_CLARO: Record<string, string> = {
   '--color-surface-tertiary': '#f1f3f5',
   '--color-surface-hover': '#f3f4f6',
   '--color-surface': '#ffffff',
+  '--color-background': '#f8fafc',
+  '--color-background-soft': '#f1f5f9',
 
   '--color-superficie-contenedor-mas-bajo': '#ffffff',
   '--color-superficie-contenedor': '#edeeef',
@@ -69,6 +71,46 @@ const VARS_CLARO: Record<string, string> = {
   '--color-secundario': '#575f67',
   '--color-secundario-contenedor': '#d8e1ea',
   '--color-en-secundario-contenedor': '#5b646b',
+
+  /* === RGB vars (para rgba() con CSS vars) === */
+  '--color-superficie-contenedor-bajo-rgb': '243, 244, 245',
+  '--color-primario-rgb': '57, 169, 0',
+  '--color-primario-contenedor-rgb': '57, 169, 0',
+  '--color-contorno-variante-rgb': '189, 202, 185',
+  '--color-error-rgb': '186, 26, 26',
+
+  /* === Warning === */
+  '--color-warning-bg': '#fffbeb',
+  '--color-warning-text': '#92400e',
+  '--color-warning-border': '#fde68a',
+  '--color-warning': '#fdcb6e',
+  '--color-warning-badge-bg': 'rgba(253, 203, 110, 0.2)',
+  '--color-warning-badge-text': '#8a5b00',
+  '--color-warning-interactive': '#d97a00',
+
+  /* === Info === */
+  '--color-info-bg': '#eff6ff',
+  '--color-info-text': '#1e40af',
+  '--color-info-border': '#bfdbfe',
+  '--color-info': '#0984e3',
+
+  /* === Brand Primary === */
+  '--color-brand-primary-soft': '#e9f8dd',
+  '--color-brand-primary-strong': '#2f7f00',
+
+  /* === KPI Colors === */
+  '--color-kpi-green-bg': '#f0fdf4',
+  '--color-kpi-green': '#16a34a',
+  '--color-kpi-blue-bg': '#eff6ff',
+  '--color-kpi-blue': '#2563eb',
+  '--color-kpi-red-bg': '#fef2f2',
+  '--color-kpi-red': '#dc2626',
+  '--color-kpi-orange-bg': '#fff7ed',
+  '--color-kpi-orange': '#ea580c',
+
+  /* === Success === */
+  '--color-success-bg': '#f0fdf4',
+  '--color-success-text': '#166534',
 
   /* === Otros === */
   '--color-backdrop': 'rgba(15, 23, 42, 0.45)',
@@ -110,6 +152,8 @@ const VARS_OSCURO: Record<string, string> = {
   '--color-surface-tertiary': '#2d2d2d',
   '--color-surface-hover': '#2a2d2e',
   '--color-surface': '#1e1e1e',
+  '--color-background': '#1e1e1e',
+  '--color-background-soft': '#252526',
 
   '--color-superficie-contenedor-mas-bajo': '#1e1e1e',
   '--color-superficie-contenedor': '#2d2d2d',
@@ -136,6 +180,46 @@ const VARS_OSCURO: Record<string, string> = {
   '--color-secundario': '#969696',
   '--color-secundario-contenedor': '#2d2d2d',
   '--color-en-secundario-contenedor': '#c8c8c8',
+
+  /* === RGB vars (para rgba() con CSS vars) === */
+  '--color-superficie-contenedor-bajo-rgb': '30, 30, 30',
+  '--color-primario-rgb': '57, 169, 0',
+  '--color-primario-contenedor-rgb': '57, 169, 0',
+  '--color-contorno-variante-rgb': '90, 90, 90',
+  '--color-error-rgb': '186, 26, 26',
+
+  /* === Warning === */
+  '--color-warning-bg': '#3a2e14',
+  '--color-warning-text': '#fbbf24',
+  '--color-warning-border': '#3c3c3c',
+  '--color-warning': '#fbbf24',
+  '--color-warning-badge-bg': 'rgba(251, 191, 36, 0.15)',
+  '--color-warning-badge-text': '#fbbf24',
+  '--color-warning-interactive': '#fbbf24',
+
+  /* === Info === */
+  '--color-info-bg': '#1a2a4a',
+  '--color-info-text': '#60a5fa',
+  '--color-info-border': '#3c3c3c',
+  '--color-info': '#60a5fa',
+
+  /* === Brand Primary === */
+  '--color-brand-primary-soft': '#1a2e14',
+  '--color-brand-primary-strong': '#4ade80',
+
+  /* === KPI Colors === */
+  '--color-kpi-green-bg': '#1a3a1a',
+  '--color-kpi-green': '#4ade80',
+  '--color-kpi-blue-bg': '#1a2a3a',
+  '--color-kpi-blue': '#60a5fa',
+  '--color-kpi-red-bg': '#3a1a1a',
+  '--color-kpi-red': '#f87171',
+  '--color-kpi-orange-bg': '#3a2a1a',
+  '--color-kpi-orange': '#fb923c',
+
+  /* === Success === */
+  '--color-success-bg': '#1a3a1a',
+  '--color-success-text': '#4ade80',
 
   /* === Otros === */
   '--color-backdrop': 'rgba(0, 0, 0, 0.6)',
@@ -191,9 +275,9 @@ export class ThemeSettingsService {
 
   private aplicarTamanoFuente(tamano: ConfiguracionApariencia['tamanoFuente']): void {
     const escalas: Record<string, Record<string, string>> = {
-      pequeno: { '--font-size-xs': '10px', '--font-size-sm': '12px', '--font-size-md': '14px', '--font-size-lg': '16px', '--font-size-xl': '20px', '--font-size-2xl': '26px' },
+      pequeno: { '--font-size-xs': '9px', '--font-size-sm': '11px', '--font-size-md': '13px', '--font-size-lg': '15px', '--font-size-xl': '19px', '--font-size-2xl': '24px' },
       medio:   { '--font-size-xs': '11px', '--font-size-sm': '13px', '--font-size-md': '15px', '--font-size-lg': '18px', '--font-size-xl': '22px', '--font-size-2xl': '28px' },
-      grande:  { '--font-size-xs': '12px', '--font-size-sm': '14px', '--font-size-md': '17px', '--font-size-lg': '20px', '--font-size-xl': '24px', '--font-size-2xl': '30px' },
+      grande:  { '--font-size-xs': '13px', '--font-size-sm': '15px', '--font-size-md': '19px', '--font-size-lg': '22px', '--font-size-xl': '26px', '--font-size-2xl': '34px' },
     };
     const root = document.documentElement;
     for (const [key, value] of Object.entries(escalas[tamano])) {

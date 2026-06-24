@@ -1,6 +1,6 @@
 .features {
   padding: 4rem 0;
-  background: #f8fafc;
+  background: var(--color-surface-secondary);
 
   &__header {
     text-align: center;
@@ -15,7 +15,7 @@
     em { color: #22c55e; font-style: normal; }
   }
 
-  &__desc { color: #64748b; line-height: 1.7; }
+  &__desc { color: var(--color-text-secondary); line-height: 1.7; }
 
   &__grid {
     display: grid;
@@ -25,8 +25,8 @@
 }
 
 .feature-card {
-  background: #fff;
-  border: 1px solid #e2e8f0;
+  background: var(--color-surface-primary);
+  border: 1px solid var(--color-border);
   border-radius: 1rem;
   padding: 1.75rem;
 
@@ -34,16 +34,16 @@
     width: 48px;
     height: 48px;
     border-radius: 12px;
-    background: #f0fdf4;
+    background: color-mix(in srgb, var(--color-success) 12%, transparent);
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 1.25rem;
-    color: #22c55e;
+    color: var(--color-success);
   }
 
   &__title { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
-  &__desc  { font-size: 0.875rem; color: #64748b; line-height: 1.6; }
+  &__desc  { font-size: 0.875rem; color: var(--color-text-secondary); line-height: 1.6; }
 }
 
 .tag {
@@ -52,5 +52,5 @@
   font-weight: 600;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
-  &-green { background: #f0fdf4; color: #16a34a; }
+  &-green { background: color-mix(in srgb, var(--color-success) 12%, transparent); color: var(--color-success); }
 }

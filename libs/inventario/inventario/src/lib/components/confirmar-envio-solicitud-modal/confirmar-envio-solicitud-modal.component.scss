@@ -124,7 +124,7 @@
 
 .btn-confirm {
   background-color: var(--color-primario, #39a900);
-  color: #ffffff;
+  color: var(--color-en-primario);
   border: none;
 
   &:hover {

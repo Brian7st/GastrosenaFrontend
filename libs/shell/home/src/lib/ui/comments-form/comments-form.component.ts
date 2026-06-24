@@ -7,14 +7,17 @@ import {
 } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
-import { AlertComponent } from '@restaurant/shared/ui';
 import { AuthService } from '@restaurant/shared/auth';
 import { CommentsService, ComentarioResponse } from '../../data-access/comments.service';
-
-@Component({
+import { AlertComponent, LucideIconComponent } from '@restaurant/shared/ui';@Component({
   selector: 'restaurant-comments-form',
   standalone: true,
-  imports: [ReactiveFormsModule, AlertComponent, DatePipe],
+  imports: [
+    ReactiveFormsModule,
+    AlertComponent,
+    DatePipe,
+    LucideIconComponent,
+  ],
   templateUrl: './comments-form.component.html',
   styleUrl: './comments-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -31,7 +31,7 @@
   align-items: center;
   gap: 0.625rem;
   padding: 0.875rem 1.5rem;
-  background: #b91c1c;
+  background: var(--color-estado-anulada);
   color: white;
   font-size: 0.875rem;
   font-weight: 700;
@@ -76,7 +76,7 @@
 
   .material-symbols-outlined {
     font-size: 28px;
-    color: #b91c1c;
+    color: var(--color-estado-anulada);
     font-variation-settings: 'FILL' 1;
   }
 }
@@ -111,7 +111,7 @@
   transition: border-color 0.2s;
 
   &::placeholder { color: var(--color-pizarra-400); }
-  &:focus { border-color: #b91c1c; box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.1); }
+  &:focus { border-color: var(--color-estado-anulada); box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.1); }
 }
 
 /* Dialog Footer */
@@ -127,7 +127,7 @@
 .btn-cancel-green {
   background: none;
   border: none;
-  color: #006e25;
+  color: var(--color-primario);
   font-size: 0.875rem;
   font-weight: 700;
   cursor: pointer;
@@ -162,8 +162,8 @@
 
   &--active {
     background: transparent;
-    color: #e87070;
-    border: 1.5px solid #e87070;
+    color: var(--color-error-text, #e87070);
+    border: 1.5px solid var(--color-error-border, #e87070);
     cursor: pointer;
     transition: all 0.2s;
 

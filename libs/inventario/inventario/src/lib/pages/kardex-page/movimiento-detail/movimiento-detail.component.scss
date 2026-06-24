@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background-color: var(--color-pizarra-50);
 }
 
 .action-header {
@@ -15,7 +15,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #e1e3e4;
+  border-bottom: 1px solid var(--color-superficie-contenedor-mas-alto);
 }
 
 .header-left {
@@ -29,8 +29,8 @@
   height: 2.5rem;
   border-radius: 50%;
   border: none;
-  background-color: #edeeef;
-  color: #191c1d;
+  background-color: var(--color-superficie-contenedor);
+  color: var(--color-en-fondo);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -38,7 +38,7 @@
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: #e7e8e9;
+    background-color: var(--color-superficie-contenedor-alto);
   }
 }
 
@@ -46,7 +46,7 @@
   font-family: 'Manrope', sans-serif;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #191c1d;
+  color: var(--color-en-fondo);
   margin: 0;
   display: flex;
   align-items: center;
@@ -58,8 +58,8 @@
   align-items: center;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
-  background-color: #28a745;
-  color: #ffffff;
+  background-color: var(--color-primario-gradient-end);
+  color: var(--color-en-primario);
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -84,7 +84,7 @@
 }
 
 .card {
-  background-color: #ffffff;
+  background-color: var(--color-surface-primary);
   border-radius: 0.75rem;
   padding: 2rem;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
@@ -104,7 +104,7 @@
   font-family: 'Manrope', sans-serif;
   font-size: 1.125rem;
   font-weight: 700;
-  color: #191c1d;
+  color: var(--color-en-fondo);
   margin: 0 0 1.5rem 0;
 
   &.mb-4 { margin-bottom: 1rem; }
@@ -132,7 +132,7 @@
 .info-label {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #575f67;
+  color: var(--color-secundario);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -143,7 +143,7 @@
   gap: 0.5rem;
   font-size: 1rem;
   font-weight: 500;
-  color: #191c1d;
+  color: var(--color-en-fondo);
   margin-top: 0.25rem;
 }
 
@@ -157,18 +157,18 @@
 
   &--entrada {
     background-color: rgba(40, 167, 69, 0.2);
-    color: #006e25;
+    color: var(--color-primario);
   }
 }
 
-.text-secondary { color: #575f67; }
+.text-secondary { color: var(--color-secundario); }
 
 .avatar {
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
-  background-color: #d8e1ea;
-  color: #5b646b;
+  background-color: var(--color-secundario-contenedor);
+  color: var(--color-en-secundario-contenedor);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -181,24 +181,24 @@
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  color: #006e25;
+  color: var(--color-primario);
   text-decoration: none;
   transition: color 0.2s;
 
   span { border-bottom: 1px solid rgba(0, 110, 37, 0.3); }
-  &:hover { color: #28a745; span { border-color: #28a745; } }
+  &:hover { color: var(--color-primario-gradient-end); span { border-color: var(--color-primario-gradient-end); } }
 }
 
 .info-box {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background-color: #f3f4f5;
+  background-color: var(--color-superficie-contenedor-bajo);
   padding: 1rem;
   border-radius: 0.5rem;
   margin-top: 0.25rem;
   font-size: 1rem;
-  color: #191c1d;
+  color: var(--color-en-fondo);
 
   strong { font-weight: 600; }
 }
@@ -219,7 +219,7 @@
     padding: 1rem 1.5rem;
     font-size: 0.75rem;
     font-weight: 600;
-    color: #575f67;
+    color: var(--color-secundario);
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
@@ -227,17 +227,17 @@
   td {
     padding: 1.5rem;
     font-size: 0.875rem;
-    border-top: 1px solid #edeeef;
+    border-top: 1px solid var(--color-superficie-contenedor);
   }
 
   tbody tr {
     transition: background-color 0.2s;
-    &:hover { background-color: #f3f4f5; }
+    &:hover { background-color: var(--color-superficie-contenedor-bajo); }
   }
 
   tfoot {
     background-color: rgba(243, 244, 245, 0.5);
-    td { padding: 1rem 1.5rem; border-top: 1px solid #e1e3e4; }
+    td { padding: 1rem 1.5rem; border-top: 1px solid var(--color-superficie-contenedor-mas-alto); }
   }
 
   .text-right { text-align: right; }
@@ -254,16 +254,16 @@
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 0.5rem;
-  background-color: #edeeef;
+  background-color: var(--color-superficie-contenedor);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #575f67;
+  color: var(--color-secundario);
 }
 
 .product-name {
   font-weight: 500;
-  color: #191c1d;
+  color: var(--color-en-fondo);
 }
 
 .qty-badge {
@@ -272,7 +272,7 @@
   padding: 0.25rem 0.5rem;
   border-radius: 0.375rem;
   background-color: rgba(40, 167, 69, 0.1);
-  color: #006e25;
+  color: var(--color-primario);
   font-weight: 700;
 }
 
@@ -283,14 +283,14 @@
 
 /* ── Observaciones ── */
 .obs-box {
-  background-color: #f3f4f5;
+  background-color: var(--color-superficie-contenedor-bajo);
   border-radius: 0.75rem;
   padding: 1rem;
   min-height: 100px;
 
   p {
     margin: 0;
-    color: #191c1d;
+    color: var(--color-en-fondo);
     line-height: 1.625;
   }
 }

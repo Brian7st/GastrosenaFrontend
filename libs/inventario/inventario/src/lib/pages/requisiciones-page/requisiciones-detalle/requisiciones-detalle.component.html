@@ -21,6 +21,9 @@
         {{ requisicion()?.numero ?? reqId() }}
       </h2>
     </div>
+    <button class="sheet-panel__close" (click)="exportarPdf()" [disabled]="loading()" title="Exportar PDF">
+      <lucide-icon name="download" [size]="20"></lucide-icon>
+    </button>
     <button class="sheet-panel__close" (click)="close()">
       <lucide-icon name="x" [size]="20"></lucide-icon>
     </button>
@@ -142,14 +145,6 @@
     </div>
   }
 
-  <!-- Aviso de descarga del soporte -->
-  @if (descargaAviso()) {
-    <div class="sheet-panel__error">
-      <lucide-icon name="alert-circle" [size]="16"></lucide-icon>
-      {{ descargaAviso() }}
-    </div>
-  }
-
   <!-- Footer Actions -->
   <footer class="sheet-panel__footer">
 
@@ -167,14 +162,6 @@
               [routerLink]="['/app/inventario/requisiciones/despacho', reqId()]">
         <lucide-icon name="truck" [size]="18"></lucide-icon>
         Registrar Despacho
-      </button>
-    }
-
-    <!-- Exportar .docx — disponible desde FIRMADA -->
-    @if (estado() === 'FIRMADA' || estado() === 'LEGALIZADA') {
-      <button class="btn-outline" (click)="exportar()">
-        <lucide-icon name="download" [size]="18"></lucide-icon>
-        Descargar Soporte
       </button>
     }
 

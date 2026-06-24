@@ -197,13 +197,6 @@ export const INVENTARIO_ROUTES: Routes = [
           ),
       },
       {
-        path: 'historial',
-        loadComponent: () =>
-          import('./pages/alertas-page/alertas-historial/alertas-historial.component').then(
-            m => m.AlertasHistorialComponent
-          ),
-      },
-      {
         path: 'configuracion',
         loadComponent: () =>
           import('./pages/alertas-page/alertas-config/alertas-config.component').then(
@@ -299,15 +292,6 @@ export const INVENTARIO_ROUTES: Routes = [
           import('./pages/actas-page/actas-detail/actas-detail.component').then(
             m => m.ActasDetailComponent
           ),
-        children: [
-          {
-            path: 'cargar-firma',
-            loadComponent: () =>
-              import('./pages/actas-page/actas-upload/actas-upload.component').then(
-                m => m.ActasUploadComponent
-              ),
-          },
-        ],
       },
     ]
   },
@@ -338,13 +322,6 @@ export const INVENTARIO_ROUTES: Routes = [
           ),
         children: [
           {
-            path: 'adjuntar',
-            loadComponent: () =>
-              import('./pages/paquete-probatorio-page/paquete-upload/paquete-upload.component').then(
-                m => m.PaqueteUploadComponent
-              ),
-          },
-          {
             path: 'requisicion',
             loadComponent: () =>
               import('./pages/paquete-probatorio-page/paquete-req-detail/paquete-req-detail.component').then(
@@ -352,6 +329,13 @@ export const INVENTARIO_ROUTES: Routes = [
               ),
           },
         ],
+      },
+      {
+        path: ':id/asistencia',
+        loadComponent: () =>
+          import('./pages/paquete-probatorio-page/paquete-asistencia/paquete-asistencia.component').then(
+            m => m.PaqueteAsistenciaComponent
+          ),
       },
     ],
   },

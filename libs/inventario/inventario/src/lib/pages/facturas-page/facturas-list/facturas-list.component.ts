@@ -115,8 +115,8 @@ export class FacturasListPageComponent implements OnInit {
   }
 
   onConfirmarExportar(formato: string): void {
-    // TODO: integrar con servicio de descarga cuando backend confirme contrato
-    console.info('[FEL] Exportar en formato:', formato);
+    // Reporte general de facturación (lo genera ga-ms-reportes).
+    this.facade.exportarPanel(formato);
     this.showExportarModal.set(false);
   }
 

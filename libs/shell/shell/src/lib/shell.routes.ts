@@ -67,7 +67,7 @@ export const shellRoutes: Routes = [
 
           {
       path: 'fichas',
-      canActivate: [roleGuard([Rol.ADMINISTRADOR])], // solo admin puede ver fichas
+      canActivate: [roleGuard([Rol.ADMINISTRADOR, Rol.INSTRUCTOR])], // solo ADMINISTRADOR e INSTRUCTOR pueden ver fichas
       loadComponent: () => import('@restaurant/usuarios').then(m => m.FichasPageComponent),
     },
     
@@ -88,12 +88,6 @@ export const shellRoutes: Routes = [
           import('@restaurant/configuracion').then(m => m.CONFIGURACION_ROUTES),
       },
 { path: 'notificaciones', loadComponent: () => import('@restaurant/notificaciones').then(m => m.NotificacionesPageComponent) },
-      // 👇 AGREGAR ESTA RUTA:
-      {
-        path: 'perfil',
-        loadComponent: () => import('@restaurant/usuarios').then(m => m.PerfilPageComponent),
-      },
-      // 👇 AGREGAR ESTA RUTA:
       {
         path: 'perfil',
         loadComponent: () => import('@restaurant/usuarios').then(m => m.PerfilPageComponent),

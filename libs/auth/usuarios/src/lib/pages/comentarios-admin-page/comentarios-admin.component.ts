@@ -7,14 +7,14 @@ import {
   computed,
 } from '@angular/core';
 import { DatePipe, TitleCasePipe } from '@angular/common';
-import { LucideIconComponent } from '@restaurant/shared/ui';
+import { KpiCardComponent } from '@restaurant/shared/ui';
 import { I18nService } from '../../i18n/i18n.service';
 import { CommentsService, ComentarioResponse } from '../../../../../../shell/home/src/lib/data-access/comments.service';
 
 @Component({
   selector: 'restaurant-comentarios-admin',
   standalone: true,
-  imports: [DatePipe, TitleCasePipe, LucideIconComponent],
+  imports: [DatePipe, TitleCasePipe, KpiCardComponent],
   templateUrl: './comentarios-admin.component.html',
   styleUrl: './comentarios-admin.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

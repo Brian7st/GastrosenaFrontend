@@ -11,7 +11,7 @@
 }
 
 .modal-content {
-  background-color: #ffffff;
+  background-color: var(--color-surface-primary);
   width: 100%;
   max-width: 45rem; /* 720px */
   border-radius: 0.75rem;
@@ -34,14 +34,14 @@
   font-family: 'Manrope', sans-serif;
   font-size: 1.5rem;
   font-weight: 800;
-  color: #191c1d;
+  color: var(--color-en-fondo);
   margin: 0;
   letter-spacing: -0.025em;
 }
 
 .modal-subtitle {
   font-size: 0.875rem;
-  color: #575f67;
+  color: var(--color-secundario);
   font-weight: 500;
   margin: 0.25rem 0 0;
 }
@@ -57,7 +57,7 @@
   display: block;
   font-size: 0.75rem;
   font-weight: 700;
-  color: #3e4a3c;
+  color: var(--color-contorno);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.75rem;
@@ -78,26 +78,26 @@
   .input-icon {
     position: absolute;
     left: 1rem;
-    color: #6e7b6b;
+    color: var(--color-contorno);
     pointer-events: none;
   }
 }
 
 .form-input {
   width: 100%;
-  background-color: #f3f4f5;
+  background-color: var(--color-superficie-contenedor-bajo);
   border: 1px solid transparent;
   border-radius: 0.75rem;
   padding: 0.75rem 1rem 0.75rem 2.5rem;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #191c1d;
+  color: var(--color-en-fondo);
   transition: all 0.2s;
   
   &:focus {
     outline: none;
-    background-color: #ffffff;
-    border-color: #006e25;
+    background-color: var(--color-surface-primary);
+    border-color: var(--color-primario);
     box-shadow: 0 0 0 2px rgba(0, 110, 37, 0.2);
   }
 }
@@ -113,8 +113,8 @@
 .chip-btn {
   padding: 0.625rem 1.25rem;
   border-radius: 9999px;
-  background-color: #f3f4f5;
-  color: #3e4a3c;
+  background-color: var(--color-superficie-contenedor-bajo);
+  color: var(--color-contorno);
   border: 1px solid rgba(189, 202, 185, 0.3);
   font-size: 0.875rem;
   font-weight: 600;
@@ -122,12 +122,12 @@
   transition: all 0.2s;
 
   &:hover {
-    background-color: #e7e8e9;
+    background-color: var(--color-superficie-contenedor-alto);
   }
 
   &.active {
-    background-color: #28a745;
-    color: #00330d;
+    background-color: var(--color-primario-gradient-end);
+    color: var(--color-en-primario-contenedor);
     border-color: transparent;
     box-shadow: 0 0 0 2px rgba(0, 110, 37, 0.2);
   }
@@ -142,7 +142,7 @@
 
 .format-card {
   position: relative;
-  background-color: #ffffff;
+  background-color: var(--color-surface-primary);
   border: 1px solid rgba(189, 202, 185, 0.3);
   border-radius: 0.75rem;
   padding: 1rem;
@@ -154,11 +154,11 @@
   transition: all 0.2s;
 
   &:hover {
-    background-color: #f3f4f5;
+    background-color: var(--color-superficie-contenedor-bajo);
   }
 
   &.selected {
-    border: 2px solid #006e25;
+    border: 2px solid var(--color-primario);
     background-color: rgba(0, 110, 37, 0.05);
   }
 }
@@ -173,24 +173,24 @@
 
   &.excel-icon {
     background-color: rgba(40, 167, 69, 0.2);
-    color: #006e25;
+    color: var(--color-primario);
   }
 
   &.pdf-icon {
     background-color: rgba(255, 85, 95, 0.1);
-    color: #ba1830;
+    color: var(--color-terciario);
   }
 
   &.csv-icon {
     background-color: rgba(91, 100, 107, 0.1);
-    color: #5b646b;
+    color: var(--color-en-secundario-contenedor);
   }
 }
 
 .format-title {
   font-size: 0.75rem;
   font-weight: 700;
-  color: #191c1d;
+  color: var(--color-en-fondo);
   letter-spacing: -0.025em;
 }
 
@@ -198,7 +198,7 @@
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  color: #006e25;
+  color: var(--color-primario);
 }
 
 /* ── Footer ── */
@@ -208,7 +208,7 @@
   margin-left: -2rem;
   margin-right: -2rem;
   padding: 1.5rem 2rem;
-  background-color: #f3f4f5;
+  background-color: var(--color-superficie-contenedor-bajo);
   display: flex;
   justify-content: flex-end;
   gap: 1rem;

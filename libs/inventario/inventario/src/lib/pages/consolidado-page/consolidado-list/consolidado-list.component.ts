@@ -52,7 +52,7 @@ export class ConsolidadoListComponent implements OnInit {
     const estado = this.filtroEstado();
     return this.consolidados().filter(c => {
       const matchQ = !q ||
-        String(c.id).toLowerCase().includes(q) ||
+        String(c.numero).includes(q) ||
         c.fechaGeneracion.toLowerCase().includes(q) ||
         c.estado.toLowerCase().includes(q);
       const matchEstado = !estado || c.estado === estado;
@@ -87,7 +87,6 @@ export class ConsolidadoListComponent implements OnInit {
   kpiTotalEjecutado = computed(() =>
     this.consolidados().reduce((acc, c) => acc + c.totales.valorNeto, 0)
   );
-  kpiContabilizados = computed(() => 0);
   kpiGenerados      = computed(() => this.consolidados().filter(c => c.estado === 'GENERADO').length);
   kpiReversados     = computed(() => this.consolidados().filter(c => c.estado === 'REVERSADO').length);
 
@@ -113,14 +112,14 @@ export class ConsolidadoListComponent implements OnInit {
     this.showExportModal.set(false);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onExport(_format: 'excel' | 'pdf'): void {
-    // Exportación real pendiente de integración HTTP
+  onExport(format: 'excel' | 'pdf'): void {
+    this.facade.exportarReporte(format);
     this.showExportModal.set(false);
   }
 
-  goToDetail(id: string): void {
-    this.router.navigate(['/app/inventario/consolidado', id]);
+  goToDetail(numero: number): void {
+    // El detalle resuelve por NÚMERO (no UUID): getConsolidadoPorNumero / GET /budget/consolidados/{numero}.
+    this.router.navigate(['/app/inventario/consolidado', numero]);
   }
 
   reversar(id: string): void {

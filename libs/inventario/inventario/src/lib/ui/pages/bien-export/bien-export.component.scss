@@ -134,7 +134,7 @@
 
 /* ── Form Sections ─────────────────────────────────────────────────────────── */
 .form-section {
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: 1.25rem;
   padding: 1.5rem;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
@@ -309,7 +309,7 @@
   transition: all 0.2s;
 
   &:hover {
-    background: white;
+    background: var(--color-surface-primary);
     border-color: var(--color-pizarra-200);
   }
 
@@ -415,7 +415,7 @@
   font-weight: 700;
 
   &.highlight-green {
-    color: #10b981; /* Emerald green */
+    color: var(--color-esmeralda-500); /* Emerald green */
     font-size: 1.5rem;
   }
 
@@ -434,7 +434,7 @@
 
   .info-icon {
     font-size: 16px;
-    color: #fbbf24; /* Amber */
+    color: var(--color-warning); /* Amber */
     flex-shrink: 0;
     margin-top: 2px;
   }
@@ -584,7 +584,7 @@
 .bottom-banner {
   margin-top: 2rem;
   border-radius: 1rem;
-  background: linear-gradient(to right, #f8fafc, #e2e8f0);
+  background: linear-gradient(to right, var(--color-pizarra-50), var(--color-pizarra-200));
   padding: 2rem;
   position: relative;
   overflow: hidden;

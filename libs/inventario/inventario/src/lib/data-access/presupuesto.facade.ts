@@ -19,6 +19,7 @@ import {
   PagoData,
   EstadoCompromiso,
 } from '../models/presupuesto.model';
+import { descargarBlob } from '../util';
 
 @Injectable({ providedIn: 'root' })
 export class PresupuestoFacade {
@@ -78,10 +79,9 @@ export class PresupuestoFacade {
     }
 
     for (const g of groupMap.values()) {
+      // Sin redondear: el formato se aplica una sola vez en el template (pipe number).
       g.porcentajeEjecucion = g.totalMontoAsignado > 0
-        ? parseFloat(
-            ((g.totalMontoComprometido + g.totalMontoPagado) / g.totalMontoAsignado * 100).toFixed(1),
-          )
+        ? (g.totalMontoComprometido + g.totalMontoPagado) / g.totalMontoAsignado * 100
         : 0;
     }
 
@@ -117,10 +117,9 @@ export class PresupuestoFacade {
     }
 
     for (const g of groupMap.values()) {
+      // Sin redondear: el formato se aplica una sola vez en el template (pipe number).
       g.porcentajeEjecucion = g.totalMontoAsignado > 0
-        ? parseFloat(
-            ((g.totalMontoComprometido + g.totalMontoPagado) / g.totalMontoAsignado * 100).toFixed(1),
-          )
+        ? (g.totalMontoComprometido + g.totalMontoPagado) / g.totalMontoAsignado * 100
         : 0;
     }
 
@@ -244,7 +243,10 @@ export class PresupuestoFacade {
         finalize(() => this._loading.set(false)),
       )
       .subscribe(res => {
-        if (res !== null) this.cargarCompromisos(presupuestoId);
+        if (res !== null) {
+          this.cargarCompromisos(presupuestoId);
+          this.loadAll(); // refresca afectaciones/saldos del dashboard tras anular
+        }
       });
   }
 
@@ -320,17 +322,23 @@ export class PresupuestoFacade {
       .subscribe(() => this.loadAll());
   }
 
-  /** Exportar — pendiente backend (FE-06) */
+  /**
+   * Exporta el presupuesto general (lo genera ga-ms-reportes).
+   * El año se toma del presupuesto seleccionado (`vigencia`); si no hay uno
+   * cargado, cae al año actual.
+   */
   exportar(formato: string): void {
+    const anio = this._presupuestoSeleccionado()?.vigencia ?? new Date().getFullYear();
+    const ext = formato.toLowerCase() === 'pdf' ? 'pdf' : 'xlsx';
     this._loading.set(true);
-    this.presupuestoService.exportar(formato)
+    this.presupuestoService.exportar(anio, formato)
       .pipe(
         catchError(() => {
-          this._error.set('Exportación pendiente de implementación en backend');
+          this._error.set('Error al exportar el presupuesto');
           return of(null);
         }),
         finalize(() => this._loading.set(false)),
       )
-      .subscribe();
+      .subscribe(blob => { if (blob) descargarBlob(blob, `presupuesto_${anio}.${ext}`); });
   }
 }

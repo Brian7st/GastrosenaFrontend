@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { provideLucideIcons, LucideMessageSquare, LucidePalette, LucideSettings2, LucideTerminal, LucideStar, LucideAward } from '@lucide/angular';
+import { provideLucideIcons, LucideBuilding2, LucideMessageSquare, LucidePalette, LucideSettings2, LucideTerminal, LucideStar, LucideAward } from '@lucide/angular';
 import { AuthService } from '@restaurant/shared/auth';
 import { RESTAURANT_UI_BASE_ICONS } from '@restaurant/shared/ui';
 import { BarraLateralComponent } from './sidebar/barra-lateral.component';
@@ -24,6 +24,7 @@ import { SIDEBAR_CONFIG, TOP_MENU_CONFIG } from '../nav/nav-config';
   providers: [
     provideLucideIcons(
       ...RESTAURANT_UI_BASE_ICONS,
+      LucideBuilding2,
       LucideMessageSquare,
       LucidePalette,
       LucideSettings2,

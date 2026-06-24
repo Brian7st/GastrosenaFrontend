@@ -13,7 +13,7 @@
   }
 
   .modal-content {
-    background: #ffffff;
+    background: var(--color-surface-primary);
     border-radius: 16px;
     width: 90%;
     max-width: 550px;
@@ -22,23 +22,23 @@
     flex-direction: column;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     animation: modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    color: #1a202c;
+    color: var(--color-text-primary);
   }
 
   .modal-header {
     padding: 24px 32px;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--color-border);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #ffffff;
+    background: var(--color-surface-primary);
     border-radius: 16px 16px 0 0;
   }
 
   .modal-body {
     padding: 32px;
     overflow-y: auto;
-    background: #f8fafc;
+    background: var(--color-surface-secondary);
     border-radius: 0 0 16px 16px;
   }
 

@@ -85,7 +85,6 @@
 
         <thead>
           <tr>
-            <th>ID</th>
             <th>FECHA</th>
             <th>UBICACIÓN</th>
             <th>ÍTEMS</th>
@@ -97,7 +96,6 @@
         <tbody>
           @for (reg of registros(); track reg.id) {
             <tr>
-              <td class="font-bold text-primary">{{ reg.id }}</td>
               <td class="text-secondary whitespace-pre">{{ reg.fecha.replace(', ', '\n') }}</td>
               <td class="text-secondary">{{ reg.ubicacion }}</td>
               <td>
