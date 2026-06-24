@@ -114,8 +114,8 @@ export class AlertasFacade {
 
   /**
    * Exporta el historial de alertas a CSV. Se genera en el cliente a partir de
-   * la lista ya cargada (no hay endpoint en reportes para alertas), siguiendo el
-   * mismo patrón que la exportación CSV de bienes.
+   * la lista ya cargada (GET /alerts/alertas trae todas, sin paginar), porque no
+   * hay endpoint de reporte de alertas en ga-ms-reportes.
    */
   exportarHistorialCSV(): void {
     const alertas = this._alertas();
