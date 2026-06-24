@@ -8,8 +8,6 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import {
-  AlertComponent,
-  DataTableComponent,
   LucideIconComponent,
 } from '@restaurant/shared/ui';
 import { BienLimpiezaFacade } from '../../data-access/bien-limpieza.facade';
@@ -21,8 +19,6 @@ import { BienInactivo, MotivoOmision } from '../../models/bien-limpieza.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     DatePipe,
-    AlertComponent,
-    DataTableComponent,
     LucideIconComponent,
   ],
   templateUrl: './bien-delete-page.component.html',
