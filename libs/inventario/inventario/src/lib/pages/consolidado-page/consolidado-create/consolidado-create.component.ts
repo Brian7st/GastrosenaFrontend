@@ -10,7 +10,7 @@ import {
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ButtonComponent, DataTableComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
+import { ButtonComponent, DataTableComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { ElegibleConsolidado } from '../../../models/consolidado.model';
 import { ConsolidadoFacade } from '../../../data-access/consolidado.facade';
@@ -33,7 +33,6 @@ interface SelectableRow {
     ReactiveFormsModule,
     ButtonComponent,
     DataTableComponent,
-    StatusBadgeComponent,
     BackButtonComponent,
   ],
   templateUrl: './consolidado-create.component.html',
