@@ -9,8 +9,6 @@ import {
   EliminarProductosMasivaRequest,
   EliminacionMasivaResponse,
   ImportarProductosRequest,
-  SolicitarExportacionRequest,
-  ExportacionProductosResponse,
 } from '../api/catalog.api';
 import { ExistenciaResponse } from '../api/inventory.api';
 import {
@@ -201,14 +199,6 @@ export class BienesService {
 
     return this.http
       .post<{ importados: number }>(`${API}/catalog/productos/importar-excel`, formData)
-      .pipe(catchError(err => throwError(() => err)));
-  }
-
-  /** POST /catalog/productos/exportaciones (202 Accepted — async) */
-  solicitarExportacion(formato: 'CSV'): Observable<ExportacionProductosResponse> {
-    const body: SolicitarExportacionRequest = { formato };
-    return this.http
-      .post<ExportacionProductosResponse>(`${API}/catalog/productos/exportaciones`, body)
       .pipe(catchError(err => throwError(() => err)));
   }
 }
