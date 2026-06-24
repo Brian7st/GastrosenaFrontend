@@ -86,4 +86,10 @@ export class RequisicionesDetalleComponent implements OnInit {
   close(): void {
     this.router.navigate(['/app/inventario/requisiciones']);
   }
+
+  /** Descarga el PDF de la requisición (lo genera ga-ms-reportes vía /api/reportes/requisicion). */
+  exportarPdf(): void {
+    const id = this.reqId();
+    if (id) this.facade.exportarRequisicion(id);
+  }
 }

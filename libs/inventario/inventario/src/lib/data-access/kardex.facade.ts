@@ -49,10 +49,10 @@ export class KardexFacade {
   public paginacion               = computed(() => this._paginacion());
 
   /** Descarga el reporte de uso/movimientos de bienes (lo genera ga-ms-reportes). */
-  exportarUsoBienes(fechaInicio: string, fechaFin: string, formato: string): void {
+  exportarUsoBienes(fechaInicio: string, fechaFin: string, formato: string, tipo?: 'ENTRADA' | 'SALIDA'): void {
     const ext = formato.toLowerCase() === 'pdf' ? 'pdf' : 'xlsx';
     this._loading.set(true);
-    this.movimientosService.exportarUsoBienes(fechaInicio, fechaFin, formato)
+    this.movimientosService.exportarUsoBienes(fechaInicio, fechaFin, formato, tipo)
       .pipe(
         catchError(() => {
           this._error.set('Error al exportar el reporte de uso de bienes');

@@ -2,46 +2,12 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { Bien } from '../../models/inventario.model';
 import { descargarBlob } from '../../util';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BienExportService {
-  /**
-   * Exporta un listado de bienes a CSV.
-   */
-  exportToCsv(bienes: Bien[]): void {
-    const headers = ['ID', 'Código SENA', 'Código Proveedor', 'Descripción', 'Categoría', 'Stock', 'Valor', 'Estado'];
-    const rows = bienes.map(b => [
-      b.id,
-      b.codigoSena,
-      b.codigoProveedor || '',
-      b.descripcion,
-      b.categoria,
-      b.stockActual,
-      b.valor,
-      b.estado
-    ]);
-
-    const csvContent = [
-      headers.join(','),
-      ...rows.map(e => e.join(','))
-    ].join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    
-    link.setAttribute('href', url);
-    link.setAttribute('download', `reporte_bienes_${new Date().getTime()}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
-
   private http = inject(HttpClient);
 
   /**
