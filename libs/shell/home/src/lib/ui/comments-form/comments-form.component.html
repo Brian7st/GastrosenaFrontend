@@ -107,11 +107,16 @@
             Cargando comentarios...
           </div>
         } @else if (comentarios().length === 0) {
-          <div class="foro-empty">
-            <span class="foro-empty__icon">💬</span>
-            <p>Aún no hay comentarios aprobados.</p>
-            <p>¡Sé el primero en compartir tu opinión!</p>
-          </div>
+        <div class="foro-empty">
+  <!-- Pasar color verde explícitamente -->
+  <lucide-icon 
+    name="info" 
+    [size]="50"
+    class="foro-empty__icon"
+  ></lucide-icon>
+  <p>Aún no hay comentarios aprobados.</p>
+  <p>¡Sé el primero en compartir tu opinión!</p>
+</div>
         } @else {
           <div class="foro-list">
             @for (c of comentarios(); track c.idComentario) {
