@@ -209,5 +209,21 @@ export class PedidosCartComponent {
     this.cantidadItemAccion.set(1);
     this.showItemActionModal.set(false);
   }
+
+  getEstadoDetalleClass(estado?: string): string {
+    if (!estado) return 'estado-pendiente';
+    switch (estado.toUpperCase()) {
+      case 'PREPARANDO': return 'estado-preparando';
+      case 'TERMINADO': return 'estado-terminado';
+      case 'CANCELADO': return 'estado-cancelado';
+      case 'DEVUELTO': return 'estado-cancelado';
+      default: return 'estado-pendiente';
+    }
+  }
+
+  getEstadoDetalleText(estado?: string): string {
+    if (!estado) return 'Pendiente';
+    return estado.charAt(0).toUpperCase() + estado.slice(1).toLowerCase();
+  }
 }
 

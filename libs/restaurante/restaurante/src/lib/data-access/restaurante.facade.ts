@@ -18,6 +18,7 @@ export interface ItemCarrito {
   precioUnitario: number;
   categoria: string;
   observaciones?: string;
+  estadoDetalle?: string;
 }
 
 export interface ProductoMenu {
@@ -227,7 +228,8 @@ export class RestauranteFacade {
               cantidad: d.cantidad,
               precioUnitario: d.precioUnitario,
               categoria: productoCat,
-              observaciones: d.observaciones || undefined
+              observaciones: d.observaciones || undefined,
+              estadoDetalle: d.estadoDetalle
             };
           })
         }));
@@ -426,7 +428,8 @@ export class RestauranteFacade {
                     cantidad: d.cantidad,
                     precioUnitario: d.precioUnitario,
                     categoria: prod ? prod.category : 'COMIDA', // Mapeo dinámico desde el catálogo
-                    observaciones: d.observaciones || undefined
+                    observaciones: d.observaciones || undefined,
+                    estadoDetalle: d.estadoDetalle
                   };
                 })
               };
@@ -553,7 +556,8 @@ export class RestauranteFacade {
           cantidad: d.cantidad,
           precioUnitario: d.precioUnitario,
           categoria: prod ? prod.category : 'COMIDA',
-          observaciones: d.observaciones || undefined
+          observaciones: d.observaciones || undefined,
+          estadoDetalle: d.estadoDetalle
         };
       })
     };

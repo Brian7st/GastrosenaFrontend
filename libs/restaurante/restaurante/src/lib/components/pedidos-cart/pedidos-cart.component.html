@@ -7,8 +7,13 @@
     @for (item of pedido.detalles; track item.productoId; let i = $index) {
       <div class="item-row">
         <div class="item-details">
-          <h4 class="name">{{ item.nombreProducto }}</h4>
-            <div class="obs-display">
+          <div style="display: flex; align-items: center;">
+            <h4 class="name" style="margin-bottom: 0;">{{ item.nombreProducto }}</h4>
+            @if (esPedidoSoloLectura() && item.estadoDetalle) {
+               <span class="estado-badge" [ngClass]="getEstadoDetalleClass(item.estadoDetalle)">{{ getEstadoDetalleText(item.estadoDetalle) }}</span>
+            }
+          </div>
+            <div class="obs-display" style="margin-top: 4px;">
               <span class="category" [title]="item.observaciones || 'Sin observaciones'">{{ item.observaciones || 'Sin observaciones' }}</span>
               @if (!esPedidoSoloLectura()) {
                 <button class="btn-edit-obs" (click)="iniciarEdicionObservacion(i, item.observaciones || '')" title="Agregar/Editar observaciones">
