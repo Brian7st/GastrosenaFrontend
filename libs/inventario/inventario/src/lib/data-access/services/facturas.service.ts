@@ -27,6 +27,20 @@ const API = '/api/v1';
 export class FacturasService {
   private http = inject(HttpClient);
 
+  /**
+   * GET /api/reportes/facturacion — reporte GENERAL de facturación por rango de fechas.
+   * Lo genera ga-ms-reportes (server-side). No existe export por-factura en el backend.
+   */
+  exportarFacturacion(fechaInicio: string, fechaFin: string, formato: 'PDF' | 'EXCEL'): Observable<Blob> {
+    const params = new HttpParams()
+      .set('fechaInicio', fechaInicio)
+      .set('fechaFin', fechaFin)
+      .set('formato', formato);
+    return this.http
+      .get('/api/reportes/facturacion', { params, responseType: 'blob' })
+      .pipe(catchError(err => throwError(() => err)));
+  }
+
   getFacturas(filtros?: FacturaFiltros): Observable<{ facturas: Factura[]; paginacion: FacturaPaginacion }> {
     let params = new HttpParams();
     if (filtros?.busqueda)   params = params.set('numeroFactura', filtros.busqueda);
