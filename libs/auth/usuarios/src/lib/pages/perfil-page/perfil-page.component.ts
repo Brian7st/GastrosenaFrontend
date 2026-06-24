@@ -53,6 +53,10 @@ export class PerfilPageComponent implements OnInit {
   localStorage.getItem(`fotoUrl_${this.usuario?.id}`) ?? null
 );
 
+readonly mostrarContrasenaActual = signal(false);
+readonly mostrarNuevaContrasena = signal(false);
+readonly mostrarConfirmarContrasena = signal(false);
+
   readonly iniciales = computed(() => {
     const nombre = this.usuario?.nombre ?? '';
     const partes = nombre.split(' ');
