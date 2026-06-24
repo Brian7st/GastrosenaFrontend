@@ -153,7 +153,9 @@ export class MovimientoAjusteComponent {
     this.successMessage.set('Ajuste registrado correctamente.');
     setTimeout(() => this.successMessage.set(null), 4000);
     this.ajusteForm.reset({ autorizado: true });
-    this.limpiarProducto();
+    this.productoSeleccionado.set(null);
+    this.busqueda.set('');
+    this.resultados.set([]);
     this.cantidadIngresada.set(null);
   }
 
