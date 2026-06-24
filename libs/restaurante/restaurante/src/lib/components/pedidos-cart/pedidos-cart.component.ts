@@ -48,7 +48,8 @@ export class PedidosCartComponent {
   motivoDevolucion = signal('');
   motivoItem = signal('');
   
-  itemAccionActual = signal<{id: string, nombre: string, tipo: 'CANCELAR' | 'DEVOLVER'} | null>(null);
+  itemAccionActual = signal<{id: string, nombre: string, tipo: 'CANCELAR' | 'DEVOLVER', maxCantidad: number} | null>(null);
+  cantidadItemAccion = signal<number>(1);
 
   editIndex = signal<number | null>(null);
   tempObservacion = signal<string>('');
@@ -155,11 +156,25 @@ export class PedidosCartComponent {
     });
   }
 
-  iniciarAccionItem(id: string | undefined, nombre: string, tipo: 'CANCELAR' | 'DEVOLVER') {
+  iniciarAccionItem(id: string | undefined, nombre: string, tipo: 'CANCELAR' | 'DEVOLVER', maxCantidad: number) {
     if (!id) return;
-    this.itemAccionActual.set({ id, nombre, tipo });
+    this.itemAccionActual.set({ id, nombre, tipo, maxCantidad });
     this.motivoItem.set('');
+    this.cantidadItemAccion.set(maxCantidad);
     this.showItemActionModal.set(true);
+  }
+
+  incrementarCantidadAccion() {
+    const accion = this.itemAccionActual();
+    if (accion && this.cantidadItemAccion() < accion.maxCantidad) {
+      this.cantidadItemAccion.update(c => c + 1);
+    }
+  }
+
+  decrementarCantidadAccion() {
+    if (this.cantidadItemAccion() > 1) {
+      this.cantidadItemAccion.update(c => c - 1);
+    }
   }
 
   ejecutarAccionItem() {
@@ -169,16 +184,18 @@ export class PedidosCartComponent {
     const motivo = this.motivoItem();
     if (!motivo.trim()) return;
 
+    const cantidad = this.cantidadItemAccion();
+
     this.showItemActionModal.set(false);
 
     if (accion.tipo === 'CANCELAR') {
-      this.facade.cancelarItemPedido(accion.id, motivo).subscribe({
+      this.facade.cancelarItemPedido(accion.id, motivo, cantidad).subscribe({
         next: (exito) => {
           if (exito) this.limpiarAccionItem();
         }
       });
     } else {
-      this.facade.devolverItemPedido(accion.id, motivo).subscribe({
+      this.facade.devolverItemPedido(accion.id, motivo, cantidad).subscribe({
         next: (exito) => {
           if (exito) this.limpiarAccionItem();
         }
@@ -189,7 +206,24 @@ export class PedidosCartComponent {
   limpiarAccionItem() {
     this.itemAccionActual.set(null);
     this.motivoItem.set('');
+    this.cantidadItemAccion.set(1);
     this.showItemActionModal.set(false);
+  }
+
+  getEstadoDetalleClass(estado?: string): string {
+    if (!estado) return 'estado-pendiente';
+    switch (estado.toUpperCase()) {
+      case 'PREPARANDO': return 'estado-preparando';
+      case 'TERMINADO': return 'estado-terminado';
+      case 'CANCELADO': return 'estado-cancelado';
+      case 'DEVUELTO': return 'estado-cancelado';
+      default: return 'estado-pendiente';
+    }
+  }
+
+  getEstadoDetalleText(estado?: string): string {
+    if (!estado) return 'Pendiente';
+    return estado.charAt(0).toUpperCase() + estado.slice(1).toLowerCase();
   }
 }
 

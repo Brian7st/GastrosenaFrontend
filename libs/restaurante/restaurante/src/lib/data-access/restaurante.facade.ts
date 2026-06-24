@@ -18,6 +18,7 @@ export interface ItemCarrito {
   precioUnitario: number;
   categoria: string;
   observaciones?: string;
+  estadoDetalle?: string;
 }
 
 export interface ProductoMenu {
@@ -227,7 +228,8 @@ export class RestauranteFacade {
               cantidad: d.cantidad,
               precioUnitario: d.precioUnitario,
               categoria: productoCat,
-              observaciones: d.observaciones || undefined
+              observaciones: d.observaciones || undefined,
+              estadoDetalle: d.estadoDetalle
             };
           })
         }));
@@ -426,7 +428,8 @@ export class RestauranteFacade {
                     cantidad: d.cantidad,
                     precioUnitario: d.precioUnitario,
                     categoria: prod ? prod.category : 'COMIDA', // Mapeo dinámico desde el catálogo
-                    observaciones: d.observaciones || undefined
+                    observaciones: d.observaciones || undefined,
+                    estadoDetalle: d.estadoDetalle
                   };
                 })
               };
@@ -494,9 +497,9 @@ export class RestauranteFacade {
     });
   }
 
-  cancelarItemPedido(idDetalle: string, motivo: string = ''): Observable<boolean> {
+  cancelarItemPedido(idDetalle: string, motivo: string = '', cantidad?: number): Observable<boolean> {
     return new Observable(observer => {
-      this.restauranteService.cancelarDetallePedido(idDetalle, motivo).subscribe({
+      this.restauranteService.cancelarDetallePedido(idDetalle, motivo, cantidad).subscribe({
         next: (pedidoFull) => {
           this.actualizarPedidoActivoDesdeRespuesta(pedidoFull);
           observer.next(true);
@@ -511,9 +514,9 @@ export class RestauranteFacade {
     });
   }
 
-  devolverItemPedido(idDetalle: string, motivo: string = ''): Observable<boolean> {
+  devolverItemPedido(idDetalle: string, motivo: string = '', cantidad?: number): Observable<boolean> {
     return new Observable(observer => {
-      this.restauranteService.devolverDetallePedido(idDetalle, motivo).subscribe({
+      this.restauranteService.devolverDetallePedido(idDetalle, motivo, cantidad).subscribe({
         next: (pedidoFull) => {
           this.actualizarPedidoActivoDesdeRespuesta(pedidoFull);
           observer.next(true);
@@ -553,7 +556,8 @@ export class RestauranteFacade {
           cantidad: d.cantidad,
           precioUnitario: d.precioUnitario,
           categoria: prod ? prod.category : 'COMIDA',
-          observaciones: d.observaciones || undefined
+          observaciones: d.observaciones || undefined,
+          estadoDetalle: d.estadoDetalle
         };
       })
     };
