@@ -7,8 +7,13 @@
     @for (item of pedido.detalles; track item.productoId; let i = $index) {
       <div class="item-row">
         <div class="item-details">
-          <h4 class="name">{{ item.nombreProducto }}</h4>
-            <div class="obs-display">
+          <div style="display: flex; align-items: center;">
+            <h4 class="name" style="margin-bottom: 0;">{{ item.nombreProducto }}</h4>
+            @if (esPedidoSoloLectura() && item.estadoDetalle) {
+               <span class="estado-badge" [ngClass]="getEstadoDetalleClass(item.estadoDetalle)">{{ getEstadoDetalleText(item.estadoDetalle) }}</span>
+            }
+          </div>
+            <div class="obs-display" style="margin-top: 4px;">
               <span class="category" [title]="item.observaciones || 'Sin observaciones'">{{ item.observaciones || 'Sin observaciones' }}</span>
               @if (!esPedidoSoloLectura()) {
                 <button class="btn-edit-obs" (click)="iniciarEdicionObservacion(i, item.observaciones || '')" title="Agregar/Editar observaciones">
@@ -42,11 +47,11 @@
             </button>
           } @else if (estadoPedido() !== 'FACTURADO' && estadoPedido() !== 'CANCELADO') {
             <div style="display: flex; gap: 8px;">
-              <button class="btn-delete" style="color: var(--color-error);" (click)="iniciarAccionItem(item.id, item.nombreProducto, 'CANCELAR')" title="Cancelar producto">
+              <button class="btn-delete" style="color: var(--color-error);" (click)="iniciarAccionItem(item.id, item.nombreProducto, 'CANCELAR', item.cantidad)" title="Cancelar producto">
                 <lucide-icon name="x-circle" [size]="16"></lucide-icon>
               </button>
               @if (estadoPedido() === 'ENTREGADO' || estadoPedido() === 'LISTO_PARA_SERVIR') {
-                <button class="btn-delete" style="color: var(--color-warning);" (click)="iniciarAccionItem(item.id, item.nombreProducto, 'DEVOLVER')" title="Devolver producto">
+                <button class="btn-delete" style="color: var(--color-warning);" (click)="iniciarAccionItem(item.id, item.nombreProducto, 'DEVOLVER', item.cantidad)" title="Devolver producto">
                   <lucide-icon name="arrow-left" [size]="16"></lucide-icon>
                 </button>
               }
@@ -210,6 +215,32 @@
         ¿Estás seguro de que quieres {{ accionItem.tipo === 'CANCELAR' ? 'cancelar' : 'devolver' }} el producto <strong>{{ accionItem.nombre }}</strong>?
       </p>
       
+      <div class="cancel-quantity-container" style="margin-top: 16px; margin-bottom: 20px;">
+        <label style="display: block; font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-text-primary);">
+          Cantidad a {{ accionItem.tipo === 'CANCELAR' ? 'cancelar' : 'devolver' }} (Max: {{ accionItem.maxCantidad }}) *
+        </label>
+        
+        <div class="modal-quantity-controls">
+          <button 
+            class="btn-minus" 
+            (click)="decrementarCantidadAccion()"
+            [disabled]="cantidadItemAccion() <= 1"
+            title="Reducir cantidad">
+            <lucide-icon name="minus" [size]="18"></lucide-icon>
+          </button>
+          
+          <span class="qty-display">{{ cantidadItemAccion() }}</span>
+          
+          <button 
+            class="btn-plus" 
+            (click)="incrementarCantidadAccion()"
+            [disabled]="cantidadItemAccion() >= accionItem.maxCantidad"
+            title="Aumentar cantidad">
+            <lucide-icon name="plus" [size]="18"></lucide-icon>
+          </button>
+        </div>
+      </div>
+
       <div class="cancel-reason-container">
         <label for="motivoItem">Motivo de la {{ accionItem.tipo === 'CANCELAR' ? 'cancelación' : 'devolución' }} *</label>
         <textarea 
@@ -227,7 +258,7 @@
         <restaurant-button 
           [class]="accionItem.tipo === 'DEVOLVER' ? 'btn-devolver' : 'btn-anular'"
           variant="primary" 
-          [disabled]="!motivoItem().trim()" 
+          [disabled]="!motivoItem().trim() || cantidadItemAccion() < 1 || cantidadItemAccion() > accionItem.maxCantidad" 
           (click)="ejecutarAccionItem()">
           Sí, {{ accionItem.tipo === 'CANCELAR' ? 'cancelar' : 'devolver' }} ítem
         </restaurant-button>

@@ -48,8 +48,9 @@ export class PerfilPageComponent implements OnInit {
   readonly usuario   = this.authService.currentUser();
   readonly guardando = signal(false);
   readonly exito     = signal(false);
+  readonly errorMsg  = signal('')
   readonly subiendo  = signal(false);
- readonly fotoUrl = signal<string | null>(
+  readonly fotoUrl = signal<string | null>(
   localStorage.getItem(`fotoUrl_${this.usuario?.id}`) ?? null
 );
 
@@ -172,32 +173,37 @@ readonly mostrarConfirmarContrasena = signal(false);
   }
 
   onCambiarContrasena(): void {
-    const form = this.seguridadForm;
-    if (form.invalid) {
-      form.markAllAsTouched();
-      return;
-    }
-    const { contrasenaActual, nuevaContrasena, confirmar } = form.value;
-    if (nuevaContrasena !== confirmar) {
-      alert('Las contraseñas nuevas no coinciden');
-      return;
-    }
-    this.guardando.set(true);
-    this.usuariosService
-      .cambiarContrasena(contrasenaActual!, nuevaContrasena!)
-      .subscribe({
-        next: () => {
-          this.guardando.set(false);
-          this.exito.set(true);
-          form.reset();
-          setTimeout(() => this.exito.set(false), 3000);
-        },
-        error: () => {
-          this.guardando.set(false);
-          alert('Error al cambiar contraseña. Verifique la contraseña actual.');
-        },
-      });
+  const form = this.seguridadForm;
+  if (form.invalid) {
+    form.markAllAsTouched();
+    return;
   }
+  const { contrasenaActual, nuevaContrasena, confirmar } = form.value;
+  if (nuevaContrasena !== confirmar) {
+    this.errorMsg.set('Las contraseñas nuevas no coinciden');
+    return;
+  }
+  this.guardando.set(true);
+  this.errorMsg.set('');
+  this.exito.set(false);
+
+  this.usuariosService
+    .cambiarContrasena(contrasenaActual!, nuevaContrasena!)
+    .subscribe({
+      next: () => {
+        this.guardando.set(false);
+        this.exito.set(true);
+        this.errorMsg.set('');
+        form.reset();
+        setTimeout(() => this.exito.set(false), 3000);
+      },
+      error: () => {
+        this.guardando.set(false);
+        this.errorMsg.set('Error al cambiar contraseña. Verifique la contraseña actual.');
+      },
+    });
+}
+
 
   onCancelar(): void {
     this.cargarPerfil();

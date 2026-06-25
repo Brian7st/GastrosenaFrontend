@@ -196,6 +196,10 @@
     }
   }
 
+  // ============================================
+  // 👇 SECCIÓN MODIFICADA - SALTO DE LÍNEA
+  // ============================================
+
   &__user {
     display: flex;
     align-items: center;
@@ -212,16 +216,23 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    max-width: 200px;
   }
 
   &__user-email {
     font-size: var(--font-size-xs);
     color: var(--color-text-secondary);
     margin: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    max-width: 180px;
+    word-wrap: break-word;        // 👈 Permite salto de línea
+    word-break: break-word;       // 👈 Rompe palabras largas
+    line-height: 1.3;
+    display: block;
   }
+
+  // ============================================
+  // FIN SECCIÓN MODIFICADA
+  // ============================================
 
   &__badge {
     display: inline-flex;

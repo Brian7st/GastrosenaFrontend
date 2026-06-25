@@ -252,6 +252,32 @@
   text-align: center;
 }
 
+// ── Mensaje de error ──────────────────────────────────────────────────────────
+
+.perfil-error {
+  padding: var(--space-3) var(--space-4);
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: center;
+  width: 100%;
+  animation: fadeSlide 0.3s ease;
+}
+
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 // ── Campo de contraseña con toggle (ojo) ───────────────────────────────────
 
 .password-field {

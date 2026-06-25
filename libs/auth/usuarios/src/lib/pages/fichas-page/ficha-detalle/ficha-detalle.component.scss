@@ -36,7 +36,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--space-3);
 }
  
 .detalle__title {
@@ -250,7 +250,8 @@
  
   td {
     padding: var(--space-3) var(--space-4);
-    color: var(--color-text-primary);
+    color: var(--color-text-heading);
+    font-weight: var(--font-weight-medium);
     vertical-align: middle;
   }
 }
@@ -265,22 +266,6 @@
   padding-left: calc(var(--space-4) - 3px);
 }
  
-.detalle__td-mono {
-  font-family: monospace;
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-}
- 
-.detalle__td-nombre {
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text-heading);
-}
- 
-.detalle__td-email {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-xs);
-}
- 
 // ── BADGES ───────────────────────────────────
 .detalle__badge {
   display: inline-flex;
@@ -292,8 +277,8 @@
   font-weight: var(--font-weight-medium);
   white-space: nowrap;
  
-  &--vocero    { background: var(--color-warning-bg); color: var(--color-warning-text); }
-  &--subvocero { background: var(--color-info-bg); color: var(--color-info-text); }
+  &--vocero    { background: var(--color-esmeralda-100); color: var(--color-esmeralda-800); }
+  &--subvocero { background: var(--color-esmeralda-50); color: var(--color-esmeralda-700); }
   &--ninguno   { background: var(--color-superficie-contenedor); color: var(--color-text-secondary); }
 }
  
@@ -320,17 +305,17 @@
   white-space: nowrap;
  
   &--vocero {
-    background: var(--color-warning-bg);
-    color: var(--color-warning-text);
-    border-color: var(--color-warning-border);
-    &:hover { background: var(--color-warning-border); }
+    background: var(--color-esmeralda-100);
+    color: var(--color-esmeralda-800);
+    border-color: var(--color-esmeralda-200);
+    &:hover { background: var(--color-esmeralda-200); }
   }
 
   &--subvocero {
-    background: var(--color-info-bg);
-    color: var(--color-info-text);
-    border-color: var(--color-info-border);
-    &:hover { background: var(--color-info-border); }
+    background: var(--color-esmeralda-50);
+    color: var(--color-esmeralda-700);
+    border-color: var(--color-esmeralda-100);
+    &:hover { background: var(--color-esmeralda-100); }
   }
  
   &--remover {
