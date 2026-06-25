@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { ButtonComponent, DataTableComponent, KpiCardComponent, LoadingSkeletonComponent } from '@restaurant/shared/ui';
+import { ButtonComponent, DataTableComponent, KpiCardComponent, LoadingSkeletonComponent, HasPermissionDirective } from '@restaurant/shared/ui';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { ContratosFacade } from '../../../data-access/contratos.facade';
 import { BienFormComponent } from '../../../ui/modals/bien-form/bien-form.component';
@@ -25,6 +25,7 @@ type VistaGestion = 'bienes' | 'contratos';
     DataTableComponent,
     KpiCardComponent,
     LoadingSkeletonComponent,
+    HasPermissionDirective,
     BienFormComponent,
     BienImportModalComponent,
     ContratoImportModalComponent,

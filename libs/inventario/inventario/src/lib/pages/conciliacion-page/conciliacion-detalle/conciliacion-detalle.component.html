@@ -13,6 +13,7 @@
 
       @if (detalle()!.estado !== 'COMPLETADA') {
         <button
+          *hasPermission="'conciliacion:registrar_conteo'"
           class="cerrar-btn"
           [disabled]="!puedeCerrar() || loading()"
           [title]="puedeCerrar() ? 'Cerrar y finalizar la conciliación' : 'Resolvé todas las diferencias antes de cerrar'"
@@ -153,7 +154,7 @@
               </td>
               <td class="text-center">
                 @if (item.estado !== 'RESUELTA') {
-                  <button class="resolver-btn" (click)="abrirResolver(item)" [disabled]="loading()">
+                  <button *hasPermission="'conciliacion:registrar_conteo'" class="resolver-btn" (click)="abrirResolver(item)" [disabled]="loading()">
                     <lucide-icon name="check" [size]="16"></lucide-icon>
                     Resolver
                   </button>

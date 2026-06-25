@@ -12,12 +12,12 @@
       <span class="breadcrumb-label">Solicitudes GIL</span>
     </div>
     <div class="topbar__actions">
-      <restaurant-button variant="ghost" (click)="onEditar()">
+      <restaurant-button *hasPermission="'gil:editar'" variant="ghost" (click)="onEditar()">
         <lucide-icon name="pencil" [size]="16"></lucide-icon>
         Editar
       </restaurant-button>
       @if (s.estadoSolicitud === 'BORRADOR') {
-        <restaurant-button variant="primary" id="btn-enviar-aprobacion" (click)="onEnviarAprobacion()">
+        <restaurant-button *hasPermission="'gil:emitir'" variant="primary" id="btn-enviar-aprobacion" (click)="onEnviarAprobacion()">
           Enviar a Aprobación
         </restaurant-button>
       }

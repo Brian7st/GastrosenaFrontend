@@ -5,6 +5,7 @@ import {
   ButtonComponent,
   LucideIconComponent,
   StatusBadgeComponent,
+  HasPermissionDirective,
 } from '@restaurant/shared/ui';
 import { FacturasFacade } from '../../../data-access/facturas.facade';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
@@ -13,7 +14,7 @@ import { EstadoGIL } from '../../../models/facturas.model';
 @Component({
   selector: 'restaurant-gil-solicitud-detail',
   standalone: true,
-  imports: [CommonModule, ButtonComponent, LucideIconComponent, StatusBadgeComponent],
+  imports: [CommonModule, ButtonComponent, LucideIconComponent, StatusBadgeComponent, HasPermissionDirective],
   templateUrl: './gil-solicitud-detail.component.html',
   styleUrl: './gil-solicitud-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

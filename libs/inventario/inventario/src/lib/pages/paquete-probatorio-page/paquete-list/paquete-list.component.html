@@ -6,7 +6,7 @@
       <p class="paquete-page__subtitle">Dossier de auditoría legal para legalización de materiales de formación.</p>
     </div>
     <div class="header-actions">
-      <restaurant-button variant="primary" (click)="crearPaquete()">
+      <restaurant-button *hasPermission="'paquete:crear'" variant="primary" (click)="crearPaquete()">
         <div class="btn-icon-text">
           <lucide-icon name="plus" [size]="20"></lucide-icon>
           Crear Expediente

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } 
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-import { LucideIconComponent, KpiCardComponent } from '@restaurant/shared/ui';
+import { LucideIconComponent, KpiCardComponent, HasPermissionDirective } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { ConciliacionFacade } from '../../../data-access/conciliacion.facade';
 import { DiferenciaItem } from '../../../models/conciliacion.model';
@@ -16,6 +16,7 @@ import { DiferenciaItem } from '../../../models/conciliacion.model';
     RouterModule,
     LucideIconComponent,
     KpiCardComponent,
+    HasPermissionDirective,
     BackButtonComponent,
   ],
   templateUrl: './conciliacion-detalle.component.html',

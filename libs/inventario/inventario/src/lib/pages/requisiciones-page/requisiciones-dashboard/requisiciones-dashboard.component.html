@@ -8,7 +8,7 @@
       <p class="page-subtitle">Gestión de Formatos de Bienes y Servicios — Ciclo completo</p>
     </div>
     <div class="header-actions">
-      <restaurant-button variant="primary" routerLink="nueva">
+      <restaurant-button *hasPermission="'requisiciones:crear'" variant="primary" routerLink="nueva">
         <div class="btn-icon-text">
           <lucide-icon name="plus" [size]="20"></lucide-icon>
           Nueva Requisición

@@ -5,15 +5,15 @@
     <p class="page-subtitle">Control exhaustivo y trazabilidad de activos de formación.</p>
   </div>
   <div class="header-actions">
-    <restaurant-button variant="surface" (click)="onImportBienes()">
+    <restaurant-button *hasPermission="'bienes:importar'" variant="surface" (click)="onImportBienes()">
       <span class="material-symbols-outlined">file_upload</span>
       Cargar datos internos
     </restaurant-button>
-    <restaurant-button variant="surface" (click)="onExportBienes()">
+    <restaurant-button *hasPermission="'bienes:exportar'" variant="surface" (click)="onExportBienes()">
       <span class="material-symbols-outlined">file_download</span>
       Exportar
     </restaurant-button>
-    <restaurant-button variant="primary" (click)="onNuevoBien()">
+    <restaurant-button *hasPermission="'bienes:crear'" variant="primary" (click)="onNuevoBien()">
       <span class="material-symbols-outlined">add</span>
       Nuevo Bien
     </restaurant-button>
@@ -170,19 +170,19 @@
             </td>
             <td class="text-center">
               <div class="actions-row">
-                <button class="action-icon" (click)="onEditar(bien)" title="Editar">
+                <button *hasPermission="'bienes:editar'" class="action-icon" (click)="onEditar(bien)" title="Editar">
                   <span class="material-symbols-outlined">edit</span>
                 </button>
                 <button class="action-icon" (click)="onVerDetalle(bien)" title="Ver detalle">
                   <span class="material-symbols-outlined">visibility</span>
                 </button>
                 @if (bien.estado === 'Activo') {
-                  <button class="action-icon action-icon--warning" (click)="onDesactivar(bien)" title="Desactivar">
+                  <button *hasPermission="'bienes:editar'" class="action-icon action-icon--warning" (click)="onDesactivar(bien)" title="Desactivar">
                     <span class="material-symbols-outlined">toggle_off</span>
                   </button>
                 }
                 @if (bien.estado === 'Inactivo') {
-                  <button class="action-icon action-icon--success" (click)="onActivar(bien)" title="Activar">
+                  <button *hasPermission="'bienes:editar'" class="action-icon action-icon--success" (click)="onActivar(bien)" title="Activar">
                     <span class="material-symbols-outlined">toggle_on</span>
                   </button>
                 }
@@ -235,7 +235,7 @@
 <!-- ── Vista: Contratos ───────────────────────────────────────────────────── -->
 @if (vista() === 'contratos') {
 <div class="contratos-toolbar">
-  <restaurant-button variant="primary" (click)="onAbrirImportarContrato()">
+  <restaurant-button *hasPermission="'bienes:importar'" variant="primary" (click)="onAbrirImportarContrato()">
     <span class="material-symbols-outlined">file_upload</span>
     Importar contrato
   </restaurant-button>
@@ -306,7 +306,7 @@
                 <span class="material-symbols-outlined">visibility</span>
               </button>
               @if (contrato.estado === 'VIGENTE') {
-                <button class="action-icon action-icon--warning" (click)="onCerrarContrato(contrato.id)" title="Cerrar contrato">
+                <button *hasPermission="'bienes:editar'" class="action-icon action-icon--warning" (click)="onCerrarContrato(contrato.id)" title="Cerrar contrato">
                   <span class="material-symbols-outlined">lock</span>
                 </button>
               }

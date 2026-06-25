@@ -18,7 +18,7 @@
           Exportar PDF
         </div>
       </restaurant-button>
-      <restaurant-button variant="primary" routerLink="registrar">
+      <restaurant-button *hasPermission="'presupuesto:asignar'" variant="primary" routerLink="registrar">
         <div class="btn-icon-text">
           <lucide-icon name="plus-circle" [size]="20"></lucide-icon>
           Nuevo Presupuesto
@@ -58,7 +58,7 @@
         <lucide-icon name="layers" [size]="20" class="estructura-icon"></lucide-icon>
         <h2 class="estructura-title">Estructura Presupuestal</h2>
       </div>
-      <restaurant-button variant="surface" routerLink="traslado">
+      <restaurant-button *hasPermission="'presupuesto:asignar'" variant="surface" routerLink="traslado">
         <div class="btn-icon-text">
           <lucide-icon name="arrow-left-right" [size]="18"></lucide-icon>
           Traslado
@@ -431,7 +431,7 @@
 
     <div class="pago-actions">
       <restaurant-button variant="surface" (click)="cerrarPago()">Cancelar</restaurant-button>
-      <restaurant-button variant="primary" [disabled]="!pagoValido()" (click)="confirmarPago()">
+      <restaurant-button *hasPermission="'presupuesto:asignar'" variant="primary" [disabled]="!pagoValido()" (click)="confirmarPago()">
         <div class="btn-icon-text">
           <lucide-icon name="dollar-sign" [size]="16"></lucide-icon>
           Confirmar pago
