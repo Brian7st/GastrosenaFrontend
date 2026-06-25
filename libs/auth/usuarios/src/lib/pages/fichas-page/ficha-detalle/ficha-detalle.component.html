@@ -141,6 +141,14 @@
                         Quitar rol
                       </button>
                     }
+                    <button
+                      class="detalle__btn-accion detalle__btn-accion--eliminar"
+                      (click)="desasignarAprendiz(aprendiz.id)"
+                      title="Quitar de ficha"
+                    >
+                      <lucide-icon name="user-minus" [size]="14"></lucide-icon>
+                      Quitar
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -174,6 +182,12 @@
             class="modal__search"
           >
         </div>
+        @if (errorAsignar()) {
+          <div class="modal__error">
+            <lucide-icon name="alert-circle" [size]="14"></lucide-icon>
+            {{ errorAsignar() }}
+          </div>
+        }
         <div class="modal__list">
           @for (user of usuariosDisponiblesFiltrados(); track user.id) {
             <div class="modal__item">

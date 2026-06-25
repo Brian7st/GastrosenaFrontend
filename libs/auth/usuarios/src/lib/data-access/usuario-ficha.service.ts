@@ -57,4 +57,11 @@ export class UsuarioFichaService extends BaseHttpService {
       {}
     );
   }
+
+  // DELETE /api/usuarios/{usuarioId}/fichas/{fichaId}
+  desasignarAprendiz(fichaId: string, usuarioId: string): Observable<void> {
+    return this.http.delete<void>(
+      this.buildUrl(`usuarios/${usuarioId}/fichas/${fichaId}`)
+    );
+  }
 }

@@ -38,6 +38,14 @@
     ></restaurant-kpi-card>
   </div>
 
+  <!-- Error global -->
+  @if (error()) {
+    <div class="fichas-page__error" (click)="error.set('')">
+      <lucide-icon name="alert-circle" [size]="16"></lucide-icon>
+      {{ error() }}
+    </div>
+  }
+
   <!-- Filtros -->
   <div class="fichas-page__filters">
     <div class="fichas-page__search-wrapper">

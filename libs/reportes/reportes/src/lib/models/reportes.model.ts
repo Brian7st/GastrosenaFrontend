@@ -23,12 +23,11 @@ export interface Reporte {
 }
 
 export interface ReporteReciente {
-  id: string;
-  nombre: string;
-  fecha: string;
-  estado: EstadoReporte;
-  tipo: TipoReporte;
-  url?: string;
+  id: number | string;
+  reporteId: string;
+  formato: string;
+  fechaGeneracion: string;
+  usuarioId?: string;
 }
 
 export interface GenerarReporteRequest {

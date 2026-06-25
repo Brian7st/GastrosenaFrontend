@@ -1,4 +1,6 @@
 import { Component, computed, signal, OnInit, inject } from '@angular/core';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { KpiCardComponent, LucideIconComponent } from '@restaurant/shared/ui';
 import { FichasService } from '../../../data-access/fichas.service';
@@ -31,6 +33,7 @@ export class FichaDetalleComponent implements OnInit {
   mostrarModalAsignar = signal(false);
   busquedaAprendiz = signal('');
   usuariosDisponibles = signal<Usuario[]>([]);
+  errorAsignar = signal<string | null>(null);
  
   // Filtra los usuarios disponibles según la búsqueda en tiempo real
   usuariosDisponiblesFiltrados = computed(() => {
@@ -144,27 +147,58 @@ cargarRoles() {
   cerrarModalAsignar() {
     this.mostrarModalAsignar.set(false);
     this.busquedaAprendiz.set('');
+    this.errorAsignar.set(null);
   }
- 
+
   cargarUsuariosDisponibles() {
-    this.usuariosService.obtenerAprendices().subscribe({
-      next: (usuarios) => {
-        const asignadosIds = new Set(this.aprendices().map(a => a.id));
+    forkJoin({
+      todos: this.usuariosService.obtenerAprendices(),
+      fichas: this.fichasService.obtenerFichas()
+    }).pipe(
+      switchMap(({ todos, fichas }) => {
+        const otrasFichas = fichas.filter(f => f.id !== this.fichaId());
+        if (otrasFichas.length === 0) return of({ todos, ocupados: new Set<string>() });
+        return forkJoin(
+          otrasFichas.map(f =>
+            this.usuarioFichaService.getAprendicesByFicha(f.id).pipe(catchError(() => of([])))
+          )
+        ).pipe(
+          map(resultados => {
+            const ocupados = new Set<string>();
+            resultados.flat().forEach((u: any) => ocupados.add(u.idUsuario ?? u.id));
+            return { todos, ocupados };
+          })
+        );
+      })
+    ).subscribe({
+      next: ({ todos, ocupados }) => {
+        const enEstaFicha = new Set(this.aprendices().map(a => a.id));
         this.usuariosDisponibles.set(
-          usuarios.filter(u => !asignadosIds.has(u.id))
+          todos.filter(u => !enEstaFicha.has(u.id) && !ocupados.has(u.id))
         );
       },
       error: (err) => console.error('Error cargando usuarios disponibles:', err)
     });
   }
- 
+
   asignarAprendiz(usuarioId: string) {
+    this.errorAsignar.set(null);
     this.usuarioFichaService.asignarAprendiz(this.fichaId(), usuarioId).subscribe({
       next: () => {
         this.cerrarModalAsignar();
-        this.cargarAprendices(); // recarga completa para reflejar el nuevo aprendiz
+        this.cargarAprendices();
       },
-      error: (err) => console.error('Error asignando aprendiz:', err)
+      error: () => {
+        this.errorAsignar.set('No se pudo asignar el aprendiz. Es posible que ya esté en otra ficha.');
+      }
+    });
+  }
+
+  desasignarAprendiz(usuarioId: string) {
+    if (!confirm('¿Quitar este aprendiz de la ficha?')) return;
+    this.usuarioFichaService.desasignarAprendiz(this.fichaId(), usuarioId).subscribe({
+      next: () => this.cargarAprendices(),
+      error: (err) => console.error('Error quitando aprendiz:', err)
     });
   }
  

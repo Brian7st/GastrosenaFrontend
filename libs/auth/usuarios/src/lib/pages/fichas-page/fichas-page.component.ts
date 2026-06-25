@@ -150,8 +150,8 @@ export class FichasPageComponent implements OnInit {
   onEliminar(id: string): void {
     if (!confirm(this.i18n.t('fichas.confirmar_eliminar'))) { return; }
     this.fichasService.eliminarFicha(id).subscribe({
-      next: () => this.cargarFichas(),
-      error: (err) => console.error(err)
+      next: () => { this.error.set(''); this.cargarFichas(); },
+      error: () => this.error.set('No se puede eliminar la ficha porque tiene aprendices asignados. Primero quítalos desde el detalle de la ficha.')
     });
   }
 

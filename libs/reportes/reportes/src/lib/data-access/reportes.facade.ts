@@ -46,14 +46,12 @@ export class ReportesFacade {
       next: (response: GenerarReporteResponse) => {
         this.reportesRecientes.update(list => [
           {
-            id: response.id,
-            nombre: response.nombre,
-            fecha: response.fechaGeneracion,
-            estado: response.estado,
-            tipo: request.tipo as any,
-            url: response.url,
+            id: Date.now(),
+            reporteId: response.id,
+            formato: 'PDF',
+            fechaGeneracion: response.fechaGeneracion,
           },
-          ...list,
+          ...list.slice(0, 9),
         ]);
         this.generando.set(false);
       },

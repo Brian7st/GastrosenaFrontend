@@ -83,16 +83,16 @@
     </thead>
     @for (reporte of reportesRecientes(); track reporte.id) {
       <tr>
-        <td>{{ reporte.nombre }}</td>
-        <td>{{ reporte.fecha }}</td>
+        <td>{{ reporte.reporteId }}</td>
+        <td>{{ reporte.fechaGeneracion | date:'dd/MM/yyyy HH:mm' }}</td>
         <td>
           <restaurant-status-badge
-            [label]="reporte.estado"
+            label="Completado"
             variant="success"
           />
         </td>
         <td>
-          <restaurant-button variant="surface" (click)="descargarReporte(reporte.id)">
+          <restaurant-button variant="surface" (click)="descargarReporte(reporte.reporteId)">
             <lucide-icon name="download" [size]="14"></lucide-icon>
             Descargar
           </restaurant-button>
