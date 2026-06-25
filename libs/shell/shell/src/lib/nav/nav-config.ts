@@ -37,7 +37,7 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
             { label: 'Inicio',        tKey: 'nav.inicio',        ruta: '/app/cocina/inicio',       icono: 'layout-dashboard' },
             { label: 'Comandas',     tKey: 'nav.comandas',      ruta: '/app/cocina/comandas',     icono: 'clipboard-list'   },
             { label: 'Recetas',      tKey: 'nav.recetas',       ruta: '/app/cocina/recetas',      icono: 'book-open'        },
-            { label: 'Evaluar',      tKey: 'nav.evaluar',       ruta: '/app/cocina/actividad',    icono: 'graduation-cap'   },
+            { label: 'Evaluar',      tKey: 'nav.evaluar',       ruta: '/app/cocina/actividad',    icono: 'graduation-cap', roles: [Rol.CHEF, Rol.ADMINISTRADOR, Rol.INSTRUCTOR] },
             { label: 'Estadísticas', tKey: 'nav.estadisticas',  ruta: '/app/cocina/estadisticas', icono: 'bar-chart-2'      },
           ],
         },
@@ -48,6 +48,7 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
           ruta: '/app/bar',
           icono: 'coffee',
           permisos: ['COMANDAS_CONSULTAR', 'RECETAS_CONSULTAR'],
+          roles: [Rol.BARTENDER, Rol.ADMINISTRADOR, Rol.CAJERO, Rol.MESERO, Rol.INSTRUCTOR],
           children: [
             {
               label: 'Inicio',

@@ -43,19 +43,29 @@ export class BarraLateralComponent {
 
     const bypass = !currentUser || permisos.length === 0;
 
+    const checkAccess = (element: any) => {
+      if (bypass) return true;
+      if (element.roles?.length && (!currentRole || !element.roles.includes(currentRole))) {
+        return false;
+      }
+      if (element.permisos?.length) {
+        return element.permisos.some((p: string) => permisos.includes(p));
+      }
+      return true;
+    };
+
     return this.config.grupos
       .map(grupo => ({
         ...grupo,
-        items: grupo.items.filter(item => {
-          if (bypass) return true;
-          if (item.roles?.length && (!currentRole || !item.roles.includes(currentRole))) {
-            return false;
-          }
-          if (item.permisos?.length) {
-            return item.permisos.some(p => permisos.includes(p));
-          }
-          return true;
-        }),
+        items: grupo.items
+          .filter(item => checkAccess(item))
+          .map(item => {
+            if (!item.children) return item;
+            return {
+              ...item,
+              children: item.children.filter(child => checkAccess(child))
+            };
+          }),
       }))
       .filter(grupo => grupo.items.length > 0);
   });

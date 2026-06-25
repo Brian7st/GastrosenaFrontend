@@ -63,7 +63,7 @@
     }
 
     .stat-card {
-      background: var(--color-surface-primary);
+      background: white;
       padding: var(--space-5);
       border-radius: var(--radius-lg, 15px);
       display: flex;
@@ -99,12 +99,12 @@
       &.orange { background: var(--color-warning, #f97316); }
       &.green { background: var(--color-primario); }
       &.red { background: var(--color-error-text); }
-      &.yellow { background: var(--color-warning); }
+      &.yellow { background: #eab308; }
     }
   }
 
   .recent-section {
-    background: var(--color-surface-primary);
+    background: white;
     padding: var(--space-6);
     border-radius: var(--radius-lg, 20px);
     box-shadow: var(--shadow-card);
@@ -179,7 +179,7 @@
 }
 
 .modal-incidencias {
-  background: var(--color-surface-primary);
+  background: white;
   border-radius: var(--radius-lg, 16px);
   width: 580px;
   max-width: 95vw;
@@ -319,7 +319,7 @@
   }
 
   .comanda-id {
-    background: var(--color-error-bg);
+    background: #fef2f2;
     color: var(--color-error-text);
     padding: var(--space-1) 10px;
     border-radius: var(--radius-sm);
@@ -330,7 +330,7 @@
 
   .mesa-badge {
     background: var(--color-surface-secondary);
-    color: var(--color-text-secondary);
+    color: #475569;
     padding: var(--space-1) 10px;
     border-radius: var(--radius-sm);
     font-size: var(--font-size-sm);
@@ -376,7 +376,7 @@
 }
 
 .motivo-box {
-  background: var(--color-error-bg);
+  background: #fef2f2;
   border-left: 3px solid var(--color-error-text);
   padding: var(--space-2) 14px;
   border-radius: 0 8px 8px 0;
@@ -391,7 +391,7 @@
   .motivo-text {
     margin: 0;
     font-size: var(--font-size-sm);
-    color: var(--color-error-text);
+    color: #991b1b;
   }
 
   /* Variante DEVOLUCION - color hueso/marfil */
