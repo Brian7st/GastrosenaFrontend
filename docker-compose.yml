@@ -381,3 +381,4 @@ volumes:
 networks:
   gastrosena-net:
     driver: bridge
+    
