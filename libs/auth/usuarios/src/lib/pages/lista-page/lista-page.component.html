@@ -154,13 +154,26 @@
             <td class="lista-page__last-access">
               {{ (u.ultimoAcceso | date:'dd/MM/yyyy') || '—' }}
             </td>
-            <td>
-             <div class="lista-page__actions">
-              <button class="lista-page__action-btn" type="button" (click)="onEditarUsuario(u)" [attr.aria-label]="i18n.t('lista.editar')">
-                <lucide-icon name="pencil" [size]="16"></lucide-icon>
-              </button>
-             </div>
-           </td>
+           <td>
+  <div class="lista-page__actions">
+    <!-- Botón Editar (siempre visible) -->
+    <button class="lista-page__action-btn" type="button" (click)="onEditarUsuario(u)" [attr.aria-label]="i18n.t('lista.editar')">
+      <lucide-icon name="pencil" [size]="16"></lucide-icon>
+    </button>
+    
+    <!-- 👇 Botón Eliminar SOLO para NO administradores -->
+    @if (!esAdmin()) {
+      <button
+        class="lista-page__action-btn lista-page__action-btn--danger"
+        type="button"
+        (click)="onEliminar(u.id)"
+        [attr.aria-label]="i18n.t('lista.eliminar')"
+      >
+        <lucide-icon name="trash-2" [size]="16"></lucide-icon>
+      </button>
+    }
+  </div>
+</td>
           </tr>
         }
       }
