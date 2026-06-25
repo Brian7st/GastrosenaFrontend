@@ -31,6 +31,8 @@ import {
   ImportarUsuariosRequest,
   UsuarioDetalle,
 } from '../../models/usuarios.model';
+// 👇 AGREGAR ESTA IMPORTACIÓN
+import { AuthService } from '@restaurant/shared/auth';
 
 @Component({
   selector: 'restaurant-lista-page',
@@ -49,83 +51,107 @@ import {
     UsuarioRolBadgeComponent,
   ],
   templateUrl: './lista-page.component.html',
-  styleUrl:    './lista-page.component.scss',
+  styleUrl: './lista-page.component.scss',
 })
 export class ListaPageComponent implements OnInit {
-  private readonly facade     = inject(UsuariosFacade);
+  private readonly facade = inject(UsuariosFacade);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly i18n = inject(I18nService);
   private toastTimer: ReturnType<typeof setTimeout> | null = null;
 
+  // 👇 AGREGAR ESTO
+  private readonly authService = inject(AuthService);
+
+  // ── Signals del Facade ──────────────────────────────────────────────────
+
   readonly usuarios = toSignal(
-    this.facade.usuarios$.pipe(
-      map((u): UsuarioDetalle[] => u ?? [])
-    ),
+    this.facade.usuarios$.pipe(map((u): UsuarioDetalle[] => u ?? [])),
     { initialValue: [] as UsuarioDetalle[] }
   );
 
-  readonly totalElements   = toSignal(this.facade.totalElements$,   { initialValue: 0 });
-  readonly totalActivos    = toSignal(this.facade.totalActivos$,    { initialValue: 0 });
-  readonly totalInactivos  = toSignal(this.facade.totalInactivos$,  { initialValue: 0 });
-  readonly loading         = toSignal(this.facade.loading$,         { initialValue: false });
-  readonly importando      = toSignal(this.facade.importando$,      { initialValue: false });
+  readonly totalElements = toSignal(this.facade.totalElements$, { initialValue: 0 });
+  readonly totalActivos = toSignal(this.facade.totalActivos$, { initialValue: 0 });
+  readonly totalInactivos = toSignal(this.facade.totalInactivos$, { initialValue: 0 });
+  readonly loading = toSignal(this.facade.loading$, { initialValue: false });
+  readonly importando = toSignal(this.facade.importando$, { initialValue: false });
   readonly resultadoImport = toSignal(this.facade.resultadoImport$, { initialValue: null });
-  readonly mensajeExport   = toSignal(this.facade.mensajeExport$,   { initialValue: null });
+  readonly mensajeExport = toSignal(this.facade.mensajeExport$, { initialValue: null });
+  readonly error = toSignal(this.facade.error$, { initialValue: null as string | null });
 
-  readonly error        = toSignal(this.facade.error$, { initialValue: null as string | null });
+  // ── Signals locales ─────────────────────────────────────────────────────
+
   readonly mensajeExito = signal<string | null>(null);
-
   readonly rolesDisponibles = Object.values(Rol);
 
-  readonly busqueda     = signal('');
-  readonly rolFiltro    = signal('');
+  readonly busqueda = signal('');
+  readonly rolFiltro = signal('');
   readonly estadoFiltro = signal<'todos' | 'activos' | 'inactivos'>('todos');
-  readonly mostrarExportar   = signal(false);
-  readonly mostrarImportar   = signal(false);
+  readonly mostrarExportar = signal(false);
+  readonly mostrarImportar = signal(false);
   readonly mostrarFormulario = signal(false);
-
   readonly usuarioEditando = signal<UsuarioDetalle | null>(null);
 
-  // Sin mock — siempre usa el backend
+  // 👇 AGREGAR ESTE COMPUTED
+  readonly esAdmin = computed(() => {
+    const user = this.authService.currentUser();
+    return user?.rol === 'ADMINISTRADOR';
+  });
+
+  // ── Computed ─────────────────────────────────────────────────────────────
+
   readonly usuariosFiltrados = computed(() => {
-    const lista  = this.usuarios() ?? [];
-    const q      = this.busqueda().toLowerCase();
-    const rol    = this.rolFiltro();
+    const lista = this.usuarios() ?? [];
+    const q = this.busqueda().toLowerCase();
+    const rol = this.rolFiltro();
     const estado = this.estadoFiltro();
-    return lista.filter(u => {
-      const matchBusq   = !q ||
+
+    return lista.filter((u) => {
+      const matchBusq =
+        !q ||
         u.nombre.toLowerCase().includes(q) ||
         u.apellidos.toLowerCase().includes(q) ||
         u.email.toLowerCase().includes(q);
-      const matchRol    = !rol || u.rol === rol;
-      const matchEstado = estado === 'todos' ||
-        (estado === 'activos'   &&  u.activo) ||
+      const matchRol = !rol || u.rol === rol;
+      const matchEstado =
+        estado === 'todos' ||
+        (estado === 'activos' && u.activo) ||
         (estado === 'inactivos' && !u.activo);
       return matchBusq && matchRol && matchEstado;
     });
   });
 
-  readonly usuariosMostrar  = computed(() => this.usuariosFiltrados());
-  readonly totalMostrar     = computed(() => this.totalElements());
-  readonly activosMostrar   = computed(() => this.totalActivos());
+  readonly usuariosMostrar = computed(() => this.usuariosFiltrados());
+  readonly totalMostrar = computed(() => this.totalElements());
+  readonly activosMostrar = computed(() => this.totalActivos());
   readonly inactivosMostrar = computed(() => this.totalInactivos());
+
+  // ── Lifecycle ────────────────────────────────────────────────────────────
 
   ngOnInit(): void {
     this.facade.cargarUsuarios();
     this.facade.cargarRoles();
+
     this.destroyRef.onDestroy(() => {
-      if (this.toastTimer !== null) { clearTimeout(this.toastTimer); }
+      if (this.toastTimer !== null) {
+        clearTimeout(this.toastTimer);
+      }
     });
   }
 
+  // ── Toast ────────────────────────────────────────────────────────────────
+
   private mostrarToast(mensaje: string): void {
-    if (this.toastTimer !== null) { clearTimeout(this.toastTimer); }
+    if (this.toastTimer !== null) {
+      clearTimeout(this.toastTimer);
+    }
     this.mensajeExito.set(mensaje);
     this.toastTimer = setTimeout(() => {
       this.mensajeExito.set(null);
       this.toastTimer = null;
     }, 4000);
   }
+
+  // ── Acciones ─────────────────────────────────────────────────────────────
 
   onCrearUsuario(): void {
     this.usuarioEditando.set(null);
@@ -142,24 +168,31 @@ export class ListaPageComponent implements OnInit {
     this.mostrarFormulario.set(false);
   }
 
-onGuardarUsuario(data: CrearUsuarioRequest): void {
-  const editando = this.usuarioEditando();
-  if (editando) {
-    const payload: ActualizarUsuarioRequest = {
-      nombre:    data.nombre,
-      apellidos: data.apellidos,
-      telefono:  data.telefono,
-      idRol:     data.nombreRol,
-      documento: data.documento,   // ← agregar
-      email:     data.email,        // ← agregar
-    };
-    this.facade.actualizarUsuario(editando.id, payload);
-  } else {
-    this.facade.crearUsuario(data);
-    this.mostrarToast(this.i18n.t('lista.toast_creado'));
+  onGuardarUsuario(data: CrearUsuarioRequest): void {
+    const editando = this.usuarioEditando();
+
+    if (editando) {
+      const payload: ActualizarUsuarioRequest = {
+        nombre: data.nombre,
+        apellidos: data.apellidos,
+        telefono: data.telefono,
+        idRol: data.nombreRol,
+        documento: data.documento,
+        email: data.email,
+      };
+      this.facade.actualizarUsuario(editando.id, payload);
+      this.mostrarToast('Usuario actualizado');
+    } else {
+      this.facade.crearUsuario(data);
+      this.mostrarToast('Usuario creado');
+    }
+
+    setTimeout(() => {
+      this.facade.cargarUsuarios();
+    }, 500);
+
+    this.onCerrarFormulario();
   }
-  this.onCerrarFormulario();
-}
 
   onExportar(config: ExportarConfig): void {
     this.facade.exportarUsuarios(config);
@@ -176,10 +209,20 @@ onGuardarUsuario(data: CrearUsuarioRequest): void {
     } else {
       this.facade.activarUsuario(u.id);
     }
+
+    setTimeout(() => {
+      this.facade.cargarUsuarios();
+    }, 500);
   }
 
   onEliminar(id: string): void {
-    if (!confirm(this.i18n.t('lista.confirmar_eliminar'))) { return; }
+    if (!confirm('¿Estás seguro de eliminar este usuario?')) {
+      return;
+    }
     this.facade.eliminarUsuario(id);
+
+    setTimeout(() => {
+      this.facade.cargarUsuarios();
+    }, 500);
   }
 }
