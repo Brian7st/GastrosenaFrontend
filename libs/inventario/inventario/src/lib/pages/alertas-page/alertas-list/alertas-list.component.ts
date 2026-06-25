@@ -18,24 +18,13 @@ import {
   AlertaPrioridad
 } from '../../../models/alerta.model';
 import { AlertasFacade } from '../../../data-access/alertas.facade';
-
-export interface HistorialResolucion {
-  bien: string;
-  accion: string;
-  tiempo: string;
-}
-
-export interface MovimientoReciente {
-  tipo: 'entrada' | 'salida';
-  nombre: string;
-  cantidad: string;
-}
+import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 
 @Component({
   selector: 'restaurant-alertas-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterModule, KpiCardComponent, ButtonComponent, StatusBadgeComponent, LucideIconComponent],
+  imports: [RouterModule, KpiCardComponent, ButtonComponent, StatusBadgeComponent, LucideIconComponent, EmptyStateComponent],
   templateUrl: './alertas-list.component.html',
   styleUrl: './alertas-list.component.scss',
 })
@@ -49,20 +38,12 @@ export class AlertasListComponent implements OnInit {
   prioridadFilter = signal<string>('');
   estadoFilter    = signal<string>('');
 
-  // Historial lateral (mock estático)
-  historial = signal<HistorialResolucion[]>([
-    { bien: 'Sal Marina',   accion: 'Repuesto 50kg. Aprobado por Admin.', tiempo: 'Hoy, 09:30 AM' },
-    { bien: 'Papa Pastusa', accion: 'Orden de compra generada (#OC-402).', tiempo: 'Ayer, 16:45 PM' },
-  ]);
-
-  movimientos = signal<MovimientoReciente[]>([
-    { tipo: 'entrada', nombre: 'Tomate Chonto',   cantidad: '+100kg' },
-    { tipo: 'salida',  nombre: 'Cebolla Cabezona', cantidad: '-25kg'  },
-    { tipo: 'entrada', nombre: 'Arroz Blanco',     cantidad: '+500kg' },
-  ]);
+  // Resumen real de alertas (GET /reporting/alertas/resumen)
+  resumen = this.facade.resumenAlertas;
 
   ngOnInit(): void {
     this.facade.loadAll();
+    this.facade.cargarResumen();
   }
 
   // ── KPIs computados ──────────────────────────────────────────────────────
@@ -122,12 +103,13 @@ export class AlertasListComponent implements OnInit {
     this.router.navigate(['/app/inventario/alertas', id, 'resolver']);
   }
 
-  irAHistorial(): void {
-    this.router.navigate(['/app/inventario/alertas/historial']);
-  }
-
   irAConfig(): void {
     this.router.navigate(['/app/inventario/alertas/configuracion']);
+  }
+
+  /** Descarga el historial de alertas en CSV (generado en cliente). */
+  onExportarCSV(): void {
+    this.facade.exportarHistorialCSV();
   }
 
   onSearch(event: Event): void {

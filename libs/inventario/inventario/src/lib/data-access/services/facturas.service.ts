@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { forkJoin, Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { Factura, FacturaFiltros, FacturaKpis, FacturaPaginacion, SolicitudGIL, EstadoGIL, ConciliacionGil, FacturaFormDto, GilPickerItem } from '../../models/facturas.model';
+import { Factura, FacturaFiltros, FacturaKpis, FacturaPaginacion, SolicitudGIL, EstadoGIL, ConciliacionGil, FacturaFormDto, GilPickerItem, NotaCredito, RegistrarNotaCreditoRequest } from '../../models/facturas.model';
 import {
   ActualizarFacturaRequest,
   AnularFacturaRequest,
@@ -13,15 +13,33 @@ import {
   ConciliarRequest,
   ResolverDiferenciaGilRequest,
   VincularInstructorRequest,
+  NotaCreditoResponse,
+  RegistrarNotaCreditoApiRequest,
+  ResolverNotaCreditoRequest,
+  ResolverNotaCreditoResponse,
 } from '../api/sourcing.api';
-import { GilResponse } from '../api/procurement.api';
-import { facturaFromApi, conciliacionGilFromApi, facturaFormToRequest } from '../mappers/sourcing.mapper';
+import { BienGilResponse, GilResponse } from '../api/procurement.api';
+import { facturaFromApi, conciliacionGilFromApi, facturaFormToRequest, notaCreditoFromApi } from '../mappers/sourcing.mapper';
 
 const API = '/api/v1';
 
 @Injectable({ providedIn: 'root' })
 export class FacturasService {
   private http = inject(HttpClient);
+
+  /**
+   * GET /api/reportes/facturacion — reporte GENERAL de facturación por rango de fechas.
+   * Lo genera ga-ms-reportes (server-side). No existe export por-factura en el backend.
+   */
+  exportarFacturacion(fechaInicio: string, fechaFin: string, formato: 'PDF' | 'EXCEL'): Observable<Blob> {
+    const params = new HttpParams()
+      .set('fechaInicio', fechaInicio)
+      .set('fechaFin', fechaFin)
+      .set('formato', formato);
+    return this.http
+      .get('/api/reportes/facturacion', { params, responseType: 'blob' })
+      .pipe(catchError(err => throwError(() => err)));
+  }
 
   getFacturas(filtros?: FacturaFiltros): Observable<{ facturas: Factura[]; paginacion: FacturaPaginacion }> {
     let params = new HttpParams();
@@ -85,7 +103,7 @@ export class FacturasService {
       );
   }
 
-  importarFacturaFel(file: File, gilId?: string): Observable<Factura> {
+  importarFacturaFelXml(file: File, gilId?: string): Observable<Factura> {
     const formData = new FormData();
     formData.append('archivo', file, file.name);
 
@@ -93,7 +111,7 @@ export class FacturasService {
     if (gilId) params = params.set('gilId', gilId);
 
     return this.http
-      .post<FacturaResponse>(`${API}/sourcing/facturas/importar-fel`, formData, { params })
+      .post<FacturaResponse>(`${API}/sourcing/facturas/importar-fel-xml`, formData, { params })
       .pipe(
         map(facturaFromApi),
         catchError(err => throwError(() => err))
@@ -127,6 +145,24 @@ export class FacturasService {
       );
   }
 
+  /**
+   * PATCH /sourcing/facturas/{id}/lineas/resolver — asocia una línea PENDIENTE-CATALOGO
+   * a un bien existente del catálogo por su código SENA. El bien debe existir.
+   */
+  resolverLineaPendiente(
+    id: string | number,
+    descripcionLinea: string,
+    codigoProductoSena: string
+  ): Observable<Factura> {
+    const body = { descripcionLinea, codigoProductoSena };
+    return this.http
+      .patch<FacturaResponse>(`${API}/sourcing/facturas/${id}/lineas/resolver`, body)
+      .pipe(
+        map(facturaFromApi),
+        catchError(err => throwError(() => err))
+      );
+  }
+
   /** PATCH /sourcing/facturas/{id}/pagar - solo válido desde estado VERIFICADA */
   marcarPagada(id: string | number): Observable<Factura> {
     return this.http
@@ -151,8 +187,15 @@ export class FacturasService {
   }
 
   /** POST /sourcing/conciliaciones-gil - vincula una factura con su GIL - 201 Created */
-  conciliarFacturaGil(facturaId: string, gilId: string): Observable<ConciliacionGil> {
+  conciliarFacturaGil(
+    facturaId: string,
+    gilId: string,
+    cantidadesRecibidas?: Record<string, number>,
+  ): Observable<ConciliacionGil> {
     const body: ConciliarRequest = { facturaId, gilId };
+    if (cantidadesRecibidas && Object.keys(cantidadesRecibidas).length > 0) {
+      body.cantidadesRecibidas = cantidadesRecibidas;
+    }
     return this.http
       .post<ConciliacionGilResponse>(`${API}/sourcing/conciliaciones-gil`, body)
       .pipe(
@@ -196,6 +239,16 @@ export class FacturasService {
       .pipe(catchError(err => throwError(() => err)));
   }
 
+  /** GET /procurement/giles/:id — bienes del GIL para cruce manual en importación FEL. */
+  getGilBienes(gilId: string): Observable<BienGilResponse[]> {
+    return this.http
+      .get<GilResponse>(`${API}/procurement/giles/${gilId}`)
+      .pipe(
+        map(r => r.bienes ?? []),
+        catchError(err => throwError(() => err))
+      );
+  }
+
   /** GET /procurement/giles — lista para picker en importación FEL.
    *  Incluye EMITIDO y ENVIADO_PROVEEDOR: una factura puede llegar mientras el GIL
    *  aún está en estado EMITIDO, antes de ser enviado formalmente al proveedor. */
@@ -214,6 +267,38 @@ export class FacturasService {
       }),
       catchError(err => throwError(() => err))
     );
+  }
+
+  /** POST /api/v1/notas-credito — registra una nota crédito por sobre-facturación */
+  registrarNotaCredito(req: RegistrarNotaCreditoRequest): Observable<NotaCredito> {
+    const body: RegistrarNotaCreditoApiRequest = {
+      facturaId:    req.facturaId,
+      cufeOrigen:   req.cufeOrigen,
+      motivo:       req.motivo,
+      fechaEmision: req.fechaEmision,
+      lineas:       req.lineas,
+    };
+    return this.http
+      .post<NotaCreditoResponse>(`${API}/notas-credito`, body)
+      .pipe(
+        map(notaCreditoFromApi),
+        catchError(err => throwError(() => err)),
+      );
+  }
+
+  /** POST /api/v1/conciliaciones/{conciliacionId}/detalles/{gilItemId}/resolver-nota-credito */
+  resolverConNotaCredito(
+    conciliacionId: string,
+    gilItemId:      string,
+    notaCreditoIds: string[],
+  ): Observable<ResolverNotaCreditoResponse> {
+    const body: ResolverNotaCreditoRequest = { notaCreditoIds };
+    return this.http
+      .post<ResolverNotaCreditoResponse>(
+        `${API}/conciliaciones/${conciliacionId}/detalles/${gilItemId}/resolver-nota-credito`,
+        body,
+      )
+      .pipe(catchError(err => throwError(() => err)));
   }
 
   /** Mapea GilResponse al tipo SolicitudGIL que usa la FacturasFacade.
@@ -249,6 +334,19 @@ export class FacturasService {
       observaciones:           g.observaciones ?? '',
       hashTransaccion:         '',
       idTransaccion:           '',
+      numeroGil:               g.numeroGil,
+      codigoGrupo:             g.codigoGrupo ?? '',
+      solicitante:             g.solicitante ?? '',
+      cuentadantes:            g.cuentadantes?.map(c => c.nombre) ?? [],
+      bienes:                  (g.bienes ?? []).map(b => ({
+        codigoSena:    b.codigoSena,
+        descripcion:   b.descripcion,
+        unidadMedida:  b.unidadMedida,
+        cantidad:      b.cantidad,
+        valorUnitario: b.valorUnitario,
+        iva:           b.iva,
+        subtotal:      b.subtotal,
+      })),
     };
   }
 }

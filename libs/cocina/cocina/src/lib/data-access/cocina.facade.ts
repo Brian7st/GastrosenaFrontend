@@ -1,5 +1,5 @@
 import { Injectable, signal, inject } from '@angular/core';
-import { ActividadService, ActividadDTO, FichaService, FichaDTO } from './actividad.service';
+import { ActividadService, ActividadDTO, FichaService, FichaDTO, AprendizService, AprendizDTO } from './actividad.service';
 import { EvaluacionService } from './evaluacion.service';
 
 export interface AprendizMock {
@@ -29,9 +29,10 @@ const APRENDICES_MOCK: AprendizMock[] = [
 export class CocinaFacade {
   private actividadService = inject(ActividadService);
   private fichaService     = inject(FichaService);
+  private aprendizService  = inject(AprendizService);
   private evaluacionService = inject(EvaluacionService);
 
-  readonly aprendices = signal<AprendizMock[]>(APRENDICES_MOCK);
+  readonly aprendices = signal<AprendizMock[]>([]);
   readonly actividades = signal<ActividadMock[]>([]);
   readonly fichas      = signal<FichaDTO[]>([]);
   readonly fichasCargando = signal<boolean>(false);
@@ -39,6 +40,28 @@ export class CocinaFacade {
   constructor() {
     this.cargarActividades();
     this.cargarFichas();
+    this.cargarAprendices();
+  }
+
+  cargarAprendices(): void {
+    this.aprendizService.getAll().subscribe({
+      next: (data) => {
+        const mapeados: AprendizMock[] = (data || []).map(a => ({
+          id: a.id,
+          nombreCompleto: a.nombreCompleto,
+          inicial: a.inicial || a.nombreCompleto.charAt(0).toUpperCase(),
+          ficha: a.ficha,
+          jornada: a.jornada as 'Diurna' | 'Nocturna' | 'Mixta',
+          estado: 'Pendiente', // por defecto
+          inactivo: a.inactivo
+        }));
+        this.aprendices.set(mapeados);
+      },
+      error: (err) => {
+        console.warn('No se pudieron cargar aprendices reales, usando mock:', err);
+        this.aprendices.set(APRENDICES_MOCK);
+      }
+    });
   }
 
   cargarActividades(): void {

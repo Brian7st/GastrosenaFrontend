@@ -1,15 +1,22 @@
 // ─── DTOs de la API de Reporting /api/v1/reporting ──────────────────────────
 
-/** GET /reporting/ejecucion-presupuestal?fichaId?&vigencia? */
+/**
+ * GET /reporting/ejecucion-presupuestal?fichaId?&vigencia?
+ * Respuesta: EjecucionPresupuestalView[] (flat array — campo a campo real del backend)
+ * NOTA: porcentajeEjecucion NO viene en el JSON — computar en FE.
+ */
 export interface EjecucionPresupuestalItemResponse {
-  fichaId:             string;
-  programaFormacion:   string;
-  vigencia:            number;
-  totalPresupuestado:  number;
-  totalComprometido:   number;
-  totalPagado:         number;
-  porcentajeEjecucion: number;
-  saldoDisponible:     number;
+  presupuestoId:      string;
+  fichaId:            string;
+  programaFormacion:  string;
+  vigencia:           number;
+  rubroId:            string;
+  rubroCodigo:        string;
+  rubroDescripcion:   string;
+  montoAsignado:      number;
+  montoComprometido:  number;
+  montoPagado:        number;
+  saldoDisponible:    number;
 }
 
 /** GET /reporting/kardex?productoId?&desde?&hasta? */
@@ -53,12 +60,34 @@ export interface TrazabilidadDocumentalItemResponse {
   fecha:             string;
 }
 
-/** GET /reporting/alertas/resumen?destinatarioId? */
+/** GET /reporting/vencimientos?dias=30 */
+export interface VencimientoResponse {
+  facturaId:        string;
+  cufe:             string;
+  numeroFactura:    string;
+  proveedor:        string;
+  gilId:            string | null;
+  montoTotal:       number;
+  fechaVencimiento: string; // ISO date
+  diasParaVencer:   number;
+  estado:           string;
+}
+
+/** GET /reporting/ejecucion-mensual?fichaId&vigencia */
+export interface EjecucionMensualResponse {
+  anio:               number;
+  mes:                number;
+  montoComprometido:  number;
+  montoPagado:        number;
+}
+
+/** GET /reporting/alertas/resumen?destinatarioId?
+ *  Forma real del backend: { totalActivas, totalCriticas, totalResueltas, porTipo: {}, porEstado: {} } */
 export interface ResumenAlertasResponse {
-  totalAlertas:       number;
-  alertasPendientes:  number;
-  alertasResueltas:   number;
-  productosCriticos:  number;
-  alertasPorTipo:     { tipo: string; cantidad: number }[];
-  ultimaAlerta?:      string;
+  totalActivas:   number;
+  totalCriticas:  number;
+  totalResueltas: number;
+  porTipo:        Record<string, number>;
+  porEstado:      Record<string, number>;
+  ultimaAlerta?:  string;
 }

@@ -73,6 +73,7 @@ export interface PaqueteResponse {
   compromisoPresupuestalId?: string;
   titulo: string;
   expediente: string;
+  fechaCreacion?: string;   // ISO "yyyy-MM-dd" enviado por el backend
 }
 
 export interface PaquetesPageResponse {
@@ -83,13 +84,12 @@ export interface PaquetesPageResponse {
   tamano: number;
 }
 
-/** Alineado con CrearPaqueteHttpRequest del backend — sin titulo. */
+/** Alineado con CrearPaqueteHttpRequest del backend — solo estos 4 campos. */
 export interface CrearPaqueteRequest {
   actaId: string;
   requisicionId: string;
   fichaId: string;
   instructorId: string;
-  titulo: string;
 }
 
 export interface TrazabilidadRequest {
@@ -140,6 +140,7 @@ export interface RequisicionResponse {
   instructorId?:     string;
   instructorNombre?: string;
   estado?:           'BORRADOR' | 'ENVIADA' | 'DESPACHADA' | 'FIRMADA' | 'LEGALIZADA';
+  voceroId?:         string;
   items?:            RequisicionItemResponse[];
 }
 
@@ -150,4 +151,74 @@ export interface CrearRequisicionRequest {
   diaSemana: string;
   horaSesion: string;
   items: RequisicionItemResponse[];
+}
+
+// ── Asistencia ─────────────────────────────────────────────────────────────
+
+export type EstadoAsistencia = 'ASISTIO' | 'TARDE' | 'EXCUSA' | 'NO_ASISTIO';
+
+export interface FichaResponseDTO {
+  id: string;           // UUID
+  numero: string;       // número visible (ej. "2574832")
+  programa: string;
+  fechaInicio: string;  // ISO date
+  fechaFin: string;     // ISO date
+  activa: boolean;
+}
+
+export interface UsuarioResponseDTO {
+  idUsuario: string;
+  documento: string;
+  nombre: string;
+  apellidos: string;
+  email: string;
+  telefono: string;
+  estado: boolean;      // true = activo
+  rol: string;
+}
+
+export interface AsistenciaItemRequest {
+  aprendizId: string;
+  nombreAprendiz: string;
+  documento: string;
+  estado: EstadoAsistencia;
+  observacion?: string;
+}
+
+export interface RegistrarAsistenciaRequest {
+  fichaId: string;      // número de ficha (string)
+  fecha: string;        // "yyyy-MM-dd"
+  items: AsistenciaItemRequest[];
+}
+
+/** PUT corregir — el backend (CorregirAsistenciaHttpRequest) solo recibe items;
+ *  ficha y fecha no se reenvían en la corrección. */
+export interface CorregirAsistenciaRequest {
+  items: AsistenciaItemRequest[];
+}
+
+export interface AsistenciaResumen {
+  total: number;
+  asistio: number;
+  tarde: number;
+  excusa: number;
+  noAsistio: number;
+}
+
+export interface AsistenciaItemResponse {
+  aprendizId: string;
+  nombreAprendiz: string;
+  documento: string;
+  estado: EstadoAsistencia;
+  observacion?: string;
+}
+
+export interface AsistenciaResponse {
+  id: string;
+  paqueteId: string;
+  fichaId: string;
+  fecha: string;
+  registradoPor: string;
+  resumen: AsistenciaResumen;
+  items: AsistenciaItemResponse[];
 }

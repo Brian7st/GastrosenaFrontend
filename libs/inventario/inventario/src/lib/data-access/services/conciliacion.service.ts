@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import {
@@ -7,20 +7,20 @@ import {
   ConciliacionDetalle,
   DiferenciaItem,
   TomaFisicaItem,
+  ConteoItemData,
 } from '../../models/conciliacion.model';
 import {
-  ConciliacionListItemResponse,
-  ConciliacionDetailResponse,
-  DiferenciaResponse,
+  ConciliacionBackendResponse,
+  CatalogoItemResponse,
   IniciarConciliacionRequest,
   RegistrarConteoRequest,
   ResolverDiferenciaRequest,
 } from '../api/reconciliation.api';
-import { ConteoItemData } from '../../models/conciliacion.model';
 import {
   conciliacionListItemFromApi,
   conciliacionDetailFromApi,
   diferenciaFromApi,
+  catalogoItemToTomaFisicaItem,
 } from '../mappers/reconciliation.mapper';
 
 const API = '/api/v1';
@@ -31,47 +31,47 @@ export class ConciliacionService {
 
   getConciliaciones(): Observable<ConciliacionRegistro[]> {
     return this.http
-      .get<ConciliacionListItemResponse[]>(`${API}/reconciliation/conciliaciones`)
+      .get<ConciliacionBackendResponse[]>(`${API}/reconciliation/conciliaciones`)
       .pipe(
         map(list => list.map(conciliacionListItemFromApi)),
         catchError(err => throwError(() => err))
       );
   }
 
-  getConciliacionById(id: string): Observable<ConciliacionDetalle | undefined> {
+  /**
+   * Retorna el detalle Y las diferencias en una sola llamada.
+   * El backend embebe las diferencias en GET /{id} — no existe un endpoint separado.
+   */
+  getConciliacionConDiferencias(id: string): Observable<{
+    detalle:      ConciliacionDetalle;
+    diferencias:  DiferenciaItem[];
+  }> {
     return this.http
-      .get<ConciliacionDetailResponse>(`${API}/reconciliation/conciliaciones/${id}`)
+      .get<ConciliacionBackendResponse>(`${API}/reconciliation/conciliaciones/${id}`)
       .pipe(
-        map(conciliacionDetailFromApi),
+        map(raw => ({
+          detalle:     conciliacionDetailFromApi(raw),
+          diferencias: raw.diferencias.map(diferenciaFromApi),
+        })),
         catchError(err => throwError(() => err))
       );
   }
 
-  getDiferenciasByConciliacion(id: string): Observable<DiferenciaItem[]> {
+  /** POST /reconciliation/conciliaciones */
+  iniciarTomaFisica(data: IniciarConciliacionRequest): Observable<{ id: string }> {
     return this.http
-      .get<DiferenciaResponse[]>(`${API}/reconciliation/conciliaciones/${id}/diferencias`)
-      .pipe(
-        map(list => list.map(diferenciaFromApi)),
-        catchError(err => throwError(() => err))
-      );
-  }
-
-  /** POST /reconciliation/conciliaciones — responsableId, responsableNombre, tipo y fecha son obligatorios */
-  iniciarTomaFisica(data: IniciarConciliacionRequest): Observable<{ sesionId: string }> {
-    return this.http
-      .post<{ sesionId: string }>(`${API}/reconciliation/conciliaciones`, data)
+      .post<{ id: string }>(`${API}/reconciliation/conciliaciones`, data)
       .pipe(catchError(err => throwError(() => err)));
   }
 
+  /** PATCH /reconciliation/conciliaciones/{id}/cerrar */
   cerrarConciliacion(id: string): Observable<void> {
     return this.http
       .patch<void>(`${API}/reconciliation/conciliaciones/${id}/cerrar`, {})
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  /** POST /reconciliation/conciliaciones/{id}/conteo
-   *  Registra el conteo físico de todos los ítems de la sesión.
-   *  Respuesta: 204 No Content */
+  /** POST /reconciliation/conciliaciones/{id}/conteo — 204 No Content */
   registrarConteo(id: string, items: ConteoItemData[]): Observable<void> {
     const body: RegistrarConteoRequest = {
       items: items.map(i => ({
@@ -87,8 +87,7 @@ export class ConciliacionService {
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  /** PATCH /reconciliation/conciliaciones/{id}/diferencias/{diferenciaId}/resolver
-   *  Respuesta: 204 No Content */
+  /** PATCH /reconciliation/conciliaciones/{id}/diferencias/{diferenciaId}/resolver — 204 */
   resolverDiferencia(id: string, diferenciaId: string, justificacion: string): Observable<void> {
     const body: ResolverDiferenciaRequest = { justificacion };
     return this.http
@@ -99,8 +98,36 @@ export class ConciliacionService {
       .pipe(catchError(err => throwError(() => err)));
   }
 
-  /** TODO: endpoint de ítems de toma física pendiente de confirmación con backend */
-  getTomaFisicaItems(): Observable<TomaFisicaItem[]> {
-    return throwError(() => new Error('getTomaFisicaItems: endpoint no disponible — pendiente con backend'));
+  /**
+   * GET /reconciliation/conciliaciones/catalogo — catálogo activo con stock del sistema.
+   * Si se indica `categoria`, el backend devuelve solo los bienes de esa categoría
+   * (toma física por categoría).
+   */
+  getTomaFisicaItems(categoria?: string): Observable<TomaFisicaItem[]> {
+    let params = new HttpParams();
+    if (categoria && categoria.trim().length > 0) {
+      params = params.set('categoria', categoria.trim());
+    }
+    return this.http
+      .get<CatalogoItemResponse[]>(`${API}/reconciliation/conciliaciones/catalogo`, { params })
+      .pipe(
+        map(list => list.map(catalogoItemToTomaFisicaItem)),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /**
+   * GET /api/reportes/conciliacion — el documento lo genera ga-ms-reportes.
+   * fechaInicio/fechaFin en formato ISO (YYYY-MM-DD); formato: PDF (default) o EXCEL → xlsx.
+   */
+  exportarConciliacion(fechaInicio: string, fechaFin: string, formato: string): Observable<Blob> {
+    const fmt = formato.toLowerCase() === 'pdf' ? 'PDF' : 'EXCEL';
+    const params = new HttpParams()
+      .set('fechaInicio', fechaInicio)
+      .set('fechaFin', fechaFin)
+      .set('formato', fmt);
+    return this.http
+      .get(`/api/reportes/conciliacion`, { params, responseType: 'blob' })
+      .pipe(catchError(err => throwError(() => err)));
   }
 }

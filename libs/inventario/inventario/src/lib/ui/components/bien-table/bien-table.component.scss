@@ -71,9 +71,9 @@
   color: var(--color-text-secondary);
 
   &--blue { background: rgba(9, 132, 227, 0.1); color: var(--color-info); }
-  &--amber { background: rgba(253, 203, 110, 0.1); color: #d35400; }
+  &--amber { background: rgba(253, 203, 110, 0.1); color: var(--color-warning-interactive-dark); }
   &--green { background: rgba(0, 184, 148, 0.1); color: var(--color-success); }
-  &--purple { background: rgba(108, 92, 231, 0.1); color: #6c5ce7; }
+  &--purple { background: rgba(108, 92, 231, 0.1); color: var(--color-terciario); }
 }
 
 .value-cell {
@@ -96,7 +96,7 @@
     height: 32px;
     border-radius: var(--radius-md);
     border: 1px solid var(--color-border);
-    background: white;
+    background: var(--color-surface-primary);
     color: var(--color-text-secondary);
     display: flex;
     align-items: center;

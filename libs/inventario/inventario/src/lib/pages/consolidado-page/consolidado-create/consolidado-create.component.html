@@ -6,50 +6,33 @@
       <div class="page-header__title-row">
         <h1 class="page-header__title">Seleccionar GIL-F-014 para Consolidar</h1>
       </div>
-      <p class="page-header__subtitle">Seleccione los formatos aprobados para incluirlos en el nuevo consolidado.</p>
-    </div>
-    <div class="page-header__actions">
-      <div class="badge badge--surface font-mono">
-        <span class="material-symbols-outlined text-secondary text-sm">tag</span>
-        #CON-2024-008
-      </div>
+      <p class="page-header__subtitle">Seleccione los compromisos elegibles para incluirlos en el nuevo consolidado.</p>
     </div>
   </header>
+
+  <!-- generadoPor input (no auth context available in this lib) -->
+  <div class="filters-card" style="margin-bottom: 1rem;">
+    <div class="filter-group" style="flex: 1;">
+      <label class="filter-label" for="generadoPor">Generado por <span class="text-danger">*</span></label>
+      <input
+        id="generadoPor"
+        class="filter-input"
+        type="text"
+        placeholder="Nombre del responsable"
+        [formControl]="generadoPorCtrl" />
+      @if (generadoPorCtrl.invalid && generadoPorCtrl.touched) {
+        <span class="field-error">Campo requerido</span>
+      }
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="alert alert--danger">{{ error() }}</div>
+  }
 
   <div class="create-layout">
     <!-- Left Column: Main Selection -->
     <div class="create-layout__main">
-      
-      <!-- Filters -->
-      <div class="filters-card">
-        <div class="filter-group">
-          <label class="filter-label">Rango de Fecha</label>
-          <div class="filter-date-row">
-            <input class="filter-input" type="date" value="2024-04-01"/>
-            <span class="filter-separator">-</span>
-            <input class="filter-input" type="date" value="2024-04-30"/>
-          </div>
-        </div>
-        <div class="filter-group">
-          <label class="filter-label">Instructor</label>
-          <select class="filter-input">
-            <option>Todos los instructores</option>
-            <option>Ricardo Martínez</option>
-            <option>Ana Lucia Gómez</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <label class="filter-label">Programa</label>
-          <select class="filter-input">
-            <option>Todos los programas</option>
-            <option>Cocina</option>
-            <option>Repostería</option>
-          </select>
-        </div>
-        <button class="filter-btn">
-          <span class="material-symbols-outlined">filter_list</span>
-        </button>
-      </div>
 
       <!-- Data Table -->
       <restaurant-data-table>
@@ -57,64 +40,59 @@
           <thead dtHeader>
             <tr>
               <th class="th-center" style="width: 3rem;">
-                <input 
-                  type="checkbox" 
-                  class="checkbox" 
-                  [checked]="allSelected()" 
+                <input
+                  type="checkbox"
+                  class="checkbox"
+                  [checked]="allSelected()"
                   (change)="toggleAll($event)" />
               </th>
-              <th class="th-center">Código GIL</th>
-              <th class="th-center">Instructor</th>
-              <th class="th-center">Programa / Ficha</th>
+              <th class="th-center">GIL ID</th>
+              <th class="th-center">Factura / CUFE</th>
+              <th class="th-center">Concepto</th>
               <th class="th-center">Fecha</th>
-              <th class="th-center">Valor Total</th>
-              <th class="th-center">Estado</th>
+              <th class="th-center">Monto</th>
+              <th class="th-center">Ret. ZESE</th>
             </tr>
           </thead>
           <tbody class="text-black text-center">
-            @for (item of gils(); track item.id) {
-              <tr [class.tr--disabled]="item.estado !== 'Disponible'" (click)="toggleSelection(item)">
+            @if (loading()) {
+              <tr><td colspan="7" class="td-center td-muted">Cargando compromisos elegibles…</td></tr>
+            }
+            @for (row of rows(); track row.data.compromisoId) {
+              <tr (click)="toggleSelection(row)">
                 <td class="td-center">
-                  <input 
-                    type="checkbox" 
-                    class="checkbox" 
-                    [checked]="item.selected" 
-                    [disabled]="item.estado !== 'Disponible'" 
+                  <input
+                    type="checkbox"
+                    class="checkbox"
+                    [checked]="row.selected"
                     (click)="$event.stopPropagation()"
-                    (change)="toggleSelection(item)" />
+                    (change)="toggleSelection(row)" />
                 </td>
                 <td>
-                  <span class="td-bold">{{ item.codigo }}</span>
+                  <span class="td-bold">{{ row.data.gilId }}</span>
+                </td>
+                <td class="cufe-cell">
+                  <div class="td-bold font-mono">{{ row.data.numeroFactura }}</div>
+                  <div class="td-muted text-xs cufe-text" [title]="row.data.cufe">{{ row.data.cufe }}</div>
                 </td>
                 <td>
-                  <span class="td-medium">{{ item.instructor }}</span>
+                  <span class="td-medium">{{ row.data.concepto }}</span>
                 </td>
                 <td>
-                  <div class="td-medium">{{ item.programa }}</div>
-                  <div class="td-muted text-xs">{{ item.ficha }}</div>
-                </td>
-                <td>
-                  <span class="td-muted">{{ item.fecha }}</span>
+                  <span class="td-muted">{{ row.data.fecha }}</span>
                 </td>
                 <td class="text-center">
-                  <span class="td-bold">{{ item.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                  <span class="td-bold">{{ row.data.monto | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
                 </td>
                 <td class="text-center">
-                  @if (item.estado === 'Disponible') {
-
-                    <restaurant-status-badge label="Activo" variant="success"></restaurant-status-badge>
-                  
-}
-                  @if (item.estado !== 'Disponible') {
-
-                    <span class="badge badge--surface">
-                      <span class="material-symbols-outlined text-[14px] mr-1">link</span>
-                      En {{ item.consolidadoRef }}
-                    </span>
-                  
-}
+                  <span class="td-muted">{{ row.data.retencionZese | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
                 </td>
               </tr>
+            }
+            @empty {
+              @if (!loading()) {
+                <tr><td colspan="7" class="td-center td-muted">No hay compromisos elegibles disponibles.</td></tr>
+              }
             }
           </tbody>
         </table>
@@ -126,31 +104,30 @@
       <div class="calc-panel">
         <div class="calc-panel__header">
           <h3 class="calc-panel__title">Resumen de Selección</h3>
-          <p class="calc-panel__subtitle">{{ selectedCount() }} Formatos seleccionados</p>
+          <p class="calc-panel__subtitle">{{ selectedCount() }} compromisos seleccionados</p>
         </div>
-        
+
         <div class="calc-panel__body">
           <div class="calc-row text-on-surface">
             <span>Subtotal Neto</span>
             <span class="calc-row__value">{{ subtotalNeto() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
           </div>
-          <div class="calc-row text-on-surface">
-            <span>IVA Acumulado</span>
-            <span class="calc-row__value">{{ ivaAcumulado() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-          </div>
           <div class="calc-row text-tertiary">
-            <span>Retención ZESE (0.625%)</span>
-            <span class="calc-row__value">-{{ retencionZese() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+            <span>Retención ZESE</span>
+            <span class="calc-row__value">-{{ retencionZeseTotal() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
           </div>
         </div>
-        
+
         <div class="calc-panel__footer">
           <p class="calc-panel__total-label">Total Consolidado</p>
           <p class="calc-panel__total-value">{{ totalConsolidado() | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
         </div>
-        
+
         <div class="calc-panel__actions">
-          <restaurant-button variant="primary" (click)="confirmar()">
+          <restaurant-button
+            variant="primary"
+            [disabled]="selectedCount() === 0 || loading()"
+            (click)="confirmar()">
             Confirmar y Generar
           </restaurant-button>
         </div>

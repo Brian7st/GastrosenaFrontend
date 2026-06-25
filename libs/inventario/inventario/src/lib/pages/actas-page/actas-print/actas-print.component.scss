@@ -33,7 +33,7 @@
 
     &--print {
       background: #39a900;
-      color: white;
+      color: var(--color-en-primario);
     }
   }
 }
@@ -47,7 +47,7 @@
 
 /* ── Página del documento ─────────────────────────────────────────────────── */
 .gor-doc {
-  background: white;
+  background: var(--color-surface-primary);
   max-width: 800px;
   margin: 24px auto;
   padding: 32px 40px;
@@ -184,7 +184,7 @@
   }
 
   body {
-    background: white !important;
+    background: var(--color-surface-primary) !important;
     margin: 0 !important;
     padding: 0 !important;
   }

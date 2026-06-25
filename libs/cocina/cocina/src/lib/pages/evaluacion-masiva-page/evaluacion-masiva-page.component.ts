@@ -15,6 +15,7 @@ import {
   CocinaFacade,
   ActividadMock,
 } from '../../data-access/cocina.facade';
+import { EvaluacionService } from '../../data-access/evaluacion.service';
 
 @Component({
   selector: 'restaurant-evaluacion-masiva-page',
@@ -28,6 +29,7 @@ export class EvaluacionMasivaPageComponent implements OnInit {
 
   // ── Inyecciones ─────────────────────────────
   private facade = inject(CocinaFacade);
+  private evaluacionService = inject(EvaluacionService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -55,13 +57,17 @@ export class EvaluacionMasivaPageComponent implements OnInit {
   // ── Datos ────────────────────────────────────
   readonly aprendices = this.facade.aprendices;
 
-  readonly aprendicesActivos = computed(() =>
-    this.aprendices().filter(a => !a.inactivo)
-  );
+  readonly aprendicesActivos = computed(() => {
+    const act = this.actividad();
+    if (!act) return [];
+    return this.aprendices().filter(a => !a.inactivo && a.ficha === act.ficha);
+  });
 
-  readonly aprendicesInactivos = computed(() =>
-    this.aprendices().filter(a => a.inactivo)
-  );
+  readonly aprendicesInactivos = computed(() => {
+    const act = this.actividad();
+    if (!act) return [];
+    return this.aprendices().filter(a => a.inactivo && a.ficha === act.ficha);
+  });
 
   // ── Selección ────────────────────────────────
   readonly modoSeleccionAbierto = signal<boolean>(false);
@@ -216,21 +222,38 @@ export class EvaluacionMasivaPageComponent implements OnInit {
   ): void {
 
     const ids = Array.from(this.seleccionados());
+    const actividadId = this.actividadId();
+    
+    if (!actividadId || ids.length === 0) return;
 
     const estadoStr =
       resultado === 'aprobo'
         ? 'Aprobó'
         : 'No Aprobó';
 
-    for (const id of ids) {
-      this.facade.actualizarEstado(id, estadoStr);
-    }
+    // 1. Crear el payload para el backend
+    const requests = ids.map(id => ({
+      aprendizId: id,
+      resultado: resultado,
+      observaciones: 'Evaluación masiva'
+    }));
 
-    this.seleccionados.set(new Set());
-
-    this.menuEvaluarAbierto.set(false);
-
-    this.modoSeleccionAbierto.set(false);
+    // 2. Enviar petición al backend
+    this.evaluacionService.evaluarAprendices(actividadId, requests).subscribe({
+      next: () => {
+        // 3. Actualizar la vista local si el backend responde exitosamente
+        for (const id of ids) {
+          this.facade.actualizarEstado(id, estadoStr);
+        }
+        this.seleccionados.set(new Set());
+        this.menuEvaluarAbierto.set(false);
+        this.modoSeleccionAbierto.set(false);
+      },
+      error: (err) => {
+        console.error('Error al guardar la evaluación masiva', err);
+        // Opcional: Mostrar mensaje de error al usuario
+      }
+    });
   }
 
   // ── Navegación ───────────────────────────────

@@ -1,11 +1,13 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import {
   PageHeaderComponent,
   ButtonComponent,
   LucideIconComponent,
-  ConfirmDialogComponent
+  ConfirmDialogComponent,
+  DataTableComponent,
+  EmptyStateComponent
 } from '@restaurant/shared/ui';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
 import { RestauranteService } from '../../data-access/restaurante.service';
@@ -18,7 +20,9 @@ import { RestauranteService } from '../../data-access/restaurante.service';
     PageHeaderComponent,
     ButtonComponent,
     LucideIconComponent,
-    ConfirmDialogComponent
+    ConfirmDialogComponent,
+    DataTableComponent,
+    EmptyStateComponent
   ],
   templateUrl: './caja-movimientos-page.component.html',
   styleUrl: './caja-movimientos-page.component.scss',
@@ -34,8 +38,21 @@ export class CajaMovimientosPageComponent implements OnInit {
   totalTransferencia = signal<number>(0);
 
   facturas = signal<any[]>([]);
+  filtroPago = signal<string>('TODOS');
 
-  alertDialog = signal<{open: boolean, title: string, message: string}>({
+  facturasFiltradas = computed(() => {
+    const data = this.facturas();
+    const filtro = this.filtroPago();
+    
+    if (filtro === 'TODOS') return data;
+    
+    return data.filter(f => {
+      const metodo = f.metodoPago ? f.metodoPago.toUpperCase() : '';
+      return metodo.includes(filtro);
+    });
+  });
+
+  alertDialog = signal<{ open: boolean, title: string, message: string }>({
     open: false,
     title: '',
     message: ''
@@ -90,23 +107,18 @@ export class CajaMovimientosPageComponent implements OnInit {
     this.router.navigate(['/app/restaurante/caja']);
   }
 
-  imprimirFactura(idPedido: string) {
-    const ref = idPedido ? idPedido.substring(0, 8).toUpperCase() : 'DESCONOCIDO';
-
-    this.alertDialog.set({
-      open: true,
-      title: 'Imprimiendo Factura',
-      message: `Enviando orden de impresión de la factura para el pedido #${ref}...`
-    });
+  imprimirFactura(idFactura: string, numeroFactura: string) {
+    if (!idFactura) {
+      this.alertDialog.set({
+        open: true,
+        title: 'Error de Impresión',
+        message: 'No se encontró el identificador de la factura.'
+      });
+      return;
+    }
+    this.facade.descargarFacturaPdf(idFactura, numeroFactura);
   }
 
-  generarReporteCuadre() {
-    this.alertDialog.set({
-      open: true,
-      title: 'Reporte Generado',
-      message: `El reporte de cuadre del turno actual ha sido generado y está listo para impresión.`
-    });
-  }
 
   cerrarAlertDialog() {
     this.alertDialog.set({ ...this.alertDialog(), open: false });

@@ -67,7 +67,7 @@ export class RequisicionDraftService {
   buildItems(): RequisicionItem[] {
     return this.itemsConCantidad().map(({ cantidad, bien }) => ({
       productoId:     bien.codigoSena,
-      productoNombre: bien.nombre,
+      productoNombre: bien.descripcion,
       cantidad,
       unidadMedida:   bien.unidadMedida,
       categoria:      RequisicionDraftService.mapearCategoria(bien.categoria ?? ''),

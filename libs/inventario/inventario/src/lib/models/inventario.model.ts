@@ -35,7 +35,7 @@ export interface FacturaBien {
  * para el módulo de administración de inventario.
  * Extiende la base de shared/models.
  */
-export interface Bien extends Omit<SharedBien, 'id' | 'codigo'> {
+export interface Bien extends Omit<SharedBien, 'id' | 'codigo' | 'nombre'> {
   id: string | number;
   codigoSena: string;
   codigoProveedor: string;
@@ -45,7 +45,6 @@ export interface Bien extends Omit<SharedBien, 'id' | 'codigo'> {
   valorNeto: number | null;
   iva: number | null;
   estado: EstadoBien;
-  imagenUrl?: string;
   tieneHistorial?: boolean;
   proveedor?: string;
   fechaCompra?: string;
@@ -99,15 +98,14 @@ export interface BienExportConfig {
 
 export interface BienImportRow {
   codigoSena?: string;
-  nombre: string;
   descripcion?: string;
   categoria?: string;
   unidadMedida: string;
   codigoProveedor?: string;
-  urlImagen?: string;
   vrlAdjudicado?: number;
   vrlAntes?: number;
   iva?: number;
+  stockMinimo?: number;
   validacion?: 'Correcto' | 'Código duplicado' | 'Falta campo' | string;
   error?: string;
 }
@@ -115,7 +113,6 @@ export interface ProductoCatalogo {
   id: string | number;
   codigoSena: string;
   codigoProveedor?: string;
-  nombre: string;
   descripcion?: string;
   categoria: string;
   unidadMedida: string;
@@ -137,15 +134,14 @@ export interface ExistenciaProducto {
 export type BienVista = ProductoCatalogo & Partial<Omit<ExistenciaProducto, 'productoId'>>;
 
 export interface BienFormDto {
-  nombre: string;
   codigoSena?: string;
   codigoProveedor?: string;
   descripcion?: string;
   categoria: string;
   unidadMedida: string;
-  imagenUrl?: string;
   vrlAdjudicado?: number | null;
   vrlAntes?: number | null;
   iva?: number | null;
+  stockMinimo?: number | null;
 }
 

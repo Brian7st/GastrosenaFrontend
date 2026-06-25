@@ -45,7 +45,7 @@
                     </div>
                     <div class="item-card__info">
                       <div class="item-card__name-row">
-                        <h4 class="item-card__name">{{ item.bien.nombre }}</h4>
+                        <h4 class="item-card__name">{{ item.bien.descripcion }}</h4>
                         @if (item.bien.estado === 'Bajo Stock') {
                           <span class="item-card__stock-badge">Bajo Stock</span>
                         }
@@ -84,12 +84,13 @@
         </div>
         <p class="modal-footer__note">Este pedido será procesado por el almacén del SENA.</p>
       </div>
-      <div class="modal-footer__actions">
+      <!-- Slot de mensaje con espacio reservado: el error no debe mover los botones -->
+      <div class="modal-footer__error-slot" [class.modal-footer__error-slot--visible]="!!error()">
         @if (error()) {
-          <p style="color:var(--color-danger, #ef4444); font-size:0.85rem; margin-bottom:0.5rem;">
-            {{ error() }}
-          </p>
+          <p class="modal-footer__error">{{ error() }}</p>
         }
+      </div>
+      <div class="modal-footer__actions">
         <button class="btn-secondary" (click)="volver()" [disabled]="enviando()">
           Volver a Editar
         </button>

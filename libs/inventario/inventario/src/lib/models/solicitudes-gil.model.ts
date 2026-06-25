@@ -1,4 +1,4 @@
-export type EstadoGil = 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'VERIFICADO' | 'CERRADO';
+export type EstadoGil = 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'VERIFICADO' | 'COMPROMETIDO' | 'CERRADO';
 
 export interface CuentadanteGil {
   id?: string | number;
@@ -7,12 +7,13 @@ export interface CuentadanteGil {
 }
 
 export interface BienSolicitud {
-  codigoSena: string;     // era: codigo
+  codigoSena: string;
   descripcion: string;
-  unidadMedida: string;   // era: um
+  unidadMedida: string;
   cantidad: number;
   valorUnitario: number;
   subtotal: number;
+  iva: number;
 }
 
 export interface SolicitudGil {
@@ -75,8 +76,9 @@ export interface CrearSolicitudData {
   cuentadantes: { nombre: string; cedula: string }[];
   solicitante: string;
   codigoGrupo?: string;
+  fichaCaracterizacion?: string;
   solicitudesOrigenIds?: string[];
-  bienes: { codigoSena: string; descripcion: string; unidadMedida: string; cantidad: number; valorUnitario: number; subtotal: number }[];
+  bienes: { codigoSena: string; descripcion: string; unidadMedida: string; cantidad: number; valorUnitario: number; subtotal: number; iva: number }[];
   observaciones?: string;
 }
 
@@ -98,4 +100,6 @@ export interface GenerarGilData {
   solicitante: string;
   codigoGrupo: string;
   observaciones?: string;
+  /** Programa de Formación por defecto del GIL (código del catálogo). */
+  programaDefault?: string;
 }

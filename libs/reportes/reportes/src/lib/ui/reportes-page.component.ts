@@ -115,12 +115,11 @@ export class ReportesPageComponent implements OnInit {
   }
 
   onGenerarReporte(): void {
-    const request: GenerarReporteRequest = {
-      reporteId: '',
-      periodicidad: this.periodicidadSeleccionada(),
-      tipo: this.tipoSeleccionado(),
-    };
-    this.facade.generarReporte(request);
+    for (const seccion of this.seccionesFiltradas()) {
+      for (const reporte of seccion.reportes) {
+        this.generarReporte(reporte.id);
+      }
+    }
   }
 
   generarReporte(reporteId: string): void {

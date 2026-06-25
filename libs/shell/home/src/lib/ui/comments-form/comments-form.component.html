@@ -1,55 +1,145 @@
 <section class="comments-section" id="comentarios">
   <div class="container">
+
     <div class="comments-section__header">
       <span class="tag tag-green">¿Qué opinas?</span>
       <h2 class="comments-section__title">Déjanos tu comentario</h2>
       <p class="comments-section__desc">Tu opinión nos ayuda a mejorar. Comparte tu experiencia o escríbenos una consulta.</p>
     </div>
 
-    <form class="comments-form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
-      @if (successMessage()) {
-        <restaurant-alert type="success" [message]="successMessage()" />
-      }
-      @if (errorMessage()) {
-        <restaurant-alert type="error" [message]="errorMessage()" />
-      }
+    <div class="comments-layout">
 
-      <div class="comments-form__row">
-        <div class="field">
-          <label class="field__label" for="name">Nombre</label>
-          <input id="name" type="text" class="field__input" placeholder="Tu nombre"
-                 formControlName="name"
-                 [class.field__input--error]="name.invalid && name.touched" />
-          @if (name.invalid && name.touched) {
-            <span class="field__error">Nombre requerido (mínimo 2 caracteres).</span>
+      <!-- Formulario -->
+      <div class="comments-layout__form">
+        <div class="comments-form-card">
+          <h3 class="comments-form-card__title">Nuevo comentario</h3>
+
+          @if (successMessage()) {
+            <restaurant-alert type="success" [message]="successMessage()" />
           }
-        </div>
-        <div class="field">
-          <label class="field__label" for="email">Correo electrónico</label>
-          <input id="email" type="email" class="field__input" placeholder="tu@correo.com"
-                 formControlName="email"
-                 [class.field__input--error]="email.invalid && email.touched" />
-          @if (email.invalid && email.touched) {
-            <span class="field__error">Ingresa un correo válido.</span>
+          @if (errorMessage()) {
+            <restaurant-alert type="error" [message]="errorMessage()" />
           }
+
+          <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+            <div class="field">
+              <label class="field__label" for="nombre">Tu nombre</label>
+              <input
+                id="nombre"
+                type="text"
+                class="field__input"
+                placeholder="Ej: Juan Pérez"
+                formControlName="nombre"
+                [class.field__input--error]="nombre.invalid && nombre.touched"
+              />
+              @if (nombre.invalid && nombre.touched) {
+                <span class="field__error">Nombre requerido (mínimo 3 caracteres).</span>
+              }
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="titulo">Título</label>
+              <input
+                id="titulo"
+                type="text"
+                class="field__input"
+                placeholder="Ej: Excelente experiencia en el módulo"
+                formControlName="titulo"
+                [class.field__input--error]="titulo.invalid && titulo.touched"
+              />
+              @if (titulo.invalid && titulo.touched) {
+                <span class="field__error">Título requerido (mínimo 3 caracteres).</span>
+              }
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="comentario">Comentario</label>
+              <textarea
+                id="comentario"
+                class="field__input field__textarea"
+                rows="5"
+                placeholder="Escribe aquí tu comentario o consulta..."
+                formControlName="comentario"
+                [class.field__input--error]="comentario.invalid && comentario.touched"
+              ></textarea>
+              <div class="field__meta">
+                @if (comentario.invalid && comentario.touched) {
+                  <span class="field__error">Mínimo 10 caracteres.</span>
+                } @else {
+                  <span></span>
+                }
+                <span class="field__count">
+                  {{ comentario.value?.length ?? 0 }}/1000
+                </span>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              class="btn btn-primary comments-form__submit"
+              [disabled]="isLoading()"
+            >
+              @if (isLoading()) {
+                <span class="spinner"></span> Enviando...
+              } @else {
+                Enviar Comentario
+              }
+            </button>
+
+            <p class="comments-form__note">
+              Tu comentario será visible después de ser aprobado por un administrador.
+            </p>
+          </form>
         </div>
       </div>
 
-      <div class="field">
-        <label class="field__label" for="message">Mensaje</label>
-        <textarea id="message" class="field__input field__textarea" rows="5"
-                  placeholder="Escribe aquí tu comentario o consulta..."
-                  formControlName="message"
-                  [class.field__input--error]="message.invalid && message.touched">
-        </textarea>
-        @if (message.invalid && message.touched) {
-          <span class="field__error">El mensaje debe tener al menos 10 caracteres.</span>
+      <!-- Foro de comentarios aprobados -->
+      <div class="comments-layout__foro">
+        <div class="foro-header">
+          <h3 class="foro-header__title">Comentarios de la comunidad</h3>
+          <span class="foro-header__count">{{ comentarios().length }} comentarios</span>
+        </div>
+
+        @if (isLoadingForo()) {
+          <div class="foro-loading">
+            <span class="spinner spinner--dark"></span>
+            Cargando comentarios...
+          </div>
+        } @else if (comentarios().length === 0) {
+        <div class="foro-empty">
+  <!-- Pasar color verde explícitamente -->
+  <lucide-icon 
+    name="info" 
+    [size]="50"
+    class="foro-empty__icon"
+  ></lucide-icon>
+  <p>Aún no hay comentarios aprobados.</p>
+  <p>¡Sé el primero en compartir tu opinión!</p>
+</div>
+        } @else {
+          <div class="foro-list">
+            @for (c of comentarios(); track c.idComentario) {
+              <div class="foro-item">
+                <div class="foro-item__avatar">
+                  {{ getInitials(c.usuarioNombre) }}
+                </div>
+                <div class="foro-item__body">
+                  <div class="foro-item__header">
+                    <span class="foro-item__name">{{ c.usuarioNombre }}</span>
+                    <span class="foro-item__date">
+                      {{ c.fechaCreacion | date:'dd MMM yyyy' }}
+                    </span>
+                  </div>
+                  <p class="foro-item__titulo">{{ c.titulo }}</p>
+                  <p class="foro-item__texto">{{ c.comentario }}</p>
+                </div>
+              </div>
+            }
+          </div>
         }
       </div>
 
-      <button type="submit" class="btn btn-primary comments-form__submit" [disabled]="isLoading()">
-        @if (isLoading()) { Enviando... } @else { Enviar Comentario }
-      </button>
-    </form>
+    </div>
   </div>
 </section>

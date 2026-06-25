@@ -3,22 +3,10 @@
    Diseño: SENA Emerald Logic / The Precision Ledger
    ========================================================================== */
 
-$primary:         #006e25;
-$primary-light:   #28a745;
-$surface:         #f8f9fa;
-$surface-low:     #f3f4f5;
-$surface-high:    #e7e8e9;
-$surface-highest: #e1e3e4;
-$on-surface:      #191c1d;
-$on-surface-var:  #3e4a3c;
-$tertiary:        #ba1830;
-$orange:          #f97316;
-$yellow:          #eab308;
-
 // ── Layout principal ───────────────────────────────────────────────────────
 .detail-container {
   min-height: 100%;
-  background: $surface;
+  background: var(--color-superficie-contenedor-bajo);
 }
 
 // ── Action Header (patrón estándar Kardex) ────────────────────────────────
@@ -52,15 +40,15 @@ $yellow:          #eab308;
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 0.75rem;
-  background: $surface-low;
+  background: var(--color-superficie-contenedor-bajo);
   border: none;
-  color: $on-surface;
+  color: var(--color-en-superficie);
   cursor: pointer;
   transition: background 0.2s;
   flex-shrink: 0;
   margin-top: 0.375rem;
 
-  &:hover { background: $surface-high; }
+  &:hover { background: var(--color-superficie-contenedor-alto); }
 }
 
 .breadcrumb-nav {
@@ -69,19 +57,19 @@ $yellow:          #eab308;
   gap: 0.375rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: $on-surface-var;
+  color: var(--color-contorno);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.5rem;
 
-  .active { color: $on-surface; }
+  .active { color: var(--color-en-superficie); }
 }
 
 .page-title {
   font-family: 'Manrope', sans-serif;
   font-size: 1.75rem;
   font-weight: 800;
-  color: $on-surface;
+  color: var(--color-en-superficie);
   letter-spacing: -0.02em;
   margin: 0 0 0.375rem;
 
@@ -111,7 +99,7 @@ $yellow:          #eab308;
 
 // ── Tarjeta de Estado ──────────────────────────────────────────────────────
 .estado-card {
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: 0.75rem;
   padding: 2rem;
   box-shadow: 0 4px 24px -8px rgba(25, 28, 29, 0.06);
@@ -123,10 +111,10 @@ $yellow:          #eab308;
     top: 0; left: 0; right: 0;
     height: 4px;
 
-    &--critica { background: $tertiary; }
-    &--alta    { background: $orange; }
-    &--media   { background: $yellow; }
-    &--baja    { background: $primary; }
+    &--critica { background: var(--color-terciario, #ba1830); }
+    &--alta    { background: var(--color-warning-interactive-dark, #f97316); }
+    &--media   { background: var(--color-warning); }
+    &--baja    { background: var(--color-primario); }
   }
 
   &__header {
@@ -144,13 +132,13 @@ $yellow:          #eab308;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgba($surface-highest, 0.5);
+    border: 1px solid color-mix(in srgb, var(--color-superficie-contenedor-mas-alto) 50%, transparent);
     flex-shrink: 0;
 
-    &--critica { background: rgba($tertiary, 0.1);  color: $tertiary; }
-    &--alta    { background: rgba($orange, 0.1);    color: $orange; }
-    &--media   { background: rgba($yellow, 0.1);    color: #b08800; }
-    &--baja    { background: rgba($primary, 0.1);   color: $primary; }
+    &--critica { background: color-mix(in srgb, var(--color-terciario, #ba1830) 10%, transparent);  color: var(--color-terciario, #ba1830); }
+    &--alta    { background: color-mix(in srgb, var(--color-warning-interactive-dark, #f97316) 10%, transparent);    color: var(--color-warning-interactive-dark, #f97316); }
+    &--media   { background: color-mix(in srgb, var(--color-warning) 10%, transparent);    color: var(--color-warning-text, #b08800); }
+    &--baja    { background: color-mix(in srgb, var(--color-primario) 10%, transparent);   color: var(--color-primario); }
   }
 
   &__icon { font-size: 1.75rem; }
@@ -159,13 +147,13 @@ $yellow:          #eab308;
     font-family: 'Manrope', sans-serif;
     font-size: 1.25rem;
     font-weight: 700;
-    color: $on-surface;
+    color: var(--color-en-superficie);
     margin: 0 0 0.25rem;
   }
 
   &__subtitulo {
     font-size: 0.875rem;
-    color: $on-surface-var;
+    color: var(--color-contorno);
     margin: 0;
   }
 
@@ -182,7 +170,7 @@ $yellow:          #eab308;
 
 .stock-label {
   font-size: 0.75rem;
-  color: $on-surface-var;
+  color: var(--color-contorno);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-weight: 600;
@@ -194,18 +182,18 @@ $yellow:          #eab308;
   font-size: 2.5rem;
   font-weight: 800;
   margin: 0;
-  color: $on-surface;
+  color: var(--color-en-superficie);
 
-  &--critica { color: $tertiary; }
-  &--alta    { color: $orange; }
-  &--media   { color: #9a7700; }
-  &--neutral { color: $on-surface; }
+  &--critica { color: var(--color-terciario, #ba1830); }
+  &--alta    { color: var(--color-warning-interactive-dark, #f97316); }
+  &--media   { color: var(--color-warning-text, #9a7700); }
+  &--neutral { color: var(--color-en-superficie); }
 }
 
 .stock-unit {
   font-size: 1.25rem;
   font-weight: 500;
-  color: $on-surface-var;
+  color: var(--color-contorno);
 }
 
 // ── Barra de progreso ──────────────────────────────────────────────────────
@@ -217,13 +205,13 @@ $yellow:          #eab308;
   display: flex;
   justify-content: space-between;
   font-size: 0.8125rem;
-  color: $on-surface-var;
+  color: var(--color-contorno);
   margin-bottom: 0.5rem;
 }
 
 .progress-track {
   height: 0.75rem;
-  background: $surface-highest;
+  background: var(--color-superficie-contenedor-mas-alto);
   border-radius: 9999px;
   overflow: hidden;
 }
@@ -234,10 +222,10 @@ $yellow:          #eab308;
   transition: width 0.4s ease;
   min-width: 4px;
 
-  &--critica { background: $tertiary; }
-  &--alta    { background: $orange; }
-  &--media   { background: $yellow; }
-  &--baja    { background: $primary; }
+  &--critica { background: var(--color-terciario, #ba1830); }
+  &--alta    { background: var(--color-warning-interactive-dark, #f97316); }
+  &--media   { background: var(--color-warning); }
+  &--baja    { background: var(--color-primario); }
 }
 
 .progress-note {
@@ -245,7 +233,7 @@ $yellow:          #eab308;
   align-items: center;
   gap: 0.25rem;
   font-size: 0.75rem;
-  color: $on-surface-var;
+  color: var(--color-contorno);
   margin: 0.75rem 0 0;
 
   &__icon { font-size: 0.875rem; }
@@ -253,7 +241,7 @@ $yellow:          #eab308;
 
 // ── Gráfico de Tendencia ───────────────────────────────────────────────────
 .chart-card {
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: 0.75rem;
   padding: 2rem;
   box-shadow: 0 4px 24px -8px rgba(25, 28, 29, 0.06);
@@ -262,7 +250,7 @@ $yellow:          #eab308;
     font-family: 'Manrope', sans-serif;
     font-size: 1.25rem;
     font-weight: 700;
-    color: $on-surface;
+    color: var(--color-en-superficie);
     margin: 0 0 1.5rem;
   }
 }
@@ -271,7 +259,7 @@ $yellow:          #eab308;
   position: relative;
   height: 16rem;
   padding-top: 2rem;
-  border-bottom: 1px solid rgba($surface-highest, 0.5);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-superficie-contenedor-mas-alto) 50%, transparent);
 }
 
 .chart-threshold {
@@ -279,14 +267,14 @@ $yellow:          #eab308;
   top: 40%;
   left: 0;
   right: 0;
-  border-top: 1px dashed $surface-highest;
+  border-top: 1px dashed var(--color-superficie-contenedor-mas-alto);
 
   &__label {
     position: absolute;
     top: -1.25rem;
     right: 0;
     font-size: 0.75rem;
-    color: $on-surface-var;
+    color: var(--color-contorno);
   }
 }
 
@@ -308,8 +296,8 @@ $yellow:          #eab308;
 
   &:hover { opacity: 0.75; }
 
-  &--safe   { background: rgba($primary-light, 0.4); }
-  &--danger { background: rgba($tertiary, 0.6); }
+  &--safe   { background: color-mix(in srgb, var(--color-primario-gradient-end) 40%, transparent); }
+  &--danger { background: color-mix(in srgb, var(--color-terciario, #ba1830) 60%, transparent); }
 }
 
 .chart-labels {
@@ -317,14 +305,14 @@ $yellow:          #eab308;
   justify-content: space-between;
   margin-top: 0.5rem;
   font-size: 0.75rem;
-  color: $on-surface-var;
+  color: var(--color-contorno);
 }
 
 // ── Timeline ───────────────────────────────────────────────────────────────
 .col-timeline {}
 
 .timeline-card {
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: 0.75rem;
   padding: 2rem;
   box-shadow: 0 4px 24px -8px rgba(25, 28, 29, 0.06);
@@ -335,7 +323,7 @@ $yellow:          #eab308;
     font-family: 'Manrope', sans-serif;
     font-size: 1.25rem;
     font-weight: 700;
-    color: $on-surface;
+    color: var(--color-en-superficie);
     margin: 0 0 1.5rem;
   }
 
@@ -346,20 +334,20 @@ $yellow:          #eab308;
     padding: 0.75rem;
     background: transparent;
     border: none;
-    color: $primary;
+    color: var(--color-primario);
     font-size: 0.875rem;
     font-weight: 600;
     border-radius: 0.75rem;
     cursor: pointer;
     transition: background 0.2s;
 
-    &:hover { background: $surface-low; }
+    &:hover { background: var(--color-superficie-contenedor-bajo); }
   }
 }
 
 .timeline {
   position: relative;
-  border-left: 1px solid rgba($surface-highest, 0.8);
+  border-left: 1px solid color-mix(in srgb, var(--color-superficie-contenedor-mas-alto) 80%, transparent);
   margin-left: 0.75rem;
   padding-left: 0;
   display: flex;
@@ -379,29 +367,29 @@ $yellow:          #eab308;
     width: 0.75rem;
     height: 0.75rem;
     border-radius: 50%;
-    border: 3px solid white;
+    border: 3px solid var(--color-surface-primary);
 
-    &--agotado       { background: $tertiary; }
-    &--alerta_umbral { background: $surface-highest; border: 2px solid rgba($surface-highest, 0.8); }
-    &--resuelto      { background: rgba($surface-highest, 0.6); border: 2px solid rgba($surface-highest, 0.5); }
+    &--agotado       { background: var(--color-terciario, #ba1830); }
+    &--alerta_umbral { background: var(--color-superficie-contenedor-mas-alto); border: 2px solid color-mix(in srgb, var(--color-superficie-contenedor-mas-alto) 80%, transparent); }
+    &--resuelto      { background: rgba(var(--color-superficie-contenedor-mas-alto), 0.6); border: 2px solid color-mix(in srgb, var(--color-superficie-contenedor-mas-alto) 50%, transparent); }
   }
 
   &__fecha {
     font-size: 0.75rem;
-    color: $on-surface-var;
+    color: var(--color-contorno);
     margin: 0 0 0.25rem;
   }
 
   &__titulo {
     font-size: 0.875rem;
     font-weight: 700;
-    color: $on-surface;
+    color: var(--color-en-superficie);
     margin: 0 0 0.375rem;
   }
 
   &__desc {
     font-size: 0.8125rem;
-    color: $on-surface-var;
+    color: var(--color-contorno);
     margin: 0;
   }
 }

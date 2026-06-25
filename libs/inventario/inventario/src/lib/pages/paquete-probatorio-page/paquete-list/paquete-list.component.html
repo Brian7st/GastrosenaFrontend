@@ -65,7 +65,6 @@
         <th>ID Expediente</th>
         <th>Detalle / Ficha</th>
         <th class="text-center">Estado</th>
-        <th>GIL Vinculado</th>
         <th>Documentos Base</th>
         <th>Responsable</th>
         <th>Fecha</th>
@@ -97,11 +96,6 @@
               [label]="getEstadoLabel(paquete.estado)"
               [variant]="getEstadoVariant(paquete.estado)"
             ></restaurant-status-badge>
-          </td>
-
-          <!-- GIL Vinculado -->
-          <td>
-            <span class="paquete-table__gil">{{ paquete.gilId }}</span>
           </td>
 
           <!-- Documentos Base (Checklist) -->
@@ -169,16 +163,26 @@
             </div>
           </td>
         </tr>
+      } @empty {
+        <tr>
+          <td colspan="7">
+            <inventario-empty-state
+              icon="folder"
+              title="Sin paquetes"
+              message="No se encontraron expedientes con los filtros aplicados."
+            />
+          </td>
+        </tr>
       }
     </tbody>
     <div dtFooter class="dt-footer">
-      <span class="table-pagination__info">Mostrando {{ filteredPaquetes().length }} de {{ allPaquetes().length }} expedientes</span>
-      <div class="pagination-btns">
-        <button class="pagination-btn" disabled>
+      <span class="dt-page-info">Mostrando {{ filteredPaquetes().length }} de {{ allPaquetes().length }} expedientes</span>
+      <div class="dt-pagination">
+        <button class="dt-page-btn" disabled>
           <lucide-icon name="chevron-left" [size]="18"></lucide-icon>
         </button>
-        <button class="pagination-btn pagination-btn--active">1</button>
-        <button class="pagination-btn">
+        <button class="dt-page-btn dt-page-btn--active">1</button>
+        <button class="dt-page-btn">
           <lucide-icon name="chevron-right" [size]="18"></lucide-icon>
         </button>
       </div>

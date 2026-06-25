@@ -1,0 +1,27 @@
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-16) var(--space-6);
+
+  &__icon {
+    font-size: 3rem;
+    color: var(--color-pizarra-300);
+    margin-bottom: var(--space-4);
+  }
+
+  &__title {
+    font-family: var(--font-family-headline);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-en-fondo);
+    margin: 0 0 var(--space-2);
+  }
+
+  &__message {
+    font-size: var(--font-size-sm);
+    color: var(--color-pizarra-500);
+    margin: 0;
+  }
+}

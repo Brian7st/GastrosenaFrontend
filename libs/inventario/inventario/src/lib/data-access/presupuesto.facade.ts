@@ -1,11 +1,14 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { catchError, finalize, of } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Observable, catchError, finalize, map, of } from 'rxjs';
 import { PresupuestoService } from './services/presupuesto.service';
 import {
-  PresupuestoResumen,
   PresupuestoDetalle,
+  PresupuestoResumen,
+  ResumenPresupuestosGlobal,
   Rubro,
   GrupoPresupuestal,
+  GrupoSiif,
   AfectacionPresupuestal,
   VencimientoProximo,
   EjecucionMensual,
@@ -14,112 +17,168 @@ import {
   Compromiso,
   ComprometerData,
   PagoData,
+  EstadoCompromiso,
 } from '../models/presupuesto.model';
+import { descargarBlob } from '../util';
 
 @Injectable({ providedIn: 'root' })
 export class PresupuestoFacade {
   private presupuestoService = inject(PresupuestoService);
 
   // Estados internos (Signals)
-  private _resumen               = signal<PresupuestoResumen | null>(null);
-  private _rubros                = signal<Rubro[]>([]);
-  private _compromisos           = signal<Compromiso[]>([]);
-  private _afectaciones          = signal<AfectacionPresupuestal[]>([]);
-  private _vencimientos          = signal<VencimientoProximo[]>([]);
-  private _ejecucionMensual      = signal<EjecucionMensual[]>([]);
+  private _resumen                 = signal<PresupuestoResumen | null>(null);
+  private _resumenGlobal           = signal<ResumenPresupuestosGlobal | null>(null);
+  private _rubros                  = signal<Rubro[]>([]);
+  private _compromisos             = signal<Compromiso[]>([]);
+  private _afectaciones            = signal<AfectacionPresupuestal[]>([]);
+  private _vencimientos            = signal<VencimientoProximo[]>([]);
+  private _ejecucionMensual        = signal<EjecucionMensual[]>([]);
   private _presupuestoSeleccionado = signal<PresupuestoDetalle | undefined>(undefined);
-  private _loading               = signal<boolean>(false);
-  private _error                 = signal<string | null>(null);
+  private _presupuestos            = signal<PresupuestoDetalle[]>([]);
+  private _loading                 = signal<boolean>(false);
+  private _error                   = signal<string | null>(null);
 
   // Exposición pública (solo lectura)
+  /** Null mientras getResumen() esté pendiente de backend. */
   public resumen                = computed(() => this._resumen());
+  public resumenGlobal          = computed(() => this._resumenGlobal());
   public rubros                 = computed(() => this._rubros());
   public compromisos            = computed(() => this._compromisos());
   public afectaciones           = computed(() => this._afectaciones());
   public vencimientos           = computed(() => this._vencimientos());
   public ejecucionMensual       = computed(() => this._ejecucionMensual());
   public presupuestoSeleccionado = computed(() => this._presupuestoSeleccionado());
+  public presupuestos            = computed(() => this._presupuestos());
   public loading                = computed(() => this._loading());
   public error                  = computed(() => this._error());
 
   /** Vista agrupada de rubros por ficha — derivada en cliente */
   public grupos = computed<GrupoPresupuestal[]>(() => {
-    const map = new Map<string, GrupoPresupuestal>();
+    const groupMap = new Map<string, GrupoPresupuestal>();
 
     for (const r of this._rubros()) {
-      if (!map.has(r.fichaId)) {
-        map.set(r.fichaId, {
-          fichaId:               r.fichaId,
-          programaFormacion:     r.programaFormacion,
-          rubros:                [],
-          totalMontoAsignado:    0,
-          totalSaldoDisponible:  0,
+      if (!groupMap.has(r.fichaId)) {
+        groupMap.set(r.fichaId, {
+          fichaId:                r.fichaId,
+          programaFormacion:      r.programaFormacion,
+          rubros:                 [],
+          totalMontoAsignado:     0,
+          totalSaldoDisponible:   0,
           totalMontoComprometido: 0,
-          totalMontoPagado:      0,
-          totalZese:             0,
-          porcentajeEjecucion:   0,
+          totalMontoPagado:       0,
+          totalZese:              0,
+          porcentajeEjecucion:    0,
         });
       }
-      const g = map.get(r.fichaId)!;
+      const g = groupMap.get(r.fichaId)!;
       g.rubros.push(r);
-      g.totalMontoAsignado    += r.montoAsignado;
-      g.totalSaldoDisponible  += r.saldoDisponible;
+      g.totalMontoAsignado     += r.montoAsignado;
+      g.totalSaldoDisponible   += r.saldoDisponible;
       g.totalMontoComprometido += r.montoComprometido;
-      g.totalMontoPagado      += r.montoPagado;
-      g.totalZese             += r.retencionZese;
+      g.totalMontoPagado       += r.montoPagado;
     }
 
-    for (const g of map.values()) {
+    for (const g of groupMap.values()) {
+      // Sin redondear: el formato se aplica una sola vez en el template (pipe number).
       g.porcentajeEjecucion = g.totalMontoAsignado > 0
-        ? parseFloat(((g.totalMontoComprometido / g.totalMontoAsignado) * 100).toFixed(1))
+        ? (g.totalMontoComprometido + g.totalMontoPagado) / g.totalMontoAsignado * 100
         : 0;
     }
 
-    return Array.from(map.values());
+    return Array.from(groupMap.values());
+  });
+
+  /** Sección B del Excel: rubros agrupados por posición presupuestal + fuente (SIIF). */
+  public gruposPorPosicion = computed<GrupoSiif[]>(() => {
+    const groupMap = new Map<string, GrupoSiif>();
+
+    for (const r of this._rubros()) {
+      const clave = `${r.posicionPresupuestal}|${r.fuente}`;
+      if (!groupMap.has(clave)) {
+        groupMap.set(clave, {
+          posicionPresupuestal:   r.posicionPresupuestal,
+          fuente:                 r.fuente,
+          rubros:                 [],
+          totalMontoAsignado:     0,
+          totalMontoComprometido: 0,
+          totalMontoPagado:       0,
+          totalSaldoDisponible:   0,
+          totalValorPorCancelar:  0,
+          porcentajeEjecucion:    0,
+        });
+      }
+      const g = groupMap.get(clave)!;
+      g.rubros.push(r);
+      g.totalMontoAsignado     += r.montoAsignado;
+      g.totalMontoComprometido += r.montoComprometido;
+      g.totalMontoPagado       += r.montoPagado;
+      g.totalSaldoDisponible   += r.saldoDisponible;
+      g.totalValorPorCancelar  += r.valorPorCancelar;
+    }
+
+    for (const g of groupMap.values()) {
+      // Sin redondear: el formato se aplica una sola vez en el template (pipe number).
+      g.porcentajeEjecucion = g.totalMontoAsignado > 0
+        ? (g.totalMontoComprometido + g.totalMontoPagado) / g.totalMontoAsignado * 100
+        : 0;
+    }
+
+    return Array.from(groupMap.values());
   });
 
   /**
-   * Carga inicial de datos para el dashboard.
+   * Carga inicial de datos para el dashboard:
+   * rubros, resumen global, afectaciones, vencimientos, ejecución mensual.
+   * Errores en cada llamada se absorben sin interrumpir las demás.
    */
   loadAll(): void {
     this._loading.set(true);
     this._error.set(null);
 
-    this.presupuestoService.getResumen()
+    this.presupuestoService.getRubros()
       .pipe(
         catchError(() => {
-          this._error.set('Error al cargar el resumen presupuestal');
-          return of(null);
-        })
+          this._error.set('Error al cargar los rubros presupuestales');
+          return of([]);
+        }),
       )
-      .subscribe(data => {
-        if (data) {
-          this._resumen.set({
-            vigenciaFiscal:    data.vigencia ?? new Date().getFullYear(),
-            corte:             new Date().toLocaleDateString('es-CO'),
-            totalApropiacion:  data.totalAsignado,
-            totalComprometido: data.totalComprometido,
-            totalPagado:       data.totalPagado,
-            totalDisponible:   data.saldoGlobal,
-            totalZese:         0,
-            porcentajeEjecucion: data.porcentajeEjecucion,
-            variacionAnual:    0,
-          });
-        }
-      });
+      .subscribe(data => this._rubros.set(data));
 
-    this.presupuestoService.getRubros()
+    this.presupuestoService.getResumen()
+      .pipe(catchError(() => of(null)))
+      .subscribe(data => this._resumenGlobal.set(data));
+
+    this.presupuestoService.getAfectaciones()
       .pipe(catchError(() => of([])))
-      .subscribe(data => {
-        this._rubros.set(data);
-        this._loading.set(false);
-      });
+      .subscribe(data => this._afectaciones.set(data));
+
+    this.presupuestoService.getVencimientos()
+      .pipe(catchError(() => of([])))
+      .subscribe(data => this._vencimientos.set(data));
+
+    this.presupuestoService.getEjecucionMensual()
+      .pipe(
+        catchError(() => of([])),
+        finalize(() => this._loading.set(false)),
+      )
+      .subscribe(data => this._ejecucionMensual.set(data));
+  }
+
+  /**
+   * Carga SOLO el resumen global (GET /budget/presupuestos/resumen).
+   * Pensado para vistas que necesitan el % de ejecución sin el resto del
+   * dashboard (evita disparar los GET de rubros/afectaciones/vencimientos).
+   */
+  cargarResumenGlobal(vigencia?: number): void {
+    this.presupuestoService.getResumen(vigencia)
+      .pipe(catchError(() => of(null)))
+      .subscribe(data => this._resumenGlobal.set(data));
   }
 
   // ── Compromisos ────────────────────────────────────────────────────────────
 
   /** Carga compromisos con filtros opcionales de presupuesto y estado */
-  cargarCompromisos(presupuestoId?: string, estado?: 'VIGENTE' | 'ANULADO'): void {
+  cargarCompromisos(presupuestoId?: string, estado?: EstadoCompromiso): void {
     this._loading.set(true);
     this.presupuestoService.getCompromisos(presupuestoId, estado)
       .pipe(
@@ -127,7 +186,7 @@ export class PresupuestoFacade {
           this._error.set('Error al cargar los compromisos');
           return of([]);
         }),
-        finalize(() => this._loading.set(false))
+        finalize(() => this._loading.set(false)),
       )
       .subscribe(data => this._compromisos.set(data));
   }
@@ -141,11 +200,35 @@ export class PresupuestoFacade {
           this._error.set('Error al comprometer el presupuesto');
           return of(null);
         }),
-        finalize(() => this._loading.set(false))
+        finalize(() => this._loading.set(false)),
       )
       .subscribe(res => {
         if (res) this.cargarCompromisos(data.presupuestoId);
       });
+  }
+
+  /**
+   * Comprometer + pagar en un solo paso (cuando el CUFE del FEL ya es conocido).
+   *
+   * Un único request al endpoint transaccional del backend: o se compromete y paga, o no
+   * pasa nada (rollback). No hay estado intermedio del lado del cliente. Devuelve un
+   * Observable<boolean> (true = éxito) para que el llamador espere antes de cerrar la vista.
+   */
+  comprometerYPagar(data: ComprometerData, cufe: string): Observable<boolean> {
+    this._error.set(null);
+    this._loading.set(true);
+    return this.presupuestoService.comprometerYPagar(data, cufe).pipe(
+      map(() => {
+        this.loadAll();
+        this.cargarCompromisos(data.presupuestoId);
+        return true;
+      }),
+      catchError((err: HttpErrorResponse) => {
+        this._error.set(err?.error?.detail ?? 'Error al comprometer y registrar el pago');
+        return of(false);
+      }),
+      finalize(() => this._loading.set(false)),
+    );
   }
 
   /** Anula un compromiso y recarga la lista */
@@ -157,10 +240,13 @@ export class PresupuestoFacade {
           this._error.set('Error al anular el compromiso');
           return of(null);
         }),
-        finalize(() => this._loading.set(false))
+        finalize(() => this._loading.set(false)),
       )
       .subscribe(res => {
-        if (res !== null) this.cargarCompromisos(presupuestoId);
+        if (res !== null) {
+          this.cargarCompromisos(presupuestoId);
+          this.loadAll(); // refresca afectaciones/saldos del dashboard tras anular
+        }
       });
   }
 
@@ -173,10 +259,13 @@ export class PresupuestoFacade {
           this._error.set('Error al registrar el pago');
           return of(null);
         }),
-        finalize(() => this._loading.set(false))
+        finalize(() => this._loading.set(false)),
       )
       .subscribe(res => {
-        if (res) this.cargarCompromisos(presupuestoId);
+        if (res) {
+          this.cargarCompromisos(presupuestoId);
+          this.loadAll(); // refresca afectaciones/saldos del dashboard tras el pago
+        }
       });
   }
 
@@ -190,11 +279,18 @@ export class PresupuestoFacade {
           this._error.set('Error al registrar presupuesto');
           return of(null);
         }),
-        finalize(() => this._loading.set(false))
+        finalize(() => this._loading.set(false)),
       )
       .subscribe(res => {
         if (res) this.loadAll();
       });
+  }
+
+  /** GET /budget/presupuestos — carga la lista de presupuestos con id + rubros (para comprometer) */
+  cargarPresupuestos(): void {
+    this.presupuestoService.getPresupuestos()
+      .pipe(catchError(() => of([])))
+      .subscribe(data => this._presupuestos.set(data));
   }
 
   /** GET /budget/presupuestos/{id} — carga el detalle de un presupuesto */
@@ -206,36 +302,43 @@ export class PresupuestoFacade {
           this._error.set('Error al cargar el detalle del presupuesto');
           return of(undefined);
         }),
-        finalize(() => this._loading.set(false))
+        finalize(() => this._loading.set(false)),
       )
       .subscribe(data => this._presupuestoSeleccionado.set(data));
   }
 
+  /** POST /budget/presupuestos/{id}/traslados */
   trasladarRubro(data: TrasladarRubroData): void {
     this._loading.set(true);
+    this._error.set(null);
     this.presupuestoService.trasladarRubro(data)
       .pipe(
         catchError(() => {
-          this._error.set('Error al trasladar rubro');
-          return of(null);
+          this._error.set('Error al trasladar el rubro presupuestal');
+          return of(undefined);
         }),
-        finalize(() => this._loading.set(false))
+        finalize(() => this._loading.set(false)),
       )
-      .subscribe(res => {
-        if (res) this.loadAll();
-      });
+      .subscribe(() => this.loadAll());
   }
 
+  /**
+   * Exporta el presupuesto general (lo genera ga-ms-reportes).
+   * El año se toma del presupuesto seleccionado (`vigencia`); si no hay uno
+   * cargado, cae al año actual.
+   */
   exportar(formato: string): void {
+    const anio = this._presupuestoSeleccionado()?.vigencia ?? new Date().getFullYear();
+    const ext = formato.toLowerCase() === 'pdf' ? 'pdf' : 'xlsx';
     this._loading.set(true);
-    this.presupuestoService.exportar(formato)
+    this.presupuestoService.exportar(anio, formato)
       .pipe(
         catchError(() => {
-          this._error.set('Error al exportar');
+          this._error.set('Error al exportar el presupuesto');
           return of(null);
         }),
-        finalize(() => this._loading.set(false))
+        finalize(() => this._loading.set(false)),
       )
-      .subscribe();
+      .subscribe(blob => { if (blob) descargarBlob(blob, `presupuesto_${anio}.${ext}`); });
   }
 }

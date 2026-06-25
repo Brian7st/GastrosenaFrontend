@@ -1,6 +1,21 @@
 import { ProductoCatalogo, BienFormDto, Bien, EstadoBien } from '../../models/inventario.model';
 import { ProductoResponse, CrearProductoRequest, ActualizarProductoRequest } from '../api/catalog.api';
 import { ExistenciaResponse } from '../api/inventory.api';
+import {
+  Contrato,
+  EstadoContrato,
+  ItemContrato,
+  PrecioVigente,
+  RegistrarContratoData,
+  RegistrarItemContratoData,
+} from '../../models/contrato.model';
+import {
+  ContratoResponse,
+  ItemContratoResponse,
+  ItemContratoRequest,
+  PrecioVigenteResponse,
+  RegistrarContratoRequest,
+} from '../api/catalog.api';
 
 // ── Catálogo → ProductoCatalogo ──────────────────────────────────────────────
 
@@ -9,7 +24,6 @@ export function productoFromApi(dto: ProductoResponse): ProductoCatalogo {
     id: dto.id,
     codigoSena: dto.codigoSena,
     codigoProveedor: dto.codigoProveedor,
-    nombre: dto.nombre,
     descripcion: dto.descripcion,
     categoria: dto.categoria,
     unidadMedida: dto.unidadMedida,
@@ -23,19 +37,17 @@ export function productoFromApi(dto: ProductoResponse): ProductoCatalogo {
 export function bienFromCatalogo(dto: ProductoResponse): Bien {
   return {
     id: dto.id,
-    nombre: dto.nombre,
     codigoSena: dto.codigoSena,
     codigoProveedor: dto.codigoProveedor ?? '',
     descripcion: dto.descripcion ?? '',
     categoria: dto.categoria ?? '',
     unidadMedida: dto.unidadMedida,
-    imagenUrl: dto.urlImagen ?? undefined,
     valor: dto.vrlAdjudicado ?? null,
     valorNeto: dto.vrlAntes ?? null,
     iva: dto.iva ?? null,
     estado: (dto.activo ? 'Activo' : 'Inactivo') as EstadoBien,
     stockActual: 0,
-    stockMinimo: 0,
+    stockMinimo: dto.stockMinimo ?? 0,
     estadoStock: dto.activo ? 'DISPONIBLE' : 'AGOTADO',
   };
 }
@@ -71,29 +83,103 @@ function derivarEstadoStock(stock: number, minimo?: number): EstadoBien {
 
 export function bienFormToRequest(form: BienFormDto): CrearProductoRequest {
   return {
-    nombre: form.nombre,
     codigoSena: form.codigoSena,
     codigoProveedor: form.codigoProveedor,
     descripcion: form.descripcion,
     categoria: form.categoria,
     unidadMedida: form.unidadMedida,
-    urlImagen: form.imagenUrl,
     vrlAdjudicado: form.vrlAdjudicado ?? null,
     vrlAntes: form.vrlAntes ?? null,
     iva: form.iva ?? null,
+    stockMinimo: form.stockMinimo ?? null,
   };
 }
 
 export function bienFormToUpdateRequest(form: BienFormDto): ActualizarProductoRequest {
   return {
-    nombre: form.nombre,
+    // El backend solo lo asigna si el producto aún no tiene código; si ya tiene, lo ignora.
+    codigoSena: form.codigoSena || null,
     codigoProveedor: form.codigoProveedor,
     descripcion: form.descripcion,
     categoria: form.categoria,
     unidadMedida: form.unidadMedida,
-    urlImagen: form.imagenUrl,
     vrlAdjudicado: form.vrlAdjudicado ?? null,
     vrlAntes: form.vrlAntes ?? null,
     iva: form.iva ?? null,
+    stockMinimo: form.stockMinimo ?? null,
+  };
+}
+
+// ── Contrato: API → dominio ────────────────────────────────────────────────────
+
+function itemContratoFromApi(dto: ItemContratoResponse): ItemContrato {
+  return {
+    refArticulo: dto.refArticulo,
+    codigoSena: dto.codigoSena ?? null,
+    descripcion: dto.descripcion,
+    unidadMedida: dto.unidadMedida ?? null,
+    cantidad: dto.cantidad ?? null,
+    codigoProveedor: dto.codigoProveedor ?? null,
+    valorEstimado: dto.valorEstimado ?? null,
+    vrlAdjudicado: dto.vrlAdjudicado,
+    vrlAntes: dto.vrlAntes ?? null,
+    ivaPorcentaje: dto.ivaPorcentaje ?? null,
+    ivaValor: dto.ivaValor ?? null,
+  };
+}
+
+export function contratoFromApi(dto: ContratoResponse): Contrato {
+  return {
+    id: dto.id,
+    numero: dto.numero,
+    descripcion: dto.descripcion ?? null,
+    vigencia: dto.vigencia,
+    fechaInicio: dto.fechaInicio ?? null,
+    fechaFin: dto.fechaFin ?? null,
+    // El backend sólo emite VIGENTE | CERRADO; cualquier otro valor cae a VIGENTE.
+    estado: dto.estado === 'CERRADO' ? 'CERRADO' : 'VIGENTE' as EstadoContrato,
+    items: dto.items.map(itemContratoFromApi),
+  };
+}
+
+export function precioVigenteFromApi(dto: PrecioVigenteResponse): PrecioVigente {
+  return {
+    codigoSena: dto.codigoSena ?? null,
+    refArticulo: dto.refArticulo,
+    descripcion: dto.descripcion,
+    numeroContrato: dto.numeroContrato,
+    vigencia: dto.vigencia,
+    vrlAdjudicado: dto.vrlAdjudicado,
+    vrlAntes: dto.vrlAntes ?? null,
+    ivaPorcentaje: dto.ivaPorcentaje ?? null,
+    ivaValor: dto.ivaValor ?? null,
+  };
+}
+
+// ── Contrato: datos → Request ──────────────────────────────────────────────────
+
+function itemContratoToRequest(item: RegistrarItemContratoData): ItemContratoRequest {
+  return {
+    refArticulo: item.refArticulo,
+    codigoSena: item.codigoSena ?? null,
+    descripcion: item.descripcion,
+    unidadMedida: item.unidadMedida ?? null,
+    cantidad: item.cantidad ?? null,
+    codigoProveedor: item.codigoProveedor ?? null,
+    valorEstimado: item.valorEstimado ?? null,
+    vrlAdjudicado: item.vrlAdjudicado,
+    vrlAntes: item.vrlAntes ?? null,
+    ivaPorcentaje: item.ivaPorcentaje ?? null,
+  };
+}
+
+export function contratoToRequest(data: RegistrarContratoData): RegistrarContratoRequest {
+  return {
+    numero: data.numero,
+    descripcion: data.descripcion ?? null,
+    vigencia: data.vigencia,
+    fechaInicio: data.fechaInicio ?? null,
+    fechaFin: data.fechaFin ?? null,
+    items: data.items.map(itemContratoToRequest),
   };
 }

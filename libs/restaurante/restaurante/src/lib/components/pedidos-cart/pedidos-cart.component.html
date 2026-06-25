@@ -7,8 +7,20 @@
     @for (item of pedido.detalles; track item.productoId; let i = $index) {
       <div class="item-row">
         <div class="item-details">
-          <h4 class="name">{{ item.nombreProducto }}</h4>
-          <span class="category">{{ item.observaciones || 'Sin observaciones' }}</span>
+          <div style="display: flex; align-items: center;">
+            <h4 class="name" style="margin-bottom: 0;">{{ item.nombreProducto }}</h4>
+            @if (esPedidoSoloLectura() && item.estadoDetalle) {
+               <span class="estado-badge" [ngClass]="getEstadoDetalleClass(item.estadoDetalle)">{{ getEstadoDetalleText(item.estadoDetalle) }}</span>
+            }
+          </div>
+            <div class="obs-display" style="margin-top: 4px;">
+              <span class="category" [title]="item.observaciones || 'Sin observaciones'">{{ item.observaciones || 'Sin observaciones' }}</span>
+              @if (!esPedidoSoloLectura()) {
+                <button class="btn-edit-obs" (click)="iniciarEdicionObservacion(i, item.observaciones || '')" title="Agregar/Editar observaciones">
+                  <lucide-icon name="pencil" [size]="14"></lucide-icon>
+                </button>
+              }
+            </div>
           
           <div class="quantity-controls">
             @if (!esPedidoSoloLectura()) {
@@ -29,10 +41,21 @@
           <div class="prices">
             <span class="current">{{ item.precioUnitario | currencyCop }}</span>
           </div>
-          @if (!esPedidoSoloLectura()) {
+          @if (estadoPedido() === 'BORRADOR') {
             <button class="btn-delete" (click)="eliminarItem(i)" title="Eliminar producto">
               <lucide-icon name="trash-2" [size]="16"></lucide-icon>
             </button>
+          } @else if (estadoPedido() !== 'FACTURADO' && estadoPedido() !== 'CANCELADO') {
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-delete" style="color: var(--color-error);" (click)="iniciarAccionItem(item.id, item.nombreProducto, 'CANCELAR', item.cantidad)" title="Cancelar producto">
+                <lucide-icon name="x-circle" [size]="16"></lucide-icon>
+              </button>
+              @if (estadoPedido() === 'ENTREGADO' || estadoPedido() === 'LISTO_PARA_SERVIR') {
+                <button class="btn-delete" style="color: var(--color-warning);" (click)="iniciarAccionItem(item.id, item.nombreProducto, 'DEVOLVER', item.cantidad)" title="Devolver producto">
+                  <lucide-icon name="arrow-left" [size]="16"></lucide-icon>
+                </button>
+              }
+            </div>
           }
         </div>
       </div>
@@ -83,17 +106,29 @@
       (click)="iniciarConfirmacion()">
       <span>Confirmar Pedido</span>
     </restaurant-button>
-  } @else if (estadoPedido() === 'ENVIADO_COCINA') {
-    <restaurant-button 
-      class="action-btn flex-1 btn-anular" 
-      variant="primary" 
-      (click)="iniciarAnulacionBackend()">
-      <lucide-icon name="alert-triangle" [size]="18" class="text-white"></lucide-icon>
-      <span>Anular Pedido</span>
-    </restaurant-button>
+  } @else if (estadoPedido() !== 'FACTURADO' && estadoPedido() !== 'CANCELADO') {
+    <div style="display: flex; gap: 8px; width: 100%;">
+      <restaurant-button 
+        class="action-btn flex-1 btn-anular" 
+        variant="primary" 
+        (click)="iniciarAnulacionBackend()">
+        <lucide-icon name="alert-triangle" [size]="18" class="text-white"></lucide-icon>
+        <span>Cancelar</span>
+      </restaurant-button>
+      
+      @if (estadoPedido() === 'ENTREGADO' || estadoPedido() === 'LISTO_PARA_SERVIR') {
+        <restaurant-button 
+          class="action-btn flex-1 btn-devolver" 
+          variant="primary" 
+          (click)="iniciarDevolucionBackend()">
+          <lucide-icon name="arrow-left" [size]="18" class="text-white"></lucide-icon>
+          <span>Devolver</span>
+        </restaurant-button>
+      }
+    </div>
   } @else {
     <div class="status-badge" style="width: 100%; text-align: center; padding: 12px; background: var(--bg-neutral); border-radius: var(--radius-md); color: var(--text-secondary); font-weight: 500;">
-      No se puede anular (Pedido {{ estadoPedido().replace('_', ' ') | titlecase }})
+      No se puede cancelar (Pedido {{ estadoPedido().replace('_', ' ') | titlecase }})
     </div>
   }
 </div>
@@ -110,15 +145,127 @@
 ></restaurant-confirm-dialog>
 
 <restaurant-confirm-dialog
-  [open]="showAnularBackendModal()"
-  title="Anular Pedido"
-  message="¿Estás seguro de que quieres anular esta comanda? Esto cancelará su preparación en cocina y liberará la mesa."
-  confirmText="Sí, anular pedido"
-  cancelText="No, volver"
-  [showCancel]="true"
-  (confirm)="ejecutarAnulacionBackend()"
-  (cancel)="showAnularBackendModal.set(false)"
+  [open]="showEmptyCartModal()"
+  title="Carrito Vacío"
+  message="No puedes confirmar un pedido vacío. Por favor agrega al menos un producto a la comanda antes de enviarla a cocina."
+  confirmText="Entendido"
+  [showCancel]="false"
+  (confirm)="showEmptyCartModal.set(false)"
 ></restaurant-confirm-dialog>
+
+@if (showAnularBackendModal()) {
+  <div class="custom-modal-backdrop" (click)="showAnularBackendModal.set(false)">
+    <section class="custom-modal-dialog" (click)="$event.stopPropagation()">
+      <strong class="modal-title text-error">Cancelar Pedido</strong>
+      <p class="modal-message">¿Estás seguro de que quieres cancelar este pedido? Esto detendrá su preparación y liberará la mesa.</p>
+      
+      <div class="cancel-reason-container">
+        <label for="motivoAnulacion">Motivo de la cancelación *</label>
+        <textarea 
+          id="motivoAnulacion"
+          [(ngModel)]="motivoAnulacion"
+          placeholder="Ej: El cliente se retiró, error en la comanda..."
+          rows="3"
+          required
+          class="cancel-reason-input"
+        ></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <restaurant-button variant="ghost" (click)="showAnularBackendModal.set(false)">No, volver</restaurant-button>
+        <restaurant-button class="btn-anular" variant="primary" [disabled]="!motivoAnulacion().trim()" (click)="ejecutarAnulacionBackend()">Sí, cancelar pedido</restaurant-button>
+      </div>
+    </section>
+  </div>
+}
+
+@if (showDevolverBackendModal()) {
+  <div class="custom-modal-backdrop" (click)="showDevolverBackendModal.set(false)">
+    <section class="custom-modal-dialog" (click)="$event.stopPropagation()">
+      <strong class="modal-title" style="color: var(--color-warning);">Devolver Pedido</strong>
+      <p class="modal-message">¿Estás seguro de que quieres devolver TODO este pedido entregado? Se requerirá un motivo y la orden será anulada.</p>
+      
+      <div class="cancel-reason-container">
+        <label for="motivoDevolucion">Motivo de la devolución *</label>
+        <textarea 
+          id="motivoDevolucion"
+          [(ngModel)]="motivoDevolucion"
+          placeholder="Ej: El cliente no quedó conforme, comida fría..."
+          rows="3"
+          required
+          class="cancel-reason-input"
+        ></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <restaurant-button variant="ghost" (click)="showDevolverBackendModal.set(false)">No, volver</restaurant-button>
+        <restaurant-button class="btn-devolver" variant="primary" [disabled]="!motivoDevolucion().trim()" (click)="ejecutarDevolucionBackend()">Sí, devolver pedido</restaurant-button>
+      </div>
+    </section>
+  </div>
+}
+
+@if (showItemActionModal() && itemAccionActual(); as accionItem) {
+  <div class="custom-modal-backdrop" (click)="limpiarAccionItem()">
+    <section class="custom-modal-dialog" (click)="$event.stopPropagation()">
+      <strong class="modal-title" [ngStyle]="{'color': accionItem.tipo === 'CANCELAR' ? 'var(--color-error)' : 'var(--color-warning)'}">
+        {{ accionItem.tipo === 'CANCELAR' ? 'Cancelar Producto' : 'Devolver Producto' }}
+      </strong>
+      <p class="modal-message">
+        ¿Estás seguro de que quieres {{ accionItem.tipo === 'CANCELAR' ? 'cancelar' : 'devolver' }} el producto <strong>{{ accionItem.nombre }}</strong>?
+      </p>
+      
+      <div class="cancel-quantity-container" style="margin-top: 16px; margin-bottom: 20px;">
+        <label style="display: block; font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-text-primary);">
+          Cantidad a {{ accionItem.tipo === 'CANCELAR' ? 'cancelar' : 'devolver' }} (Max: {{ accionItem.maxCantidad }}) *
+        </label>
+        
+        <div class="modal-quantity-controls">
+          <button 
+            class="btn-minus" 
+            (click)="decrementarCantidadAccion()"
+            [disabled]="cantidadItemAccion() <= 1"
+            title="Reducir cantidad">
+            <lucide-icon name="minus" [size]="18"></lucide-icon>
+          </button>
+          
+          <span class="qty-display">{{ cantidadItemAccion() }}</span>
+          
+          <button 
+            class="btn-plus" 
+            (click)="incrementarCantidadAccion()"
+            [disabled]="cantidadItemAccion() >= accionItem.maxCantidad"
+            title="Aumentar cantidad">
+            <lucide-icon name="plus" [size]="18"></lucide-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="cancel-reason-container">
+        <label for="motivoItem">Motivo de la {{ accionItem.tipo === 'CANCELAR' ? 'cancelación' : 'devolución' }} *</label>
+        <textarea 
+          id="motivoItem"
+          [(ngModel)]="motivoItem"
+          placeholder="Ej: Cambio de opinión, error en el plato..."
+          rows="3"
+          required
+          class="cancel-reason-input"
+        ></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <restaurant-button variant="ghost" (click)="limpiarAccionItem()">No, volver</restaurant-button>
+        <restaurant-button 
+          [class]="accionItem.tipo === 'DEVOLVER' ? 'btn-devolver' : 'btn-anular'"
+          variant="primary" 
+          [disabled]="!motivoItem().trim() || cantidadItemAccion() < 1 || cantidadItemAccion() > accionItem.maxCantidad" 
+          (click)="ejecutarAccionItem()">
+          Sí, {{ accionItem.tipo === 'CANCELAR' ? 'cancelar' : 'devolver' }} ítem
+        </restaurant-button>
+      </div>
+    </section>
+  </div>
+}
 
 @if (showConfirmModal()) {
   <div class="custom-modal-backdrop" (click)="showConfirmModal.set(false)">
@@ -133,10 +280,17 @@
             <h5 class="category-title">Comidas</h5>
             <ul class="summary-list">
               @for (item of comidasPedido(); track item.productoId) {
-                <li>
-                  <span class="qty">{{ item.cantidad }}x</span>
-                  <span class="name">{{ item.nombreProducto }}</span>
-                  <span class="price">{{ (item.cantidad * item.precioUnitario) | currencyCop }}</span>
+                <li class="summary-item-container">
+                  <div class="summary-item-main">
+                    <span class="qty">{{ item.cantidad }}x</span>
+                    <span class="name">{{ item.nombreProducto }}</span>
+                    <span class="price">{{ (item.cantidad * item.precioUnitario) | currencyCop }}</span>
+                  </div>
+                  @if (item.observaciones) {
+                    <div class="summary-item-obs">
+                      {{ item.observaciones }}
+                    </div>
+                  }
                 </li>
               }
             </ul>
@@ -146,10 +300,17 @@
             <h5 class="category-title mt-3">Bebidas</h5>
             <ul class="summary-list">
               @for (item of bebidasPedido(); track item.productoId) {
-                <li>
-                  <span class="qty">{{ item.cantidad }}x</span>
-                  <span class="name">{{ item.nombreProducto }}</span>
-                  <span class="price">{{ (item.cantidad * item.precioUnitario) | currencyCop }}</span>
+                <li class="summary-item-container">
+                  <div class="summary-item-main">
+                    <span class="qty">{{ item.cantidad }}x</span>
+                    <span class="name">{{ item.nombreProducto }}</span>
+                    <span class="price">{{ (item.cantidad * item.precioUnitario) | currencyCop }}</span>
+                  </div>
+                  @if (item.observaciones) {
+                    <div class="summary-item-obs">
+                      {{ item.observaciones }}
+                    </div>
+                  }
                 </li>
               }
             </ul>
@@ -170,6 +331,31 @@
       <div class="modal-actions">
         <restaurant-button variant="ghost" (click)="showConfirmModal.set(false)">Revisar de nuevo</restaurant-button>
         <restaurant-button variant="primary" (click)="ejecutarConfirmacion()">Sí, enviar pedido</restaurant-button>
+      </div>
+    </section>
+  </div>
+}
+
+@if (editIndex() !== null) {
+  <div class="custom-modal-backdrop" (click)="cancelarEdicionObservacion()">
+    <section class="custom-modal-dialog" (click)="$event.stopPropagation()">
+      <strong class="modal-title">Observaciones del Producto</strong>
+      <p class="modal-message">Escribe las indicaciones específicas para este plato.</p>
+      
+      <div class="obs-textarea-container">
+        <textarea 
+          [ngModel]="tempObservacion()" 
+          (ngModelChange)="tempObservacion.set($event)"
+          placeholder="Ej: Sin cebolla, bien asado..."
+          rows="4"
+          class="obs-textarea-input"
+          autofocus
+        ></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <restaurant-button variant="ghost" (click)="cancelarEdicionObservacion()">Cancelar</restaurant-button>
+        <restaurant-button variant="primary" (click)="guardarObservacion()">Guardar</restaurant-button>
       </div>
     </section>
   </div>

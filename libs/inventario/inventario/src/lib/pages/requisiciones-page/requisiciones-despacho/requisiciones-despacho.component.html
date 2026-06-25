@@ -44,9 +44,10 @@
                 <span class="checklist-item__name">{{ item.productoNombre }}</span>
                 <span class="checklist-item__qty-label">Pedido: {{ item.cantidad }} {{ item.unidadMedida }}</span>
               </div>
+              <!-- Se despacha la cantidad solicitada: no se permite modificarla,
+                   solo marcar el ítem como entregado. -->
               <div class="checklist-item__delivery">
-                <span class="checklist-item__delivery-label">Cant. Entregada</span>
-                <input class="checklist-item__delivery-input" type="number" [value]="item.cantidad"/>
+                <span class="checklist-item__delivery-value">{{ item.cantidad }} {{ item.unidadMedida }}</span>
               </div>
             </div>
           </div>
@@ -65,14 +66,16 @@
         </div>
       </div>
       <div class="form-field">
-        <label class="form-field__label">Ecónomo Responsable</label>
+        <label class="form-field__label">Ecónomo Responsable <span class="form-field__required">*</span></label>
         <div class="form-field__input-wrapper">
           <lucide-icon name="user" [size]="16" class="form-field__icon"></lucide-icon>
-          <select class="form-field__input form-field__input--select" (change)="onEconomo($event)">
-            @for (e of econoOpciones; track e) {
-              <option [value]="e" [selected]="economoSeleccionado() === e">{{ e }}</option>
-            }
-          </select>
+          <input
+            class="form-field__input"
+            type="text"
+            placeholder="Documento del ecónomo"
+            [value]="economoId()"
+            (input)="onEconomo($event)"
+          />
         </div>
       </div>
     </div>
@@ -84,9 +87,12 @@
 
   <!-- Footer Action -->
   <footer class="sheet-drawer__footer">
-    <button class="sheet-drawer__cta" (click)="finalizarEntrega()" [disabled]="loading()">
+    @if (error()) {
+      <p class="sheet-drawer__error">{{ error() }}</p>
+    }
+    <button class="sheet-drawer__cta" (click)="finalizarEntrega()" [disabled]="!puedeDespachar()">
       <lucide-icon name="check-circle" [size]="24"></lucide-icon>
-      Finalizar Entrega
+      {{ procesando() ? 'Despachando...' : 'Finalizar Entrega' }}
     </button>
     <p class="sheet-drawer__disclaimer">Al finalizar se generará el soporte digital 45-S</p>
   </footer>

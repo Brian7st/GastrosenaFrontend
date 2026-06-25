@@ -13,7 +13,7 @@
       </div>
       <div class="header-right">
         <span class="comanda-estado-badge" [ngClass]="'estado-' + (comanda().estadoPreparacion || 'PENDIENTE').toLowerCase()">
-          {{ comanda().estadoPreparacion || 'PENDIENTE' }}
+          {{ comanda().estadoPreparacion === 'PENDIENTE' ? 'EN ESPERA' : comanda().estadoPreparacion }}
         </span>
         <div class="mesero-text">
           <span class="mesero-label">Mesero: </span>
@@ -31,52 +31,56 @@
         </div>
       }
 
-      <!-- Platos/Bebidas (En Bar es una sola preparación representada como item de lista) -->
       <div class="platos-list">
-        
-        <div class="plato-card" [ngClass]="{'plato-listo': comanda().estadoPreparacion === 'LISTO'}">
-          
-          <div class="plato-main-row">
-            <div class="plato-info">
-              <div class="plato-title-row">
-                <span class="plato-qty">1x</span>
-                <span class="plato-name">{{ comanda().preparacion }}</span>
-                <span class="comanda-estado-badge" 
-                      [ngClass]="comanda().estadoPreparacion === 'PENDIENTE' ? 'estado-espera' : (comanda().estadoPreparacion === 'EN_PREPARACION' ? 'estado-preparando' : 'estado-listo')" 
-                      style="font-size: 0.6rem; padding: 2px 8px; margin-left: 4px;">
-                  @if (comanda().estadoPreparacion === 'PENDIENTE') { ESPERA }
-                  @else if (comanda().estadoPreparacion === 'EN_PREPARACION') { PREPARANDO }
-                  @else { LISTO }
-                </span>
+        @for (item of comanda().items || []; track item.idDetalleComanda) {
+          <div class="plato-card" [ngClass]="{'plato-listo': item.estado === 'LISTO'}">
+            
+            <div class="plato-main-row">
+              <div class="plato-info">
+                <div class="plato-title-row">
+                  <span class="plato-qty">{{ item.cantidad }}x</span>
+                  <span class="plato-name">{{ item.nombre }}</span>
+                  <span class="comanda-estado-badge" 
+                        [ngClass]="item.estado === 'ESPERA' ? 'estado-espera' : (item.estado === 'PREPARANDO' ? 'estado-preparando' : 'estado-listo')" 
+                        style="font-size: 0.6rem; padding: 2px 8px; margin-left: 4px;">
+                    {{ item.estado === 'ESPERA' ? 'ESPERA' : (item.estado === 'PREPARANDO' ? 'PREPARANDO' : 'LISTO') }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="plato-actions">
+                @if (item.estado === 'ESPERA') {
+                  <restaurant-button (click)="iniciar(item)" class="btn-override-warning">Preparar</restaurant-button>
+                }
+                @if (item.estado === 'PREPARANDO') {
+                  <restaurant-button (click)="finalizar(item)" class="btn-override-success">Terminado</restaurant-button>
+                }
+                
+                <button class="btn-round btn-detalle" (click)="verDetalles()" title="Ver Detalles">
+                  <lucide-icon name="eye" style="width: 18px;"></lucide-icon>
+                </button>
+                
+                <button class="btn-round btn-receta" (click)="alternarReceta(item)" title="Ver Receta">
+                  <lucide-icon name="book-open" style="width: 18px;"></lucide-icon>
+                </button>
               </div>
             </div>
 
-            <div class="plato-actions">
-              @if (comanda().estadoPreparacion === 'PENDIENTE') {
-                <restaurant-button (click)="iniciar()" class="btn-override-warning">Preparar</restaurant-button>
-              }
-              @if (comanda().estadoPreparacion === 'EN_PREPARACION') {
-                <restaurant-button (click)="finalizar()" class="btn-override-success">Terminado</restaurant-button>
-              }
-              
-              <button class="btn-round btn-detalle" (click)="verDetalles()" title="Ver Detalles">
-                <lucide-icon name="eye" style="width: 18px;"></lucide-icon>
-              </button>
-              
-              <button class="btn-round btn-receta" (click)="alternarReceta(comanda().preparacion)" title="Ver Receta">
-                <lucide-icon name="book-open" style="width: 18px;"></lucide-icon>
-              </button>
-            </div>
+            @if (item.nota) {
+              <div class="plato-nota">
+                <lucide-icon name="info" class="flex-shrink-0" style="width: 16px; height: 16px;"></lucide-icon>
+                <span>Nota: {{ item.nota }}</span>
+              </div>
+            }
           </div>
-
-          @if (comanda().notasEspeciales) {
-            <div class="plato-nota">
-              <lucide-icon name="info" class="flex-shrink-0" style="width: 16px; height: 16px;"></lucide-icon>
-              <span>Nota: {{ comanda().notasEspeciales }}</span>
-            </div>
-          }
-        </div>
+        }
       </div>
+
+      @if (puedePrepararTodos()) {
+        <div style="margin-top: var(--space-3);">
+          <restaurant-button (click)="iniciarTodos()" variant="primary" size="small" style="width: 100%;">Preparar todas</restaurant-button>
+        </div>
+      }
     </div>
 
   </div>
@@ -87,7 +91,6 @@
   <div class="modal-overlay" (click)="cerrarVista()">
     <div class="modal-content modal-detalles-content" (click)="$event.stopPropagation()">
       
-      <!-- Header -->
       <div class="modal-header-custom">
         <div class="modal-header-titles">
           <h4 class="modal-title">Detalles del Pedido - Mesa {{ comanda().numeroMesa }}</h4>
@@ -95,14 +98,13 @@
         </div>
       </div>
 
-      <!-- Info Grid -->
       <div class="modal-info-grid">
         <div class="info-item">
           <strong>Mesa:</strong> <span>{{ comanda().numeroMesa }}</span>
         </div>
         <div class="info-item">
           <strong>Estado:</strong> 
-          <span class="comanda-estado-badge" [ngClass]="'estado-' + (comanda().estadoPreparacion || 'PENDIENTE').toLowerCase()">{{ comanda().estadoPreparacion }}</span>
+          <span class="comanda-estado-badge" [ngClass]="'estado-' + (comanda().estadoPreparacion || 'PENDIENTE').toLowerCase()">{{ comanda().estadoPreparacion === 'PENDIENTE' ? 'EN ESPERA' : comanda().estadoPreparacion }}</span>
         </div>
         <div class="info-item">
           <strong>Prioridad:</strong> 
@@ -125,24 +127,26 @@
 
       <div class="modal-section-title mt-4">Items del pedido:</div>
       <div class="modal-items-list">
-        <div class="modal-item-row">
-          <div class="item-details">
-            <span class="item-name">1x {{ comanda().preparacion }}</span>
-            @if (comanda().notasEspeciales) {
-              <span class="item-note">Nota: {{ comanda().notasEspeciales }}</span>
-            } @else {
-              <span class="item-note">Nota: Sin especificaciones</span>
-            }
+        @for (item of comanda().items || []; track item.idDetalleComanda) {
+          <div class="modal-item-row">
+            <div class="item-details">
+              <span class="item-name">{{ item.cantidad }}x {{ item.nombre }}</span>
+              @if (item.nota) {
+                <span class="item-note">Nota: {{ item.nota }}</span>
+              } @else {
+                <span class="item-note">Nota: Sin especificaciones</span>
+              }
+            </div>
+            <div class="item-status-group">
+              @if (comanda().tiempoEstimado) {
+                <span class="item-time">{{ comanda().tiempoEstimado }} min</span>
+              }
+              <span class="comanda-estado-badge" [ngClass]="item.estado === 'ESPERA' ? 'estado-espera' : (item.estado === 'PREPARANDO' ? 'estado-preparando' : 'estado-listo')">
+                {{ item.estado === 'ESPERA' ? 'ESPERA' : (item.estado === 'PREPARANDO' ? 'PREPARANDO' : 'LISTO') }}
+              </span>
+            </div>
           </div>
-          <div class="item-status-group">
-            @if (comanda().tiempoEstimado) {
-              <span class="item-time">{{ comanda().tiempoEstimado }} min</span>
-            }
-            <span class="comanda-estado-badge" [ngClass]="'estado-' + (comanda().estadoPreparacion || 'PENDIENTE').toLowerCase()">
-              {{ comanda().estadoPreparacion }}
-            </span>
-          </div>
-        </div>
+        }
       </div>
 
       <div class="mt-5 pt-3" style="border-top: 1px solid var(--color-pizarra-100); margin-top: 32px !important;">
@@ -158,7 +162,6 @@
   <div class="modal-overlay" (click)="cerrarVista()">
     <div class="modal-content modal-receta-content" (click)="$event.stopPropagation()">
       
-      <!-- Header Receta -->
       <div class="modal-header-custom">
         <div class="modal-header-titles">
           <h3 class="modal-receta-title">
@@ -171,7 +174,6 @@
 
       @if (recetaActiva(); as receta) {
         <div class="modal-receta-body">
-          <!-- Columna Izquierda (Info General e Ingredientes) -->
           <div class="receta-col-left">
             <div class="modal-section-title">Información General</div>
             <div class="receta-info-row">
@@ -193,7 +195,6 @@
             </div>
           </div>
           
-          <!-- Columna Derecha (Instrucciones) -->
           <div class="receta-col-right">
             <div class="modal-section-title">Instrucciones</div>
             <div class="receta-pasos-list">
@@ -210,7 +211,7 @@
                   </div>
                 }
               } @else {
-                <p class="text-muted small">No hay pasos descritos para esta receta.</p>
+                <restaurant-empty-state title="Sin pasos" message="No hay pasos descritos para esta receta."></restaurant-empty-state>
               }
             </div>
           </div>
@@ -220,7 +221,6 @@
           <restaurant-button (click)="cerrarVista()" class="btn-override-warning" style="display: block; width: 100%;">Cerrar Receta</restaurant-button>
         </div>
       } @else {
-        <!-- ESTADO DE CARGA -->
         <div class="receta-loading">
           <div class="spinner"></div>
           <p>Cargando receta desde el servidor Java...</p>

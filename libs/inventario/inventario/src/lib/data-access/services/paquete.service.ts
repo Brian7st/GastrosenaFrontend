@@ -37,7 +37,6 @@ export class PaqueteService {
       requisicionId: data.requisicionId ?? '',
       fichaId:       data.fichaId       ?? '',
       instructorId:  data.instructorId  ?? '',
-      titulo:        data.titulo        ?? '',
     };
     return this.http
       .post<PaqueteResponse>(`${API}/legalization/paquetes`, request)
@@ -71,20 +70,24 @@ export class PaqueteService {
     return this.adjuntarAsistencia(paqueteId);
   }
 
-  /** POST /legalization/paquetes/{id}/exportar */
-  exportarPaquete(id: string): Observable<boolean> {
+  /** GET /api/reportes/paquete — el PDF lo genera el microservicio de reportes. */
+  exportarPaquete(id: string): Observable<Blob> {
     return this.http
-      .post<void>(`${API}/legalization/paquetes/${id}/exportar`, {})
+      .get(`/api/reportes/paquete`, {
+        params: { id, formato: 'PDF' },
+        responseType: 'blob',
+      })
+      .pipe(catchError(err => throwError(() => err)));
+  }
+
+  /** PATCH /legalization/paquetes/{id}/revisar — transición COMPLETO → REVISADO. */
+  revisarPaquete(id: string, revisorId: string): Observable<boolean> {
+    return this.http
+      .patch<void>(`${API}/legalization/paquetes/${id}/revisar`, { revisorId })
       .pipe(
         map(() => true),
         catchError(err => throwError(() => err))
       );
-  }
-
-  /** @deprecated TrazabilidadRequest ahora requiere los 3 campos — usar vincularTrazabilidad directamente */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  incluirRequisicion(paqueteId: string, reqId: string): Observable<boolean> {
-    return this.archivarPaquete(paqueteId);
   }
 
   /** PATCH /legalization/paquetes/{id}/archivar */

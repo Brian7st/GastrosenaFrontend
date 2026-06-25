@@ -4,9 +4,11 @@ import {
   EventEmitter,
   Input,
   Output,
+  inject,
   signal,
 } from '@angular/core';
 import { LucideIconComponent } from '@restaurant/shared/ui';
+import { I18nService } from '../../i18n/i18n.service';
 import {
   ImportarUsuariosRequest,
   ImportarUsuariosResponse,
@@ -21,6 +23,7 @@ import {
   styleUrl:    './importar-usuarios.component.scss',
 })
 export class ImportarUsuariosComponent {
+  protected readonly i18n = inject(I18nService);
   @Output() cerrar   = new EventEmitter<void>();
   @Output() importar = new EventEmitter<ImportarUsuariosRequest>();
 

@@ -8,10 +8,10 @@
       <p class="page-subtitle">Gestión proactiva de inventario crítico y riesgo financiero.</p>
     </div>
     <div class="header-actions">
-      <restaurant-button variant="surface" (click)="irAHistorial()">
+      <restaurant-button variant="surface" (click)="onExportarCSV()">
         <div class="btn-icon-text">
-          <lucide-icon name="history" [size]="20"></lucide-icon>
-          Historial
+          <lucide-icon name="download" [size]="20"></lucide-icon>
+          Exportar CSV
         </div>
       </restaurant-button>
       <restaurant-button variant="surface" (click)="irAConfig()">
@@ -124,10 +124,11 @@
         }
 
         @empty {
-          <div class="empty-state">
-            <span class="material-symbols-outlined empty-state__icon">check_circle</span>
-            <p class="empty-state__text">No hay alertas activas con los filtros seleccionados.</p>
-          </div>
+          <inventario-empty-state
+            icon="notifications"
+            title="Sin alertas"
+            message="No hay alertas con los filtros seleccionados."
+          />
         }
       </div>
     </div>
@@ -135,43 +136,65 @@
     <!-- ── Columna Derecha: Panel lateral ───────────────────────────────── -->
     <aside class="col-lateral">
 
-      <!-- Historial de Resoluciones -->
+      <!-- Resumen de Alertas (datos reales: /reporting/alertas/resumen) -->
       <div class="lateral-card">
         <div class="lateral-card__header">
-          <h3 class="lateral-card__title">Historial de Resoluciones</h3>
-          <span class="material-symbols-outlined lateral-card__chevron">expand_more</span>
+          <h3 class="lateral-card__title">Resumen de Alertas</h3>
         </div>
         <div class="lateral-card__body">
-          @for (item of historial(); track item.bien) {
+          @if (resumen(); as r) {
             <div class="historial-item">
-              <div class="historial-item__check">
-                <span class="material-symbols-outlined">check</span>
-              </div>
               <div>
-                <p class="historial-item__bien">{{ item.bien }}</p>
-                <p class="historial-item__accion">{{ item.accion }}</p>
-                <p class="historial-item__tiempo">{{ item.tiempo }}</p>
+                <p class="historial-item__bien">Total de alertas</p>
+                <p class="historial-item__accion">{{ r.totalAlertas }}</p>
               </div>
             </div>
+            <div class="historial-item">
+              <div>
+                <p class="historial-item__bien">Pendientes</p>
+                <p class="historial-item__accion">{{ r.alertasPendientes }}</p>
+              </div>
+            </div>
+            <div class="historial-item">
+              <div>
+                <p class="historial-item__bien">Resueltas</p>
+                <p class="historial-item__accion">{{ r.alertasResueltas }}</p>
+              </div>
+            </div>
+            <div class="historial-item">
+              <div>
+                <p class="historial-item__bien">Productos críticos</p>
+                <p class="historial-item__accion">{{ r.productosCriticos }}</p>
+              </div>
+            </div>
+            @if (r.ultimaAlerta) {
+              <div class="historial-item">
+                <div>
+                  <p class="historial-item__bien">Última alerta</p>
+                  <p class="historial-item__tiempo">{{ r.ultimaAlerta }}</p>
+                </div>
+              </div>
+            }
+          } @else {
+            <p class="text-secondary">Cargando resumen…</p>
           }
         </div>
       </div>
 
-      <!-- Movimientos Recientes -->
-      <div class="lateral-card">
-        <h3 class="lateral-card__title lateral-card__title--pad">Movimientos Recientes</h3>
-        <div class="movimientos-list">
-          @for (mov of movimientos(); track mov.nombre) {
-            <div class="movimiento-item">
-              <div class="movimiento-item__dot" [class]="'movimiento-item__dot--' + mov.tipo"></div>
-              <span class="movimiento-item__nombre">
-                {{ mov.tipo === 'entrada' ? 'Entrada' : 'Salida' }}: {{ mov.nombre }}
-              </span>
-              <span class="movimiento-item__cantidad">{{ mov.cantidad }}</span>
-            </div>
-          }
+      <!-- Alertas por tipo -->
+      @if (resumen()?.alertasPorTipo?.length) {
+        <div class="lateral-card">
+          <h3 class="lateral-card__title lateral-card__title--pad">Alertas por tipo</h3>
+          <div class="movimientos-list">
+            @for (t of resumen()!.alertasPorTipo; track t.tipo) {
+              <div class="movimiento-item">
+                <span class="movimiento-item__nombre">{{ t.tipo }}</span>
+                <span class="movimiento-item__cantidad">{{ t.cantidad }}</span>
+              </div>
+            }
+          </div>
         </div>
-      </div>
+      }
 
     </aside>
   </div>

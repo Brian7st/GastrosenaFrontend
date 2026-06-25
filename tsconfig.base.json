@@ -31,6 +31,7 @@
       "@restaurant/shared/ui": ["libs/shared/ui/src/index.ts"],
       "@restaurant/shared/util": ["libs/shared/util/src/index.ts"],
       "@restaurant/shell": ["libs/shell/shell/src/index.ts"],
+      "@restaurant/configuracion": ["libs/configuracion/configuracion/src/index.ts"],
       "@restaurant/usuarios": ["libs/auth/usuarios/src/index.ts"]
     }
   },

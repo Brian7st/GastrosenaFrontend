@@ -15,6 +15,45 @@ export interface FacturaLineaResponse {
   total: number;
 }
 
+export interface NotaCreditoLineaResponse {
+  productoId:    string;
+  cantidad:      number;
+  valorUnitario: number;
+  valorTotal:    number;
+}
+
+export interface NotaCreditoResponse {
+  id:           string;
+  facturaId:    string;
+  cufeOrigen:   string;
+  motivo:       string;
+  fechaEmision: string;
+  estado:       string;
+  valorTotal:   number;
+  lineas:       NotaCreditoLineaResponse[];
+}
+
+export interface RegistrarNotaCreditoApiRequest {
+  facturaId:    string;
+  cufeOrigen:   string;
+  motivo:       string;
+  fechaEmision: string;
+  lineas: Array<{
+    productoId:    string;
+    cantidad:      number;
+    valorUnitario: number;
+  }>;
+}
+
+export interface ResolverNotaCreditoRequest {
+  notaCreditoIds: string[];
+}
+
+export interface ResolverNotaCreditoResponse {
+  conciliacionId: string;
+  estado:         string;
+}
+
 export interface FacturaResponse {
   id: string;
   numeroFactura: string;
@@ -36,6 +75,7 @@ export interface FacturaResponse {
   total: number;
   instructorId?: string;
   motivoAnulacion?: string | null;
+  valorNetoAPagar?: number;
 }
 
 export interface FacturaPagedResponse {
@@ -122,6 +162,7 @@ export interface CrearGilRequest {
   cuentadantes: CuentadanteGilRequest[];
   solicitante: string;
   codigoGrupo: string;
+  fichaCaracterizacion?: string;
   solicitudesOrigenIds?: string[];
   bienes: BienGilRequest[];
   observaciones?: string;
@@ -141,7 +182,9 @@ export interface GenerarGilRequest {
   cuentadantes: CuentadanteGilRequest[];
   solicitante: string;
   codigoGrupo: string;
+  fichaCaracterizacion: string;
   observaciones?: string;
+  programaDefault?: string;
 }
 
 // ─── GIL — Response types (canonical definitions live in procurement.api.ts) ──
@@ -176,6 +219,7 @@ export interface DetalleGilResponse {
   porcentajeIvaFactura:  number;
   estado:                'OK' | 'DIFERENCIA_PENDIENTE' | 'DIFERENCIA_RESUELTA';
   observacion?:          string;
+  cantidadRecibida:      number | null;
 }
 
 /** Respuesta de POST, GET y PATCH /sourcing/conciliaciones-gil */
@@ -190,8 +234,9 @@ export interface ConciliacionGilResponse {
 
 /** POST /sourcing/conciliaciones-gil */
 export interface ConciliarRequest {
-  facturaId: string;
-  gilId:     string;
+  facturaId:             string;
+  gilId:                 string;
+  cantidadesRecibidas?:  Record<string, number>;
 }
 
 /** PATCH /sourcing/conciliaciones-gil/{id}/diferencias/{gilItemId}/resolver */

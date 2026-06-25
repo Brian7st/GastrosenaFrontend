@@ -34,6 +34,25 @@ import { solicitudSesionFromApi } from '../mappers/training.mapper';
 
 const API = '/api/v1';
 
+/** Ítem del PDF del GIL que espera ga-ms-reportes (GilPdfRequest.Item). */
+export interface GilPdfItem {
+  codigo: string;
+  descripcion: string;
+  cantidad: string;
+  unidad: string;
+}
+
+/** Body que ga-ms-reportes espera en POST /api/reportes/gil/pdf (GilPdfRequest). */
+export interface GilPdfBody {
+  gilId: string;
+  numeroGil: string;
+  regionalNombre: string;
+  centroNombre: string;
+  solicitante: string;
+  fecha: string;
+  items: GilPdfItem[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class SolicitudesService {
   private http = inject(HttpClient);
@@ -163,7 +182,9 @@ export class SolicitudesService {
       cuentadantes:           data.cuentadantes,
       solicitante:            data.solicitante,
       codigoGrupo:            data.codigoGrupo,
+      fichaCaracterizacion:   data.codigoGrupo,
       observaciones:          data.observaciones,
+      programaDefault:        data.programaDefault,
     };
     return this.http
       .post<GilResponse>(`${API}/procurement/giles/generar`, body)
@@ -186,17 +207,19 @@ export class SolicitudesService {
     params = params.set('size', String(filtros?.size ?? 20));
 
     return this.http
-      .get<PagedSolicitudSesionResponse>(`${API}/training/solicitudes`, { params })
+      .get<PagedSolicitudSesionResponse | SolicitudSesionResponse[]>(`${API}/training/solicitudes`, { params })
       .pipe(
-        map(res => ({
-          solicitudes: res.content.map(solicitudSesionFromApi),
-          paginacion: {
-            totalElements: res.totalElements,
-            totalPages:    res.totalPages,
-            page:          res.number,
-            size:          res.size,
-          },
-        })),
+        map(res => {
+          const items = Array.isArray(res) ? res : res.content;
+          const total = Array.isArray(res) ? items.length : res.totalElements;
+          const pages = Array.isArray(res) ? 1 : res.totalPages;
+          const page  = Array.isArray(res) ? 0 : res.number;
+          const size  = Array.isArray(res) ? items.length : res.size;
+          return {
+            solicitudes: items.map(solicitudSesionFromApi),
+            paginacion: { totalElements: total, totalPages: pages, page, size },
+          };
+        }),
         catchError(err => throwError(() => err))
       );
   }
@@ -265,7 +288,7 @@ export class SolicitudesService {
       })),
     };
     return this.http
-      .put<SolicitudSesionResponse>(`${API}/training/solicitudes/${id}`, body)
+      .patch<SolicitudSesionResponse>(`${API}/training/solicitudes/${id}`, body)
       .pipe(
         map(solicitudSesionFromApi),
         catchError(err => throwError(() => err))
@@ -308,5 +331,12 @@ export class SolicitudesService {
         map(solicitudSesionFromApi),
         catchError(err => throwError(() => err))
       );
+  }
+
+  /** POST /api/reportes/gil/pdf — reportes genera el PDF del GIL (GIL-F-014). */
+  exportarGilPdf(body: GilPdfBody): Observable<Blob> {
+    return this.http
+      .post(`/api/reportes/gil/pdf`, body, { responseType: 'blob' })
+      .pipe(catchError(err => throwError(() => err)));
   }
 }

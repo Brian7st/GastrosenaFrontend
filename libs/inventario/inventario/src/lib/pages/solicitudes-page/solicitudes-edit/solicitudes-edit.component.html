@@ -52,17 +52,15 @@
     <!-- ════════════════════════════════════════════════════════════════════
          Columna Principal
     ════════════════════════════════════════════════════════════════════ -->
+    <!-- ── Información Institucional (col izquierda, fila 1) ─────────────── -->
     <div
-      class="main-form-col"
+      class="form-card info-card"
       [class.opacity-50]="isBlocked()"
       [class.pointer-events-none]="isBlocked()">
-
-      <!-- ── Información Institucional ─────────────────────────────────── -->
-      <div class="form-card">
-        <div class="card-header">
-          <span class="material-symbols-outlined icon-primary">corporate_fare</span>
-          <h3>Información Institucional</h3>
-        </div>
+      <div class="card-header">
+        <span class="material-symbols-outlined icon-primary">corporate_fare</span>
+        <h3>Información Institucional</h3>
+      </div>
         <div class="form-row-2">
 
           <div class="form-group">
@@ -137,17 +135,22 @@
             <label>Área <span class="required">*</span></label>
             <select
               class="form-control"
-              [value]="area()"
               (change)="area.set($any($event.target).value)">
-              <option value="">Seleccione Área</option>
+              <option value="" [selected]="area() === ''">Seleccione Área</option>
               @for (a of AREAS; track a) {
-                <option [value]="a">{{ a }}</option>
+                <option [value]="a" [selected]="a === area()">{{ a }}</option>
               }
             </select>
           </div>
 
         </div>
       </div>
+
+    <!-- ── Resto del formulario (ancho completo, debajo) ────────────────── -->
+    <div
+      class="form-col-full"
+      [class.opacity-50]="isBlocked()"
+      [class.pointer-events-none]="isBlocked()">
 
       <!-- ── Solicitante y Coordinador ──────────────────────────────────── -->
       <div class="form-card">
@@ -272,13 +275,15 @@
           <span class="material-symbols-outlined icon-primary">notes</span>
           <h3>Observaciones</h3>
         </div>
-        <textarea
-          class="form-control"
-          rows="4"
-          placeholder="Notas adicionales, justificación técnica…"
-          [value]="observaciones()"
-          (input)="observaciones.set($any($event.target).value)">
-        </textarea>
+        <div class="form-group">
+          <textarea
+            class="form-control"
+            rows="4"
+            placeholder="Notas adicionales, justificación técnica…"
+            [value]="observaciones()"
+            (input)="observaciones.set($any($event.target).value)">
+          </textarea>
+        </div>
       </div>
 
       <!-- ── Acciones ───────────────────────────────────────────────────── -->
@@ -330,19 +335,33 @@
       <!-- Resumen -->
       <div class="side-card side-card--summary">
         <h4>Resumen del GIL</h4>
-        <p class="summary-text">
-          Este formulario es el soporte legal de la asignación de bienes institucionales.
-          Toda modificación queda registrada en la auditoría del sistema.
-        </p>
+        <div class="summary-total">
+          <span>N.° GIL</span>
+          <span class="summary-value">{{ solicitudId() || '—' }}</span>
+        </div>
+        <div class="summary-total">
+          <span>Estado</span>
+          <span class="summary-value">{{ solicitud()?.estado ?? '—' }}</span>
+        </div>
+        <div class="summary-total">
+          <span>Solicitante</span>
+          <span class="summary-value">{{ solicitante() || '—' }}</span>
+        </div>
+        <div class="summary-total">
+          <span>Coordinador</span>
+          <span class="summary-value">{{ jefeOficinaCoordinador() || '—' }}</span>
+        </div>
+        <div class="summary-total">
+          <span>Código de grupo</span>
+          <span class="summary-value">{{ codigoGrupo() || '—' }}</span>
+        </div>
         <div class="summary-total">
           <span>Total bienes</span>
           <span class="summary-value">{{ bienes().length }} ítem(s)</span>
         </div>
         <div class="summary-total">
           <span>Valor estimado</span>
-          <span class="summary-value">
-            {{ totalValor() | currency:'COP':'symbol-narrow':'1.0-0' }}
-          </span>
+          <span class="summary-value">{{ totalValor() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
         </div>
       </div>
 

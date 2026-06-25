@@ -27,39 +27,39 @@
        ═══════════════════════════════════════════════════════════════════════ -->
   <div class="kpi-grid">
     <restaurant-kpi-card
-      label="ESTADO GLOBAL"
-      value="96%"
+      label="PRECISIÓN PROMEDIO"
+      [value]="precisionPromedio() + '%'"
       icon="check-circle-2"
       iconColor="green"
-      trend="Óptimo"
-      [trendUp]="true"
+      trend="Exactitud global"
+      [trendUp]="precisionPromedio() >= 90"
     ></restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="CONCILIACIONES TRIMESTRE"
-      value="12"
+      label="CONCILIACIONES REGISTRADAS"
+      [value]="totalConciliaciones()"
       icon="calendar"
       iconColor="blue"
-      trend="completadas"
+      trend="en el historial"
       [trendUp]="null"
     ></restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="DIFERENCIAS CRÍTICAS"
-      value="3"
+      label="ÍTEMS CON DIFERENCIA"
+      [value]="diferenciasTotal()"
       icon="alert-triangle"
       iconColor="red"
-      trend="pendientes"
+      trend="detectadas"
       [trendUp]="false"
     ></restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="PRECISIÓN PROMEDIO"
-      value="95%"
+      label="ESTADO"
+      [value]="precisionPromedio() >= 90 ? 'Óptimo' : 'Revisar'"
       icon="check-circle-2"
-      iconColor="green"
-      trend="+2%"
-      [trendUp]="true"
+      [iconColor]="precisionPromedio() >= 90 ? 'green' : 'orange'"
+      trend="umbral: 90%"
+      [trendUp]="precisionPromedio() >= 90"
     ></restaurant-kpi-card>
   </div>
 
@@ -72,28 +72,32 @@
     <div class="main-content">
       <div class="section-header">
         <h2 class="section-title">Toma Física por Categoría</h2>
-        <a routerLink="CONC-2024-012" class="link-action">Ver detalle</a>
       </div>
 
       <div class="categorias-grid">
-        @for (cat of categorias(); track cat.nombre) {
-          <div class="categoria-card" [class.categoria-card--alert]="cat.tipo === 'alert'">
-            <div class="categoria-icon-box" [class.categoria-icon-box--alert]="cat.tipo === 'alert'">
-              <lucide-icon [name]="cat.icono" [size]="24"></lucide-icon>
-            </div>
-            <div class="categoria-info">
-              <h3 class="categoria-name">{{ cat.nombre }}</h3>
-              <p class="categoria-status" [class.categoria-status--alert]="cat.tipo === 'alert'">
-                @if (cat.tipo === 'alert') {
-                  <lucide-icon name="alert-triangle" [size]="14"></lucide-icon>
-                }
-                {{ cat.estado }}
-              </p>
-            </div>
-            <div class="categoria-arrow">
-              <lucide-icon name="chevron-right" [size]="20"></lucide-icon>
-            </div>
-          </div>
+        @if (facade.loading()) {
+          <p class="text-secondary">Cargando categorías...</p>
+        } @else if (categorias().length === 0) {
+          <p class="text-secondary">Sin productos en el catálogo.</p>
+        } @else {
+          @for (cat of categorias(); track cat.nombre) {
+            <a
+              class="categoria-card"
+              routerLink="toma-fisica"
+              [queryParams]="{ categoria: cat.nombre }"
+              [attr.aria-label]="'Iniciar toma física de ' + cat.nombre">
+              <div class="categoria-icon-box">
+                <lucide-icon [name]="iconoDeCategoria(cat.nombre)" [size]="24"></lucide-icon>
+              </div>
+              <div class="categoria-info">
+                <h3 class="categoria-name">{{ cat.nombre }}</h3>
+                <p class="categoria-status">{{ cat.totalItems }} ítems activos</p>
+              </div>
+              <div class="categoria-arrow">
+                <lucide-icon name="chevron-right" [size]="20"></lucide-icon>
+              </div>
+            </a>
+          }
         }
       </div>
     </div>
@@ -110,10 +114,12 @@
           @for (item of tendencias(); track item.mes) {
             <div class="chart-col">
               <div class="chart-bar-container">
-                <div class="chart-bar" [class.chart-bar--current]="item.isCurrent" [style.height.%]="item.valor"></div>
+                <div class="chart-bar" [class.chart-bar--current]="item.isCurrent" [style.height.%]="item.merma"></div>
               </div>
-              <span class="chart-label" [class.chart-label--current]="item.isCurrent">{{ item.mes }}</span>
+              <span class="chart-label" [class.chart-label--current]="item.isCurrent">{{ item.label }}</span>
             </div>
+          } @empty {
+            <p class="text-secondary">Sin conciliaciones registradas.</p>
           }
         </div>
       </div>
@@ -130,16 +136,17 @@
                 <div class="indicator-ring" [ngClass]="'indicator-ring--' + act.estado">
                   <div class="indicator-dot"></div>
                 </div>
-                <!-- Line connection could be added via CSS if needed, but keeping it simple as per prototype -->
               </div>
               <div class="actividad-content">
                 <p class="actividad-ubicacion">{{ act.ubicacion }}</p>
                 <p class="actividad-detalle" [ngClass]="{'actividad-detalle--alert': act.estado === 'alert'}">
                   {{ act.detalle }}
                 </p>
-                <p class="actividad-tiempo">{{ act.tiempo }}</p>
+                <p class="actividad-tiempo">{{ act.fecha }}</p>
               </div>
             </div>
+          } @empty {
+            <p class="text-secondary">Sin actividad reciente.</p>
           }
         </div>
         <div class="sidebar-card-footer">

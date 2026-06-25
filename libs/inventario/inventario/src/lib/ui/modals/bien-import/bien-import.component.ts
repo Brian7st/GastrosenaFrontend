@@ -20,6 +20,7 @@ export class BienImportModalComponent {
 
   isDragging = signal(false);
   file = signal<File | null>(null);
+  isExcel = signal(false);
   isProcessing = signal(false);
   previewData = signal<BienImportRow[]>([]);
   hasErrors = signal(false);
@@ -28,7 +29,9 @@ export class BienImportModalComponent {
   readonly INSTRUCCIONES = [
     'Descargue la plantilla y complétela con los datos de sus bienes.',
     'Los únicos campos obligatorios son Nombre y Unidad de Medida.',
-    'Si algún bien tiene errores, se rechaza el lote completo. Corrija antes de importar.',
+    'El IVA se carga como fracción: 0 (exento), 0.05 o 0.19 — no como porcentaje.',
+    'Si un bien ya existe (por código o descripción) se actualiza y se completan los datos faltantes, no se duplica.',
+    'Si alguna fila tiene errores de formato, se rechaza el lote. Corrija antes de importar.',
   ];
 
   onFileSelected(event: Event): void {
@@ -55,6 +58,7 @@ export class BienImportModalComponent {
 
   removeFile(): void {
     this.file.set(null);
+    this.isExcel.set(false);
     this.previewData.set([]);
     this.hasErrors.set(false);
     this.statusMessage.set(null);
@@ -134,7 +138,7 @@ export class BienImportModalComponent {
 
     const fileName = f.name.toLowerCase();
     if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
-      this.statusMessage.set('Archivo Excel listo para importación al backend.');
+      this.isExcel.set(true);
       this.isProcessing.set(false);
       return;
     }
@@ -181,21 +185,20 @@ export class BienImportModalComponent {
 
       const row: BienImportRow = {
         codigoSena: record['codigoSena'] || undefined,
-        nombre: record['nombre'] || '',
         descripcion: record['descripcion'] || undefined,
         categoria: record['categoria'] || undefined,
         unidadMedida: record['unidadMedida'] || '',
         codigoProveedor: record['codigoProveedor'] || undefined,
-        urlImagen: record['urlImagen'] || undefined,
         vrlAdjudicado: record['vrlAdjudicado'] !== undefined ? Number(record['vrlAdjudicado']) : 0,
         vrlAntes: record['vrlAntes'] !== undefined ? Number(record['vrlAntes']) : 0,
         iva: record['iva'] !== undefined ? Number(record['iva']) : 0,
+        stockMinimo: record['stockMinimo'] !== undefined ? Number(record['stockMinimo']) : undefined,
         validacion: 'Correcto',
       };
 
-      if (!row.nombre || !row.unidadMedida) {
+      if (!row.unidadMedida) {
         row.validacion = 'Falta campo';
-        row.error = 'Nombre y Unidad de Medida son obligatorios';
+        row.error = 'Unidad de Medida es obligatoria';
       } else if (row.codigoSena && seenCodes.has(row.codigoSena)) {
         row.validacion = 'Código duplicado';
         row.error = 'Código SENA duplicado en el archivo';

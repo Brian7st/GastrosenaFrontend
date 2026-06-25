@@ -1,9 +1,14 @@
 <div class="modulo-container">
   <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-4);">
     <restaurant-page-header title="Gestión de Recetas" subtitle="Administrá el recetario de Bar y Barismo" style="margin-bottom: 0;"></restaurant-page-header>
-    <restaurant-button variant="primary" (click)="abrirNuevaReceta()">
-      <lucide-icon name="plus" size="18" style="margin-right: var(--space-2);"></lucide-icon> Nueva Receta
-    </restaurant-button>
+    <div style="display: flex; gap: var(--space-3);">
+      <restaurant-button variant="surface" (click)="abrirGestionCategorias()">
+        <lucide-icon name="list" size="18" style="margin-right: var(--space-2);"></lucide-icon> Gestionar Categorías
+      </restaurant-button>
+      <restaurant-button variant="primary" (click)="abrirNuevaReceta()">
+        <lucide-icon name="plus" size="18" style="margin-right: var(--space-2);"></lucide-icon> Nueva Receta
+      </restaurant-button>
+    </div>
   </div>
   
   <!-- Filtros: Buscador y Categorías alineados al lado -->
@@ -21,7 +26,7 @@
       <restaurant-select-filter
         label="Categoría"
         [value]="categoriaSeleccionada()"
-        [options]="opcionesCategoria"
+        [options]="opcionesCategoria()"
         (valueChange)="categoriaSeleccionada.set($event)"
       ></restaurant-select-filter>
     </div>
@@ -32,7 +37,7 @@
       <restaurant-card 
         [title]="receta.nombreReceta" 
         [subtitle]="receta.nombreCategoria || 'Sin categoría'" 
-        [imageUrl]="receta.urlImagen || ''" 
+        [imageUrl]="receta.urlImagen || 'https://placehold.co/600x400/f8f9fa/a0aec0?text=Sin+Imagen'" 
         [price]="receta.precioUnitario || 0"
       >
         <div class="card-content" style="display: flex; flex-direction: column; flex: 1; justify-content: space-between;">
@@ -71,15 +76,21 @@
   @if (mostrarDetalle() && recetaSeleccionada()) {
     <bar-detalle-receta 
       [receta]="recetaSeleccionada()!" 
-      (closeDetail)="cerrarModales()" 
+      (close)="cerrarModales()" 
     ></bar-detalle-receta>
   }
 
   @if (mostrarGestion()) {
     <bar-gestion-receta 
       [receta]="recetaSeleccionada()" 
-      (closeManage)="cerrarModales($event)" 
+      (close)="cerrarModales($event)" 
     ></bar-gestion-receta>
+  }
+
+  @if (mostrarCategorias()) {
+    <restaurant-bar-gestion-categorias
+      (close)="cerrarModales($event)"
+    ></restaurant-bar-gestion-categorias>
   }
 
   <!-- Modal para confirmar eliminación -->

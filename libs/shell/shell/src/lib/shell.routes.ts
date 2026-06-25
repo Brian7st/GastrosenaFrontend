@@ -64,6 +64,13 @@ export const shellRoutes: Routes = [
         canActivate: [permissionGuard(['USUARIOS_LISTAR', 'USUARIOS_VER'])],
         loadChildren: () => import('@restaurant/usuarios').then(m => m.USUARIOS_ROUTES),
       },
+
+          {
+      path: 'fichas',
+      canActivate: [roleGuard([Rol.ADMINISTRADOR, Rol.INSTRUCTOR])], // solo ADMINISTRADOR e INSTRUCTOR pueden ver fichas
+      loadComponent: () => import('@restaurant/usuarios').then(m => m.FichasPageComponent),
+    },
+    
       {
         path: 'reportes',
         canActivate: [permissionGuard(['MODULO_REPORTES_VER', 'REPORTES_GESTIONAR', 'REPORTES_PEDIDOS_COCINA', 'REPORTES_VENTAS_MESERO'])],
@@ -75,13 +82,12 @@ export const shellRoutes: Routes = [
         loadChildren: () =>
           import('@restaurant/abastecimiento').then(m => m.ABASTECIMIENTO_ROUTES),
       },
-{ path: 'notificaciones', loadComponent: () => import('@restaurant/notificaciones').then(m => m.NotificacionesPageComponent) },
-      // 👇 AGREGAR ESTA RUTA:
       {
-        path: 'perfil',
-        loadComponent: () => import('@restaurant/usuarios').then(m => m.PerfilPageComponent),
+        path: 'configuracion',
+        loadChildren: () =>
+          import('@restaurant/configuracion').then(m => m.CONFIGURACION_ROUTES),
       },
-      // 👇 AGREGAR ESTA RUTA:
+{ path: 'notificaciones', loadComponent: () => import('@restaurant/notificaciones').then(m => m.NotificacionesPageComponent) },
       {
         path: 'perfil',
         loadComponent: () => import('@restaurant/usuarios').then(m => m.PerfilPageComponent),

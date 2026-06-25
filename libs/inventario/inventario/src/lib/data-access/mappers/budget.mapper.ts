@@ -1,27 +1,62 @@
-import { Rubro, Compromiso, PresupuestoDetalle, ResumenPresupuestosGlobal } from '../../models/presupuesto.model';
-import { Consolidado } from '../../models/consolidado.model';
+import { Rubro, Compromiso, PresupuestoDetalle, ResumenPresupuestosGlobal, AfectacionPresupuestal } from '../../models/presupuesto.model';
+import { Consolidado, ElegibleConsolidado } from '../../models/consolidado.model';
 import {
   PresupuestoResponse,
   ConsolidadoResponse,
   CompromisoResponse,
-  PresupuestoDetalleResponse,
+  RubroResponse,
   ResumenPresupuestosResponse,
+  ElegibleConsolidadoResponse,
 } from '../api/budget.api';
 
-export function rubroFromApi(dto: PresupuestoResponse): Rubro {
+/**
+ * Computa porcentajeEjecucion sin redondear: la precisión de visualización
+ * se decide UNA sola vez en el template con el pipe `number`. Redondear acá
+ * (lossy) provocaba que distintas vistas mostraran el mismo % con caras
+ * distintas (17.5 vs 17.52).
+ */
+function computePorcentajeEjecucion(
+  montoAsignado: number,
+  montoComprometido: number,
+  montoPagado: number,
+): number {
+  if (montoAsignado <= 0) return 0;
+  return (montoComprometido + montoPagado) / montoAsignado * 100;
+}
+
+/** Mapea RubroResponse + contexto del presupuesto padre → Rubro del modelo. */
+export function rubroFromApi(
+  dto: RubroResponse,
+  fichaId: string,
+  programaFormacion: string,
+): Rubro {
   return {
-    id: dto.id,
-    codigo: dto.codigo,
-    descripcion: dto.descripcion,
-    fichaId: dto.fichaId,
-    programaFormacion: dto.programaFormacion,
-    montoAsignado: dto.montoAsignado,
-    saldoDisponible: dto.saldoDisponible,
-    montoComprometido: dto.montoComprometido,
-    montoPagado: dto.montoPagado,
-    retencionZese: dto.retencionZese,
-    porcentajeEjecucion: dto.porcentajeEjecucion,
+    id:                 dto.id,
+    codigo:             dto.codigo,
+    descripcion:        dto.descripcion,
+    fichaId,
+    programaFormacion,
+    posicionPresupuestal: dto.posicionPresupuestal,
+    dependencia:          dto.dependencia,
+    fuente:               dto.fuente,
+    valorPorCancelar:     dto.valorPorCancelar,
+    montoAsignado:      dto.montoAsignado,
+    saldoDisponible:    dto.saldoDisponible,
+    montoComprometido:  dto.montoComprometido,
+    montoPagado:        dto.montoPagado,
+    // retencionZese: ZESE no existe en el backend — se mantiene a 0 para compatibilidad UI
+    retencionZese:      0,
+    porcentajeEjecucion: computePorcentajeEjecucion(
+      dto.montoAsignado, dto.montoComprometido, dto.montoPagado,
+    ),
   };
+}
+
+/** Aplana la lista paginada de presupuestos → array plano de Rubros. */
+export function rubrosFromPresupuestoList(presupuestos: PresupuestoResponse[]): Rubro[] {
+  return presupuestos.flatMap(p =>
+    p.rubros.map(r => rubroFromApi(r, p.fichaId, p.programaFormacion)),
+  );
 }
 
 export function compromisoFromApi(dto: CompromisoResponse): Compromiso {
@@ -38,60 +73,79 @@ export function compromisoFromApi(dto: CompromisoResponse): Compromiso {
   };
 }
 
-export function presupuestoDetalleFromApi(dto: PresupuestoDetalleResponse): PresupuestoDetalle {
+export function presupuestoDetalleFromApi(dto: PresupuestoResponse): PresupuestoDetalle {
   return {
     id:                dto.id,
     fichaId:           dto.fichaId,
     programaFormacion: dto.programaFormacion,
     vigencia:          dto.vigencia,
     fechaAprobacion:   dto.fechaAprobacion,
-    rubros: dto.rubros.map(r => ({
-      id:                 r.id,
-      codigo:             r.codigo,
-      descripcion:        r.descripcion,
-      fichaId:            dto.fichaId,
-      programaFormacion:  dto.programaFormacion,
-      montoAsignado:      r.montoAsignado,
-      saldoDisponible:    r.saldoDisponible,
-      montoComprometido:  r.montoComprometido,
-      montoPagado:        r.montoPagado,
-      retencionZese:      r.retencionZese,
-      porcentajeEjecucion: r.porcentajeEjecucion,
-    })),
+    rubros: dto.rubros.map(r => rubroFromApi(r, dto.fichaId, dto.programaFormacion)),
   };
 }
 
 export function resumenPresupuestosFromApi(dto: ResumenPresupuestosResponse): ResumenPresupuestosGlobal {
   return {
-    totalPresupuestos: dto.totalPresupuestos,
-    vigencia:          dto.vigencia,
-    totalAsignado:     dto.totalAsignado,
-    totalComprometido: dto.totalComprometido,
-    totalPagado:       dto.totalPagado,
-    saldoGlobal:       dto.saldoGlobal,
+    totalPresupuestos:   dto.totalPresupuestos,
+    vigencia:            dto.vigencia,
+    totalAsignado:       dto.totalAsignado,
+    totalComprometido:   dto.totalComprometido,
+    totalPagado:         dto.totalPagado,
+    saldoGlobal:         dto.saldoGlobal,
     porcentajeEjecucion: dto.porcentajeEjecucion,
+  };
+}
+
+export function afectacionFromCompromiso(dto: CompromisoResponse): AfectacionPresupuestal {
+  return {
+    id:                 dto.id,
+    rubroId:            dto.rubroId,
+    gilId:              dto.gilId,
+    concepto:           dto.concepto,
+    monto:              dto.monto,
+    montoRetencionZese: dto.montoRetencionZese,
+    fecha:              dto.fecha,
+    estado:             dto.estado,
+  };
+}
+
+export function elegibleFromApi(dto: ElegibleConsolidadoResponse): ElegibleConsolidado {
+  return {
+    compromisoId:  dto.compromisoId,
+    gilId:         dto.gilId,
+    facturaId:     dto.facturaId,
+    concepto:      dto.concepto,
+    fecha:         dto.fecha,
+    numeroFactura: dto.numeroFactura,
+    cufe:          dto.cufe,
+    monto:         dto.monto,
+    retencionZese: dto.retencionZese,
+    selected:      false,
   };
 }
 
 export function consolidadoFromApi(dto: ConsolidadoResponse): Consolidado {
   return {
-    id: dto.id,
-    numero: dto.numero,
+    id:              dto.id,
+    numero:          dto.numero,
     fechaGeneracion: dto.fechaGeneracion,
-    generadoPor: dto.generadoPor,
-    estado: dto.estado,
-    lineas: dto.lineas.map((l) => ({
-      id: l.id,
-      tipo: l.tipo,
-      referencia: l.referencia,
-      descripcion: l.descripcion,
-      cantidad: l.cantidad,
-      valor: l.valor,
+    generadoPor:     dto.generadoPor,
+    estado:          dto.estado,
+    lineas: dto.lineas.map(l => ({
+      gilId:         l.gilId,
+      compromisoId:  l.compromisoId,
+      facturaId:     l.facturaId,
+      concepto:      l.concepto,
+      fecha:         l.fecha,
+      numeroFactura: l.numeroFactura,
+      cufe:          l.cufe,
+      monto:         l.monto,
+      retencionZese: l.retencionZese,
     })),
     totales: {
-      totalBienes: dto.totales.totalBienes,
-      totalServicios: dto.totales.totalServicios,
-      totalGeneral: dto.totales.totalGeneral,
+      sumaMontos:        dto.totales.sumaMontos,
+      sumaRetencionZese: dto.totales.sumaRetencionZese,
+      valorNeto:         dto.totales.valorNeto,
     },
   };
 }

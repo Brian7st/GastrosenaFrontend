@@ -21,6 +21,9 @@
         {{ requisicion()?.numero ?? reqId() }}
       </h2>
     </div>
+    <button class="sheet-panel__close" (click)="exportarPdf()" [disabled]="loading()" title="Exportar PDF">
+      <lucide-icon name="download" [size]="20"></lucide-icon>
+    </button>
     <button class="sheet-panel__close" (click)="close()">
       <lucide-icon name="x" [size]="20"></lucide-icon>
     </button>
@@ -49,7 +52,7 @@
         </h3>
         <div class="info-grid">
           <div class="info-cell">
-            <div class="info-cell__icon-wrap"><lucide-icon name="tag" [size]="20"></lucide-icon></div>
+            <div class="info-cell__icon-wrap"><lucide-icon name="hash" [size]="20"></lucide-icon></div>
             <div>
               <p class="info-cell__label">Ficha</p>
               <p class="info-cell__value">{{ requisicion()?.fichaId ?? '—' }}</p>
@@ -67,6 +70,13 @@
             <div>
               <p class="info-cell__label">Fecha Programada</p>
               <p class="info-cell__value">{{ requisicion()?.fecha ?? '—' }}</p>
+            </div>
+          </div>
+          <div class="info-cell">
+            <div class="info-cell__icon-wrap"><lucide-icon name="calendar" [size]="20"></lucide-icon></div>
+            <div>
+              <p class="info-cell__label">Día</p>
+              <p class="info-cell__value">{{ (requisicion()?.diaSemana | titlecase) || '—' }}</p>
             </div>
           </div>
           <div class="info-cell">
@@ -152,14 +162,6 @@
               [routerLink]="['/app/inventario/requisiciones/despacho', reqId()]">
         <lucide-icon name="truck" [size]="18"></lucide-icon>
         Registrar Despacho
-      </button>
-    }
-
-    <!-- Exportar .docx — disponible desde FIRMADA -->
-    @if (estado() === 'FIRMADA' || estado() === 'LEGALIZADA') {
-      <button class="btn-outline" (click)="exportar()">
-        <lucide-icon name="download" [size]="18"></lucide-icon>
-        Descargar Soporte
       </button>
     }
 

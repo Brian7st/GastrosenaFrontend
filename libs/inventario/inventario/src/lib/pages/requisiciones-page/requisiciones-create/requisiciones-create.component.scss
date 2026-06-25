@@ -342,6 +342,20 @@
   margin: var(--space-1) 0 0;
 }
 
+.product-card__stock {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 11px;
+  color: var(--color-pizarra-500);
+  margin: var(--space-2) 0 0;
+
+  strong {
+    color: var(--color-pizarra-700);
+    font-weight: 600;
+  }
+}
+
 .product-card__qty-row {
   display: flex;
   align-items: center;
@@ -434,7 +448,7 @@
   max-width: 800px;
   width: calc(100% - var(--space-16));
   padding: var(--space-4) var(--space-6);
-  background-color: rgba(255, 255, 255, 0.92);
+  background-color: rgba(var(--color-superficie-contenedor-bajo-rgb), 0.92);
   backdrop-filter: blur(12px);
   border: 1px solid var(--color-contorno-variante);
   border-radius: var(--radius-xl);

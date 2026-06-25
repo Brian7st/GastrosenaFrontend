@@ -33,32 +33,28 @@
   <div class="kpi-row">
     <restaurant-kpi-card
       label="TOTAL CONCILIACIONES"
-      value="48"
+      [value]="totalConciliaciones()"
       iconName="check-square"
-      iconVariant="success"
-      trend="+12%"
-      trendDirection="up">
+      iconVariant="success">
     </restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="DIFERENCIAS CRÍTICAS"
-      value="15"
+      label="ÍTEMS CON DIFERENCIA"
+      [value]="diferenciasTotal()"
       iconName="alert-triangle"
-      iconVariant="alert"
-      trend="-3%"
-      trendDirection="down">
+      iconVariant="alert">
     </restaurant-kpi-card>
 
     <restaurant-kpi-card
       label="PRECISIÓN PROMEDIO"
-      value="94.2%"
+      [value]="precisionPromedio() + '%'"
       iconName="check-circle-2"
       iconVariant="info">
     </restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="TIEMPO PROMEDIO"
-      value="1.5h"
+      label="ÚLTIMA CONCILIACIÓN"
+      [value]="ultimaFecha() ?? 'Sin datos'"
       iconName="clock"
       iconVariant="neutral">
     </restaurant-kpi-card>
@@ -89,7 +85,6 @@
 
         <thead>
           <tr>
-            <th>ID</th>
             <th>FECHA</th>
             <th>UBICACIÓN</th>
             <th>ÍTEMS</th>
@@ -101,7 +96,6 @@
         <tbody>
           @for (reg of registros(); track reg.id) {
             <tr>
-              <td class="font-bold text-primary">{{ reg.id }}</td>
               <td class="text-secondary whitespace-pre">{{ reg.fecha.replace(', ', '\n') }}</td>
               <td class="text-secondary">{{ reg.ubicacion }}</td>
               <td>
@@ -139,59 +133,55 @@
   <!-- PANELS BELOW THE TABLE -->
   <div class="bottom-panels">
     
-    <!-- Top 3 Diferencias -->
+    <!-- Top 3 conciliaciones con más diferencias -->
     <div class="sidebar-card">
-      <h3 class="sidebar-title">Top 3 Diferencias</h3>
+      <h3 class="sidebar-title">Top 3 con más diferencias</h3>
       <div class="top-list">
-        @for (item of topDiferencias(); track item.producto) {
+        @if (topDiferencias().length === 0) {
+          <p class="text-secondary">Sin conciliaciones con diferencias.</p>
+        }
+        @for (item of topDiferencias(); track item.label) {
           <div class="top-item">
             <div class="top-icon">
-              <lucide-icon [name]="item.icon" [size]="18"></lucide-icon>
+              <lucide-icon name="alert-triangle" [size]="18"></lucide-icon>
             </div>
-            <span class="top-name">{{ item.producto }}</span>
-            <span class="top-dif">{{ item.diferencia }}</span>
+            <div class="top-info">
+              <span class="top-name">{{ item.label }}</span>
+              <span class="top-fecha">{{ item.fecha }}</span>
+            </div>
+            <span class="top-dif">{{ item.diferencia }} dif.</span>
           </div>
         }
       </div>
     </div>
 
-    <!-- Volumen vs Precision -->
+    <!-- Volumen vs Precisión (últimos 6 meses reales) -->
     <div class="sidebar-card">
       <div class="sidebar-header-flex">
-        <h3 class="sidebar-title">Volumen vs Precisión</h3>
+        <h3 class="sidebar-title">Precisión mensual</h3>
         <lucide-icon name="more-vertical" [size]="18" class="text-disabled"></lucide-icon>
       </div>
-      <p class="sidebar-subtitle">Análisis trimestral (Q3)</p>
-      
-      <div class="placeholder-chart">
-        <div class="vol-bars">
-          <div class="vol-col">
-            <div class="bar-pair">
-              <div class="bar vol" style="height: 40%"></div>
-              <div class="bar prec" style="height: 90%"></div>
-            </div>
-            <span>Jul</span>
+      <p class="sidebar-subtitle">Últimos {{ tendenciaMensual().length }} meses</p>
+
+      @if (tendenciaMensual().length === 0) {
+        <p class="text-secondary">Sin datos para mostrar.</p>
+      } @else {
+        <div class="placeholder-chart">
+          <div class="vol-bars">
+            @for (m of tendenciaMensual(); track m.mes) {
+              <div class="vol-col">
+                <div class="bar-pair">
+                  <div class="bar prec" [class.chart-bar--current]="m.isCurrent" [style.height.%]="m.precision"></div>
+                </div>
+                <span [class.chart-label--current]="m.isCurrent">{{ m.label }}</span>
+              </div>
+            }
           </div>
-          <div class="vol-col">
-            <div class="bar-pair">
-              <div class="bar vol" style="height: 60%"></div>
-              <div class="bar prec" style="height: 95%"></div>
-            </div>
-            <span>Ago</span>
-          </div>
-          <div class="vol-col">
-            <div class="bar-pair">
-              <div class="bar vol" style="height: 80%"></div>
-              <div class="bar prec" style="height: 85%"></div>
-            </div>
-            <span>Sep</span>
+          <div class="chart-legend">
+            <div class="legend-item"><div class="dot prec-dot"></div><span>Precisión (%)</span></div>
           </div>
         </div>
-        <div class="chart-legend">
-          <div class="legend-item"><div class="dot vol-dot"></div><span>Volumen (Ítems)</span></div>
-          <div class="legend-item"><div class="dot prec-dot"></div><span>Precisión (%)</span></div>
-        </div>
-      </div>
+      }
     </div>
 
   </div>

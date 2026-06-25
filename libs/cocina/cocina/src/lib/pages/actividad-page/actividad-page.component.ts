@@ -25,13 +25,13 @@ export class ActividadPageComponent {
   private facade = inject(CocinaFacade);
 
   // ── Datos de fichas desde el facade ──────────────────────────────────────
-  readonly fichas         = this.facade.fichas;
+  readonly fichas = this.facade.fichas;
   readonly fichasCargando = this.facade.fichasCargando;
 
   // ── Estado del buscador de fichas ─────────────────────────────────────────
-  readonly fichaBusqueda    = signal<string>('');   // texto escrito en el input
+  readonly fichaBusqueda = signal<string>('');   // texto escrito en el input
   readonly fichaDropdownOpen = signal<boolean>(false);
-  readonly numeroFicha       = signal<string>('');  // valor seleccionado/confirmado
+  readonly numeroFicha = signal<string>('');  // valor seleccionado/confirmado
 
   /** Lista filtrada según lo que escribe el usuario (solo por número de ficha) */
   readonly fichasFiltradas = computed(() => {
@@ -42,21 +42,21 @@ export class ActividadPageComponent {
   });
 
   // ── Resto del formulario ──────────────────────────────────────────────────
-  fecha           = signal<string>('');
+  fecha = signal<string>('');
   nombreActividad = signal<string>('');
-  jornada         = signal<string>('');
-  pasosActividad  = signal<string>('');
-  trimestre       = signal<string>('trimestre1');
+  jornada = signal<string>('');
+  pasosActividad = signal<string>('');
+  trimestre = signal<string>('trimestre1');
 
   readonly historialReciente = [
     { nombre: 'Matemáticas', estado: 'Aprobado', clase: 'badge-aprobado' },
-    { nombre: 'Lógica',      estado: 'Pendiente', clase: 'badge-pendiente' },
-    { nombre: 'Inglés I',    estado: 'Aprobado',  clase: 'badge-aprobado' },
+    { nombre: 'Lógica', estado: 'Pendiente', clase: 'badge-pendiente' },
+    { nombre: 'Inglés I', estado: 'Aprobado', clase: 'badge-aprobado' },
   ];
 
   readonly jornadas = [
-    { value: 'diurna',   label: 'Diurna' },
-    { value: 'mixta',    label: 'Mixta' },
+    { value: 'diurna', label: 'Diurna' },
+    { value: 'mixta', label: 'Mixta' },
     { value: 'nocturna', label: 'Nocturna' },
   ];
 
@@ -121,10 +121,10 @@ export class ActividadPageComponent {
       this.trimestres.find(t => t.value === this.trimestre())?.label ?? this.trimestre();
 
     this.facade.crearActividad({
-      nombre:   this.nombreActividad() || 'Actividad sin nombre',
-      fecha:    this.fecha() || new Date().toISOString().slice(0, 10),
-      jornada:  jornadaLabel,
-      ficha:    this.numeroFicha() || '0000000',
+      nombre: this.nombreActividad() || 'Actividad sin nombre',
+      fecha: this.fecha() || new Date().toISOString().slice(0, 10),
+      jornada: jornadaLabel,
+      ficha: this.numeroFicha() || '0000000',
       trimestre: trimestreLabel,
     });
 
@@ -134,4 +134,4 @@ export class ActividadPageComponent {
   verActividades(): void {
     this.router.navigate(['/app/cocina/actividades']);
   }
-}
+}

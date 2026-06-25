@@ -7,7 +7,6 @@ import {
 } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LucideIconComponent } from '@restaurant/shared/ui';
-import { RequisicionesService } from '../../../data-access/services/requisiciones.service';
 import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
 
 @Component({
@@ -21,7 +20,6 @@ import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
 export class RequisicionesFirmarComponent {
   private router  = inject(Router);
   private route   = inject(ActivatedRoute);
-  private service = inject(RequisicionesService);
   readonly facade = inject(RequisicionesFacade);
 
   readonly requisicionId: string;
@@ -84,7 +82,7 @@ export class RequisicionesFirmarComponent {
     this.firmando.set(true);
     this.error.set(null);
 
-    this.service.firmarRequisicion(this.requisicionId, voceroId).subscribe({
+    this.facade.firmarRequisicion(this.requisicionId, voceroId).subscribe({
       next: () => {
         this.router.navigate(['/app/inventario/requisiciones']);
       },

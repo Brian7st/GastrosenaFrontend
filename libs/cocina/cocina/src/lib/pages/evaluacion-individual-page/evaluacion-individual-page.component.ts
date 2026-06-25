@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CocinaFacade } from '../../data-access/cocina.facade';
+import { EvaluacionService } from '../../data-access/evaluacion.service';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 
 // ─── Modelos ──────────────────────────────────────────────────────────────────
@@ -74,10 +75,11 @@ export class EvaluacionIndividualPageComponent implements OnInit {
   // ── UI ───────────────────────────────────────────────────────────────────
   readonly menuEvaluarAbierto = signal<boolean>(false);
 
-  // ── Dependencias ──────────────────────────────────────────────────────────
-  private facade = inject(CocinaFacade);
-  private router = inject(Router);
+  // ── Inyecciones ──────────────────────────────────────────────────────────
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private facade = inject(CocinaFacade);
+  private evaluacionService = inject(EvaluacionService);
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
   ngOnInit(): void {
@@ -132,13 +134,37 @@ export class EvaluacionIndividualPageComponent implements OnInit {
       esRevaluacion: false,
     };
 
-    this.historialEvaluaciones.update(h => [...h, nuevoRegistro]);
+    const payload = [{
+      aprendizId: this.aprendiz().id,
+      resultado: resultado,
+      observaciones: this.observaciones.trim()
+    }];
 
-    const estadoFacade = resultado === 'aprobo' ? 'Aprobó' : 'No Aprobó';
-    this.facade.actualizarEstado(this.aprendiz().id, estadoFacade);
+    console.log(
+      '[EvaluacionIndividual] Submit:',
+      JSON.stringify(payload, null, 2)
+    );
 
-    this.observaciones = '';
-    this.menuEvaluarAbierto.set(false);
+    // Obtener la actividad asociada
+    const actividades = this.facade.actividades();
+    const actividad = actividades.find(a => a.nombre === this.aprendiz().actividad);
+    const actividadId = actividad ? actividad.id : 1; // Fallback o manejar null si es necesario
+
+    this.evaluacionService.evaluarAprendices(actividadId, payload).subscribe({
+      next: () => {
+        this.historialEvaluaciones.update(h => [...h, nuevoRegistro]);
+
+        const estadoFacade = resultado === 'aprobo' ? 'Aprobó' : 'No Aprobó';
+        this.facade.actualizarEstado(this.aprendiz().id, estadoFacade);
+
+        // Limpiar formulario y cerrar menú
+        this.observaciones = '';
+        this.menuEvaluarAbierto.set(false);
+      },
+      error: (err) => {
+        console.error('Error al guardar evaluación individual', err);
+      }
+    });
   }
 
   // ── Re-evaluar ────────────────────────────────────────────────────────────
@@ -169,14 +195,32 @@ export class EvaluacionIndividualPageComponent implements OnInit {
       esRevaluacion: true,
     };
 
-    this.historialEvaluaciones.update(h => [...h, nuevoRegistro]);
+    const payload = [{
+      aprendizId: this.aprendiz().id,
+      resultado: resultado === 'Aprobado' ? 'aprobo' as const : 'no_aprobo' as const,
+      observaciones: this.observacionesRevaluar.trim()
+    }];
 
-    const estadoFacade = resultado === 'Aprobado' ? 'Aprobó' : 'No Aprobó';
-    this.facade.actualizarEstado(this.aprendiz().id, estadoFacade);
+    // Obtener la actividad asociada
+    const actividades = this.facade.actividades();
+    const actividad = actividades.find(a => a.nombre === this.aprendiz().actividad);
+    const actividadId = actividad ? actividad.id : 1; // Fallback
 
-    this.modoRevaluar.set(false);
-    this.resultadoRevaluar.set('');
-    this.observacionesRevaluar = '';
+    this.evaluacionService.evaluarAprendices(actividadId, payload).subscribe({
+      next: () => {
+        this.historialEvaluaciones.update(h => [...h, nuevoRegistro]);
+
+        const estadoFacade = resultado === 'Aprobado' ? 'Aprobó' : 'No Aprobó';
+        this.facade.actualizarEstado(this.aprendiz().id, estadoFacade);
+
+        this.modoRevaluar.set(false);
+        this.resultadoRevaluar.set('');
+        this.observacionesRevaluar = '';
+      },
+      error: (err) => {
+        console.error('Error al re-evaluar', err);
+      }
+    });
   }
 
   volver(): void {

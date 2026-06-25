@@ -136,11 +136,11 @@
   .icon-blue { color: var(--color-info); }
   .text-blue { color: var(--color-info); }
 
-  .icon-purple { color: #6f42c1; }
-  .text-purple { color: #6f42c1; }
+  .icon-purple { color: var(--color-kpi-blue); }
+  .text-purple { color: var(--color-kpi-blue); }
 
-  .icon-orange { color: #fd7e14; }
-  .text-orange { color: #fd7e14; }
+  .icon-orange { color: var(--color-kpi-orange); }
+  .text-orange { color: var(--color-kpi-orange); }
 
   .icon-gray { color: var(--color-text-secondary); }
   .text-gray { color: var(--color-text-secondary); }

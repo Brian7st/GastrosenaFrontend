@@ -10,80 +10,77 @@
   <!-- Filtros -->
   <div class="filters-container showcase__row" style="margin-bottom: var(--space-6);">
     <div style="flex: 1; min-width: 250px;">
-      <restaurant-search-filter 
-        label="Buscar comanda" 
-        placeholder="Buscar por mesa, mesero o plato..." 
-        [value]="searchTerm()" 
+      <restaurant-search-filter
+        label="Buscar comanda"
+        placeholder="Buscar por mesa, mesero o plato..."
+        [value]="searchTerm()"
         (valueChange)="searchTerm.set($event)"
       ></restaurant-search-filter>
     </div>
 
     <div style="min-width: 180px;">
-      <restaurant-select-filter 
-        label="Estado" 
-        [value]="filtroEstado()" 
-        [options]="opcionesEstado" 
+      <restaurant-select-filter
+        label="Estado"
+        [value]="filtroEstado()"
+        [options]="opcionesEstado"
         (valueChange)="filtroEstado.set($event)"
       ></restaurant-select-filter>
     </div>
 
-    <div style="min-width: 180px;">
-      <restaurant-select-filter 
-        label="Prioridad" 
-        [value]="filtroPrioridad()" 
-        [options]="opcionesPrioridad" 
-        (valueChange)="filtroPrioridad.set($event)"
-      ></restaurant-select-filter>
-    </div>
+
 
     <div style="min-width: 180px;">
-      <restaurant-select-filter 
-        label="Ordenar por" 
-        [value]="filtroOrden()" 
-        [options]="opcionesOrden" 
+      <restaurant-select-filter
+        label="Ordenar por"
+        [value]="filtroOrden()"
+        [options]="opcionesOrden"
         (valueChange)="filtroOrden.set($event)"
       ></restaurant-select-filter>
     </div>
   </div>
 
+  <!-- Tablero Kanban (3 columnas) -->
   <div class="comandas-grid kanban-board-container">
 
+    <!-- Columna: En Espera -->
     <div class="column col-espera kanban-column">
       <div class="col-header showcase__row" style="justify-content: space-between; margin-bottom: var(--space-4);">
         <h5 class="m-0 fw-bold">En Espera</h5>
         <span class="showcase__value">{{ enEspera().length }}</span>
       </div>
       @for (c of enEspera(); track c.idComanda) {
-      <restaurant-comanda-card class="comanda-card-wrapper shadow-sm" [comanda]="c"
-        (onIniciarPlato)="onIniciarPlato($event, c.idComanda)"
-        (onFinalizarPlato)="onFinalizarPlato($event, c.idComanda)">
-      </restaurant-comanda-card>
+        <restaurant-comanda-card class="comanda-card-wrapper shadow-sm" [comanda]="c"
+          (onIniciarPlato)="onIniciarPlato($event, c.idComanda)"
+          (onFinalizarPlato)="onFinalizarPlato($event, c.idComanda)">
+        </restaurant-comanda-card>
       }
     </div>
 
+    <!-- Columna: Preparando -->
     <div class="column col-preparando kanban-column">
       <div class="col-header showcase__row" style="justify-content: space-between; margin-bottom: var(--space-4);">
         <h5 class="m-0 fw-bold">Preparando</h5>
         <span class="showcase__value">{{ preparando().length }}</span>
       </div>
       @for (c of preparando(); track c.idComanda) {
-      <restaurant-comanda-card class="comanda-card-wrapper shadow-sm" [comanda]="c"
-        (onIniciarPlato)="onIniciarPlato($event, c.idComanda)"
-        (onFinalizarPlato)="onFinalizarPlato($event, c.idComanda)">
-      </restaurant-comanda-card>
+        <restaurant-comanda-card class="comanda-card-wrapper shadow-sm" [comanda]="c"
+          (onIniciarPlato)="onIniciarPlato($event, c.idComanda)"
+          (onFinalizarPlato)="onFinalizarPlato($event, c.idComanda)">
+        </restaurant-comanda-card>
       }
     </div>
 
+    <!-- Columna: Listo -->
     <div class="column col-listo kanban-column">
       <div class="col-header showcase__row" style="justify-content: space-between; margin-bottom: var(--space-4);">
         <h5 class="m-0 fw-bold">Listo</h5>
         <span class="showcase__value">{{ listos().length }}</span>
       </div>
       @for (c of listos(); track c.idComanda) {
-      <restaurant-comanda-card class="comanda-card-wrapper shadow-sm card-completed" [comanda]="c"
-        (onIniciarPlato)="onIniciarPlato($event, c.idComanda)"
-        (onFinalizarPlato)="onFinalizarPlato($event, c.idComanda)">
-      </restaurant-comanda-card>
+        <restaurant-comanda-card class="comanda-card-wrapper shadow-sm card-completed" [comanda]="c"
+          (onIniciarPlato)="onIniciarPlato($event, c.idComanda)"
+          (onFinalizarPlato)="onFinalizarPlato($event, c.idComanda)">
+        </restaurant-comanda-card>
       }
     </div>
 

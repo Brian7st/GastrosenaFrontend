@@ -24,6 +24,15 @@ export interface FichaDTO {
   programa?: string;
 }
 
+export interface AprendizDTO {
+  id: number;
+  nombreCompleto: string;
+  inicial: string;
+  ficha: string;
+  jornada: string;
+  inactivo?: boolean;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Gateway único de entrada — apunta al API Gateway en lugar de cada microservicio directamente */
@@ -63,5 +72,16 @@ export class FichaService {
   /** Obtiene todas las fichas desde el microservicio de usuarios vía el gateway */
   getAll(): Observable<FichaDTO[]> {
     return this.http.get<FichaDTO[]>(this.BASE);
+  }
+}
+
+@Injectable({ providedIn: 'root' })
+export class AprendizService {
+  private http = inject(HttpClient);
+  private readonly BASE = `${GATEWAY}/api/aprendices`;
+
+  /** Obtiene todos los aprendices desde el microservicio de usuarios vía el gateway */
+  getAll(): Observable<AprendizDTO[]> {
+    return this.http.get<AprendizDTO[]>(this.BASE);
   }
 }

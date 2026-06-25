@@ -11,6 +11,7 @@ import {
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Rol } from '@restaurant/shared/models';
 import { LucideIconComponent } from '@restaurant/shared/ui';
+import { I18nService } from '../../i18n/i18n.service';
 import { CrearUsuarioRequest, UsuarioDetalle } from '../../models/usuarios.model';
 
 @Component({
@@ -22,6 +23,7 @@ import { CrearUsuarioRequest, UsuarioDetalle } from '../../models/usuarios.model
   styleUrl:    './usuario-form.component.scss',
 })
 export class UsuarioFormComponent implements OnChanges {
+  protected readonly i18n = inject(I18nService);
   @Input() usuario: UsuarioDetalle | null = null;
   @Output() guardar = new EventEmitter<CrearUsuarioRequest>();
   @Output() cerrar  = new EventEmitter<void>();

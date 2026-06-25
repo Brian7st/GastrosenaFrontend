@@ -166,14 +166,11 @@ describe('GestionRecetaComponent', () => {
     beforeEach(() => {
       fixture.detectChanges();
       
-      // Espiar la emisión del evento closeManage
-      jest.spyOn(component.closeManage, 'emit');
-      // Mockear window.alert para evitar que salte popup real en los tests
+      jest.spyOn(component.close, 'emit');
       jest.spyOn(window, 'alert').mockImplementation(() => {});
     });
 
     it('debería llamar a guardarRecetaCompleta si no se está editando (receta es null)', () => {
-      // Rellenar formulario con datos válidos
       component.recipeForm.get('nombreReceta')?.setValue('Nuevo Cóctel');
       component.recipeForm.get('idCategoria')?.setValue('1');
       component.recipeForm.get('tiempoPreparacion')?.setValue(10);
@@ -192,31 +189,27 @@ describe('GestionRecetaComponent', () => {
 
       component.guardar();
 
-      // Verificar que se llamó al servicio de guardar de ts-mockito
       verify(mockRecetaService.guardarRecetaCompleta(anything())).once();
-      expect(component.closeManage.emit).toHaveBeenCalledWith(true);
+      expect(component.close.emit).toHaveBeenCalledWith(true);
     });
 
     it('debería llamar a actualizarRecetaCompleta si se está editando una receta existente', () => {
       component.receta = mockReceta;
-      component.ngOnInit(); // Recargar datos de edición
+      component.ngOnInit();
 
       expect(component.recipeForm.valid).toBe(true);
 
       component.guardar();
 
-      // Verificar que se llamó al servicio de actualizar
       verify(mockRecetaService.actualizarRecetaCompleta('RB-100', anything())).once();
-      expect(component.closeManage.emit).toHaveBeenCalledWith(true);
+      expect(component.close.emit).toHaveBeenCalledWith(true);
     });
 
     it('debería manejar errores del backend al guardar', () => {
-      // Re-mockear la llamada para que devuelva un error
       when(mockRecetaService.guardarRecetaCompleta(anything())).thenReturn(throwError(() => ({
         error: { mensaje: 'Error simulado de base de datos' }
       })));
 
-      // Rellenar formulario
       component.recipeForm.get('nombreReceta')?.setValue('Nuevo Cóctel');
       component.recipeForm.get('idCategoria')?.setValue('1');
       component.recipeForm.get('tiempoPreparacion')?.setValue(10);
@@ -231,15 +224,15 @@ describe('GestionRecetaComponent', () => {
 
       verify(mockRecetaService.guardarRecetaCompleta(anything())).once();
       expect(component.isSaving).toBe(false);
-      expect(component.closeManage.emit).not.toHaveBeenCalled();
+      expect(component.close.emit).not.toHaveBeenCalled();
     });
   });
 
   describe('Acciones de Cancelar', () => {
     it('debería emitir close con false al llamar a cancelar()', () => {
-      jest.spyOn(component.closeManage, 'emit');
+      jest.spyOn(component.close, 'emit');
       component.cancelar();
-      expect(component.closeManage.emit).toHaveBeenCalledWith(false);
+      expect(component.close.emit).toHaveBeenCalledWith(false);
     });
   });
 });

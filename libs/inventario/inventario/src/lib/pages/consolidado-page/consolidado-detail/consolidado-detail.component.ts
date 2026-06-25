@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal, OnInit } from '@angular/core';
+// Note: subtotalesPorTipo removed — old fields (tipo/cantidad/referencia) no longer in backend response.
 import { CurrencyPipe } from '@angular/common';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { ButtonComponent, DataTableComponent, KpiCardComponent } from '@restaurant/shared/ui';
@@ -24,25 +25,26 @@ export class ConsolidadoDetailComponent implements OnInit {
   consolidado = this.facade.consolidadoSeleccionado;
   loading     = this.facade.loading;
 
-  // ── Subtotales agrupados por tipo de línea ────────────────────────────────
-  subtotalesPorTipo = computed(() => {
-    const lineas = this.consolidado()?.lineas ?? [];
-    const grupos: Record<string, { tipo: string; cantidad: number; valor: number }> = {};
-    for (const l of lineas) {
-      if (!grupos[l.tipo]) grupos[l.tipo] = { tipo: l.tipo, cantidad: 0, valor: 0 };
-      grupos[l.tipo].cantidad += l.cantidad;
-      grupos[l.tipo].valor    += l.valor;
-    }
-    return Object.values(grupos);
-  });
+  /** Totales derivados de las líneas reales (monto y retencionZese por GIL). */
+  totalMonto = computed(() =>
+    this.consolidado()?.lineas.reduce((acc, l) => acc + l.monto, 0) ?? 0,
+  );
+  totalRetencion = computed(() =>
+    this.consolidado()?.lineas.reduce((acc, l) => acc + l.retencionZese, 0) ?? 0,
+  );
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (!id) {
+    const numeroStr = this.route.snapshot.paramMap.get('id');
+    if (!numeroStr) {
       this.router.navigate(['/app/inventario/consolidado']);
       return;
     }
-    this.facade.cargarConsolidado(id);
+    const numero = Number(numeroStr);
+    if (isNaN(numero)) {
+      this.router.navigate(['/app/inventario/consolidado']);
+      return;
+    }
+    this.facade.cargarConsolidadoPorNumero(numero);
   }
 
   showExportModal   = signal(false);
@@ -53,10 +55,6 @@ export class ConsolidadoDetailComponent implements OnInit {
     this.router.navigate(['/app/inventario/consolidado']);
   }
 
-  goToGilDetail(codigo: string): void {
-    this.router.navigate(['/app/inventario/solicitudes-gil', codigo]);
-  }
-
   openExportModal(): void {
     this.showExportModal.set(true);
   }
@@ -65,14 +63,13 @@ export class ConsolidadoDetailComponent implements OnInit {
     this.showExportModal.set(false);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onExport(_format: 'excel' | 'pdf'): void {
-    // Exportación real pendiente de integración HTTP
+  onExport(format: 'excel' | 'pdf'): void {
+    this.facade.exportarReporte(format);
     this.showExportModal.set(false);
   }
 
   openReversarModal(): void {
-    this.isReversarBlocked.set(false);
+    this.isReversarBlocked.set(this.consolidado()?.estado === 'REVERSADO');
     this.showReversarModal.set(true);
   }
 
@@ -81,8 +78,8 @@ export class ConsolidadoDetailComponent implements OnInit {
   }
 
   confirmReversar(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) this.facade.reversarConsolidado(id);
+    const numero = this.consolidado()?.numero;
+    if (numero !== undefined) this.facade.reversarConsolidado(numero);
     this.closeReversarModal();
   }
 }

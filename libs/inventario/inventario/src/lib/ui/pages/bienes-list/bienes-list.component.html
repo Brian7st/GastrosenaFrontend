@@ -7,7 +7,7 @@
   <div class="header-actions">
     <restaurant-button variant="surface" (click)="onImportBienes()">
       <span class="material-symbols-outlined">file_upload</span>
-      Importar
+      Cargar datos internos
     </restaurant-button>
     <restaurant-button variant="surface" (click)="onExportBienes()">
       <span class="material-symbols-outlined">file_download</span>
@@ -54,56 +54,101 @@
 </div>
 }
 
+<!-- Toggle de vistas: Bienes / Contratos -->
+<div class="vista-toggle" role="group" aria-label="Seleccionar vista">
+  <button
+    class="vista-toggle__btn"
+    [class.vista-toggle__btn--active]="vista() === 'bienes'"
+    (click)="cambiarVista('bienes')"
+    type="button">
+    <span class="material-symbols-outlined">inventory_2</span>
+    Bienes
+  </button>
+  <button
+    class="vista-toggle__btn"
+    [class.vista-toggle__btn--active]="vista() === 'contratos'"
+    (click)="cambiarVista('contratos')"
+    type="button">
+    <span class="material-symbols-outlined">description</span>
+    Contratos
+  </button>
+</div>
+
+<!-- ── Vista: Bienes ──────────────────────────────────────────────────────── -->
+@if (vista() === 'bienes') {
 <!-- Dashboard Card Container (Tabla) -->
-<div class="card-container">
-  <!-- Table Controls -->
-  <div class="table-controls">
-    <div class="table-controls__title">
-      <span class="material-symbols-outlined filled text-primary">list_alt</span>
-      <h3>Lista de Bienes</h3>
-    </div>
-    <div class="table-controls__actions">
-      <div class="search-box">
-        <span class="material-symbols-outlined search-icon">search</span>
-        <input #searchInput type="text" placeholder="Buscar por código o nombre..." (input)="onSearch(searchInput.value)" />
+<restaurant-data-table
+  tableTitle="Lista de Bienes"
+  tableIcon="package"
+  searchPlaceholder="Buscar por código o nombre..."
+  [showFilterButton]="true"
+  [filterActive]="showFilters()"
+  [filterCount]="filtrosActivos()"
+  (searchChange)="onSearch($event)"
+  (filterToggle)="onToggleFilters()"
+>
+
+  <!-- Panel de filtros colapsable (slot [dtHeader]) -->
+  @if (showFilters()) {
+    <div dtHeader class="filter-panel">
+      <div class="filter-panel__row">
+        <div class="filter-group">
+          <label class="filter-label">Categoría</label>
+          <select class="filter-select" [value]="filtroCategoria()" (change)="onFiltroCategoria($any($event.target).value)">
+            <option value="">Todas</option>
+            @for (cat of CATEGORIAS; track cat) {
+              <option [value]="cat">{{ cat }}</option>
+            }
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Estado</label>
+          <select class="filter-select" [value]="filtroEstado()" (change)="onFiltroEstado($any($event.target).value)">
+            <option value="">Todos</option>
+            <option value="Activo">Activo</option>
+            <option value="Inactivo">Inactivo</option>
+          </select>
+        </div>
+        <div class="filter-group filter-group--actions">
+          <button class="filter-clear-btn" (click)="onLimpiarFiltros()" [disabled]="filtrosActivos() === 0">
+            <span class="material-symbols-outlined">clear_all</span>
+            Limpiar
+          </button>
+        </div>
       </div>
-      <restaurant-button variant="filter" (click)="showFilters.set(!showFilters())">
-        <span class="material-symbols-outlined">filter_list</span>
-        Filtros
-      </restaurant-button>
     </div>
-  </div>
+  }
 
-  <!-- Data Table -->
-  @if (!loading()) {
+  <!-- Cabecera de tabla -->
+  <thead>
+    <tr>
+      <th>CÓD. SENA</th>
+      <th>Descripción</th>
+      <th class="text-center">Stock</th>
+      <th class="text-center">Stock Mín.</th>
+      <th class="text-center">UM</th>
+      <th>Valor</th>
+      <th>Estado</th>
+      <th class="text-center">Acciones</th>
+    </tr>
+  </thead>
 
-    <div class="table-scroll">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>CÓD. SENA</th>
-            <th>Nombre</th>
-            <th>Categoría</th>
-            <th class="text-center">Stock</th>
-            <th class="text-center">Stock Mín.</th>
-            <th class="text-center">UM</th>
-            <th>Valor</th>
-            <th>Estado</th>
-            <th class="text-center">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (bien of bienes(); track bien) {
+  <!-- Filas de datos -->
+  <tbody>
+    @if (loading()) {
+      <tr>
+        <td colspan="8">
+          <restaurant-loading-skeleton [rows]="5" [columns]="8"></restaurant-loading-skeleton>
+        </td>
+      </tr>
+    } @else {
+      @for (bien of bienes(); track bien) {
 <tr class="table-row">
             <td>
               <span class="code-mono">{{ bien.codigoSena }}</span>
             </td>
             <td>
-              <p class="bien-nombre">{{ bien.nombre }}</p>
               <p class="bien-desc">{{ bien.descripcion }}</p>
-            </td>
-            <td>
-              <span class="category-pill" [ngClass]="'category-pill--' + bien.categoriaColor">{{ bien.categoria }}</span>
             </td>
             <td class="text-center">
               <span class="stock-value" [class.stock-value--danger]="bien.stockActual < bien.stockMinimo">{{ bien.stockActual }}</span>
@@ -141,59 +186,148 @@
                     <span class="material-symbols-outlined">toggle_on</span>
                   </button>
                 }
-                <button class="action-icon action-icon--danger" (click)="onEliminar(bien)" title="Eliminar">
-                  <span class="material-symbols-outlined">delete</span>
-                </button>
               </div>
             </td>
           </tr>
 } @empty {
           <tr>
-            <td colspan="9" class="empty-state">
-              <span class="material-symbols-outlined empty-state__icon">inventory_2</span>
-              <p class="empty-state__title">Sin bienes registrados</p>
-              <p class="empty-state__message">No se encontraron bienes con los filtros aplicados.</p>
+            <td colspan="8">
+              <inventario-empty-state
+                icon="inventory_2"
+                title="Sin bienes registrados"
+                message="No se encontraron bienes con los filtros aplicados."
+              />
             </td>
           </tr>
 }
-        </tbody>
-      </table>
-    </div>
+    }
+  </tbody>
 
-    <!-- Pagination Footer -->
-    <div class="pagination-footer">
-      <p class="pagination-info">
-        MOSTRANDO {{ bienes().length }} DE {{ paginacion().totalElements }} BIENES
-      </p>
-      <div class="pagination-controls">
-        <button class="page-btn"
-          [disabled]="paginacion().page === 0"
-          (click)="onIrAPagina(paginacion().page - 1)">
-          <span class="material-symbols-outlined">chevron_left</span>
+  <!-- Paginación (slot [dtFooter]) -->
+  <div dtFooter class="dt-footer">
+    <p class="dt-page-info">
+      Mostrando {{ bienes().length }} de {{ paginacion().totalElements }} bienes
+    </p>
+    <div class="dt-pagination">
+      <button class="dt-page-btn"
+        [disabled]="paginacion().page === 0"
+        (click)="onIrAPagina(paginacion().page - 1)">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      @for (p of paginas(); track p) {
+        <button class="dt-page-btn"
+          [class.dt-page-btn--active]="p === paginacion().page"
+          (click)="onIrAPagina(p)">
+          {{ p + 1 }}
         </button>
-        @for (p of paginas(); track p) {
-          <button class="page-btn"
-            [class.page-btn--active]="p === paginacion().page"
-            (click)="onIrAPagina(p)">
-            {{ p + 1 }}
-          </button>
-        }
-        <button class="page-btn"
-          [disabled]="paginacion().page >= paginacion().totalPages - 1"
-          (click)="onIrAPagina(paginacion().page + 1)">
-          <span class="material-symbols-outlined">chevron_right</span>
-        </button>
-      </div>
+      }
+      <button class="dt-page-btn"
+        [disabled]="paginacion().page >= paginacion().totalPages - 1"
+        (click)="onIrAPagina(paginacion().page + 1)">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
     </div>
-  
-} @else {
+  </div>
 
-    <restaurant-loading-skeleton [rows]="5" [columns]="10"></restaurant-loading-skeleton>
-  
+</restaurant-data-table>
 }
 
-  
+<!-- ── Vista: Contratos ───────────────────────────────────────────────────── -->
+@if (vista() === 'contratos') {
+<div class="contratos-toolbar">
+  <restaurant-button variant="primary" (click)="onAbrirImportarContrato()">
+    <span class="material-symbols-outlined">file_upload</span>
+    Importar contrato
+  </restaurant-button>
 </div>
+
+@if (ultimaImportacion(); as imp) {
+<div class="import-result">
+  <span class="material-symbols-outlined">check_circle</span>
+  Contrato importado: {{ imp.productosCreados }} bienes creados, {{ imp.productosActualizados }} actualizados.
+</div>
+}
+
+@if (feedbackCierre(); as feedback) {
+<div class="import-result import-result--cierre">
+  <span class="material-symbols-outlined">lock</span>
+  Contrato cerrado: {{ feedback }}.
+</div>
+}
+
+<restaurant-data-table
+  class="tabla-contratos"
+  tableTitle="Contratos de adjudicación"
+  tableIcon="file-text"
+  [showFilterButton]="false"
+>
+  <thead>
+    <tr>
+      <th>N.º Contrato</th>
+      <th>Descripción</th>
+      <th class="text-center">Vigencia</th>
+      <th class="text-center">Ítems</th>
+      <th>Estado</th>
+      <th class="text-center">Acciones</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    @if (loadingContratos()) {
+      <tr>
+        <td colspan="6">
+          <restaurant-loading-skeleton [rows]="5" [columns]="6"></restaurant-loading-skeleton>
+        </td>
+      </tr>
+    } @else {
+      @for (contrato of contratos(); track contrato.id) {
+        <tr class="table-row">
+          <td>
+            <span class="code-mono">{{ contrato.numero }}</span>
+          </td>
+          <td>
+            <p class="bien-desc">{{ contrato.descripcion }}</p>
+          </td>
+          <td class="text-center">
+            <span class="um-value">{{ contrato.vigencia }}</span>
+          </td>
+          <td class="text-center">
+            <span class="stock-value">{{ contrato.items.length }}</span>
+          </td>
+          <td>
+            <span class="estado-badge" [ngClass]="getEstadoContratoBadgeClass(contrato.estado)">
+              <span class="estado-dot"></span>
+              {{ contrato.estado }}
+            </span>
+          </td>
+          <td class="text-center">
+            <div class="actions-row">
+              <button class="action-icon" (click)="onVerDetalleContrato(contrato.id)" title="Ver detalle">
+                <span class="material-symbols-outlined">visibility</span>
+              </button>
+              @if (contrato.estado === 'VIGENTE') {
+                <button class="action-icon action-icon--warning" (click)="onCerrarContrato(contrato.id)" title="Cerrar contrato">
+                  <span class="material-symbols-outlined">lock</span>
+                </button>
+              }
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="6">
+            <inventario-empty-state
+              icon="description"
+              title="Sin contratos registrados"
+              message="Importá un contrato para cargar precios adjudicados y crear bienes automáticamente."
+            />
+          </td>
+        </tr>
+      }
+    }
+  </tbody>
+</restaurant-data-table>
+}
 
 <!-- Modales -->
 @if (showFormModal()) {
@@ -206,19 +340,31 @@
 ></restaurant-bien-form>
 }
 
-@if (showDeleteModal() && selectedBien()) {
-<restaurant-bien-delete-modal
- 
-  [bien]="selectedBien()!"
-  (cancel)="showDeleteModal.set(false)"
-  (confirm)="confirmarEliminacion()"
-></restaurant-bien-delete-modal>
-}
-
 @if (showImportModal()) {
 <restaurant-bien-import
- 
+
   (cancelar)="showImportModal.set(false)"
   (importar)="onProcessImport($event)"
 ></restaurant-bien-import>
+}
+
+@if (showImportContratoModal()) {
+<restaurant-contrato-import
+  (cancelar)="showImportContratoModal.set(false)"
+  (importar)="onImportarContrato($event)"
+></restaurant-contrato-import>
+}
+
+<restaurant-confirmar-cierre-contrato-modal
+  [isOpen]="showCierreContratoModal()"
+  (confirmed)="onConfirmarCierre()"
+  (cancelled)="onCancelarCierre()"
+/>
+
+@if (showDetalleContratoModal()) {
+<restaurant-contrato-detalle
+  [contrato]="contratosFacade.contratoSeleccionado()"
+  [loading]="contratosFacade.loading()"
+  (cerrar)="showDetalleContratoModal.set(false)"
+></restaurant-contrato-detalle>
 }

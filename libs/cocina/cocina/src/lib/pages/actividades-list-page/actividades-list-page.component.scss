@@ -25,7 +25,7 @@
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 0.75rem;
-  background: #e7e8e9;
+  background: var(--color-surface-tertiary);
   border: none;
   color: var(--color-text-primary, #1e293b);
   cursor: pointer;
@@ -33,7 +33,7 @@
   flex-shrink: 0;
   margin-top: 0.125rem;
 
-  &:hover { background: #e1e3e4; }
+  &:hover { background: var(--color-surface-tertiary); }
 }
 
 .header-info {
@@ -65,7 +65,7 @@
 
 // ─── Card de actividad ───────────────────────
 .actividad-card {
-  background: white;
+  background: var(--color-surface-primary);
   border: 1px solid var(--color-border, #e2e8f0);
   border-radius: var(--radius-lg, 14px);
   padding: var(--space-4, 1.2rem) var(--space-5, 1.5rem);
@@ -127,7 +127,7 @@
 }
 
 .estado-pendiente {
-  color: #b45309;
+  color: var(--color-warning-interactive);
   background: color-mix(in srgb, var(--color-warning, #f59e0b) 12%, white);
 }
 

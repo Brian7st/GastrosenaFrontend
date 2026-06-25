@@ -63,13 +63,16 @@
 
         <div class="form-group">
           <label class="form-label">Programa de Formación <span class="required-mark">*</span></label>
-          <input
-            type="text"
+          <select
             class="form-control"
-            placeholder="Ej. GASTRONOMÍA"
             [value]="programaId()"
-            (input)="programaId.set($any($event.target).value)"
-          />
+            (change)="programaId.set($any($event.target).value)"
+          >
+            <option value="" disabled>Seleccione un programa…</option>
+            @for (programa of programas(); track programa.codigo) {
+              <option [value]="programa.codigo">{{ programa.nombre }}</option>
+            }
+          </select>
           @if (submitAttempted() && errores()['programaId']) {
             <p class="field-error">{{ errores()['programaId'] }}</p>
           }
@@ -124,6 +127,13 @@
         <span class="material-symbols-outlined">add</span>
         Agregar desde catálogo
       </restaurant-button>
+    </div>
+
+    <!-- Cascada VLOOKUP: tipear código almacén/descripción autollena la fila desde el catálogo -->
+    <div class="contrato-typeahead-row">
+      <restaurant-bien-typeahead
+        (seleccionar)="onSeleccionarBien($event)"
+      ></restaurant-bien-typeahead>
     </div>
 
     @if (submitAttempted() && errores()['items']) {
@@ -240,8 +250,8 @@
   <div class="actions-footer">
     <restaurant-button variant="ghost" (click)="onCancel()">Cancelar</restaurant-button>
     <restaurant-button variant="primary" (click)="onSave()" [disabled]="facade.loading()">
-      {{ facade.loading() ? 'Enviando...' : 'Enviar solicitud' }}
-      <span class="material-symbols-outlined right-icon">arrow_forward</span>
+      {{ facade.loading() ? (isEdit() ? 'Guardando...' : 'Enviando...') : (isEdit() ? 'Guardar cambios' : 'Enviar solicitud') }}
+      <span class="material-symbols-outlined right-icon">{{ isEdit() ? 'save' : 'arrow_forward' }}</span>
     </restaurant-button>
   </div>
 
@@ -298,15 +308,14 @@
                 <tr>
                   <td class="catalog-code">{{ bien.codigoSena }}</td>
                   <td>
-                    <p class="item-name" style="margin:0">{{ bien.nombre }}</p>
-                    <p class="item-code" style="margin:0">{{ bien.descripcion }}</p>
+                    <p class="item-name" style="margin:0">{{ bien.descripcion }}</p>
                   </td>
                   <td class="catalog-unit">{{ bien.unidadMedida }}</td>
                   <td class="text-right catalog-price">
                     {{ (bien.valor ?? 0) | currency:'COP':'symbol-narrow':'1.0-0' }}
                   </td>
                   <td class="text-center">
-                    @if (estaEnLista(bien.id)) {
+                    @if (addedCodigosSena().includes(bien.codigoSena ?? '')) {
                       <span class="catalog-added-label">
                         <span class="material-symbols-outlined" style="font-size:14px">check</span>
                         Agregado

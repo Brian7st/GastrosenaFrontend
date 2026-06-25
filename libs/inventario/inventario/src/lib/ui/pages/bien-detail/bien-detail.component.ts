@@ -1,17 +1,18 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { MovimientoBien } from '../../../models/inventario.model';
+import { ActivatedRoute, Router } from '@angular/router';
+import { BienFormDto, EstadoBien } from '../../../models/inventario.model';
+import { Movimiento } from '../../../models/movimiento.model';
+import { MovimientosService } from '../../../data-access/services/movimientos.service';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { ButtonComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
 import { BienFormComponent } from '../../../ui/modals/bien-form/bien-form.component';
-import { BienFormDto, EstadoBien } from '../../../models/inventario.model';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 
 @Component({
   selector: 'restaurant-bien-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, BienFormComponent, BackButtonComponent, StatusBadgeComponent, ButtonComponent],
+  imports: [CommonModule, BienFormComponent, BackButtonComponent, StatusBadgeComponent, ButtonComponent],
   templateUrl: './bien-detail.component.html',
   styleUrl: './bien-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,34 +21,33 @@ export class BienDetailPageComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private facade = inject(InventarioFacade);
+  private movimientosService = inject(MovimientosService);
 
   bien = this.facade.bienSeleccionado;
   loading = this.facade.loading;
-  movimientos = signal<MovimientoBien[]>([]);
+  movimientos = signal<Movimiento[]>([]);
   showEditModal = signal(false);
-  mostrarTodasFacturas = signal(false);
 
-  readonly FACTURAS_PREVIEW_COUNT = 3;
+  private codigoCargado: string | null = null;
 
-  toggleFacturas(): void {
-    this.mostrarTodasFacturas.update(v => !v);
+  constructor() {
+    // Cuando el bien queda cargado, traemos su kardex (entradas, salidas y ajustes)
+    // por codigoSena — el productoId canónico del sistema.
+    effect(() => {
+      const codigo = this.bien()?.codigoSena;
+      if (codigo && codigo !== this.codigoCargado) {
+        this.codigoCargado = codigo;
+        this.movimientosService.getKardex(codigo, 0, 50).subscribe({
+          next: r => this.movimientos.set(r.movimientos),
+          error: () => this.movimientos.set([]),
+        });
+      }
+    });
   }
-
-  espec = computed(() => {
-    const b = this.bien();
-    return b?.especificaciones ? Object.entries(b.especificaciones) : [];
-  });
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.loadData(id);
-    }
-  }
-
-  private loadData(id: string): void {
-    this.facade.cargarBienPorId(id);
-    this.movimientos.set([]);
+    if (id) this.facade.cargarBienPorId(id);
   }
 
   onVolver(): void {
@@ -65,41 +65,34 @@ export class BienDetailPageComponent implements OnInit {
     this.showEditModal.set(false);
   }
 
-  onExportarHistorial(): void {
-    this.router.navigate(['/app/inventario/bienes/exportar']);
+  /** Un movimiento resta stock si es salida, liberación o ajuste negativo. */
+  private esNegativo(tipo: string): boolean {
+    return tipo === 'SALIDA' || tipo === 'LIBERACION' || tipo === 'AJUSTE_NEGATIVO';
   }
 
-  getTipoClass(tipo: string): string {
-    const map: Record<string, string> = { 'ENTRADA': 'entrada', 'SALIDA': 'salida', 'TRASLADO': 'traslado' };
-    return map[tipo] ?? '';
+  getCantidadPrefix(m: Movimiento): string {
+    return this.esNegativo(m.tipo) ? `-${m.cantidad}` : `+${m.cantidad}`;
   }
 
-
-  getCantidadPrefix(cantidad: number): string {
-    if (cantidad > 0) return `+${cantidad}`;
-    if (cantidad < 0) return `${cantidad}`;
-    return '0';
+  getCantidadClass(m: Movimiento): string {
+    return this.esNegativo(m.tipo) ? 'cantidad--negativa' : 'cantidad--positiva';
   }
 
-  getCantidadClass(cantidad: number): string {
-    if (cantidad > 0) return 'cantidad--positiva';
-    if (cantidad < 0) return 'cantidad--negativa';
-    return '';
+  getSigno(m: Movimiento): string {
+    return this.esNegativo(m.tipo) ? '-' : '+';
   }
 
-  getEstadoFacturaClass(estado: string): string {
-    const map: Record<string, string> = { 'PAGADA': 'factura-estado--pagada', 'CAUSADA': 'factura-estado--causada', 'PENDIENTE': 'factura-estado--pendiente' };
-    return map[estado] ?? '';
-  }
-
-  getEstadoPillClass(estado: EstadoBien): string {
-    const map: Record<EstadoBien, string> = {
-      'Activo': 'estado-pill--activo',
-      'Bajo Stock': 'estado-pill--bajo',
-      'Agotado': 'estado-pill--agotado',
-      'Inactivo': 'estado-pill--inactivo'
+  getTipoLabel(tipo: string): string {
+    const map: Record<string, string> = {
+      ENTRADA: 'Entrada',
+      SALIDA: 'Salida',
+      RESERVA: 'Reserva',
+      LIBERACION: 'Liberación',
+      AJUSTE: 'Ajuste',
+      AJUSTE_POSITIVO: 'Ajuste (+)',
+      AJUSTE_NEGATIVO: 'Ajuste (−)',
     };
-    return map[estado] || '';
+    return map[tipo] ?? tipo;
   }
 
   // ── StatusBadge helpers ─────────────────────────────────────────────────────
@@ -114,12 +107,10 @@ export class BienDetailPageComponent implements OnInit {
   }
 
   getTipoVariant(tipo: string): 'success' | 'danger' | 'warning' | 'neutral' {
-    const map: Record<string, 'success' | 'danger' | 'warning' | 'neutral'> = {
-      'ENTRADA':  'success',
-      'SALIDA':   'danger',
-      'TRASLADO': 'warning',
-    };
-    return map[tipo] ?? 'neutral';
+    if (tipo === 'ENTRADA' || tipo === 'AJUSTE_POSITIVO') return 'success';
+    if (tipo === 'SALIDA' || tipo === 'AJUSTE_NEGATIVO' || tipo === 'LIBERACION') return 'danger';
+    if (tipo === 'RESERVA') return 'warning';
+    return 'neutral';
   }
 
   getFacturaEstadoVariant(estado: string): 'success' | 'warning' | 'neutral' {

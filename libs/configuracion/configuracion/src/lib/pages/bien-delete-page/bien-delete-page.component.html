@@ -1,0 +1,169 @@
+<div class="bien-delete-page">
+
+  @if (showResultado() && resultado()) {
+    <div class="bien-delete-page__toast bien-delete-page__toast--success" role="status" aria-live="polite">
+      <lucide-icon name="check-circle" [size]="16"></lucide-icon>
+      <strong>{{ resultado()!.borrados }}</strong> borrado{{ resultado()!.borrados !== 1 ? 's' : '' }},
+      <strong>{{ resultado()!.omitidos }}</strong> omitido{{ resultado()!.omitidos !== 1 ? 's' : '' }}
+    </div>
+  }
+
+  @if (error()) {
+    <div class="bien-delete-page__toast bien-delete-page__toast--error" role="alert" aria-live="assertive">
+      <lucide-icon name="alert-circle" [size]="16"></lucide-icon>
+      {{ error() }}
+    </div>
+  }
+
+  <div class="bien-delete-page__header">
+    <div class="bien-delete-page__header-text">
+      <h1 class="bien-delete-page__title">Limpieza de Bienes Desactivados</h1>
+      <p class="bien-delete-page__subtitle">
+        Eliminá físicamente todos los bienes desactivados que no tienen movimientos asociados.
+        El servidor determina la elegibilidad — los omitidos se reportan con su motivo.
+      </p>
+    </div>
+    <button
+      class="bien-delete-page__btn bien-delete-page__btn--danger"
+      type="button"
+      [disabled]="loading() || bienes().length === 0"
+      (click)="onOpenConfirm()"
+    >
+      <lucide-icon name="trash-2" [size]="16"></lucide-icon>
+      Limpiar desactivados
+    </button>
+  </div>
+
+  <!-- Filtro -->
+  <div class="bien-delete-page__filters">
+    <div class="bien-delete-page__search-wrapper">
+      <lucide-icon name="search" [size]="16" class="bien-delete-page__search-icon"></lucide-icon>
+      <input
+        class="bien-delete-page__search-input"
+        type="text"
+        placeholder="Buscar por descripción o código SENA..."
+        [value]="busqueda()"
+        (input)="busqueda.set($any($event.target).value)"
+      >
+    </div>
+  </div>
+
+  <!-- Resultado de limpieza con omitidos -->
+  @if (showResultado() && resultado() && motivosOmision().length > 0) {
+    <div class="bien-delete-page__omitidos-panel">
+      <div class="bien-delete-page__omitidos-header">
+        <lucide-icon name="alert-triangle" [size]="16"></lucide-icon>
+        <strong>{{ motivosOmision().length }} bien{{ motivosOmision().length !== 1 ? 'es' : '' }} no pudieron eliminarse</strong>
+      </div>
+      <ul class="bien-delete-page__omitidos-list">
+        @for (motivo of motivosOmision(); track motivo.productoId) {
+          <li class="bien-delete-page__omitido-item">
+            <span class="bien-delete-page__omitido-desc">{{ motivo.descripcion }}</span>
+            @if (motivo.codigoSena) {
+              <span class="bien-delete-page__category-badge">{{ motivo.codigoSena }}</span>
+            }
+            <span class="bien-delete-page__omitido-motivo">{{ motivo.motivo }}</span>
+          </li>
+        }
+      </ul>
+    </div>
+  }
+
+  <!-- Tabla de bienes inactivos -->
+  <div class="bien-delete-page__table-wrapper">
+    @if (loading()) {
+      <div class="bien-delete-page__empty">
+        <lucide-icon name="loader-2" [size]="20"></lucide-icon>
+        Cargando bienes desactivados...
+      </div>
+    } @else {
+      <table class="bien-delete-page__table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Descripción</th>
+            <th>Código SENA</th>
+            <th>Estado</th>
+            <th>Fecha registro</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (bienesFiltrados().length === 0) {
+            <tr>
+              <td colspan="5" class="bien-delete-page__empty">
+                <lucide-icon name="package-x" [size]="20"></lucide-icon>
+                No hay bienes desactivados
+              </td>
+            </tr>
+          } @else {
+            @for (bien of bienesFiltrados(); track bien.id) {
+              <tr class="bien-delete-page__row">
+                <td class="bien-delete-page__id">{{ bien.id }}</td>
+                <td class="bien-delete-page__name">{{ bien.descripcion }}</td>
+                <td>
+                  @if (bien.codigoSena) {
+                    <span class="bien-delete-page__category-badge">{{ bien.codigoSena }}</span>
+                  } @else {
+                    <span class="bien-delete-page__empty-cell">—</span>
+                  }
+                </td>
+                <td>
+                  <span class="bien-delete-page__badge bien-delete-page__badge--inactivo">
+                    Inactivo
+                  </span>
+                </td>
+                <td class="bien-delete-page__date">{{ bien.fechaRegistro | date:'dd/MM/yyyy' }}</td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+
+  <!-- Modal de confirmación -->
+  @if (showConfirm()) {
+    <div class="bien-delete-page__overlay" (click)="onCancelDelete()">
+      <div class="bien-delete-page__modal" (click)="$event.stopPropagation()">
+        <div class="bien-delete-page__modal-header">
+          <div class="bien-delete-page__modal-icon-wrapper">
+            <lucide-icon name="alert-triangle" [size]="24"></lucide-icon>
+          </div>
+          <h2 class="bien-delete-page__modal-title">Confirmar limpieza</h2>
+        </div>
+        <p class="bien-delete-page__modal-text">
+          Se eliminarán físicamente <strong>todos los bienes desactivados</strong> que no tengan movimientos asociados.
+          Esta acción no se puede deshacer.
+        </p>
+        <div class="bien-delete-page__field">
+          <label class="bien-delete-page__label" for="confirmacion-input">
+            Escribí <strong>LIMPIAR</strong> para confirmar
+          </label>
+          <input
+            id="confirmacion-input"
+            class="bien-delete-page__input"
+            type="text"
+            placeholder="LIMPIAR"
+            [value]="confirmacionInput()"
+            (input)="confirmacionInput.set($any($event.target).value)"
+          >
+        </div>
+        <div class="bien-delete-page__modal-actions">
+          <button class="bien-delete-page__btn bien-delete-page__btn--ghost" type="button" (click)="onCancelDelete()">
+            Cancelar
+          </button>
+          <button
+            class="bien-delete-page__btn bien-delete-page__btn--danger"
+            type="button"
+            [disabled]="!confirmacionValida()"
+            (click)="onConfirmDelete()"
+          >
+            <lucide-icon name="trash-2" [size]="16"></lucide-icon>
+            Ejecutar limpieza
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, computed, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -28,13 +28,18 @@ import {
   styleUrls: ['./historial-instructor-page.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HistorialInstructorPageComponent {
+export class HistorialInstructorPageComponent implements OnInit {
   public facade = inject(RestauranteFacade);
   
   public todasLasOrdenes = this.facade.ordenesHistorial;
   public meseroFiltrado = signal<string>('');
   public terminoBusqueda = signal<string>('');
+  public filtroEstado = signal<string>('TODAS');
   public isDropdownOpen = signal<boolean>(false);
+
+  ngOnInit() {
+    this.facade.cargarTodasLasOrdenes();
+  }
 
   public meserosUnicos = computed(() => {
     const ordenes = this.todasLasOrdenes();
@@ -58,6 +63,12 @@ export class HistorialInstructorPageComponent {
     return ordenes;
   });
 
+  public ordenesListo = computed(() => this.ordenes().filter(o => o.estado === 'LISTO_PARA_SERVIR'));
+  public ordenesPreparacion = computed(() => this.ordenes().filter(o => o.estado === 'EN_PREPARACION'));
+  public ordenesEnviado = computed(() => this.ordenes().filter(o => o.estado === 'ENVIADO_COCINA'));
+  public ordenesBorrador = computed(() => this.ordenes().filter(o => o.estado === 'BORRADOR'));
+  public ordenesOtras = computed(() => this.ordenes().filter(o => ['ENTREGADO', 'FACTURADO', 'CANCELADO'].includes(o.estado)));
+
   toggleDropdown() {
     this.isDropdownOpen.update(v => !v);
   }
@@ -72,8 +83,24 @@ export class HistorialInstructorPageComponent {
       case 'ENTREGADO': return 'success';
       case 'FACTURADO': return 'success';
       case 'EN_PREPARACION': return 'warning';
+      case 'LISTO_PARA_SERVIR': return 'warning';
       case 'BORRADOR': return 'info';
       default: return 'info';
     }
+  }
+
+  formatearEstado(estado: string): string {
+    if (!estado) return '';
+    return estado.replace(/_/g, ' ');
+  }
+
+  obtenerNombreMesa(mesaId: string): string {
+    const mesa = this.facade.mesas().find(m => m.id === mesaId);
+    return mesa ? mesa.nombre : 'Mesa ' + mesaId.substring(0, 4);
+  }
+
+  acortarMesero(meseroId: string): string {
+    if (!meseroId) return 'N/A';
+    return meseroId.length > 8 ? 'Mesero ' + meseroId.substring(meseroId.length - 8) : meseroId;
   }
 }

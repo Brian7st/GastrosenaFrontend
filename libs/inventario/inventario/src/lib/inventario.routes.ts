@@ -75,8 +75,8 @@ export const INVENTARIO_ROUTES: Routes = [
 
 
   {
-    path: 'solicitudes-insumos-page/:id/consolidacion',
-    loadComponent: () => import('./pages/solicitudes-insumos-page/solicitudes-insumos-consolidacion/solicitudes-insumos-consolidacion.component').then(m => m.SolicitudesInsumosConsolidacionComponent)
+    path: 'solicitudes-insumos-page/:id',
+    loadComponent: () => import('./pages/solicitudes-insumos-page/solicitudes-insumos-detail/solicitudes-insumos-detail.component').then(m => m.SolicitudesInsumosDetailComponent)
   },
 
   {
@@ -171,19 +171,14 @@ export const INVENTARIO_ROUTES: Routes = [
     loadComponent: () => import('./pages/kardex-page/movimientos-list/movimientos-list.component').then(m => m.MovimientosListComponent),
     children: [
       {
-        path: 'entrada',
-        loadComponent: () => import('./pages/kardex-page/movimiento-entrada/movimiento-entrada.component').then(m => m.MovimientoEntradaComponent)
+        path: 'ajuste',
+        loadComponent: () => import('./pages/kardex-page/movimiento-ajuste/movimiento-ajuste.component').then(m => m.MovimientoAjusteComponent)
       },
       {
         path: 'exportar',
         loadComponent: () => import('./pages/kardex-page/movimiento-export/movimiento-export.component').then(m => m.MovimientoExportComponent)
       }
     ]
-  },
-  // entrada-gil is a standalone page — NOT a child of movimientos to avoid rendering inside the list.
-  {
-    path: 'movimientos/entrada-gil',
-    loadComponent: () => import('./pages/kardex-page/movimiento-entrada-gil/movimiento-entrada-gil.component').then(m => m.MovimientoEntradaGilComponent)
   },
   {
     path: 'movimientos/:id',
@@ -199,13 +194,6 @@ export const INVENTARIO_ROUTES: Routes = [
         loadComponent: () =>
           import('./pages/alertas-page/alertas-list/alertas-list.component').then(
             m => m.AlertasListComponent
-          ),
-      },
-      {
-        path: 'historial',
-        loadComponent: () =>
-          import('./pages/alertas-page/alertas-historial/alertas-historial.component').then(
-            m => m.AlertasHistorialComponent
           ),
       },
       {
@@ -304,15 +292,6 @@ export const INVENTARIO_ROUTES: Routes = [
           import('./pages/actas-page/actas-detail/actas-detail.component').then(
             m => m.ActasDetailComponent
           ),
-        children: [
-          {
-            path: 'cargar-firma',
-            loadComponent: () =>
-              import('./pages/actas-page/actas-upload/actas-upload.component').then(
-                m => m.ActasUploadComponent
-              ),
-          },
-        ],
       },
     ]
   },
@@ -343,13 +322,6 @@ export const INVENTARIO_ROUTES: Routes = [
           ),
         children: [
           {
-            path: 'adjuntar',
-            loadComponent: () =>
-              import('./pages/paquete-probatorio-page/paquete-upload/paquete-upload.component').then(
-                m => m.PaqueteUploadComponent
-              ),
-          },
-          {
             path: 'requisicion',
             loadComponent: () =>
               import('./pages/paquete-probatorio-page/paquete-req-detail/paquete-req-detail.component').then(
@@ -357,6 +329,13 @@ export const INVENTARIO_ROUTES: Routes = [
               ),
           },
         ],
+      },
+      {
+        path: ':id/asistencia',
+        loadComponent: () =>
+          import('./pages/paquete-probatorio-page/paquete-asistencia/paquete-asistencia.component').then(
+            m => m.PaqueteAsistenciaComponent
+          ),
       },
     ],
   },

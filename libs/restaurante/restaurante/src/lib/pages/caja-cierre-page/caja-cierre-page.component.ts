@@ -38,7 +38,7 @@ export class CajaCierrePageComponent implements OnInit {
   totalVentas = signal<number>(0);
   totalEsperado = signal<number>(0);
 
-  alertDialog = signal<{open: boolean, title: string, message: string}>({
+  alertDialog = signal<{ open: boolean, title: string, message: string }>({
     open: false,
     title: '',
     message: ''

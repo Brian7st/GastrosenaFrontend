@@ -1,7 +1,10 @@
-<aside class="barra-lateral">
+<aside
+  class="barra-lateral"
+  [class.barra-lateral--colapsada]="asistente.panelAbierto()"
+>
   <div class="barra-lateral__encabezado">
     <div class="barra-lateral__logo-contenedor">
-      <div class="barra-lateral__logo-icono barra-lateral__logo-icono--imagen">
+      <div class="barra-lateral__logo-icono" [class.barra-lateral__logo-icono--imagen]="!!config.logoUrl">
         @if (config.logoUrl) {
           <img [src]="config.logoUrl" [alt]="config.titulo" class="barra-lateral__logo-img" />
         } @else {
@@ -21,7 +24,7 @@
   <nav class="barra-lateral__navegacion">
     @for (grupo of visibleGroups(); track grupo.etiqueta) {
       <div class="barra-lateral__grupo">
-        <p class="barra-lateral__etiqueta-grupo">{{ grupo.etiqueta }}</p>
+        <p class="barra-lateral__etiqueta-grupo">{{ grupo.tKey ? i18n.t(grupo.tKey) : grupo.etiqueta }}</p>
         <div class="barra-lateral__grupo-items">
           @for (item of grupo.items; track item.ruta) {
 
@@ -29,13 +32,13 @@
               <button
                 class="barra-lateral__enlace barra-lateral__enlace--expandible"
                 [class.barra-lateral__enlace--expandido]="isExpanded(item.ruta)"
-                (click)="toggleItem(item.ruta)"
+                (click)="asistente.cerrar(); toggleItem(item.ruta)"
                 type="button"
               >
                 @if (item.icono) {
                   <svg [lucideIcon]="item.icono!" class="barra-lateral__icono"></svg>
                 }
-                <span class="barra-lateral__texto">{{ item.label }}</span>
+                <span class="barra-lateral__texto">{{ item.tKey ? i18n.t(item.tKey) : item.label }}</span>
                 @if (item.insignia !== undefined) {
                   <span
                     class="barra-lateral__insignia"
@@ -55,13 +58,14 @@
                       [routerLink]="child.ruta"
                       routerLinkActive="barra-lateral__subenlace--activo"
                       class="barra-lateral__subenlace"
+                      (click)="asistente.cerrar()"
                     >
                       @if (child.icono) {
                         <svg [lucideIcon]="child.icono!" class="barra-lateral__subicono"></svg>
                       } @else {
                         <span class="barra-lateral__subpunto"></span>
                       }
-                      <span class="barra-lateral__texto">{{ child.label }}</span>
+                      <span class="barra-lateral__texto">{{ child.tKey ? i18n.t(child.tKey) : child.label }}</span>
                     </a>
                   }
                 </div>
@@ -74,11 +78,12 @@
                 [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
                 class="barra-lateral__enlace"
                 [class.barra-lateral__enlace--con-insignia]="item.insignia !== undefined"
+                (click)="asistente.cerrar()"
               >
                 @if (item.icono) {
                   <svg [lucideIcon]="item.icono!" class="barra-lateral__icono"></svg>
                 }
-                <span class="barra-lateral__texto">{{ item.label }}</span>
+                <span class="barra-lateral__texto">{{ item.tKey ? i18n.t(item.tKey) : item.label }}</span>
                 @if (item.insignia !== undefined) {
                   <span
                     class="barra-lateral__insignia"
@@ -94,19 +99,39 @@
     }
   </nav>
 
-  <!-- PIE DEL SIDEBAR (enlaces fijos: Perfil, Configuración, Cerrar Sesión) -->
+  <!-- PIE DEL SIDEBAR (enlaces fijos: Configuración expandible, Perfil, Cerrar Sesión) -->
   <div class="barra-lateral__pie">
-    <a routerLink="/app/configuracion" class="barra-lateral__enlace">
+    <button
+      type="button"
+      class="barra-lateral__enlace barra-lateral__enlace--expandible"
+      [class.barra-lateral__enlace--expandido]="isExpanded('footer-config')"
+      (click)="toggleItem('footer-config')"
+    >
       <svg lucideSettings class="barra-lateral__icono"></svg>
-      <span class="barra-lateral__texto">Configuración</span>
-    </a>
+      <span class="barra-lateral__texto">{{ i18n.t('footer.configuracion') }}</span>
+      <svg [lucideIcon]="isExpanded('footer-config') ? 'chevron-down' : 'chevron-right'" class="barra-lateral__chevron"></svg>
+    </button>
+
+    @if (isExpanded('footer-config')) {
+      <div class="barra-lateral__subgrupo">
+        <a routerLink="/app/configuracion/general" class="barra-lateral__subenlace">
+          <span class="barra-lateral__subpunto"></span>
+          <span class="barra-lateral__texto">{{ i18n.t('footer.general') }}</span>
+        </a>
+        <a routerLink="/app/configuracion/bienes/eliminar-masiva" class="barra-lateral__subenlace">
+          <span class="barra-lateral__subpunto"></span>
+          <span class="barra-lateral__texto">{{ i18n.t('footer.eliminar_masiva') }}</span>
+        </a>
+      </div>
+    }
+
     <a routerLink="/app/perfil" class="barra-lateral__enlace">
       <svg lucideUser class="barra-lateral__icono"></svg>
-      <span class="barra-lateral__texto">Perfil</span>
+      <span class="barra-lateral__texto">{{ i18n.t('footer.perfil') }}</span>
     </a>
     <a href="#" class="barra-lateral__enlace barra-lateral__enlace--peligro">
       <svg lucideLogOut class="barra-lateral__icono"></svg>
-      <span class="barra-lateral__texto">Cerrar Sesión</span>
+      <span class="barra-lateral__texto">{{ i18n.t('footer.cerrar_sesion') }}</span>
     </a>
   </div>
 </aside>
