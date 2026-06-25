@@ -84,7 +84,7 @@
     @for (reporte of reportesRecientes(); track reporte.id) {
       <tr>
         <td>{{ reporte.reporteId }}</td>
-        <td>{{ reporte.fechaGeneracion | date:'dd/MM/yyyy HH:mm' }}</td>
+        <td>{{ reporte.fechaGeneracion + 'Z' | date:'dd/MM/yyyy HH:mm' }}</td>
         <td>
           <restaurant-status-badge
             label="Completado"

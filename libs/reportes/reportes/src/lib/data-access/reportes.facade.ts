@@ -49,7 +49,7 @@ export class ReportesFacade {
             id: Date.now(),
             reporteId: response.id,
             formato: 'PDF',
-            fechaGeneracion: response.fechaGeneracion,
+            fechaGeneracion: new Date().toISOString(),
           },
           ...list.slice(0, 9),
         ]);
