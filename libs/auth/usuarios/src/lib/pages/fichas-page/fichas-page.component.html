@@ -40,10 +40,9 @@
 
   <!-- Error global -->
   @if (error()) {
-    <div class="fichas-page__error" (click)="error.set('')">
-      <lucide-icon name="alert-circle" [size]="16"></lucide-icon>
+    <p style="color:var(--color-error-text);background:var(--color-error-bg);padding:10px 16px;border-radius:6px;font-size:13px;margin:0;cursor:pointer" (click)="error.set('')">
       {{ error() }}
-    </div>
+    </p>
   }
 
   <!-- Filtros -->

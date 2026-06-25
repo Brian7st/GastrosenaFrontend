@@ -142,7 +142,7 @@
                       </button>
                     }
                     <button
-                      class="detalle__btn-accion detalle__btn-accion--eliminar"
+                      class="detalle__btn-accion detalle__btn-accion--remover"
                       (click)="desasignarAprendiz(aprendiz.id)"
                       title="Quitar de ficha"
                     >
@@ -183,10 +183,9 @@
           >
         </div>
         @if (errorAsignar()) {
-          <div class="modal__error">
-            <lucide-icon name="alert-circle" [size]="14"></lucide-icon>
+          <p style="color:var(--color-error-text);background:var(--color-error-bg);padding:8px 12px;border-radius:6px;font-size:13px;margin:0 0 8px">
             {{ errorAsignar() }}
-          </div>
+          </p>
         }
         <div class="modal__list">
           @for (user of usuariosDisponiblesFiltrados(); track user.id) {
