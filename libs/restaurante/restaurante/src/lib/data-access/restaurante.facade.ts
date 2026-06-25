@@ -4,7 +4,7 @@ import {
   RestauranteStats, PedidoResumenResponse, CajaStats,
   EstadoPedido, PedidoResponse, PedidoCreateRequest,
   SesionCajaResponse, AbrirSesionRequest, CerrarSesionRequest,
-  FacturarPedidoRequest, MetodoPago
+  FacturarPedidoRequest, MetodoPago, EstadoDetallePedido, IncidenciaPedidoResponse
 } from '../models/restaurante.model';
 import { RestauranteService } from './restaurante.service';
 import { AuthService } from './auth.service';
@@ -18,7 +18,7 @@ export interface ItemCarrito {
   precioUnitario: number;
   categoria: string;
   observaciones?: string;
-  estadoDetalle?: string;
+  estadoDetalle?: EstadoDetallePedido;
 }
 
 export interface ProductoMenu {
@@ -40,6 +40,7 @@ export interface PedidoCarrito {
   estado: EstadoPedido;
   fechaCreacion: string;
   detalles: ItemCarrito[];
+  incidencias?: IncidenciaPedidoResponse[];
   subtotal: number;
 }
 
@@ -231,7 +232,8 @@ export class RestauranteFacade {
               observaciones: d.observaciones || undefined,
               estadoDetalle: d.estadoDetalle
             };
-          })
+          }),
+          incidencias: p!.incidencias || []
         }));
 
         const ESTADO_PESO: Record<string, number> = {
@@ -431,7 +433,8 @@ export class RestauranteFacade {
                     observaciones: d.observaciones || undefined,
                     estadoDetalle: d.estadoDetalle
                   };
-                })
+                }),
+                incidencias: pedidoFull.incidencias || []
               };
               this._pedidoActivo.set(pedidoParaCarrito);
               observer.next(true);
@@ -559,7 +562,8 @@ export class RestauranteFacade {
           observaciones: d.observaciones || undefined,
           estadoDetalle: d.estadoDetalle
         };
-      })
+      }),
+      incidencias: pedidoFull.incidencias || []
     };
     
     this._pedidoActivo.set(pedidoParaCarrito);
@@ -580,6 +584,7 @@ export class RestauranteFacade {
       estado: EstadoPedido.BORRADOR,
       fechaCreacion: new Date().toISOString(),
       detalles: [],
+      incidencias: [],
       subtotal: 0
     });
   }
@@ -699,6 +704,7 @@ export class RestauranteFacade {
             estado: EstadoPedido.EN_PREPARACION,
             fechaCreacion: pedidoResponse.fechaCreacion,
             detalles: pedido.detalles,
+            incidencias: [],
             subtotal: pedidoResponse.subtotal
           };
 

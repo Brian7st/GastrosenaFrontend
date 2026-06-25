@@ -216,6 +216,7 @@ export class PedidosCartComponent {
       case 'PREPARANDO': return 'estado-preparando';
       case 'TERMINADO': return 'estado-terminado';
       case 'CANCELADO': return 'estado-cancelado';
+      case 'EN_DEVOLUCION': return 'estado-cancelado';
       case 'DEVUELTO': return 'estado-cancelado';
       default: return 'estado-pendiente';
     }
@@ -223,7 +224,8 @@ export class PedidosCartComponent {
 
   getEstadoDetalleText(estado?: string): string {
     if (!estado) return 'Pendiente';
-    return estado.charAt(0).toUpperCase() + estado.slice(1).toLowerCase();
+    const cleanEstado = estado.replace('_', ' ');
+    return cleanEstado.charAt(0).toUpperCase() + cleanEstado.slice(1).toLowerCase();
   }
 }
 
