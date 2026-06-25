@@ -378,3 +378,12 @@
     </section>
   </div>
 }
+
+<restaurant-confirm-dialog
+  [open]="errorModalVisible()"
+  title="Acción Denegada"
+  [message]="errorMessage()"
+  confirmText="Entendido"
+  [showCancel]="false"
+  (confirm)="cerrarErrorModal()"
+></restaurant-confirm-dialog>

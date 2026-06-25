@@ -456,78 +456,82 @@ export class RestauranteFacade {
     });
   }
 
-  cancelarPedidoActivoEnBackend(motivo: string = ''): Observable<boolean> {
+  cancelarPedidoActivoEnBackend(motivo: string = ''): Observable<{exito: boolean, mensaje?: string}> {
     const pedido = this.pedidoActivo();
     if (!pedido || pedido.estado === EstadoPedido.BORRADOR) {
-      return of(false);
+      return of({exito: false, mensaje: 'Pedido no válido'});
     }
     return new Observable(observer => {
       this.restauranteService.cancelarPedido(pedido.id, motivo).subscribe({
         next: () => {
           this.vaciarCarrito();
           this.cargarMesas(); // Recargar mesas para actualizar el mapa
-          observer.next(true);
+          observer.next({exito: true});
           observer.complete();
         },
         error: (err) => {
           console.error('[RestauranteFacade] Error al cancelar pedido en backend:', err);
-          observer.next(false);
+          const mensaje = err.error?.mensaje || err.error?.message || 'Error al cancelar el pedido';
+          observer.next({exito: false, mensaje});
           observer.complete();
         }
       });
     });
   }
 
-  devolverPedidoActivoEnBackend(motivo: string = ''): Observable<boolean> {
+  devolverPedidoActivoEnBackend(motivo: string = ''): Observable<{exito: boolean, mensaje?: string}> {
     const pedido = this.pedidoActivo();
     if (!pedido || pedido.estado === EstadoPedido.BORRADOR) {
-      return of(false);
+      return of({exito: false, mensaje: 'Pedido no válido'});
     }
     return new Observable(observer => {
       this.restauranteService.devolverPedido(pedido.id, motivo).subscribe({
         next: () => {
           this.vaciarCarrito();
           this.cargarMesas(); // Recargar mesas para actualizar el mapa
-          observer.next(true);
+          observer.next({exito: true});
           observer.complete();
         },
         error: (err) => {
           console.error('[RestauranteFacade] Error al devolver pedido en backend:', err);
-          observer.next(false);
+          const mensaje = err.error?.mensaje || err.error?.message || 'Error al devolver el pedido';
+          observer.next({exito: false, mensaje});
           observer.complete();
         }
       });
     });
   }
 
-  cancelarItemPedido(idDetalle: string, motivo: string = '', cantidad?: number): Observable<boolean> {
+  cancelarItemPedido(idDetalle: string, motivo: string = '', cantidad?: number): Observable<{exito: boolean, mensaje?: string}> {
     return new Observable(observer => {
       this.restauranteService.cancelarDetallePedido(idDetalle, motivo, cantidad).subscribe({
         next: (pedidoFull) => {
           this.actualizarPedidoActivoDesdeRespuesta(pedidoFull);
-          observer.next(true);
+          observer.next({exito: true});
           observer.complete();
         },
         error: (err) => {
           console.error('[RestauranteFacade] Error al cancelar ítem:', err);
-          observer.next(false);
+          const mensaje = err.error?.mensaje || err.error?.message || 'Error al cancelar el ítem';
+          observer.next({exito: false, mensaje});
           observer.complete();
         }
       });
     });
   }
 
-  devolverItemPedido(idDetalle: string, motivo: string = '', cantidad?: number): Observable<boolean> {
+  devolverItemPedido(idDetalle: string, motivo: string = '', cantidad?: number): Observable<{exito: boolean, mensaje?: string}> {
     return new Observable(observer => {
       this.restauranteService.devolverDetallePedido(idDetalle, motivo, cantidad).subscribe({
         next: (pedidoFull) => {
           this.actualizarPedidoActivoDesdeRespuesta(pedidoFull);
-          observer.next(true);
+          observer.next({exito: true});
           observer.complete();
         },
         error: (err) => {
           console.error('[RestauranteFacade] Error al devolver ítem:', err);
-          observer.next(false);
+          const mensaje = err.error?.mensaje || err.error?.message || 'Error al devolver el ítem';
+          observer.next({exito: false, mensaje});
           observer.complete();
         }
       });
