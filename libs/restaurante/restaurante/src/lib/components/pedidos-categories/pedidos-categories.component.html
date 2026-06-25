@@ -2,18 +2,60 @@
   <h2>Categorías</h2>
 </div>
 
+<!-- Main Categories (Level 1) -->
 <div class="categories-list">
+  
   <div 
     class="category-card" 
-    *ngFor="let cat of categories"
-    [class.active]="activeCategory() === cat.id"
-    (click)="selectCategory(cat.id)"
+    [class.active]="activeMainCategory() === 'all'"
+    (click)="selectMain('all')"
   >
     <div class="icon">
-      <lucide-icon [name]="cat.icon" [size]="24"></lucide-icon>
+      <lucide-icon name="layout-grid" [size]="24"></lucide-icon>
     </div>
-    <span class="name">{{ cat.name }}</span>
+    <span class="name">Todo</span>
   </div>
+
+  <div 
+    class="category-card" 
+    [class.active]="activeMainCategory() === 'COMIDA'"
+    (click)="selectMain('COMIDA')"
+  >
+    <div class="icon">
+      <lucide-icon name="utensils" [size]="24"></lucide-icon>
+    </div>
+    <span class="name">Comidas</span>
+  </div>
+
+  <div 
+    class="category-card" 
+    [class.active]="activeMainCategory() === 'BEBIDA'"
+    (click)="selectMain('BEBIDA')"
+  >
+    <div class="icon">
+      <lucide-icon name="coffee" [size]="24"></lucide-icon>
+    </div>
+    <span class="name">Bebidas</span>
+  </div>
+
 </div>
 
-
+<!-- Subcategories (Level 2) -->
+<div class="subcategories-list" *ngIf="activeMainCategory() !== 'all' && currentSubcategories().length > 0">
+  <div 
+    class="subcategory-chip" 
+    [class.active]="activeSubCategory() === 'all'"
+    (click)="selectSub('all')"
+  >
+    Todas
+  </div>
+  
+  <div 
+    class="subcategory-chip" 
+    *ngFor="let sub of currentSubcategories()"
+    [class.active]="activeSubCategory() === sub.id"
+    (click)="selectSub(sub.id)"
+  >
+    {{ sub.name }}
+  </div>
+</div>

@@ -4,13 +4,13 @@ export { EstadoPedido };
 export type EstadoMesa = 'LIBRE' | 'OCUPADA' | 'POR_PAGAR' | 'INACTIVA';
 
 // --- Enums de Detalles e Incidencias (Reglas de Cancelación/Devolución) ---
-export type EstadoDetallePedido = 
-  | 'PENDIENTE' 
-  | 'PREPARANDO' 
-  | 'TERMINADO' 
-  | 'EN_DEVOLUCION' 
-  | 'ENTREGADO' 
-  | 'CANCELADO' 
+export type EstadoDetallePedido =
+  | 'PENDIENTE'
+  | 'PREPARANDO'
+  | 'TERMINADO'
+  | 'EN_DEVOLUCION'
+  | 'ENTREGADO'
+  | 'CANCELADO'
   | 'DEVUELTO';
 
 export type TipoIncidencia = 'CANCELACION' | 'DEVOLUCION';
@@ -35,6 +35,7 @@ export interface CategoriaMenu {
   id: string;
   name: string;
   icon: string;
+  type?: 'COMIDA' | 'BEBIDA' | 'ALL';
 }
 
 export interface Mesa {

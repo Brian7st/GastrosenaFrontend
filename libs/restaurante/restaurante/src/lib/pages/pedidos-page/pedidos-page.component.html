@@ -43,14 +43,15 @@
       <section class="categories-section">
         <lib-pedidos-categories 
           [categories]="facade.categoriasMenu()"
-          (categorySelected)="selectedCategory.set($event)">
+          (filterChanged)="onFilterChanged($event)">
         </lib-pedidos-categories>
       </section>
 
       <section class="menu-section">
         <lib-pedidos-menu-grid 
           [searchTerm]="searchTerm()" 
-          [category]="selectedCategory()">
+          [mainCategory]="selectedMainCategory()"
+          [subCategory]="selectedSubCategory()">
         </lib-pedidos-menu-grid>
       </section>
     </div>

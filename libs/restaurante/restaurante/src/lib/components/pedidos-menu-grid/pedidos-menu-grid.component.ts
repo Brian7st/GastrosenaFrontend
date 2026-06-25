@@ -20,7 +20,8 @@ export class PedidosMenuGridComponent {
     this._searchTerm = val.toLowerCase();
   }
   private _searchTerm = '';
-  @Input() category: string = 'all';
+  @Input() mainCategory: string = 'all';
+  @Input() subCategory: string = 'all';
 
   private facade = inject(RestauranteFacade);
   private router = inject(Router);
@@ -31,8 +32,15 @@ export class PedidosMenuGridComponent {
   get products() {
     let filtered = this.facade.productosMenu();
 
-    if (this.category && this.category !== 'all') {
-      filtered = filtered.filter(p => p.category === this.category);
+    if (this.mainCategory !== 'all') {
+      filtered = filtered.filter(p => {
+        const isBeb = !!(p.categoryName || '').toLowerCase().match(/bebida|jugo|licor|café|cafe|alcohol|alcholica|coctel|cóctel/);
+        return this.mainCategory === 'BEBIDA' ? isBeb : !isBeb;
+      });
+    }
+
+    if (this.subCategory !== 'all') {
+      filtered = filtered.filter(p => p.category === this.subCategory);
     }
 
     if (this._searchTerm) {

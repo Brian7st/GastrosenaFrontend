@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 import { CategoriaMenu } from '../../models/restaurante.model';
@@ -14,12 +14,33 @@ import { CategoriaMenu } from '../../models/restaurante.model';
 export class PedidosCategoriesComponent {
   @Input() categories: CategoriaMenu[] = [];
   
-  @Output() categorySelected = new EventEmitter<string>();
+  @Output() filterChanged = new EventEmitter<{main: string, sub: string}>();
 
-  activeCategory = signal<string>('all');
+  activeMainCategory = signal<string>('all');
+  activeSubCategory = signal<string>('all');
 
-  selectCategory(id: string) {
-    this.activeCategory.set(id);
-    this.categorySelected.emit(id);
+  // Propiedad computada para obtener las subcategorías según la categoría principal activa
+  currentSubcategories = computed(() => {
+    const main = this.activeMainCategory();
+    if (main === 'all') return [];
+    return this.categories.filter(c => c.type === main);
+  });
+
+  selectMain(mainId: string) {
+    this.activeMainCategory.set(mainId);
+    this.activeSubCategory.set('all'); // Resetear subcategoría al cambiar la principal
+    this.emitFilter();
+  }
+
+  selectSub(subId: string) {
+    this.activeSubCategory.set(subId);
+    this.emitFilter();
+  }
+
+  private emitFilter() {
+    this.filterChanged.emit({
+      main: this.activeMainCategory(),
+      sub: this.activeSubCategory()
+    });
   }
 }

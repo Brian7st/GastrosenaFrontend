@@ -136,7 +136,7 @@ export class RestauranteFacade {
         const cocinaMapeada = cocina.map(r => ({ ...r, idCategoria: `cocina_${r.idCategoria}` }));
         const barMapeada = bar.map(r => ({ ...r, idCategoria: `bar_${r.idCategoria}` }));
         const todasLasRecetas = [...cocinaMapeada, ...barMapeada];
-        
+
         // --- 1. Mapear Productos ---
         const menuMapeado: ProductoMenu[] = todasLasRecetas.filter(r => r.activo !== false).map(r => {
           return {
@@ -150,7 +150,7 @@ export class RestauranteFacade {
             categoryName: r.nombreCategoria || 'Sin Categoría'
           };
         });
-        
+
         this._productosMenu.set(menuMapeado);
 
         // --- 2. Extraer Categorías Dinámicas ---
@@ -160,28 +160,29 @@ export class RestauranteFacade {
             const nombre = prod.categoryName || 'Desconocida';
             const lower = nombre.toLowerCase();
             let icon = 'utensils'; // ícono por defecto (comida)
-            
+
             // Asignar icono basado en si es bebida
             if (lower.includes('bebida') || lower.includes('jugo') || lower.includes('licor') || lower.includes('café') || lower.includes('cafe') || lower.includes('alcohol') || lower.includes('alcholica') || lower.includes('coctel') || lower.includes('cóctel')) {
               icon = 'coffee';
             }
-            
+
             mapCategorias.set(prod.category, {
               id: prod.category,
               name: nombre,
-              icon: icon
+              icon: icon,
+              type: icon === 'coffee' ? 'BEBIDA' : 'COMIDA'
             });
           }
         });
-        
+
         // Agregar "Todo" al principio
         const arrCategorias = Array.from(mapCategorias.values());
         arrCategorias.sort((a, b) => a.name.localeCompare(b.name));
         this._categoriasMenu.set([
-          { id: 'all', name: 'Todo', icon: 'layout-grid' },
+          { id: 'all', name: 'Todo', icon: 'layout-grid', type: 'ALL' },
           ...arrCategorias
         ]);
-        
+
       },
       error: (err) => {
         console.error('[RestauranteFacade] Error fatal al cargar menú:', err);
@@ -482,82 +483,82 @@ export class RestauranteFacade {
     });
   }
 
-  cancelarPedidoActivoEnBackend(motivo: string = ''): Observable<{exito: boolean, mensaje?: string}> {
+  cancelarPedidoActivoEnBackend(motivo: string = ''): Observable<{ exito: boolean, mensaje?: string }> {
     const pedido = this.pedidoActivo();
     if (!pedido || pedido.estado === EstadoPedido.BORRADOR) {
-      return of({exito: false, mensaje: 'Pedido no válido'});
+      return of({ exito: false, mensaje: 'Pedido no válido' });
     }
     return new Observable(observer => {
       this.restauranteService.cancelarPedido(pedido.id, motivo).subscribe({
         next: () => {
           this.vaciarCarrito();
           this.cargarMesas(); // Recargar mesas para actualizar el mapa
-          observer.next({exito: true});
+          observer.next({ exito: true });
           observer.complete();
         },
         error: (err) => {
           console.error('[RestauranteFacade] Error al cancelar pedido en backend:', err);
           const mensaje = err.error?.mensaje || err.error?.message || 'Error al cancelar el pedido';
-          observer.next({exito: false, mensaje});
+          observer.next({ exito: false, mensaje });
           observer.complete();
         }
       });
     });
   }
 
-  devolverPedidoActivoEnBackend(motivo: string = ''): Observable<{exito: boolean, mensaje?: string}> {
+  devolverPedidoActivoEnBackend(motivo: string = ''): Observable<{ exito: boolean, mensaje?: string }> {
     const pedido = this.pedidoActivo();
     if (!pedido || pedido.estado === EstadoPedido.BORRADOR) {
-      return of({exito: false, mensaje: 'Pedido no válido'});
+      return of({ exito: false, mensaje: 'Pedido no válido' });
     }
     return new Observable(observer => {
       this.restauranteService.devolverPedido(pedido.id, motivo).subscribe({
         next: () => {
           this.vaciarCarrito();
           this.cargarMesas(); // Recargar mesas para actualizar el mapa
-          observer.next({exito: true});
+          observer.next({ exito: true });
           observer.complete();
         },
         error: (err) => {
           console.error('[RestauranteFacade] Error al devolver pedido en backend:', err);
           const mensaje = err.error?.mensaje || err.error?.message || 'Error al devolver el pedido';
-          observer.next({exito: false, mensaje});
+          observer.next({ exito: false, mensaje });
           observer.complete();
         }
       });
     });
   }
 
-  cancelarItemPedido(idDetalle: string, motivo: string = '', cantidad?: number): Observable<{exito: boolean, mensaje?: string}> {
+  cancelarItemPedido(idDetalle: string, motivo: string = '', cantidad?: number): Observable<{ exito: boolean, mensaje?: string }> {
     return new Observable(observer => {
       this.restauranteService.cancelarDetallePedido(idDetalle, motivo, cantidad).subscribe({
         next: (pedidoFull) => {
           this.actualizarPedidoActivoDesdeRespuesta(pedidoFull);
-          observer.next({exito: true});
+          observer.next({ exito: true });
           observer.complete();
         },
         error: (err) => {
           console.error('[RestauranteFacade] Error al cancelar ítem:', err);
           const mensaje = err.error?.mensaje || err.error?.message || 'Error al cancelar el ítem';
-          observer.next({exito: false, mensaje});
+          observer.next({ exito: false, mensaje });
           observer.complete();
         }
       });
     });
   }
 
-  devolverItemPedido(idDetalle: string, motivo: string = '', cantidad?: number): Observable<{exito: boolean, mensaje?: string}> {
+  devolverItemPedido(idDetalle: string, motivo: string = '', cantidad?: number): Observable<{ exito: boolean, mensaje?: string }> {
     return new Observable(observer => {
       this.restauranteService.devolverDetallePedido(idDetalle, motivo, cantidad).subscribe({
         next: (pedidoFull) => {
           this.actualizarPedidoActivoDesdeRespuesta(pedidoFull);
-          observer.next({exito: true});
+          observer.next({ exito: true });
           observer.complete();
         },
         error: (err) => {
           console.error('[RestauranteFacade] Error al devolver ítem:', err);
           const mensaje = err.error?.mensaje || err.error?.message || 'Error al devolver el ítem';
-          observer.next({exito: false, mensaje});
+          observer.next({ exito: false, mensaje });
           observer.complete();
         }
       });
@@ -595,7 +596,7 @@ export class RestauranteFacade {
       }),
       incidencias: pedidoFull.incidencias || []
     };
-    
+
     this._pedidoActivo.set(pedidoParaCarrito);
     this._ordenesHistorial.update(historial =>
       historial.map(p => p.id === pedidoFull.id ? pedidoParaCarrito : p)
