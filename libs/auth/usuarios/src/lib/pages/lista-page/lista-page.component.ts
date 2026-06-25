@@ -150,10 +150,21 @@ onGuardarUsuario(data: CrearUsuarioRequest): void {
       apellidos: data.apellidos,
       telefono:  data.telefono,
       idRol:     data.nombreRol,
-      documento: data.documento,   // ← agregar
-      email:     data.email,        // ← agregar
+      documento: data.documento,
+      email:     data.email,
     };
     this.facade.actualizarUsuario(editando.id, payload);
+    
+    // ← AGREGAR ESTO
+    const rolCambio = editando.rol !== data.nombreRol;
+    if (rolCambio) {
+      this.mostrarToast(
+        'Usuario actualizado. Si se cambió el rol, el usuario deberá cerrar sesión para ver los cambios.'
+      );
+    } else {
+      this.mostrarToast('Usuario actualizado correctamente.');
+    }
+
   } else {
     this.facade.crearUsuario(data);
     this.mostrarToast(this.i18n.t('lista.toast_creado'));

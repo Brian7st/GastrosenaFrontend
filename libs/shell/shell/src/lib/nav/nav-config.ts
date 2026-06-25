@@ -111,7 +111,7 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
           tKey: 'nav.restaurante',
           ruta: '/app/restaurante',
           icono: 'utensils',
-          permisos: ['MODULO_MESAS_VER', 'MODULO_PEDIDOS_VER', 'MESAS_CONSULTAR'],
+          permisos: ['MODULO_MESAS_VER', 'MODULO_PEDIDOS_VER', 'MESAS_CONSULTAR', 'PAGOS_REGISTRAR'], // ← agregar PAGOS_REGISTRAR
           children: [
             { label: 'Mesas',   tKey: 'nav.mesas',   ruta: '/app/restaurante/mesas',   icono: 'layout-grid' },
             { label: 'Pedidos', tKey: 'nav.pedidos', ruta: '/app/restaurante/pedidos', icono: 'receipt'     },
