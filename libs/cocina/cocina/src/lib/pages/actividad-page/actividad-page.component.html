@@ -59,16 +59,67 @@
         </div>
       </div>
 
-      <!-- Número de ficha -->
-      <div class="form-group full-width">
-        <label class="form-label" for="act-ficha">Número de ficha</label>
-        <input
-          id="act-ficha"
-          type="text"
-          class="form-input"
-          placeholder="Ej: 2561234"
-          (input)="numeroFicha.set($any($event.target).value)"
-        />
+      <!-- Número de ficha — buscador con dropdown -->
+      <div class="form-group full-width ficha-search-wrapper">
+        <label class="form-label" for="act-ficha">
+          Número de ficha <span class="required">*</span>
+        </label>
+
+        <div class="ficha-combobox" [class.is-open]="fichaDropdownOpen()">
+          <!-- Input de búsqueda -->
+          <div class="ficha-input-row">
+            <lucide-icon name="search" size="16" class="ficha-search-icon"></lucide-icon>
+            <input
+              id="act-ficha"
+              type="text"
+              class="form-input ficha-input"
+              placeholder="Buscar ficha por número..."
+              [value]="fichaBusqueda()"
+              (input)="onFichaBusquedaInput($any($event.target).value)"
+              (focus)="abrirFichaDropdown()"
+              (blur)="cerrarFichaDropdown()"
+              autocomplete="off"
+            />
+            @if (fichasCargando()) {
+              <span class="ficha-loading-dot"></span>
+            }
+            @if (numeroFicha()) {
+              <lucide-icon name="check-circle" size="16" class="ficha-ok-icon"></lucide-icon>
+            }
+          </div>
+
+          <!-- Dropdown lista -->
+          @if (fichaDropdownOpen()) {
+            <div class="ficha-dropdown">
+              @if (fichasCargando()) {
+                <div class="ficha-empty">Cargando fichas…</div>
+              } @else if (fichasFiltradas().length === 0) {
+                <div class="ficha-empty">No se encontraron fichas</div>
+              } @else {
+                @for (f of fichasFiltradas(); track f.id) {
+                  <button
+                    type="button"
+                    class="ficha-option"
+                    [class.is-selected]="numeroFicha() === f.numero"
+                    (click)="seleccionarFicha(f.numero)"
+                  >
+                    <span class="ficha-numero">{{ f.numero }}</span>
+                    @if (f.nombre) {
+                      <span class="ficha-nombre">{{ f.nombre }}</span>
+                    }
+                  </button>
+                }
+              }
+            </div>
+          }
+        </div>
+
+        @if (numeroFicha()) {
+          <p class="ficha-selected-hint">
+            <lucide-icon name="check" size="12"></lucide-icon>
+            Ficha <strong>{{ numeroFicha() }}</strong> seleccionada
+          </p>
+        }
       </div>
 
       <!-- Pasos de la actividad -->
