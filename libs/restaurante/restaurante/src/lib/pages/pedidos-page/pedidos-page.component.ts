@@ -34,7 +34,6 @@ export class PedidosPageComponent {
 
   searchTerm = signal('');
   selectedCategory = signal('all');
-  selectedSubcategory = signal('');
 
   mesaActual = computed(() => {
     const pedido = this.facade.pedidoActivo();

@@ -21,7 +21,6 @@ export class PedidosMenuGridComponent {
   }
   private _searchTerm = '';
   @Input() category: string = 'all';
-  @Input() subcategory: string = '';
 
   private facade = inject(RestauranteFacade);
   private router = inject(Router);
@@ -36,12 +35,8 @@ export class PedidosMenuGridComponent {
       filtered = filtered.filter(p => p.category === this.category);
     }
 
-    if (this.subcategory) {
-      filtered = filtered.filter(p => p.subcategory === this.subcategory);
-    }
-
     if (this._searchTerm) {
-      filtered = filtered.filter(p => p.name.toLowerCase().includes(this._searchTerm));
+      filtered = filtered.filter(p => p.name?.toLowerCase().includes(this._searchTerm));
     }
 
     return filtered;
@@ -53,7 +48,17 @@ export class PedidosMenuGridComponent {
       return;
     }
 
-    const categoriaMapped = product.category === 'bebidas' ? 'BEBIDA' : 'COMIDA';
+    const nombreCat = (product.categoryName || '').toLowerCase();
+    const isBebida = nombreCat.includes('bebida') || 
+                     nombreCat.includes('jugo') || 
+                     nombreCat.includes('licor') || 
+                     nombreCat.includes('café') || 
+                     nombreCat.includes('cafe') || 
+                     nombreCat.includes('alcohol') || 
+                     nombreCat.includes('alcholica') || 
+                     nombreCat.includes('coctel') || 
+                     nombreCat.includes('cóctel');
+    const categoriaMapped = isBebida ? 'BEBIDA' : 'COMIDA';
 
     this.facade.agregarProductoAlPedido(
       product.id,

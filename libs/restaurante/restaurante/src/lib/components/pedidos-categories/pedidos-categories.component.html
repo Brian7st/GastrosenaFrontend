@@ -16,13 +16,4 @@
   </div>
 </div>
 
-<div class="subcategories-list" *ngIf="activeCategory() === 'bebidas'">
-  <button 
-    class="subcategory-chip"
-    *ngFor="let sub of subcategoriesBebidas"
-    [class.active]="activeSubcategory() === sub.id"
-    (click)="selectSubcategory(sub.id)"
-  >
-    {{ sub.name }}
-  </button>
-</div>
+

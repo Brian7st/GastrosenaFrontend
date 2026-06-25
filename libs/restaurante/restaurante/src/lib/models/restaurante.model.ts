@@ -29,6 +29,14 @@ export interface IncidenciaPedidoResponse {
   fechaResolucion: string | null;
 }
 
+
+
+export interface CategoriaMenu {
+  id: string;
+  name: string;
+  icon: string;
+}
+
 export interface Mesa {
   id: string;        // UUID proveniente del backend
   nombre: string;

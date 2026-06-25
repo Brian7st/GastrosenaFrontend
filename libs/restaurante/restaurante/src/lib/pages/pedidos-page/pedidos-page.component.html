@@ -41,14 +41,16 @@
     <div [style.pointer-events]="esPedidoSoloLectura() ? 'none' : 'auto'"
       [style.opacity]="esPedidoSoloLectura() ? '0.5' : '1'">
       <section class="categories-section">
-        <lib-pedidos-categories (categorySelected)="selectedCategory.set($event)"
-          (subcategorySelected)="selectedSubcategory.set($event)">
+        <lib-pedidos-categories 
+          [categories]="facade.categoriasMenu()"
+          (categorySelected)="selectedCategory.set($event)">
         </lib-pedidos-categories>
       </section>
 
       <section class="menu-section">
-        <lib-pedidos-menu-grid [searchTerm]="searchTerm()" [category]="selectedCategory()"
-          [subcategory]="selectedSubcategory()">
+        <lib-pedidos-menu-grid 
+          [searchTerm]="searchTerm()" 
+          [category]="selectedCategory()">
         </lib-pedidos-menu-grid>
       </section>
     </div>
