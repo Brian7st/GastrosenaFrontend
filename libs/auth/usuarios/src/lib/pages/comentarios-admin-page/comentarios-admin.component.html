@@ -67,7 +67,11 @@
   } @else if (comentariosFiltrados().length === 0) {
   <div class="admin-comentarios__empty">
     <lucide-icon name="file-text" [size]="32"></lucide-icon>
-    <p>{{ i18n.t('comentarios.sin_comentarios') }} <strong>{{ filtroEstado() }}</strong></p>
+     @if (filtroEstado() === 'TODOS') {
+     <p>No hay comentarios</p>
+      } @else {
+     <p>{{ i18n.t('comentarios.sin_comentarios') }} <strong>{{ filtroEstado() }}</strong></p>
+}
   </div>
   } @else {
     <div class="comentarios-list">
