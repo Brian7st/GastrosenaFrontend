@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { LucideIconComponent, ButtonComponent, KpiCardComponent } from '@restaurant/shared/ui';
+import { LucideIconComponent, ButtonComponent, KpiCardComponent, HasPermissionDirective } from '@restaurant/shared/ui';
 import { ConciliacionFacade } from '../../../data-access/conciliacion.facade';
 
 @Component({
@@ -13,6 +13,7 @@ import { ConciliacionFacade } from '../../../data-access/conciliacion.facade';
     LucideIconComponent,
     ButtonComponent,
     KpiCardComponent,
+    HasPermissionDirective,
   ],
   templateUrl: './conciliacion-dashboard.component.html',
   styleUrl: './conciliacion-dashboard.component.scss',

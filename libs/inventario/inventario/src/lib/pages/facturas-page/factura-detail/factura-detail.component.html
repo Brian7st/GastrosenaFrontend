@@ -22,12 +22,12 @@
         <restaurant-button variant="surface" icon="print" (click)="descargarOImprimir()">Imprimir</restaurant-button>
 
         @if (f.estado === 'VERIFICADA') {
-          <restaurant-button variant="primary" icon="check_circle" (click)="showConfirmPagada.set(true)">Marcar como Pagada</restaurant-button>
+          <restaurant-button *hasPermission="'facturas:marcar_pagada'" variant="primary" icon="check_circle" (click)="showConfirmPagada.set(true)">Marcar como Pagada</restaurant-button>
         }
 
         @if (f.estado === 'REGISTRADA' && conciliacionGil(); as c) {
           @if (estaConciliada(c.diferencias)) {
-            <restaurant-button variant="primary" icon="verified" (click)="showConfirmVerificar.set(true)">Verificar Factura</restaurant-button>
+            <restaurant-button *hasPermission="'facturas:verificar'" variant="primary" icon="verified" (click)="showConfirmVerificar.set(true)">Verificar Factura</restaurant-button>
           }
         }
       </div>

@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmModalComponent } from '@restaurant/shared/ui';
+import { ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmModalComponent, HasPermissionDirective } from '@restaurant/shared/ui';
 import { SolicitudGil, EstadoGil } from '../../../models/solicitudes-gil.model';
 import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
@@ -9,7 +9,7 @@ import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 @Component({
   selector: 'restaurant-solicitudes-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmModalComponent, EmptyStateComponent],
+  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmModalComponent, HasPermissionDirective, EmptyStateComponent],
   templateUrl: './solicitudes-list.component.html',
   styleUrl: './solicitudes-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

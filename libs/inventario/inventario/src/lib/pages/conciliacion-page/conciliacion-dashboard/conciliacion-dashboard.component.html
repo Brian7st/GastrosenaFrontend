@@ -13,7 +13,7 @@
           Ver Historial
         </div>
       </restaurant-button>
-      <restaurant-button variant="primary" routerLink="toma-fisica">
+      <restaurant-button *hasPermission="'conciliacion:registrar_conteo'" variant="primary" routerLink="toma-fisica">
         <div class="btn-icon-text">
           <lucide-icon name="plus" [size]="20"></lucide-icon>
           Nueva Conciliación

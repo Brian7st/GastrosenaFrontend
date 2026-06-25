@@ -10,7 +10,7 @@
 
     <div class="header-actions">
       <inventario-back-button (clicked)="onVolver()" />
-      <button class="btn-action" (click)="onEditar()" [disabled]="estadoActual() !== 'BORRADOR'">
+      <button *hasPermission="'gil:editar'" class="btn-action" (click)="onEditar()" [disabled]="estadoActual() !== 'BORRADOR'">
         <span class="material-symbols-outlined">edit</span> Editar
       </button>
       <button class="btn-action" (click)="onDownloadPdf()">
@@ -19,12 +19,12 @@
 
       <div class="action-group">
         @if (estadoActual() === 'BORRADOR') {
-          <button class="btn-primary" (click)="onEnviarAprobacion()">
+          <button *hasPermission="'gil:emitir'" class="btn-primary" (click)="onEnviarAprobacion()">
             Enviar a Aprobación
           </button>
         }
         @if (estadoActual() === 'EMITIDO') {
-          <button class="btn-primary" (click)="onToggleEnviarProveedor()">
+          <button *hasPermission="'gil:emitir'" class="btn-primary" (click)="onToggleEnviarProveedor()">
             <span class="material-symbols-outlined">local_shipping</span>
             Enviar a Proveedor
           </button>
@@ -86,7 +86,7 @@
         <restaurant-button variant="ghost" (click)="onToggleEnviarProveedor()">
           Cancelar
         </restaurant-button>
-        <restaurant-button variant="primary"
+        <restaurant-button *hasPermission="'gil:emitir'" variant="primary"
           [disabled]="!correoProveedor()"
           (click)="onConfirmarEnvioProveedor()">
           <span class="material-symbols-outlined">send</span>

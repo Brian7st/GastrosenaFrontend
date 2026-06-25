@@ -7,7 +7,7 @@
     <p class="page-subtitle">Gestión de bienes y servicios — Centro de Servicios y Gestión Empresarial</p>
   </div>
   <div style="display: flex; gap: 1rem;">
-    <restaurant-button variant="primary" routerLink="generar">
+    <restaurant-button *hasPermission="'gil:crear'" variant="primary" routerLink="generar">
       <span class="material-symbols-outlined">library_add_check</span>
       Generar GIL
     </restaurant-button>
@@ -149,7 +149,7 @@
           <button class="action-icon" (click)="onView(s.id)" title="Ver Detalle">
             <span class="material-symbols-outlined">visibility</span>
           </button>
-          <button class="action-icon"
+          <button *hasPermission="'gil:editar'" class="action-icon"
                   (click)="onEdit(s.id)"
                   [disabled]="!canEdit(s.estado)"
                   title="Editar">
@@ -159,7 +159,7 @@
           <button class="action-icon" (click)="onExportPdf(s.id)" title="Exportar PDF/DOCX">
             <span class="material-symbols-outlined">picture_as_pdf</span>
           </button>
-          <button class="action-icon action-icon--danger"
+          <button *hasPermission="'gil:editar'" class="action-icon action-icon--danger"
                   (click)="onDelete(s)"
                   title="Eliminar">
             <span class="material-symbols-outlined">delete</span>
