@@ -4,7 +4,7 @@ import {
   RestauranteStats, PedidoResumenResponse, CajaStats,
   EstadoPedido, PedidoResponse, PedidoCreateRequest,
   SesionCajaResponse, AbrirSesionRequest, CerrarSesionRequest,
-  FacturarPedidoRequest, MetodoPago
+  FacturarPedidoRequest, MetodoPago, EstadoDetallePedido, IncidenciaPedidoResponse
 } from '../models/restaurante.model';
 import { RestauranteService } from './restaurante.service';
 import { AuthService } from './auth.service';
@@ -18,7 +18,7 @@ export interface ItemCarrito {
   precioUnitario: number;
   categoria: string;
   observaciones?: string;
-  estadoDetalle?: string;
+  estadoDetalle?: EstadoDetallePedido;
 }
 
 export interface ProductoMenu {
@@ -40,6 +40,7 @@ export interface PedidoCarrito {
   estado: EstadoPedido;
   fechaCreacion: string;
   detalles: ItemCarrito[];
+  incidencias?: IncidenciaPedidoResponse[];
   subtotal: number;
 }
 
@@ -231,7 +232,8 @@ export class RestauranteFacade {
               observaciones: d.observaciones || undefined,
               estadoDetalle: d.estadoDetalle
             };
-          })
+          }),
+          incidencias: p!.incidencias || []
         }));
 
         const ESTADO_PESO: Record<string, number> = {
@@ -431,7 +433,8 @@ export class RestauranteFacade {
                     observaciones: d.observaciones || undefined,
                     estadoDetalle: d.estadoDetalle
                   };
-                })
+                }),
+                incidencias: pedidoFull.incidencias || []
               };
               this._pedidoActivo.set(pedidoParaCarrito);
               observer.next(true);
@@ -453,78 +456,82 @@ export class RestauranteFacade {
     });
   }
 
-  cancelarPedidoActivoEnBackend(motivo: string = ''): Observable<boolean> {
+  cancelarPedidoActivoEnBackend(motivo: string = ''): Observable<{exito: boolean, mensaje?: string}> {
     const pedido = this.pedidoActivo();
     if (!pedido || pedido.estado === EstadoPedido.BORRADOR) {
-      return of(false);
+      return of({exito: false, mensaje: 'Pedido no válido'});
     }
     return new Observable(observer => {
       this.restauranteService.cancelarPedido(pedido.id, motivo).subscribe({
         next: () => {
           this.vaciarCarrito();
           this.cargarMesas(); // Recargar mesas para actualizar el mapa
-          observer.next(true);
+          observer.next({exito: true});
           observer.complete();
         },
         error: (err) => {
           console.error('[RestauranteFacade] Error al cancelar pedido en backend:', err);
-          observer.next(false);
+          const mensaje = err.error?.mensaje || err.error?.message || 'Error al cancelar el pedido';
+          observer.next({exito: false, mensaje});
           observer.complete();
         }
       });
     });
   }
 
-  devolverPedidoActivoEnBackend(motivo: string = ''): Observable<boolean> {
+  devolverPedidoActivoEnBackend(motivo: string = ''): Observable<{exito: boolean, mensaje?: string}> {
     const pedido = this.pedidoActivo();
     if (!pedido || pedido.estado === EstadoPedido.BORRADOR) {
-      return of(false);
+      return of({exito: false, mensaje: 'Pedido no válido'});
     }
     return new Observable(observer => {
       this.restauranteService.devolverPedido(pedido.id, motivo).subscribe({
         next: () => {
           this.vaciarCarrito();
           this.cargarMesas(); // Recargar mesas para actualizar el mapa
-          observer.next(true);
+          observer.next({exito: true});
           observer.complete();
         },
         error: (err) => {
           console.error('[RestauranteFacade] Error al devolver pedido en backend:', err);
-          observer.next(false);
+          const mensaje = err.error?.mensaje || err.error?.message || 'Error al devolver el pedido';
+          observer.next({exito: false, mensaje});
           observer.complete();
         }
       });
     });
   }
 
-  cancelarItemPedido(idDetalle: string, motivo: string = '', cantidad?: number): Observable<boolean> {
+  cancelarItemPedido(idDetalle: string, motivo: string = '', cantidad?: number): Observable<{exito: boolean, mensaje?: string}> {
     return new Observable(observer => {
       this.restauranteService.cancelarDetallePedido(idDetalle, motivo, cantidad).subscribe({
         next: (pedidoFull) => {
           this.actualizarPedidoActivoDesdeRespuesta(pedidoFull);
-          observer.next(true);
+          observer.next({exito: true});
           observer.complete();
         },
         error: (err) => {
           console.error('[RestauranteFacade] Error al cancelar ítem:', err);
-          observer.next(false);
+          const mensaje = err.error?.mensaje || err.error?.message || 'Error al cancelar el ítem';
+          observer.next({exito: false, mensaje});
           observer.complete();
         }
       });
     });
   }
 
-  devolverItemPedido(idDetalle: string, motivo: string = '', cantidad?: number): Observable<boolean> {
+  devolverItemPedido(idDetalle: string, motivo: string = '', cantidad?: number): Observable<{exito: boolean, mensaje?: string}> {
     return new Observable(observer => {
       this.restauranteService.devolverDetallePedido(idDetalle, motivo, cantidad).subscribe({
         next: (pedidoFull) => {
           this.actualizarPedidoActivoDesdeRespuesta(pedidoFull);
-          observer.next(true);
+          observer.next({exito: true});
           observer.complete();
         },
         error: (err) => {
           console.error('[RestauranteFacade] Error al devolver ítem:', err);
-          observer.next(false);
+          const mensaje = err.error?.mensaje || err.error?.message || 'Error al devolver el ítem';
+          observer.next({exito: false, mensaje});
           observer.complete();
         }
       });
@@ -559,7 +566,8 @@ export class RestauranteFacade {
           observaciones: d.observaciones || undefined,
           estadoDetalle: d.estadoDetalle
         };
-      })
+      }),
+      incidencias: pedidoFull.incidencias || []
     };
     
     this._pedidoActivo.set(pedidoParaCarrito);
@@ -580,6 +588,7 @@ export class RestauranteFacade {
       estado: EstadoPedido.BORRADOR,
       fechaCreacion: new Date().toISOString(),
       detalles: [],
+      incidencias: [],
       subtotal: 0
     });
   }
@@ -699,6 +708,7 @@ export class RestauranteFacade {
             estado: EstadoPedido.EN_PREPARACION,
             fechaCreacion: pedidoResponse.fechaCreacion,
             detalles: pedido.detalles,
+            incidencias: [],
             subtotal: pedidoResponse.subtotal
           };
 
