@@ -1,5 +1,5 @@
 import { Injectable, signal, inject } from '@angular/core';
-import { ActividadService, ActividadDTO } from './actividad.service';
+import { ActividadService, ActividadDTO, FichaService, FichaDTO } from './actividad.service';
 import { EvaluacionService } from './evaluacion.service';
 
 export interface AprendizMock {
@@ -13,6 +13,7 @@ export interface AprendizMock {
 }
 
 export type ActividadMock = ActividadDTO;
+export type { FichaDTO };
 
 const APRENDICES_MOCK: AprendizMock[] = [
   { id: 1, nombreCompleto: 'Camila Rodriguez Torres',  inicial: 'C', ficha: '2561234', jornada: 'Diurna',   estado: 'Pendiente' },
@@ -27,13 +28,17 @@ const APRENDICES_MOCK: AprendizMock[] = [
 @Injectable({ providedIn: 'root' })
 export class CocinaFacade {
   private actividadService = inject(ActividadService);
+  private fichaService     = inject(FichaService);
   private evaluacionService = inject(EvaluacionService);
 
   readonly aprendices = signal<AprendizMock[]>(APRENDICES_MOCK);
   readonly actividades = signal<ActividadMock[]>([]);
+  readonly fichas      = signal<FichaDTO[]>([]);
+  readonly fichasCargando = signal<boolean>(false);
 
   constructor() {
     this.cargarActividades();
+    this.cargarFichas();
   }
 
   cargarActividades(): void {
@@ -43,8 +48,22 @@ export class CocinaFacade {
     });
   }
 
+  cargarFichas(): void {
+    this.fichasCargando.set(true);
+    this.fichaService.getAll().subscribe({
+      next: (data) => {
+        this.fichas.set(data || []);
+        this.fichasCargando.set(false);
+      },
+      error: (err) => {
+        console.warn('No se pudieron cargar fichas desde el microservicio de usuarios:', err);
+        this.fichasCargando.set(false);
+      }
+    });
+  }
+
   actualizarEstado(id: number, estado: 'Aprobó' | 'No Aprobó'): void {
-    this.aprendices.update(aprendices => 
+    this.aprendices.update(aprendices =>
       aprendices.map(a => a.id === id ? { ...a, estado } : a)
     );
   }
