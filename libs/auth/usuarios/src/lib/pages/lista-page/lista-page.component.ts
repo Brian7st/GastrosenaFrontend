@@ -31,7 +31,6 @@ import {
   ImportarUsuariosRequest,
   UsuarioDetalle,
 } from '../../models/usuarios.model';
-// 👇 AGREGAR ESTA IMPORTACIÓN
 import { AuthService } from '@restaurant/shared/auth';
 
 @Component({
@@ -58,8 +57,6 @@ export class ListaPageComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   protected readonly i18n = inject(I18nService);
   private toastTimer: ReturnType<typeof setTimeout> | null = null;
-
-  // 👇 AGREGAR ESTO
   private readonly authService = inject(AuthService);
 
   // ── Signals del Facade ──────────────────────────────────────────────────
@@ -91,7 +88,6 @@ export class ListaPageComponent implements OnInit {
   readonly mostrarFormulario = signal(false);
   readonly usuarioEditando = signal<UsuarioDetalle | null>(null);
 
-  // 👇 AGREGAR ESTE COMPUTED
   readonly esAdmin = computed(() => {
     const user = this.authService.currentUser();
     return user?.rol === 'ADMINISTRADOR';
@@ -168,32 +164,32 @@ export class ListaPageComponent implements OnInit {
     this.mostrarFormulario.set(false);
   }
 
-onGuardarUsuario(data: CrearUsuarioRequest): void {
-  const editando = this.usuarioEditando();
-  if (editando) {
-    const payload: ActualizarUsuarioRequest = {
-      nombre:    data.nombre,
-      apellidos: data.apellidos,
-      telefono:  data.telefono,
-      idRol:     data.nombreRol,
-      documento: data.documento,
-      email:     data.email,
-    };
-    this.facade.actualizarUsuario(editando.id, payload);
-    
-    // ← AGREGAR ESTO
-    const rolCambio = editando.rol !== data.nombreRol;
-    if (rolCambio) {
-      this.mostrarToast(
-        'Usuario actualizado. Si se cambió el rol, el usuario deberá cerrar sesión para ver los cambios.'
-      );
-    } else {
-      this.mostrarToast('Usuario actualizado correctamente.');
-    }
+  onGuardarUsuario(data: CrearUsuarioRequest): void {
+    const editando = this.usuarioEditando();
+    if (editando) {
+      const payload: ActualizarUsuarioRequest = {
+        nombre: data.nombre,
+        apellidos: data.apellidos,
+        telefono: data.telefono,
+        idRol: data.nombreRol,
+        documento: data.documento,
+        email: data.email,
+      };
+      this.facade.actualizarUsuario(editando.id, payload);
 
-  } else {
-    this.facade.crearUsuario(data);
-    this.mostrarToast(this.i18n.t('lista.toast_creado'));
+      const rolCambio = editando.rol !== data.nombreRol;
+      if (rolCambio) {
+        this.mostrarToast(
+          'Usuario actualizado. Si se cambió el rol, el usuario deberá cerrar sesión para ver los cambios.'
+        );
+      } else {
+        this.mostrarToast('Usuario actualizado correctamente.');
+      }
+    } else {
+      this.facade.crearUsuario(data);
+      this.mostrarToast(this.i18n.t('lista.toast_creado'));
+    }
+    this.onCerrarFormulario();
   }
 
   onExportar(config: ExportarConfig): void {
@@ -211,7 +207,6 @@ onGuardarUsuario(data: CrearUsuarioRequest): void {
     } else {
       this.facade.activarUsuario(u.id);
     }
-
     setTimeout(() => {
       this.facade.cargarUsuarios();
     }, 500);
@@ -222,7 +217,6 @@ onGuardarUsuario(data: CrearUsuarioRequest): void {
       return;
     }
     this.facade.eliminarUsuario(id);
-
     setTimeout(() => {
       this.facade.cargarUsuarios();
     }, 500);
