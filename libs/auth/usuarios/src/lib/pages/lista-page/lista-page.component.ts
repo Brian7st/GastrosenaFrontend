@@ -168,30 +168,32 @@ export class ListaPageComponent implements OnInit {
     this.mostrarFormulario.set(false);
   }
 
-  onGuardarUsuario(data: CrearUsuarioRequest): void {
-    const editando = this.usuarioEditando();
-
-    if (editando) {
-      const payload: ActualizarUsuarioRequest = {
-        nombre: data.nombre,
-        apellidos: data.apellidos,
-        telefono: data.telefono,
-        idRol: data.nombreRol,
-        documento: data.documento,
-        email: data.email,
-      };
-      this.facade.actualizarUsuario(editando.id, payload);
-      this.mostrarToast('Usuario actualizado');
+onGuardarUsuario(data: CrearUsuarioRequest): void {
+  const editando = this.usuarioEditando();
+  if (editando) {
+    const payload: ActualizarUsuarioRequest = {
+      nombre:    data.nombre,
+      apellidos: data.apellidos,
+      telefono:  data.telefono,
+      idRol:     data.nombreRol,
+      documento: data.documento,
+      email:     data.email,
+    };
+    this.facade.actualizarUsuario(editando.id, payload);
+    
+    // ← AGREGAR ESTO
+    const rolCambio = editando.rol !== data.nombreRol;
+    if (rolCambio) {
+      this.mostrarToast(
+        'Usuario actualizado. Si se cambió el rol, el usuario deberá cerrar sesión para ver los cambios.'
+      );
     } else {
-      this.facade.crearUsuario(data);
-      this.mostrarToast('Usuario creado');
+      this.mostrarToast('Usuario actualizado correctamente.');
     }
 
-    setTimeout(() => {
-      this.facade.cargarUsuarios();
-    }, 500);
-
-    this.onCerrarFormulario();
+  } else {
+    this.facade.crearUsuario(data);
+    this.mostrarToast(this.i18n.t('lista.toast_creado'));
   }
 
   onExportar(config: ExportarConfig): void {
