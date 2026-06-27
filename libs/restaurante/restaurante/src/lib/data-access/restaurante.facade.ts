@@ -9,6 +9,7 @@ import {
 import { RestauranteService } from './restaurante.service';
 import { AuthService } from './auth.service';
 import { catchError, of, Observable, forkJoin, switchMap } from 'rxjs';
+import { CategoriaMenu } from '../models/restaurante.model';
 
 export interface ItemCarrito {
   id?: string; // UUID del detalle en base de datos
@@ -29,6 +30,7 @@ export interface ProductoMenu {
   temperatura?: string;
   image: string;
   category: string;
+  categoryName?: string;
   subcategory?: string;
 }
 
@@ -61,6 +63,7 @@ export class RestauranteFacade {
   private _historialFacturas = signal<any[]>([]);
 
   private _productosMenu = signal<ProductoMenu[]>([]);
+  private _categoriasMenu = signal<CategoriaMenu[]>([]);
   private readonly _mostrarModalAccesoDenegado = signal<boolean>(false);
 
   readonly mesas = this._mesas.asReadonly();
@@ -73,6 +76,7 @@ export class RestauranteFacade {
   readonly pedidosParaCobro = this._pedidosParaCobro.asReadonly();
   readonly historialFacturas = this._historialFacturas.asReadonly();
   readonly productosMenu = this._productosMenu.asReadonly();
+  readonly categoriasMenu = this._categoriasMenu.asReadonly();
   readonly errorGeneral = computed(() => this._errorGeneral());
   readonly mostrarModalAccesoDenegado = computed(() => this._mostrarModalAccesoDenegado());
 
@@ -128,22 +132,13 @@ export class RestauranteFacade {
       bar: this.restauranteService.obtenerRecetasBar().pipe(catchError(() => of([])))
     }).subscribe({
       next: ({ cocina, bar }) => {
-        const todasLasRecetas = [...cocina, ...bar];
-        const menuMapeado: ProductoMenu[] = todasLasRecetas.filter(r => r.activo !== false).map(r => {
-          let cat = 'plato_fuerte';
-          let subcat: string | undefined = undefined;
-          const catNombre = (r.nombreCategoria || '').toLowerCase();
-          
-          if (catNombre.includes('bebida')) {
-            cat = 'bebidas';
-            if (catNombre.includes('caliente')) subcat = 'calientes';
-            else if (catNombre.includes('fria') || catNombre.includes('fría')) subcat = 'frias';
-            else if (catNombre.includes('sin alcohol')) subcat = 'sin_alcohol';
-            else if (catNombre.includes('con alcohol') || catNombre.includes('licor')) subcat = 'con_alcohol';
-          }
-          else if (catNombre.includes('entrada')) cat = 'entrada';
-          else if (catNombre.includes('postre')) cat = 'postre';
+        // Prefijar IDs para evitar colisión si Bar y Cocina usan los mismos IDs (ej: id 1 en ambos)
+        const cocinaMapeada = cocina.map(r => ({ ...r, idCategoria: `cocina_${r.idCategoria}` }));
+        const barMapeada = bar.map(r => ({ ...r, idCategoria: `bar_${r.idCategoria}` }));
+        const todasLasRecetas = [...cocinaMapeada, ...barMapeada];
 
+        // --- 1. Mapear Productos ---
+        const menuMapeado: ProductoMenu[] = todasLasRecetas.filter(r => r.activo !== false).map(r => {
           return {
             id: r.idReceta,
             name: r.nombreReceta,
@@ -151,11 +146,43 @@ export class RestauranteFacade {
             tiempoPreparacion: r.tiempoPreparacion,
             temperatura: r.temperatura,
             image: r.urlImagen || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&q=80',
-            category: cat,
-            subcategory: subcat
+            category: r.idCategoria || 'sin-categoria',
+            categoryName: r.nombreCategoria || 'Sin Categoría'
           };
         });
+
         this._productosMenu.set(menuMapeado);
+
+        // --- 2. Extraer Categorías Dinámicas ---
+        const mapCategorias = new Map<string, CategoriaMenu>();
+        menuMapeado.forEach(prod => {
+          if (!mapCategorias.has(prod.category)) {
+            const nombre = prod.categoryName || 'Desconocida';
+            const lower = nombre.toLowerCase();
+            let icon = 'utensils'; // ícono por defecto (comida)
+
+            // Asignar icono basado en si es bebida
+            if (lower.includes('bebida') || lower.includes('jugo') || lower.includes('licor') || lower.includes('café') || lower.includes('cafe') || lower.includes('alcohol') || lower.includes('alcholica') || lower.includes('coctel') || lower.includes('cóctel')) {
+              icon = 'coffee';
+            }
+
+            mapCategorias.set(prod.category, {
+              id: prod.category,
+              name: nombre,
+              icon: icon,
+              type: icon === 'coffee' ? 'BEBIDA' : 'COMIDA'
+            });
+          }
+        });
+
+        // Agregar "Todo" al principio
+        const arrCategorias = Array.from(mapCategorias.values());
+        arrCategorias.sort((a, b) => a.name.localeCompare(b.name));
+        this._categoriasMenu.set([
+          { id: 'all', name: 'Todo', icon: 'layout-grid', type: 'ALL' },
+          ...arrCategorias
+        ]);
+
       },
       error: (err) => {
         console.error('[RestauranteFacade] Error fatal al cargar menú:', err);
@@ -456,82 +483,82 @@ export class RestauranteFacade {
     });
   }
 
-  cancelarPedidoActivoEnBackend(motivo: string = ''): Observable<{exito: boolean, mensaje?: string}> {
+  cancelarPedidoActivoEnBackend(motivo: string = ''): Observable<{ exito: boolean, mensaje?: string }> {
     const pedido = this.pedidoActivo();
     if (!pedido || pedido.estado === EstadoPedido.BORRADOR) {
-      return of({exito: false, mensaje: 'Pedido no válido'});
+      return of({ exito: false, mensaje: 'Pedido no válido' });
     }
     return new Observable(observer => {
       this.restauranteService.cancelarPedido(pedido.id, motivo).subscribe({
         next: () => {
           this.vaciarCarrito();
           this.cargarMesas(); // Recargar mesas para actualizar el mapa
-          observer.next({exito: true});
+          observer.next({ exito: true });
           observer.complete();
         },
         error: (err) => {
           console.error('[RestauranteFacade] Error al cancelar pedido en backend:', err);
           const mensaje = err.error?.mensaje || err.error?.message || 'Error al cancelar el pedido';
-          observer.next({exito: false, mensaje});
+          observer.next({ exito: false, mensaje });
           observer.complete();
         }
       });
     });
   }
 
-  devolverPedidoActivoEnBackend(motivo: string = ''): Observable<{exito: boolean, mensaje?: string}> {
+  devolverPedidoActivoEnBackend(motivo: string = ''): Observable<{ exito: boolean, mensaje?: string }> {
     const pedido = this.pedidoActivo();
     if (!pedido || pedido.estado === EstadoPedido.BORRADOR) {
-      return of({exito: false, mensaje: 'Pedido no válido'});
+      return of({ exito: false, mensaje: 'Pedido no válido' });
     }
     return new Observable(observer => {
       this.restauranteService.devolverPedido(pedido.id, motivo).subscribe({
         next: () => {
           this.vaciarCarrito();
           this.cargarMesas(); // Recargar mesas para actualizar el mapa
-          observer.next({exito: true});
+          observer.next({ exito: true });
           observer.complete();
         },
         error: (err) => {
           console.error('[RestauranteFacade] Error al devolver pedido en backend:', err);
           const mensaje = err.error?.mensaje || err.error?.message || 'Error al devolver el pedido';
-          observer.next({exito: false, mensaje});
+          observer.next({ exito: false, mensaje });
           observer.complete();
         }
       });
     });
   }
 
-  cancelarItemPedido(idDetalle: string, motivo: string = '', cantidad?: number): Observable<{exito: boolean, mensaje?: string}> {
+  cancelarItemPedido(idDetalle: string, motivo: string = '', cantidad?: number): Observable<{ exito: boolean, mensaje?: string }> {
     return new Observable(observer => {
       this.restauranteService.cancelarDetallePedido(idDetalle, motivo, cantidad).subscribe({
         next: (pedidoFull) => {
           this.actualizarPedidoActivoDesdeRespuesta(pedidoFull);
-          observer.next({exito: true});
+          observer.next({ exito: true });
           observer.complete();
         },
         error: (err) => {
           console.error('[RestauranteFacade] Error al cancelar ítem:', err);
           const mensaje = err.error?.mensaje || err.error?.message || 'Error al cancelar el ítem';
-          observer.next({exito: false, mensaje});
+          observer.next({ exito: false, mensaje });
           observer.complete();
         }
       });
     });
   }
 
-  devolverItemPedido(idDetalle: string, motivo: string = '', cantidad?: number): Observable<{exito: boolean, mensaje?: string}> {
+  devolverItemPedido(idDetalle: string, motivo: string = '', cantidad?: number): Observable<{ exito: boolean, mensaje?: string }> {
     return new Observable(observer => {
       this.restauranteService.devolverDetallePedido(idDetalle, motivo, cantidad).subscribe({
         next: (pedidoFull) => {
           this.actualizarPedidoActivoDesdeRespuesta(pedidoFull);
-          observer.next({exito: true});
+          observer.next({ exito: true });
           observer.complete();
         },
         error: (err) => {
           console.error('[RestauranteFacade] Error al devolver ítem:', err);
           const mensaje = err.error?.mensaje || err.error?.message || 'Error al devolver el ítem';
-          observer.next({exito: false, mensaje});
+          observer.next({ exito: false, mensaje });
           observer.complete();
         }
       });
@@ -569,7 +596,7 @@ export class RestauranteFacade {
       }),
       incidencias: pedidoFull.incidencias || []
     };
-    
+
     this._pedidoActivo.set(pedidoParaCarrito);
     this._ordenesHistorial.update(historial =>
       historial.map(p => p.id === pedidoFull.id ? pedidoParaCarrito : p)

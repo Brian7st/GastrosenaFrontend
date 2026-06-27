@@ -33,8 +33,13 @@ export class PedidosPageComponent {
   private route = inject(ActivatedRoute);
 
   searchTerm = signal('');
-  selectedCategory = signal('all');
-  selectedSubcategory = signal('');
+  selectedMainCategory = signal('all');
+  selectedSubCategory = signal('all');
+
+  onFilterChanged(event: {main: string, sub: string}) {
+    this.selectedMainCategory.set(event.main);
+    this.selectedSubCategory.set(event.sub);
+  }
 
   mesaActual = computed(() => {
     const pedido = this.facade.pedidoActivo();
