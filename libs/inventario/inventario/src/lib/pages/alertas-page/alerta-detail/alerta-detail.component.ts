@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
-import { StatusBadgeComponent, ButtonComponent, LucideIconComponent } from '@restaurant/shared/ui';
+import { StatusBadgeComponent, ButtonComponent, LucideIconComponent, HasPermissionDirective } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { AlertasFacade } from '../../../data-access/alertas.facade';
 
@@ -15,7 +15,7 @@ import { AlertasFacade } from '../../../data-access/alertas.facade';
   selector: 'restaurant-alerta-detail',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterModule, StatusBadgeComponent, ButtonComponent, LucideIconComponent, BackButtonComponent],
+  imports: [RouterModule, StatusBadgeComponent, ButtonComponent, LucideIconComponent, HasPermissionDirective, BackButtonComponent],
   templateUrl: './alerta-detail.component.html',
   styleUrl: './alerta-detail.component.scss',
 })

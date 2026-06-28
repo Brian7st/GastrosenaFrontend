@@ -1,8 +1,20 @@
 // ── Movimiento de Almacén — Modelo (F-11) ──────────────────────────────────
 
+/** Documento agrupado de movimientos (lista de entradas/salidas). */
+export interface DocumentoMovimiento {
+  tipo: 'ENTRADA' | 'SALIDA';
+  documentoId: string;
+  numeroDocumento: string | null;
+  cantidadBienes: number;
+  cantidadTotal: number;
+  valorTotal: number;
+  fecha: string;
+  estado: 'Completado' | 'Pendiente' | 'Cancelado';
+}
+
 export interface Movimiento {
   id: string;
-  tipo: 'ENTRADA' | 'SALIDA' | 'RESERVA' | 'LIBERACION' | 'AJUSTE';
+  tipo: 'ENTRADA' | 'SALIDA' | 'RESERVA' | 'LIBERACION' | 'AJUSTE' | 'AJUSTE_POSITIVO' | 'AJUSTE_NEGATIVO';
   productoNombre: string;
   codigoSena: string;
   cantidad: number;
@@ -11,19 +23,6 @@ export interface Movimiento {
   responsableNombre: string;
   valor: number;
   estado: 'Completado' | 'Pendiente' | 'Cancelado';
-}
-
-/** Payload del formulario de registro de entrada.
- *  Alineado con RegistrarEntradaHttpRequest (Swagger).
- *  Las entradas deben originarse desde un GIL validado → gilId obligatorio en ese flujo. */
-export interface EntradaMovimientoData {
-  productoId:      string;
-  cantidad:        number;
-  precioUnitario:  number;
-  facturaId?:      string;
-  proveedorNit?:   string;
-  gilId?:          string;
-  conciliacionId?: string;
 }
 
 /** Payload del formulario de registro de salida.
@@ -53,10 +52,13 @@ export interface LiberacionMovimientoData {
   motivo: string;
 }
 
-/** Payload para ajustar el inventario físico de un producto */
+/** Payload para ajustar el inventario físico de un producto.
+ *  Alineado con AjustarInventarioHttpRequest (Swagger).
+ *  `cantidadNueva` es el stock absoluto corregido (set-to), NO un delta. */
 export interface AjusteMovimientoData {
   producto: string;
   cantidadNueva: number;
   motivo: string;
-  responsableId: string;
+  autorizado: boolean;
+  referenciaId?: string | null;
 }

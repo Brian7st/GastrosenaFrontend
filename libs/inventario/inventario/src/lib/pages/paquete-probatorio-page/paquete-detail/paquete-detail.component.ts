@@ -11,6 +11,7 @@ import {
   StatusBadgeComponent,
   LucideIconComponent,
   ButtonComponent,
+  HasPermissionDirective,
 } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import {
@@ -29,6 +30,7 @@ import { PaqueteFacade } from '../../../data-access/paquete.facade';
     StatusBadgeComponent,
     LucideIconComponent,
     ButtonComponent,
+    HasPermissionDirective,
     BackButtonComponent
 ],
   templateUrl: './paquete-detail.component.html',
@@ -40,14 +42,23 @@ export class PaqueteDetailComponent implements OnInit {
   private facade = inject(PaqueteFacade);
 
   // ── Estado reactivo desde facade ─────────────────────────────────────────
-  paquete = this.facade.paqueteSeleccionado;
-  loading = this.facade.loading;
+  paquete      = this.facade.paqueteSeleccionado;
+  loading      = this.facade.loading;
+  facadeError  = this.facade.error;
 
   // ── Estado derivado ──────────────────────────────────────────────────────
   isCompleto = computed(() => {
     const p = this.paquete();
     return p ? (!!p.actaId && !!p.requisicionId && p.registroAsistenciaAdjunto) : false;
   });
+
+  /** El backend exige COMPLETO → REVISADO (revisar) antes de poder archivar. */
+  readonly puedeRevisar = computed(() => this.paquete()?.estado === 'COMPLETO');
+
+  /** Archivar solo es válido cuando el paquete está REVISADO. */
+  readonly puedeArchivar = computed(() =>
+    this.paquete()?.estado === 'REVISADO'
+  );
 
   docsCompletados = computed(() => {
     const p = this.paquete();
@@ -67,14 +78,23 @@ export class PaqueteDetailComponent implements OnInit {
         fecha: 'Pendiente de acción',
         activo: true,
         tipo: 'error',
-        detalle: `Validación automática - ${p.fecha}`,
+        detalle: `Validación automática - ${p.fecha ?? ''}`,
       });
     }
 
     if (p.estado === 'COMPLETO') {
       entries.push({
         estado: 'Completo',
-        fecha: p.fecha,
+        fecha: p.fecha ?? '',
+        activo: true,
+        tipo: 'success',
+      });
+    }
+
+    if (p.estado === 'REVISADO') {
+      entries.push({
+        estado: 'Revisado',
+        fecha: p.fecha ?? '',
         activo: true,
         tipo: 'success',
       });
@@ -83,7 +103,7 @@ export class PaqueteDetailComponent implements OnInit {
     if (p.estado === 'ARCHIVADO') {
       entries.push({
         estado: 'Archivado',
-        fecha: p.fecha,
+        fecha: p.fecha ?? '',
         activo: true,
         tipo: 'neutral',
       });
@@ -93,7 +113,7 @@ export class PaqueteDetailComponent implements OnInit {
     if (p.estado !== 'INCOMPLETO') {
       entries.push({
         estado: 'Incompleto',
-        fecha: p.fecha,
+        fecha: p.fecha ?? '',
         activo: false,
         tipo: 'neutral',
       });
@@ -107,6 +127,7 @@ export class PaqueteDetailComponent implements OnInit {
     const map: Record<PaqueteEstado, string> = {
       INCOMPLETO: 'Incompleto',
       COMPLETO:   'Completo',
+      REVISADO:   'Revisado',
       ARCHIVADO:  'Archivado',
     };
     return map[estado];
@@ -116,6 +137,7 @@ export class PaqueteDetailComponent implements OnInit {
     const map: Record<PaqueteEstado, 'success' | 'warning' | 'danger' | 'info'> = {
       INCOMPLETO: 'danger',
       COMPLETO:   'success',
+      REVISADO:   'success',
       ARCHIVADO:  'info',
     };
     return map[estado];
@@ -139,35 +161,49 @@ export class PaqueteDetailComponent implements OnInit {
   irAdjuntar(): void {
     const p = this.paquete();
     if (p) {
-      this.router.navigate(['/app/inventario/paquete-probatorio', p.id, 'adjuntar']);
+      this.router.navigate(['/app/inventario/paquete-probatorio', p.id, 'asistencia']);
     }
   }
 
   exportarPaquete(): void {
     const p = this.paquete();
     if (p) {
-      console.log('Exportar paquete:', p.expediente);
+      this.facade.exportarPaquete(p.id);
+    }
+  }
+
+  /** Avanza el paquete de COMPLETO → REVISADO. revisorId provisional: el instructor del paquete. */
+  revisarPaquete(): void {
+    const p = this.paquete();
+    if (p && this.puedeRevisar()) {
+      this.facade.revisarPaquete(p.id, p.instructorId || 'revisor-sena');
     }
   }
 
   archivarExpediente(): void {
     const p = this.paquete();
-    if (p) {
-      console.log('Archivar expediente:', p.expediente);
+    if (p && this.puedeArchivar()) {
+      this.facade.archivarPaquete(p.id);
     }
   }
 
   verDocumento(tipo: string): void {
     const p = this.paquete();
-    if (p) {
-      this.router.navigate(['/app/inventario/paquete-probatorio', p.id, tipo]);
+    if (!p) return;
+    if (tipo === 'requisicion') {
+      this.router.navigate(['/app/inventario/paquete-probatorio', p.id, 'requisicion']);
+    } else if (tipo === 'asistencia') {
+      this.router.navigate(['/app/inventario/paquete-probatorio', p.id, 'asistencia']);
+    } else if (tipo === 'acta' && p.actaId) {
+      // El acta vive en su propia página: /app/inventario/actas/:id
+      this.router.navigate(['/app/inventario/actas', p.actaId]);
     }
   }
 
   cambiarDocumento(tipo: string): void {
     const p = this.paquete();
     if (p) {
-      this.router.navigate(['/app/inventario/paquete-probatorio', p.id, 'adjuntar'], {
+      this.router.navigate(['/app/inventario/paquete-probatorio', p.id, 'asistencia'], {
         queryParams: { tipo },
       });
     }

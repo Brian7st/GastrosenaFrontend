@@ -44,10 +44,47 @@ export class RequisicionesService {
   }
 
   crearRequisicion(data: Partial<Requisicion>): Observable<Requisicion> {
+    // Mapeo al contrato exacto del backend CrearRequisicionHttpRequest
+    const instructorNombre = data.instructorNombre?.trim()
+      || data.instructorId  // fallback: usa el ID si no hay nombre
+      || 'Instructor';
+
+    const body = {
+      sufijo:           data.fichaId ?? '',           // identificador de la ficha
+      fecha:            data.fecha ?? '',             // ISO date "yyyy-MM-dd"
+      horaSesion:       this.toLocalTime(data.horaSesion ?? ''),
+      fichaId:          data.fichaId ?? '',
+      instructorId:     data.instructorId ?? '',
+      instructorNombre,
+      items: (data.items ?? []).map(item => ({
+        codigoSena:   item.productoId,      // backend espera codigoSena
+        descripcion:  item.productoNombre,  // backend espera descripcion
+        cantidad:     item.cantidad,
+        unidadMedida: item.unidadMedida,
+        categoria:    item.categoria,       // ya viene como CategoriaInsumo del draft
+      })),
+    };
+
     return this.http
-      .post<RequisicionResponse>(`${API}/legalization/requisiciones`, data)
+      .post<{ id: string }>(`${API}/legalization/requisiciones`, body)
       .pipe(
-        map(requisicionFromApi),
+        map(() => ({ ...data } as Requisicion)),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** Convierte "HH:mm" a "HH:mm:ss" que espera LocalTime en Spring Boot. */
+  private toLocalTime(hora: string): string {
+    if (!hora) return '00:00:00';
+    return hora.length === 5 ? `${hora}:00` : hora;
+  }
+
+  /** PATCH /legalization/requisiciones/{id}/enviar — transición BORRADOR → ENVIADA */
+  enviarRequisicion(id: string): Observable<boolean> {
+    return this.http
+      .patch<void>(`${API}/legalization/requisiciones/${id}/enviar`, {})
+      .pipe(
+        map(() => true),
         catchError(err => throwError(() => err))
       );
   }
@@ -70,6 +107,16 @@ export class RequisicionesService {
         map(() => true),
         catchError(err => throwError(() => err))
       );
+  }
+
+  /** GET /api/reportes/requisicion — el PDF lo genera el microservicio de reportes. */
+  exportarRequisicion(id: string): Observable<Blob> {
+    return this.http
+      .get(`/api/reportes/requisicion`, {
+        params: { id, formato: 'PDF' },
+        responseType: 'blob',
+      })
+      .pipe(catchError(err => throwError(() => err)));
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

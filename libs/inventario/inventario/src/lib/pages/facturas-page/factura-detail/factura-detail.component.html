@@ -19,16 +19,15 @@
       </div>
 
       <div class="page-header__actions">
-        <restaurant-button variant="surface" icon="picture_as_pdf" (click)="descargarOImprimir()">Descargar PDF</restaurant-button>
         <restaurant-button variant="surface" icon="print" (click)="descargarOImprimir()">Imprimir</restaurant-button>
 
         @if (f.estado === 'VERIFICADA') {
-          <restaurant-button variant="primary" icon="check_circle" (click)="showConfirmPagada.set(true)">Marcar como Pagada</restaurant-button>
+          <restaurant-button *hasPermission="'facturas:marcar_pagada'" variant="primary" icon="check_circle" (click)="showConfirmPagada.set(true)">Marcar como Pagada</restaurant-button>
         }
 
         @if (f.estado === 'REGISTRADA' && conciliacionGil(); as c) {
           @if (estaConciliada(c.diferencias)) {
-            <restaurant-button variant="primary" icon="verified" (click)="showConfirmVerificar.set(true)">Verificar Factura</restaurant-button>
+            <restaurant-button *hasPermission="'facturas:verificar'" variant="primary" icon="verified" (click)="showConfirmVerificar.set(true)">Verificar Factura</restaurant-button>
           }
         }
       </div>
@@ -104,7 +103,13 @@
                 <tr>
                   <td class="text-center text-secondary">{{ i + 1 }}</td>
                   <td class="font-medium">{{ item.descripcion }}</td>
-                  <td class="text-secondary">{{ item.productoId || '—' }}</td>
+                  <td class="text-secondary">
+                    @if (esPendiente(item)) {
+                      <span class="badge badge--orange" title="Esta línea aún no está asociada a un bien del catálogo">Sin bien</span>
+                    } @else {
+                      {{ item.productoId || '—' }}
+                    }
+                  </td>
                   <td class="text-right">{{ item.cantidad }}</td>
                   <td class="text-right">{{ item.precioUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
                   <td class="text-right text-secondary">{{ item.porcentajeIva ?? item.iva }}%</td>
@@ -141,7 +146,7 @@
                 <span class="cufe-box__label">CUFE</span>
                 <span class="cufe-box__value" [title]="f.cufe">{{ f.cufe ? (f.cufe | slice:0:10) + '...' + (f.cufe | slice:-5) : 'N/A' }}</span>
               </div>
-              <button class="icon-btn" title="Copiar CUFE">
+              <button class="icon-btn" title="Copiar CUFE" (click)="onCopiarCufe(f.cufe)">
                 <span class="material-symbols-outlined">content_copy</span>
               </button>
             </div>
@@ -216,10 +221,28 @@
             </div>
           </div>
 
+          @if (f.valorNetoAPagar !== null && f.valorNetoAPagar !== undefined && f.valorNetoAPagar < f.total) {
+            <div class="summary__body summary__body--nc">
+              <div class="summary-row">
+                <span class="summary-row__label">Total FEL</span>
+                <span class="summary-row__value font-medium">{{ f.total | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+              </div>
+              <div class="summary-row summary-row--deduction">
+                <span class="summary-row__label">
+                  <span class="material-symbols-outlined summary-row__icon">remove_circle</span>
+                  Notas crédito
+                </span>
+                <span class="summary-row__value font-medium text-danger">
+                  − {{ (f.total - f.valorNetoAPagar) | currency:'COP':'symbol-narrow':'1.0-0' }}
+                </span>
+              </div>
+            </div>
+          }
+
           <div class="summary__footer">
-            <span class="summary__footer-label">Total a Pagar</span>
+            <span class="summary__footer-label">{{ f.valorNetoAPagar !== null && f.valorNetoAPagar !== undefined && f.valorNetoAPagar < f.total ? 'Neto a pagar' : 'Total a Pagar' }}</span>
             <div class="text-right">
-              <span class="summary__footer-total">{{ f.total | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+              <span class="summary__footer-total">{{ (f.valorNetoAPagar ?? f.total) | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
               <p class="summary__footer-currency">COP • Pesos Colombianos</p>
             </div>
           </div>
@@ -239,6 +262,71 @@
               {{ estaConciliada(c.diferencias) ? 'Conciliada' : countPendientes(c.diferencias) + ' diferencia(s) pendiente(s)' }}
             </span>
           </div>
+
+          @if (f.estado === 'REGISTRADA') {
+            @if (!mostrarConteo()) {
+              <div class="gil-reconciliar-row">
+                <p class="gil-reconciliar-hint">
+                  ¿Lo recibido no coincide con lo facturado? Ajustá el conteo físico y volvé a conciliar.
+                </p>
+                <restaurant-button variant="surface" icon="checklist" (click)="abrirConteo()">
+                  Ajustar conteo físico
+                </restaurant-button>
+              </div>
+            } @else {
+              <div class="conteo-editor">
+                <div class="conteo-editor__head">
+                  <h5 class="conteo-editor__title">Conteo físico recibido</h5>
+                  <p class="conteo-editor__hint">
+                    Editá la cantidad realmente recibida por ítem. Se precargó con lo facturado.
+                  </p>
+                </div>
+
+                <div class="gil-table-wrapper">
+                  <table class="gil-table">
+                    <thead>
+                      <tr>
+                        <th>Ítem</th>
+                        <th class="text-right">Cant. solicitada (GIL)</th>
+                        <th class="text-right">Cant. recibida</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (b of gilBienes(); track $index) {
+                        <tr>
+                          <td>
+                            <span class="conteo-item-code">{{ b.codigoSena }}</span>
+                            <span class="conteo-item-name">{{ b.descripcion }}</span>
+                          </td>
+                          <td class="text-right text-secondary">{{ b.cantidad }} {{ b.unidadMedida }}</td>
+                          <td class="text-right">
+                            @if (b.productoId; as pid) {
+                              <input
+                                type="number"
+                                min="0"
+                                class="gil-obs-input conteo-input"
+                                [value]="conteoRecibido()[pid] ?? ''"
+                                (input)="setConteo(pid, $event)"
+                              />
+                            } @else {
+                              <span class="text-secondary">Sin producto vinculado</span>
+                            }
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="conteo-editor__actions">
+                  <button class="btn-cancel" type="button" (click)="cerrarConteo()">Cancelar</button>
+                  <button class="gil-resolve-btn" type="button" [disabled]="loading()" (click)="confirmarConteoYConciliar()">
+                    Confirmar conteo y conciliar
+                  </button>
+                </div>
+              </div>
+            }
+          }
 
           @if (c.diferencias.length === 0) {
             <p class="gil-conciliacion__empty">Todos los ítems coinciden con el GIL.</p>
@@ -272,12 +360,24 @@
                         @if (dif.resuelta) {
                           <span class="badge badge--success-soft">Resuelta</span>
                         } @else {
-                          <span class="badge badge--tertiary">Pendiente</span>
+                          <span class="badge" [ngClass]="tipoDiferencia(dif).clase" [title]="dif.observacion || ''">
+                            {{ tipoDiferencia(dif).label }}
+                          </span>
                         }
                       </td>
                       <td>
                         @if (dif.resuelta) {
                           <span class="gil-obs-text">{{ dif.observacion || '—' }}</span>
+                        } @else if (esSobrefacturacion(dif)) {
+                          <button
+                            class="gil-resolve-btn gil-resolve-btn--nc"
+                            type="button"
+                            [disabled]="loading()"
+                            (click)="abrirNotaCreditoModal(dif)"
+                          >
+                            <span class="material-symbols-outlined">receipt_long</span>
+                            Registrar nota crédito
+                          </button>
                         } @else {
                           <div class="gil-resolve-row">
                             <input
@@ -335,6 +435,45 @@
         </section>
       }
 
+      <!-- Cola de revisión: líneas FEL que quedaron sin bien tras la conciliación -->
+      @if (lineasPendientes().length > 0) {
+        <section class="bento-card pendientes-card">
+          <div class="card-section">
+            <h4 class="card-section__title">
+              <span class="material-symbols-outlined text-tertiary">rule</span>
+              Líneas sin bien asignado ({{ lineasPendientes().length }})
+            </h4>
+            <p class="pendientes-card__hint">
+              Estas líneas no se resolvieron automáticamente al conciliar con el GIL. Asociá cada una a un
+              bien existente del catálogo. Si el bien no existe,
+              <button type="button" class="link-btn" (click)="irACrearBien()">creálo primero en Bienes</button>.
+            </p>
+
+            @if (f.estado === 'REGISTRADA') {
+              <ul class="pendientes-list">
+                @for (linea of lineasPendientes(); track linea.descripcion) {
+                  <li class="pendientes-list__item">
+                    <span class="pendientes-list__desc font-medium">{{ linea.descripcion }}</span>
+                    <div class="pendientes-list__action">
+                      <restaurant-button
+                        variant="primary"
+                        (click)="abrirBuscadorBien(linea.descripcion)">
+                        <span class="material-symbols-outlined">search</span>
+                        Buscar bien…
+                      </restaurant-button>
+                    </div>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="pendientes-card__locked text-secondary">
+                Solo se pueden asociar líneas mientras la factura está en estado REGISTRADA.
+              </p>
+            }
+          </div>
+        </section>
+      }
+
     </div>
 
   } @else {
@@ -383,6 +522,81 @@
           <button class="btn-cancel" type="button" (click)="showConfirmPagada.set(false)">Cancelar</button>
           <button class="btn-confirm" type="button" (click)="confirmarPagada()">Confirmar pago</button>
         </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Modal: Registrar nota crédito ───────────────────────────────────── -->
+<inventario-registrar-nota-credito-modal
+  [isOpen]="notaCreditoModalAbierto()"
+  [factura]="factura()"
+  [diferencia]="diferenciaNotaCredito()"
+  (confirmar)="onConfirmarNotaCredito($event)"
+  (cancelar)="cerrarNotaCreditoModal()"
+/>
+
+<!-- ── Buscador de bien para asociar línea pendiente ───────────────────── -->
+@if (buscadorBienAbierto()) {
+  <div class="modal-backdrop" (click)="cerrarBuscadorBien()">
+    <div class="modal-container modal-container--wide" (click)="$event.stopPropagation()">
+      <div class="buscador-bien">
+        <h2 class="modal-title">Buscar bien para asociar</h2>
+        @if (lineaPendienteActiva(); as desc) {
+          <p class="modal-text">Línea FEL: <strong>{{ desc }}</strong></p>
+        }
+        @if (bienAConfirmar(); as b) {
+          <div class="confirm-pair">
+            <div class="confirm-pair__side">
+              <span class="confirm-pair__label">Línea del FEL</span>
+              <span class="confirm-pair__value">{{ lineaPendienteActiva() }}</span>
+            </div>
+            <span class="material-symbols-outlined confirm-pair__arrow">arrow_forward</span>
+            <div class="confirm-pair__side">
+              <span class="confirm-pair__label">Bien del catálogo</span>
+              <span class="confirm-pair__value"><strong>{{ b.codigoSena }}</strong> — {{ b.descripcion }}</span>
+            </div>
+          </div>
+          <p class="confirm-pair__warn">
+            <span class="material-symbols-outlined">info</span>
+            Verificá que correspondan: el sistema no valida que coincidan.
+          </p>
+          <div class="modal-actions">
+            <button class="btn-cancel" type="button" (click)="volverABuscar()">Volver</button>
+            <button class="btn-confirm" type="button" (click)="confirmarAsociacion()">Confirmar asociación</button>
+          </div>
+        } @else {
+          <input
+            type="text"
+            class="gil-obs-input buscador-bien__search"
+            placeholder="Buscar por nombre o código SENA…"
+            (input)="onBuscarBienCatalogo($any($event.target).value)" />
+          <div class="buscador-bien__results">
+            @if (catalogoLoading()) {
+              <p class="buscador-bien__empty">Buscando…</p>
+            } @else if (catalogoBienes().length === 0) {
+              <p class="buscador-bien__empty">No se encontraron bienes. Probá con otro término.</p>
+            } @else {
+              <ul class="bien-result-list">
+                @for (bien of catalogoBienes(); track bien.id) {
+                  <li class="bien-result">
+                    <div class="bien-result__info">
+                      <span class="bien-result__code">{{ bien.codigoSena }}</span>
+                      <span class="bien-result__name">{{ bien.descripcion }}</span>
+                      <span class="bien-result__meta">{{ bien.unidadMedida }}</span>
+                    </div>
+                    <restaurant-button variant="primary" (click)="onBienCatalogoSeleccionado(bien)">
+                      Seleccionar
+                    </restaurant-button>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+          <div class="modal-actions">
+            <button class="btn-cancel" type="button" (click)="cerrarBuscadorBien()">Cerrar</button>
+          </div>
+        }
       </div>
     </div>
   </div>

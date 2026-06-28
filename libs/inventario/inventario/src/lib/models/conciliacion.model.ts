@@ -29,15 +29,18 @@ export interface ConciliacionDetalle {
  * Sustituye a ConciliacionDiferencia eliminando los strings combinados.
  */
 export interface DiferenciaItem {
-  producto: string;
-  codigo: string;
-  categoria: string;
-  stockSistema: number;
-  stockFisico: number;
-  diferencia: number;
-  unidad: string;
-  valorUnit: number;
-  impacto: number;
+  id:            string;
+  producto:      string;
+  codigo:        string;
+  categoria:     string;
+  stockSistema:  number;
+  stockFisico:   number;
+  diferencia:    number;
+  unidad:        string;
+  valorUnit:     number;
+  impacto:       number;
+  estado:        string;
+  justificacion: string | null;
 }
 
 export interface TomaFisicaItem {
@@ -48,12 +51,6 @@ export interface TomaFisicaItem {
   stockSistema: number;
   conteoFisico: number | null;
   valorUnitario: number;
-}
-
-export interface TopDiferencia {
-  producto: string;
-  diferencia: string;
-  icon: string;
 }
 
 /** Payload UI para registrar el conteo físico de un ítem

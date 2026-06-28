@@ -1,4 +1,42 @@
+import { EstadoPedido } from '@restaurant/shared/models';
+export { EstadoPedido };
+
 export type EstadoMesa = 'LIBRE' | 'OCUPADA' | 'POR_PAGAR' | 'INACTIVA';
+
+// --- Enums de Detalles e Incidencias (Reglas de Cancelación/Devolución) ---
+export type EstadoDetallePedido =
+  | 'PENDIENTE'
+  | 'PREPARANDO'
+  | 'TERMINADO'
+  | 'EN_DEVOLUCION'
+  | 'ENTREGADO'
+  | 'CANCELADO'
+  | 'DEVUELTO';
+
+export type TipoIncidencia = 'CANCELACION' | 'DEVOLUCION';
+export type EstadoIncidencia = 'EN_PROCESO' | 'RESUELTA';
+
+export interface IncidenciaPedidoResponse {
+  id: string;
+  tipo: TipoIncidencia;
+  detalleId: string | null;
+  producto: string | null;
+  cantidadAfectada: number | null;
+  motivo: string;
+  estado: EstadoIncidencia;
+  registradaPor: string;
+  fechaRegistro: string;
+  fechaResolucion: string | null;
+}
+
+
+
+export interface CategoriaMenu {
+  id: string;
+  name: string;
+  icon: string;
+  type?: 'COMIDA' | 'BEBIDA' | 'ALL';
+}
 
 export interface Mesa {
   id: string;        // UUID proveniente del backend
@@ -7,6 +45,7 @@ export interface Mesa {
   zona: string | null;
   estado: EstadoMesa;
   activo: boolean;
+  observaciones?: string | null;
 }
 
 /** Espejo de MesaCreateRequest.java — @NotBlank nombre, @NotNull capacidad */
@@ -21,6 +60,7 @@ export interface MesaUpdateRequest {
   nombre?: string;
   capacidad?: number;
   zona?: string | null;
+  observaciones?: string | null;
 }
 
 
@@ -66,7 +106,6 @@ export interface FacturaResponse {
   sesionCajaId: string;
   cajeroId: string;
   subtotal: number;
-  propina: number;
   total: number;
   metodoPago: MetodoPago;
   estado: EstadoFacturaRestaurante;
@@ -88,18 +127,7 @@ export interface FacturarPedidoRequest {
   propina: number;
 }
 
-/**
- * Espejo exacto de EstadoPedido.java
- * 7 valores — coincide con @Enumerated(EnumType.STRING) del backend.
- */
-export type EstadoPedido =
-  | 'BORRADOR'
-  | 'ENVIADO_COCINA'
-  | 'EN_PREPARACION'
-  | 'LISTO_PARA_SERVIR'
-  | 'ENTREGADO'
-  | 'FACTURADO'
-  | 'CANCELADO';
+
 
 /** Espejo de PedidoResumenResponse.java */
 export interface PedidoResumenResponse {
@@ -131,6 +159,7 @@ export interface DetallePedidoResponse {
   precioUnitario: number;     // BigDecimal → number
   subtotalLinea: number;      // cantidad * precioUnitario (calculado por backend)
   observaciones?: string | null;
+  estadoDetalle?: EstadoDetallePedido;
 }
 
 /**
@@ -162,4 +191,34 @@ export interface PedidoResponse {
   fechaCreacion: string;              // LocalDateTime → ISO-8601
   fechaCierre: string | null;         // null mientras esté abierto
   detalles: DetallePedidoResponse[];
+  incidencias?: IncidenciaPedidoResponse[];
+}
+
+// --- DTOs provenientes de Cocina (Recetas) ---
+
+export interface RecetaIngredienteResponseDTO {
+  idIngrediente: string;
+  nombreIngrediente: string;
+  cantidad: number;
+  unidadMedida: string;
+}
+
+export interface PasosPreparacionResponseDTO {
+  numeroPaso: number;
+  descripcion: string;
+}
+
+export interface RecetaResponseDTO {
+  idReceta: string;
+  nombreReceta: string;
+  nombreCategoria: string;
+  idCategoria: string;
+  fechaCreacion: string;
+  tiempoPreparacion: number;
+  precioUnitario: number;
+  temperatura: string;
+  urlImagen: string;
+  activo: boolean;
+  ingredientes?: RecetaIngredienteResponseDTO[];
+  pasos?: PasosPreparacionResponseDTO[];
 }

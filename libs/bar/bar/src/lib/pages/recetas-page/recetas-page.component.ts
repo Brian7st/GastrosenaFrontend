@@ -1,9 +1,11 @@
 import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RecetaService } from '../../data-access/receta.service';
+import { CategoriaService } from '../../data-access/categoria.service';
 import { Receta } from '../../models/receta.model';
 import { DetalleRecetaComponent } from '../../components/detalle-receta/detalle-receta.component';
 import { GestionRecetaComponent } from '../../components/gestion-receta/gestion-receta.component';
+import { GestionCategoriasComponent } from '../../components/gestion-categorias/gestion-categorias.component';
 import {
   LucideIconComponent,
   PageHeaderComponent,
@@ -23,6 +25,7 @@ import {
     CommonModule,
     DetalleRecetaComponent,
     GestionRecetaComponent,
+    GestionCategoriasComponent,
     LucideIconComponent,
     PageHeaderComponent,
     SearchFilterComponent,
@@ -39,6 +42,7 @@ import {
 })
 export class RecetasPageComponent implements OnInit {
   public recetaService = inject(RecetaService);
+  public catService = inject(CategoriaService);
 
   searchTerm = signal<string>('');
   categoriaSeleccionada = signal<string>('');
@@ -47,6 +51,7 @@ export class RecetasPageComponent implements OnInit {
   recetaSeleccionada = signal<Receta | null>(null);
   mostrarDetalle = signal<boolean>(false);
   mostrarGestion = signal<boolean>(false);
+  mostrarCategorias = signal<boolean>(false);
 
   // Estados para alertas y confirmación
   confirmDeleteOpen = signal<boolean>(false);
@@ -54,16 +59,13 @@ export class RecetasPageComponent implements OnInit {
   alertMessage = signal<string>('');
   alertType = signal<'success' | 'error' | 'warning' | 'info'>('info');
 
-  // Categorías estáticas del módulo Bar y Barismo
-  opcionesCategoria = [
-    { label: 'Todas las categorías', value: '' },
-    { label: 'Cócteles',            value: 'cocteles' },
-    { label: 'Bebidas Calientes',   value: 'bebidas calientes' },
-    { label: 'Bebidas Frías',       value: 'bebidas frias' },
-    { label: 'Café y Barismo',      value: 'cafe y barismo' },
-    { label: 'Shots y Chupitos',    value: 'shots' },
-    { label: 'Sin Alcohol',         value: 'sin alcohol' },
-  ];
+  opcionesCategoria = computed(() => {
+    const cats = this.catService.categorias();
+    return [
+      { label: 'Todas las categorías', value: '' },
+      ...cats.map(c => ({ label: c.nombreCategoria, value: c.nombreCategoria.toLowerCase() }))
+    ];
+  });
 
   recetasFiltradas = computed(() => {
     const term = this.searchTerm().toLowerCase().trim();
@@ -75,23 +77,7 @@ export class RecetasPageComponent implements OnInit {
 
       let matchCategory = !cat;
       if (cat && r.nombreCategoria) {
-        const rc = r.nombreCategoria.toLowerCase().trim();
-        // Mapeo inteligente en español para consistencia con mock y base de datos
-        if (cat === 'cocteles') {
-          matchCategory = rc.includes('cóctel') || rc.includes('coctel') || rc.includes('cócteles') || rc === 'bebidas con alcohol' || rc.includes('alcohol');
-        } else if (cat === 'bebidas calientes') {
-          matchCategory = rc.includes('caliente') || rc.includes('café') || rc.includes('cafe') || rc.includes('barismo') || rc.includes('té') || rc.includes('te');
-        } else if (cat === 'bebidas frias') {
-          matchCategory = rc.includes('fría') || rc.includes('fria') || rc.includes('frío') || rc.includes('frio') || rc.includes('helado') || rc.includes('limonada') || rc.includes('smoothie') || rc.includes('jugo');
-        } else if (cat === 'cafe y barismo') {
-          matchCategory = rc.includes('café') || rc.includes('cafe') || rc.includes('barismo') || rc.includes('espresso') || rc.includes('latte') || rc.includes('cappuccino');
-        } else if (cat === 'shots') {
-          matchCategory = rc.includes('shot') || rc.includes('chupito') || rc.includes('shooter');
-        } else if (cat === 'sin alcohol') {
-          matchCategory = rc.includes('sin alcohol') || rc.includes('mocktail') || rc.includes('limonada') || rc.includes('agua');
-        } else {
-          matchCategory = rc.includes(cat) || cat.includes(rc);
-        }
+        matchCategory = r.nombreCategoria.toLowerCase().trim() === cat;
       }
       return matchSearch && matchCategory;
     });
@@ -105,6 +91,7 @@ export class RecetasPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.recetaService.listar();
+    this.catService.listar();
   }
 
   verDetalle(receta: Receta) {
@@ -117,6 +104,10 @@ export class RecetasPageComponent implements OnInit {
     this.mostrarGestion.set(true);
   }
 
+  abrirGestionCategorias() {
+    this.mostrarCategorias.set(true);
+  }
+
   editarReceta(receta: Receta) {
     this.recetaSeleccionada.set(receta);
     this.mostrarGestion.set(true);
@@ -125,6 +116,7 @@ export class RecetasPageComponent implements OnInit {
   cerrarModales(actualizoDatos = false) {
     this.mostrarDetalle.set(false);
     this.mostrarGestion.set(false);
+    this.mostrarCategorias.set(false);
     if (actualizoDatos) {
       this.recetaService.listar();
     }

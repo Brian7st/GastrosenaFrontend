@@ -1,14 +1,18 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
-import { finalize, catchError, of } from 'rxjs';
-import { Factura, FacturaFiltros, FacturaKpis, FacturaPaginacion, SolicitudGIL, ConciliacionGil, FacturaFormDto, GilPickerItem } from '../models/facturas.model';
+import { finalize, catchError, of, Observable } from 'rxjs';
+import { Factura, FacturaFiltros, FacturaKpis, FacturaPaginacion, SolicitudGIL, ConciliacionGil, FacturaFormDto, GilPickerItem, NotaCredito, RegistrarNotaCreditoRequest } from '../models/facturas.model';
 import { FacturasService } from './services/facturas.service';
+import { KardexFacade } from './kardex.facade';
+import { descargarBlob } from '../util';
 import { ActualizarFacturaRequest } from './api/sourcing.api';
+import { BienGilResponse } from './api/procurement.api';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FacturasFacade {
   private svc = inject(FacturasService);
+  private kardex = inject(KardexFacade);
 
   private _facturas              = signal<Factura[]>([]);
   private _kpis                  = signal<FacturaKpis | null>(null);
@@ -18,6 +22,7 @@ export class FacturasFacade {
   private _conciliacionGil       = signal<ConciliacionGil | null>(null);
   private _gilesDisponibles      = signal<GilPickerItem[]>([]);
   private _conciliacionImportacion = signal<ConciliacionGil | null>(null);
+  private _gilBienes               = signal<BienGilResponse[]>([]);
   private _conciliacionCargada   = signal(false);
   private _paginacion            = signal<FacturaPaginacion>({ totalElements: 0, totalPages: 1, page: 0, size: 10 });
   private _loading               = signal<boolean>(false);
@@ -32,6 +37,7 @@ export class FacturasFacade {
   public conciliacionGil       = computed(() => this._conciliacionGil());
   public gilesDisponibles      = computed(() => this._gilesDisponibles());
   public conciliacionImportacion = computed(() => this._conciliacionImportacion());
+  public gilBienes               = computed(() => this._gilBienes());
   public conciliacionCargada   = computed(() => this._conciliacionCargada());
   public paginacion            = computed(() => this._paginacion());
   public loading               = computed(() => this._loading());
@@ -41,6 +47,28 @@ export class FacturasFacade {
   loadAll(): void {
     this.cargarFacturas();
     this.cargarKpis();
+  }
+
+  /**
+   * Exporta el reporte GENERAL de facturación (año en curso) vía ga-ms-reportes.
+   * El backend solo ofrece reporte general por rango; no hay export por-factura.
+   */
+  exportarPanel(formato: string): void {
+    const fmt = formato.toLowerCase() === 'pdf' ? 'PDF' : 'EXCEL';
+    const ext = fmt === 'PDF' ? 'pdf' : 'xlsx';
+    const hoy = new Date();
+    const fechaInicio = `${hoy.getFullYear()}-01-01`;
+    const fechaFin = hoy.toISOString().slice(0, 10);
+    this._loading.set(true);
+    this.svc.exportarFacturacion(fechaInicio, fechaFin, fmt)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al exportar el reporte de facturación');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false)),
+      )
+      .subscribe(blob => { if (blob) descargarBlob(blob, `facturacion_${fechaFin}.${ext}`); });
   }
 
   cargarFacturas(filtros?: FacturaFiltros): void {
@@ -121,12 +149,12 @@ export class FacturasFacade {
       });
   }
 
-  importarFacturaFel(file: File, gilId?: string): void {
+  importarFacturaFelXml(file: File, gilId?: string): void {
     this._loading.set(true);
     this._error.set(null);
     this._facturaImportada.set(null);
 
-    this.svc.importarFacturaFel(file, gilId)
+    this.svc.importarFacturaFelXml(file, gilId)
       .pipe(
         catchError((error) => {
           this._error.set(this.getImportErrorMessage(error));
@@ -140,11 +168,6 @@ export class FacturasFacade {
           this._facturaSeleccionada.set(factura);
           this.cargarFacturas();
           this.cargarKpis();
-          if (gilId) {
-            this.svc.getConciliacionGil({ facturaId: String(factura.id) })
-              .pipe(catchError(() => of(null)))
-              .subscribe(c => this._conciliacionImportacion.set(c));
-          }
         }
       });
   }
@@ -164,6 +187,13 @@ export class FacturasFacade {
         this._conciliacionGil.set(res);
         this._conciliacionCargada.set(true);
       });
+  }
+
+  cargarGilBienes(gilId: string): void {
+    if (!gilId) { this._gilBienes.set([]); return; }
+    this.svc.getGilBienes(gilId)
+      .pipe(catchError(() => of([])))
+      .subscribe(bienes => this._gilBienes.set(bienes));
   }
 
   cargarGilesDisponibles(): void {
@@ -216,8 +246,47 @@ export class FacturasFacade {
         finalize(() => this._loading.set(false))
       )
       .subscribe(res => {
-        if (res) { this._facturaSeleccionada.set(res); this.cargarFacturas(); }
+        if (res) {
+          this._facturaSeleccionada.set(res);
+          this.cargarFacturas();
+          this.intentarCargarConciliacion(String(id)); // refresca el cruce tras verificar
+          this.kardex.loadAll(); // verificar crea la entrada al inventario → refresca movimientos
+        }
       });
+  }
+
+  /**
+   * Asocia una línea PENDIENTE-CATALOGO a un bien existente del catálogo.
+   * Propaga el mensaje del backend (p. ej. "el bien no existe") para guiar al usuario.
+   */
+  resolverLineaPendiente(
+    id: string | number,
+    descripcionLinea: string,
+    codigoProductoSena: string,
+  ): void {
+    this._loading.set(true);
+    this.svc.resolverLineaPendiente(id, descripcionLinea, codigoProductoSena)
+      .pipe(
+        catchError((err: unknown) => {
+          this._error.set(this.mensajeResolverPendiente(err));
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => {
+        if (res) {
+          this._facturaSeleccionada.set(res);
+          this.cargarFacturas();
+          this.intentarCargarConciliacion(String(id)); // refresca el cruce con el GIL tras resolver
+        }
+      });
+  }
+
+  private mensajeResolverPendiente(err: unknown): string {
+    const detail = (err as { error?: { detail?: string } } | null)?.error?.detail;
+    return detail && detail.trim().length > 0
+      ? detail
+      : 'No se pudo asociar la línea al bien.';
   }
 
   marcarPagada(id: string | number): void {
@@ -262,10 +331,32 @@ export class FacturasFacade {
       .subscribe(s => this._solicitudGIL.set(s ?? null));
   }
 
-  conciliarFacturaGil(facturaId: string, gilId: string): void {
+  conciliarEnImportacion(
+    facturaId: string,
+    gilId: string,
+    cantidadesRecibidas?: Record<string, number>,
+  ): void {
     this._loading.set(true);
     this._error.set(null);
-    this.svc.conciliarFacturaGil(facturaId, gilId)
+    this.svc.conciliarFacturaGil(facturaId, gilId, cantidadesRecibidas)
+      .pipe(
+        catchError((error) => {
+          this._error.set(this.getConciliacionErrorMessage(error));
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(res => { if (res !== null) this._conciliacionImportacion.set(res); });
+  }
+
+  conciliarFacturaGil(
+    facturaId: string,
+    gilId: string,
+    cantidadesRecibidas?: Record<string, number>,
+  ): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this.svc.conciliarFacturaGil(facturaId, gilId, cantidadesRecibidas)
       .pipe(
         catchError(() => {
           this._error.set('Error al conciliar la factura con el GIL');
@@ -273,7 +364,12 @@ export class FacturasFacade {
         }),
         finalize(() => this._loading.set(false))
       )
-      .subscribe(res => { if (res !== null) this._conciliacionGil.set(res); });
+      .subscribe(res => {
+        if (res !== null) {
+          this._conciliacionGil.set(res);
+          this.cargarFactura(facturaId); // la factura pudo cambiar de estado al conciliar
+        }
+      });
   }
 
   cargarConciliacionGil(params: { facturaId?: string; gilId?: string }): void {
@@ -304,6 +400,42 @@ export class FacturasFacade {
       .subscribe(res => { if (res !== null) this._conciliacionGil.set(res); });
   }
 
+  registrarNotaCredito(req: RegistrarNotaCreditoRequest): Observable<NotaCredito> {
+    return this.svc.registrarNotaCredito(req).pipe(
+      catchError(() => {
+        this._error.set('Error al registrar la nota crédito');
+        return of(null as unknown as NotaCredito);
+      }),
+    );
+  }
+
+  resolverConNotaCredito(
+    conciliacionId: string,
+    gilItemId:      string,
+    notaCreditoIds: string[],
+  ): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this.svc.resolverConNotaCredito(conciliacionId, gilItemId, notaCreditoIds)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al resolver la diferencia con nota crédito');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false)),
+      )
+      .subscribe(res => {
+        if (res !== null) {
+          // Reload both factura and conciliacion to reflect valorNetoAPagar and resuelta state
+          const factura = this._facturaSeleccionada();
+          if (factura) {
+            this.cargarFactura(String(factura.id));
+            this.intentarCargarConciliacion(String(factura.id));
+          }
+        }
+      });
+  }
+
   vincularInstructorOrden(ordenCompra: string, instructorId: string): void {
     this._loading.set(true);
     this._error.set(null);
@@ -318,6 +450,15 @@ export class FacturasFacade {
       .subscribe(() => { /* 204 No Content */ });
   }
 
+  private getConciliacionErrorMessage(error: unknown): string {
+    const httpError = error as { error?: { detail?: string; title?: string }; status?: number };
+    if (httpError?.error?.detail) return httpError.error.detail;
+    if (httpError?.error?.title) return httpError.error.title;
+    if (httpError?.status === 409) return 'Ya existe una conciliación para esta factura o GIL.';
+    if (httpError?.status === 422) return 'No se pudo conciliar. Verificá que el GIL tenga ítems y la factura esté en estado REGISTRADA.';
+    return 'Error al conciliar la factura con el GIL';
+  }
+
   private getImportErrorMessage(error: unknown): string {
     const httpError = error as {
       error?: { detail?: string; title?: string };
@@ -327,7 +468,7 @@ export class FacturasFacade {
     if (httpError?.error?.detail) return httpError.error.detail;
     if (httpError?.error?.title) return httpError.error.title;
     if (httpError?.status === 409) return 'La factura ya existe en el sistema.';
-    if (httpError?.status === 400) return 'El archivo no es un PDF FEL válido.';
+    if (httpError?.status === 400) return 'El archivo no es un XML FEL válido.';
     if (httpError?.status === 422) return 'No se pudo procesar el contenido de la factura.';
 
     return 'Error al importar la factura electrónica';

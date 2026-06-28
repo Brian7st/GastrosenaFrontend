@@ -2,6 +2,7 @@ import { inject, Injectable, signal, computed } from '@angular/core';
 import { finalize, catchError, of } from 'rxjs';
 import { PaqueteService } from './services/paquete.service';
 import { PaqueteProbatorio } from '../models/paquete.model';
+import { descargarBlob } from '../util';
 
 @Injectable({ providedIn: 'root' })
 export class PaqueteFacade {
@@ -77,6 +78,53 @@ export class PaqueteFacade {
       });
   }
 
+  /** Exporta el paquete — descarga el PDF generado por el microservicio de reportes. */
+  exportarPaquete(id: string): void {
+    this._loading.set(true);
+    this.paqueteService.exportarPaquete(id)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al exportar el paquete');
+          return of(null);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(blob => {
+        if (blob) descargarBlob(blob, `paquete_${id}.pdf`);
+      });
+  }
+
+  /** PATCH /legalization/paquetes/{id}/trazabilidad — vincula GIL, CUFE y compromiso. */
+  vincularTrazabilidad(
+    id: string,
+    datos: { cufeFuenteId: string; gilId: string; compromisoPresupuestalId: string }
+  ): void {
+    this._loading.set(true);
+    this.paqueteService.vincularTrazabilidad(id, datos)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al vincular la trazabilidad');
+          return of(false);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(ok => { if (ok) this.cargarPaquete(id); });
+  }
+
+  /** PATCH /legalization/paquetes/{id}/revisar — avanza COMPLETO → REVISADO y recarga el detalle. */
+  revisarPaquete(id: string, revisorId: string): void {
+    this._loading.set(true);
+    this.paqueteService.revisarPaquete(id, revisorId)
+      .pipe(
+        catchError(() => {
+          this._error.set('Error al revisar el paquete');
+          return of(false);
+        }),
+        finalize(() => this._loading.set(false))
+      )
+      .subscribe(ok => { if (ok) this.cargarPaquete(id); });
+  }
+
   /** Archiva el paquete y recarga su detalle. */
   archivarPaquete(id: string): void {
     this._loading.set(true);
@@ -91,17 +139,4 @@ export class PaqueteFacade {
       .subscribe(ok => { if (ok) this.cargarPaquete(id); });
   }
 
-  /** Incluye una requisición en el paquete y recarga su detalle. */
-  incluirRequisicion(paqueteId: string, reqId: string): void {
-    this.paqueteService.incluirRequisicion(paqueteId, reqId)
-      .pipe(
-        catchError(() => {
-          this._error.set('Error al incluir la requisición');
-          return of(false);
-        })
-      )
-      .subscribe(ok => {
-        if (ok) this.cargarPaquete(paqueteId);
-      });
-  }
 }

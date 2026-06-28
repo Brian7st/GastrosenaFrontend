@@ -1,9 +1,14 @@
 <div class="modulo-container">
   <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-4);">
     <restaurant-page-header title="Gestión de Recetas" subtitle="Administrá el menú y recetario" style="margin-bottom: 0;"></restaurant-page-header>
-    <restaurant-button variant="primary" (click)="abrirNuevaReceta()">
-      <lucide-icon name="plus" size="18" style="margin-right: var(--space-2);"></lucide-icon> Nueva Receta
-    </restaurant-button>
+    <div style="display: flex; gap: var(--space-3);">
+      <restaurant-button *hasRole="[Rol.ADMINISTRADOR, Rol.CHEF]" variant="surface" (click)="abrirGestionCategorias()">
+        <lucide-icon name="list" size="18" style="margin-right: var(--space-2);"></lucide-icon> Gestionar Categorías
+      </restaurant-button>
+      <restaurant-button *hasRole="[Rol.ADMINISTRADOR, Rol.CHEF]" variant="primary" (click)="abrirNuevaReceta()">
+        <lucide-icon name="plus" size="18" style="margin-right: var(--space-2);"></lucide-icon> Nueva Receta
+      </restaurant-button>
+    </div>
   </div>
   <!-- Filtros: Buscador y Categorías alineados al lado -->
   <div class="recetas-filters">
@@ -20,7 +25,7 @@
       <restaurant-select-filter
         label="Categoría"
         [value]="categoriaSeleccionada()"
-        [options]="opcionesCategoria"
+        [options]="opcionesCategoria()"
         (valueChange)="categoriaSeleccionada.set($event)"
       ></restaurant-select-filter>
     </div>
@@ -52,7 +57,7 @@
           </div>
           <div class="action-buttons" style="display: flex; gap: var(--space-2); align-items: center; justify-content: space-between; margin-top: auto; padding-top: var(--space-4); border-top: 1px solid var(--color-border);">
             <restaurant-button variant="primary" (click)="verDetalle(receta)" style="flex: 1;">Ver Detalle</restaurant-button>
-            <div style="display: flex; gap: var(--space-2);">
+            <div *hasRole="[Rol.ADMINISTRADOR, Rol.CHEF]" style="display: flex; gap: var(--space-2);">
               <restaurant-button variant="surface" (click)="editarReceta(receta)"><lucide-icon name="pencil" size="16"></lucide-icon></restaurant-button>
               <restaurant-button variant="ghost" (click)="prepararEliminacion(receta.idReceta)"><lucide-icon name="trash-2" size="16"></lucide-icon></restaurant-button>
             </div>
@@ -79,6 +84,12 @@
       [receta]="recetaSeleccionada()" 
       (close)="cerrarModales($event)" 
     ></restaurant-gestion-receta>
+  }
+
+  @if (mostrarCategorias()) {
+    <restaurant-gestion-categorias
+      (close)="cerrarModales($event)"
+    ></restaurant-gestion-categorias>
   }
 
   <!-- Modal para confirmar eliminación -->

@@ -1,38 +1,38 @@
 <div class="perfil-wrapper">
 
   <restaurant-page-header
-    title="Mi Perfil"
-    subtitle="Administra tu información personal y preferencias"
+    [title]="i18n.t('perfil.titulo')"
+    [subtitle]="i18n.t('perfil.subtitulo')"
   />
 
   <!-- Header de perfil -->
   <div class="perfil-header">
     <div class="perfil-header__avatar-wrapper">
-  <div class="perfil-header__avatar" (click)="triggerFileInput()">
-    @if (fotoUrl()) {
-      <img [src]="fotoUrl()" alt="Foto de perfil" class="perfil-header__foto"/>
-    } @else {
-      {{ iniciales() }}
-    }
-    <div class="perfil-header__avatar-overlay">
-      <lucide-icon name="camera" [size]="20"></lucide-icon>
+      <div class="perfil-header__avatar" (click)="triggerFileInput()">
+        @if (fotoUrl()) {
+          <img [src]="fotoUrl()" [alt]="i18n.t('perfil.foto_alt')" class="perfil-header__foto"/>
+        } @else {
+          {{ iniciales() }}
+        }
+        <div class="perfil-header__avatar-overlay">
+          <lucide-icon name="upload" [size]="20"></lucide-icon>
+        </div>
+      </div>
+      <input
+        #fileInput
+        type="file"
+        accept="image/*"
+        class="perfil-header__file-input"
+        (change)="onFotoChange($event)"
+      />
     </div>
-  </div>
-  <input
-    #fileInput
-    type="file"
-    accept="image/*"
-    class="perfil-header__file-input"
-    (change)="onFotoChange($event)"
-  />
-</div>
     <div class="perfil-header__info">
       <h2 class="perfil-header__nombre">{{ usuario?.nombre }}</h2>
       <div class="perfil-header__meta">
         <lucide-icon name="user" [size]="14"></lucide-icon>
         <span>{{ usuario?.rol }}</span>
         <span class="perfil-header__dot">•</span>
-        <restaurant-status-badge label="Activo" variant="success"/>
+        <restaurant-status-badge [label]="i18n.t('perfil.activo')" variant="success" />
       </div>
       <p class="perfil-header__email">{{ usuario?.email }}</p>
     </div>
@@ -42,123 +42,190 @@
   <div class="perfil-card">
     <div class="perfil-card__title">
       <lucide-icon name="user" [size]="18"></lucide-icon>
-      <h3>Información Personal</h3>
+      <h3>{{ i18n.t('perfil.info_personal') }}</h3>
     </div>
     <form [formGroup]="infoForm" class="perfil-form">
       <div class="perfil-form__row">
         <restaurant-input
-          label="Nombre"
-          placeholder="Tu nombre"
+          [label]="i18n.t('perfil.nombre')"
+          [placeholder]="i18n.t('perfil.nombre_placeholder')"
           type="text"
           icon="user"
           formControlName="nombre"
-          [error]="infoForm.get('nombre')?.invalid && infoForm.get('nombre')?.touched ? 'Campo requerido' : null"
+          [error]="infoForm.get('nombre')?.invalid && infoForm.get('nombre')?.touched ? i18n.t('perfil.campo_requerido') : null"
         />
         <restaurant-input
-          label="Apellidos"
-          placeholder="Tus apellidos"
+          [label]="i18n.t('perfil.apellidos')"
+          [placeholder]="i18n.t('perfil.apellidos_placeholder')"
           type="text"
           icon="user"
           formControlName="apellidos"
-          [error]="infoForm.get('apellidos')?.invalid && infoForm.get('apellidos')?.touched ? 'Campo requerido' : null"
+          [error]="infoForm.get('apellidos')?.invalid && infoForm.get('apellidos')?.touched ? i18n.t('perfil.campo_requerido') : null"
         />
         <restaurant-input
-          label="Email"
-          placeholder="tu@email.com"
+          [label]="i18n.t('perfil.email')"
+          [placeholder]="i18n.t('perfil.email_placeholder')"
           type="email"
           icon="mail"
           formControlName="email"
-          [error]="infoForm.get('email')?.invalid && infoForm.get('email')?.touched ? 'Email inválido' : null"
+          [error]="infoForm.get('email')?.invalid && infoForm.get('email')?.touched ? i18n.t('perfil.email_invalido') : null"
         />
       </div>
       <div class="perfil-form__row">
         <restaurant-input
-          label="Documento"
-          placeholder="Número de documento"
+          [label]="i18n.t('perfil.documento')"
+          [placeholder]="i18n.t('perfil.documento_placeholder')"
           type="text"
           icon="credit-card"
           formControlName="documento"
-          [error]="infoForm.get('documento')?.invalid && infoForm.get('documento')?.touched ? 'Campo requerido' : null"
+          [error]="infoForm.get('documento')?.invalid && infoForm.get('documento')?.touched ? i18n.t('perfil.campo_requerido') : null"
         />
         <restaurant-input
-          label="Teléfono"
-          placeholder="+57 300 000 0000"
+          [label]="i18n.t('perfil.telefono')"
+          [placeholder]="i18n.t('perfil.telefono_placeholder')"
           type="tel"
           icon="phone"
           formControlName="telefono"
-          [error]="infoForm.get('telefono')?.invalid && infoForm.get('telefono')?.touched ? 'Campo requerido' : null"
+          [error]="infoForm.get('telefono')?.invalid && infoForm.get('telefono')?.touched ? i18n.t('perfil.campo_requerido') : null"
         />
       </div>
     </form>
   </div>
 
-  <!-- Seguridad y Actividad -->
-  <div class="perfil-grid">
-
-    <!-- Seguridad -->
-    <div class="perfil-card">
-      <div class="perfil-card__title">
-        <lucide-icon name="lock" [size]="18"></lucide-icon>
-        <h3>Seguridad</h3>
-      </div>
-      <form [formGroup]="seguridadForm" class="perfil-form">
-        <restaurant-input
-          label="Contraseña Actual"
-          placeholder="••••••••"
-          type="password"
-          icon="lock"
-          formControlName="contrasenaActual"
-        />
-        <restaurant-input
-          label="Nueva Contraseña"
-          placeholder="••••••••"
-          type="password"
-          icon="lock"
-          formControlName="nuevaContrasena"
-        />
-        <restaurant-input
-          label="Confirmar Contraseña"
-          placeholder="••••••••"
-          type="password"
-          icon="lock"
-          formControlName="confirmar"
-        />
-      </form>
-    </div>
-
-    <!-- Actividad Reciente -->
-    <div class="perfil-card">
-      <div class="perfil-card__title">
-        <lucide-icon name="activity" [size]="18"></lucide-icon>
-        <h3>Actividad Reciente</h3>
-      </div>
-      <div class="perfil-actividad">
-        @for (item of actividadReciente; track item.fecha) {
-          <div class="perfil-actividad__item">
-            <p class="perfil-actividad__accion">{{ item.accion }}</p>
-            <div class="perfil-actividad__meta">
-              <lucide-icon name="calendar" [size]="12"></lucide-icon>
-              <span>{{ item.fecha }}</span>
-              <lucide-icon name="file-text" [size]="12"></lucide-icon>
-              <span>{{ item.modulo }}</span>
-            </div>
-          </div>
-        }
-      </div>
-    </div>
-
+  <!-- Seguridad (Cambio de contraseña) -->
+<div class="perfil-card">
+  <div class="perfil-card__title">
+    <lucide-icon name="shield-check" [size]="18"></lucide-icon>
+    <h3>{{ i18n.t('perfil.cambiar_contrasena') }}</h3>
   </div>
+  <form [formGroup]="seguridadForm" class="perfil-form">
 
-  <!-- Botones -->
+    <!-- Contraseña Actual -->
+    <div class="password-field">
+      <label class="password-field__label">{{ i18n.t('perfil.contrasena_actual') }}</label>
+      <div class="password-input-wrapper">
+        <input
+          [type]="mostrarContrasenaActual() ? 'text' : 'password'"
+          class="password-field__input"
+          formControlName="contrasenaActual"
+          placeholder="••••••••"
+        />
+        <button
+          type="button"
+          class="toggle-password-btn"
+          (click)="mostrarContrasenaActual.set(!mostrarContrasenaActual())"
+          [attr.aria-label]="mostrarContrasenaActual() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+        >
+          @if (mostrarContrasenaActual()) {
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+          } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          }
+        </button>
+      </div>
+    </div>
+
+    <!-- Nueva Contraseña -->
+    <div class="password-field">
+      <label class="password-field__label">{{ i18n.t('perfil.nueva_contrasena') }}</label>
+      <div class="password-input-wrapper">
+        <input
+          [type]="mostrarNuevaContrasena() ? 'text' : 'password'"
+          class="password-field__input"
+          formControlName="nuevaContrasena"
+          placeholder="••••••••"
+        />
+        <button
+          type="button"
+          class="toggle-password-btn"
+          (click)="mostrarNuevaContrasena.set(!mostrarNuevaContrasena())"
+          [attr.aria-label]="mostrarNuevaContrasena() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+        >
+          @if (mostrarNuevaContrasena()) {
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+          } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          }
+        </button>
+      </div>
+    </div>
+
+    <!-- Confirmar Contraseña -->
+    <div class="password-field">
+      <label class="password-field__label">{{ i18n.t('perfil.confirmar_contrasena') }}</label>
+      <div class="password-input-wrapper">
+        <input
+          [type]="mostrarConfirmarContrasena() ? 'text' : 'password'"
+          class="password-field__input"
+          formControlName="confirmar"
+          placeholder="••••••••"
+        />
+        <button
+          type="button"
+          class="toggle-password-btn"
+          (click)="mostrarConfirmarContrasena.set(!mostrarConfirmarContrasena())"
+          [attr.aria-label]="mostrarConfirmarContrasena() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+        >
+          @if (mostrarConfirmarContrasena()) {
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+          } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          }
+        </button>
+      </div>
+    </div>
+
+    <div style="margin-top: 1rem;">
+      <restaurant-button variant="primary" (click)="onCambiarContrasena()" [disabled]="guardando()">
+        @if (!guardando()) {
+          <lucide-icon name="shield-check" [size]="16"></lucide-icon>
+          {{ i18n.t('perfil.btn_cambiar_contrasena') }}
+        } @else {
+          <span class="perfil-spinner"></span>
+        }
+      </restaurant-button>
+    </div>
+  </form>
+</div>
+
+  <!-- Mensaje de éxito -->
+  @if (exito()) {
+    <div class="perfil-exito">{{ i18n.t('perfil.exito') }}</div>
+  }
+
+  <!-- Mensaje de error -->
+  @if (errorMsg()) {
+  <div class="perfil-error">{{ errorMsg() }}</div>
+  }
+
+  <!-- Botones de acción -->
   <div class="perfil-actions">
     <restaurant-button variant="surface" (click)="onCancelar()">
       <lucide-icon name="x" [size]="16"></lucide-icon>
-      Cancelar
+      {{ i18n.t('perfil.cancelar') }}
     </restaurant-button>
     <restaurant-button variant="primary" (click)="onGuardar()" [disabled]="guardando()">
       @if (!guardando()) {
         <lucide-icon name="save" [size]="16"></lucide-icon>
-        Guardar Cambios
+        {{ i18n.t('perfil.guardar') }}
       } @else {
         <span class="perfil-spinner"></span>
       }

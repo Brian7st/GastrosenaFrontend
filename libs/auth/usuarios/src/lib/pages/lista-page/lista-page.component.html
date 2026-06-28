@@ -10,21 +10,21 @@
   <!-- Page Header -->
   <div class="lista-page__header">
     <div class="lista-page__header-text">
-      <h1 class="lista-page__title">Gestión de Usuarios</h1>
-      <p class="lista-page__subtitle">Administrá los accesos y roles del equipo</p>
+      <h1 class="lista-page__title">{{ i18n.t('lista.titulo') }}</h1>
+      <p class="lista-page__subtitle">{{ i18n.t('lista.subtitulo') }}</p>
     </div>
     <div class="lista-page__header-actions">
       <button class="lista-page__btn lista-page__btn--ghost" type="button" (click)="mostrarImportar.set(true)">
         <lucide-icon name="upload" [size]="16"></lucide-icon>
-        Importar
+        {{ i18n.t('lista.importar') }}
       </button>
       <button class="lista-page__btn lista-page__btn--ghost" type="button" (click)="mostrarExportar.set(true)">
         <lucide-icon name="download" [size]="16"></lucide-icon>
-        Exportar
+        {{ i18n.t('lista.exportar') }}
       </button>
       <button class="lista-page__btn lista-page__btn--primary" type="button" (click)="onCrearUsuario()">
         <lucide-icon name="user-plus" [size]="16"></lucide-icon>
-        Nuevo Usuario
+        {{ i18n.t('lista.nuevo_usuario') }}
       </button>
     </div>
   </div>
@@ -46,19 +46,19 @@
   <!-- KPI Cards -->
   <div class="lista-page__kpis">
     <restaurant-kpi-card
-      label="Total Usuarios"
+      [label]="i18n.t('lista.kpi_total')"
       [value]="totalMostrar().toString()"
       icon="users"
       iconColor="blue"
     ></restaurant-kpi-card>
     <restaurant-kpi-card
-      label="Activos"
+      [label]="i18n.t('lista.kpi_activos')"
       [value]="activosMostrar().toString()"
       icon="user-check"
       iconColor="green"
     ></restaurant-kpi-card>
     <restaurant-kpi-card
-      label="Inactivos"
+      [label]="i18n.t('lista.kpi_inactivos')"
       [value]="inactivosMostrar().toString()"
       icon="user-x"
       iconColor="red"
@@ -72,7 +72,7 @@
       <input
         class="lista-page__search-input"
         type="text"
-        placeholder="Buscar por nombre o email..."
+        [placeholder]="i18n.t('lista.buscar')"
         [value]="busqueda()"
         (input)="busqueda.set($any($event.target).value)"
       >
@@ -80,7 +80,7 @@
     <div class="lista-page__filter-selects">
       <div class="lista-page__select-wrapper">
         <select class="lista-page__select" (change)="rolFiltro.set($any($event.target).value)">
-          <option value="">Todos los roles</option>
+          <option value="">{{ i18n.t('lista.todos_roles') }}</option>
           @for (rol of rolesDisponibles; track rol) {
             <option [value]="rol">{{ rol }}</option>
           }
@@ -89,9 +89,9 @@
       </div>
       <div class="lista-page__select-wrapper">
         <select class="lista-page__select" (change)="estadoFiltro.set($any($event.target).value)">
-          <option value="todos">Todos</option>
-          <option value="activos">Activos</option>
-          <option value="inactivos">Inactivos</option>
+          <option value="todos">{{ i18n.t('lista.filtro_todos') }}</option>
+          <option value="activos">{{ i18n.t('lista.filtro_activos') }}</option>
+          <option value="inactivos">{{ i18n.t('lista.filtro_inactivos') }}</option>
         </select>
         <lucide-icon name="filter" [size]="14" class="lista-page__select-icon"></lucide-icon>
       </div>
@@ -102,11 +102,11 @@
   <restaurant-data-table>
     <thead>
       <tr>
-        <th>Usuario</th>
-        <th>Rol</th>
-        <th>Estado</th>
-        <th>Último acceso</th>
-        <th>Acciones</th>
+        <th>{{ i18n.t('lista.col_usuario') }}</th>
+        <th>{{ i18n.t('lista.col_rol') }}</th>
+        <th>{{ i18n.t('lista.col_estado') }}</th>
+        <th>{{ i18n.t('lista.col_ultimo_acceso') }}</th>
+        <th>{{ i18n.t('lista.col_acciones') }}</th>
       </tr>
     </thead>
     <tbody>
@@ -114,12 +114,12 @@
         <tr>
           <td colspan="5" class="lista-page__loading">
             <lucide-icon name="loader-circle" [size]="20"></lucide-icon>
-            Cargando usuarios...
+            {{ i18n.t('lista.cargando') }}
           </td>
         </tr>
       } @else if (usuariosMostrar().length === 0) {
         <tr>
-          <td colspan="5" class="lista-page__empty">Sin resultados</td>
+          <td colspan="5" class="lista-page__empty">{{ i18n.t('lista.sin_resultados') }}</td>
         </tr>
       } @else {
         @for (u of usuariosMostrar(); track u.id) {
@@ -146,29 +146,34 @@
                 [class.lista-page__badge--inactivo]="!u.activo"
                 type="button"
                 (click)="onCambiarEstado(u)"
-                [attr.aria-label]="(u.activo ? 'Desactivar' : 'Activar') + ' usuario'"
+                [attr.aria-label]="(u.activo ? i18n.t('lista.desactivar') : i18n.t('lista.activar'))"
               >
-                {{ u.activo ? 'Activo' : 'Inactivo' }}
+                {{ u.activo ? i18n.t('lista.activo') : i18n.t('lista.inactivo') }}
               </button>
             </td>
             <td class="lista-page__last-access">
               {{ (u.ultimoAcceso | date:'dd/MM/yyyy') || '—' }}
             </td>
-            <td>
-              <div class="lista-page__actions">
-                <button class="lista-page__action-btn" type="button" (click)="onEditarUsuario(u)" aria-label="Editar">
-                  <lucide-icon name="pencil" [size]="16"></lucide-icon>
-                </button>
-                <button
-                  class="lista-page__action-btn lista-page__action-btn--danger"
-                  type="button"
-                  (click)="onEliminar(u.id)"
-                  aria-label="Eliminar"
-                >
-                  <lucide-icon name="trash-2" [size]="16"></lucide-icon>
-                </button>
-              </div>
-            </td>
+           <td>
+  <div class="lista-page__actions">
+    <!-- Botón Editar (siempre visible) -->
+    <button class="lista-page__action-btn" type="button" (click)="onEditarUsuario(u)" [attr.aria-label]="i18n.t('lista.editar')">
+      <lucide-icon name="pencil" [size]="16"></lucide-icon>
+    </button>
+    
+    <!-- 👇 Botón Eliminar SOLO para NO administradores -->
+    @if (!esAdmin()) {
+      <button
+        class="lista-page__action-btn lista-page__action-btn--danger"
+        type="button"
+        (click)="onEliminar(u.id)"
+        [attr.aria-label]="i18n.t('lista.eliminar')"
+      >
+        <lucide-icon name="trash-2" [size]="16"></lucide-icon>
+      </button>
+    }
+  </div>
+</td>
           </tr>
         }
       }

@@ -1,19 +1,21 @@
-import { Component, ChangeDetectionStrategy, signal, inject, OnInit, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, inject, OnInit, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { ConfirmarEnvioSolicitudModalComponent } from '../../../components/confirmar-envio-solicitud-modal/confirmar-envio-solicitud-modal.component';
+import { BienTypeaheadComponent } from '../../../ui/components/bien-typeahead/bien-typeahead.component';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
+import { ProgramasService, Programa } from '../../../data-access/services/programas.service';
 import { SolicitudSesionItem } from '../../../models/solicitud-sesion.model';
 import { Bien } from '../../../models/inventario.model';
 
 @Component({
   selector: 'restaurant-solicitudes-insumos-form',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ButtonComponent, BackButtonComponent, ConfirmarEnvioSolicitudModalComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ButtonComponent, BackButtonComponent, ConfirmarEnvioSolicitudModalComponent, BienTypeaheadComponent],
   templateUrl: './solicitudes-insumos-form.component.html',
   styleUrl: './solicitudes-insumos-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,8 +25,26 @@ export class SolicitudesInsumosFormComponent implements OnInit {
   private route          = inject(ActivatedRoute);
   readonly facade        = inject(SolicitudesFacade);
   readonly inventario    = inject(InventarioFacade);
+  private programasService = inject(ProgramasService);
 
   isEdit          = signal(false);
+
+  /** Catálogo de los 5 programas válidos para el selector. */
+  programas       = signal<Programa[]>([]);
+
+  constructor() {
+    effect(() => {
+      const s = this.facade.solicitudSesionSeleccionada();
+      if (s && this.isEdit()) {
+        this.fichaId.set(s.fichaId);
+        this.programaId.set(s.programaId);
+        this.instructorId.set(s.instructorId);
+        this.identificacionInstructor.set(s.identificacionInstructor ?? '');
+        if (s.fechaSolicitud) this.fechaSolicitud.set(s.fechaSolicitud);
+        this.items.set(s.items.map(i => ({ ...i })));
+      }
+    });
+  }
   solicitudId     = signal<string | null>(null);
   solicitudCodigo = signal<string | null>(null);
   isModalOpen     = signal(false);
@@ -57,6 +77,8 @@ export class SolicitudesInsumosFormComponent implements OnInit {
     return { desde, hasta, total: totalElements };
   });
 
+  addedCodigosSena = computed(() => this.items().map(i => i.codigoSena));
+
   // ── Validación ────────────────────────────────────────────────────────────
   submitAttempted = signal(false);
 
@@ -67,7 +89,7 @@ export class SolicitudesInsumosFormComponent implements OnInit {
     if (!this.programaId().trim())
       e['programaId'] = 'El programa de formación es requerido.';
     if (!this.instructorId().trim())
-      e['instructorId'] = 'El ID del instructor es requerido.';
+      e['instructorId'] = 'El nombre del instructor es obligatorio.';
     if (this.items().length === 0)
       e['items'] = 'Debe agregar al menos un ítem.';
     return e;
@@ -80,27 +102,24 @@ export class SolicitudesInsumosFormComponent implements OnInit {
     if (id) {
       this.isEdit.set(true);
       this.solicitudId.set(id);
+      this.facade.cargarSolicitudSesionById(id);
     }
-    this.inventario.cargarBienes({ page: 0, size: 8 });
+    this.inventario.cargarBienes({ estado: 'Activo', page: 0, size: 8 });
+    this.programasService.getProgramas().subscribe(p => this.programas.set(p));
   }
 
   // ── Handlers del catálogo ──────────────────────────────────────────────────
   onAbrirSelectorBien(): void {
     this.mostrarSelectorBien.set(true);
-    this.inventario.cargarBienes({ page: 0, size: 8 });
+    this.inventario.cargarBienes({ estado: 'Activo', page: 0, size: 8 });
   }
 
   onBuscarBienCatalogo(term: string): void {
-    this.inventario.cargarBienes({ busqueda: term, page: 0, size: 8 });
+    this.inventario.cargarBienes({ estado: 'Activo', busqueda: term, page: 0, size: 8 });
   }
 
   onSelectorIrAPagina(page: number): void {
     this.inventario.irAPagina(page);
-  }
-
-  estaEnLista(id: string | number): boolean {
-    const bien = this.inventario.bienes().find(b => b.id === id);
-    return bien ? this.items().some(i => i.codigoSena === bien.codigoSena) : false;
   }
 
   onSeleccionarBien(bien: Bien): void {
@@ -109,14 +128,15 @@ export class SolicitudesInsumosFormComponent implements OnInit {
 
     this.items.update(list => [...list, {
       codigoSena:              bien.codigoSena ?? '',
-      nombreBien:              bien.nombre,
+      nombreBien:              bien.descripcion ?? '',
       descripcion:             bien.descripcion ?? '',
+      codigoAlmacen:           bien.codigoProveedor ?? '',
       unidadMedida:            bien.unidadMedida,
       cantidad:                1,
       valorUnitario:           bien.valor ?? 0,
       valorUnitarioAdjudicado: bien.valor ?? 0,
       total:                   bien.valor ?? 0,
-      iva:                     0,
+      iva:                     bien.iva ?? 0,
     }]);
     this.mostrarSelectorBien.set(false);
   }
@@ -164,7 +184,7 @@ export class SolicitudesInsumosFormComponent implements OnInit {
 
   confirmarEnvio(): void {
     this.isModalOpen.set(false);
-    this.facade.crearSolicitudSesion({
+    const payload = {
       fechaSolicitud:           this.fechaSolicitud(),
       fichaId:                  this.fichaId(),
       programaId:               this.programaId(),
@@ -172,7 +192,12 @@ export class SolicitudesInsumosFormComponent implements OnInit {
       identificacionInstructor: this.identificacionInstructor() || undefined,
       valorTotalDeSolicitud:    this.valorTotalDeSolicitud(),
       items:                    this.items(),
-    }).subscribe(res => {
+    };
+    const id = this.solicitudId();
+    const op$ = this.isEdit() && id
+      ? this.facade.actualizarSolicitudSesion(id, payload)
+      : this.facade.crearSolicitudSesion(payload);
+    op$.subscribe(res => {
       if (res !== null) {
         this.router.navigate(['/app/inventario/solicitudes-insumos-page']);
       }

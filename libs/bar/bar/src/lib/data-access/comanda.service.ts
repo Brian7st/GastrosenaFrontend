@@ -10,81 +10,63 @@ import { Receta } from '../models/receta.model';
 export class ComandaService {
     private http = inject(HttpClient);
     private url = '/api/barybarismo/comandas';
-    private parseListaPlatosToItems(idComanda: string, listaPlatos: string, estadoComanda: string, notasEspeciales?: string): ComandaItem[] {
+
+    private parsearItems(idComanda: string, listaPlatos: string, estadoPreparacion: string): ComandaItem[] {
         if (!listaPlatos) return [];
-        const parts = listaPlatos.split(',');
-        const items = parts.map((part, index) => {
-            const trimmed = part.trim();
-            const match = trimmed.match(/^(\d+)\s*[xX]\s*(.+)$/);
+        const parts = this.splitRespectingParens(listaPlatos);
+        return parts.map((part, index) => {
+            const match = part.match(/^(\d+)\s*[xX]\s*(.+)$/);
             const cantidad = match ? parseInt(match[1], 10) : 1;
-            const nombreCompleto = match ? match[2].trim() : trimmed;
+            const nombreCompleto = match ? match[2].trim() : part;
 
-            // Extraer nota si viene en paréntesis, ej: "Mojito (Sin azúcar)"
-            let nombre = nombreCompleto;
-            let nota = '';
             const notaMatch = nombreCompleto.match(/\(([^)]+)\)/);
-            if (notaMatch) {
-                nota = notaMatch[1].trim();
-                nombre = nombreCompleto.replace(/\([^)]+\)/, '').trim();
-            }
+            const nota = notaMatch ? notaMatch[1].trim() : '';
+            const nombre = notaMatch ? nombreCompleto.replace(/\s*\([^)]+\)\s*/g, '').trim() : nombreCompleto;
 
-            // Determinar estado basado en local storage y comanda
             let estado: 'ESPERA' | 'PREPARANDO' | 'LISTO' = 'ESPERA';
-            if (estadoComanda === 'PENDIENTE') {
-                estado = 'ESPERA';
-                localStorage.removeItem(`gastro_bar_item_status_${idComanda}_${nombre}`);
-            } else if (estadoComanda === 'LISTO') {
-                estado = 'LISTO';
-                localStorage.removeItem(`gastro_bar_item_status_${idComanda}_${nombre}`);
-            } else {
-                const local = localStorage.getItem(`gastro_bar_item_status_${idComanda}_${nombre}`);
-                if (local === 'PREPARANDO' || local === 'LISTO') {
-                    estado = local;
-                } else {
-                    estado = 'ESPERA';
-                }
-            }
-
-            // Mapeo simple de idReceta
-            let idReceta = '';
-            const nameLower = nombre.toLowerCase();
-            if (nameLower.includes('mojito')) idReceta = 'rec-mojito';
-            else if (nameLower.includes('limonada')) idReceta = 'rec-limonada-coco';
-            else if (nameLower.includes('capuchino')) idReceta = 'rec-001';
+            if (estadoPreparacion === 'LISTO') estado = 'LISTO';
+            else if (estadoPreparacion === 'PROCESO' || estadoPreparacion === 'EN_PREPARACION') estado = 'PREPARANDO';
 
             return {
                 idDetalleComanda: `${idComanda}-${index}`,
                 nombre,
                 cantidad,
                 estado,
-                idReceta,
                 nota: nota || undefined,
                 tiempoEstimado: 5
             };
         });
-
-        // Si hay una sola bebida y tiene notasEspeciales general de comanda, y no tiene nota individual, le asignamos esa
-        if (items.length === 1 && notasEspeciales && !items[0].nota) {
-            items[0].nota = notasEspeciales;
-        }
-
-        return items;
     }
 
+    private splitRespectingParens(text: string): string[] {
+        const parts: string[] = [];
+        let depth = 0;
+        let current = '';
+        for (const ch of text) {
+            if (ch === '(') depth++;
+            else if (ch === ')') depth = Math.max(0, depth - 1);
+            if (ch === ',' && depth === 0) {
+                const trimmed = current.trim();
+                if (trimmed) parts.push(trimmed);
+                current = '';
+            } else {
+                current += ch;
+            }
+        }
+        const trimmed = current.trim();
+        if (trimmed) parts.push(trimmed);
+        return parts;
+    }
 
     listarComandas(): Observable<ComandaBarYBarismo[]> {
         return this.http.get<ComandaBarYBarismo[]>(this.url).pipe(
-            map(comandas => (comandas || []).map(c => {
-                const notasEsp = c.notasEspeciales || '';
-                return {
-                    ...c,
-                    idComanda: String(c.idComanda),
-                    prioridad: (c.prioridad?.toLowerCase() || 'normal') as 'normal' | 'alta' | 'urgente',
-                    mesero: c.mesero || '',
-                    especificacionesCliente: notasEsp,
-                    items: this.parseListaPlatosToItems(String(c.idComanda), c.preparacion, c.estadoPreparacion, notasEsp)
-                };
-            }))
+            map(comandas => (comandas || []).map(c => ({
+                ...c,
+                idComanda: String(c.idComanda),
+                prioridad: (c.prioridad?.toLowerCase() || 'normal') as 'normal' | 'alta' | 'urgente',
+                mesero: c.mesero || '',
+                items: this.parsearItems(String(c.idComanda), c.preparacion, c.estadoPreparacion)
+            })))
         );
     }
 
@@ -92,43 +74,36 @@ export class ComandaService {
         return this.http.get<ComandaBarYBarismo>(`${this.url}/${id}`).pipe(
             map(c => {
                 if (!c) return c;
-                const notasEsp = c.notasEspeciales || '';
                 return {
                     ...c,
                     prioridad: (c.prioridad?.toLowerCase() || 'normal') as 'normal' | 'alta' | 'urgente',
                     mesero: c.mesero || c.responsable || '',
-                    especificacionesCliente: notasEsp,
-                    items: this.parseListaPlatosToItems(c.idComanda, c.preparacion, c.estadoPreparacion, notasEsp)
+                    items: this.parsearItems(c.idComanda, c.preparacion, c.estadoPreparacion)
                 };
             })
         );
     }
-    actualizarEstado(idComanda: string, nuevoEstado: string): Observable<void> {
-        return this.http.put<void>(`${this.url}/${idComanda}/estado?estado=${nuevoEstado}`, {});
-    }
 
     iniciarDetalle(idDetalle: string): Observable<unknown> {
-        return this.http.put(`${this.url}/${idDetalle}/iniciar?responsable=1`, {});
+        const idComanda = idDetalle.split('-')[0];
+        return this.http.put(`${this.url}/${idComanda}/iniciar?responsable=1`, {});
     }
 
     finalizarDetalle(idDetalle: string): Observable<unknown> {
-        return this.http.put(`${this.url}/${idDetalle}/finalizar`, {});
+        const idComanda = idDetalle.split('-')[0];
+        return this.http.put(`${this.url}/${idComanda}/finalizar`, {});
+    }
+
+    eliminarComandaPorId(idComanda: string): Observable<unknown> {
+        return this.http.delete(`${this.url}/${idComanda}`);
+    }
+
+    limpiarComandas(fechaInicio: string, fechaFin: string): Observable<unknown> {
+        return this.http.delete(`${this.url}/limpiar?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`);
     }
 
     getRecetaById(idReceta: string): Observable<Receta> {
         return this.http.get<Receta>(`/api/barybarismo/recetas/${idReceta}`);
-    }
-    private evaluarYActualizarEstadoComanda(comanda: ComandaBarYBarismo) {
-        if (!comanda.items || comanda.items.length === 0) return;
-        const todosListos = comanda.items.every(i => i.estado === 'LISTO');
-        const algunoPreparandoOlisto = comanda.items.some(i => i.estado === 'PREPARANDO' || i.estado === 'LISTO');
-        if (todosListos) {
-            comanda.estadoPreparacion = 'LISTO';
-        } else if (algunoPreparandoOlisto) {
-            comanda.estadoPreparacion = 'PREPARANDO';
-        } else {
-            comanda.estadoPreparacion = 'PENDIENTE';
-        }
     }
 
     private baseUrlEstadisticas = '/api/barybarismo/estadisticas';

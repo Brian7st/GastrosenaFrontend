@@ -1,4 +1,7 @@
-<header class="barra-superior">
+<header
+  class="barra-superior"
+  [class.barra-superior--comprimida]="asistente.panelAbierto()"
+>
   @if (enlaces.length > 0) {
     <nav class="barra-superior__nav">
       @for (enlace of enlaces; track enlace.ruta) {
@@ -16,7 +19,7 @@
   <div class="barra-superior__buscador-contenedor">
     <div class="barra-superior__buscador">
       <svg lucideSearch class="barra-superior__buscador-icono"></svg>
-      <input class="barra-superior__buscador-input" [placeholder]="buscarPlaceholder" type="text" />
+      <input class="barra-superior__buscador-input" [placeholder]="buscarPlaceholder || i18n.t('topbar.buscar')" type="text" />
     </div>
   </div>
 
@@ -24,15 +27,16 @@
     <div class="barra-superior__herramientas">
       <button
         class="barra-superior__boton-icono barra-superior__boton-icono--ia"
-        title="Asistente IA"
+        [title]="i18n.t('topbar.asistente_ia')"
         type="button"
+        (click)="asistente.toggle()"
       >
         <svg lucideBrainCircuit></svg>
       </button>
 
       <button
         class="barra-superior__boton-icono"
-        [title]="esOscuro() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+        [title]="esOscuro() ? i18n.t('topbar.modo_claro') : i18n.t('topbar.modo_oscuro')"
         (click)="alternarTema()"
         type="button"
       >
@@ -43,11 +47,16 @@
         }
       </button>
 
-      <button class="barra-superior__boton-icono">
+      <!-- 🔔 Botón de notificaciones con enlace y badge -->
+      <button class="barra-superior__boton-icono" routerLink="/app/notificaciones">
         <svg lucideBell></svg>
+        @if (contadorNotificaciones() > 0) {
+          <span class="barra-superior__badge">{{ contadorNotificaciones() }}</span>
+        }
       </button>
 
-      <div class="barra-superior__perfil">
+      <!-- CAMBIADO: routerLink ahora apunta a /app/perfil -->
+      <div class="barra-superior__perfil" routerLink="/app/perfil" style="cursor: pointer;">
         @if (perfil.avatarUrl) {
           <img
             [alt]="perfil.nombre || 'Usuario'"

@@ -82,31 +82,6 @@
     gap: var(--space-4);
   }
 
-  &__kpi {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
-    padding: var(--space-4) var(--space-5);
-    background: var(--color-superficie-contenedor-bajo);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-  }
-
-  &__kpi-value {
-    font-size: var(--font-size-2xl);
-    font-weight: var(--font-weight-bold);
-    color: var(--color-text-heading);
-    line-height: 1;
-
-    &--activas  { color: var(--color-success-text); }
-    &--inactivas { color: var(--color-error-text); }
-  }
-
-  &__kpi-label {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
-  }
-
   &__filters {
     display: flex;
     align-items: center;

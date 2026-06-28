@@ -1,0 +1,24 @@
+<!-- Barra de control (oculta al imprimir) -->
+<div class="print-toolbar no-print">
+  <button class="print-toolbar__btn print-toolbar__btn--back" (click)="volver()">
+    ← Volver al acta
+  </button>
+  <button class="print-toolbar__btn print-toolbar__btn--print" (click)="imprimir()">
+    🖨 Imprimir / Guardar PDF
+  </button>
+  <button
+    class="print-toolbar__btn print-toolbar__btn--print"
+    [disabled]="loading()"
+    (click)="exportarPdf()"
+  >
+    📄 Descargar PDF oficial
+  </button>
+</div>
+
+@if (loading()) {
+  <div class="print-loading no-print">Cargando acta...</div>
+} @else if (acta(); as a) {
+  <inventario-acta-documento [acta]="a" />
+} @else {
+  <div class="print-loading no-print">Acta no encontrada.</div>
+}

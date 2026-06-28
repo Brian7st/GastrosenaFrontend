@@ -8,9 +8,28 @@
 
   .header-section {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: center;
     gap: var(--space-4);
+
+    .back-btn {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--color-text-primary);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s;
+
+      &:hover {
+        background: var(--color-background-soft);
+      }
+    }
 
     restaurant-page-header {
       ::ng-deep .page-header {
@@ -19,28 +38,80 @@
     }
   }
 
-  .form-block {
-    display: block;
-    max-width: 600px;
-    
-    .card {
-      background-color: var(--color-surface-primary);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-sm);
-      padding: var(--space-6);
+  .kpi-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .kpi-card {
+    background-color: var(--color-surface-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    box-shadow: var(--shadow-sm);
+
+    .kpi-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &.cash { background-color: var(--color-success-bg); color: var(--color-success); }
+      &.card-payment { background-color: var(--color-info-bg); color: var(--color-info-text); }
+      &.transfer { background-color: var(--color-surface-hover); color: var(--color-text-secondary); }
+    }
+
+    .kpi-info {
       display: flex;
       flex-direction: column;
-      gap: var(--space-6);
+
+      .kpi-label {
+        font-size: var(--font-size-sm);
+        color: var(--color-text-secondary);
+        font-weight: var(--font-weight-medium);
+      }
+
+      .kpi-value {
+        font-size: var(--font-size-xl);
+        color: var(--color-text-heading);
+        font-weight: var(--font-weight-bold);
+      }
     }
+  }
+
+  .main-content-block {
+    display: block;
+    width: 100%;
+  }
+
+  .card {
+    background-color: var(--color-surface-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
   }
 
   .block-header {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: var(--space-3);
+    gap: var(--space-4);
     border-bottom: 1px solid var(--color-border);
     padding-bottom: var(--space-4);
+    flex-wrap: wrap;
 
     .title-group {
       display: flex;
@@ -59,49 +130,8 @@
     }
   }
 
-  .input-group {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-
-    label {
-      font-size: var(--font-size-sm);
-      font-weight: var(--font-weight-medium);
-      color: var(--color-text-secondary);
-    }
-  }
-
-  .form-control {
-    padding: var(--space-3);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    font-family: inherit;
-    font-size: var(--font-size-sm);
-    color: var(--color-text-primary);
-    background-color: var(--color-surface-primary);
-    outline: none;
-    width: 100%;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-
-    &:focus {
-      border-color: var(--color-brand-primary);
-      box-shadow: var(--focus-ring);
-    }
-  }
-
-  textarea.form-control {
-    resize: vertical;
-    min-height: 80px;
-  }
-
-  .form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--space-4);
-    border-top: 1px solid var(--color-border);
-    padding-top: var(--space-4);
-  }
-
   .mt-4 { margin-top: var(--space-4); }
-  .mt-6 { margin-top: var(--space-6); }
 }
+
+.p-0 { padding: 0 !important; }
+.border-0 { border: none !important; }

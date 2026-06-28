@@ -1,14 +1,15 @@
 import { Component, ChangeDetectionStrategy, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmModalComponent } from '@restaurant/shared/ui';
+import { ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmModalComponent, HasPermissionDirective } from '@restaurant/shared/ui';
 import { SolicitudGil, EstadoGil } from '../../../models/solicitudes-gil.model';
+import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 
 @Component({
   selector: 'restaurant-solicitudes-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmModalComponent],
+  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmModalComponent, HasPermissionDirective, EmptyStateComponent],
   templateUrl: './solicitudes-list.component.html',
   styleUrl: './solicitudes-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -26,15 +27,29 @@ export class SolicitudesListComponent implements OnInit {
     Array.from({ length: this.paginacion().totalPages }, (_, i) => i)
   );
 
+  // ─── Filtros (panel colapsable) ──────────────────────────────────────────────
+  showFilters  = signal(false);
+  filtroEstado = signal<string>('');
+  filtrosActivos = computed(() => (this.filtroEstado() ? 1 : 0));
+
+  onToggleFilters(): void { this.showFilters.update(v => !v); }
+  onLimpiarFiltros(): void {
+    this.filtroEstado.set('');
+    this.facade.cargarSolicitudes({ estado: undefined });
+  }
+
   ngOnInit(): void {
     this.facade.loadAll();
   }
 
   // ─── KPIs calculados ─────────────────────────────────────────────────────
-  totalSolicitudes   = computed(() => this.paginacion().totalElements);
-  totalBorradores    = computed(() => this.solicitudes().filter(s => s.estado === 'BORRADOR').length);
-  enTramite          = computed(() => this.solicitudes().filter(s => s.estado === 'EMITIDO' || s.estado === 'ENVIADO_PROVEEDOR').length);
-  finalizadas        = computed(() => this.solicitudes().filter(s => s.estado === 'CERRADO').length);
+  totalSolicitudes = computed(() => this.paginacion().totalElements);
+  // Page-scoped — counts only current page, not total (backend does not expose per-estado aggregates)
+  borradorPagina   = computed(() => this.solicitudes().filter(s => s.estado === 'BORRADOR').length);
+  // Page-scoped — counts only current page, not total
+  enTramitePagina  = computed(() => this.solicitudes().filter(s => s.estado === 'EMITIDO' || s.estado === 'ENVIADO_PROVEEDOR' || s.estado === 'VERIFICADO').length);
+  // Page-scoped — counts only current page, not total
+  finalizadasPagina = computed(() => this.solicitudes().filter(s => s.estado === 'CERRADO').length);
 
   // ─── Opciones filtros ──────────────────────────────────────────────────────
   estadoOptions = [
@@ -42,14 +57,8 @@ export class SolicitudesListComponent implements OnInit {
     { value: 'BORRADOR',          label: 'Borrador'            },
     { value: 'EMITIDO',           label: 'Emitido'             },
     { value: 'ENVIADO_PROVEEDOR', label: 'Enviado a Proveedor' },
+    { value: 'VERIFICADO',        label: 'Verificado'          },
     { value: 'CERRADO',           label: 'Cerrado'             },
-  ];
-
-  fechaOptions = [
-    { value: '', label: 'Filtrar por Fecha' },
-    { value: '7d',    label: 'Últimos 7 días' },
-    { value: 'mes',   label: 'Este mes'       },
-    { value: '2024',  label: 'Año 2024'       },
   ];
 
   // ─── Helpers ───────────────────────────────────────────────────────────────
@@ -80,14 +89,15 @@ export class SolicitudesListComponent implements OnInit {
     }).format(value);
   }
 
-  /** Editar solo está habilitado en Borrador o Emitido */
   canEdit(estado: string): boolean {
-    return estado === 'BORRADOR' || estado === 'EMITIDO';
+    return estado === 'BORRADOR';
   }
 
   onSearch(term: string): void        { this.facade.cargarSolicitudes({ busqueda: term }); }
-  onFilterEstado(v: string): void     { this.facade.cargarSolicitudes({ estado: v ? (v as EstadoGil) : undefined }); }
-  onFilterFecha(v: string): void      { this.facade.cargarSolicitudes({ fechaRango: v }); }
+  onFilterEstado(v: string): void     {
+    this.filtroEstado.set(v);
+    this.facade.cargarSolicitudes({ estado: v ? (v as EstadoGil) : undefined });
+  }
   onIrAPagina(page: number): void     { this.facade.irAPagina(page); }
   onExportPdf(id: string | number): void {
     this.router.navigate(['/app/inventario/solicitudes-gil', id, 'exportar']);

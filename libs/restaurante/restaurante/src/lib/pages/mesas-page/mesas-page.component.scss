@@ -97,6 +97,7 @@
       font-family: inherit;
       font-size: var(--font-size-sm);
       background-color: var(--color-surface-primary);
+      color: var(--color-text-primary);
       outline: none;
       transition: border-color var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast) var(--ease-standard);
 
@@ -295,10 +296,12 @@
   left: 0;
   width: 100%;
   height: 100%;
+  box-sizing: border-box;
   background-color: var(--color-backdrop);
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: var(--space-6);
   z-index: var(--z-modal);
   backdrop-filter: blur(4px);
 }
@@ -310,11 +313,15 @@
   box-shadow: var(--shadow-lg);
   width: 100%;
   max-width: 400px;
-  max-height: 90vh;
+  max-height: 80vh;
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
   overflow: hidden; // Para el header coloreado con border radius
+
+  &--wide {
+    max-width: 700px;
+  }
 
   // Clases personalizadas para el modal de Crear Mesa
   .modal-header-colored {
@@ -325,6 +332,7 @@
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
 
     h3 {
       font-size: var(--font-size-lg);
@@ -356,6 +364,12 @@
     flex-direction: column;
     gap: var(--space-5);
 
+    &--flex {
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
     .modal-note {
       font-size: var(--font-size-xs);
       color: var(--color-text-secondary);
@@ -365,6 +379,11 @@
 
     &.modal-body--no-padding {
       padding: 0 !important;
+      margin: 0 calc(var(--space-8) * -1);
+      flex: 1;
+      min-height: 0;
+      max-height: 50vh; // Fuerza el scroll temprano (aprox 5 mesas en móviles)
+      overflow-y: auto;
       
       .empty-state-container {
         padding: var(--space-8);
@@ -374,6 +393,7 @@
     .table-responsive {
       width: 100%;
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch; // Suavidad en móviles
 
       .restaurant-table {
         width: 100%;
@@ -572,6 +592,8 @@
       border: 1px solid var(--color-border);
       border-radius: var(--radius-md);
       font-family: inherit;
+      background-color: var(--color-surface-primary);
+      color: var(--color-text-primary);
       outline: none;
 
       &:focus {
@@ -648,6 +670,8 @@
         border-right: 1px solid var(--color-border);
         text-align: center;
         -moz-appearance: textfield;
+        background-color: var(--color-surface-primary);
+        color: var(--color-text-primary);
         
         &::-webkit-outer-spin-button,
         &::-webkit-inner-spin-button {
@@ -701,6 +725,7 @@
     display: flex;
     justify-content: flex-end;
     gap: var(--space-4);
+    flex-shrink: 0;
   }
 
   .modal-actions-between {
@@ -783,6 +808,7 @@
         font-family: inherit;
         font-size: var(--font-size-sm);
         background-color: var(--color-surface-primary);
+        color: var(--color-text-primary);
         outline: none;
         transition: border-color var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast) var(--ease-standard);
 
@@ -811,8 +837,32 @@
 
       .mesa-list-info {
         display: flex;
-        align-items: center;
-        gap: var(--space-3);
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-2);
+
+        .mesa-list-info-header {
+          display: flex;
+          align-items: center;
+          gap: var(--space-3);
+        }
+
+        .mesa-obs-text {
+          display: flex;
+          align-items: flex-start;
+          gap: var(--space-2);
+          font-size: var(--font-size-xs);
+          color: var(--color-warning-interactive-dark, #a15c00);
+          background-color: var(--color-warning-bg-subtle, #fef3c7);
+          padding: var(--space-2) var(--space-3);
+          border-radius: var(--radius-sm);
+          font-style: italic;
+          margin-top: var(--space-1);
+          width: 100%;
+          word-break: break-word;
+          white-space: normal;
+          line-height: 1.4;
+        }
       }
 
       .mesa-list-number {
@@ -836,4 +886,189 @@
       padding: var(--space-4) 0;
     }
   }
+}/* Modal personalizado para confirmación de pedido */
+.custom-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.custom-modal-dialog {
+  background-color: var(--color-surface-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  width: 90%;
+  max-width: 450px;
+  box-shadow: var(--shadow-lg);
+  animation: slideUp 0.2s ease-out;
+
+  .modal-title {
+    display: block;
+    font-family: var(--font-family-headline);
+    font-size: var(--font-size-xl);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-2);
+  }
+
+  .modal-message {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-4);
+  }
+
+  .modal-order-summary {
+    background-color: var(--color-surface-secondary);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    margin-bottom: var(--space-6);
+    max-height: 250px;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--color-border);
+      border-radius: 4px;
+    }
+
+    .category-title {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: 0 0 var(--space-2) 0;
+      font-weight: var(--font-weight-semibold);
+      
+      &.mt-3 {
+        margin-top: var(--space-4);
+      }
+    }
+
+    .summary-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+
+      li {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        font-size: var(--font-size-sm);
+        
+        .summary-item-main {
+          display: flex;
+          width: 100%;
+        }
+
+        .summary-item-obs {
+          font-size: var(--font-size-xs);
+          color: var(--color-text-secondary);
+          background-color: var(--color-surface-primary);
+          border: 1px dashed var(--color-border);
+          padding: 2px 6px;
+          border-radius: var(--radius-sm);
+          font-style: italic;
+          margin-left: 30px;
+          display: inline-block;
+          width: fit-content;
+        }
+        
+        .qty {
+          font-weight: var(--font-weight-semibold);
+          min-width: 30px;
+        }
+        
+        .name {
+          flex: 1;
+          color: var(--color-text-primary);
+        }
+        
+        .price {
+          color: var(--color-text-secondary);
+        }
+      }
+    }
+
+    .summary-notes {
+      margin-top: var(--space-3);
+      padding-top: var(--space-2);
+      border-top: 1px dashed var(--color-border);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+    }
+
+    .summary-total-row {
+      margin-top: var(--space-3);
+      padding-top: var(--space-3);
+      border-top: 1px solid var(--color-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      span {
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-sm);
+      }
+      
+      strong {
+        color: var(--color-primario);
+        font-size: var(--font-size-lg);
+      }
+    }
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+  }
+
+  .text-error {
+    color: var(--color-error);
+  }
+
+  .cancel-reason-container {
+    margin-bottom: var(--space-5);
+
+    label {
+      display: block;
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      margin-bottom: var(--space-2);
+      color: var(--color-text-primary);
+    }
+
+    .cancel-reason-input {
+      width: 100%;
+      padding: var(--space-3);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      resize: vertical;
+      background-color: var(--color-surface-secondary);
+      color: var(--color-text-primary);
+      box-sizing: border-box;
+
+      &:focus {
+        outline: none;
+        border-color: var(--color-primario);
+        box-shadow: var(--focus-ring);
+      }
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

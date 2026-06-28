@@ -190,8 +190,24 @@
 
 .paquete-detail__trace-card {
   background: var(--color-superficie-contenedor-bajo);
+  border: 1px solid var(--color-superficie-contenedor);
+  border-left: 3px solid var(--color-primario);
   border-radius: var(--radius-md);
-  padding: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  transition: box-shadow var(--duration-fast) var(--ease-standard),
+              transform var(--duration-fast) var(--ease-standard);
+
+  &:hover {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
+  }
+
+  // Estilos scopeados al card (no afectan los labels del formulario de abajo)
+  .paquete-detail__trace-label {
+    color: var(--color-primario);
+    letter-spacing: 0.06em;
+    margin-bottom: var(--space-2);
+  }
 }
 
 .paquete-detail__trace-label {
@@ -201,6 +217,15 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin: 0 0 var(--space-1);
+}
+
+.paquete-detail__trace-value {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-en-superficie);
+  word-break: break-all;
+  margin: 0;
 }
 
 .paquete-detail__trace-link {
@@ -227,6 +252,99 @@
   border-radius: var(--radius-sm);
   word-break: break-all;
   margin: 0;
+}
+
+// ── Formulario de trazabilidad (estado Pendiente) ───────────────────────────────
+.paquete-detail__trace-form {
+  margin-top: var(--space-4);
+  padding: var(--space-5);
+  background: var(--color-superficie-contenedor-bajo);
+  border: 1px solid var(--color-superficie-contenedor);
+  border-radius: var(--radius-md);
+}
+
+.paquete-detail__trace-hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-4);
+}
+
+.paquete-detail__trace-inputs {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.paquete-detail__trace-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  // Label apilado arriba del input (antes salía en línea y apretado)
+  .paquete-detail__trace-label {
+    margin: 0;
+  }
+}
+
+.paquete-detail__trace-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--space-3);
+  font-size: var(--font-size-sm);
+  color: var(--color-en-superficie);
+  background: var(--color-superficie, #fff);
+  border: 1px solid var(--color-superficie-contenedor);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--duration-fast) var(--ease-standard),
+              box-shadow var(--duration-fast) var(--ease-standard);
+
+  &::placeholder {
+    color: var(--color-text-secondary);
+    opacity: 0.6;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+  }
+}
+
+.paquete-detail__trace-error {
+  margin: var(--space-3) 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-danger, #ef4444);
+}
+
+.paquete-detail__trace-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  padding: var(--space-3) var(--space-5);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-on-primario, #fff);
+  background: var(--color-primario);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: opacity var(--duration-fast) var(--ease-standard),
+              transform var(--duration-fast) var(--ease-standard);
+
+  &:hover:not(:disabled) {
+    opacity: 0.92;
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 
 // ── Document Cards ─────────────────────────────────────────────────────────────
@@ -485,4 +603,16 @@
   .paquete-detail__trace-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.paquete-detail__state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3, 0.75rem);
+  padding: var(--space-8, 3rem);
+  min-height: 240px;
+  color: var(--color-text-muted, #6b7280);
+  text-align: center;
 }

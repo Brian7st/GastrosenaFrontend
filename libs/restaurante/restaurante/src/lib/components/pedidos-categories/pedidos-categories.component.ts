@@ -1,45 +1,46 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LucideIconComponent } from '@restaurant/shared/ui';
+import { CategoriaMenu } from '../../models/restaurante.model';
 
 @Component({
   selector: 'lib-pedidos-categories',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideIconComponent],
   templateUrl: './pedidos-categories.component.html',
   styleUrls: ['./pedidos-categories.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PedidosCategoriesComponent {
-  @Output() categorySelected = new EventEmitter<string>();
-  @Output() subcategorySelected = new EventEmitter<string>();
+  @Input() categories: CategoriaMenu[] = [];
+  
+  @Output() filterChanged = new EventEmitter<{main: string, sub: string}>();
 
-  categories = [
-    { id: 'all', name: 'Todo', icon: '🍽️' },
-    { id: 'entrada', name: 'Entradas', icon: '🥗' },
-    { id: 'plato_fuerte', name: 'Plato Fuerte', icon: '🥩' },
-    { id: 'postre', name: 'Postres', icon: '🍰' },
-    { id: 'bebidas', name: 'Bebidas', icon: '🍹' },
-  ];
+  activeMainCategory = signal<string>('all');
+  activeSubCategory = signal<string>('all');
 
-  subcategoriesBebidas = [
-    { id: 'calientes', name: 'Calientes' },
-    { id: 'frias', name: 'Frías' },
-    { id: 'sin_alcohol', name: 'Sin Alcohol' },
-    { id: 'con_alcohol', name: 'Con Alcohol' },
-  ];
+  // Propiedad computada para obtener las subcategorías según la categoría principal activa
+  currentSubcategories = computed(() => {
+    const main = this.activeMainCategory();
+    if (main === 'all') return [];
+    return this.categories.filter(c => c.type === main);
+  });
 
-  activeCategory = signal<string>('all');
-  activeSubcategory = signal<string>('');
-
-  selectCategory(id: string) {
-    this.activeCategory.set(id);
-    this.activeSubcategory.set('');
-    this.categorySelected.emit(id);
-    this.subcategorySelected.emit('');
+  selectMain(mainId: string) {
+    this.activeMainCategory.set(mainId);
+    this.activeSubCategory.set('all'); // Resetear subcategoría al cambiar la principal
+    this.emitFilter();
   }
 
-  selectSubcategory(id: string) {
-    this.activeSubcategory.set(id);
-    this.subcategorySelected.emit(id);
+  selectSub(subId: string) {
+    this.activeSubCategory.set(subId);
+    this.emitFilter();
+  }
+
+  private emitFilter() {
+    this.filterChanged.emit({
+      main: this.activeMainCategory(),
+      sub: this.activeSubCategory()
+    });
   }
 }

@@ -102,6 +102,17 @@
   }
 }
 
+/* ── Empty Notice ───────────────────────────────────────────────────────────── */
+.empty-notice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-pizarra-400);
+  padding: var(--space-4);
+  font-weight: var(--font-weight-medium);
+}
+
 /* ── Category Section ───────────────────────────────────────────────────────── */
 .category-section {
   margin-bottom: var(--space-8);
@@ -291,6 +302,20 @@
   max-width: 180px;
   text-align: right;
   line-height: 1.4;
+  margin: 0;
+}
+
+.modal-footer__error-slot {
+  // Espacio reservado siempre presente: aparezca o no el error, los botones no se mueven.
+  min-height: 1.25rem;
+  display: flex;
+  align-items: flex-start;
+}
+
+.modal-footer__error {
+  color: var(--color-danger, #ef4444);
+  font-size: 0.85rem;
+  line-height: 1.25rem;
   margin: 0;
 }
 

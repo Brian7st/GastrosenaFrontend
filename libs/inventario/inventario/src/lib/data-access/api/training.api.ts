@@ -32,17 +32,28 @@ export interface SolicitudSesionResponse {
 export interface SolicitudesSesionFiltros {
   instructorId?: string;
   estado?:       string;
+  page?:         number;
+  size?:         number;
+}
+
+/** Respuesta paginada de GET /training/solicitudes */
+export interface PagedSolicitudSesionResponse {
+  content:       SolicitudSesionResponse[];
+  totalElements: number;
+  totalPages:    number;
+  number:        number;
+  size:          number;
 }
 
 /** POST /training/solicitudes */
 export interface CrearSolicitudSesionRequest {
-  fechaSolicitud?:          string;
-  numeroSolicitud?:         number;
-  fichaId:                  string;
-  programaId:               string;
-  instructorId:             string;
+  fechaSolicitud?:           string;
+  numeroSolicitud?:          number;
+  fichaId:                   string;
+  programaId:                string;
+  instructorId:              string;
   identificacionInstructor?: string;
-  valorTotalDeSolicitud?:   number;
+  valorTotalDeSolicitud?:    number;
   items: {
     codigoSena:              string;
     nombreBien?:             string;
@@ -56,6 +67,9 @@ export interface CrearSolicitudSesionRequest {
     iva?:                    number;
   }[];
 }
+
+/** PUT /training/solicitudes/{id} — actualiza una solicitud de sesión existente */
+export type ActualizarSolicitudSesionRequest = CrearSolicitudSesionRequest;
 
 /** PATCH /training/solicitudes/{id}/aprobar */
 export interface AprobarSolicitudSesionRequest {

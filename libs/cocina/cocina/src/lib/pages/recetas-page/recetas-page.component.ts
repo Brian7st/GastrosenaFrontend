@@ -1,9 +1,12 @@
 import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RecetaService } from '../../data-access/receta.service';
+import { CategoriaService } from '../../data-access/categoria.service';
 import { Receta } from '../../models/receta.model';
 import { DetalleRecetaComponent } from '../../components/detalle-receta/detalle-receta.component';
 import { GestionRecetaComponent } from '../../components/gestion-receta/gestion-receta.component';
+import { GestionCategoriasComponent } from '../../components/gestion-categorias/gestion-categorias.component';
+import { Rol } from '@restaurant/shared/models';
 import {
   LucideIconComponent,
   PageHeaderComponent,
@@ -13,7 +16,8 @@ import {
   EmptyStateComponent,
   CardComponent,
   ConfirmDialogComponent,
-  AlertComponent
+  AlertComponent,
+  HasRoleDirective
 } from '@restaurant/shared/ui';
 
 @Component({
@@ -23,6 +27,7 @@ import {
     CommonModule, 
     DetalleRecetaComponent, 
     GestionRecetaComponent, 
+    GestionCategoriasComponent,
     LucideIconComponent,
     PageHeaderComponent,
     SearchFilterComponent,
@@ -31,14 +36,17 @@ import {
     EmptyStateComponent,
     CardComponent,
     ConfirmDialogComponent,
-    AlertComponent
+    AlertComponent,
+    HasRoleDirective
   ],
   templateUrl: './recetas-page.component.html',
   styleUrl: './recetas-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RecetasPageComponent implements OnInit {
+  protected readonly Rol = Rol;
   public recetaService = inject(RecetaService);
+  public categoriaService = inject(CategoriaService);
 
   searchTerm = signal<string>('');
   categoriaSeleccionada = signal<string>('');
@@ -47,6 +55,7 @@ export class RecetasPageComponent implements OnInit {
   recetaSeleccionada = signal<Receta | null>(null);
   mostrarDetalle = signal<boolean>(false);
   mostrarGestion = signal<boolean>(false);
+  mostrarCategorias = signal<boolean>(false);
 
   // Estados para alertas y confirmación
   confirmDeleteOpen = signal<boolean>(false);
@@ -54,12 +63,13 @@ export class RecetasPageComponent implements OnInit {
   alertMessage = signal<string>('');
   alertType = signal<'success' | 'error' | 'warning' | 'info'>('info');
 
-  opcionesCategoria = [
-    { label: 'Todas las categorías', value: '' },
-    { label: 'Platos Fuertes', value: 'platos fuertes' },
-    { label: 'Entradas', value: 'entradas' },
-    { label: 'Postres', value: 'postres' }
-  ];
+  opcionesCategoria = computed(() => {
+    const cats = this.categoriaService.categorias();
+    return [
+      { label: 'Todas las categorías', value: '' },
+      ...cats.map(c => ({ label: c.nombreCategoria, value: c.nombreCategoria }))
+    ];
+  });
 
   recetasFiltradas = computed(() => {
     const term = this.searchTerm().toLowerCase();
@@ -95,6 +105,7 @@ export class RecetasPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.recetaService.listar();
+    this.categoriaService.listar();
   }
 
   verDetalle(receta: Receta) {
@@ -107,6 +118,10 @@ export class RecetasPageComponent implements OnInit {
     this.mostrarGestion.set(true);
   }
 
+  abrirGestionCategorias() {
+    this.mostrarCategorias.set(true);
+  }
+
   editarReceta(receta: Receta) {
     this.recetaSeleccionada.set(receta);
     this.mostrarGestion.set(true);
@@ -115,8 +130,10 @@ export class RecetasPageComponent implements OnInit {
   cerrarModales(actualizoDatos = false) {
     this.mostrarDetalle.set(false);
     this.mostrarGestion.set(false);
+    this.mostrarCategorias.set(false);
     if (actualizoDatos) {
       this.recetaService.listar();
+      this.categoriaService.listar();
     }
   }
 

@@ -7,7 +7,7 @@
     <p class="page-subtitle">Gestión de bienes y servicios — Centro de Servicios y Gestión Empresarial</p>
   </div>
   <div style="display: flex; gap: 1rem;">
-    <restaurant-button variant="primary" routerLink="generar">
+    <restaurant-button *hasPermission="'gil:crear'" variant="primary" routerLink="generar">
       <span class="material-symbols-outlined">library_add_check</span>
       Generar GIL
     </restaurant-button>
@@ -27,22 +27,22 @@
   />
 
   <restaurant-kpi-card
-    label="Borradores"
-    [value]="totalBorradores() | number"
+    label="Borradores (página)"
+    [value]="borradorPagina() | number"
     icon="pencil"
     iconColor="blue"
   />
 
   <restaurant-kpi-card
-    label="En Trámite"
-    [value]="enTramite() | number"
+    label="En Trámite (página)"
+    [value]="enTramitePagina() | number"
     icon="clock"
     iconColor="orange"
   />
 
   <restaurant-kpi-card
-    label="Finalizadas"
-    [value]="finalizadas() | number"
+    label="Finalizadas (página)"
+    [value]="finalizadasPagina() | number"
     icon="check-circle"
     iconColor="green"
   />
@@ -52,42 +52,38 @@
 <!-- ══════════════════════════════════════════════════════════════════════════
      Tabla con filtros
 ══════════════════════════════════════════════════════════════════════════ -->
-<restaurant-data-table tableTitle="Solicitudes GIL-F-014" tableIcon="clipboard-list">
+<restaurant-data-table
+  tableTitle="Solicitudes GIL-F-014"
+  tableIcon="clipboard-list"
+  searchPlaceholder="Filtrar por Instructor..."
+  [showFilterButton]="true"
+  [filterActive]="showFilters()"
+  [filterCount]="filtrosActivos()"
+  (searchChange)="onSearch($event)"
+  (filterToggle)="onToggleFilters()"
+>
 
-  <!-- Barra de filtros -->
-  <div dtHeader class="table-controls">
-    <div class="filters-left">
-
-      <!-- Filtro Estado -->
-      <div class="select-box">
-        <select #estadoSelect (change)="onFilterEstado(estadoSelect.value)">
-          @for (opt of estadoOptions; track opt) {
-<option [value]="opt.value">{{ opt.label }}</option>
-}
-        </select>
-        <span class="material-symbols-outlined dropdown-icon">expand_more</span>
-      </div>
-
-      <!-- Filtro Fecha -->
-      <div class="select-box">
-        <select #fechaSelect (change)="onFilterFecha(fechaSelect.value)">
-          @for (opt of fechaOptions; track opt) {
-<option [value]="opt.value">{{ opt.label }}</option>
-}
-        </select>
-        <span class="material-symbols-outlined dropdown-icon">calendar_month</span>
-      </div>
-
-      <!-- Buscar por instructor -->
-      <div class="search-box">
-        <span class="material-symbols-outlined search-icon">search</span>
-        <input type="text"
-               placeholder="Filtrar por Instructor..."
-               (input)="onSearch($any($event.target).value)" />
+  <!-- Panel de filtros colapsable (slot [dtHeader]) -->
+  @if (showFilters()) {
+    <div dtHeader class="filter-panel">
+      <div class="filter-panel__row">
+        <div class="filter-group">
+          <label class="filter-label">Estado</label>
+          <select class="filter-select" [value]="filtroEstado()" (change)="onFilterEstado($any($event.target).value)">
+            @for (opt of estadoOptions; track opt) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="filter-group filter-group--actions">
+          <button class="filter-clear-btn" (click)="onLimpiarFiltros()" [disabled]="filtrosActivos() === 0">
+            <span class="material-symbols-outlined">clear_all</span>
+            Limpiar
+          </button>
+        </div>
       </div>
     </div>
-
-  </div>
+  }
 
   <!-- Cabecera de tabla -->
   <thead>
@@ -126,7 +122,7 @@
       </td>
 
       <!-- Ficha / Grupo -->
-      <td class="text-secondary">{{ s.fichaCaracterizacion }}</td>
+      <td class="text-secondary">{{ s.codigoGrupo ?? '—' }}</td>
 
       <!-- Estado badge -->
       <td>
@@ -134,8 +130,9 @@
               [ngClass]="{
                 'estado-badge--borrador':  s.estado === 'BORRADOR',
                 'estado-badge--pendiente': s.estado === 'EMITIDO',
-                'estado-badge--validado':  s.estado === 'ENVIADO_PROVEEDOR',
-                'estado-badge--procesado': s.estado === 'CERRADO'
+                'estado-badge--validado':    s.estado === 'ENVIADO_PROVEEDOR',
+                'estado-badge--verificado': s.estado === 'VERIFICADO',
+                'estado-badge--procesado':  s.estado === 'CERRADO'
               }">
           {{ s.estado }}
         </span>
@@ -152,7 +149,7 @@
           <button class="action-icon" (click)="onView(s.id)" title="Ver Detalle">
             <span class="material-symbols-outlined">visibility</span>
           </button>
-          <button class="action-icon"
+          <button *hasPermission="'gil:editar'" class="action-icon"
                   (click)="onEdit(s.id)"
                   [disabled]="!canEdit(s.estado)"
                   title="Editar">
@@ -162,7 +159,7 @@
           <button class="action-icon" (click)="onExportPdf(s.id)" title="Exportar PDF/DOCX">
             <span class="material-symbols-outlined">picture_as_pdf</span>
           </button>
-          <button class="action-icon action-icon--danger"
+          <button *hasPermission="'gil:editar'" class="action-icon action-icon--danger"
                   (click)="onDelete(s)"
                   title="Eliminar">
             <span class="material-symbols-outlined">delete</span>
@@ -170,28 +167,38 @@
         </div>
       </td>
     </tr>
+} @empty {
+    <tr>
+      <td colspan="7">
+        <inventario-empty-state
+          icon="assignment"
+          title="Sin solicitudes"
+          message="No se encontraron solicitudes con los filtros aplicados."
+        />
+      </td>
+    </tr>
 }
   </tbody>
 
   <!-- Paginación -->
-  <div dtFooter class="pagination-footer">
-    <p class="results-count">
-      MOSTRANDO {{ solicitudes().length }} DE {{ paginacion().totalElements }} SOLICITUDES
+  <div dtFooter class="dt-footer">
+    <p class="dt-page-info">
+      Mostrando {{ solicitudes().length }} de {{ paginacion().totalElements }} solicitudes
     </p>
-    <div class="page-numbers">
-      <button class="page-btn"
+    <div class="dt-pagination">
+      <button class="dt-page-btn"
         [disabled]="paginacion().page === 0"
         (click)="onIrAPagina(paginacion().page - 1)">
         <span class="material-symbols-outlined">chevron_left</span>
       </button>
       @for (p of paginas(); track p) {
-        <button class="page-btn"
-          [class.page-btn--active]="p === paginacion().page"
+        <button class="dt-page-btn"
+          [class.dt-page-btn--active]="p === paginacion().page"
           (click)="onIrAPagina(p)">
           {{ p + 1 }}
         </button>
       }
-      <button class="page-btn"
+      <button class="dt-page-btn"
         [disabled]="paginacion().page >= paginacion().totalPages - 1"
         (click)="onIrAPagina(paginacion().page + 1)">
         <span class="material-symbols-outlined">chevron_right</span>

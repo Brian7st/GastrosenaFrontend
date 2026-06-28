@@ -4,8 +4,7 @@
     <div class="page-header__left">
       <inventario-back-button (clicked)="goBack()"></inventario-back-button>
       <div class="page-header__title-row">
-        <h1 class="page-header__title">Detalle: <span class="text-primary">#{{ consolidado()?.id ?? '...' }}</span></h1>
-        <span class="badge badge--success-soft">{{ consolidado()?.estado ?? '' }}</span>
+        <h1 class="page-header__title">Detalle: <span class="text-primary">#{{ consolidado()?.numero ?? '...' }}</span></h1>
       </div>
     </div>
 
@@ -13,7 +12,7 @@
       <restaurant-button variant="surface" (click)="openExportModal()">
         <span class="material-symbols-outlined btn-icon">download</span> Exportar
       </restaurant-button>
-      <restaurant-button variant="danger" (click)="openReversarModal()">
+      <restaurant-button *hasPermission="'consolidado:crear'" variant="danger" (click)="openReversarModal()">
         <span class="material-symbols-outlined btn-icon">cancel</span> Reversar Consolidado
       </restaurant-button>
     </div>
@@ -22,8 +21,8 @@
   <!-- Dashboard Stats Summary (Bento Grid) -->
   <div class="kpi-grid">
     <restaurant-kpi-card
-      label="Total Consolidado"
-      [value]="(consolidado()?.totales?.totalGeneral ?? 0) | currency:'COP':'symbol-narrow':'1.0-0'"
+      label="Valor Neto"
+      [value]="(consolidado()?.totales?.valorNeto ?? 0) | currency:'COP':'symbol-narrow':'1.0-0'"
       icon="landmark"
       iconColor="green">
     </restaurant-kpi-card>
@@ -50,38 +49,46 @@
     </restaurant-kpi-card>
   </div>
 
-  <!-- Section 1: Subtotales por tipo de línea -->
+  <!-- Section 1: Totales reales del consolidado -->
   <section class="bento-card p-0">
     <div class="section-header">
       <div class="section-header__title-container">
         <div class="section-header__icon">
           <span class="material-symbols-outlined">pie_chart</span>
         </div>
-        <h3 class="section-header__title">Subtotales por Tipo</h3>
+        <h3 class="section-header__title">Resumen Financiero</h3>
       </div>
-      <span class="section-header__subtitle">Agrupado por tipo de línea</span>
+      <span class="section-header__subtitle">Totales del consolidado</span>
     </div>
 
     <restaurant-data-table>
       <thead>
         <tr>
-          <th class="th-left">Tipo</th>
-          <th class="th-right">Cantidad total</th>
-          <th class="th-right">Valor total</th>
+          <th class="th-left">Concepto</th>
+          <th class="th-right">Valor</th>
         </tr>
       </thead>
       <tbody>
-        @for (item of subtotalesPorTipo(); track item.tipo) {
-          <tr>
-            <td><span class="td-bold">{{ item.tipo }}</span></td>
-            <td class="text-right"><span class="td-medium">{{ item.cantidad }}</span></td>
-            <td class="text-right">
-              <span class="td-value-primary">{{ item.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-            </td>
-          </tr>
-        }
-        @if (subtotalesPorTipo().length === 0) {
-          <tr><td colspan="3" class="td-muted text-center">Sin líneas registradas</td></tr>
+        <tr>
+          <td><span class="td-bold">Suma Montos</span></td>
+          <td class="text-right">
+            <span class="td-value-primary">{{ (consolidado()?.totales?.sumaMontos ?? 0) | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="td-bold">Retención ZESE</span></td>
+          <td class="text-right">
+            <span class="td-value-primary">{{ (consolidado()?.totales?.sumaRetencionZese ?? 0) | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="td-bold">Valor Neto</span></td>
+          <td class="text-right">
+            <span class="td-value-primary">{{ (consolidado()?.totales?.valorNeto ?? 0) | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+          </td>
+        </tr>
+        @if (!consolidado()) {
+          <tr><td colspan="2" class="td-muted text-center">Sin datos</td></tr>
         }
       </tbody>
     </restaurant-data-table>
@@ -101,59 +108,55 @@
     <restaurant-data-table>
       <thead>
         <tr>
-          <th class="th-left">Referencia</th>
-          <th class="th-left">Descripción</th>
-          <th class="th-left">Tipo</th>
-          <th class="th-right">Cantidad</th>
-          <th class="th-right">Valor</th>
+          <th class="th-left">GIL ID</th>
+          <th class="th-left">Factura N°</th>
+          <th class="th-left">Concepto</th>
+          <th class="th-left">Fecha</th>
+          <th class="th-right">Monto</th>
+          <th class="th-right">Ret. ZESE</th>
         </tr>
       </thead>
       <tbody>
-        @for (linea of (consolidado()?.lineas ?? []); track linea.id) {
+        @for (linea of (consolidado()?.lineas ?? []); track linea.gilId) {
           <tr>
-            <td class="td-mono td-muted">{{ linea.referencia }}</td>
-            <td class="td-normal">{{ linea.descripcion }}</td>
-            <td><span class="td-muted">{{ linea.tipo }}</span></td>
-            <td class="text-right td-normal">{{ linea.cantidad }}</td>
-            <td class="text-right td-medium">{{ linea.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+            <td class="td-mono td-muted">{{ linea.gilId }}</td>
+            <td class="td-mono">{{ linea.numeroFactura }}</td>
+            <td class="td-normal">{{ linea.concepto }}</td>
+            <td class="td-muted">{{ linea.fecha }}</td>
+            <td class="text-right td-medium">{{ linea.monto | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+            <td class="text-right td-normal">{{ linea.retencionZese | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
           </tr>
         }
         @if ((consolidado()?.lineas ?? []).length === 0) {
-          <tr><td colspan="5" class="td-muted text-center">Sin líneas registradas</td></tr>
+          <tr><td colspan="6" class="td-muted text-center">Sin líneas registradas</td></tr>
         }
       </tbody>
       <tfoot dtFooter class="tfoot-totals">
         <tr>
-          <td class="tfoot-totals__label" colspan="3">Totales</td>
+          <td class="tfoot-totals__label" colspan="4">Totales</td>
           <td class="text-right">
-            <div class="td-flex-col text-right">
-              <span class="tfoot-totals__sublabel">Σ Bienes</span>
-              <span class="tfoot-totals__value">{{ (consolidado()?.totales?.totalBienes ?? 0) | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-            </div>
+            <span class="tfoot-totals__value">{{ totalMonto() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
           </td>
           <td class="text-right">
-            <div class="td-flex-col text-right">
-              <span class="tfoot-totals__sublabel">Σ Servicios</span>
-              <span class="tfoot-totals__value">{{ (consolidado()?.totales?.totalServicios ?? 0) | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-            </div>
+            <span class="tfoot-totals__value">{{ totalRetencion() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
           </td>
         </tr>
       </tfoot>
     </restaurant-data-table>
   </section>
+
   @if (showExportModal()) {
-<restaurant-exportar-consolidado-modal
-   
-    (close)="closeExportModal()"
-    (export)="onExport($event)">
-  </restaurant-exportar-consolidado-modal>
-}
+    <restaurant-exportar-consolidado-modal
+      (close)="closeExportModal()"
+      (export)="onExport($event)">
+    </restaurant-exportar-consolidado-modal>
+  }
 
   @if (showReversarModal() && consolidado()) {
     <restaurant-reversar-consolidado-modal
       [consolidadoId]="consolidado()!.id"
       [periodo]="consolidado()!.fechaGeneracion"
-      [total]="(consolidado()!.totales.totalGeneral | currency:'COP':'symbol-narrow':'1.0-0') ?? ''"
+      [total]="(consolidado()!.totales.valorNeto | currency:'COP':'symbol-narrow':'1.0-0') ?? ''"
       [comprobantes]="consolidado()!.lineas.length"
       [isBlocked]="isReversarBlocked()"
       (close)="closeReversarModal()"

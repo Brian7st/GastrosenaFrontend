@@ -1,8 +1,7 @@
 import { Usuario } from '@restaurant/shared/models';
 
 export interface UsuarioDetalle extends Usuario {
-  apellidos:        string;
-  documento:        string;
+
   telefono:         string;
   ultimoAcceso:     string | null;
   cuentaBloqueada:  boolean;
@@ -32,6 +31,8 @@ export interface ActualizarUsuarioRequest {
   apellidos: string;
   telefono:  string;
   idRol:     string;
+  documento: string;   // ← agregar
+  email:     string;
 }
 
 export interface RolOpcion {

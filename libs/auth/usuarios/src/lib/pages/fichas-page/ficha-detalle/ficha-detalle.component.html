@@ -1,0 +1,200 @@
+<div class="detalle">
+ 
+  <!-- Header -->
+  <div class="detalle__header">
+    <button class="detalle__back" (click)="volver()">
+      <lucide-icon name="arrow-left" [size]="16"></lucide-icon>
+      Volver
+    </button>
+    <div class="detalle__title-block">
+      <h1 class="detalle__title">Ficha {{ ficha()?.numero }}</h1>
+      <span class="detalle__programa">{{ ficha()?.programa }}</span>
+    </div>
+    <span
+      class="detalle__estado-badge"
+      [class.detalle__estado-badge--activa]="ficha()?.activa"
+      [class.detalle__estado-badge--inactiva]="!ficha()?.activa"
+    >
+      {{ ficha()?.activa ? 'Activa' : 'Inactiva' }}
+    </span>
+  </div>
+ 
+  <!-- KPIs -->
+  <div class="detalle__kpis">
+    <restaurant-kpi-card
+      label="Total Aprendices"
+      [value]="aprendices().length.toString()"
+      icon="users"
+      iconColor="blue"
+    ></restaurant-kpi-card>
+    <div class="detalle__kpi detalle__kpi--vocero">
+      <div class="detalle__kpi-body">
+        <span class="detalle__kpi-label">Vocero</span>
+        <span class="detalle__kpi-value">{{ voceroId() ? 1 : 0 }}</span>
+        @if (voceroId()) {
+          <span class="detalle__kpi-nombre">
+            {{ getNombreAprendiz(voceroId()!) }}
+          </span>
+        }
+      </div>
+      <div class="detalle__kpi-icon">
+        <lucide-icon name="star" [size]="22"></lucide-icon>
+      </div>
+    </div>
+    <div class="detalle__kpi detalle__kpi--subvocero">
+      <div class="detalle__kpi-body">
+        <span class="detalle__kpi-label">Subvocero</span>
+        <span class="detalle__kpi-value">{{ subvoceroId() ? 1 : 0 }}</span>
+        @if (subvoceroId()) {
+          <span class="detalle__kpi-nombre">
+            {{ getNombreAprendiz(subvoceroId()!) }}
+          </span>
+        }
+      </div>
+      <div class="detalle__kpi-icon">
+        <lucide-icon name="award" [size]="22"></lucide-icon>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- Lista -->
+  <div class="detalle__section">
+    <div class="detalle__section-header">
+      <h2 class="detalle__section-title">Aprendices asignados</h2>
+      <button class="detalle__btn-primary" (click)="abrirModalAsignar()">
+        <lucide-icon name="user-plus" [size]="16"></lucide-icon>
+        Asignar Aprendiz
+      </button>
+    </div>
+ 
+    @if (loading()) {
+      <div class="detalle__empty">
+        <lucide-icon name="loader" [size]="28"></lucide-icon>
+        <p>Cargando aprendices...</p>
+      </div>
+    } @else if (aprendices().length === 0) {
+      <div class="detalle__empty">
+        <lucide-icon name="users" [size]="36"></lucide-icon>
+        <p>No hay aprendices asignados a esta ficha</p>
+        <button class="detalle__btn-primary" (click)="abrirModalAsignar()">
+          <lucide-icon name="user-plus" [size]="14"></lucide-icon>
+          Asignar el primero
+        </button>
+      </div>
+    } @else {
+      <div class="detalle__table-wrapper">
+        <table class="detalle__table">
+          <thead>
+            <tr>
+              <th>Documento</th>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>Rol en ficha</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (aprendiz of aprendices(); track aprendiz.id) {
+              <tr [class.detalle__row--vocero]="esVocero(aprendiz.id)"
+                  [class.detalle__row--subvocero]="esSubvocero(aprendiz.id)">
+                <td>{{ aprendiz.documento }}</td>
+                <td>{{ aprendiz.nombre }} {{ aprendiz.apellidos }}</td>
+                <td>{{ aprendiz.email }}</td>
+                <td>
+                  @if (esVocero(aprendiz.id)) {
+                    <span class="detalle__badge detalle__badge--vocero"><lucide-icon name="star" [size]="12"></lucide-icon> Vocero</span>
+                  } @else if (esSubvocero(aprendiz.id)) {
+                    <span class="detalle__badge detalle__badge--subvocero"><lucide-icon name="award" [size]="12"></lucide-icon> Subvocero</span>
+                  } @else {
+                    <span class="detalle__badge detalle__badge--ninguno">Sin rol</span>
+                  }
+                </td>
+                <td>
+                  <div class="detalle__acciones">
+                    @if (!esVocero(aprendiz.id)) {
+                      <button
+                        class="detalle__btn-accion detalle__btn-accion--vocero"
+                        (click)="asignarVocero(aprendiz.id)"
+                        title="Asignar como vocero"
+                      >
+                        <lucide-icon name="star" [size]="14"></lucide-icon>
+                        Vocero
+                      </button>
+                    }
+                    @if (!esSubvocero(aprendiz.id)) {
+                      <button
+                        class="detalle__btn-accion detalle__btn-accion--subvocero"
+                        (click)="asignarSubvocero(aprendiz.id)"
+                        title="Asignar como subvocero"
+                      >
+                        <lucide-icon name="award" [size]="14"></lucide-icon>
+                        Subvocero
+                      </button>
+                    }
+                    @if (esVocero(aprendiz.id) || esSubvocero(aprendiz.id)) {
+                      <button
+                        class="detalle__btn-accion detalle__btn-accion--remover"
+                        (click)="removerRol(aprendiz.id)"
+                        title="Quitar rol"
+                      >
+                        <lucide-icon name="x" [size]="14"></lucide-icon>
+                        Quitar rol
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+ 
+</div>
+ 
+<!-- Modal Asignar Aprendiz -->
+@if (mostrarModalAsignar()) {
+  <div class="modal-backdrop" (click)="cerrarModalAsignar()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h3 class="modal__title">Asignar Aprendiz a Ficha</h3>
+        <button class="modal__close" (click)="cerrarModalAsignar()">
+          <lucide-icon name="x" [size]="18"></lucide-icon>
+        </button>
+      </div>
+      <div class="modal__body">
+        <div class="modal__search-wrapper">
+          <lucide-icon name="search" [size]="16" class="modal__search-icon"></lucide-icon>
+          <input
+            type="text"
+            placeholder="Buscar por documento o nombre..."
+            [value]="busquedaAprendiz()"
+            (input)="busquedaAprendiz.set($any($event.target).value)"
+            class="modal__search"
+          >
+        </div>
+        <div class="modal__list">
+          @for (user of usuariosDisponiblesFiltrados(); track user.id) {
+            <div class="modal__item">
+              <div class="modal__item-info">
+                <strong>{{ user.nombre }} {{ user.apellidos }}</strong>
+                <small>{{ user.documento }} · {{ user.email }}</small>
+              </div>
+              <button class="modal__item-btn" (click)="asignarAprendiz(user.id)">
+                <lucide-icon name="user-plus" [size]="14"></lucide-icon>
+                Asignar
+              </button>
+            </div>
+          }
+          @if (usuariosDisponiblesFiltrados().length === 0) {
+            <div class="modal__empty">
+              <lucide-icon name="search-x" [size]="28"></lucide-icon>
+              <p>No hay aprendices disponibles</p>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}

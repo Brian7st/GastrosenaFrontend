@@ -12,73 +12,12 @@
 
   <div class="export-title-block">
     <h1 class="page-title">Exportar Reporte de Bienes</h1>
-    <p class="page-subtitle">Configure los parámetros del reporte para generar un archivo detallado del inventario actual. Los reportes generados se archivan automáticamente en el historial del sistema.</p>
+    <p class="page-subtitle">Generá un archivo con el inventario actual de bienes: catálogo, precios unitarios y existencias vigentes del almacén SENA.</p>
   </div>
 
   <div class="export-layout">
     <!-- Main Form Area -->
     <div class="export-main">
-      
-      <!-- Parámetros de Filtrado -->
-      <div class="form-section">
-        <div class="form-section__header">
-          <span class="material-symbols-outlined section-icon text-primary">tune</span>
-          <h3>Parámetros de Filtrado</h3>
-        </div>
-
-        <div class="filters-grid">
-          <div class="field-group">
-            <label class="field-label">RANGO DE FECHAS</label>
-            <div class="date-range">
-              <input type="date" class="field-input" [ngModel]="fechaInicio()" (ngModelChange)="fechaInicio.set($event)" />
-              <span class="range-sep">al</span>
-              <input type="date" class="field-input" [ngModel]="fechaFin()" (ngModelChange)="fechaFin.set($event)" />
-            </div>
-          </div>
-          
-          <div class="field-group">
-            <label class="field-label">CATEGORÍA</label>
-            <div class="select-wrapper">
-              <select class="field-select" [ngModel]="categoria()" (ngModelChange)="categoria.set($event)">
-                <option value="">Todas las categorías</option>
-                @for (cat of CATEGORIAS; track cat) {
-<option [value]="cat">{{ cat }}</option>
-}
-              </select>
-              <span class="material-symbols-outlined select-icon">expand_more</span>
-            </div>
-          </div>
-
-          <div class="field-group checkbox-group-col">
-            <label class="field-label">ESTADO DEL BIEN</label>
-            <div class="checkbox-row">
-              <label class="checkbox-label">
-                <input type="checkbox" [ngModel]="soloActivos()" (ngModelChange)="soloActivos.set($event)" />
-                <span class="custom-checkbox"><span class="material-symbols-outlined check-icon">check</span></span>
-                Activo
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" [ngModel]="soloBajoStock()" (ngModelChange)="soloBajoStock.set($event)" />
-                <span class="custom-checkbox"><span class="material-symbols-outlined check-icon">check</span></span>
-                Bajo Stock
-              </label>
-            </div>
-          </div>
-
-          <div class="field-group">
-            <label class="field-label">ALMACÉN / BODEGA</label>
-            <div class="select-wrapper">
-              <select class="field-select" [ngModel]="almacen()" (ngModelChange)="almacen.set($event)">
-                <option value="">Todos los almacenes</option>
-                @for (alm of ALMACENES; track alm) {
-<option [value]="alm">{{ alm }}</option>
-}
-              </select>
-              <span class="material-symbols-outlined select-icon">expand_more</span>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <!-- Formato de Exportación -->
       <div class="form-section">
@@ -89,66 +28,52 @@
 
         <div class="format-cards">
           @for (f of FORMATOS; track f) {
-<button class="format-card" 
-                  
+<button class="format-card"
+
                   [class.format-card--selected]="selectedFormato() === f.id"
                   (click)="onSelectFormato(f.id)">
-            
+
             <div class="radio-circle">
               @if (selectedFormato() === f.id) {
 <div class="radio-dot"></div>
 }
             </div>
-            
+
             <div class="format-icon" [style.color]="f.iconColor">
-              <!-- Using standard material symbols mapped from prototype if exact not available -->
               <span class="material-symbols-outlined">{{ f.id === 'excel' ? 'table' : (f.id === 'pdf' ? 'picture_as_pdf' : 'data_object') }}</span>
             </div>
-            
+
             <span class="format-label">{{ f.label }}</span>
             <span class="format-sub">{{ f.sub }}</span>
           </button>
 }
         </div>
       </div>
-      
+
+      <!-- Opciones -->
+      <div class="form-section">
+        <div class="form-section__header">
+          <span class="material-symbols-outlined section-icon text-primary">tune</span>
+          <h3>Opciones</h3>
+        </div>
+
+        <div class="checkbox-row">
+          <label class="checkbox-label">
+            <input type="checkbox" [ngModel]="soloActivos()" (ngModelChange)="soloActivos.set($event)" />
+            <span class="custom-checkbox"><span class="material-symbols-outlined check-icon">check</span></span>
+            Excluir bienes sin existencias
+          </label>
+        </div>
+      </div>
+
     </div>
 
     <!-- Sidebar Area -->
     <div class="export-sidebar">
-      
-      <!-- Resumen Preview -->
-      <div class="summary-card">
-        <p class="summary-title">Resumen del Reporte</p>
-        <h2 class="summary-heading">Vista Previa</h2>
 
-        <div class="summary-stats">
-          <div class="stat-row">
-            <span class="stat-label">Registros totales</span>
-            <span class="stat-value text-white">{{ resumenReporte().registros | number }}</span>
-          </div>
-          <div class="stat-row">
-            <span class="stat-label">Valor estimado</span>
-            <span class="stat-value text-white">${{ resumenReporte().valorEstimado | number:'1.2-2' }}</span>
-          </div>
-          <div class="stat-row">
-            <span class="stat-label">Columnas incluidas</span>
-            <span class="stat-value text-white">{{ resumenReporte().columnas }}</span>
-          </div>
-          <div class="stat-row">
-            <span class="stat-label">Lista de precios</span>
-            <span class="stat-value text-white">{{ resumenReporte().listaPreciosIncluida ? 'Incluida' : 'No' }}</span>
-          </div>
-          <div class="stat-row">
-            <span class="stat-label">Existencias actuales</span>
-            <span class="stat-value text-white">{{ resumenReporte().existenciasIncluidas ? 'Incluidas' : 'No' }}</span>
-          </div>
-        </div>
-
-        <div class="info-box">
-          <span class="material-symbols-outlined info-icon">info</span>
-          <p>Este reporte incluye el catálogo completo de insumos de gastronomía, precios unitarios y niveles de stock vigentes en el almacén SENA.</p>
-        </div>
+      <div class="info-box">
+        <span class="material-symbols-outlined info-icon">info</span>
+        <p>El reporte incluye el catálogo completo de bienes, precios unitarios y niveles de stock vigentes. Excel y PDF los genera el servidor; CSV se arma con los bienes cargados en pantalla.</p>
       </div>
 
       <!-- Main Action Button -->
@@ -165,35 +90,6 @@
         </div>
       </button>
 
-      <!-- Recientes -->
-      <div class="recent-card">
-        <h4 class="recent-title">EXPORTACIONES RECIENTES</h4>
-        <div class="recent-list">
-          @for (item of EXPORTACIONES_RECIENTES; track item) {
-<div class="recent-item">
-            <div class="recent-icon-wrap" [style.background]="item.color + '15'" [style.color]="item.color">
-              <span class="material-symbols-outlined">{{ item.icono === 'table_chart' ? 'table' : item.icono }}</span>
-            </div>
-            <div class="recent-info">
-              <p class="recent-name">{{ item.nombre }}</p>
-              <p class="recent-meta">{{ item.tiempo }} • {{ item.tamano }}</p>
-            </div>
-            <button class="btn-download-sm">
-              <span class="material-symbols-outlined">download</span>
-            </button>
-          </div>
-}
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Bottom Banner Placeholder -->
-  <div class="bottom-banner">
-    <div class="banner-content">
-      <h3>Seguridad de Datos</h3>
-      <p>Todas las exportaciones son cifradas y auditadas conforme a la política de tratamiento de información del SENA.</p>
     </div>
   </div>
 

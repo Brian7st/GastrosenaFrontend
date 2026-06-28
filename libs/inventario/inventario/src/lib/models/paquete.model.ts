@@ -3,6 +3,7 @@
 export type PaqueteEstado =
   | 'INCOMPLETO'
   | 'COMPLETO'
+  | 'REVISADO'
   | 'ARCHIVADO';
 
 export interface PaqueteProbatorio {
@@ -17,7 +18,7 @@ export interface PaqueteProbatorio {
   requisicionId?: string;              // era: documentos[tipo='requisicion'].referencia
   registroAsistenciaAdjunto: boolean;  // era: documentos[tipo='asistencia'].vinculado
   instructorId: string;                // era: responsable
-  fecha: string;                       // "15/04/2026"
+  fecha?: string;                      // desde fechaCreacion del backend (ISO)
 }
 
 // ── Mock Data ──────────────────────────────────────────────────────────────

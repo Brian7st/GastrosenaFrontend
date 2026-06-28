@@ -25,7 +25,7 @@ export const shellRoutes: Routes = [
   {
     path: 'app',
     component: ShellLayoutComponent,
-    canActivate: [authGuard], // ← ACTIVADO
+    canActivate: [authGuard],
     children: [
       {
         path: '',
@@ -55,7 +55,11 @@ export const shellRoutes: Routes = [
       },
       {
         path: 'inventario',
-        canActivate: [permissionGuard(['bienes:ver', 'facturas:ver', 'consolidado:ver', 'alertas:ver', 'FACTURAS_GENERAR'])],
+        canActivate: [permissionGuard([
+          'bienes:ver', 'facturas:ver', 'consolidado:ver', 'alertas:ver', 'FACTURAS_GENERAR',
+          // Acceso de legalización/formación (INSTRUCTOR) — el guard pasa con cualquiera de estos.
+          'MODULO_LEGALIZACION_VER', 'requisiciones:ver', 'actas:ver', 'paquete:ver', 'solicitudes:ver',
+        ])],
         loadChildren: () =>
           import('@restaurant/inventario').then(m => m.INVENTARIO_ROUTES),
       },
@@ -64,6 +68,13 @@ export const shellRoutes: Routes = [
         canActivate: [permissionGuard(['USUARIOS_LISTAR', 'USUARIOS_VER'])],
         loadChildren: () => import('@restaurant/usuarios').then(m => m.USUARIOS_ROUTES),
       },
+
+          {
+      path: 'fichas',
+      canActivate: [roleGuard([Rol.ADMINISTRADOR, Rol.INSTRUCTOR])], // solo ADMINISTRADOR e INSTRUCTOR pueden ver fichas
+      loadComponent: () => import('@restaurant/usuarios').then(m => m.FichasPageComponent),
+    },
+    
       {
         path: 'reportes',
         canActivate: [permissionGuard(['MODULO_REPORTES_VER', 'REPORTES_GESTIONAR', 'REPORTES_PEDIDOS_COCINA', 'REPORTES_VENTAS_MESERO'])],
@@ -76,9 +87,14 @@ export const shellRoutes: Routes = [
           import('@restaurant/abastecimiento').then(m => m.ABASTECIMIENTO_ROUTES),
       },
       {
-        path: 'notificaciones',
+        path: 'configuracion',
         loadChildren: () =>
-          import('@restaurant/notificaciones').then(m => m.NOTIFICACIONES_ROUTES),
+          import('@restaurant/configuracion').then(m => m.CONFIGURACION_ROUTES),
+      },
+{ path: 'notificaciones', loadComponent: () => import('@restaurant/notificaciones').then(m => m.NotificacionesPageComponent) },
+      {
+        path: 'perfil',
+        loadComponent: () => import('@restaurant/usuarios').then(m => m.PerfilPageComponent),
       },
     ],
   },

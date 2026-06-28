@@ -8,7 +8,7 @@
       <p class="page-subtitle">Gestión de Formatos de Bienes y Servicios — Ciclo completo</p>
     </div>
     <div class="header-actions">
-      <restaurant-button variant="primary" routerLink="nueva">
+      <restaurant-button *hasPermission="'requisiciones:crear'" variant="primary" routerLink="nueva">
         <div class="btn-icon-text">
           <lucide-icon name="plus" [size]="20"></lucide-icon>
           Nueva Requisición
@@ -91,7 +91,7 @@
       </div>
       <div class="kanban-column__cards">
         @for (req of enviadas(); track req.id) {
-          <div class="kanban-card kanban-card--enviada" [routerLink]="['detalle', req.id]">
+          <div class="kanban-card kanban-card--enviada" [routerLink]="['despacho', req.id]">
             <div class="kanban-card__header">
               <div style="display: flex; align-items: center; gap: 8px;">
                 <span class="kanban-card__id">REQ-{{ req.numero }}</span>
@@ -133,7 +133,7 @@
       </div>
       <div class="kanban-column__cards">
         @for (req of enDespacho(); track req.id) {
-          <div class="kanban-card kanban-card--despacho" [routerLink]="['despacho', req.id]">
+          <div class="kanban-card kanban-card--despacho" [routerLink]="['detalle', req.id]">
             <div class="kanban-card__header">
               <span class="kanban-card__id">REQ-{{ req.numero }}</span>
               <span class="kanban-card__badge kanban-card__badge--despacho">

@@ -14,8 +14,10 @@ import {
   LucideIconComponent,
   KpiCardComponent,
   ButtonComponent,
+  HasPermissionDirective,
 } from '@restaurant/shared/ui';
 import { PaqueteProbatorio, PaqueteEstado } from '../../../models/paquete.model';
+import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 import { PaqueteFacade } from '../../../data-access/paquete.facade';
 
 @Component({
@@ -27,7 +29,9 @@ import { PaqueteFacade } from '../../../data-access/paquete.facade';
     StatusBadgeComponent,
     LucideIconComponent,
     KpiCardComponent,
-    ButtonComponent
+    ButtonComponent,
+    HasPermissionDirective,
+    EmptyStateComponent,
 ],
   templateUrl: './paquete-list.component.html',
   styleUrl: './paquete-list.component.scss',
@@ -73,6 +77,7 @@ export class PaqueteListComponent implements OnInit {
     const map: Record<PaqueteEstado, string> = {
       INCOMPLETO: 'Incompleto',
       COMPLETO:   'Completo',
+      REVISADO:   'Revisado',
       ARCHIVADO:  'Archivado',
     };
     return map[estado];
@@ -82,6 +87,7 @@ export class PaqueteListComponent implements OnInit {
     const map: Record<PaqueteEstado, 'success' | 'warning' | 'danger' | 'info'> = {
       INCOMPLETO: 'danger',
       COMPLETO:   'success',
+      REVISADO:   'success',
       ARCHIVADO:  'info',
     };
     return map[estado];

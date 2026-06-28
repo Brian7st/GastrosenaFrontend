@@ -1,13 +1,15 @@
-import { Component, ChangeDetectionStrategy, computed, inject, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import { ButtonComponent, HasPermissionDirective } from '@restaurant/shared/ui';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 
 @Component({
   selector: 'restaurant-solicitudes-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, BackButtonComponent],
+  imports: [CommonModule, RouterModule, FormsModule, BackButtonComponent, ButtonComponent, HasPermissionDirective],
   templateUrl: './solicitudes-detail.component.html',
   styleUrl: './solicitudes-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -39,13 +41,14 @@ export class SolicitudesDetailComponent implements OnInit {
   }
 
   // ─── Helpers para el Timeline ───────────────────────────
-  estados = ['BORRADOR', 'EMITIDO', 'ENVIADO_PROVEEDOR', 'CERRADO'];
+  estados = ['BORRADOR', 'EMITIDO', 'ENVIADO_PROVEEDOR', 'VERIFICADO', 'CERRADO'];
 
   getIcon(estado: string): string {
     const iconos: Record<string, string> = {
       BORRADOR:          'edit_document',
       EMITIDO:           'hourglass_empty',
       ENVIADO_PROVEEDOR: 'local_shipping',
+      VERIFICADO:        'fact_check',
       CERRADO:           'check_circle',
     };
     return iconos[estado] || 'help';
@@ -72,11 +75,32 @@ export class SolicitudesDetailComponent implements OnInit {
   }
 
   onDownloadPdf(): void {
-    // Exportación PDF pendiente de integración HTTP
+    // Genera y descarga el PDF del GIL vía ga-ms-reportes (POST /api/reportes/gil/pdf).
+    this.facade.exportarGilPdf();
   }
 
   onEnviarAprobacion(): void {
     const id = this.solicitud()?.id;
     if (id) this.facade.cambiarEstado(String(id), 'EMITIDO');
+  }
+
+  // ─── Enviar a Proveedor (EMITIDO → ENVIADO_PROVEEDOR) ───────────────
+  showEnviarProveedorForm = signal(false);
+  correoProveedor         = signal('');
+  nombreProveedor         = signal('');
+  asuntoCorreo            = signal('');
+
+  onToggleEnviarProveedor(): void {
+    this.showEnviarProveedorForm.update(v => !v);
+  }
+
+  onConfirmarEnvioProveedor(): void {
+    const id = this.solicitud()?.id;
+    if (!id || !this.correoProveedor()) return;
+    this.facade.enviarAProveedor(String(id), {
+      proveedorDestinatarioId: this.correoProveedor(),
+      fechaEnvio:              new Date().toISOString().split('T')[0],
+    });
+    this.showEnviarProveedorForm.set(false);
   }
 }

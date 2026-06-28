@@ -31,35 +31,63 @@
     iconColor="green"
   />
 
-  <restaurant-kpi-card variant="states">
-    <div class="custom-kpi-body">
-      <span class="kpi-card__label">Cerradas</span>
-      <span class="kpi-card__value">{{ totalCerradas() | number }}</span>
-    </div>
-    <div class="custom-kpi-icon custom-kpi-icon--slate">
-      <span class="material-symbols-outlined">lock</span>
-    </div>
-  </restaurant-kpi-card>
+  <restaurant-kpi-card
+    label="Rechazadas"
+    [value]="totalRechazadas()"
+    icon="x-circle"
+    iconColor="red"
+  />
 
-  <restaurant-kpi-card variant="states">
-    <div class="custom-kpi-body">
-      <span class="kpi-card__label">Libres</span>
-      <span class="kpi-card__value">{{ totalLibres() | number }}</span>
-    </div>
-    <div class="custom-kpi-icon custom-kpi-icon--red">
-      <span class="material-symbols-outlined">pending_actions</span>
-    </div>
-  </restaurant-kpi-card>
+  <restaurant-kpi-card
+    label="Comprometidas"
+    [value]="totalComprometidas()"
+    icon="lock"
+    iconColor="slate"
+  />
 
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════════════
      Tabla con filtros
 ══════════════════════════════════════════════════════════════════════════ -->
+@if (facade.errorSesion()) {
+  <div class="error-inline">
+    <lucide-icon name="alert-triangle" [size]="16" />
+    {{ facade.errorSesion() }}
+  </div>
+}
+
 <restaurant-data-table
   tableTitle="Solicitudes de Insumos"
   tableIcon="clipboard-list"
-  searchPlaceholder="Buscar por instructor o código...">
+  searchPlaceholder="Buscar por instructor o código..."
+  [showFilterButton]="true"
+  [filterActive]="showFilters()"
+  [filterCount]="filtrosActivos()"
+  (searchChange)="onSearch($event)"
+  (filterToggle)="onToggleFilters()">
+
+  <!-- Panel de filtros colapsable (slot [dtHeader]) -->
+  @if (showFilters()) {
+    <div dtHeader class="filter-panel">
+      <div class="filter-panel__row">
+        <div class="filter-group">
+          <label class="filter-label">Estado</label>
+          <select class="filter-select" [value]="filtroEstado()" (change)="onFilterEstado($any($event.target).value)">
+            @for (opt of estadoOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="filter-group filter-group--actions">
+          <button class="filter-clear-btn" (click)="onClearFilters()" type="button" [disabled]="filtrosActivos() === 0">
+            <span class="material-symbols-outlined">clear_all</span>
+            Limpiar
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 
   <!-- Cabecera de tabla -->
   <thead>
@@ -81,19 +109,6 @@
         <td colspan="7" style="text-align: center; padding: 2rem;">
           <span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">progress_activity</span>
           Cargando solicitudes...
-        </td>
-      </tr>
-    } @else if (facade.errorSesion()) {
-      <tr>
-        <td colspan="7" style="text-align: center; padding: 2rem; color: var(--color-danger);">
-          <span class="material-symbols-outlined">error</span>
-          {{ facade.errorSesion() }}
-        </td>
-      </tr>
-    } @else if (facade.solicitudesSesion().length === 0) {
-      <tr>
-        <td colspan="7" style="text-align: center; padding: 2rem; color: var(--color-text-secondary);">
-          No hay solicitudes registradas.
         </td>
       </tr>
     } @else {
@@ -164,11 +179,26 @@
                 <button class="action-icon action-icon--approve" (click)="onApprove(s); $event.stopPropagation()" title="Aprobar Solicitud">
                   <lucide-icon name="check-circle" [size]="16"></lucide-icon>
                 </button>
-                <button class="action-icon action-icon--reject" (click)="onReject(s.id); $event.stopPropagation()" title="Rechazar Solicitud">
+                <button class="action-icon action-icon--reject" (click)="onReject(s); $event.stopPropagation()" title="Rechazar Solicitud">
                   <lucide-icon name="x" [size]="16"></lucide-icon>
                 </button>
               }
+              @if (s.estado === 'APROBADA') {
+                <button class="action-icon action-icon--approve" (click)="onComprometer(s.id); $event.stopPropagation()" title="Comprometer Solicitud">
+                  <span class="material-symbols-outlined" style="font-size:16px">lock</span>
+                </button>
+              }
             </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="7">
+            <inventario-empty-state
+              icon="assignment"
+              title="Sin solicitudes de insumos"
+              message="No hay solicitudes registradas para esta sesión."
+            />
           </td>
         </tr>
       }
@@ -176,9 +206,25 @@
   </tbody>
 
   <!-- Paginación -->
-  <div dtFooter class="pagination-footer">
-    <div class="page-numbers">
-      <button class="page-btn page-btn--active">1</button>
+  <div dtFooter class="dt-footer">
+    <span class="dt-page-info">
+      Mostrando {{ facade.solicitudesSesion().length }} de {{ facade.paginacionSesion().totalElements }} solicitudes
+    </span>
+    <div class="dt-pagination">
+      <button class="dt-page-btn"
+        [disabled]="facade.paginacionSesion().page === 0"
+        (click)="facade.irAPaginaSesion(facade.paginacionSesion().page - 1)">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      @for (p of paginasSesion(); track p) {
+        <button class="dt-page-btn" [class.dt-page-btn--active]="p === facade.paginacionSesion().page"
+          (click)="facade.irAPaginaSesion(p)">{{ p + 1 }}</button>
+      }
+      <button class="dt-page-btn"
+        [disabled]="facade.paginacionSesion().page >= facade.paginacionSesion().totalPages - 1"
+        (click)="facade.irAPaginaSesion(facade.paginacionSesion().page + 1)">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
     </div>
   </div>
 
@@ -191,3 +237,11 @@
   (cancel)="onCloseModal()"
   (confirm)="onConfirmApprove($event)">
 </restaurant-aprobar-solicitud-modal>
+
+<!-- Modal de rechazo -->
+<restaurant-rechazar-solicitud-modal
+  [isOpen]="solicitudRechazo() !== null"
+  [solicitud]="solicitudRechazo()"
+  (cancelar)="onCloseRechazo()"
+  (confirmar)="onConfirmReject($event)">
+</restaurant-rechazar-solicitud-modal>

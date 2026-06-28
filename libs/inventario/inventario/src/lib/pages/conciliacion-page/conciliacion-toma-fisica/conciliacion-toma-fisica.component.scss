@@ -58,6 +58,28 @@
   font-size: var(--font-size-sm);
 }
 
+.meta-input {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  transition: border-color 0.15s ease, background 0.15s ease;
+
+  &:hover {
+    border-color: var(--color-pizarra-200);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary, var(--color-pizarra-400));
+    background: var(--color-surface, #fff);
+    color: var(--color-text-base);
+  }
+}
+
 .meta-divider {
   width: 4px;
   height: 4px;
@@ -95,7 +117,7 @@
   gap: var(--space-4);
 
   &--success {
-    background: #e6f6ec; /* Very light green tint */
+    background: var(--color-success-bg); /* Very light green tint */
   }
 }
 
@@ -111,13 +133,13 @@
 
   &--alert {
     color: var(--color-terciario);
-    background: #ffebe9;
+    background: var(--color-error-bg);
   }
 }
 
 .summary-card--success .summary-icon {
   color: var(--color-primario);
-  background: #c3e6cb;
+  background: var(--color-success-border);
 }
 
 .summary-content {
@@ -265,16 +287,16 @@
   font-size: 0.75rem;
 
   &--zero {
-    background: #e6f6ec;
+    background: var(--color-success-bg);
     color: var(--color-primario);
   }
   &--neg {
-    background: #ffebe9;
+    background: var(--color-error-bg);
     color: var(--color-terciario);
   }
   &--pos {
-    background: #fff3e0;
-    color: #e65100;
+    background: var(--color-warning-bg);
+    color: var(--color-warning-interactive-dark);
   }
 }
 
@@ -287,7 +309,7 @@
 .text-secondary { color: var(--color-text-muted); }
 .text-disabled { color: var(--color-pizarra-400); }
 .text-red { color: var(--color-terciario); }
-.text-orange { color: #e65100; }
+.text-orange { color: var(--color-warning-interactive-dark); }
 
 /* ── FOOTER ACTIONS ────────────────────────────────────────────────────── */
 .page-footer {
@@ -304,9 +326,9 @@
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-2) var(--space-4);
-  background: #fff3e0;
+  background: var(--color-warning-bg);
   border-radius: var(--radius-md);
-  color: #e65100;
+  color: var(--color-warning-interactive-dark);
   font-family: var(--font-family-base);
   font-size: var(--font-size-sm);
   font-weight: 600;

@@ -5,20 +5,17 @@
       <div class="header-left">
         <div class="header-title">
           <h4 class="mesa-text">Mesa {{ comanda().numeroMesa }}</h4>
-          <span class="hora-text">{{ comanda().horaEntrada | date:'HH:mm' }}</span>
         </div>
-        <span class="prioridad-badge" [ngClass]="'badge-' + comanda().prioridad.toLowerCase()">
-          {{ comanda().prioridad }}
-        </span>
-      </div>
-      <div class="header-right">
-        <span class="comanda-estado-badge" [ngClass]="'estado-' + comanda().estado.toLowerCase()">
-          {{ comanda().estado }}
-        </span>
         <div class="mesero-text">
           <span class="mesero-label">Mesero: </span>
           <span class="mesero-name">{{ comanda().nombreMesero }}</span>
         </div>
+      </div>
+      <div class="header-right">
+        <span class="comanda-estado-badge" [ngClass]="comanda().esDevolucion ? 'estado-devolucion' : ('estado-' + (comanda().estado || '').toLowerCase())">
+          {{ comanda().esDevolucion ? 'DEVUELTO' : comanda().estado }}
+        </span>
+        <span class="hora-text">{{ comanda().horaEntrada | date:'HH:mm' }}</span>
       </div>
     </div>
 
@@ -41,8 +38,8 @@
                 <div class="plato-title-row">
                   <span class="plato-qty">{{ plato.cantidad }}x</span>
                   <span class="plato-name">{{ plato.nombrePlato }}</span>
-                  <span class="comanda-estado-badge" [ngClass]="'estado-' + plato.estado.toLowerCase()" style="font-size: 0.6rem; padding: 2px 8px; margin-left: 4px;">
-                    {{ plato.estado }}
+                  <span class="comanda-estado-badge" [ngClass]="(comanda().esDevolucion && plato.estado === 'ESPERA') ? 'estado-devolucion' : ('estado-' + (plato.estado || '').toLowerCase())" style="font-size: 0.6rem; padding: 2px 8px; margin-left: 4px;">
+                    {{ (comanda().esDevolucion && plato.estado === 'ESPERA') ? 'DEVUELTO' : plato.estado }}
                   </span>
                 </div>
               </div>
@@ -59,7 +56,7 @@
                   <lucide-icon name="eye" style="width: 18px;"></lucide-icon>
                 </button>
                 
-                <button class="btn-round btn-receta" (click)="alternarReceta(plato)" [disabled]="plato.estado === 'LISTO' || comanda().estado === 'LISTO'" title="Ver Receta">
+                <button class="btn-round btn-receta" (click)="alternarReceta(plato)" title="Ver Receta">
                   <lucide-icon name="book-open" style="width: 18px;"></lucide-icon>
                 </button>
               </div>
@@ -106,12 +103,9 @@
         </div>
         <div class="info-item">
           <strong>Estado:</strong> 
-          <span class="comanda-estado-badge" [ngClass]="'estado-' + comanda().estado.toLowerCase()">{{ comanda().estado }}</span>
+          <span class="comanda-estado-badge" [ngClass]="'estado-' + (comanda().estado || '').toLowerCase()">{{ comanda().estado }}</span>
         </div>
-        <div class="info-item">
-          <strong>Prioridad:</strong> 
-          <span class="prioridad-badge" [ngClass]="'badge-' + comanda().prioridad.toLowerCase()">{{ comanda().prioridad | lowercase }}</span>
-        </div>
+
         <div class="info-item">
           <strong>Mesero:</strong> <span>{{ comanda().nombreMesero }}</span>
         </div>
@@ -144,7 +138,7 @@
                 @if (plato.estado === 'ESPERA') { 15min }
                 @else { {{ plato.duracionMinutos || getTiempoTranscurrido(plato.horaInicioPreparacion) }}min }
               </span>
-              <span class="comanda-estado-badge text-uppercase" [ngClass]="'estado-' + plato.estado.toLowerCase()">{{ plato.estado }}</span>
+              <span class="comanda-estado-badge text-uppercase" [ngClass]="'estado-' + (plato.estado || '').toLowerCase()">{{ plato.estado }}</span>
             </div>
           </div>
         }

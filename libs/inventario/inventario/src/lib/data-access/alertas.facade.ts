@@ -1,8 +1,9 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
 import { AlertasService } from './services/alertas.service';
-import { Alerta, RegistroHistorial, UmbralConfig } from '../models/alerta.model';
+import { Alerta, UmbralConfig } from '../models/alerta.model';
 import { ResumenAlertas } from '../models/reporting.model';
 import { finalize, catchError, of, firstValueFrom, forkJoin } from 'rxjs';
+import { descargarBlob } from '../util';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,6 @@ export class AlertasFacade {
   // ── Estado interno ────────────────────────────────────────────────────────
   private _alertas              = signal<Alerta[]>([]);
   private _alertaSeleccionada   = signal<Alerta | undefined>(undefined);
-  private _historial            = signal<RegistroHistorial[]>([]); // legacy, mantenido por compat
   private _resumenAlertas       = signal<ResumenAlertas | null>(null);
   private _umbrales             = signal<UmbralConfig[]>([]);
   private _loading              = signal<boolean>(false);
@@ -22,7 +22,6 @@ export class AlertasFacade {
   // ── Exposición pública ────────────────────────────────────────────────────
   public alertas            = computed(() => this._alertas());
   public alertaSeleccionada = computed(() => this._alertaSeleccionada());
-  public historial          = computed(() => this._historial());
   public resumenAlertas     = computed(() => this._resumenAlertas());
   public umbrales           = computed(() => this._umbrales());
   public loading            = computed(() => this._loading());
@@ -61,8 +60,8 @@ export class AlertasFacade {
     }
   }
 
-  /** GET /reporting/alertas/resumen — carga el resumen de alertas */
-  cargarHistorial(destinatarioId?: string): void {
+  /** GET /reporting/alertas/resumen — carga el resumen real de alertas (conteos + por tipo). */
+  cargarResumen(destinatarioId?: string): void {
     this._loading.set(true);
     this._error.set(null);
     this.alertasService.getResumenAlertas(destinatarioId)
@@ -113,18 +112,30 @@ export class AlertasFacade {
       });
   }
 
-  /** Exporta el historial de alertas en formato CSV. */
+  /**
+   * Exporta el historial de alertas a CSV. Se genera en el cliente a partir de
+   * la lista ya cargada (GET /alerts/alertas trae todas, sin paginar), porque no
+   * hay endpoint de reporte de alertas en ga-ms-reportes.
+   */
   exportarHistorialCSV(): void {
-    this._loading.set(true);
-    this.alertasService.exportarHistorialCSV()
-      .pipe(
-        catchError(() => {
-          this._error.set('Error al exportar el historial');
-          return of(null);
-        }),
-        finalize(() => this._loading.set(false))
-      )
-      .subscribe();
+    const alertas = this._alertas();
+    if (alertas.length === 0) {
+      this._error.set('No hay alertas para exportar');
+      return;
+    }
+    const headers = [
+      'ID', 'Tipo', 'Prioridad', 'Descripción', 'Estado', 'Fecha generación',
+      'Código SENA', 'Bien', 'Stock actual', 'Stock mínimo', 'Unidad',
+    ];
+    const escape = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const filas = alertas.map(a => [
+      a.id, a.tipo, a.prioridad, a.descripcion, a.estado, a.fechaGeneracion,
+      a.codigoSena ?? '', a.nombreBien ?? '', a.stockActual ?? '', a.stockMinimo ?? '', a.unidad ?? '',
+    ].map(escape).join(','));
+    const csv = [headers.map(escape).join(','), ...filas].join('\n');
+    // BOM (﻿) para que Excel respete acentos/UTF-8.
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    descargarBlob(blob, `historial_alertas_${new Date().toISOString().slice(0, 10)}.csv`);
   }
 
   /** Resuelve una alerta con datos tipados. */

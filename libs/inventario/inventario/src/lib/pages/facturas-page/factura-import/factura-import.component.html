@@ -3,10 +3,34 @@
     <inventario-back-button (clicked)="goBack()" />
     <div>
       <h1 class="page-header__title">Importar Factura Electrónica</h1>
-      <p class="page-header__subtitle">Subí el PDF de la factura electrónica para registrarla en el sistema.</p>
+      <p class="page-header__subtitle">Subí el XML de la factura electrónica para registrarla en el sistema.</p>
     </div>
   </header>
 
+  <!-- Stepper -->
+  <nav class="wizard-steps" aria-label="Pasos de importación">
+    @for (p of pasos; track p.n) {
+      <button
+        type="button"
+        class="wizard-step"
+        [class.wizard-step--active]="paso() === p.n"
+        [class.wizard-step--done]="paso() > p.n"
+        [disabled]="!puedeAvanzar(p.n)"
+        (click)="irAPaso(p.n)"
+      >
+        <span class="wizard-step__num">
+          @if (paso() > p.n) {
+            <span class="material-symbols-outlined">check</span>
+          } @else {
+            {{ p.n }}
+          }
+        </span>
+        <span class="wizard-step__label">{{ p.label }}</span>
+      </button>
+    }
+  </nav>
+
+  <!-- Alertas globales (estado de importación / conciliación) -->
   @if (importStatus() !== 'idle') {
     <div class="alerts-container">
       @if (importStatus() === 'loading') {
@@ -15,7 +39,6 @@
           <span class="alert__text font-medium">Procesando {{ fileName() }}…</span>
         </div>
       }
-
       @if (importStatus() === 'error') {
         <div class="alert alert--error">
           <span class="material-symbols-outlined">error</span>
@@ -25,7 +48,6 @@
           </div>
         </div>
       }
-
       @if (importStatus() === 'success') {
         <div class="alert alert--success">
           <span class="material-symbols-outlined">check_circle</span>
@@ -35,74 +57,59 @@
     </div>
   }
 
-  <div class="import-grid">
-    <div class="upload-zone-wrapper">
-      <div
-        class="upload-zone"
-        [class.upload-zone--active]="isDragOver()"
-        (dragover)="onDragOver($event)"
-        (dragleave)="onDragLeave()"
-        (drop)="onDrop($event)"
-        (click)="fileInput.click()"
-      >
-        <div class="upload-zone__icon-wrapper">
-          <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">cloud_upload</span>
-        </div>
-        <h3 class="upload-zone__title">Arrastrá tu factura acá</h3>
-        <p class="upload-zone__subtitle">Solo se aceptan archivos PDF · máximo 10 MB</p>
-
-        <div class="field-group upload-zone__field">
-          <label class="field-label">GIL a vincular (opcional)</label>
-          <select
-            class="field-input"
-            [value]="gilId()"
-            (change)="onGilSelect($event); $event.stopPropagation()"
-            (click)="$event.stopPropagation()"
-          >
-            <option value="">Sin GIL</option>
-            @for (gil of gilesDisponibles(); track gil.id) {
-              <option [value]="gil.id">{{ gil.numeroGil }} — {{ gil.destino }}</option>
-            }
-          </select>
-        </div>
-
-        <button class="btn btn--primary" (click)="fileInput.click(); $event.stopPropagation()">
-          Seleccionar archivo
-        </button>
-
-        <input
-          #fileInput
-          type="file"
-          accept=".pdf"
-          hidden
-          (change)="onFileInput($event)"
+  <!-- ══════════════════ PASO 1 · Subir XML ══════════════════ -->
+  @if (paso() === 1) {
+    <div class="import-grid">
+      <div class="upload-zone-wrapper">
+        <div
+          class="upload-zone"
+          [class.upload-zone--active]="isDragOver()"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave()"
+          (drop)="onDrop($event)"
+          (click)="fileInput.click()"
         >
+          <div class="upload-zone__icon-wrapper">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">code</span>
+          </div>
+          <h3 class="upload-zone__title">Arrastrá el XML UBL 2.1 acá</h3>
+          <p class="upload-zone__subtitle">Solo archivos .xml · máximo 10 MB</p>
+          <button class="btn btn--primary" (click)="fileInput.click(); $event.stopPropagation()">
+            Seleccionar archivo
+          </button>
+          <input #fileInput type="file" accept=".xml" hidden (change)="onFileInput($event)">
+        </div>
+      </div>
+
+      <div class="instructions-card">
+        <h3 class="instructions-card__title">
+          <span class="material-symbols-outlined">help</span>
+          ¿Cómo funciona?
+        </h3>
+        <ul class="instructions-list">
+          <li>
+            <div class="step-badge">1</div>
+            <p>Subí el XML de la factura electrónica original. El sistema extrae automáticamente los datos del documento.</p>
+          </li>
+          <li>
+            <div class="step-badge">2</div>
+            <p>Revisás los datos extraídos antes de continuar.</p>
+          </li>
+          <li>
+            <div class="step-badge">3</div>
+            <p>Vinculás un GIL y cruzás los ítems recibidos contra lo solicitado.</p>
+          </li>
+          <li>
+            <div class="step-badge">4</div>
+            <p>Confirmás el resultado del cruce y registrás la factura.</p>
+          </li>
+        </ul>
       </div>
     </div>
+  }
 
-    <div class="instructions-card">
-      <h3 class="instructions-card__title">
-        <span class="material-symbols-outlined">help</span>
-        ¿Cómo funciona?
-      </h3>
-      <ul class="instructions-list">
-        <li>
-          <div class="step-badge">1</div>
-          <p>Subí el PDF de la factura electrónica original. El sistema extrae automáticamente los datos del documento.</p>
-        </li>
-        <li>
-          <div class="step-badge">2</div>
-          <p>Si ingresás un GIL, la factura quedará vinculada a esa gestión de inventario automáticamente.</p>
-        </li>
-        <li>
-          <div class="step-badge">3</div>
-          <p>Una vez procesada, podés revisar los datos extraídos antes de continuar.</p>
-        </li>
-      </ul>
-    </div>
-  </div>
-
-  @if (fileLoaded()) {
+  <!-- ══════════════════ PASO 2 · Revisar datos ══════════════════ -->
+  @if (paso() === 2 && facturaImportada()) {
     <div class="review-section">
       <h2 class="review-section__title">Datos de la factura importada</h2>
 
@@ -116,7 +123,6 @@
             <label class="field-label">CUFE</label>
             <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.cufe ?? ''"/>
           </div>
-
           <div class="field-group">
             <label class="field-label">Proveedor NIT</label>
             <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.proveedorNit ?? ''"/>
@@ -125,7 +131,6 @@
             <label class="field-label">Proveedor Nombre</label>
             <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.proveedorNombre ?? ''"/>
           </div>
-
           <div class="field-group">
             <label class="field-label">Fecha Emisión</label>
             <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.fechaEmision ?? ''"/>
@@ -138,7 +143,6 @@
             <label class="field-label">Estado</label>
             <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.estado ?? ''"/>
           </div>
-
           <div class="field-group">
             <label class="field-label">Orden de Compra</label>
             <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.ordenCompra ?? 'No reportada'"/>
@@ -151,7 +155,6 @@
             <label class="field-label">ZESE</label>
             <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.proveedorBeneficiarioZese ? 'Sí' : 'No'"/>
           </div>
-
           <div class="field-group">
             <label class="field-label">Banco</label>
             <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.infoBancariaBanco ?? 'No reportado'"/>
@@ -210,18 +213,14 @@
               <span class="summary-label">Subtotal</span>
               <span class="summary-value">{{ formatMoney(facturaImportada()?.subtotal) }}</span>
             </div>
-
             <div class="summary-divider"></div>
-
             @for (item of totalIvaPorTarifa(); track item.porcentaje) {
               <div class="summary-row summary-row--sm">
                 <span class="summary-label">IVA ({{ item.porcentaje }}%)</span>
                 <span class="summary-value">{{ formatMoney(item.valor) }}</span>
               </div>
             }
-
             <div class="summary-divider"></div>
-
             <div class="summary-row summary-row--sm">
               <span class="summary-label">Total IVA</span>
               <span class="summary-value">{{ formatMoney(facturaImportada()?.totalIva) }}</span>
@@ -231,7 +230,6 @@
               <span class="summary-value text-tertiary">-{{ formatMoney(facturaImportada()?.valorRetencionZese) }}</span>
             </div>
           </div>
-
           <div class="summary-card__footer">
             <span class="total-label">Total a Pagar</span>
             <span class="total-value">{{ formatMoney(facturaImportada()?.total) }}</span>
@@ -241,7 +239,130 @@
     </div>
   }
 
-  @if (conciliacionImportacion(); as conciliacion) {
+  <!-- ══════════════════ PASO 3 · Vincular GIL y cruzar ══════════════════ -->
+  @if (paso() === 3 && facturaImportada()) {
+    <div class="review-section">
+      <h2 class="review-section__title">Vincular GIL y cruzar ítems</h2>
+
+      <div class="data-card">
+        <div class="field-group gil-vincular-field">
+          <label class="field-label">GIL a vincular</label>
+          <select class="field-input" [value]="gilId()" (change)="onGilSelect($event)">
+            <option value="">Sin GIL — registrar sin conciliar</option>
+            @for (gil of gilesDisponibles(); track gil.id) {
+              <option [value]="gil.id">{{ gil.numeroGil }} — {{ gil.destino }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      @if (!gilId()) {
+        <div class="alert alert--info">
+          <span class="material-symbols-outlined">info</span>
+          <span class="alert__text">Seleccioná un GIL para cruzar los ítems recibidos, o finalizá sin conciliar para solo registrar la factura.</span>
+        </div>
+      }
+
+      @if (showManualMapping()) {
+        <div class="matching-section">
+          <div class="matching-header">
+            <div>
+              <h2 class="matching-header__title">Cruce de ítems</h2>
+              <p class="matching-header__subtitle">
+                Verificá que cada ítem del GIL esté asignado al ítem correcto de la factura y ajustá la cantidad recibida.
+                El sistema hace una asignación automática por descripción — podés corregirla.
+              </p>
+            </div>
+            <div class="matching-legend">
+              <span class="badge badge--green">Coincide</span>
+              <span class="badge badge--orange">Diferencia</span>
+              <span class="badge badge--gray">Sin asignar</span>
+            </div>
+          </div>
+
+          <div class="table-card">
+            <div class="table-wrapper">
+              <table class="matching-table">
+                <thead>
+                  <tr>
+                    <th>Ítem GIL solicitado</th>
+                    <th class="text-right">Cant. solicitada</th>
+                    <th class="text-right">V. Unit. GIL</th>
+                    <th>Ítem FEL recibido</th>
+                    <th class="text-right">Cant. recibida</th>
+                    <th class="text-right">V. Unit. FEL</th>
+                    <th class="text-center">Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (bien of gilBienes(); track $index; let i = $index) {
+                    <tr [class]="matchRowClass(i)">
+                      <td>
+                        <div class="item-cell">
+                          <span class="item-code">{{ bien.codigoSena }}</span>
+                          <span class="item-name">{{ bien.descripcion }}</span>
+                        </div>
+                      </td>
+                      <td class="text-right text-secondary">{{ bien.cantidad }} {{ bien.unidadMedida }}</td>
+                      <td class="text-right text-secondary">{{ formatMoney(bien.valorUnitario) }}</td>
+                      <td>
+                        <select
+                          class="field-input field-input--sm"
+                          [value]="manualLinks()[i] ?? ''"
+                          (change)="onLinkChange(i, $event)"
+                          (click)="$event.stopPropagation()"
+                        >
+                          <option value="" [selected]="manualLinks()[i] === null || manualLinks()[i] === undefined">— Sin asignar —</option>
+                          @for (linea of facturaImportada()?.lineas ?? []; track $index; let fi = $index) {
+                            <option [value]="fi" [selected]="manualLinks()[i] === fi">{{ fi + 1 }}. {{ linea.descripcion }}</option>
+                          }
+                        </select>
+                      </td>
+                      <td class="text-right">
+                        <input
+                          type="number"
+                          min="0"
+                          class="field-input field-input--sm count-input"
+                          [value]="cantidadesRecibidas()[i] ?? ''"
+                          (input)="onCantidadRecibidaChange(i, $event)"
+                          (click)="$event.stopPropagation()"
+                        />
+                      </td>
+                      <td class="text-right font-bold">
+                        @if (manualLinks()[i] !== null && manualLinks()[i] !== undefined) {
+                          <span [class.text-diferencia]="(getLinea(manualLinks()[i]!)?.precioUnitario ?? 0) !== bien.valorUnitario">
+                            {{ formatMoney(getLinea(manualLinks()[i]!)?.precioUnitario) }}
+                          </span>
+                        } @else {
+                          <span class="text-secondary">—</span>
+                        }
+                      </td>
+                      <td class="text-center">
+                        <span [class]="matchStatusClass(i)">{{ matchStatusLabel(i) }}</span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (conciliacionError()) {
+        <div class="alert alert--error">
+          <span class="material-symbols-outlined">error</span>
+          <div class="alert__content">
+            <h4 class="alert__title">No se pudo conciliar con el GIL</h4>
+            <p class="alert__text">{{ conciliacionError() }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ══════════════════ PASO 4 · Resultado ══════════════════ -->
+  @if (paso() === 4 && conciliacionImportacion(); as conciliacion) {
     <div class="review-section">
       <div class="conciliacion-header">
         <h2 class="review-section__title">Resultado del cruce con GIL</h2>
@@ -259,9 +380,11 @@
                   <th>Descripción</th>
                   <th class="text-right">Cant. GIL</th>
                   <th class="text-right">Cant. FEL</th>
+                  <th class="text-right">Cant. recibida</th>
                   <th class="text-right">Precio GIL</th>
                   <th class="text-right">Precio FEL</th>
                   <th class="text-right">Diferencia</th>
+                  <th>Motivo</th>
                   <th class="text-center">Resuelta</th>
                 </tr>
               </thead>
@@ -271,11 +394,11 @@
                     <td>{{ dif.descripcion }}</td>
                     <td class="text-right">{{ dif.cantidadGil }}</td>
                     <td class="text-right">{{ dif.cantidadFactura }}</td>
+                    <td class="text-right">{{ dif.cantidadRecibida ?? '—' }}</td>
                     <td class="text-right">{{ formatMoney(dif.precioUnitarioGil) }}</td>
                     <td class="text-right">{{ formatMoney(dif.precioUnitarioFactura) }}</td>
-                    <td class="text-right" [class.text-tertiary]="dif.diferencia !== 0">
-                      {{ formatMoney(dif.diferencia) }}
-                    </td>
+                    <td class="text-right" [class.text-tertiary]="dif.diferencia !== 0">{{ formatMoney(dif.diferencia) }}</td>
+                    <td class="text-secondary">{{ dif.observacion || '—' }}</td>
                     <td class="text-center">
                       <span class="badge" [class.badge--green]="dif.resuelta" [class.badge--gray]="!dif.resuelta">
                         {{ dif.resuelta ? 'Sí' : 'No' }}
@@ -294,10 +417,34 @@
   }
 </div>
 
+<!-- Footer contextual por paso -->
 <div class="sticky-footer">
   <button class="btn btn--ghost" (click)="goBack()">Cancelar</button>
+
   <div class="footer-actions">
-    <button class="btn btn--outline" (click)="resetImport()">Limpiar</button>
-    <button class="btn btn--primary" [disabled]="!facturaImportada()" (click)="viewImportedFactura()">Ver factura registrada</button>
+    @switch (paso()) {
+      @case (1) {
+        <!-- el avance es automático al importar el XML -->
+      }
+      @case (2) {
+        <button class="btn btn--outline" (click)="resetImport()">Importar otra</button>
+        <button class="btn btn--primary" (click)="siguiente()">Continuar</button>
+      }
+      @case (3) {
+        <button class="btn btn--outline" (click)="atras()">Atrás</button>
+        @if (canConciliar()) {
+          @if (missingCounts()) {
+            <p class="count-warning">Hay ítems sin conteo físico. Podés conciliar igual, pero la verificación lo exigirá.</p>
+          }
+          <button class="btn btn--primary" [disabled]="loading()" (click)="onConciliar()">Conciliar con GIL</button>
+        } @else {
+          <button class="btn btn--primary" [disabled]="!facturaImportada()" (click)="viewImportedFactura()">Finalizar sin conciliar</button>
+        }
+      }
+      @case (4) {
+        <button class="btn btn--outline" (click)="resetImport()">Importar otra</button>
+        <button class="btn btn--primary" [disabled]="!facturaImportada()" (click)="viewImportedFactura()">Ver factura registrada</button>
+      }
+    }
   </div>
 </div>

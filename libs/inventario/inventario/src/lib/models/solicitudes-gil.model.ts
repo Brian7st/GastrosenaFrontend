@@ -1,4 +1,4 @@
-export type EstadoGil = 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'CERRADO';
+export type EstadoGil = 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'VERIFICADO' | 'COMPROMETIDO' | 'CERRADO';
 
 export interface CuentadanteGil {
   id?: string | number;
@@ -7,12 +7,13 @@ export interface CuentadanteGil {
 }
 
 export interface BienSolicitud {
-  codigoSena: string;     // era: codigo
+  codigoSena: string;
   descripcion: string;
-  unidadMedida: string;   // era: um
+  unidadMedida: string;
   cantidad: number;
   valorUnitario: number;
   subtotal: number;
+  iva: number;
 }
 
 export interface SolicitudGil {
@@ -28,8 +29,7 @@ export interface SolicitudGil {
   jefeOficinaCoordinador: string;     // nuevo — requerido por backend
   cuentadantes: CuentadanteGil[];
   solicitante: string;                // nuevo — requerido por backend
-  codigoGrupo: string;                // nuevo — requerido por backend
-  fichaCaracterizacion: string;       // era: fichaId
+  codigoGrupo?: string;               // opcional
   estado: EstadoGil;
   observaciones?: string;
   bienes?: BienSolicitud[];
@@ -47,7 +47,7 @@ export interface SolicitudGil {
 
 export interface SolicitudesGilFiltros {
   estado?: EstadoGil;
-  fichaCaracterizacion?: string;  // filtro real del backend
+  codigoGrupo?: string;
   page?: number;
   size?: number;
   // Campos de UI sin soporte backend aún (no se envían como HTTP params):
@@ -75,10 +75,10 @@ export interface CrearSolicitudData {
   jefeOficinaCoordinador: string;
   cuentadantes: { nombre: string; cedula: string }[];
   solicitante: string;
-  codigoGrupo: string;
-  fichaCaracterizacion: string;
+  codigoGrupo?: string;
+  fichaCaracterizacion?: string;
   solicitudesOrigenIds?: string[];
-  bienes: { codigoSena: string; descripcion: string; unidadMedida: string; cantidad: number; valorUnitario: number; subtotal: number }[];
+  bienes: { codigoSena: string; descripcion: string; unidadMedida: string; cantidad: number; valorUnitario: number; subtotal: number; iva: number }[];
   observaciones?: string;
 }
 
@@ -99,6 +99,7 @@ export interface GenerarGilData {
   cuentadantes: { nombre: string; cedula: string }[];
   solicitante: string;
   codigoGrupo: string;
-  fichaCaracterizacion: string;
   observaciones?: string;
+  /** Programa de Formación por defecto del GIL (código del catálogo). */
+  programaDefault?: string;
 }

@@ -10,7 +10,7 @@
 
     <div class="header-actions">
       <inventario-back-button (clicked)="onVolver()" />
-      <button class="btn-action" (click)="onEditar()" [disabled]="estadoActual() !== 'BORRADOR'">
+      <button *hasPermission="'gil:editar'" class="btn-action" (click)="onEditar()" [disabled]="estadoActual() !== 'BORRADOR'">
         <span class="material-symbols-outlined">edit</span> Editar
       </button>
       <button class="btn-action" (click)="onDownloadPdf()">
@@ -18,24 +18,90 @@
       </button>
 
       <div class="action-group">
-        <button class="btn-primary" (click)="onEnviarAprobacion()" [disabled]="estadoActual() !== 'BORRADOR'">
-          Enviar a Aprobación
-        </button>
-        @if (estadoActual() !== 'BORRADOR') {
-          <div class="tooltip">
-            La solicitud ya fue enviada o no puede ser aprobada.
-          </div>
+        @if (estadoActual() === 'BORRADOR') {
+          <button *hasPermission="'gil:emitir'" class="btn-primary" (click)="onEnviarAprobacion()">
+            Enviar a Aprobación
+          </button>
+        }
+        @if (estadoActual() === 'EMITIDO') {
+          <button *hasPermission="'gil:emitir'" class="btn-primary" (click)="onToggleEnviarProveedor()">
+            <span class="material-symbols-outlined">local_shipping</span>
+            Enviar a Proveedor
+          </button>
         }
       </div>
     </div>
   </div>
+
+  <!-- ── Panel: Enviar a Proveedor por correo ───────────────────────────── -->
+  @if (showEnviarProveedorForm()) {
+    <div class="enviar-proveedor-panel">
+      <div class="panel-header">
+        <span class="material-symbols-outlined icon-primary">forward_to_inbox</span>
+        <div>
+          <h4>Enviar GIL al Proveedor</h4>
+          <p>Se enviará un correo con el GIL adjunto en PDF.</p>
+        </div>
+      </div>
+
+      <div class="panel-form">
+        <div class="form-group">
+          <label>Correo del Proveedor <span class="required">*</span></label>
+          <input
+            type="email"
+            class="form-control"
+            placeholder="proveedor@empresa.com"
+            [value]="correoProveedor()"
+            (input)="correoProveedor.set($any($event.target).value)" />
+        </div>
+
+        <div class="form-group">
+          <label>Nombre del Proveedor</label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Ej. Distribuidora Nacional S.A.S."
+            [value]="nombreProveedor()"
+            (input)="nombreProveedor.set($any($event.target).value)" />
+        </div>
+
+        <div class="form-group form-group--full">
+          <label>Asunto</label>
+          <input
+            type="text"
+            class="form-control"
+            [value]="asuntoCorreo() || 'Solicitud de bienes ' + solicitudId()"
+            (input)="asuntoCorreo.set($any($event.target).value)" />
+        </div>
+
+        <div class="form-group form-group--full">
+          <div class="adjunto-chip">
+            <span class="material-symbols-outlined">picture_as_pdf</span>
+            <span>{{ solicitudId() }}.pdf — adjunto automáticamente</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-actions">
+        <restaurant-button variant="ghost" (click)="onToggleEnviarProveedor()">
+          Cancelar
+        </restaurant-button>
+        <restaurant-button *hasPermission="'gil:emitir'" variant="primary"
+          [disabled]="!correoProveedor()"
+          (click)="onConfirmarEnvioProveedor()">
+          <span class="material-symbols-outlined">send</span>
+          Enviar correo
+        </restaurant-button>
+      </div>
+    </div>
+  }
 
   <!-- ══════════════════════════════════════════════════════════════════════════
        Timeline Visual
   ══════════════════════════════════════════════════════════════════════════ -->
   <div class="timeline-container">
     <div class="timeline-line-bg"></div>
-    <div class="timeline-line-active" [style.width]="(estados.indexOf(estadoActual()) * 25) + '%'"></div>
+    <div class="timeline-line-active" [style.width]="(estados.indexOf(estadoActual()) * 20) + '%'"></div>
 
     <div class="timeline-nodes">
       @for (est of estados; track est) {
@@ -73,10 +139,6 @@
       <div class="info-block">
         <label>Código de Grupo</label>
         <p>{{ solicitud()?.codigoGrupo ?? '—' }}</p>
-      </div>
-      <div class="info-block">
-        <label>Ficha de Caracterización</label>
-        <p>{{ solicitud()?.fichaCaracterizacion ?? '—' }}</p>
       </div>
     </div>
   </div>
@@ -184,31 +246,6 @@
               }
             </tbody>
           </table>
-        </div>
-      </div>
-
-      <!-- Card: Observaciones -->
-      <div class="card">
-        <div class="card-header-icon mb-4">
-          <span class="material-symbols-outlined icon-primary">comment</span>
-          <h3>Observaciones y Justificación</h3>
-        </div>
-        <div class="comment-box">
-          @if (solicitud()?.observaciones) {
-            <p>"{{ solicitud()!.observaciones }}"</p>
-          } @else {
-            <p class="text-muted">Sin observaciones registradas.</p>
-          }
-        </div>
-
-        <!-- Add comment action -->
-        <div class="comment-actions">
-          <div class="avatars-group">
-            <div class="avatar-circle">{{ solicitanteIniciales() }}</div>
-          </div>
-          <button class="btn-link">
-            Añadir comentario <span class="material-symbols-outlined">add</span>
-          </button>
         </div>
       </div>
 

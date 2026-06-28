@@ -9,7 +9,7 @@
       <restaurant-button variant="ghost" (click)="openExportModal()">
         <span class="material-symbols-outlined btn-icon">download</span> Exportar
       </restaurant-button>
-      <restaurant-button variant="primary" routerLink="/app/inventario/consolidado/nuevo">
+      <restaurant-button *hasPermission="'consolidado:crear'" variant="primary" routerLink="/app/inventario/consolidado/nuevo">
         <span class="material-symbols-outlined btn-icon">add</span> Generar Nuevo Consolidado
       </restaurant-button>
     </div>
@@ -22,13 +22,6 @@
       [value]="kpiTotalEjecutado() | currency:'COP':'symbol-narrow':'1.0-0'"
       icon="bar-chart-2"
       iconColor="blue">
-    </restaurant-kpi-card>
-
-    <restaurant-kpi-card
-      label="Contabilizados"
-      [value]="kpiContabilizados()"
-      icon="check-circle"
-      iconColor="green">
     </restaurant-kpi-card>
 
     <restaurant-kpi-card
@@ -50,8 +43,35 @@
   <restaurant-data-table
     tableTitle="Consolidados Históricos"
     tableIcon="history"
-    searchPlaceholder="Buscar reporte o ID...">
-    
+    searchPlaceholder="Buscar reporte o ID..."
+    [showFilterButton]="true"
+    [filterActive]="showFilters()"
+    [filterCount]="filtrosActivos()"
+    (searchChange)="onSearch($event)"
+    (filterToggle)="onToggleFilters()">
+
+    <!-- Panel de filtros colapsable (slot [dtHeader]) -->
+    @if (showFilters()) {
+      <div dtHeader class="filter-panel">
+        <div class="filter-panel__row">
+          <div class="filter-group">
+            <label class="filter-label">Estado</label>
+            <select class="filter-select" [value]="filtroEstado()" (change)="onFilterEstado($any($event.target).value)">
+              <option value="">Todos</option>
+              <option value="GENERADO">Generado</option>
+              <option value="REVERSADO">Reversado</option>
+            </select>
+          </div>
+          <div class="filter-group filter-group--actions">
+            <button class="filter-clear-btn" (click)="onLimpiarFiltros()" [disabled]="filtrosActivos() === 0">
+              <span class="material-symbols-outlined">clear_all</span>
+              Limpiar
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
     <thead>
       <tr>
         <th class="th-center">ID Consolidado</th>
@@ -62,10 +82,10 @@
       </tr>
     </thead>
     <tbody class="text-black text-center">
-      @for (item of consolidados(); track item.id) {
-        <tr>
+      @for (item of consolidadosPaginados(); track item.id) {
+      <tr>
           <td>
-            <span class="td-value-primary td-mono">#{{ item.id }}</span>
+            <span class="td-value-primary td-mono">#{{ item.numero }}</span>
           </td>
           <td>
             <div class="td-flex-col">
@@ -74,72 +94,69 @@
             </div>
           </td>
           <td>
-            <span class="td-bold">{{ item.totales.totalGeneral | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+            <span class="td-bold">{{ item.totales.valorNeto | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
           </td>
           <td>
             <restaurant-status-badge [label]="item.estado" [variant]="getVariantFromEstado(item.estado)"></restaurant-status-badge>
           </td>
           <td class="text-center">
             <div class="action-buttons justify-center">
-              <button class="icon-btn-action" title="Ver Detalles" (click)="goToDetail(item.id)">
+              <button class="icon-btn-action" title="Ver Detalles" (click)="goToDetail(item.numero)">
                 <span class="material-symbols-outlined">visibility</span>
               </button>
-              <button class="icon-btn-action icon-btn-action--danger" title="Reversar / Eliminar" (click)="reversar(item.id)">
+              <button *hasPermission="'consolidado:crear'" class="icon-btn-action icon-btn-action--danger" title="Reversar / Eliminar" (click)="reversar(item.id)">
                 <span class="material-symbols-outlined">undo</span>
               </button>
             </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="5">
+            <inventario-empty-state
+              icon="summarize"
+              title="Sin consolidados"
+              message="No hay consolidados generados para el período actual."
+            />
           </td>
         </tr>
       }
     </tbody>
     
     <div dtFooter class="dt-footer">
-      <span class="table-pagination__info">Mostrando {{ consolidados().length }} consolidado(s)</span>
-      <div class="pagination-btns">
-        <button class="pagination-btn" disabled>
+      <span class="dt-page-info">Mostrando {{ consolidadosPaginados().length }} de {{ filteredConsolidados().length }} consolidados</span>
+      <div class="dt-pagination">
+        <button class="dt-page-btn" [disabled]="paginaActual() === 1" (click)="anterior()">
           <span class="material-symbols-outlined">chevron_left</span>
         </button>
-        <button class="pagination-btn pagination-btn--active">1</button>
-        <button class="pagination-btn">2</button>
-        <button class="pagination-btn">3</button>
-        <button class="pagination-btn">
+        @for (p of paginas(); track p) {
+          <button class="dt-page-btn" [class.dt-page-btn--active]="paginaActual() === p" (click)="irAPagina(p)">{{ p }}</button>
+        }
+        <button class="dt-page-btn" [disabled]="paginaActual() === totalPaginas()" (click)="siguiente()">
           <span class="material-symbols-outlined">chevron_right</span>
         </button>
       </div>
     </div>
   </restaurant-data-table>
 
-  <!-- Contextual Insight / Floating Cards -->
+  <!-- Ejecución presupuestal (dato real: GET /budget/presupuestos/resumen) -->
   <div class="insights-grid">
     <div class="insight-card insight-card--primary">
       <div class="insight-card__content">
-        <h3 class="insight-card__title">Resumen de Cumplimiento</h3>
-        <p class="insight-card__text">La ejecución presupuestal del presente trimestre se encuentra en un 85% de avance respecto a la proyección anual GIL-F014.</p>
-        <button class="insight-card__btn">Ver Auditoría</button>
+        <h3 class="insight-card__title">Ejecución Presupuestal</h3>
+        @if (porcentajeEjecucion() !== null) {
+          <p class="insight-card__text">El presupuesto vigente registra un {{ porcentajeEjecucion() | number:'1.2-2' }}% de ejecución (comprometido + pagado sobre el total asignado).</p>
+        } @else {
+          <p class="insight-card__text">Sin datos de presupuesto para la vigencia actual.</p>
+        }
+        <button class="insight-card__btn" (click)="verPresupuesto()">Ver detalle</button>
       </div>
       <div class="insight-card__visual">
         <div class="progress-circle">
-          <span>85%</span>
+          <span>{{ porcentajeEjecucion() !== null ? (porcentajeEjecucion() | number:'1.2-2') + '%' : '—' }}</span>
         </div>
       </div>
       <div class="insight-card__decor"></div>
-    </div>
-
-    <div class="insight-card insight-card--surface">
-      <div class="insight-card__header">
-        <div class="insight-icon-box">
-          <span class="material-symbols-outlined text-primary">description</span>
-        </div>
-        <div>
-          <h4 class="insight-card__subtitle">Instructivo GIL-F014</h4>
-          <p class="insight-card__date">Actualizado hace 2 días</p>
-        </div>
-      </div>
-      <p class="insight-card__text-dark">Revise los nuevos parámetros de consolidación para el IVA y retención en la fuente según la circular 012-2024.</p>
-      <a class="insight-card__link" href="#">
-        Descargar Guía PDF
-        <span class="material-symbols-outlined">open_in_new</span>
-      </a>
     </div>
   </div>
 
@@ -156,7 +173,7 @@
    
     [consolidadoId]="selectedReversarItem()!.id"
     [periodo]="selectedReversarItem()!.fechaGeneracion"
-    [total]="(selectedReversarItem()!.totales.totalGeneral | currency:'COP':'symbol-narrow':'1.0-0') ?? ''"
+    [total]="(selectedReversarItem()!.totales.valorNeto | currency:'COP':'symbol-narrow':'1.0-0') ?? ''"
     [comprobantes]="selectedReversarItem()!.lineas.length"
     [isBlocked]="isReversarBlocked()"
     (close)="closeReversarModal()"

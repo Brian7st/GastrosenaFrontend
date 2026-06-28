@@ -4,20 +4,23 @@ import {
   EventEmitter,
   Input,
   Output,
+  computed,
+  inject,
   signal,
 } from '@angular/core';
 import { LucideIconComponent } from '@restaurant/shared/ui';
+import { I18nService } from '../../i18n/i18n.service';
 import { ExportarConfig } from '../../models/usuarios.model';
 
-const ROL_OPCIONES = [
-  { value: '',              label: 'Todos los roles'  },
-  { value: 'ADMINISTRADOR', label: 'Administrador'    },
-  { value: 'CHEF',          label: 'Chef'             },
-  { value: 'MESERO',        label: 'Mesero'           },
-  { value: 'BARTENDER',     label: 'Bartender'        },
-  { value: 'CAJERO',        label: 'Cajero'           },
-  { value: 'CONTADORA',     label: 'Contadora'        },
-  { value: 'INSTRUCTOR',    label: 'Instructor'       },
+const ROL_OPCIONES: { value: string; label: string; tKey: string }[] = [
+  { value: '',              label: 'Todos los roles',  tKey: 'exportar.todos_roles' },
+  { value: 'ADMINISTRADOR', label: 'Administrador',    tKey: 'exportar.admin' },
+  { value: 'CHEF',          label: 'Chef',             tKey: 'exportar.chef' },
+  { value: 'MESERO',        label: 'Mesero',           tKey: 'exportar.mesero' },
+  { value: 'BARTENDER',     label: 'Bartender',        tKey: 'exportar.bartender' },
+  { value: 'CAJERO',        label: 'Cajero',           tKey: 'exportar.cajero' },
+  { value: 'CONTADORA',     label: 'Contadora',        tKey: 'exportar.contadora' },
+  { value: 'INSTRUCTOR',    label: 'Instructor',       tKey: 'exportar.instructor' },
 ];
 
 @Component({
@@ -29,6 +32,7 @@ const ROL_OPCIONES = [
   styleUrl:    './exportar-usuarios.component.scss',
 })
 export class ExportarUsuariosComponent {
+  protected readonly i18n = inject(I18nService);
   @Input({ required: true }) totalUsuarios!: number;
   @Output() cerrar   = new EventEmitter<void>();
   @Output() exportar = new EventEmitter<ExportarConfig>();
@@ -36,7 +40,9 @@ export class ExportarUsuariosComponent {
   readonly formato          = signal<'excel' | 'csv'>('excel');
   readonly incluirInactivos = signal(false);
   readonly filtroRol        = signal('');
-  readonly rolOpciones      = ROL_OPCIONES;
+  readonly rolOpciones      = computed(() =>
+    ROL_OPCIONES.map(o => ({ value: o.value, label: this.i18n.t(o.tKey) })),
+  );
 
   onFormatoChange(event: Event): void {
     const value = (event.target as HTMLSelectElement).value;

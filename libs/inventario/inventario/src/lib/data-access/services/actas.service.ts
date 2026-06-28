@@ -8,7 +8,7 @@ import {
   CompromisoActa,
   FirmanteActa,
 } from '../../models/acta.model';
-import { ActaResponse } from '../api/legalization.api';
+import { ActaResponse, ActasPageResponse, CrearActaRequest } from '../api/legalization.api';
 import { actaFromApi } from '../mappers/legalization.mapper';
 
 const API = '/api/v1';
@@ -26,13 +26,14 @@ export class ActasService {
 
   getActas(): Observable<ActaLegalizacion[]> {
     return this.http
-      .get<ActaResponse[]>(`${API}/legalization/actas`)
+      .get<ActasPageResponse>(`${API}/legalization/actas`)
       .pipe(
-        map(list => list.map(actaFromApi)),
+        map(resp => resp.contenido.map(actaFromApi)),
         catchError(err => throwError(() => err))
       );
   }
 
+  /** GET /legalization/actas/{id} — detalle directo (no depende del tamaño de la lista). */
   getActaById(id: string): Observable<ActaLegalizacion | undefined> {
     return this.http
       .get<ActaResponse>(`${API}/legalization/actas/${id}`)
@@ -42,11 +43,11 @@ export class ActasService {
       );
   }
 
-  crearActa(data: Partial<ActaLegalizacion>): Observable<ActaLegalizacion> {
+  crearActa(data: CrearActaRequest): Observable<string> {
     return this.http
-      .post<ActaResponse>(`${API}/legalization/actas`, data)
+      .post<{ id: string }>(`${API}/legalization/actas`, data)
       .pipe(
-        map(actaFromApi),
+        map(resp => resp.id),
         catchError(err => throwError(() => err))
       );
   }
@@ -72,6 +73,16 @@ export class ActasService {
         map(() => true),
         catchError(err => throwError(() => err))
       );
+  }
+
+  /** GET /api/reportes/acta — el PDF lo genera el microservicio de reportes. */
+  exportarActa(id: string): Observable<Blob> {
+    return this.http
+      .get(`/api/reportes/acta`, {
+        params: { id, formato: 'PDF' },
+        responseType: 'blob',
+      })
+      .pipe(catchError(err => throwError(() => err)));
   }
 
   /** TODO: insumos/compromisos/firmantes — verificar si el backend los expone por separado */

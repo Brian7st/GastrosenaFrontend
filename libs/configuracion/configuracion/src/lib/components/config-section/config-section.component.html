@@ -1,0 +1,36 @@
+<div class="config-section" [class.config-section--collapsed]="!expanded()">
+  <button
+    class="config-section__header"
+    type="button"
+    (click)="toggleSection.emit()"
+    [attr.aria-expanded]="expanded()"
+  >
+    <div class="config-section__header-left">
+      <div class="config-section__icon-wrapper">
+        <lucide-icon [name]="icono()" [size]="20"></lucide-icon>
+      </div>
+      <div class="config-section__header-text">
+        <h2 class="config-section__title">{{ titulo() }}</h2>
+        @if (subtitulo()) {
+          <p class="config-section__subtitle">{{ subtitulo() }}</p>
+        }
+      </div>
+    </div>
+    <div class="config-section__header-right">
+      @if (guardando()) {
+        <lucide-icon name="loader-circle" [size]="16" class="config-section__spinner"></lucide-icon>
+      }
+      <lucide-icon
+        [name]="expanded() ? 'chevron-up' : 'chevron-down'"
+        [size]="18"
+        class="config-section__chevron"
+      ></lucide-icon>
+    </div>
+  </button>
+
+  @if (expanded()) {
+    <div class="config-section__body">
+      <ng-content />
+    </div>
+  }
+</div>

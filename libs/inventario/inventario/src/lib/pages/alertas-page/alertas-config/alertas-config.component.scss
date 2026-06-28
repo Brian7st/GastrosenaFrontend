@@ -2,16 +2,6 @@
    Configuración de Umbrales y Notificaciones
    ========================================================================== */
 
-$primary:         #006e25;
-$primary-light:   #28a745;
-$surface:         #f8f9fa;
-$surface-low:     #f3f4f5;
-$surface-high:    #e7e8e9;
-$surface-highest: #e1e3e4;
-$on-surface:      #191c1d;
-$on-surface-var:  #3e4a3c;
-$tertiary:        #ba1830;
-
 .page-container {
   padding: 0;
   min-height: 100%;
@@ -48,15 +38,15 @@ $tertiary:        #ba1830;
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 0.75rem;
-  background: $surface-high;
+  background: var(--color-superficie-contenedor-alto);
   border: none;
-  color: $on-surface;
+  color: var(--color-en-superficie);
   cursor: pointer;
   transition: background 0.2s;
   flex-shrink: 0;
   margin-top: 0.375rem;
 
-  &:hover { background: $surface-highest; }
+  &:hover { background: var(--color-superficie-contenedor-mas-alto); }
 }
 
 .breadcrumb-nav {
@@ -65,20 +55,20 @@ $tertiary:        #ba1830;
   gap: 0.375rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: $on-surface;
+  color: var(--color-en-superficie);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.375rem;
 
-  span:not(.active) { color: #666; }
-  .active { color: $on-surface; }
+  span:not(.active) { color: var(--color-pizarra-500, #666); }
+  .active { color: var(--color-en-superficie); }
 }
 
 .page-title {
   font-family: 'Manrope', sans-serif;
   font-size: 1.75rem;
   font-weight: 800;
-  color: $on-surface;
+  color: var(--color-en-superficie);
   letter-spacing: -0.02em;
   margin: 0 0 0.5rem;
 
@@ -87,7 +77,7 @@ $tertiary:        #ba1830;
 
 .page-subtitle {
   font-size: 0.9375rem;
-  color: $on-surface-var;
+  color: var(--color-contorno);
   margin: 0;
   line-height: 1.6;
 }
@@ -96,7 +86,7 @@ $tertiary:        #ba1830;
 .btn-reset {
   background: transparent;
   border: none;
-  color: $primary;
+  color: var(--color-primario);
   font-size: 0.875rem;
   font-weight: 600;
   padding: 0.75rem 1.25rem;
@@ -104,7 +94,7 @@ $tertiary:        #ba1830;
   cursor: pointer;
   transition: background 0.2s;
 
-  &:hover { background: rgba($primary, 0.08); }
+  &:hover { background: color-mix(in srgb, var(--color-primario) 8%, transparent); }
 }
 
 .btn-save {
@@ -112,18 +102,18 @@ $tertiary:        #ba1830;
   align-items: center;
   gap: 0.5rem;
   background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-primario-gradient-end) 100%);
-  color: white;
+  color: var(--color-en-primario);
   border: none;
   border-radius: 0.75rem;
   padding: 0.75rem 1.5rem;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba($primary, 0.25);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primario) 25%, transparent);
   transition: opacity 0.2s, box-shadow 0.2s;
 
   .material-symbols-outlined { font-size: 1.125rem; }
-  &:hover { opacity: 0.92; box-shadow: 0 4px 16px rgba($primary, 0.35); }
+  &:hover { opacity: 0.92; box-shadow: 0 4px 16px color-mix(in srgb, var(--color-primario) 35%, transparent); }
 }
 
 // ── Lista de Umbrales ──────────────────────────────────────────────────────
@@ -135,9 +125,9 @@ $tertiary:        #ba1830;
 
 // ── Ítem de Umbral ─────────────────────────────────────────────────────────
 .umbral-item {
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: 0.75rem;
-  border: 1px solid rgba($surface-highest, 0.6);
+  border: 1px solid color-mix(in srgb, var(--color-superficie-contenedor-mas-alto) 60%, transparent);
   padding: 1.25rem 1.5rem;
   display: grid;
   grid-template-columns: 1fr;
@@ -150,8 +140,8 @@ $tertiary:        #ba1830;
   }
 
   &--alerta {
-    border-left: 4px solid $tertiary;
-    background: rgba($tertiary, 0.02);
+    border-left: 4px solid var(--color-terciario, #ba1830);
+    background: color-mix(in srgb, var(--color-terciario, #ba1830) 2%, transparent);
   }
 
   // ── Bien ──────────────────────────────────────────────────────────────
@@ -165,18 +155,18 @@ $tertiary:        #ba1830;
     width: 2.75rem;
     height: 2.75rem;
     border-radius: 0.625rem;
-    background: $surface-high;
+    background: var(--color-superficie-contenedor-alto);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: $on-surface-var;
+    color: var(--color-contorno);
     flex-shrink: 0;
 
     .material-symbols-outlined { font-size: 1.25rem; }
 
     &--alerta {
-      background: rgba($tertiary, 0.1);
-      color: $tertiary;
+      background: color-mix(in srgb, var(--color-terciario, #ba1830) 10%, transparent);
+      color: var(--color-terciario, #ba1830);
     }
   }
 
@@ -184,7 +174,7 @@ $tertiary:        #ba1830;
     font-family: 'Manrope', sans-serif;
     font-size: 1rem;
     font-weight: 700;
-    color: $on-surface;
+    color: var(--color-en-superficie);
     margin: 0 0 0.125rem;
   }
 
@@ -192,7 +182,7 @@ $tertiary:        #ba1830;
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: $on-surface-var;
+    color: var(--color-contorno);
     font-weight: 500;
     margin: 0;
   }
@@ -204,8 +194,8 @@ $tertiary:        #ba1830;
     text-transform: uppercase;
     font-weight: 700;
     letter-spacing: 0.05em;
-    color: $tertiary;
-    background: rgba($tertiary, 0.12);
+    color: var(--color-terciario, #ba1830);
+    background: color-mix(in srgb, var(--color-terciario, #ba1830) 12%, transparent);
     padding: 0.125rem 0.5rem;
     border-radius: 9999px;
   }
@@ -232,40 +222,40 @@ $tertiary:        #ba1830;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: $on-surface-var;
+  color: var(--color-contorno);
 
-  &--alerta { color: $tertiary; }
-  &--dim    { color: rgba($on-surface-var, 0.5); }
+  &--alerta { color: var(--color-terciario, #ba1830); }
+  &--dim    { color: color-mix(in srgb, var(--color-contorno) 50%, transparent); }
 }
 
 .field-input {
-  background: $surface-low;
+  background: var(--color-superficie-contenedor-bajo);
   border: none;
   border-radius: 0.5rem;
   padding: 0.625rem 0.75rem;
   font-size: 0.875rem;
-  color: $on-surface;
+  color: var(--color-en-superficie);
   width: 100%;
   box-sizing: border-box;
   outline: none;
   transition: all 0.2s;
 
   &:focus {
-    background: white;
-    box-shadow: 0 0 0 2px rgba($primary, 0.25);
+    background: var(--color-surface-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primario) 25%, transparent);
   }
 
   &--alerta {
-    border: 1px solid rgba($tertiary, 0.4);
-    background: rgba($tertiary, 0.04);
+    border: 1px solid color-mix(in srgb, var(--color-terciario, #ba1830) 40%, transparent);
+    background: color-mix(in srgb, var(--color-terciario, #ba1830) 4%, transparent);
   }
 
   &--disabled {
-    background: $surface-highest;
-    color: rgba($on-surface-var, 0.5);
+    background: var(--color-superficie-contenedor-mas-alto);
+    color: color-mix(in srgb, var(--color-contorno) 50%, transparent);
     cursor: not-allowed;
 
-    &::placeholder { color: rgba($on-surface-var, 0.5); }
+    &::placeholder { color: color-mix(in srgb, var(--color-contorno) 50%, transparent); }
     &:focus { box-shadow: none; }
   }
 }
@@ -289,7 +279,7 @@ $tertiary:        #ba1830;
   &__track {
     position: absolute;
     inset: 0;
-    background: $surface-highest;
+    background: var(--color-superficie-contenedor-mas-alto);
     border-radius: 9999px;
     transition: background 0.2s;
   }
@@ -300,7 +290,7 @@ $tertiary:        #ba1830;
     left: 2px;
     width: 20px;
     height: 20px;
-    background: white;
+    background: var(--color-surface-primary);
     border-radius: 50%;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
     transition: transform 0.2s;
@@ -309,7 +299,7 @@ $tertiary:        #ba1830;
 
   // Estado activo (checked)
   input:checked ~ .toggle__track {
-    background: $primary-light;
+    background: var(--color-primario-gradient-end);
   }
 
   input:checked ~ .toggle__thumb {
