@@ -142,7 +142,7 @@
         </td>
       </tr>
     } @else {
-      @for (bien of bienes(); track bien) {
+      @for (bien of bienes(); track bien.id) {
 <tr class="table-row">
             <td>
               <span class="code-mono">{{ bien.codigoSena }}</span>
