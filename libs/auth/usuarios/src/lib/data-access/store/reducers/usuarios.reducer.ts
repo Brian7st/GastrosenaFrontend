@@ -150,6 +150,19 @@ export const usuariosFeature = createFeature({
       ...state, loadingAccion: false, error,
     })),
 
+    // ── NUEVO: Bloquear cuenta ────────────────────────────────────────────────
+    on(UsuariosActions.bloquearCuenta, state => ({
+      ...state, loadingAccion: true, error: null,
+    })),
+    on(UsuariosActions.bloquearCuentaExitoso, (state, { usuario }) => ({
+      ...state,
+      loadingAccion: false,
+      usuarios:      state.usuarios.map(u => u.id === usuario.id ? usuario : u),
+    })),
+    on(UsuariosActions.bloquearCuentaFallido, (state, { error }) => ({
+      ...state, loadingAccion: false, error,
+    })),
+
     on(UsuariosActions.importarMasivo, state => ({
       ...state, importando: true, error: null, resultadoImport: null,
     })),

@@ -14,8 +14,6 @@
     }
   }
 
-  // ── Filtros ───────────────────────────────────────────────────────────────
-
   &__filters {
     display: flex;
     align-items: center;
@@ -100,8 +98,6 @@
     pointer-events: none;
   }
 
-  // ── Tabla ─────────────────────────────────────────────────────────────────
-
   &__user {
     display: flex;
     align-items: center;
@@ -150,6 +146,11 @@
       color: var(--color-success-text);
     }
 
+    &--inactiva {
+      background: var(--color-warning-bg);
+      color: var(--color-warning-text);
+    }
+
     &--bloqueada {
       background: var(--color-error-bg);
       color: var(--color-error-text);
@@ -177,12 +178,12 @@
                 color      var(--duration-fast) var(--ease-standard);
 
     &--unlock {
-      background: var(--color-brand-primary-soft);
-      color: var(--color-brand-primary-strong);
+      background: var(--color-success-bg);
+      color: var(--color-success-text);
 
       &:hover {
-        background: var(--color-primario);
-        color: var(--color-en-primario);
+        background: var(--color-success-text);
+        color: var(--color-surface-primary);
       }
     }
 
@@ -195,6 +196,11 @@
         color: var(--color-surface-primary);
       }
     }
+  }
+
+  &__sin-accion {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
   }
 
   &__empty-cell {
