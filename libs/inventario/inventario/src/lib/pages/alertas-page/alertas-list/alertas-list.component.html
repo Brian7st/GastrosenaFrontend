@@ -114,6 +114,7 @@
             <!-- Botón Resolver -->
             <div class="alerta-card__action">
               <button
+                *hasPermission="'alertas:resolver'"
                 class="btn-resolver"
                 (click)="irAResolver($event, alerta.id)"
               >

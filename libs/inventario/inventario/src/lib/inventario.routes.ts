@@ -1,29 +1,58 @@
 import { Routes } from '@angular/router';
+import { inject } from '@angular/core';
+import { AuthService, permissionGuard } from '@restaurant/shared/auth';
 
+/**
+ * Orden de preferencia de la landing del módulo: el primer permiso que el rol
+ * posee define a qué sección se redirige `/app/inventario`. Evita que un rol de
+ * legalización (INSTRUCTOR) sea enviado a `bienes`, que no puede ver.
+ */
+const LANDING_POR_PERMISO: ReadonlyArray<readonly [string, string]> = [
+  ['bienes:ver', 'bienes'],
+  ['inventario:ver_movimientos', 'movimientos'],
+  ['facturas:ver', 'facturas'],
+  ['gil:ver', 'solicitudes-gil'],
+  ['presupuesto:ver', 'presupuesto'],
+  ['consolidado:ver', 'consolidado'],
+  ['conciliacion:ver', 'conciliacion'],
+  ['alertas:ver', 'alertas'],
+  ['requisiciones:ver', 'requisiciones'],
+  ['actas:ver', 'actas'],
+  ['paquete:ver', 'paquete-probatorio'],
+  ['solicitudes:ver', 'solicitudes-insumos-page'],
+];
 
 export const INVENTARIO_ROUTES: Routes = [
-  // ── Gestión de Bienes ────────────────────────────────────────────────────
+  // ── Redirección por defecto según los permisos del rol ───────────────────
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'bienes',
+    redirectTo: () => {
+      const permisos = inject(AuthService).currentUser()?.permisos ?? [];
+      const destino = LANDING_POR_PERMISO.find(([permiso]) => permisos.includes(permiso));
+      return `/app/inventario/${destino ? destino[1] : 'bienes'}`;
+    },
   },
   {
     path: 'bienes',
+    canActivate: [permissionGuard(['bienes:ver'])],
     loadComponent: () => import('./ui/pages/bienes-list/bienes-list.component').then(m => m.BienesListPageComponent),
   },
   {
     path: 'bienes/exportar',
+    canActivate: [permissionGuard(['bienes:ver'])],
     loadComponent: () => import('./ui/pages/bien-export/bien-export.component').then(m => m.BienExportPageComponent),
   },
   {
     path: 'bienes/:id',
+    canActivate: [permissionGuard(['bienes:ver'])],
     loadComponent: () => import('./ui/pages/bien-detail/bien-detail.component').then(m => m.BienDetailPageComponent),
   },
 
   // ── GIL-F-014: Solicitudes de Abastecimiento ─────────────────────────────
   {
     path: 'solicitudes-gil',
+    canActivate: [permissionGuard(['gil:ver'])],
     children: [
       {
         path: '',
@@ -66,21 +95,25 @@ export const INVENTARIO_ROUTES: Routes = [
   // ── Solicitudes de Insumos (Bandeja de Aprobación) ───────────────────────
   {
     path: 'solicitudes-insumos-page',
+    canActivate: [permissionGuard(['solicitudes:ver'])],
     loadComponent: () => import('./pages/solicitudes-insumos-page/solicitudes-insumos-list/solicitudes-insumos-list.component').then(m => m.SolicitudesInsumosListComponent)
   },
   {
     path: 'solicitudes-insumos-page/nueva',
+    canActivate: [permissionGuard(['solicitudes:crear'])],
     loadComponent: () => import('./pages/solicitudes-insumos-page/solicitudes-insumos-form/solicitudes-insumos-form.component').then(m => m.SolicitudesInsumosFormComponent)
   },
 
 
   {
     path: 'solicitudes-insumos-page/:id',
+    canActivate: [permissionGuard(['solicitudes:ver'])],
     loadComponent: () => import('./pages/solicitudes-insumos-page/solicitudes-insumos-detail/solicitudes-insumos-detail.component').then(m => m.SolicitudesInsumosDetailComponent)
   },
 
   {
     path: 'solicitudes-insumos-page/:id/editar',
+    canActivate: [permissionGuard(['solicitudes:editar'])],
     loadComponent: () => import('./pages/solicitudes-insumos-page/solicitudes-insumos-form/solicitudes-insumos-form.component').then(m => m.SolicitudesInsumosFormComponent)
   },
 
@@ -88,32 +121,38 @@ export const INVENTARIO_ROUTES: Routes = [
   // Vista 1: Panel de Facturación (listado + KPIs)
   {
     path: 'facturas',
+    canActivate: [permissionGuard(['facturas:ver'])],
     loadComponent: () => import('./pages/facturas-page/facturas-list/facturas-list.component').then(m => m.FacturasListPageComponent),
   },
   // Vista de Importar Factura
   {
     path: 'facturas/importar',
+    canActivate: [permissionGuard(['facturas:ver'])],
     loadComponent: () => import('./pages/facturas-page/factura-import/factura-import.component').then(m => m.FacturaImportPageComponent)
   },
   // Vista 5: Detalle Solicitud GIL F-014
   {
     path: 'facturas/gil/:id',
+    canActivate: [permissionGuard(['facturas:ver'])],
     loadComponent: () => import('./pages/facturas-page/gil-solicitud-detail/gil-solicitud-detail.component').then(m => m.GilSolicitudDetailPageComponent),
   },
   // Vista 3: Detalle de Factura FEL (Bento Grid)
   {
     path: 'facturas/:id',
+    canActivate: [permissionGuard(['facturas:ver'])],
     loadComponent: () => import('./pages/facturas-page/factura-detail/factura-detail.component').then(m => m.FacturaDetailPageComponent)
   },
   // Vista 4: Editar Factura FEL (Editable/Lectura antigua)
   {
     path: 'facturas/:id/editar',
+    canActivate: [permissionGuard(['facturas:ver'])],
     loadComponent: () => import('./pages/facturas-page/factura-edit/factura-edit.component').then(m => m.FacturaEditPageComponent),
   },
 
   // ── Consolidado de Ejecución Presupuestal ────────────────────────────────
   {
     path: 'consolidado',
+    canActivate: [permissionGuard(['consolidado:ver'])],
     children: [
       {
         path: '',
@@ -133,6 +172,7 @@ export const INVENTARIO_ROUTES: Routes = [
   // ── Conciliación de Inventario ───────────────────────────────────────────
   {
     path: 'conciliacion',
+    canActivate: [permissionGuard(['conciliacion:ver'])],
     children: [
       {
         path: '',
@@ -168,6 +208,7 @@ export const INVENTARIO_ROUTES: Routes = [
   // ── Entradas y Salidas (Movimientos / Kardex) ────────────────────────────
   {
     path: 'movimientos',
+    canActivate: [permissionGuard(['inventario:ver_movimientos'])],
     loadComponent: () => import('./pages/kardex-page/movimientos-list/movimientos-list.component').then(m => m.MovimientosListComponent),
     children: [
       {
@@ -182,12 +223,14 @@ export const INVENTARIO_ROUTES: Routes = [
   },
   {
     path: 'movimientos/:id',
+    canActivate: [permissionGuard(['inventario:ver_movimientos'])],
     loadComponent: () => import('./pages/kardex-page/movimiento-detail/movimiento-detail.component').then(m => m.MovimientoDetailComponent)
   },
 
   // ── Alertas de Stock ─────────────────────────────────────────────────────
   {
     path: 'alertas',
+    canActivate: [permissionGuard(['alertas:ver'])],
     children: [
       {
         path: '',
@@ -225,6 +268,7 @@ export const INVENTARIO_ROUTES: Routes = [
   // ── Presupuesto General ──────────────────────────────────────────────────
   {
     path: 'presupuesto',
+    canActivate: [permissionGuard(['presupuesto:ver'])],
     loadComponent: () =>
       import('./pages/presupuesto-page/presupuesto-dashboard/presupuesto-dashboard.component').then(
         m => m.PresupuestoDashboardComponent
@@ -264,6 +308,7 @@ export const INVENTARIO_ROUTES: Routes = [
   // ── Actas de Legalización ───────────────────────────────────────────────────
   {
     path: 'actas',
+    canActivate: [permissionGuard(['actas:ver'])],
     children: [
       {
         path: '',
@@ -299,6 +344,7 @@ export const INVENTARIO_ROUTES: Routes = [
   // ── Paquete Probatorio ──────────────────────────────────────────────────
   {
     path: 'paquete-probatorio',
+    canActivate: [permissionGuard(['paquete:ver'])],
     children: [
       {
         path: '',
@@ -343,6 +389,7 @@ export const INVENTARIO_ROUTES: Routes = [
   // ── Requisiciones (Formato 45-S) ────────────────────────────────────────
   {
     path: 'requisiciones',
+    canActivate: [permissionGuard(['requisiciones:ver'])],
     children: [
       {
         path: '',

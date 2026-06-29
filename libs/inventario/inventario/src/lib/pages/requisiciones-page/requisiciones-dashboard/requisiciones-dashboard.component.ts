@@ -5,6 +5,7 @@ import {
   LucideIconComponent,
   KpiCardComponent,
   ButtonComponent,
+  HasPermissionDirective,
 } from '@restaurant/shared/ui';
 import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
 import { I18nService } from '../../../i18n/i18n.service';
@@ -16,7 +17,8 @@ import { I18nService } from '../../../i18n/i18n.service';
     RouterModule,
     LucideIconComponent,
     KpiCardComponent,
-    ButtonComponent
+    ButtonComponent,
+    HasPermissionDirective
 ],
   templateUrl: './requisiciones-dashboard.component.html',
   styleUrl: './requisiciones-dashboard.component.scss',

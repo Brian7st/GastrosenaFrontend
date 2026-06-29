@@ -100,7 +100,7 @@
             </td>
             <td>
               <div class="fichas-page__actions">
-                <!-- ✅ BOTÓN VER APRENDICES (NUEVO) -->
+                <!-- Botón Ver aprendices -->
                 <button
                   class="fichas-page__action-btn"
                   type="button"
@@ -111,7 +111,7 @@
                   <lucide-icon name="users" [size]="16"></lucide-icon>
                 </button>
                 @if (esAdmin()) {
-                  <!-- BOTÓN EDITAR -->
+                  <!-- Botón Editar -->
                   <button
                     class="fichas-page__action-btn"
                     type="button"
@@ -121,19 +121,20 @@
                   >
                     <lucide-icon name="pencil" [size]="16"></lucide-icon>
                   </button>
-                  <!-- BOTÓN ELIMINAR -->
+                  <!-- Botón Eliminar -->
                   <button
                     class="fichas-page__action-btn fichas-page__action-btn--danger"
                     type="button"
-                    (click)="onEliminar(f.id)"
+                    (click)="abrirModalEliminar(f)"
                     aria-label="Eliminar ficha"
-                    title="Eliminar ficha"                >
+                    title="Eliminar ficha"
+                  >
                     <lucide-icon name="trash-2" [size]="16"></lucide-icon>
                   </button>
                 }
               </div>
             </td>
-          
+          </tr>
         }
       }
     </tbody>
@@ -141,7 +142,7 @@
 
 </div>
 
-<!-- Modal crear / editar -->
+<!-- ====== MODAL CREAR / EDITAR ====== -->
 @if (mostrarModal()) {
   <div class="fichas-modal-backdrop" (click)="onCerrarModal()">
     <div class="fichas-modal" (click)="$event.stopPropagation()">
@@ -228,6 +229,32 @@
         </button>
       </div>
 
+    </div>
+  </div>
+}
+
+<!-- ====== MODAL ELIMINAR ====== -->
+@if (mostrarModalEliminar()) {
+  <div class="fichas-modal-backdrop" (click)="cerrarModalEliminar()">
+    <div class="fichas-modal" (click)="$event.stopPropagation()">
+      <div class="fichas-modal__header">
+        <h2 class="fichas-modal__title">Confirmar eliminación</h2>
+        <button class="fichas-modal__close" type="button" (click)="cerrarModalEliminar()">
+          <lucide-icon name="x" [size]="18"></lucide-icon>
+        </button>
+      </div>
+      <div class="fichas-modal__body">
+        <p>¿Estás seguro de que deseas eliminar la ficha <strong>{{ fichaAEliminar()?.numero }}</strong>?</p>
+        <p style="color: #94a3b8; font-size: 0.85rem;">Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="fichas-modal__footer">
+        <button class="fichas-page__btn fichas-page__btn--ghost" type="button" (click)="cerrarModalEliminar()">
+          Cancelar
+        </button>
+        <button class="fichas-page__btn fichas-page__btn--danger" type="button" (click)="confirmarEliminar()">
+          Eliminar
+        </button>
+      </div>
     </div>
   </div>
 }

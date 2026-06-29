@@ -7,11 +7,11 @@
       <p class="page-header__subtitle">{{ i18n.t('facturas.subtitulo') }}</p>
     </div>
     <div class="page-header__actions">
-      <restaurant-button variant="ghost" (click)="onImportar()">
+      <restaurant-button *hasPermission="'facturas:crear'" variant="ghost" (click)="onImportar()">
         <span class="material-symbols-outlined">upload</span>
         Importar
       </restaurant-button>
-      <restaurant-button variant="ghost" (click)="onExportar()">
+      <restaurant-button *hasPermission="'facturas:exportar_contable'" variant="ghost" (click)="onExportar()">
         <span class="material-symbols-outlined">download</span>
         Exportar
       </restaurant-button>
@@ -169,7 +169,7 @@
         </td>
         <td class="cell--actions">
           <div class="actions-row">
-            <button class="action-icon"
+            <button *hasPermission="'facturas:editar'" class="action-icon"
               [disabled]="factura.estado === 'ANULADA' || factura.estado === 'PAGADA'"
               (click)="$event.stopPropagation(); onEditarFactura(factura)" title="Editar">
               <span class="material-symbols-outlined">edit</span>
@@ -177,7 +177,7 @@
             <button class="action-icon" (click)="$event.stopPropagation(); onVerFactura(factura)" title="Ver detalle">
               <span class="material-symbols-outlined">visibility</span>
             </button>
-            <button class="action-icon action-icon--danger"
+            <button *hasPermission="'facturas:anular'" class="action-icon action-icon--danger"
               [disabled]="factura.estado === 'ANULADA'"
               (click)="$event.stopPropagation(); onAnularFactura(factura)" title="Anular">
               <span class="material-symbols-outlined">block</span>

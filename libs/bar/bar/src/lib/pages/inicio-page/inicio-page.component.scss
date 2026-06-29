@@ -18,6 +18,24 @@
     grid-template-columns: repeat(4, 1fr);
     gap: var(--space-5);
     margin-bottom: var(--space-10);
+    align-items: stretch;
+
+    > div,
+    > restaurant-kpi-card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    > div > restaurant-kpi-card {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    restaurant-kpi-card ::ng-deep .kpi-card {
+      height: 100%;
+    }
 
     @media (max-width: 1024px) {
       grid-template-columns: repeat(2, 1fr);

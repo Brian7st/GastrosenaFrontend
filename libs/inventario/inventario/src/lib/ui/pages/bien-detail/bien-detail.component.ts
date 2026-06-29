@@ -5,7 +5,7 @@ import { BienFormDto, EstadoBien } from '../../../models/inventario.model';
 import { Movimiento } from '../../../models/movimiento.model';
 import { MovimientosService } from '../../../data-access/services/movimientos.service';
 import { InventarioFacade } from '../../../data-access/inventario.facade';
-import { ButtonComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
+import { ButtonComponent, StatusBadgeComponent, HasPermissionDirective } from '@restaurant/shared/ui';
 import { BienFormComponent } from '../../../ui/modals/bien-form/bien-form.component';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { I18nService } from '../../../i18n/i18n.service';
@@ -13,7 +13,7 @@ import { I18nService } from '../../../i18n/i18n.service';
 @Component({
   selector: 'restaurant-bien-detail',
   standalone: true,
-  imports: [CommonModule, BienFormComponent, BackButtonComponent, StatusBadgeComponent, ButtonComponent],
+  imports: [CommonModule, BienFormComponent, BackButtonComponent, StatusBadgeComponent, ButtonComponent, HasPermissionDirective],
   templateUrl: './bien-detail.component.html',
   styleUrl: './bien-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

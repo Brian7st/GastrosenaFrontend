@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { DecimalPipe, TitleCasePipe } from '@angular/common';
-import { LucideIconComponent } from '@restaurant/shared/ui';
+import { LucideIconComponent, HasPermissionDirective } from '@restaurant/shared/ui';
 import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
 import { RequisicionItem } from '../../../models/requisicion.model';
 import { I18nService } from '../../../i18n/i18n.service';
@@ -33,7 +33,7 @@ const ESTADO_CLASS: Record<string, string> = {
 @Component({
   selector: 'restaurant-requisiciones-detalle',
   standalone: true,
-  imports: [RouterModule, LucideIconComponent, DecimalPipe, TitleCasePipe],
+  imports: [RouterModule, LucideIconComponent, HasPermissionDirective, DecimalPipe, TitleCasePipe],
   templateUrl: './requisiciones-detalle.component.html',
   styleUrl: './requisiciones-detalle.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

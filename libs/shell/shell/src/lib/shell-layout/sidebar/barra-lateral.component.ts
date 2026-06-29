@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { LucideBox, LucideDynamicIcon, LucideLogOut, LucideSettings, LucideUser } from '@lucide/angular';
 import { AuthService } from '@restaurant/shared/auth';
-import { BarraLateralConfig } from '../../nav/nav.models';
+import { BarraLateralConfig, NavItem } from '../../nav/nav.models';
+import { Rol } from '@restaurant/shared/models';
 import { I18nService } from '../../i18n/i18n.service';
 import { AsistenteUiService } from '../asistente/asistente-ui.service';
 
@@ -46,19 +47,47 @@ export class BarraLateralComponent {
     return this.config.grupos
       .map(grupo => ({
         ...grupo,
-        items: grupo.items.filter(item => {
-          if (bypass) return true;
-          if (item.roles?.length && (!currentRole || !item.roles.includes(currentRole))) {
-            return false;
-          }
-          if (item.permisos?.length) {
-            return item.permisos.some(p => permisos.includes(p));
-          }
-          return true;
-        }),
+        items: this.filterItems(grupo.items, bypass, currentRole, permisos),
       }))
       .filter(grupo => grupo.items.length > 0);
   });
+
+  /**
+   * Filters nav items by role and permission, recursively pruning children.
+   * A parent that declared children but ends up with none visible is hidden,
+   * so a role only sees the entries the backend actually authorizes.
+   */
+  private filterItems(
+    items: NavItem[],
+    bypass: boolean,
+    currentRole: Rol | undefined,
+    permisos: string[],
+  ): NavItem[] {
+    return items
+      .filter(item => this.isItemVisible(item, bypass, currentRole, permisos))
+      .map(item => {
+        if (!item.children?.length) return item;
+        const children = this.filterItems(item.children, bypass, currentRole, permisos);
+        return { ...item, children };
+      })
+      .filter(item => !item.children || item.children.length > 0 || bypass);
+  }
+
+  private isItemVisible(
+    item: NavItem,
+    bypass: boolean,
+    currentRole: Rol | undefined,
+    permisos: string[],
+  ): boolean {
+    if (bypass) return true;
+    if (item.roles?.length && (!currentRole || !item.roles.includes(currentRole))) {
+      return false;
+    }
+    if (item.permisos?.length) {
+      return item.permisos.some(p => permisos.includes(p));
+    }
+    return true;
+  }
 
   toggleItem(ruta: string): void {
     this.expandedItems.update(current => {

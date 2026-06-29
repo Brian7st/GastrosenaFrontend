@@ -13,6 +13,7 @@ import {
   ButtonComponent,
   StatusBadgeComponent,
   LucideIconComponent,
+  HasPermissionDirective,
 } from '@restaurant/shared/ui';
 import {
   AlertaPrioridad
@@ -25,7 +26,7 @@ import { I18nService } from '../../../i18n/i18n.service';
   selector: 'restaurant-alertas-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterModule, KpiCardComponent, ButtonComponent, StatusBadgeComponent, LucideIconComponent, EmptyStateComponent],
+  imports: [RouterModule, KpiCardComponent, ButtonComponent, StatusBadgeComponent, LucideIconComponent, HasPermissionDirective, EmptyStateComponent],
   templateUrl: './alertas-list.component.html',
   styleUrl: './alertas-list.component.scss',
 })

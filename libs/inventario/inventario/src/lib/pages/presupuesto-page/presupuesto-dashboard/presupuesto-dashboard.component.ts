@@ -9,6 +9,7 @@ import {
   ButtonComponent,
   StatusBadgeComponent,
   InputComponent,
+  HasPermissionDirective,
 } from '@restaurant/shared/ui';
 import { AfectacionPresupuestal } from '../../../models/presupuesto.model';
 import { PresupuestoFacade } from '../../../data-access/presupuesto.facade';
@@ -35,6 +36,7 @@ import { I18nService } from '../../../i18n/i18n.service';
     ButtonComponent,
     StatusBadgeComponent,
     InputComponent,
+    HasPermissionDirective,
     FormatoMonedaPipe,
     ExportarComponent,
   ],

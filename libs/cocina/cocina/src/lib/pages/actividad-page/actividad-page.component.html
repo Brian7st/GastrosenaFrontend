@@ -3,9 +3,9 @@
   <!-- ===== CABECERA ===== -->
   <div class="page-header">
     <div class="header-left">
-      <h1 class="page-title">{{ i18n.t('actividad.page.title') }}</h1>
+      <h1 class="page-title">Actividad</h1>
       <p class="page-subtitle">
-        {{ i18n.t('actividad.page.subtitle') }}
+        Registro y evaluación de actividades académicas para aprendices.
       </p>
     </div>
   </div>
@@ -18,12 +18,12 @@
 
       <!-- Fecha -->
       <div class="form-group full-width">
-        <label class="form-label" for="act-fecha">{{ i18n.t('actividad.fecha') }}</label>
+        <label class="form-label" for="act-fecha">Fecha</label>
         <input
           id="act-fecha"
           type="date"
           class="form-input"
-          [placeholder]="i18n.t('actividad.fecha_placeholder')"
+          placeholder="dd/mm/aaaa"
           min="2020-01-01"
           max="2050-12-31"
           (change)="fecha.set($any($event.target).value)"
@@ -34,23 +34,23 @@
       <div class="form-row">
         <div class="form-group">
           <label class="form-label" for="act-nombre">
-            {{ i18n.t('actividad.nombre_label') }}
+            Nombre de actividad <span class="required">*</span>
           </label>
           <input
             id="act-nombre"
             type="text"
             class="form-input"
-            [placeholder]="i18n.t('actividad.nombre_placeholder')"
+            placeholder="Ej: Fundamentos de Redes"
             (input)="nombreActividad.set($any($event.target).value)"
           />
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="act-jornada">{{ i18n.t('actividad.jornada_label') }}</label>
+          <label class="form-label" for="act-jornada">Jornada</label>
           <div class="select-wrapper">
             <select id="act-jornada" class="form-select" (change)="jornada.set($any($event.target).value)">
-              <option value="" disabled selected>{{ i18n.t('actividad.jornada_placeholder') }}</option>
-              @for (j of jornadas(); track j.value) {
+              <option value="" disabled selected>Seleccione una jornada</option>
+              @for (j of jornadas; track j.value) {
                 <option [value]="j.value">{{ j.label }}</option>
               }
             </select>
@@ -59,36 +59,87 @@
         </div>
       </div>
 
-      <!-- Número de ficha -->
-      <div class="form-group full-width">
-        <label class="form-label" for="act-ficha">{{ i18n.t('actividad.ficha_label') }}</label>
-        <input
-          id="act-ficha"
-          type="text"
-          class="form-input"
-          [placeholder]="i18n.t('actividad.ficha_placeholder')"
-          (input)="numeroFicha.set($any($event.target).value)"
-        />
+      <!-- Número de ficha — buscador con dropdown -->
+      <div class="form-group full-width ficha-search-wrapper">
+        <label class="form-label" for="act-ficha">
+          Número de ficha <span class="required">*</span>
+        </label>
+
+        <div class="ficha-combobox" [class.is-open]="fichaDropdownOpen()">
+          <!-- Input de búsqueda -->
+          <div class="ficha-input-row">
+            <lucide-icon name="search" size="16" class="ficha-search-icon"></lucide-icon>
+            <input
+              id="act-ficha"
+              type="text"
+              class="form-input ficha-input"
+              placeholder="Buscar ficha por número..."
+              [value]="fichaBusqueda()"
+              (input)="onFichaBusquedaInput($any($event.target).value)"
+              (focus)="abrirFichaDropdown()"
+              (blur)="cerrarFichaDropdown()"
+              autocomplete="off"
+            />
+            @if (fichasCargando()) {
+              <span class="ficha-loading-dot"></span>
+            }
+            @if (numeroFicha()) {
+              <lucide-icon name="check-circle" size="16" class="ficha-ok-icon"></lucide-icon>
+            }
+          </div>
+
+          <!-- Dropdown lista -->
+          @if (fichaDropdownOpen()) {
+            <div class="ficha-dropdown">
+              @if (fichasCargando()) {
+                <div class="ficha-empty">Cargando fichas…</div>
+              } @else if (fichasFiltradas().length === 0) {
+                <div class="ficha-empty">No se encontraron fichas</div>
+              } @else {
+                @for (f of fichasFiltradas(); track f.id) {
+                  <button
+                    type="button"
+                    class="ficha-option"
+                    [class.is-selected]="numeroFicha() === f.numero"
+                    (click)="seleccionarFicha(f.numero)"
+                  >
+                    <span class="ficha-numero">{{ f.numero }}</span>
+                    @if (f.nombre) {
+                      <span class="ficha-nombre">{{ f.nombre }}</span>
+                    }
+                  </button>
+                }
+              }
+            </div>
+          }
+        </div>
+
+        @if (numeroFicha()) {
+          <p class="ficha-selected-hint">
+            <lucide-icon name="check" size="12"></lucide-icon>
+            Ficha <strong>{{ numeroFicha() }}</strong> seleccionada
+          </p>
+        }
       </div>
 
       <!-- Pasos de la actividad -->
       <div class="form-group full-width">
-        <label class="form-label" for="act-pasos">{{ i18n.t('actividad.pasos_label') }}</label>
+        <label class="form-label" for="act-pasos">Pasos de la actividad</label>
         <textarea
           id="act-pasos"
           class="form-textarea"
           rows="5"
-          [placeholder]="i18n.t('actividad.pasos_placeholder')"
+          placeholder="Describa detalladamente los pasos realizados en la actividad..."
           (input)="pasosActividad.set($any($event.target).value)"
         ></textarea>
       </div>
 
       <!-- Trimestre -->
       <div class="form-group">
-        <label class="form-label" for="act-trimestre">{{ i18n.t('actividad.trimestre_label') }}</label>
+        <label class="form-label" for="act-trimestre">Trimestre</label>
         <div class="select-wrapper">
           <select id="act-trimestre" class="form-select" (change)="trimestre.set($any($event.target).value)">
-            @for (t of trimestres(); track t.value) {
+            @for (t of trimestres; track t.value) {
               <option [value]="t.value">{{ t.label }}</option>
             }
           </select>
@@ -100,15 +151,15 @@
       <div class="form-actions">
         <div class="form-actions-row">
           <button id="btn-ver-actividades" class="btn-outline" type="button" (click)="verActividades()">
-            {{ i18n.t('actividad.btn_ver') }}
+            VER ACTIVIDADES
           </button>
           <button id="btn-crear-actividad" class="btn-primary" type="button" [disabled]="!esFormularioValido" (click)="crearActividad()">
-            {{ i18n.t('actividad.btn_crear') }}
+            CREAR ACTIVIDAD
           </button>
         </div>
 
         <p class="form-hint">
-          {{ i18n.t('actividad.hint') }}
+          Asegúrese de que todos los campos obligatorios (*) estén completos antes de evaluar.
         </p>
       </div>
 
@@ -121,19 +172,19 @@
       <div class="panel-card panel-guide">
         <div class="panel-header">
           <lucide-icon name="info" size="18" class="panel-icon info-icon"></lucide-icon>
-          <h3>{{ i18n.t('actividad.guia_titulo') }}</h3>
+          <h3>Guía de Evaluación</h3>
         </div>
         <p class="panel-text">
-          {{ i18n.t('actividad.guia_texto') }}
-          <a href="#" class="link-registro">{{ i18n.t('actividad.guia_enlace') }}</a>.
+          Las actividades se evalúan basándose en las competencias técnicas definidas en el
+          <a href="#" class="link-registro">programa oficial</a>.
         </p>
       </div>
 
       <!-- Historial reciente -->
       <div class="panel-card panel-historial">
-        <h3>{{ i18n.t('actividad.historial_titulo') }}</h3>
+        <h3>Historial Reciente</h3>
         <div class="badges-list">
-          @for (item of historialReciente(); track item.nombre) {
+          @for (item of historialReciente; track item.nombre) {
             <span class="activity-badge" [ngClass]="item.clase">
               {{ item.nombre }} · {{ item.estado }}
             </span>

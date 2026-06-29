@@ -21,8 +21,8 @@ export class PedidosMenuGridComponent {
     this._searchTerm = val.toLowerCase();
   }
   private _searchTerm = '';
-  @Input() category: string = 'all';
-  @Input() subcategory: string = '';
+  @Input() mainCategory: string = 'all';
+  @Input() subCategory: string = 'all';
 
   protected readonly i18n = inject(I18nService);
   private facade = inject(RestauranteFacade);
@@ -34,16 +34,19 @@ export class PedidosMenuGridComponent {
   get products() {
     let filtered = this.facade.productosMenu();
 
-    if (this.category && this.category !== 'all') {
-      filtered = filtered.filter(p => p.category === this.category);
+    if (this.mainCategory !== 'all') {
+      filtered = filtered.filter(p => {
+        const isBeb = !!(p.categoryName || '').toLowerCase().match(/bebida|jugo|licor|café|cafe|alcohol|alcholica|coctel|cóctel/);
+        return this.mainCategory === 'BEBIDA' ? isBeb : !isBeb;
+      });
     }
 
-    if (this.subcategory) {
-      filtered = filtered.filter(p => p.subcategory === this.subcategory);
+    if (this.subCategory !== 'all') {
+      filtered = filtered.filter(p => p.category === this.subCategory);
     }
 
     if (this._searchTerm) {
-      filtered = filtered.filter(p => p.name.toLowerCase().includes(this._searchTerm));
+      filtered = filtered.filter(p => p.name?.toLowerCase().includes(this._searchTerm));
     }
 
     return filtered;
@@ -55,7 +58,17 @@ export class PedidosMenuGridComponent {
       return;
     }
 
-    const categoriaMapped = product.category === 'bebidas' ? 'BEBIDA' : 'COMIDA';
+    const nombreCat = (product.categoryName || '').toLowerCase();
+    const isBebida = nombreCat.includes('bebida') || 
+                     nombreCat.includes('jugo') || 
+                     nombreCat.includes('licor') || 
+                     nombreCat.includes('café') || 
+                     nombreCat.includes('cafe') || 
+                     nombreCat.includes('alcohol') || 
+                     nombreCat.includes('alcholica') || 
+                     nombreCat.includes('coctel') || 
+                     nombreCat.includes('cóctel');
+    const categoriaMapped = isBebida ? 'BEBIDA' : 'COMIDA';
 
     this.facade.agregarProductoAlPedido(
       product.id,

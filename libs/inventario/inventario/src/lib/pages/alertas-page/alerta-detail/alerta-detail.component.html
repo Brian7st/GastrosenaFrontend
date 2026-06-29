@@ -15,13 +15,13 @@
         </div>
       </div>
       <div class="header-right">
-        <restaurant-button variant="surface" (click)="irAUmbral()">
+        <restaurant-button *hasPermission="'alertas:configurar_umbrales'" variant="surface" (click)="irAUmbral()">
           <div class="btn-icon-text">
             <lucide-icon name="settings" [size]="18"></lucide-icon>
             {{ i18n.t('alerta.editar_umbral') }}
           </div>
         </restaurant-button>
-        <restaurant-button variant="primary" (click)="abrirResolver()">
+        <restaurant-button *hasPermission="'alertas:resolver'" variant="primary" (click)="abrirResolver()">
           <div class="btn-icon-text">
             <lucide-icon name="check-circle" [size]="18"></lucide-icon>
             {{ i18n.t('alerta.resolver_ahora') }}

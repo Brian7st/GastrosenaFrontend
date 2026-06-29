@@ -147,13 +147,33 @@ export class FichasPageComponent implements OnInit {
     this.onCerrarModal();
   }
 
-  onEliminar(id: string): void {
-    if (!confirm(this.i18n.t('fichas.confirmar_eliminar'))) { return; }
-    this.fichasService.eliminarFicha(id).subscribe({
-      next: () => this.cargarFichas(),
-      error: (err) => console.error(err)
-    });
-  }
+  // ── Modal Eliminar ──────────────────────────────────────────────────────
+
+readonly mostrarModalEliminar = signal(false);
+readonly fichaAEliminar = signal<Ficha | null>(null);
+
+abrirModalEliminar(ficha: Ficha): void {
+  this.fichaAEliminar.set(ficha);
+  this.mostrarModalEliminar.set(true);
+}
+
+cerrarModalEliminar(): void {
+  this.mostrarModalEliminar.set(false);
+  this.fichaAEliminar.set(null);
+}
+
+confirmarEliminar(): void {
+  const ficha = this.fichaAEliminar();
+  if (!ficha) return;
+
+  this.fichasService.eliminarFicha(ficha.id).subscribe({
+    next: () => {
+      this.cerrarModalEliminar();
+      this.cargarFichas();
+    },
+    error: (err) => console.error('Error eliminando ficha:', err),
+  });
+}
 
   onVerAprendices(id: string) {
   this.router.navigate(['app/usuarios/fichas', id, 'detalle']);

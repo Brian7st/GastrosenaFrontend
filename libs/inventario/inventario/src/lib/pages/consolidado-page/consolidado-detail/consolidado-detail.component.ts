@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal, OnInit } 
 // Note: subtotalesPorTipo removed — old fields (tipo/cantidad/referencia) no longer in backend response.
 import { CurrencyPipe } from '@angular/common';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-import { ButtonComponent, DataTableComponent, KpiCardComponent } from '@restaurant/shared/ui';
+import { ButtonComponent, DataTableComponent, KpiCardComponent, HasPermissionDirective } from '@restaurant/shared/ui';
 import { ExportarConsolidadoModalComponent } from '../components/exportar-consolidado-modal/exportar-consolidado-modal.component';
 import { ReversarConsolidadoModalComponent } from '../components/reversar-consolidado-modal/reversar-consolidado-modal.component';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
@@ -12,7 +12,7 @@ import { I18nService } from '../../../i18n/i18n.service';
 @Component({
   selector: 'restaurant-consolidado-detail',
   standalone: true,
-  imports: [RouterModule, CurrencyPipe, ButtonComponent, DataTableComponent, KpiCardComponent, ExportarConsolidadoModalComponent, ReversarConsolidadoModalComponent, BackButtonComponent],
+  imports: [RouterModule, CurrencyPipe, ButtonComponent, DataTableComponent, KpiCardComponent, HasPermissionDirective, ExportarConsolidadoModalComponent, ReversarConsolidadoModalComponent, BackButtonComponent],
   templateUrl: './consolidado-detail.component.html',
   styleUrl: './consolidado-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

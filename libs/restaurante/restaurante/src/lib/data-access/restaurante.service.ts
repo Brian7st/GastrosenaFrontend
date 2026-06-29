@@ -135,18 +135,24 @@ export class RestauranteService {
     return this.http.patch<PedidoResponse>(`${this.pedidosUrl}/${id}/devolver`, null, { params });
   }
 
-  cancelarDetallePedido(idDetalle: string, motivo?: string): Observable<PedidoResponse> {
+  cancelarDetallePedido(idDetalle: string, motivo?: string, cantidad?: number): Observable<PedidoResponse> {
     let params = new HttpParams();
     if (motivo) {
       params = params.set('motivo', motivo);
     }
+    if (cantidad !== undefined && cantidad !== null) {
+      params = params.set('cantidad', cantidad.toString());
+    }
     return this.http.patch<PedidoResponse>(`${this.pedidosUrl}/detalle/${idDetalle}/cancelar`, null, { params });
   }
 
-  devolverDetallePedido(idDetalle: string, motivo?: string): Observable<PedidoResponse> {
+  devolverDetallePedido(idDetalle: string, motivo?: string, cantidad?: number): Observable<PedidoResponse> {
     let params = new HttpParams();
     if (motivo) {
       params = params.set('motivo', motivo);
+    }
+    if (cantidad !== undefined && cantidad !== null) {
+      params = params.set('cantidad', cantidad.toString());
     }
     return this.http.patch<PedidoResponse>(`${this.pedidosUrl}/detalle/${idDetalle}/devolver`, null, { params });
   }

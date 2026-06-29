@@ -6,7 +6,7 @@
       <p class="page-subtitle">{{ i18n.t('acta.subtitulo') }}</p>
     </div>
     <div class="header-actions">
-      <restaurant-button variant="primary" (click)="crearActa()">
+      <restaurant-button *hasPermission="'actas:crear'" variant="primary" (click)="crearActa()">
         <div class="btn-icon-text">
           <lucide-icon name="plus-circle" [size]="20"></lucide-icon>
           {{ i18n.t('acta.nueva') }}

@@ -55,7 +55,11 @@ export const shellRoutes: Routes = [
       },
       {
         path: 'inventario',
-        canActivate: [permissionGuard(['bienes:ver', 'facturas:ver', 'consolidado:ver', 'alertas:ver', 'FACTURAS_GENERAR'])],
+        canActivate: [permissionGuard([
+          'bienes:ver', 'facturas:ver', 'consolidado:ver', 'alertas:ver', 'FACTURAS_GENERAR',
+          // Acceso de legalización/formación (INSTRUCTOR) — el guard pasa con cualquiera de estos.
+          'MODULO_LEGALIZACION_VER', 'requisiciones:ver', 'actas:ver', 'paquete:ver', 'solicitudes:ver',
+        ])],
         loadChildren: () =>
           import('@restaurant/inventario').then(m => m.INVENTARIO_ROUTES),
       },

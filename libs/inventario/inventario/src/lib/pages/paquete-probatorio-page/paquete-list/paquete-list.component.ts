@@ -14,6 +14,7 @@ import {
   LucideIconComponent,
   KpiCardComponent,
   ButtonComponent,
+  HasPermissionDirective,
 } from '@restaurant/shared/ui';
 import { PaqueteProbatorio, PaqueteEstado } from '../../../models/paquete.model';
 import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
@@ -30,6 +31,7 @@ import { I18nService } from '../../../i18n/i18n.service';
     LucideIconComponent,
     KpiCardComponent,
     ButtonComponent,
+    HasPermissionDirective,
     EmptyStateComponent,
 ],
   templateUrl: './paquete-list.component.html',

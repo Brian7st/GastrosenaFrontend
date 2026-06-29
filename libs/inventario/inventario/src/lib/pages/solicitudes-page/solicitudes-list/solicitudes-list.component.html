@@ -7,7 +7,7 @@
     <p class="page-subtitle">{{ i18n.t('solicitudes-list.subtitle') }}</p>
   </div>
   <div style="display: flex; gap: 1rem;">
-    <restaurant-button variant="primary" routerLink="generar">
+    <restaurant-button *hasPermission="'gil:crear'" variant="primary" routerLink="generar">
       <span class="material-symbols-outlined">library_add_check</span>
       {{ i18n.t('solicitudes-list.generar_gil') }}
     </restaurant-button>
@@ -149,7 +149,7 @@
           <button class="action-icon" (click)="onView(s.id)" [title]="i18n.t('solicitudes-list.ver_detalle')">
             <span class="material-symbols-outlined">visibility</span>
           </button>
-          <button class="action-icon"
+          <button *hasPermission="'gil:editar'" class="action-icon"
                   (click)="onEdit(s.id)"
                   [disabled]="!canEdit(s.estado)"
                   [title]="i18n.t('solicitudes-list.editar')">
@@ -159,7 +159,7 @@
           <button class="action-icon" (click)="onExportPdf(s.id)" [title]="i18n.t('solicitudes-list.exportar_pdf')">
             <span class="material-symbols-outlined">picture_as_pdf</span>
           </button>
-          <button class="action-icon action-icon--danger"
+          <button *hasPermission="'gil:editar'" class="action-icon action-icon--danger"
                   (click)="onDelete(s)"
                   [title]="i18n.t('solicitudes-list.eliminar')">
             <span class="material-symbols-outlined">delete</span>

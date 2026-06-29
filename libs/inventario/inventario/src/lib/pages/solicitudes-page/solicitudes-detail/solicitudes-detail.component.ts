@@ -3,14 +3,14 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
-import { ButtonComponent } from '@restaurant/shared/ui';
+import { ButtonComponent, HasPermissionDirective } from '@restaurant/shared/ui';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-solicitudes-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, BackButtonComponent, ButtonComponent],
+  imports: [CommonModule, RouterModule, FormsModule, BackButtonComponent, ButtonComponent, HasPermissionDirective],
   templateUrl: './solicitudes-detail.component.html',
   styleUrl: './solicitudes-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

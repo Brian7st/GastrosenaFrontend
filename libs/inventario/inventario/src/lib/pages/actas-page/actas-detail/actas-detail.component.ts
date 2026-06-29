@@ -8,6 +8,7 @@ import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import {
   StatusBadgeComponent,
   LucideIconComponent,
+  HasPermissionDirective,
 } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { ActaDocumentoComponent } from '../../../components/acta-documento/acta-documento.component';
@@ -23,6 +24,7 @@ import { I18nService } from '../../../i18n/i18n.service';
     RouterModule,
     StatusBadgeComponent,
     LucideIconComponent,
+    HasPermissionDirective,
     BackButtonComponent,
     ActaDocumentoComponent,
   ],

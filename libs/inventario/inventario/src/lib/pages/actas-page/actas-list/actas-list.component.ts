@@ -13,6 +13,7 @@ import {
   StatusBadgeComponent,
   LucideIconComponent,
   ButtonComponent,
+  HasPermissionDirective,
 } from '@restaurant/shared/ui';
 import { ActaEstado } from '../../../models/acta.model';
 import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
@@ -28,6 +29,7 @@ import { I18nService } from '../../../i18n/i18n.service';
     StatusBadgeComponent,
     LucideIconComponent,
     ButtonComponent,
+    HasPermissionDirective,
     EmptyStateComponent,
   ],
   templateUrl: './actas-list.component.html',

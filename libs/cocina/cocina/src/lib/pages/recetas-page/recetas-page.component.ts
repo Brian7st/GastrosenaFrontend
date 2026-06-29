@@ -1,11 +1,12 @@
 import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { I18nService } from '../../i18n/i18n.service';
 import { RecetaService } from '../../data-access/receta.service';
+import { CategoriaService } from '../../data-access/categoria.service';
 import { Receta } from '../../models/receta.model';
 import { DetalleRecetaComponent } from '../../components/detalle-receta/detalle-receta.component';
 import { GestionRecetaComponent } from '../../components/gestion-receta/gestion-receta.component';
 import { GestionCategoriasComponent } from '../../components/gestion-categorias/gestion-categorias.component';
+import { Rol } from '@restaurant/shared/models';
 import {
   LucideIconComponent,
   PageHeaderComponent,
@@ -15,7 +16,8 @@ import {
   EmptyStateComponent,
   CardComponent,
   ConfirmDialogComponent,
-  AlertComponent
+  AlertComponent,
+  HasRoleDirective
 } from '@restaurant/shared/ui';
 
 @Component({
@@ -34,15 +36,17 @@ import {
     EmptyStateComponent,
     CardComponent,
     ConfirmDialogComponent,
-    AlertComponent
+    AlertComponent,
+    HasRoleDirective
   ],
   templateUrl: './recetas-page.component.html',
   styleUrl: './recetas-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RecetasPageComponent implements OnInit {
-  protected readonly i18n = inject(I18nService);
+  protected readonly Rol = Rol;
   public recetaService = inject(RecetaService);
+  public categoriaService = inject(CategoriaService);
 
   searchTerm = signal<string>('');
   categoriaSeleccionada = signal<string>('');
@@ -59,12 +63,13 @@ export class RecetasPageComponent implements OnInit {
   alertMessage = signal<string>('');
   alertType = signal<'success' | 'error' | 'warning' | 'info'>('info');
 
-  opcionesCategoria = computed(() => [
-    { label: this.i18n.t('recetas.opcion_todas'), value: '' },
-    { label: this.i18n.t('recetas.opcion_platos_fuertes'), value: 'platos fuertes' },
-    { label: this.i18n.t('recetas.opcion_entradas'), value: 'entradas' },
-    { label: this.i18n.t('recetas.opcion_postres'), value: 'postres' }
-  ]);
+  opcionesCategoria = computed(() => {
+    const cats = this.categoriaService.categorias();
+    return [
+      { label: 'Todas las categorías', value: '' },
+      ...cats.map(c => ({ label: c.nombreCategoria, value: c.nombreCategoria }))
+    ];
+  });
 
   recetasFiltradas = computed(() => {
     const term = this.searchTerm().toLowerCase();
@@ -100,6 +105,7 @@ export class RecetasPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.recetaService.listar();
+    this.categoriaService.listar();
   }
 
   verDetalle(receta: Receta) {
@@ -127,6 +133,7 @@ export class RecetasPageComponent implements OnInit {
     this.mostrarCategorias.set(false);
     if (actualizoDatos) {
       this.recetaService.listar();
+      this.categoriaService.listar();
     }
   }
 
@@ -145,7 +152,7 @@ export class RecetasPageComponent implements OnInit {
     if (id) {
       this.recetaService.eliminarReceta(id).subscribe({
         next: () => {
-          this.mostrarAlerta('success', this.i18n.t('recetas.alerta_eliminada'));
+          this.mostrarAlerta('success', 'Receta eliminada correctamente');
           this.recetaService.listar();
         },
         error: (err) => {
@@ -153,9 +160,9 @@ export class RecetasPageComponent implements OnInit {
           // Fallback: si es un ID de prueba o el backend está apagado (status 0)
           if (id.startsWith('R-') || err.status === 0) {
             this.recetaService.recetas.update(recetas => recetas.filter(r => r.idReceta !== id));
-            this.mostrarAlerta('success', this.i18n.t('recetas.alerta_eliminada_local'));
+            this.mostrarAlerta('success', 'Receta eliminada localmente (Modo de prueba)');
           } else {
-            this.mostrarAlerta('error', this.i18n.t('recetas.alerta_error_eliminar'));
+            this.mostrarAlerta('error', 'No se pudo eliminar la receta.');
           }
         }
       });

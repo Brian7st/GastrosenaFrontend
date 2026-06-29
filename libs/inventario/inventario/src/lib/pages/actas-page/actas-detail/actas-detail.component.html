@@ -38,11 +38,11 @@
 
         <!-- FIRMADA → Aprobar + Crear Paquete -->
         @if (a.estado === 'FIRMADA') {
-          <button class="acta-detail__btn-aprobar" (click)="revisarActa()">
+          <button *hasPermission="'actas:revisar'" class="acta-detail__btn-aprobar" (click)="revisarActa()">
             <lucide-icon name="check-circle" [size]="16"></lucide-icon>
             {{ i18n.t('acta.aprobar') }}
           </button>
-          <button class="acta-detail__btn-aprobar"
+          <button *hasPermission="'paquete:crear'" class="acta-detail__btn-aprobar"
                   [routerLink]="['/app/inventario/paquete-probatorio/nuevo']"
                   [queryParams]="{ actaId: a.id, requisicionId: a.requisicionId }">
             <lucide-icon name="package" [size]="16"></lucide-icon>
@@ -52,7 +52,7 @@
 
         <!-- REVISADA → Archivar -->
         @if (a.estado === 'REVISADA') {
-          <button class="acta-detail__btn-archivar" (click)="cambiarEstado('ARCHIVADA')">
+          <button *hasPermission="'actas:archivar'" class="acta-detail__btn-archivar" (click)="cambiarEstado('ARCHIVADA')">
             <lucide-icon name="archive" [size]="16"></lucide-icon>
             {{ i18n.t('acta.archivar') }}
           </button>

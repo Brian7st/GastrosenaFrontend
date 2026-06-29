@@ -6,7 +6,7 @@
       <p class="paquete-page__subtitle">{{ i18n.t('paquete.subtitulo') }}</p>
     </div>
     <div class="header-actions">
-      <restaurant-button variant="primary" (click)="crearPaquete()">
+      <restaurant-button *hasPermission="'paquete:crear'" variant="primary" (click)="crearPaquete()">
         <div class="btn-icon-text">
           <lucide-icon name="plus" [size]="20"></lucide-icon>
           {{ i18n.t('paquete.crear') }}

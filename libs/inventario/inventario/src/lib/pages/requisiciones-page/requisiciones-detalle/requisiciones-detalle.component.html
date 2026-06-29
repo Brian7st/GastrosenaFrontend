@@ -150,7 +150,7 @@
 
     <!-- Enviar al Economato — solo cuando BORRADOR (RF-5.9.2) -->
     @if (estado() === 'BORRADOR') {
-      <button class="btn-primary" (click)="enviar()" [disabled]="loading()">
+      <button *hasPermission="'requisiciones:enviar'" class="btn-primary" (click)="enviar()" [disabled]="loading()">
         <lucide-icon name="send" [size]="18"></lucide-icon>
         {{ i18n.t('req.enviar_economato') }}
       </button>
@@ -158,7 +158,7 @@
 
     <!-- Registrar Despacho — solo cuando ENVIADA (RF-5.9.3) -->
     @if (estado() === 'ENVIADA') {
-      <button class="btn-primary"
+      <button *hasPermission="'requisiciones:despachar'" class="btn-primary"
               [routerLink]="['/app/inventario/requisiciones/despacho', reqId()]">
         <lucide-icon name="truck" [size]="18"></lucide-icon>
         {{ i18n.t('req.registrar_despacho') }}
@@ -167,7 +167,7 @@
 
     <!-- Confirmar Recepción / Firmar — solo cuando DESPACHADA (RF-5.9.6) -->
     @if (estado() === 'DESPACHADA') {
-      <button class="btn-primary"
+      <button *hasPermission="'requisiciones:firmar'" class="btn-primary"
               [routerLink]="['/app/inventario/requisiciones/firmar', reqId()]">
         <lucide-icon name="pen-tool" [size]="18"></lucide-icon>
         {{ i18n.t('req.confirmar_recepcion') }}
@@ -176,7 +176,7 @@
 
     <!-- Crear Acta — solo cuando FIRMADA (RF-5.9.6) -->
     @if (estado() === 'FIRMADA') {
-      <button class="btn-primary"
+      <button *hasPermission="'actas:crear'" class="btn-primary"
               [routerLink]="['/app/inventario/actas/nueva']"
               [queryParams]="{ requisicionId: reqId() }">
         <lucide-icon name="file-plus" [size]="18"></lucide-icon>

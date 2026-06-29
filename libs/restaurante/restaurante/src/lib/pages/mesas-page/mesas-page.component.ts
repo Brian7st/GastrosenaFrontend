@@ -314,7 +314,18 @@ export class MesasPageComponent {
     if (!mesa) return;
 
     const rawNombre = this.editNombre().trim();
-    const nombre    = rawNombre ? `MESA ${rawNombre}` : '';
+    
+    // Calcular el nombre original limpio igual que al abrir el modal
+    const nombreLimpioOriginal = mesa.nombre.toUpperCase().startsWith('MESA ') 
+      ? mesa.nombre.substring(5).trim() 
+      : mesa.nombre.trim();
+      
+    // Si el nombre ingresado es idéntico al original, enviar el nombre exacto de la base de datos
+    // para evitar que el backend lo vea diferente por espacios o mayúsculas y lance error de duplicado
+    const nombre = (rawNombre === nombreLimpioOriginal) 
+      ? mesa.nombre 
+      : (rawNombre ? `MESA ${rawNombre}` : '');
+
     const capacidad = this.editCapacidad();
     const zona = this.editZona().trim();
     const obs = this.editObservaciones().trim();

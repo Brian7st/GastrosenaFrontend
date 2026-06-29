@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { ButtonComponent, DataTableComponent, KpiCardComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
+import { ButtonComponent, DataTableComponent, KpiCardComponent, StatusBadgeComponent, HasPermissionDirective } from '@restaurant/shared/ui';
 import { ExportarConsolidadoModalComponent } from '../components/exportar-consolidado-modal/exportar-consolidado-modal.component';
 import { ReversarConsolidadoModalComponent } from '../components/reversar-consolidado-modal/reversar-consolidado-modal.component';
 import { Consolidado } from '../../../models/consolidado.model';
@@ -13,7 +13,7 @@ import { I18nService } from '../../../i18n/i18n.service';
 @Component({
   selector: 'restaurant-consolidado-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent, StatusBadgeComponent, ExportarConsolidadoModalComponent, ReversarConsolidadoModalComponent, EmptyStateComponent],
+  imports: [CommonModule, RouterModule, ButtonComponent, DataTableComponent, KpiCardComponent, StatusBadgeComponent, HasPermissionDirective, ExportarConsolidadoModalComponent, ReversarConsolidadoModalComponent, EmptyStateComponent],
   templateUrl: './consolidado-list.component.html',
   styleUrl: './consolidado-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

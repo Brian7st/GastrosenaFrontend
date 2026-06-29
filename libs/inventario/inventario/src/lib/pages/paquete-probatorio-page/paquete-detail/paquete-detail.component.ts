@@ -11,6 +11,7 @@ import {
   StatusBadgeComponent,
   LucideIconComponent,
   ButtonComponent,
+  HasPermissionDirective,
 } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import {
@@ -30,6 +31,7 @@ import { I18nService } from '../../../i18n/i18n.service';
     StatusBadgeComponent,
     LucideIconComponent,
     ButtonComponent,
+    HasPermissionDirective,
     BackButtonComponent
 ],
   templateUrl: './paquete-detail.component.html',

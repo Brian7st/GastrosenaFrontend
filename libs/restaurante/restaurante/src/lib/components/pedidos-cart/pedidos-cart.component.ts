@@ -46,11 +46,14 @@ export class PedidosCartComponent {
   showDevolverBackendModal = signal(false);
   showItemActionModal = signal(false);
   
+  errorModalVisible = signal(false);
+  errorMessage = signal('');
   motivoAnulacion = signal('');
   motivoDevolucion = signal('');
   motivoItem = signal('');
   
-  itemAccionActual = signal<{id: string, nombre: string, tipo: 'CANCELAR' | 'DEVOLVER'} | null>(null);
+  itemAccionActual = signal<{id: string, nombre: string, tipo: 'CANCELAR' | 'DEVOLVER', maxCantidad: number} | null>(null);
+  cantidadItemAccion = signal<number>(1);
 
   editIndex = signal<number | null>(null);
   tempObservacion = signal<string>('');
@@ -131,10 +134,12 @@ export class PedidosCartComponent {
     if (!this.motivoAnulacion().trim()) return;
     this.showAnularBackendModal.set(false);
     this.facade.cancelarPedidoActivoEnBackend(this.motivoAnulacion()).subscribe({
-      next: (exito) => {
-        if (exito) {
+      next: (res) => {
+        if (res.exito) {
           this.motivoAnulacion.set('');
           this.router.navigate(['/app/restaurante/mesas']);
+        } else {
+          this.mostrarError(res.mensaje || 'Error al cancelar el pedido');
         }
       }
     });
@@ -148,20 +153,36 @@ export class PedidosCartComponent {
     if (!this.motivoDevolucion().trim()) return;
     this.showDevolverBackendModal.set(false);
     this.facade.devolverPedidoActivoEnBackend(this.motivoDevolucion()).subscribe({
-      next: (exito) => {
-        if (exito) {
+      next: (res) => {
+        if (res.exito) {
           this.motivoDevolucion.set('');
           this.router.navigate(['/app/restaurante/mesas']);
+        } else {
+          this.mostrarError(res.mensaje || 'Error al devolver el pedido');
         }
       }
     });
   }
 
-  iniciarAccionItem(id: string | undefined, nombre: string, tipo: 'CANCELAR' | 'DEVOLVER') {
+  iniciarAccionItem(id: string | undefined, nombre: string, tipo: 'CANCELAR' | 'DEVOLVER', maxCantidad: number) {
     if (!id) return;
-    this.itemAccionActual.set({ id, nombre, tipo });
+    this.itemAccionActual.set({ id, nombre, tipo, maxCantidad });
     this.motivoItem.set('');
+    this.cantidadItemAccion.set(maxCantidad);
     this.showItemActionModal.set(true);
+  }
+
+  incrementarCantidadAccion() {
+    const accion = this.itemAccionActual();
+    if (accion && this.cantidadItemAccion() < accion.maxCantidad) {
+      this.cantidadItemAccion.update(c => c + 1);
+    }
+  }
+
+  decrementarCantidadAccion() {
+    if (this.cantidadItemAccion() > 1) {
+      this.cantidadItemAccion.update(c => c - 1);
+    }
   }
 
   ejecutarAccionItem() {
@@ -171,18 +192,28 @@ export class PedidosCartComponent {
     const motivo = this.motivoItem();
     if (!motivo.trim()) return;
 
+    const cantidad = this.cantidadItemAccion();
+
     this.showItemActionModal.set(false);
 
     if (accion.tipo === 'CANCELAR') {
-      this.facade.cancelarItemPedido(accion.id, motivo).subscribe({
-        next: (exito) => {
-          if (exito) this.limpiarAccionItem();
+      this.facade.cancelarItemPedido(accion.id, motivo, cantidad).subscribe({
+        next: (res) => {
+          if (res.exito) {
+            this.limpiarAccionItem();
+          } else {
+            this.mostrarError(res.mensaje || 'Error al cancelar el ítem');
+          }
         }
       });
     } else {
-      this.facade.devolverItemPedido(accion.id, motivo).subscribe({
-        next: (exito) => {
-          if (exito) this.limpiarAccionItem();
+      this.facade.devolverItemPedido(accion.id, motivo, cantidad).subscribe({
+        next: (res) => {
+          if (res.exito) {
+            this.limpiarAccionItem();
+          } else {
+            this.mostrarError(res.mensaje || 'Error al devolver el ítem');
+          }
         }
       });
     }
@@ -191,7 +222,36 @@ export class PedidosCartComponent {
   limpiarAccionItem() {
     this.itemAccionActual.set(null);
     this.motivoItem.set('');
+    this.cantidadItemAccion.set(1);
     this.showItemActionModal.set(false);
+  }
+
+  getEstadoDetalleClass(estado?: string): string {
+    if (!estado) return 'estado-pendiente';
+    switch (estado.toUpperCase()) {
+      case 'PREPARANDO': return 'estado-preparando';
+      case 'TERMINADO': return 'estado-terminado';
+      case 'CANCELADO': return 'estado-cancelado';
+      case 'EN_DEVOLUCION': return 'estado-cancelado';
+      case 'DEVUELTO': return 'estado-cancelado';
+      default: return 'estado-pendiente';
+    }
+  }
+
+  getEstadoDetalleText(estado?: string): string {
+    if (!estado) return 'Pendiente';
+    const cleanEstado = estado.replace('_', ' ');
+    return cleanEstado.charAt(0).toUpperCase() + cleanEstado.slice(1).toLowerCase();
+  }
+
+  mostrarError(mensaje: string) {
+    this.errorMessage.set(mensaje);
+    this.errorModalVisible.set(true);
+  }
+
+  cerrarErrorModal() {
+    this.errorModalVisible.set(false);
+    this.errorMessage.set('');
   }
 }
 
