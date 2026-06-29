@@ -8,7 +8,9 @@ import {
   RespuestaLimpieza,
 } from '../models/bien-limpieza.model';
 
-const CATALOG_PRODUCTOS = 'api/v1/catalog/productos';
+// API_BASE_URL ya aporta el prefijo '/api'; la ruta del catálogo va con '/v1'.
+// Antes decía 'api/v1/...' y generaba '/api/api/v1/...' (404 → "Error al cargar bienes inactivos").
+const CATALOG_PRODUCTOS = 'v1/catalog/productos';
 
 @Injectable({ providedIn: 'root' })
 export class BienLimpiezaService {
