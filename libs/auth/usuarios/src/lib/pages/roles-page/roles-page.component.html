@@ -119,17 +119,22 @@
             <th>{{ i18n.t('roles.col_aprendiz') }}</th>
             <th>{{ i18n.t('roles.col_rol_actual') }}</th>
             <th>{{ i18n.t('roles.col_ficha') }}</th>
+            <th>Estado</th>
             <th>{{ i18n.t('roles.col_acciones') }}</th>
           </tr>
         </thead>
         <tbody>
           @for (u of aprendices(); track u.id) {
-            <tr [class.roles-page__row--selected]="estaSeleccionado(u.id)">
+            <tr
+              [class.roles-page__row--selected]="estaSeleccionado(u.id)"
+              [class.roles-page__row--inactivo]="!u.activo"
+            >
               <td class="roles-page__col-check">
                 <input
                   class="roles-page__checkbox"
                   type="checkbox"
                   [checked]="estaSeleccionado(u.id)"
+                  [disabled]="!u.activo"
                   (change)="onToggleSeleccion(u.id)"
                 >
               </td>
@@ -150,10 +155,20 @@
               </td>
               <td class="roles-page__ficha">{{ u.ficha || '—' }}</td>
               <td>
+                <span
+                  class="roles-page__estado-badge"
+                  [class.roles-page__estado-badge--activo]="u.activo"
+                  [class.roles-page__estado-badge--inactivo]="!u.activo"
+                >
+                  {{ u.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td>
                 <button
                   class="roles-page__action-btn"
                   type="button"
                   (click)="onToggleSeleccion(u.id)"
+                  [disabled]="!u.activo"
                   [attr.aria-label]="i18n.t('roles.seleccionar_todos') + ' ' + u.nombre"
                 >
                   <lucide-icon name="user-cog" [size]="16"></lucide-icon>
@@ -162,7 +177,7 @@
             </tr>
           } @empty {
             <tr>
-              <td colspan="5" class="roles-page__empty-cell">
+              <td colspan="6" class="roles-page__empty-cell">
                 <restaurant-empty-state
                   [title]="i18n.t('roles.sin_aprendices')"
                   [message]="i18n.t('roles.sin_aprendices_msg')"

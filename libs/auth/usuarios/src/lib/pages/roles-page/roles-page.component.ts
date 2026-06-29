@@ -34,54 +34,27 @@ interface RolSimulacionInfo {
 const ROLES_SIMULACION_INFO: readonly (RolSimulacionInfo & {
   etiquetaTKey: string; descripcionTKey: string; permisosTKeys: string[];
 })[] = [
+  // Solo se gestiona el rol Auxiliar de Cocina en esta vista
   {
-    rol: Rol.MESERO, icono: 'utensils', etiqueta: 'Mesero',
-    etiquetaTKey: 'roles.rol_mesero',
-    descripcion: 'Atención al cliente y toma de pedidos',
-    descripcionTKey: 'roles.desc_mesero',
-    permisos: ['Ver mesas', 'Tomar pedidos', 'Ver comandas'],
-    permisosTKeys: ['roles.perm_mesero_1', 'roles.perm_mesero_2', 'roles.perm_mesero_3'],
-  },
-  {
-    rol: Rol.BARTENDER, icono: 'coffee', etiqueta: 'Bartender',
-    etiquetaTKey: 'roles.rol_bartender',
-    descripcion: 'Preparación de bebidas',
-    descripcionTKey: 'roles.desc_bartender',
-    permisos: ['Ver comandas bar', 'Recetas bebidas'],
-    permisosTKeys: ['roles.perm_bartender_1', 'roles.perm_bartender_2'],
-  },
-  {
-    rol: Rol.CHEF, icono: 'chef-hat', etiqueta: 'Chef',
-    etiquetaTKey: 'roles.rol_chef',
-    descripcion: 'Operaciones de cocina',
-    descripcionTKey: 'roles.desc_chef',
-    permisos: ['Ver comandas', 'Gestionar recetas', 'Ver menú'],
-    permisosTKeys: ['roles.perm_chef_1', 'roles.perm_chef_2', 'roles.perm_chef_3'],
-  },
-  {
-    rol: Rol.AUXILIAR_COCINA, icono: 'package', etiqueta: 'Auxiliar Cocina',
+    rol: Rol.AUXILIAR_COCINA, icono: 'chef-hat', etiqueta: 'Auxiliar de Cocina',
     etiquetaTKey: 'roles.rol_auxiliar',
     descripcion: 'Apoyo en operaciones de cocina',
     descripcionTKey: 'roles.desc_auxiliar',
     permisos: ['Ver comandas', 'Ver ingredientes'],
     permisosTKeys: ['roles.perm_auxiliar_1', 'roles.perm_auxiliar_2'],
   },
-  {
-    rol: Rol.CAJERO, icono: 'receipt', etiqueta: 'Cajero',
-    etiquetaTKey: 'roles.rol_cajero',
-    descripcion: 'Gestión de caja y pagos',
-    descripcionTKey: 'roles.desc_cajero',
-    permisos: ['Gestionar caja', 'Ver facturas'],
-    permisosTKeys: ['roles.perm_cajero_1', 'roles.perm_cajero_2'],
-  },
 ];
 
 const ROLES_SIMULACION_SET = new Set<string>(ROLES_SIMULACION_INFO.map(r => r.rol));
 
+// Todos los roles que NO son Auxiliar de Cocina se tratan como Staff (excluidos de la lista de aprendices)
 const ROLES_STAFF = new Set<string>([
   Rol.ADMINISTRADOR, Rol.CONTADORA, Rol.INSTRUCTOR,
-  
+  Rol.CHEF, Rol.MESERO, Rol.BARTENDER, Rol.CAJERO,
 ]);
+
+// Solo se muestran en la tabla los usuarios con rol AUXILIAR_COCINA
+const ROLES_APRENDIZ = new Set<string>([Rol.AUXILIAR_COCINA]);
 
 @Component({
   selector: 'restaurant-roles-page',
@@ -110,8 +83,9 @@ export class RolesPageComponent implements OnInit {
 
   readonly rolesInfo = ROLES_SIMULACION_INFO;
 
+  // Solo muestra usuarios con rol AUXILIAR_COCINA (activos e inactivos)
   readonly aprendices = computed(() =>
-    this.usuarios().filter(u => !ROLES_STAFF.has(u.rol as string)),
+    this.usuarios().filter(u => ROLES_APRENDIZ.has(u.rol as string)),
   );
 
   readonly totalAprendices = computed(() => this.aprendices().length);
@@ -140,7 +114,8 @@ export class RolesPageComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    this.facade.cargarUsuarios();
+    // Cargar usuarios filtrando por rol AUXILIAR_COCINA desde el backend
+    this.facade.cargarUsuarios({ rol: 'AUXILIAR_COCINA', tamano: 500 } as any);
   }
 
   onToggleSeleccion(id: string): void {

@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 // ── DTOs alineados con el backend ─────────────────────────────────────────────
 
@@ -30,7 +31,7 @@ export interface AprendizDTO {
   inicial: string;
   ficha: string;
   jornada: string;
-  inactivo?: boolean;
+  inactivo: boolean; // true = inactivo (activo === false en el backend de usuarios)
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -75,13 +76,49 @@ export class FichaService {
   }
 }
 
+/** Forma en que el microservicio de usuarios devuelve cada usuario */
+interface UsuarioRaw {
+  idUsuario?: number | string;
+  id?:        number | string;
+  nombre:     string;
+  apellidos?: string;
+  email:      string;
+  activo?:    boolean;
+  estado?:    boolean;
+  ficha?:     string;
+  jornada?:   string;
+  rol?:       string | { nombreRol: string };
+}
+
 @Injectable({ providedIn: 'root' })
 export class AprendizService {
   private http = inject(HttpClient);
-  private readonly BASE = `${GATEWAY}/api/aprendices`;
+  // Consumir únicamente usuarios con rol AUXILIAR_COCINA desde el microservicio de usuarios
+  private readonly BASE = `${GATEWAY}/api/usuarios?rol=AUXILIAR_COCINA&tamano=500`;
 
-  /** Obtiene todos los aprendices desde el microservicio de usuarios vía el gateway */
+  /** Obtiene aprendices con rol AUXILIAR_COCINA desde el microservicio de usuarios vía el gateway */
   getAll(): Observable<AprendizDTO[]> {
-    return this.http.get<AprendizDTO[]>(this.BASE);
+    return this.http.get<any>(this.BASE).pipe(
+      map((res: any) => {
+        const raw: UsuarioRaw[] = Array.isArray(res) ? res : (res.content ?? []);
+        return raw.map((u) => {
+          const id      = Number(u.idUsuario ?? u.id ?? 0);
+          const nombre  = u.nombre ?? '';
+          const ape     = u.apellidos ? ` ${u.apellidos}` : '';
+          const fullName = `${nombre}${ape}`.trim();
+          const inicial = fullName.charAt(0).toUpperCase();
+          // activo puede venir como boolean `activo` o `estado`
+          const esActivo = u.activo !== undefined ? u.activo : (u.estado !== undefined ? u.estado : true);
+          return {
+            id,
+            nombreCompleto: fullName,
+            inicial,
+            ficha:    u.ficha    ?? '',
+            jornada:  u.jornada  ?? 'Diurna',
+            inactivo: !esActivo,
+          } as AprendizDTO;
+        });
+      })
+    );
   }
 }

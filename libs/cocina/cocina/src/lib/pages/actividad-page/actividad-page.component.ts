@@ -29,34 +29,31 @@ export class ActividadPageComponent {
   readonly fichasCargando = this.facade.fichasCargando;
 
   // ── Estado del buscador de fichas ─────────────────────────────────────────
-  readonly fichaBusqueda = signal<string>('');   // texto escrito en el input
+  readonly fichaBusqueda    = signal<string>('');
   readonly fichaDropdownOpen = signal<boolean>(false);
-  readonly numeroFicha = signal<string>('');  // valor seleccionado/confirmado
+  readonly numeroFicha      = signal<string>('');
 
   /** Lista filtrada según lo que escribe el usuario (solo por número de ficha) */
   readonly fichasFiltradas = computed(() => {
-    const q = this.fichaBusqueda().toLowerCase().trim();
+    const q    = this.fichaBusqueda().toLowerCase().trim();
     const lista = this.fichas();
     if (!q) return lista;
-    return lista.filter(f => f.numero.toLowerCase().includes(q));
+    return lista.filter(f => String(f.numero).toLowerCase().includes(q));
   });
 
-  // ── Resto del formulario ──────────────────────────────────────────────────
-  fecha = signal<string>('');
-  nombreActividad = signal<string>('');
-  jornada = signal<string>('');
-  pasosActividad = signal<string>('');
-  trimestre = signal<string>('trimestre1');
+  // ── Estado de guardado ────────────────────────────────────────────────────
+  readonly guardando = signal<boolean>(false);
 
-  readonly historialReciente = [
-    { nombre: 'Matemáticas', estado: 'Aprobado', clase: 'badge-aprobado' },
-    { nombre: 'Lógica', estado: 'Pendiente', clase: 'badge-pendiente' },
-    { nombre: 'Inglés I', estado: 'Aprobado', clase: 'badge-aprobado' },
-  ];
+  // ── Resto del formulario ──────────────────────────────────────────────────
+  fecha            = signal<string>('');
+  nombreActividad  = signal<string>('');
+  jornada          = signal<string>('');
+  pasosActividad   = signal<string>('');
+  trimestre        = signal<string>('trimestre1');
 
   readonly jornadas = [
-    { value: 'diurna', label: 'Diurna' },
-    { value: 'mixta', label: 'Mixta' },
+    { value: 'diurna',   label: 'Diurna'   },
+    { value: 'mixta',    label: 'Mixta'    },
     { value: 'nocturna', label: 'Nocturna' },
   ];
 
@@ -90,7 +87,7 @@ export class ActividadPageComponent {
 
   onFichaBusquedaInput(valor: string): void {
     this.fichaBusqueda.set(valor);
-    this.numeroFicha.set('');        // limpiar selección hasta que elija de la lista
+    this.numeroFicha.set('');
     this.fichaDropdownOpen.set(true);
   }
 
@@ -98,37 +95,48 @@ export class ActividadPageComponent {
     this.fichaDropdownOpen.set(true);
   }
 
-  /**
-   * Cierra el dropdown cuando el input pierde el foco.
-   * El timeout de 150 ms permite que el clic en una opción se procese antes de cerrar.
-   */
   cerrarFichaDropdown(): void {
     setTimeout(() => this.fichaDropdownOpen.set(false), 150);
   }
 
   seleccionarFicha(numero: string): void {
-    this.numeroFicha.set(numero);
-    this.fichaBusqueda.set(numero);
+    const numStr = String(numero);
+    this.numeroFicha.set(numStr);
+    this.fichaBusqueda.set(numStr);
     this.fichaDropdownOpen.set(false);
   }
 
   // ── Acciones del formulario ───────────────────────────────────────────────
 
   crearActividad(): void {
+    if (!this.esFormularioValido || this.guardando()) return;
+
     const jornadaLabel =
       this.jornadas.find(j => j.value === this.jornada())?.label ?? this.jornada();
     const trimestreLabel =
       this.trimestres.find(t => t.value === this.trimestre())?.label ?? this.trimestre();
 
-    this.facade.crearActividad({
-      nombre: this.nombreActividad() || 'Actividad sin nombre',
-      fecha: this.fecha() || new Date().toISOString().slice(0, 10),
-      jornada: jornadaLabel,
-      ficha: this.numeroFicha() || '0000000',
-      trimestre: trimestreLabel,
-    });
+    this.guardando.set(true);
 
-    this.router.navigate(['/app/cocina/evaluacion-masiva']);
+    this.facade.crearActividad({
+      nombre:    this.nombreActividad() || 'Actividad sin nombre',
+      fecha:     this.fecha() || new Date().toISOString().slice(0, 10),
+      jornada:   jornadaLabel,
+      ficha:     this.numeroFicha() || '0000000',
+      trimestre: trimestreLabel,
+    }).subscribe({
+      next: (actividadCreada) => {
+        // Navegar con el ID real que asignó el backend
+        this.router.navigate(
+          ['/app/cocina/evaluacion-masiva'],
+          { queryParams: { actividadId: actividadCreada.id } }
+        );
+      },
+      error: (err) => {
+        console.error('Error al crear actividad:', err);
+        this.guardando.set(false);
+      }
+    });
   }
 
   verActividades(): void {

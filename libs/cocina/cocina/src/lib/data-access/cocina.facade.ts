@@ -1,7 +1,10 @@
 import { Injectable, signal, inject } from '@angular/core';
-import { ActividadService, ActividadDTO, FichaService, FichaDTO, AprendizService, AprendizDTO } from './actividad.service';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { ActividadService, ActividadDTO, FichaService, FichaDTO, AprendizService } from './actividad.service';
 import { EvaluacionService } from './evaluacion.service';
 
+// ── Tipos exportados ──────────────────────────────────────────────────────────
 export interface AprendizMock {
   id: number;
   nombreCompleto: string;
@@ -9,33 +12,24 @@ export interface AprendizMock {
   ficha: string;
   jornada: 'Diurna' | 'Nocturna' | 'Mixta';
   estado: 'Pendiente' | 'Aprobó' | 'No Aprobó';
-  inactivo?: boolean;
+  inactivo: boolean;
 }
 
 export type ActividadMock = ActividadDTO;
 export type { FichaDTO };
 
-const APRENDICES_MOCK: AprendizMock[] = [
-  { id: 1, nombreCompleto: 'Camila Rodriguez Torres',  inicial: 'C', ficha: '2561234', jornada: 'Diurna',   estado: 'Pendiente' },
-  { id: 2, nombreCompleto: 'Andrés Felipe Mora',       inicial: 'A', ficha: '2561234', jornada: 'Diurna',   estado: 'Pendiente' },
-  { id: 3, nombreCompleto: 'Laura Valentina Gómez',    inicial: 'L', ficha: '2489012', jornada: 'Mixta',    estado: 'Pendiente' },
-  { id: 4, nombreCompleto: 'María Fernanda Castro',    inicial: 'M', ficha: '2561234', jornada: 'Diurna',   estado: 'Pendiente' },
-  { id: 5, nombreCompleto: 'Valeria Ospina Herrera',   inicial: 'V', ficha: '2632456', jornada: 'Mixta',    estado: 'Pendiente' },
-  { id: 6, nombreCompleto: 'Juan Pérez Inactivo',      inicial: 'J', ficha: '0000000', jornada: 'Diurna',   estado: 'Pendiente', inactivo: true },
-  { id: 7, nombreCompleto: 'Ana López Inactiva',       inicial: 'A', ficha: '0000000', jornada: 'Nocturna', estado: 'Pendiente', inactivo: true }
-];
-
 @Injectable({ providedIn: 'root' })
 export class CocinaFacade {
-  private actividadService = inject(ActividadService);
-  private fichaService     = inject(FichaService);
-  private aprendizService  = inject(AprendizService);
+  private actividadService  = inject(ActividadService);
+  private fichaService      = inject(FichaService);
+  private aprendizService   = inject(AprendizService);
   private evaluacionService = inject(EvaluacionService);
 
-  readonly aprendices = signal<AprendizMock[]>([]);
-  readonly actividades = signal<ActividadMock[]>([]);
-  readonly fichas      = signal<FichaDTO[]>([]);
+  readonly aprendices     = signal<AprendizMock[]>([]);
+  readonly actividades    = signal<ActividadMock[]>([]);
+  readonly fichas         = signal<FichaDTO[]>([]);
   readonly fichasCargando = signal<boolean>(false);
+  readonly aprendicesCargando = signal<boolean>(false);
 
   constructor() {
     this.cargarActividades();
@@ -43,27 +37,32 @@ export class CocinaFacade {
     this.cargarAprendices();
   }
 
+  // ── Carga de aprendices (solo rol AUXILIAR_COCINA, sin mocks) ─────────────
   cargarAprendices(): void {
+    this.aprendicesCargando.set(true);
     this.aprendizService.getAll().subscribe({
       next: (data) => {
         const mapeados: AprendizMock[] = (data || []).map(a => ({
-          id: a.id,
+          id:             a.id,
           nombreCompleto: a.nombreCompleto,
-          inicial: a.inicial || a.nombreCompleto.charAt(0).toUpperCase(),
-          ficha: a.ficha,
-          jornada: a.jornada as 'Diurna' | 'Nocturna' | 'Mixta',
-          estado: 'Pendiente', // por defecto
-          inactivo: a.inactivo
+          inicial:        a.inicial || a.nombreCompleto.charAt(0).toUpperCase(),
+          ficha:          a.ficha,
+          jornada:        (a.jornada as 'Diurna' | 'Nocturna' | 'Mixta') || 'Diurna',
+          estado:         'Pendiente' as const,
+          inactivo:       a.inactivo,
         }));
         this.aprendices.set(mapeados);
+        this.aprendicesCargando.set(false);
       },
       error: (err) => {
-        console.warn('No se pudieron cargar aprendices reales, usando mock:', err);
-        this.aprendices.set(APRENDICES_MOCK);
+        console.error('Error al cargar aprendices con rol AUXILIAR_COCINA:', err);
+        this.aprendices.set([]);
+        this.aprendicesCargando.set(false);
       }
     });
   }
 
+  // ── Carga de actividades ──────────────────────────────────────────────────
   cargarActividades(): void {
     this.actividadService.getAll().subscribe({
       next: (data) => this.actividades.set(data || []),
@@ -71,6 +70,7 @@ export class CocinaFacade {
     });
   }
 
+  // ── Carga de fichas (sin fallback a mock) ─────────────────────────────────
   cargarFichas(): void {
     this.fichasCargando.set(true);
     this.fichaService.getAll().subscribe({
@@ -79,27 +79,29 @@ export class CocinaFacade {
         this.fichasCargando.set(false);
       },
       error: (err) => {
-        console.warn('No se pudieron cargar fichas desde el microservicio de usuarios:', err);
+        console.error('Error al cargar fichas desde el microservicio de usuarios:', err);
+        this.fichas.set([]);
         this.fichasCargando.set(false);
       }
     });
   }
 
+  // ── Actualizar estado de un aprendiz (evaluación) ────────────────────────
   actualizarEstado(id: number, estado: 'Aprobó' | 'No Aprobó'): void {
-    this.aprendices.update(aprendices =>
-      aprendices.map(a => a.id === id ? { ...a, estado } : a)
+    this.aprendices.update(lista =>
+      lista.map(a => a.id === id ? { ...a, estado } : a)
     );
   }
 
-  crearActividad(data: Omit<ActividadMock, 'id' | 'estado'>): void {
-    this.actividadService.create(data).subscribe({
-      next: (nueva) => {
-        this.actividades.update(list => [nueva, ...list]);
-      },
-      error: (err) => console.error('Error al crear actividad:', err)
-    });
+  // ── Crear actividad — devuelve el Observable para que el caller navegue
+  //    DESPUÉS de tener el id real asignado por el backend ───────────────────
+  crearActividad(data: Omit<ActividadMock, 'id' | 'estado'>): Observable<ActividadDTO> {
+    return this.actividadService.create(data).pipe(
+      tap((nueva) => this.actividades.update(list => [nueva, ...list]))
+    );
   }
 
+  // ── Actualizar estado de actividad ────────────────────────────────────────
   actualizarEstadoActividad(id: number, estado: 'Activa' | 'Finalizada' | 'Pendiente'): void {
     this.actividadService.updateEstado(id, estado).subscribe({
       next: (actualizada) => {
@@ -111,11 +113,10 @@ export class CocinaFacade {
     });
   }
 
+  // ── Eliminar actividad ────────────────────────────────────────────────────
   eliminarActividad(id: number): void {
     this.actividadService.delete(id).subscribe({
-      next: () => {
-        this.actividades.update(list => list.filter(a => a.id !== id));
-      },
+      next: () => this.actividades.update(list => list.filter(a => a.id !== id)),
       error: (err) => console.error('Error al eliminar actividad:', err)
     });
   }

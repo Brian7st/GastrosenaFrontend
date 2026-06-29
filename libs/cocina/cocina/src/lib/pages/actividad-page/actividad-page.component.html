@@ -153,8 +153,18 @@
           <button id="btn-ver-actividades" class="btn-outline" type="button" (click)="verActividades()">
             VER ACTIVIDADES
           </button>
-          <button id="btn-crear-actividad" class="btn-primary" type="button" [disabled]="!esFormularioValido" (click)="crearActividad()">
-            CREAR ACTIVIDAD
+          <button
+            id="btn-crear-actividad"
+            class="btn-primary"
+            type="button"
+            [disabled]="!esFormularioValido || guardando()"
+            (click)="crearActividad()"
+          >
+            @if (guardando()) {
+              Guardando...
+            } @else {
+              CREAR ACTIVIDAD
+            }
           </button>
         </div>
 
@@ -180,16 +190,13 @@
         </p>
       </div>
 
-      <!-- Historial reciente -->
+      <!-- Info adicional -->
       <div class="panel-card panel-historial">
-        <h3>Historial Reciente</h3>
-        <div class="badges-list">
-          @for (item of historialReciente; track item.nombre) {
-            <span class="activity-badge" [ngClass]="item.clase">
-              {{ item.nombre }} · {{ item.estado }}
-            </span>
-          }
-        </div>
+        <h3>Información</h3>
+        <p class="panel-text">
+          Al crear la actividad, los aprendices vinculados a la ficha seleccionada
+          aparecerán automáticamente en la pantalla de evaluación.
+        </p>
       </div>
 
     </div><!-- /bottom-panels -->
