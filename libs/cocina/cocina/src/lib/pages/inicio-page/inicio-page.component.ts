@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Subject, timer, forkJoin } from 'rxjs';
 import { takeUntil, switchMap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { I18nService } from '../../i18n/i18n.service';
 import { IncidenciaService } from '../../data-access/incidencia.service';
 import { ComandaService } from '../../data-access/comanda.service';
 import { AuditoriaIncidencia } from '../../models/incidencia.model';
@@ -38,6 +39,7 @@ type ConfirmAction = 'eliminar-individual' | 'eliminar-rango' | 'info';
   styleUrls: ['./inicio-page.component.scss']
 })
 export class InicioPageComponent implements OnInit, OnDestroy {
+  protected readonly i18n = inject(I18nService);
   private incidenciaService = inject(IncidenciaService);
   private comandaService = inject(ComandaService);
   private destroy$ = new Subject<void>();
@@ -78,7 +80,7 @@ export class InicioPageComponent implements OnInit, OnDestroy {
               .filter(c => c.estado !== 'LISTO')
               .slice(0, 3)
               .map(c => {
-                 const platosStr = c.detalles ? c.detalles.map((d: any) => `${d.cantidad}x ${d.nombrePlato || d.receta?.nombre}`).join(', ') : 'Sin platos';
+                 const platosStr = c.detalles ? c.detalles.map((d: any) => `${d.cantidad}x ${d.nombrePlato || d.receta?.nombre}`).join(', ') : this.i18n.t('inicio.sin_platos');
                  const elapsedMs = new Date().getTime() - new Date(c.horaEntrada).getTime();
                  const elapsedMin = Math.floor(elapsedMs / 60000);
                  const horas = Math.floor(elapsedMin / 60);
@@ -189,10 +191,10 @@ export class InicioPageComponent implements OnInit, OnDestroy {
 
   abrirModal(tipo: 'CANCELACION' | 'DEVOLUCION' | 'MODIFICACION' | 'LISTAS') {
     const titulos: Record<string, string> = {
-      'CANCELACION': 'Pedidos Cancelados - Cocina',
-      'DEVOLUCION': 'Pedidos Devueltos - Cocina',
-      'MODIFICACION': 'Pedidos Modificados - Cocina',
-      'LISTAS': 'Todas las Comandas Listas'
+      'CANCELACION': this.i18n.t('inicio.modal.titulo_cancelacion'),
+      'DEVOLUCION': this.i18n.t('inicio.modal.titulo_devolucion'),
+      'MODIFICACION': this.i18n.t('inicio.modal.titulo_modificacion'),
+      'LISTAS': this.i18n.t('inicio.modal.titulo_listas')
     };
 
     this.modalTipo.set(tipo as any);
@@ -208,7 +210,7 @@ export class InicioPageComponent implements OnInit, OnDestroy {
            fechaRegistro: c.horaEntrada,
            detalleModificado: c.detalles ? c.detalles.map((d: any) => `${d.cantidad}x ${d.nombrePlato || d.receta?.nombre}`).join(', ') : '',
            tipoIncidencia: 'LISTAS' as any,
-           motivo: 'Comanda procesada y entregada correctamente.'
+           motivo: this.i18n.t('inicio.comanda_procesada_motivo')
        })));
        return;
     }
@@ -262,12 +264,12 @@ export class InicioPageComponent implements OnInit, OnDestroy {
 
   getEtiquetaTipo(tipo: string): string {
     const etiquetas: Record<string, string> = {
-      'CANCELACION': 'Motivo de cancelación:',
-      'DEVOLUCION': 'Motivo de devolución:',
-      'MODIFICACION': 'Detalle de modificación:',
-      'LISTAS': 'Estado actual:'
+      'CANCELACION': this.i18n.t('inicio.motivo_cancelacion'),
+      'DEVOLUCION': this.i18n.t('inicio.motivo_devolucion'),
+      'MODIFICACION': this.i18n.t('inicio.motivo_modificacion'),
+      'LISTAS': this.i18n.t('inicio.motivo_listas')
     };
-    return etiquetas[tipo] || 'Motivo:';
+    return etiquetas[tipo] || this.i18n.t('inicio.motivo_default');
   }
 
   getBadgeVariant(estado: string): 'success' | 'warning' | 'danger' | 'info' {
@@ -280,8 +282,8 @@ export class InicioPageComponent implements OnInit, OnDestroy {
   // ── Acciones con confirmación personalizada ──────────────────────────────────
 
   eliminarComandaIndividual(id: string) {
-    this.confirmTitulo.set('¿Eliminar comanda?');
-    this.confirmMensaje.set(`Esta acción no se puede deshacer. La comanda <strong>#${id.slice(0, 8).toUpperCase()}</strong> será eliminada permanentemente del sistema.`);
+    this.confirmTitulo.set(this.i18n.t('inicio.confirm.delete_titulo'));
+    this.confirmMensaje.set(this.i18n.t('inicio.confirm.delete_mensaje').replace('{0}', id.slice(0, 8).toUpperCase()));
     this.confirmAccion.set('eliminar-individual');
     this.confirmPayload.set(id);
     this.confirmModalAbierto.set(true);
@@ -292,16 +294,16 @@ export class InicioPageComponent implements OnInit, OnDestroy {
     const fin = this.fechaFinEliminar();
 
     if (!inicio || !fin) {
-      this.confirmTitulo.set('Fechas requeridas');
-      this.confirmMensaje.set('Por favor selecciona <strong>ambas fechas</strong> para definir el rango de eliminación.');
+      this.confirmTitulo.set(this.i18n.t('inicio.confirm.fechas_requeridas_titulo'));
+      this.confirmMensaje.set(this.i18n.t('inicio.confirm.fechas_requeridas_mensaje'));
       this.confirmAccion.set('info');
       this.confirmPayload.set(null);
       this.confirmModalAbierto.set(true);
       return;
     }
 
-    this.confirmTitulo.set('¿Eliminar comandas en rango?');
-    this.confirmMensaje.set(`Esta acción eliminará permanentemente <strong>TODAS las comandas listas</strong> entre el <strong>${inicio}</strong> y el <strong>${fin}</strong>. Esta acción no se puede deshacer.`);
+    this.confirmTitulo.set(this.i18n.t('inicio.confirm.rango_titulo'));
+    this.confirmMensaje.set(this.i18n.t('inicio.confirm.rango_mensaje').replace('{0}', inicio).replace('{1}', fin));
     this.confirmAccion.set('eliminar-rango');
     this.confirmPayload.set({ inicio, fin });
     this.confirmModalAbierto.set(true);
@@ -354,8 +356,8 @@ export class InicioPageComponent implements OnInit, OnDestroy {
 
   private mostrarErrorEliminar(err: unknown) {
     console.error('Error eliminando:', err);
-    this.confirmTitulo.set('Error al eliminar');
-    this.confirmMensaje.set('No se pudo eliminar. Verifica la conexión con el servidor.');
+    this.confirmTitulo.set(this.i18n.t('inicio.error_eliminar_titulo'));
+    this.confirmMensaje.set(this.i18n.t('inicio.error_eliminar_mensaje'));
     this.confirmAccion.set('info');
     this.confirmModalAbierto.set(true);
   }
@@ -404,8 +406,8 @@ export class InicioPageComponent implements OnInit, OnDestroy {
 
   private mostrarErrorLimpiar(err: unknown) {
     console.error('Error al limpiar:', err);
-    this.confirmTitulo.set('Error al limpiar');
-    this.confirmMensaje.set('Hubo un error al intentar eliminar. Asegúrate de que el backend esté ejecutándose.');
+    this.confirmTitulo.set(this.i18n.t('inicio.error_limpiar_titulo'));
+    this.confirmMensaje.set(this.i18n.t('inicio.error_limpiar_mensaje'));
     this.confirmAccion.set('info');
     this.confirmModalAbierto.set(true);
   }

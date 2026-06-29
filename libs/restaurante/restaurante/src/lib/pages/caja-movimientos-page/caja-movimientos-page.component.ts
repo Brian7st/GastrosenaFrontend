@@ -11,6 +11,7 @@ import {
 } from '@restaurant/shared/ui';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
 import { RestauranteService } from '../../data-access/restaurante.service';
+import { I18nService } from '../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-caja-movimientos-page',
@@ -29,6 +30,7 @@ import { RestauranteService } from '../../data-access/restaurante.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CajaMovimientosPageComponent implements OnInit {
+  protected readonly i18n = inject(I18nService);
   private router = inject(Router);
   public facade = inject(RestauranteFacade);
   private restauranteService = inject(RestauranteService);
@@ -111,8 +113,8 @@ export class CajaMovimientosPageComponent implements OnInit {
     if (!idFactura) {
       this.alertDialog.set({
         open: true,
-        title: 'Error de Impresión',
-        message: 'No se encontró el identificador de la factura.'
+        title: this.i18n.t('cajaMovimientos.printErrorTitle'),
+        message: this.i18n.t('cajaMovimientos.printErrorMessage')
       });
       return;
     }

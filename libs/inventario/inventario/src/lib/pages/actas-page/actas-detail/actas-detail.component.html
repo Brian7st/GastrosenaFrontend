@@ -2,7 +2,7 @@
   <!-- ── Estado de carga ─────────────────────────────────────────────── -->
   <div class="acta-detail__loading">
     <lucide-icon name="loader-2" [size]="32"></lucide-icon>
-    <p>Cargando acta...</p>
+    <p>{{ i18n.t('acta.cargando') }}</p>
   </div>
 } @else if (acta(); as a) {
 
@@ -17,7 +17,7 @@
       <button class="acta-detail__export-btn"
               [routerLink]="['/app/inventario/actas', a.id, 'imprimir']">
         <lucide-icon name="printer" [size]="16"></lucide-icon>
-        Imprimir / Descargar
+        {{ i18n.t('acta.imprimir_descargar') }}
       </button>
     </div>
   </header>
@@ -28,7 +28,7 @@
     <!-- ── Management Action Bar ──────────────────────────────────────── -->
     <div class="acta-detail__action-bar">
       <div class="acta-detail__action-bar-left">
-        <span class="acta-detail__action-bar-label">Estado:</span>
+        <span class="acta-detail__action-bar-label">{{ i18n.t('comun.estado') }}:</span>
         <restaurant-status-badge
           [label]="getEstadoLabel(a.estado)"
           [variant]="getEstadoVariant(a.estado)"
@@ -40,13 +40,13 @@
         @if (a.estado === 'FIRMADA') {
           <button class="acta-detail__btn-aprobar" (click)="revisarActa()">
             <lucide-icon name="check-circle" [size]="16"></lucide-icon>
-            Aprobar
+            {{ i18n.t('acta.aprobar') }}
           </button>
           <button class="acta-detail__btn-aprobar"
                   [routerLink]="['/app/inventario/paquete-probatorio/nuevo']"
                   [queryParams]="{ actaId: a.id, requisicionId: a.requisicionId }">
             <lucide-icon name="package" [size]="16"></lucide-icon>
-            Crear Paquete
+            {{ i18n.t('acta.crear_paquete') }}
           </button>
         }
 
@@ -54,7 +54,7 @@
         @if (a.estado === 'REVISADA') {
           <button class="acta-detail__btn-archivar" (click)="cambiarEstado('ARCHIVADA')">
             <lucide-icon name="archive" [size]="16"></lucide-icon>
-            Archivar
+            {{ i18n.t('acta.archivar') }}
           </button>
         }
 
@@ -70,7 +70,7 @@
   <!-- ── Acta no encontrada ──────────────────────────────────────────── -->
   <div class="acta-detail__loading">
     <lucide-icon name="file-x" [size]="32"></lucide-icon>
-    <p>Acta no encontrada.</p>
-    <button class="acta-detail__btn-archivar" (click)="volver()">Volver al listado</button>
+    <p>{{ i18n.t('acta.no_encontrada') }}</p>
+    <button class="acta-detail__btn-archivar" (click)="volver()">{{ i18n.t('acta.volver_listado') }}</button>
   </div>
 }

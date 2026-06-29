@@ -19,6 +19,7 @@ import { OnInit, inject } from '@angular/core';
 import { switchMap } from 'rxjs';
 import { FormatoMonedaPipe } from '../../../pipes/formato-moneda.pipe';
 import { ExportarComponent } from '../../../components/exportar/exportar.component';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-presupuesto-dashboard',
@@ -43,6 +44,7 @@ import { ExportarComponent } from '../../../components/exportar/exportar.compone
 })
 export class PresupuestoDashboardComponent implements OnInit {
   public facade = inject(PresupuestoFacade);
+  protected readonly i18n = inject(I18nService);
   private gilesService = inject(GilesService);
   private facturasService = inject(FacturasService);
 

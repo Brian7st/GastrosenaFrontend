@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideIconComponent } from '@restaurant/shared/ui';
+import { I18nService } from '../../i18n/i18n.service';
 
 @Component({
   selector: 'lib-pedidos-categories',
@@ -11,23 +12,25 @@ import { LucideIconComponent } from '@restaurant/shared/ui';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PedidosCategoriesComponent {
+  protected readonly i18n = inject(I18nService);
+
   @Output() categorySelected = new EventEmitter<string>();
   @Output() subcategorySelected = new EventEmitter<string>();
 
-  categories = [
-    { id: 'all', name: 'Todo', icon: 'layout-grid' },
-    { id: 'entrada', name: 'Entradas', icon: 'clipboard-list' },
-    { id: 'plato_fuerte', name: 'Plato Fuerte', icon: 'utensils' },
-    { id: 'postre', name: 'Postres', icon: 'cake' },
-    { id: 'bebidas', name: 'Bebidas', icon: 'coffee' },
-  ];
+  categories = computed(() => [
+    { id: 'all', name: this.i18n.t('pedidosCategories.all'), icon: 'layout-grid' },
+    { id: 'entrada', name: this.i18n.t('pedidosCategories.entrada'), icon: 'clipboard-list' },
+    { id: 'plato_fuerte', name: this.i18n.t('pedidosCategories.platoFuerte'), icon: 'utensils' },
+    { id: 'postre', name: this.i18n.t('pedidosCategories.postre'), icon: 'cake' },
+    { id: 'bebidas', name: this.i18n.t('pedidosCategories.bebidas'), icon: 'coffee' },
+  ]);
 
-  subcategoriesBebidas = [
-    { id: 'calientes', name: 'Calientes' },
-    { id: 'frias', name: 'Frías' },
-    { id: 'sin_alcohol', name: 'Sin Alcohol' },
-    { id: 'con_alcohol', name: 'Con Alcohol' },
-  ];
+  subcategoriesBebidas = computed(() => [
+    { id: 'calientes', name: this.i18n.t('pedidosCategories.calientes') },
+    { id: 'frias', name: this.i18n.t('pedidosCategories.frias') },
+    { id: 'sin_alcohol', name: this.i18n.t('pedidosCategories.sinAlcohol') },
+    { id: 'con_alcohol', name: this.i18n.t('pedidosCategories.conAlcohol') },
+  ]);
 
   activeCategory = signal<string>('all');
   activeSubcategory = signal<string>('');

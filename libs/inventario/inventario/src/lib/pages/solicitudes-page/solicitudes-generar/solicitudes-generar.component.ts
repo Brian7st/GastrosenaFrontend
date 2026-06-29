@@ -8,6 +8,7 @@ import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 import { ProgramasService, Programa } from '../../../data-access/services/programas.service';
 import { GenerarGilData } from '../../../models/solicitudes-gil.model';
 import { GIL_DEFAULTS } from '../../../util/gil-defaults.config';
+import { I18nService } from '../../../i18n/i18n.service';
 
 interface SolicitudRow {
   id: string;
@@ -30,6 +31,7 @@ export class SolicitudesGenerarComponent implements OnInit {
   private router = inject(Router);
   private facade = inject(SolicitudesFacade);
   private programasService = inject(ProgramasService);
+  protected readonly i18n = inject(I18nService);
 
   /** Catálogo de programas para el selector del GIL. */
   programas       = signal<Programa[]>([]);

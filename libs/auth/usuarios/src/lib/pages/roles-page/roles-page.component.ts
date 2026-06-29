@@ -7,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { DatePipe } from '@angular/common';
 import { Rol } from '@restaurant/shared/models';
 import {
   DataTableComponent,
@@ -88,6 +89,7 @@ const ROLES_STAFF = new Set<string>([
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    DatePipe,
     DataTableComponent,
     EmptyStateComponent,
     KpiCardComponent,
@@ -129,6 +131,7 @@ export class RolesPageComponent implements OnInit {
 
   readonly seleccionados  = signal<Set<string>>(new Set());
   readonly rolAsignacion  = signal('');
+  readonly usuarioDetalle = signal<UsuarioDetalle | null>(null);
 
   readonly todosSeleccionados = computed(() => {
     const lista = this.aprendices();
@@ -174,6 +177,14 @@ export class RolesPageComponent implements OnInit {
 
   estaSeleccionado(id: string): boolean {
     return this.seleccionados().has(id);
+  }
+
+  onVerDetalle(u: UsuarioDetalle): void {
+    this.usuarioDetalle.set(u);
+  }
+
+  onCerrarDetalle(): void {
+    this.usuarioDetalle.set(null);
   }
 
   getRolClass(rol: string): string {

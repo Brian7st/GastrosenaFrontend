@@ -6,6 +6,7 @@ import { KardexFacade } from '../../../data-access/kardex.facade';
 import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 import { MovimientosService } from '../../../data-access/services/movimientos.service';
 import { Movimiento } from '../../../models/movimiento.model';
+import { I18nService } from '../../../i18n/i18n.service';
 
 type Vista = 'documentos' | 'todos';
 type TipoMovimiento = Movimiento['tipo'];
@@ -30,6 +31,7 @@ type TipoMovimiento = Movimiento['tipo'];
 })
 export class MovimientosListComponent implements OnInit {
   private facade             = inject(KardexFacade);
+  protected readonly i18n = inject(I18nService);
   private movimientosService = inject(MovimientosService);
 
   // ── Vista activa (toggle) ─────────────────────────────────────────────────

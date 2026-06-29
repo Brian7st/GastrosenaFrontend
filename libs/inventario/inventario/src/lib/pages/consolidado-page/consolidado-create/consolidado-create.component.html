@@ -4,24 +4,24 @@
     <div class="page-header__left">
       <inventario-back-button (clicked)="goBack()"></inventario-back-button>
       <div class="page-header__title-row">
-        <h1 class="page-header__title">Seleccionar GIL-F-014 para Consolidar</h1>
+        <h1 class="page-header__title">{{ i18n.t('consolidado.crear_titulo') }}</h1>
       </div>
-      <p class="page-header__subtitle">Seleccione los compromisos elegibles para incluirlos en el nuevo consolidado.</p>
+      <p class="page-header__subtitle">{{ i18n.t('consolidado.crear_subtitulo') }}</p>
     </div>
   </header>
 
   <!-- generadoPor input (no auth context available in this lib) -->
   <div class="filters-card" style="margin-bottom: 1rem;">
     <div class="filter-group" style="flex: 1;">
-      <label class="filter-label" for="generadoPor">Generado por <span class="text-danger">*</span></label>
+      <label class="filter-label" for="generadoPor">{{ i18n.t('consolidado.generado_por') }} <span class="text-danger">*</span></label>
       <input
         id="generadoPor"
         class="filter-input"
         type="text"
-        placeholder="Nombre del responsable"
+        [placeholder]="i18n.t('consolidado.nombre_responsable')"
         [formControl]="generadoPorCtrl" />
       @if (generadoPorCtrl.invalid && generadoPorCtrl.touched) {
-        <span class="field-error">Campo requerido</span>
+        <span class="field-error">{{ i18n.t('comun.campo_requerido') }}</span>
       }
     </div>
   </div>
@@ -46,17 +46,17 @@
                   [checked]="allSelected()"
                   (change)="toggleAll($event)" />
               </th>
-              <th class="th-center">GIL ID</th>
-              <th class="th-center">Factura / CUFE</th>
-              <th class="th-center">Concepto</th>
-              <th class="th-center">Fecha</th>
-              <th class="th-center">Monto</th>
-              <th class="th-center">Ret. ZESE</th>
+              <th class="th-center">{{ i18n.t('consolidado.th_gil_id') }}</th>
+              <th class="th-center">{{ i18n.t('consolidado.th_factura_cufe') }}</th>
+              <th class="th-center">{{ i18n.t('consolidado.th_concepto') }}</th>
+              <th class="th-center">{{ i18n.t('comun.fecha') }}</th>
+              <th class="th-center">{{ i18n.t('consolidado.th_monto') }}</th>
+              <th class="th-center">{{ i18n.t('consolidado.th_ret_zese') }}</th>
             </tr>
           </thead>
           <tbody class="text-black text-center">
             @if (loading()) {
-              <tr><td colspan="7" class="td-center td-muted">Cargando compromisos elegibles…</td></tr>
+              <tr><td colspan="7" class="td-center td-muted">{{ i18n.t('consolidado.cargando') }}</td></tr>
             }
             @for (row of rows(); track row.data.compromisoId) {
               <tr (click)="toggleSelection(row)">
@@ -91,7 +91,7 @@
             }
             @empty {
               @if (!loading()) {
-                <tr><td colspan="7" class="td-center td-muted">No hay compromisos elegibles disponibles.</td></tr>
+                <tr><td colspan="7" class="td-center td-muted">{{ i18n.t('consolidado.sin_compromisos') }}</td></tr>
               }
             }
           </tbody>
@@ -103,23 +103,23 @@
     <aside class="create-layout__sidebar">
       <div class="calc-panel">
         <div class="calc-panel__header">
-          <h3 class="calc-panel__title">Resumen de Selección</h3>
-          <p class="calc-panel__subtitle">{{ selectedCount() }} compromisos seleccionados</p>
+          <h3 class="calc-panel__title">{{ i18n.t('consolidado.resumen_seleccion') }}</h3>
+          <p class="calc-panel__subtitle">{{ i18n.t('consolidado.compromisos_seleccionados', { count: selectedCount().toString() }) }}</p>
         </div>
 
         <div class="calc-panel__body">
           <div class="calc-row text-on-surface">
-            <span>Subtotal Neto</span>
+            <span>{{ i18n.t('consolidado.subtotal_neto') }}</span>
             <span class="calc-row__value">{{ subtotalNeto() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
           </div>
           <div class="calc-row text-tertiary">
-            <span>Retención ZESE</span>
+            <span>{{ i18n.t('comun.retencion_zese') }}</span>
             <span class="calc-row__value">-{{ retencionZeseTotal() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
           </div>
         </div>
 
         <div class="calc-panel__footer">
-          <p class="calc-panel__total-label">Total Consolidado</p>
+          <p class="calc-panel__total-label">{{ i18n.t('consolidado.total_consolidado') }}</p>
           <p class="calc-panel__total-value">{{ totalConsolidado() | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
         </div>
 
@@ -128,7 +128,7 @@
             variant="primary"
             [disabled]="selectedCount() === 0 || loading()"
             (click)="confirmar()">
-            Confirmar y Generar
+            {{ i18n.t('consolidado.confirmar_generar') }}
           </restaurant-button>
         </div>
       </div>

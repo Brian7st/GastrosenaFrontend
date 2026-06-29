@@ -1,13 +1,14 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { NotificacionesService } from '../data-access/notificaciones.service';
-import { Notificacion, EstadoNotificacion, TipoNotificacion } from '../models/notificaciones.model';
+import { Notificacion } from '../models/notificaciones.model';
 import {
   PageHeaderComponent,
   StatusBadgeComponent,
   LucideIconComponent,
   ButtonComponent,
 } from '@restaurant/shared/ui';
+import { I18nService } from '../i18n/i18n.service';
 const MOCK_NOTIFICACIONES: Notificacion[] = [
   {
     id: '1',
@@ -66,6 +67,7 @@ const MOCK_NOTIFICACIONES: Notificacion[] = [
 })
 export class NotificacionesPageComponent implements OnInit {
   private notificacionesService = inject(NotificacionesService);
+  protected readonly i18n = inject(I18nService);
 
   notificaciones = signal<Notificacion[]>([]);
   loading = signal(false);
@@ -108,12 +110,8 @@ export class NotificacionesPageComponent implements OnInit {
   }
 
   getTipoLabel(tipo: string): string {
-    const labels: Record<string, string> = {
-      BLOQUEO: 'Bloqueo',
-      RESTABLECIMIENTO: 'Restablecimiento',
-      CAMBIO_CONTRASENA: 'Cambio',
-      REGISTRO: 'Registro',
-    };
-    return labels[tipo] || tipo;
+    const key = `tipo.${tipo}`;
+    const translated = this.i18n.t(key);
+    return translated === key ? tipo : translated;
   }
 }

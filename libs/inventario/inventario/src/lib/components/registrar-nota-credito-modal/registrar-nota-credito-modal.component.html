@@ -7,18 +7,14 @@
           <span class="material-symbols-outlined">receipt_long</span>
         </div>
 
-        <h2 class="modal-title">Registrar Nota Crédito</h2>
-        <p class="modal-text">
-          Complete los datos de la nota crédito por
-          <strong>sobre-facturación</strong>.
-          Los valores se prellena con la diferencia detectada.
-        </p>
+        <h2 class="modal-title">{{ i18n.t('nc.titulo') }}</h2>
+        <p class="modal-text">{{ i18n.t('nc.descripcion') }}</p>
 
         <div class="nc-form">
 
           <!-- Motivo -->
           <div class="nc-form__field">
-            <label class="nc-form__label" for="nc-motivo">Motivo</label>
+            <label class="nc-form__label" for="nc-motivo">{{ i18n.t('nc.motivo') }}</label>
             <select
               id="nc-motivo"
               class="nc-form__select"
@@ -33,7 +29,7 @@
 
           <!-- Fecha de emisión -->
           <div class="nc-form__field">
-            <label class="nc-form__label" for="nc-fecha">Fecha de emisión</label>
+            <label class="nc-form__label" for="nc-fecha">{{ i18n.t('nc.fecha_emision') }}</label>
             <input
               id="nc-fecha"
               type="date"
@@ -45,7 +41,7 @@
 
           <!-- Línea: productoId -->
           <div class="nc-form__field">
-            <label class="nc-form__label" for="nc-producto">Producto / Ítem GIL</label>
+            <label class="nc-form__label" for="nc-producto">{{ i18n.t('nc.producto') }}</label>
             <input
               id="nc-producto"
               type="text"
@@ -58,7 +54,7 @@
           <!-- Línea: cantidad y valor unitario -->
           <div class="nc-form__row">
             <div class="nc-form__field">
-              <label class="nc-form__label" for="nc-cantidad">Cantidad</label>
+              <label class="nc-form__label" for="nc-cantidad">{{ i18n.t('nc.cantidad') }}</label>
               <input
                 id="nc-cantidad"
                 type="number"
@@ -69,7 +65,7 @@
               />
             </div>
             <div class="nc-form__field">
-              <label class="nc-form__label" for="nc-precio">Valor unitario (COP)</label>
+              <label class="nc-form__label" for="nc-precio">{{ i18n.t('nc.valor_unitario') }}</label>
               <input
                 id="nc-precio"
                 type="number"
@@ -83,7 +79,7 @@
 
           <!-- Resumen -->
           <div class="nc-summary">
-            <span class="nc-summary__label">Total nota crédito</span>
+            <span class="nc-summary__label">{{ i18n.t('nc.total') }}</span>
             <span class="nc-summary__value">
               {{ valorTotal() | currency:'COP':'symbol-narrow':'1.0-0' }}
             </span>
@@ -92,14 +88,14 @@
         </div>
 
         <div class="modal-actions">
-          <button class="btn-cancel" type="button" (click)="onCancelar()">Cancelar</button>
+          <button class="btn-cancel" type="button" (click)="onCancelar()">{{ i18n.t('comun.cancelar') }}</button>
           <button
             class="btn-confirm"
             type="button"
             [disabled]="!esValido()"
             (click)="onConfirmar()"
           >
-            Registrar nota crédito
+            {{ i18n.t('nc.registrar') }}
           </button>
         </div>
 

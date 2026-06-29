@@ -2,6 +2,7 @@ import { Component, signal, computed, ChangeDetectionStrategy, inject, OnInit, O
 import { CommonModule } from '@angular/common';
 import { interval, Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
+import { I18nService } from '../../i18n/i18n.service';
 import { ComandaCardComponent } from '../../components/comanda-card/comanda-card.component';
 import { ComandaService, Comanda } from '../../data-access/comanda.service';
 import {
@@ -27,6 +28,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ComandasPageComponent implements OnInit, OnDestroy {
+  protected readonly i18n = inject(I18nService);
   private comandaService = inject(ComandaService);
   private pollingSub?: Subscription;
 
@@ -37,17 +39,17 @@ export class ComandasPageComponent implements OnInit, OnDestroy {
   comandas = signal<Comanda[]>([]);
   errorToast = signal<string | null>(null);
 
-  opcionesEstado = [
-    { label: 'Todos los estados', value: 'Todos los estados' },
-    { label: 'PENDIENTE', value: 'PENDIENTE' },
-    { label: 'PREPARANDO', value: 'PREPARANDO' },
-    { label: 'LISTO', value: 'LISTO' }
-  ];
+  opcionesEstado = computed(() => [
+    { label: this.i18n.t('comandas.estado_opciones'), value: 'Todos los estados' },
+    { label: this.i18n.t('comandas.estado_pendiente'), value: 'PENDIENTE' },
+    { label: this.i18n.t('comandas.estado_preparando'), value: 'PREPARANDO' },
+    { label: this.i18n.t('comandas.estado_listo'), value: 'LISTO' }
+  ]);
 
-  opcionesOrden = [
-    { label: 'Hora de llegada', value: 'Hora de llegada' },
-    { label: 'Tiempo estimado', value: 'Tiempo estimado' }
-  ];
+  opcionesOrden = computed(() => [
+    { label: this.i18n.t('comandas.orden_opciones_hora'), value: 'Hora de llegada' },
+    { label: this.i18n.t('comandas.orden_opciones_tiempo'), value: 'Tiempo estimado' }
+  ]);
 
   ngOnInit() {
     this.cargarComandas();
@@ -98,7 +100,7 @@ export class ComandasPageComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error fetching comandas:', err);
-        this.mostrarError('Error de conexión con el backend');
+        this.mostrarError(this.i18n.t('comandas.error_conexion'));
       }
     });
   }
@@ -114,7 +116,7 @@ export class ComandasPageComponent implements OnInit, OnDestroy {
         this.actualizarEstadoPlato(idComanda, idDetalle, 'PREPARANDO');
         this.evaluarEstadoComanda(idComanda);
       },
-      error: (err) => this.mostrarError('Error al iniciar plato: ' + err.message)
+      error: (err) => this.mostrarError(this.i18n.t('comandas.error_iniciar') + err.message)
     });
   }
 
@@ -124,7 +126,7 @@ export class ComandasPageComponent implements OnInit, OnDestroy {
         this.actualizarEstadoPlato(idComanda, idDetalle, 'LISTO');
         this.evaluarEstadoComanda(idComanda);
       },
-      error: (err) => this.mostrarError('Error al finalizar plato: ' + err.message)
+      error: (err) => this.mostrarError(this.i18n.t('comandas.error_finalizar') + err.message)
     });
   }
 
@@ -184,7 +186,7 @@ export class ComandasPageComponent implements OnInit, OnDestroy {
       const matchBusqueda = c.numeroMesa.toString().includes(term) ||
                             c.nombreMesero.toLowerCase().includes(term) ||
                             c.idComanda.toLowerCase().includes(term);
-      const matchEstado = this.filtroEstado() === 'Todos los estados' || c.estado === this.filtroEstado();
+       const matchEstado = this.filtroEstado() === 'Todos los estados' || c.estado === this.filtroEstado();
       return matchBusqueda && matchEstado;
     });
 

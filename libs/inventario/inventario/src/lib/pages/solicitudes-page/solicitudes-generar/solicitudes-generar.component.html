@@ -7,8 +7,8 @@
   <div class="page-header">
     <inventario-back-button (clicked)="goBack()" />
     <div class="header-titles">
-      <h2 class="title">Generar GIL — Seleccionar solicitudes aprobadas</h2>
-      <p class="subtitle">Seleccione las solicitudes aprobadas para consolidar en la Guía de Ingreso Local (GIL).</p>
+      <h2 class="title">{{ i18n.t('solicitudes-generar.title') }}</h2>
+      <p class="subtitle">{{ i18n.t('solicitudes-generar.subtitle') }}</p>
     </div>
   </div>
 
@@ -19,16 +19,16 @@
     <div class="form-card-header">
       <div class="form-card-header__left">
         <span class="material-symbols-outlined section-icon">description</span>
-        <h3 class="section-title">Formato GIL-F-014</h3>
+        <h3 class="section-title">{{ i18n.t('solicitudes-generar.section_title') }}</h3>
       </div>
-      <span class="form-card-header__code">Versión 05</span>
+      <span class="form-card-header__code">{{ i18n.t('solicitudes-generar.version') }}</span>
     </div>
 
     <div class="form-grid">
       <!-- Columna 1 -->
       <div class="form-col">
         <div class="form-group">
-          <label class="form-label">Fecha Solicitud <span class="required-mark">*</span></label>
+          <label class="form-label">{{ i18n.t('solicitudes-generar.label_fecha') }} <span class="required-mark">*</span></label>
           <input
             type="date"
             class="form-control"
@@ -37,51 +37,51 @@
           />
         </div>
         <div class="form-group">
-          <label class="form-label">Regional (Código) <span class="required-mark">*</span></label>
+          <label class="form-label">{{ i18n.t('solicitudes-generar.label_regional_codigo') }} <span class="required-mark">*</span></label>
           <input
             type="number"
             class="form-control"
-            placeholder="Ej. 63"
+            [placeholder]="i18n.t('solicitudes-generar.placeholder_ejemplo', { valor: '63' })"
             [value]="regionalCodigo()"
             (input)="regionalCodigo.set(+$any($event.target).value)"
           />
         </div>
         <div class="form-group">
-          <label class="form-label">Nombre Regional <span class="required-mark">*</span></label>
+          <label class="form-label">{{ i18n.t('solicitudes-generar.label_regional_nombre') }} <span class="required-mark">*</span></label>
           <input
             type="text"
             class="form-control"
-            placeholder="Ej. Quindío"
+            [placeholder]="i18n.t('solicitudes-generar.placeholder_ejemplo', { valor: 'Quindío' })"
             [value]="regionalNombre()"
             (input)="regionalNombre.set($any($event.target).value)"
           />
         </div>
         <div class="form-group">
-          <label class="form-label">Cod Centro de Costos <span class="required-mark">*</span></label>
+          <label class="form-label">{{ i18n.t('solicitudes-generar.label_centro_costos_codigo') }} <span class="required-mark">*</span></label>
           <input
             type="number"
             class="form-control"
-            placeholder="Ej. 953810"
+            [placeholder]="i18n.t('solicitudes-generar.placeholder_ejemplo', { valor: '953810' })"
             [value]="centroCostosCodigo()"
             (input)="centroCostosCodigo.set(+$any($event.target).value)"
           />
         </div>
         <div class="form-group">
-          <label class="form-label">Nombre Centro de Costos <span class="required-mark">*</span></label>
+          <label class="form-label">{{ i18n.t('solicitudes-generar.label_centro_costos_nombre') }} <span class="required-mark">*</span></label>
           <input
             type="text"
             class="form-control"
-            placeholder="Ej. COMERCIO Y TURISMO"
+            [placeholder]="i18n.t('solicitudes-generar.placeholder_ejemplo', { valor: 'COMERCIO Y TURISMO' })"
             [value]="centroCostosNombre()"
             (input)="centroCostosNombre.set($any($event.target).value)"
           />
         </div>
         <div class="form-group">
-          <label class="form-label">Área <span class="required-mark">*</span></label>
+          <label class="form-label">{{ i18n.t('solicitudes-generar.label_area') }} <span class="required-mark">*</span></label>
           <input
             type="text"
             class="form-control"
-            placeholder="Ej. CENTRO DE COMERCIO Y TURISMO - ESCUELA DE GASTROSENA"
+            [placeholder]="i18n.t('solicitudes-generar.placeholder_ejemplo', { valor: 'CENTRO DE COMERCIO Y TURISMO - ESCUELA DE GASTROSENA' })"
             [value]="area()"
             (input)="area.set($any($event.target).value)"
           />
@@ -91,17 +91,17 @@
       <!-- Columna 2 -->
       <div class="form-col">
         <div class="form-group">
-          <label class="form-label">Jefe de Oficina o Coordinador de Área <span class="required-mark">*</span></label>
+          <label class="form-label">{{ i18n.t('solicitudes-generar.label_jefe_oficina') }} <span class="required-mark">*</span></label>
           <input
             type="text"
             class="form-control"
-            placeholder="Ej. CARMENZA QUINTERO DE LEON"
+            [placeholder]="i18n.t('solicitudes-generar.placeholder_ejemplo', { valor: 'CARMENZA QUINTERO DE LEON' })"
             [value]="jefeOficinaCoordinador()"
             (input)="jefeOficinaCoordinador.set($any($event.target).value)"
           />
         </div>
         <div class="form-group">
-          <label class="form-label">Cuentadante(s) <span class="required-mark">*</span></label>
+          <label class="form-label">{{ i18n.t('solicitudes-generar.label_cuentadantes') }} <span class="required-mark">*</span></label>
 
           @if (cuentadantes().length > 0) {
             <div class="cuentadantes-list">
@@ -110,7 +110,7 @@
                   <span class="material-symbols-outlined">person</span>
                   <span class="cuentadante-nombre">{{ c.nombre }}</span>
                   <span class="cuentadante-cedula">CC {{ c.cedula }}</span>
-                  <button class="btn-chip-remove" type="button" (click)="onRemoveCuentadante(i)" title="Quitar">
+                  <button class="btn-chip-remove" type="button" (click)="onRemoveCuentadante(i)" [title]="i18n.t('solicitudes-generar.quitar')">
                     <span class="material-symbols-outlined">close</span>
                   </button>
                 </div>
@@ -120,27 +120,27 @@
 
           <button class="btn-link" type="button" (click)="onToggleNuevaCuenta()">
             <span class="material-symbols-outlined">{{ mostrarNuevaCuenta() ? 'remove' : 'add' }}</span>
-            {{ mostrarNuevaCuenta() ? 'Cancelar' : 'Agregar cuentadante' }}
+            {{ mostrarNuevaCuenta() ? i18n.t('solicitudes-generar.cancelar') : i18n.t('solicitudes-generar.agregar_cuentadante') }}
           </button>
 
           @if (mostrarNuevaCuenta()) {
             <div class="nueva-cuenta-panel">
               <div class="form-group">
-                <label class="form-label">Nombre</label>
+                <label class="form-label">{{ i18n.t('solicitudes-generar.label_nombre') }}</label>
                 <input
                   type="text"
                   class="form-control"
-                  placeholder="Ej. Juan Pablo Gómez"
+                  [placeholder]="i18n.t('solicitudes-generar.placeholder_ejemplo', { valor: 'Juan Pablo Gómez' })"
                   [value]="nuevaCuentaNombre()"
                   (input)="nuevaCuentaNombre.set($any($event.target).value)"
                 />
               </div>
               <div class="form-group">
-                <label class="form-label">N° de Identificación</label>
+                <label class="form-label">{{ i18n.t('solicitudes-generar.label_identificacion') }}</label>
                 <input
                   type="text"
                   class="form-control"
-                  placeholder="Ej. 1001234567"
+                  [placeholder]="i18n.t('solicitudes-generar.placeholder_ejemplo', { valor: '1001234567' })"
                   [value]="nuevaCuentaCedula()"
                   (input)="nuevaCuentaCedula.set($any($event.target).value)"
                 />
@@ -151,64 +151,64 @@
                 [disabled]="!nuevaCuentaNombre().trim() || !nuevaCuentaCedula().trim()"
                 (click)="onConfirmarCuentadante()">
                 <span class="material-symbols-outlined">check_circle</span>
-                Confirmar cuentadante
+                {{ i18n.t('solicitudes-generar.confirmar_cuentadante') }}
               </button>
             </div>
           }
         </div>
         <div class="form-group">
-          <label class="form-label">Destino de los Bienes Solicitados <span class="required-mark">*</span></label>
+          <label class="form-label">{{ i18n.t('solicitudes-generar.label_destino_bienes') }} <span class="required-mark">*</span></label>
           <select
             class="form-control"
             [value]="destinoBienes()"
             (change)="destinoBienes.set($any($event.target).value)">
-            <option value="FORMACION">Formación</option>
-            <option value="LABORATORIO">Laboratorio</option>
-            <option value="AULA">Aula</option>
-            <option value="OTRO">Otro</option>
+            <option value="FORMACION">{{ i18n.t('solicitudes-generar.destino_formacion') }}</option>
+            <option value="LABORATORIO">{{ i18n.t('solicitudes-generar.destino_laboratorio') }}</option>
+            <option value="AULA">{{ i18n.t('solicitudes-generar.destino_aula') }}</option>
+            <option value="OTRO">{{ i18n.t('solicitudes-generar.destino_otro') }}</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Código de Grupo o Ficha de Caracterización <span class="required-mark">*</span></label>
+          <label class="form-label">{{ i18n.t('solicitudes-generar.label_codigo_grupo') }} <span class="required-mark">*</span></label>
           <input
             type="text"
             inputmode="numeric"
             pattern="[0-9]*"
             class="form-control"
-            placeholder="Ej. 3434234324"
+            [placeholder]="i18n.t('solicitudes-generar.placeholder_ejemplo', { valor: '3434234324' })"
             [value]="codigoGrupo()"
             (input)="onCodigoGrupoInput($any($event.target).value)"
           />
         </div>
         <div class="form-group">
-          <label class="form-label">Programa de Formación</label>
+          <label class="form-label">{{ i18n.t('solicitudes-generar.label_programa') }}</label>
           <select
             class="form-control"
             [value]="programaDefault()"
             (change)="programaDefault.set($any($event.target).value)"
           >
-            <option value="">Sin asignar</option>
+            <option value="">{{ i18n.t('solicitudes-generar.sin_asignar') }}</option>
             @for (programa of programas(); track programa.codigo) {
               <option [value]="programa.codigo">{{ programa.nombre }}</option>
             }
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Solicitante <span class="required-mark">*</span></label>
+          <label class="form-label">{{ i18n.t('solicitudes-generar.label_solicitante') }} <span class="required-mark">*</span></label>
           <input
             type="text"
             class="form-control"
-            placeholder="Nombre del solicitante"
+            [placeholder]="i18n.t('solicitudes-generar.placeholder_solicitante')"
             [value]="solicitante()"
             (input)="solicitante.set($any($event.target).value)"
           />
         </div>
         <div class="form-group">
-          <label class="form-label">Observaciones</label>
+          <label class="form-label">{{ i18n.t('solicitudes-generar.label_observaciones') }}</label>
           <textarea
             class="form-control"
             rows="2"
-            placeholder="Notas adicionales (opcional)"
+            [placeholder]="i18n.t('solicitudes-generar.placeholder_observaciones')"
             [value]="observaciones()"
             (input)="observaciones.set($any($event.target).value)">
           </textarea>
@@ -224,18 +224,18 @@
     ══════════════════════════════════════════════════════════════════════════ -->
     <div class="main-col">
       <restaurant-data-table
-        tableTitle="Solicitudes de Sesión"
+        [tableTitle]="i18n.t('solicitudes-generar.table_title')"
         tableIcon="checklist"
-        searchPlaceholder="Buscar por ficha o instructor..."
+        [searchPlaceholder]="i18n.t('solicitudes-generar.search_placeholder')"
         (searchChange)="searchTerm.set($event)">
 
         <thead>
           <tr>
             <th class="w-checkbox"></th>
-            <th>Ficha</th>
-            <th>Instructor</th>
-            <th>Items</th>
-            <th>Estado</th>
+            <th>{{ i18n.t('solicitudes-generar.th_ficha') }}</th>
+            <th>{{ i18n.t('solicitudes-generar.th_instructor') }}</th>
+            <th>{{ i18n.t('solicitudes-generar.th_items') }}</th>
+            <th>{{ i18n.t('solicitudes-generar.th_estado') }}</th>
           </tr>
         </thead>
 
@@ -258,7 +258,7 @@
               </td>
               <td class="text-dark font-medium">{{ row.fichaId }}</td>
               <td class="text-dark">{{ row.instructorId }}</td>
-              <td class="text-muted">{{ row.totalItems }} ítems</td>
+              <td class="text-muted">{{ row.totalItems }} {{ i18n.t('solicitudes-generar.items_label') }}</td>
               <td>
                 <span class="estado-badge" [ngClass]="{
                   'estado-badge--creada':       row.estado === 'CREADA',
@@ -283,22 +283,22 @@
       <div class="summary-card">
         <div class="summary-header">
           <span class="material-symbols-outlined icon-doc">description</span>
-          <h3>Resumen de Consolidación</h3>
+          <h3>{{ i18n.t('solicitudes-generar.summary_title') }}</h3>
         </div>
 
         <div class="summary-body">
           <div class="summary-item">
-            <span>Solicitudes seleccionadas</span>
+            <span>{{ i18n.t('solicitudes-generar.summary_solicitudes') }}</span>
             <span class="value text-dark">{{ solicitudesSeleccionadas() }}</span>
           </div>
           <div class="summary-item">
-            <span>Ítems totales a consolidar</span>
+            <span>{{ i18n.t('solicitudes-generar.summary_items') }}</span>
             <span class="value text-primario">{{ itemsTotalesConsolidar() }}</span>
           </div>
 
           <div class="info-box">
             <span class="material-symbols-outlined info-icon">info</span>
-            <p>Solo las solicitudes en estado APROBADA pueden incluirse en la Guía de Ingreso Local.</p>
+            <p>{{ i18n.t('solicitudes-generar.summary_info') }}</p>
           </div>
         </div>
 
@@ -308,7 +308,7 @@
             class="w-full"
             [disabled]="!canGenerar()"
             (click)="onGenerar()">
-            Vista previa de consolidación
+            {{ i18n.t('solicitudes-generar.boton_vista_previa') }}
             <span class="material-symbols-outlined right-icon">arrow_forward</span>
           </restaurant-button>
         </div>
@@ -323,10 +323,10 @@
 ══════════════════════════════════════════════════════════════════════════ -->
 <restaurant-confirm-dialog
   [open]="showModal()"
-  title="Confirmar Consolidación"
-  [message]="'¿Generar la GIL con ' + solicitudesSeleccionadas() + ' solicitudes y ' + itemsTotalesConsolidar() + ' ítems?'"
-  confirmText="Confirmar y Generar GIL"
-  cancelText="Cancelar"
+  [title]="i18n.t('solicitudes-generar.modal_title')"
+  [message]="i18n.t('solicitudes-generar.modal_message', { count: solicitudesSeleccionadas(), items: itemsTotalesConsolidar() })"
+  [confirmText]="i18n.t('solicitudes-generar.modal_confirm')"
+  [cancelText]="i18n.t('solicitudes-generar.modal_cancel')"
   (confirm)="confirmarGeneracion()"
   (cancel)="cerrarModal()"
 />

@@ -7,21 +7,21 @@
     <div class="title-group">
       <inventario-back-button (clicked)="goBack()" />
       <div>
-        <h1 class="page-title">Historial de Conciliaciones</h1>
-        <p class="page-subtitle">Revisión y auditoría de inventario físico vs sistema</p>
+        <h1 class="page-title">{{ i18n.t('conciliacion.historial_titulo') }}</h1>
+        <p class="page-subtitle">{{ i18n.t('conciliacion.historial_subtitulo') }}</p>
       </div>
     </div>
     <div class="header-actions">
       <restaurant-button variant="ghost" (click)="onExportar()">
         <div class="btn-icon-text">
           <lucide-icon name="download" [size]="18"></lucide-icon>
-          Exportar Reporte
+          {{ i18n.t('conciliacion.exportar_reporte') }}
         </div>
       </restaurant-button>
       <restaurant-button variant="primary" routerLink="../toma-fisica">
         <div class="btn-icon-text">
           <lucide-icon name="plus" [size]="18"></lucide-icon>
-          Nueva Conciliación
+          {{ i18n.t('conciliacion.nueva') }}
         </div>
       </restaurant-button>
     </div>
@@ -32,28 +32,28 @@
        ═══════════════════════════════════════════════════════════════════════ -->
   <div class="kpi-row">
     <restaurant-kpi-card
-      label="TOTAL CONCILIACIONES"
+      [label]="i18n.t('conciliacion.kpi_total')"
       [value]="totalConciliaciones()"
       iconName="check-square"
       iconVariant="success">
     </restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="ÍTEMS CON DIFERENCIA"
+      [label]="i18n.t('conciliacion.kpi_diferencias')"
       [value]="diferenciasTotal()"
       iconName="alert-triangle"
       iconVariant="alert">
     </restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="PRECISIÓN PROMEDIO"
+      [label]="i18n.t('conciliacion.kpi_precision')"
       [value]="precisionPromedio() + '%'"
       iconName="check-circle-2"
       iconVariant="info">
     </restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="ÚLTIMA CONCILIACIÓN"
+      [label]="i18n.t('conciliacion.kpi_ultima')"
       [value]="ultimaFecha() ?? 'Sin datos'"
       iconName="clock"
       iconVariant="neutral">
@@ -74,23 +74,23 @@
         
         <div dtHeader class="table-filters">
           <div class="filter-dropdown">
-            <span>Todos</span>
+            <span>{{ i18n.t('comun.todos') }}</span>
             <lucide-icon name="chevron-down" [size]="16"></lucide-icon>
           </div>
           <div class="filter-dropdown">
-            <span>Todos los estados</span>
+            <span>{{ i18n.t('conciliacion.todos_estados') }}</span>
             <lucide-icon name="chevron-down" [size]="16"></lucide-icon>
           </div>
         </div>
 
         <thead>
           <tr>
-            <th>FECHA</th>
-            <th>UBICACIÓN</th>
-            <th>ÍTEMS</th>
-            <th>PRECISIÓN</th>
-            <th>ESTADO</th>
-            <th class="text-center">ACCIÓN</th>
+            <th>{{ i18n.t('comun.fecha') }}</th>
+            <th>{{ i18n.t('conciliacion.th_ubicacion') }}</th>
+            <th>{{ i18n.t('conciliacion.th_items') }}</th>
+            <th>{{ i18n.t('conciliacion.th_precision') }}</th>
+            <th>{{ i18n.t('comun.estado') }}</th>
+            <th class="text-center">{{ i18n.t('comun.accion') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -135,10 +135,10 @@
     
     <!-- Top 3 conciliaciones con más diferencias -->
     <div class="sidebar-card">
-      <h3 class="sidebar-title">Top 3 con más diferencias</h3>
+      <h3 class="sidebar-title">{{ i18n.t('conciliacion.top3_titulo') }}</h3>
       <div class="top-list">
         @if (topDiferencias().length === 0) {
-          <p class="text-secondary">Sin conciliaciones con diferencias.</p>
+          <p class="text-secondary">{{ i18n.t('conciliacion.sin_diferencias') }}</p>
         }
         @for (item of topDiferencias(); track item.label) {
           <div class="top-item">
@@ -158,13 +158,13 @@
     <!-- Volumen vs Precisión (últimos 6 meses reales) -->
     <div class="sidebar-card">
       <div class="sidebar-header-flex">
-        <h3 class="sidebar-title">Precisión mensual</h3>
+        <h3 class="sidebar-title">{{ i18n.t('conciliacion.precision_mensual') }}</h3>
         <lucide-icon name="more-vertical" [size]="18" class="text-disabled"></lucide-icon>
       </div>
       <p class="sidebar-subtitle">Últimos {{ tendenciaMensual().length }} meses</p>
 
       @if (tendenciaMensual().length === 0) {
-        <p class="text-secondary">Sin datos para mostrar.</p>
+        <p class="text-secondary">{{ i18n.t('comun.sin_datos') }}</p>
       } @else {
         <div class="placeholder-chart">
           <div class="vol-bars">
@@ -178,7 +178,7 @@
             }
           </div>
           <div class="chart-legend">
-            <div class="legend-item"><div class="dot prec-dot"></div><span>Precisión (%)</span></div>
+            <div class="legend-item"><div class="dot prec-dot"></div><span>{{ i18n.t('conciliacion.leyenda_precision') }}</span></div>
           </div>
         </div>
       }

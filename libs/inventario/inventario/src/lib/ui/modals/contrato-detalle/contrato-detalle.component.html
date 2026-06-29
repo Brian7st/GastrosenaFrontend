@@ -6,13 +6,13 @@
       <div class="detalle-header__info">
         <h2 class="detalle-title">
           @if (contrato) {
-            Contrato {{ contrato.numero }}
+            {{ i18n.t('contrato-detalle.title').replace('{{ numero }}', contrato.numero) }}
           } @else {
-            Detalle de contrato
+            {{ i18n.t('contrato-detalle.title_fallback') }}
           }
         </h2>
         @if (contrato) {
-          <p class="detalle-subtitle">Vigencia {{ contrato.vigencia }}</p>
+          <p class="detalle-subtitle">{{ i18n.t('contrato-detalle.vigencia').replace('{{ vigencia }}', String(contrato.vigencia)) }}</p>
         }
       </div>
       <div class="detalle-header__actions">
@@ -22,7 +22,7 @@
             {{ contrato.estado }}
           </span>
         }
-        <button class="btn-close" (click)="cerrar.emit()" aria-label="Cerrar">
+        <button class="btn-close" (click)="cerrar.emit()" [attr.aria-label]="i18n.t('contrato-detalle.cerrar')">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
@@ -38,19 +38,19 @@
         <!-- Metadata grid -->
         <div class="meta-grid">
           <div class="meta-field">
-            <span class="meta-label">Descripción</span>
+            <span class="meta-label">{{ i18n.t('contrato-detalle.label_descripcion') }}</span>
             <span class="meta-value">{{ contrato.descripcion ?? '—' }}</span>
           </div>
           <div class="meta-field">
-            <span class="meta-label">Fecha inicio</span>
+            <span class="meta-label">{{ i18n.t('contrato-detalle.label_fecha_inicio') }}</span>
             <span class="meta-value">{{ contrato.fechaInicio ?? '—' }}</span>
           </div>
           <div class="meta-field">
-            <span class="meta-label">Fecha fin</span>
+            <span class="meta-label">{{ i18n.t('contrato-detalle.label_fecha_fin') }}</span>
             <span class="meta-value">{{ contrato.fechaFin ?? '—' }}</span>
           </div>
           <div class="meta-field">
-            <span class="meta-label">Total ítems</span>
+            <span class="meta-label">{{ i18n.t('contrato-detalle.label_total_items') }}</span>
             <span class="meta-value">{{ contrato.items.length }}</span>
           </div>
         </div>
@@ -59,7 +59,7 @@
         <div class="items-section">
           <div class="items-section__header">
             <span class="material-symbols-outlined">receipt_long</span>
-            <h3 class="items-section__title">Ítems adjudicados</h3>
+            <h3 class="items-section__title">{{ i18n.t('contrato-detalle.items_title') }}</h3>
             <span class="items-count">{{ contrato.items.length }}</span>
           </div>
 
@@ -67,12 +67,12 @@
             <table class="items-table">
               <thead>
                 <tr>
-                  <th>Ref. Artículo</th>
-                  <th>Descripción</th>
-                  <th class="text-center">Unidad</th>
-                  <th class="text-right">Vlr. Adjudicado</th>
-                  <th class="text-right">Vlr. Antes</th>
-                  <th class="text-right">IVA</th>
+                  <th>{{ i18n.t('contrato-detalle.th_ref_articulo') }}</th>
+                  <th>{{ i18n.t('contrato-detalle.th_descripcion') }}</th>
+                  <th class="text-center">{{ i18n.t('contrato-detalle.th_unidad') }}</th>
+                  <th class="text-right">{{ i18n.t('contrato-detalle.th_vlr_adjudicado') }}</th>
+                  <th class="text-right">{{ i18n.t('contrato-detalle.th_vlr_antes') }}</th>
+                  <th class="text-right">{{ i18n.t('contrato-detalle.th_iva') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -87,7 +87,7 @@
                   </tr>
                 } @empty {
                   <tr>
-                    <td colspan="6" class="empty-row">Sin ítems registrados</td>
+                    <td colspan="6" class="empty-row">{{ i18n.t('contrato-detalle.sin_items') }}</td>
                   </tr>
                 }
               </tbody>
@@ -104,7 +104,7 @@
                   variant="surface"
                   [disabled]="pagina === 0"
                   (click)="paginaAnterior()">
-                  Anterior
+                  {{ i18n.t('contrato-detalle.pag_anterior') }}
                 </restaurant-button>
                 <span class="items-paginacion__pagina">
                   {{ pagina + 1 }} / {{ totalPaginas }}
@@ -113,7 +113,7 @@
                   variant="surface"
                   [disabled]="pagina >= totalPaginas - 1"
                   (click)="paginaSiguiente()">
-                  Siguiente
+                  {{ i18n.t('contrato-detalle.pag_siguiente') }}
                 </restaurant-button>
               </div>
             </div>
@@ -126,7 +126,7 @@
     <!-- Footer -->
     <div class="detalle-footer">
       <restaurant-button variant="surface" (click)="cerrar.emit()">
-        Cerrar
+        {{ i18n.t('contrato-detalle.cerrar') }}
       </restaurant-button>
     </div>
 

@@ -20,8 +20,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         !req.url.includes('/auth/login') &&
         enAreaProtegida
       ) {
-        authService.logout();
-        router.navigate(['/auth/login']);
+         authService.logout();
+         router.navigate(['/auth/login']);
       }
       
       return throwError(() => error);

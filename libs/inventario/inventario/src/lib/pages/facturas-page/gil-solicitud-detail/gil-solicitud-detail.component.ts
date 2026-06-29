@@ -9,6 +9,7 @@ import {
 import { FacturasFacade } from '../../../data-access/facturas.facade';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 import { EstadoGIL } from '../../../models/facturas.model';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-gil-solicitud-detail',
@@ -20,6 +21,7 @@ import { EstadoGIL } from '../../../models/facturas.model';
 })
 export class GilSolicitudDetailPageComponent implements OnInit {
   private facade            = inject(FacturasFacade);
+  protected readonly i18n = inject(I18nService);
   private solicitudesFacade = inject(SolicitudesFacade);
   private route             = inject(ActivatedRoute);
   private router            = inject(Router);

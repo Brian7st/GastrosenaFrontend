@@ -5,6 +5,7 @@ import { LucideIconComponent, ButtonComponent, DataTableComponent, KpiCardCompon
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { ExportarComponent } from '../../../components/exportar/exportar.component';
 import { ConciliacionFacade } from '../../../data-access/conciliacion.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-conciliacion-historial',
@@ -25,6 +26,7 @@ import { ConciliacionFacade } from '../../../data-access/conciliacion.facade';
 })
 export class ConciliacionHistorialComponent implements OnInit {
   private location = inject(Location);
+  protected readonly i18n = inject(I18nService);
   protected facade = inject(ConciliacionFacade);
 
   // Signals desde la facade

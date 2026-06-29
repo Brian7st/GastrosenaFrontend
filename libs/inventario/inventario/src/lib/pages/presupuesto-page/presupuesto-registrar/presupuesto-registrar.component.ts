@@ -6,6 +6,7 @@ import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 import { PresupuestoFacade } from '../../../data-access/presupuesto.facade';
 import { ProgramasService, Programa } from '../../../data-access/services/programas.service';
 import { FuenteFinanciacion, RegistrarPresupuestoData } from '../../../models/presupuesto.model';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-presupuesto-registrar',
@@ -17,6 +18,7 @@ import { FuenteFinanciacion, RegistrarPresupuestoData } from '../../../models/pr
 })
 export class PresupuestoRegistrarComponent implements OnInit {
   private router = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private fb     = inject(FormBuilder);
   private facade = inject(PresupuestoFacade);
   private programasService = inject(ProgramasService);

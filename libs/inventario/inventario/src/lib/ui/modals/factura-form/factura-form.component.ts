@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, inject, signal } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { FacturaFormDto } from '../../../models/facturas.model';
 import type { InfoBancariaTipo } from '../../../data-access/api/sourcing.api';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-factura-form',
@@ -13,6 +14,7 @@ import type { InfoBancariaTipo } from '../../../data-access/api/sourcing.api';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FacturaFormComponent {
+  protected readonly i18n = inject(I18nService);
   // eslint-disable-next-line @angular-eslint/no-output-native
   @Output() close = new EventEmitter<void>();
   // eslint-disable-next-line @angular-eslint/no-output-native

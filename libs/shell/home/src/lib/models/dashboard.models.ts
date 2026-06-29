@@ -13,6 +13,7 @@ export interface ModuleCard {
   ruta: string;
   badgeCount?: number;
   badgeType?: 'alert' | 'info' | 'success';
+  roles?: string[];
 }
 
 export interface ActividadReciente {

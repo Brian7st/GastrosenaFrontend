@@ -43,9 +43,10 @@ export class UsuariosService extends BaseHttpService {
         const raw = Array.isArray(res) ? res : (res.content ?? []);
         const content = raw.map((u: any) => ({
           ...u,
-          id:     u.idUsuario  ?? u.id,
-          activo: u.estado     ?? u.activo,
-          rol:    u.rol?.nombreRol ?? u.rol,
+          id:       u.idUsuario       ?? u.id,
+          activo:   u.estado          ?? u.activo,
+          rol:      u.rol?.nombreRol  ?? u.rol,
+          creadoEn: u.fechaCreacion   ?? u.creadoEn,
         }));
         return {
           content,
@@ -87,15 +88,21 @@ export class UsuariosService extends BaseHttpService {
   }
 
   activarUsuario(id: string): Observable<UsuarioDetalle> {
-    return this.http.patch<UsuarioDetalle>(this.buildUrl(`${this.resource}/${id}/activar`), {});
+    return this.http.patch<any>(this.buildUrl(`${this.resource}/${id}/activar`), {}).pipe(
+      map(u => ({ ...u, id: u.idUsuario ?? u.id, activo: u.estado ?? u.activo, rol: u.rol?.nombreRol ?? u.rol }))
+    );
   }
 
   desactivarUsuario(id: string): Observable<UsuarioDetalle> {
-    return this.http.patch<UsuarioDetalle>(this.buildUrl(`${this.resource}/${id}/desactivar`), {});
+    return this.http.patch<any>(this.buildUrl(`${this.resource}/${id}/desactivar`), {}).pipe(
+      map(u => ({ ...u, id: u.idUsuario ?? u.id, activo: u.estado ?? u.activo, rol: u.rol?.nombreRol ?? u.rol }))
+    );
   }
 
   desbloquearCuenta(id: string): Observable<UsuarioDetalle> {
-    return this.http.patch<UsuarioDetalle>(this.buildUrl(`${this.resource}/${id}/desbloquear`), {});
+    return this.http.patch<any>(this.buildUrl(`${this.resource}/${id}/desbloquear`), {}).pipe(
+      map(u => ({ ...u, id: u.idUsuario ?? u.id, activo: u.estado ?? u.activo, rol: u.rol?.nombreRol ?? u.rol }))
+    );
   }
 
   importarMasivo(request: ImportarUsuariosRequest): Observable<ImportarUsuariosResponse> {

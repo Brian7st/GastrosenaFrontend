@@ -1,5 +1,5 @@
 <div class="menu-header">
-  <h2>Menú</h2>
+  <h2>{{ i18n.t('pedidosMenuGrid.title') }}</h2>
 </div>
 
 <div class="menu-grid">
@@ -27,9 +27,9 @@
 
 <restaurant-confirm-dialog
   [open]="showNoTableModal()"
-  title="Mesa no asignada"
-  message="Debes tener una mesa asignada para poder agregar productos al pedido."
-  confirmText="Ir a mesas"
+  [title]="i18n.t('pedidosMenuGrid.noTableTitle')"
+  [message]="i18n.t('pedidosMenuGrid.noTableMessage')"
+  [confirmText]="i18n.t('pedidosMenuGrid.goToTables')"
   [showCancel]="false"
   (confirm)="irAMesas()"
   (cancel)="showNoTableModal.set(false)"

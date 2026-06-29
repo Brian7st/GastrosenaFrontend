@@ -10,6 +10,7 @@ import {
   ButtonComponent,
   StatusBadgeComponent
 } from '@restaurant/shared/ui';
+import { I18nService } from '../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-historial-instructor-page',
@@ -29,6 +30,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HistorialInstructorPageComponent implements OnInit {
+  protected readonly i18n = inject(I18nService);
   public facade = inject(RestauranteFacade);
   
   public todasLasOrdenes = this.facade.ordenesHistorial;
@@ -96,11 +98,11 @@ export class HistorialInstructorPageComponent implements OnInit {
 
   obtenerNombreMesa(mesaId: string): string {
     const mesa = this.facade.mesas().find(m => m.id === mesaId);
-    return mesa ? mesa.nombre : 'Mesa ' + mesaId.substring(0, 4);
+    return mesa ? mesa.nombre : this.i18n.t('historialInstructor.table') + ' ' + mesaId.substring(0, 4);
   }
 
   acortarMesero(meseroId: string): string {
     if (!meseroId) return 'N/A';
-    return meseroId.length > 8 ? 'Mesero ' + meseroId.substring(meseroId.length - 8) : meseroId;
+    return meseroId.length > 8 ? 'Waiter ' + meseroId.substring(meseroId.length - 8) : meseroId;
   }
 }

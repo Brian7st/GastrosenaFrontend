@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, Output, EventEmitter, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { I18nService } from '../../i18n/i18n.service';
 import { CategoriaService } from '../../data-access/categoria.service';
 import { Categoria } from '../../models/receta.model';
 import { LucideIconComponent, ButtonComponent, AlertComponent, InputComponent, ConfirmDialogComponent } from '@restaurant/shared/ui';
@@ -13,6 +14,7 @@ import { LucideIconComponent, ButtonComponent, AlertComponent, InputComponent, C
   styleUrl: './gestion-categorias.component.scss',
 })
 export class GestionCategoriasComponent implements OnInit {
+  protected readonly i18n = inject(I18nService);
   public categoriaService = inject(CategoriaService);
   
   @Output() close = new EventEmitter<boolean>();
@@ -37,7 +39,7 @@ export class GestionCategoriasComponent implements OnInit {
 
   guardarCategoria() {
     if (!this.nuevaCategoriaNombre.trim()) {
-      this.mostrarAlerta('error', 'El nombre no puede estar vacío');
+      this.mostrarAlerta('error', this.i18n.t('gestion-categorias.alerta_vacio'));
       return;
     }
 
@@ -46,22 +48,22 @@ export class GestionCategoriasComponent implements OnInit {
       this.categoriaService.actualizarCategoria(this.categoriaEnEdicion.idCategoria!, { nombreCategoria: this.nuevaCategoriaNombre })
         .subscribe({
           next: () => {
-            this.mostrarAlerta('success', 'Categoría actualizada correctamente');
+            this.mostrarAlerta('success', this.i18n.t('gestion-categorias.alerta_actualizada'));
             this.resetFormulario();
             this.categoriaService.listar();
           },
-          error: (err) => this.mostrarAlerta('error', 'Error al actualizar categoría')
+          error: (err) => this.mostrarAlerta('error', this.i18n.t('gestion-categorias.alerta_error_actualizar'))
         });
     } else {
       // Crear nueva
       this.categoriaService.guardarCategoria({ nombreCategoria: this.nuevaCategoriaNombre })
         .subscribe({
           next: () => {
-            this.mostrarAlerta('success', 'Categoría creada correctamente');
+            this.mostrarAlerta('success', this.i18n.t('gestion-categorias.alerta_creada'));
             this.resetFormulario();
             this.categoriaService.listar();
           },
-          error: (err) => this.mostrarAlerta('error', 'Error al crear categoría')
+          error: (err) => this.mostrarAlerta('error', this.i18n.t('gestion-categorias.alerta_error_crear'))
         });
     }
   }
@@ -86,12 +88,12 @@ export class GestionCategoriasComponent implements OnInit {
     if (id) {
       this.categoriaService.eliminarCategoria(id).subscribe({
         next: () => {
-          this.mostrarAlerta('success', 'Categoría eliminada con éxito');
+          this.mostrarAlerta('success', this.i18n.t('gestion-categorias.alerta_eliminada'));
           this.categoriaService.listar();
         },
         error: (err) => {
           // El backend rechaza la eliminación por integridad referencial
-          this.mostrarAlerta('error', 'La categoría está en uso por una o más recetas y no se puede eliminar.');
+          this.mostrarAlerta('error', this.i18n.t('gestion-categorias.alerta_error_eliminar'));
         }
       });
     }

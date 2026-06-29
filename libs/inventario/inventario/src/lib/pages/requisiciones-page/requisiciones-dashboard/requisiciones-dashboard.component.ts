@@ -7,6 +7,7 @@ import {
   ButtonComponent,
 } from '@restaurant/shared/ui';
 import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-requisiciones-dashboard',
@@ -23,6 +24,7 @@ import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
 })
 export class RequisicionesDashboardComponent implements OnInit {
   private router = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private facade = inject(RequisicionesFacade);
 
   // ── Estado reactivo desde facade ─────────────────────────────────────────

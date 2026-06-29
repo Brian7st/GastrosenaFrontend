@@ -8,6 +8,7 @@ import { PresupuestoFacade } from '../../../data-access/presupuesto.facade';
 import { GilesService } from '../../../data-access/services/giles.service';
 import { FacturasService } from '../../../data-access/services/facturas.service';
 import { GilResponse } from '../../../data-access/api/procurement.api';
+import { I18nService } from '../../../i18n/i18n.service';
 
 /**
  * Comprometer presupuesto contra un GIL verificado (conciliación FEL↔GIL completa).
@@ -24,6 +25,7 @@ import { GilResponse } from '../../../data-access/api/procurement.api';
 })
 export class PresupuestoCargarGilComponent implements OnInit {
   private router          = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private facade          = inject(PresupuestoFacade);
   private giles           = inject(GilesService);
   private facturasService = inject(FacturasService);

@@ -6,6 +6,7 @@ import { LucideIconComponent, KpiCardComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { ConciliacionFacade } from '../../../data-access/conciliacion.facade';
 import { DiferenciaItem } from '../../../models/conciliacion.model';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-conciliacion-detalle',
@@ -24,6 +25,7 @@ import { DiferenciaItem } from '../../../models/conciliacion.model';
 })
 export class ConciliacionDetalleComponent implements OnInit {
   private location = inject(Location);
+  protected readonly i18n = inject(I18nService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private facade = inject(ConciliacionFacade);

@@ -5,8 +5,8 @@
     <div style="display:flex;justify-content:flex-start;margin-bottom:var(--space-6)">
       <inventario-back-button (clicked)="goBack()"></inventario-back-button>
     </div>
-    <h1 class="page-title">Nueva Requisición de Insumos</h1>
-    <p class="page-subtitle">Seleccione los productos necesarios para su práctica formativa</p>
+    <h1 class="page-title">{{ i18n.t('req.crear_titulo') }}</h1>
+    <p class="page-subtitle">{{ i18n.t('req.crear_subtitulo') }}</p>
   </div>
 
   <!-- ═══ CONTEXT FORM (debajo del título) ═════════════════════════════════ -->
@@ -15,13 +15,13 @@
       <lucide-icon name="hash" [size]="16"></lucide-icon>
       <input class="context-bar__input" formControlName="fichaId"
              inputmode="numeric" pattern="[0-9]*"
-             placeholder="Ficha de caracterización"/>
+             [placeholder]="i18n.t('req.ficha_placeholder')"/>
     </div>
     <div class="context-bar__divider"></div>
     <div class="context-bar__item">
       <lucide-icon name="user" [size]="16"></lucide-icon>
       <input class="context-bar__input" formControlName="instructorNombre"
-             placeholder="Nombre del instructor"/>
+             [placeholder]="i18n.t('req.instructor_placeholder')"/>
     </div>
     <div class="context-bar__divider"></div>
     <div class="context-bar__item">
@@ -63,12 +63,12 @@
             @if (catState()[cat.key].loading) {
               <div class="empty-notice">
                 <lucide-icon name="loader-2" [size]="16"></lucide-icon>
-                Cargando productos...
+                {{ i18n.t('comun.cargando_productos') }}
               </div>
             } @else if (catState()[cat.key].productos.length === 0) {
               <div class="empty-notice">
                 <lucide-icon name="inbox" [size]="16"></lucide-icon>
-                No hay productos activos en esta categoría.
+                {{ i18n.t('req.sin_productos_cat') }}
               </div>
             } @else {
               <div class="product-grid">
@@ -81,7 +81,7 @@
                           <h4 class="product-card__name">{{ bien.descripcion }}</h4>
                           @if (bien.estado === 'Bajo Stock' || bien.estado === 'Agotado') {
                             <span class="product-card__tag product-card__tag--critical">
-                              {{ bien.estado === 'Agotado' ? 'AGOTADO' : 'BAJO STOCK' }}
+                              {{ bien.estado === 'Agotado' ? i18n.t('req.agotado') : i18n.t('req.bajo_stock') }}
                             </span>
                           }
                         </div>
@@ -91,7 +91,7 @@
                         </p>
                         <p class="product-card__stock">
                           <lucide-icon name="layers" [size]="13"></lucide-icon>
-                          Stock actual:
+                          {{ i18n.t('req.stock_actual') }}:
                           <strong>{{ bien.stockActual | number:'1.0-2' }} {{ bien.unidadMedida }}</strong>
                         </p>
                         <div class="product-card__qty-row">
@@ -106,20 +106,20 @@
                             <button class="qty-btn qty-btn--plus" type="button"
                                     (click)="incrementar(bien)">+</button>
                           </div>
-                          <span class="product-card__qty-label">Cant. a pedir</span>
+                          <span class="product-card__qty-label">{{ i18n.t('req.cant_pedir') }}</span>
                         </div>
                       </div>
                     </div>
                     @if (bien.estado === 'Bajo Stock') {
                       <div class="product-card__alert">
                         <lucide-icon name="alert-triangle" [size]="14"></lucide-icon>
-                        Stock bajo — verificar disponibilidad
+                        {{ i18n.t('req.stock_bajo_hint') }}
                       </div>
                     }
                     @if (bien.estado === 'Agotado') {
                       <div class="product-card__alert">
                         <lucide-icon name="alert-triangle" [size]="14"></lucide-icon>
-                        Producto agotado en bodega
+                        {{ i18n.t('req.agotado_hint') }}
                       </div>
                     }
                   </div>
@@ -136,30 +136,30 @@
   <div class="summary-bar">
     <div class="summary-bar__stats">
       <div class="summary-bar__stat">
-        <span class="summary-bar__stat-label">Productos</span>
+        <span class="summary-bar__stat-label">{{ i18n.t('req.productos') }}</span>
         <span class="summary-bar__stat-value">{{ draft.totalItems() }}</span>
       </div>
       <div class="summary-bar__stat-divider"></div>
       <div class="summary-bar__stat">
-        <span class="summary-bar__stat-label">Unidades</span>
+        <span class="summary-bar__stat-label">{{ i18n.t('req.unidades') }}</span>
         <span class="summary-bar__stat-value">{{ draft.totalUnidades() }}</span>
       </div>
     </div>
     @if (!contextForm.valid && contextForm.touched) {
       <div class="summary-bar__message">
         <lucide-icon name="alert-circle" [size]="14"></lucide-icon>
-        Complete la ficha, instructor, fecha y hora
+        {{ i18n.t('req.completar_contexto') }}
       </div>
     } @else if (draft.totalItems() === 0) {
       <div class="summary-bar__message">
         <lucide-icon name="info" [size]="14"></lucide-icon>
-        Seleccione al menos un producto para continuar
+        {{ i18n.t('req.sel_producto_hint') }}
       </div>
     }
     <restaurant-button variant="primary"
                        (click)="revisar()"
                        [disabled]="!puedeRevisar()">
-      Revisar Pedido
+      {{ i18n.t('req.revisar_pedido') }}
       <lucide-icon name="shopping-cart" [size]="20"></lucide-icon>
     </restaurant-button>
   </div>

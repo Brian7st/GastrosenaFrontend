@@ -7,9 +7,7 @@
     <div>
       <div class="title-group">
         <inventario-back-button (clicked)="goBack()" />
-        <h1 class="page-title">
-          Toma Física de Inventario@if (categoria()) {<span class="page-title-cat"> · {{ categoria() }}</span>}
-        </h1>
+        <h1 class="page-title">{{ i18n.t('conciliacion.toma_titulo') }}@if (categoria()) {<span class="page-title-cat"> · {{ categoria() }}</span>}</h1>
       </div>
       <div class="header-meta">
         <div class="meta-item">
@@ -29,14 +27,14 @@
             class="meta-input"
             [ngModel]="responsable()"
             (ngModelChange)="responsable.set($event)"
-            placeholder="Responsable del conteo"
+            [placeholder]="i18n.t('conciliacion.responsable_placeholder')"
             aria-label="Responsable del conteo">
         </div>
       </div>
     </div>
     <div class="header-actions">
       <div class="location-selector">
-        <span>Almacén Principal - Cocina</span>
+        <span>{{ i18n.t('conciliacion.almacen_principal') }}</span>
         <lucide-icon name="chevron-down" [size]="16"></lucide-icon>
       </div>
     </div>
@@ -47,28 +45,28 @@
        ═══════════════════════════════════════════════════════════════════════ -->
   <div class="summary-grid">
     <restaurant-kpi-card
-      label="ÍTEMS TOTALES"
+      [label]="i18n.t('conciliacion.kpi_items_totales')"
       [value]="itemsTotales()"
       iconName="list"
       iconVariant="neutral">
     </restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="PRECISIÓN"
+      [label]="i18n.t('conciliacion.kpi_precision_card')"
       [value]="precision() + '%'"
       iconName="check-circle"
       iconVariant="success">
     </restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="DIFERENCIAS"
+      [label]="i18n.t('conciliacion.kpi_diferencias_card')"
       [value]="diferenciasCount()"
       iconName="alert-triangle"
       iconVariant="alert">
     </restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="IMPACTO FINANCIERO"
+      [label]="i18n.t('conciliacion.kpi_impacto')"
       [value]="formatCurrency(impactoFinanciero())"
       iconName="trending-down"
       iconVariant="alert">
@@ -80,22 +78,22 @@
        ═══════════════════════════════════════════════════════════════════════ -->
   <div class="table-controls">
     <div class="tabs-group">
-      <button class="tab-btn" [class.tab-btn--active]="activeTab() === 'todos'" (click)="setTab('todos')">TODOS</button>
-      <button class="tab-btn" [class.tab-btn--active]="activeTab() === 'diferencias'" (click)="setTab('diferencias')">DIFERENCIAS</button>
-      <button class="tab-btn" [class.tab-btn--active]="activeTab() === 'pendientes'" (click)="setTab('pendientes')">PENDIENTES</button>
+      <button class="tab-btn" [class.tab-btn--active]="activeTab() === 'todos'" (click)="setTab('todos')">{{ i18n.t('conciliacion.tab_todos') }}</button>
+      <button class="tab-btn" [class.tab-btn--active]="activeTab() === 'diferencias'" (click)="setTab('diferencias')">{{ i18n.t('conciliacion.tab_diferencias') }}</button>
+      <button class="tab-btn" [class.tab-btn--active]="activeTab() === 'pendientes'" (click)="setTab('pendientes')">{{ i18n.t('conciliacion.tab_pendientes') }}</button>
     </div>
     
     <div class="actions-group">
       <restaurant-button variant="ghost">
         <div class="btn-icon-text">
           <lucide-icon name="save" [size]="18"></lucide-icon>
-          Guardar Borrador
+          {{ i18n.t('conciliacion.guardar_borrador') }}
         </div>
       </restaurant-button>
       <restaurant-button variant="ghost">
         <div class="btn-icon-text">
           <lucide-icon name="download" [size]="18"></lucide-icon>
-          Exportar Acta
+          {{ i18n.t('conciliacion.exportar_acta') }}
         </div>
       </restaurant-button>
     </div>
@@ -108,14 +106,14 @@
     <table class="interactive-table">
       <thead>
         <tr>
-          <th>CÓD SENA</th>
-          <th>CATEGORÍA</th>
-          <th>PRODUCTO</th>
-          <th class="text-right">STOCK SIST.</th>
-          <th class="text-center">CONTEO FÍSICO</th>
-          <th class="text-center">DIF.</th>
-          <th class="text-right">VALOR UNIT.</th>
-          <th class="text-right">IMPACTO TOTAL</th>
+          <th>{{ i18n.t('comun.cod_sena') }}</th>
+          <th>{{ i18n.t('conciliacion.th_categoria') }}</th>
+          <th>{{ i18n.t('conciliacion.th_producto') }}</th>
+          <th class="text-right">{{ i18n.t('conciliacion.th_stock_sis') }}</th>
+          <th class="text-center">{{ i18n.t('conciliacion.th_conteo_fisico') }}</th>
+          <th class="text-center">{{ i18n.t('conciliacion.th_dif') }}</th>
+          <th class="text-right">{{ i18n.t('conciliacion.th_valor_unit') }}</th>
+          <th class="text-right">{{ i18n.t('conciliacion.th_impacto_total') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -162,7 +160,7 @@
     @if (pendientesCount() > 0) {
       <div class="warning-alert">
         <lucide-icon name="alert-circle" [size]="16"></lucide-icon>
-        <span>Quedan {{ pendientesCount() }} ítems sin contar</span>
+        <span>{{ i18n.t('conciliacion.items_sin_contar', { count: pendientesCount().toString() }) }}</span>
       </div>
     } @else {
       <div></div>
@@ -171,9 +169,9 @@
     <restaurant-button variant="primary" [disabled]="!puedeFinalizar()" (click)="finalizar()">
       <div class="btn-icon-text">
         @if (loading()) {
-          Procesando...
+          {{ i18n.t('comun.procesando') }}
         } @else {
-          Finalizar y Ajustar Stock
+          {{ i18n.t('conciliacion.finalizar') }}
           <lucide-icon name="arrow-right" [size]="18"></lucide-icon>
         }
       </div>

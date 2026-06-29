@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { BienExportService } from '../../../data-access/services/bien-export.service';
+import { I18nService } from '../../../i18n/i18n.service';
 
 interface FormatoExport {
   id: 'excel' | 'pdf';
@@ -24,6 +25,7 @@ interface FormatoExport {
 export class BienExportPageComponent {
   private router = inject(Router);
   private bienExportService = inject(BienExportService);
+  protected readonly i18n = inject(I18nService);
 
   selectedFormato = signal<'excel' | 'pdf'>('excel');
   soloActivos = signal(true);

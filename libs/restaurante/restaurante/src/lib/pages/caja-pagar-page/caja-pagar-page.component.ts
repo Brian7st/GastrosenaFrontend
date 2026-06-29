@@ -11,6 +11,7 @@ import {
 } from '@restaurant/shared/ui';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
 import { MetodoPago } from '../../models/restaurante.model';
+import { I18nService } from '../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-caja-pagar-page',
@@ -30,6 +31,7 @@ import { MetodoPago } from '../../models/restaurante.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CajaPagarPageComponent implements OnInit {
+  protected readonly i18n = inject(I18nService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   public facade = inject(RestauranteFacade);
@@ -154,17 +156,17 @@ export class CajaPagarPageComponent implements OnInit {
           this.facturaRecienPagadaId.set(facturaId);
           this.alertDialog.set({
             open: true,
-            title: 'Pago Procesado',
-            message: `El pago del pedido #${pedido.id.substring(0, 8).toUpperCase()} se registró correctamente. ¿Deseas descargar la tirilla en PDF?`,
+            title: this.i18n.t('cajaPagar.paymentSuccessTitle'),
+            message: this.i18n.t('cajaPagar.paymentSuccessMessage').replace('{{ id }}', pedido.id.substring(0, 8).toUpperCase()),
             type: 'confirm',
-            confirmText: 'Descargar Tirilla',
-            cancelText: 'Cerrar'
+            confirmText: this.i18n.t('cajaPagar.downloadReceipt'),
+            cancelText: this.i18n.t('cajaPagar.close')
           });
         } else {
           this.alertDialog.set({
             open: true,
-            title: 'Error de Pago',
-            message: 'No se pudo obtener el número de factura. Verifique en Movimientos.',
+            title: this.i18n.t('cajaPagar.paymentErrorTitle'),
+            message: this.i18n.t('cajaPagar.paymentErrorMessage'),
             type: 'error'
           });
         }
@@ -173,8 +175,8 @@ export class CajaPagarPageComponent implements OnInit {
         this.cerrarModal();
         this.alertDialog.set({
           open: true,
-          title: 'Error de Pago',
-          message: 'No se pudo registrar el pago. Verifique e intente nuevamente.',
+          title: this.i18n.t('cajaPagar.paymentErrorTitle'),
+          message: this.i18n.t('cajaPagar.paymentErrorTryMessage'),
           type: 'error'
         });
       }
@@ -183,7 +185,7 @@ export class CajaPagarPageComponent implements OnInit {
 
   confirmAlertDialog() {
     const state = this.alertDialog();
-    if (state.type === 'confirm' && state.title === 'Pago Procesado') {
+    if (state.type === 'confirm' && this.facturaRecienPagadaId()) {
       this.descargarTirillaYCerrar();
     } else {
       this.cerrarAlertDialog();

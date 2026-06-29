@@ -7,27 +7,27 @@
         <inventario-back-button (clicked)="goBack()" />
         <nav class="breadcrumb">
           <ol>
-            <li><a routerLink="/app/inventario/facturas">Facturas</a></li>
+            <li><a routerLink="/app/inventario/facturas">{{ i18n.t('factura.breadcrumb') }}</a></li>
             <li class="separator"><span class="material-symbols-outlined">chevron_right</span></li>
             <li class="current">{{ f.numeroFactura }}</li>
           </ol>
         </nav>
         <div class="page-header__title-row">
-          <h1 class="page-header__title">Factura Electrónica {{ f.numeroFactura }}</h1>
+          <h1 class="page-header__title">{{ i18n.t('factura.titulo') }} {{ f.numeroFactura }}</h1>
           <span class="badge" [ngClass]="'badge--' + (f.estado === 'VERIFICADA' ? 'verificada' : (f.estado === 'ANULADA' ? 'error' : 'primary-soft'))">{{ f.estado }}</span>
         </div>
       </div>
 
       <div class="page-header__actions">
-        <restaurant-button variant="surface" icon="print" (click)="descargarOImprimir()">Imprimir</restaurant-button>
+        <restaurant-button variant="surface" icon="print" (click)="descargarOImprimir()">{{ i18n.t('factura.imprimir') }}</restaurant-button>
 
         @if (f.estado === 'VERIFICADA') {
-          <restaurant-button variant="primary" icon="check_circle" (click)="showConfirmPagada.set(true)">Marcar como Pagada</restaurant-button>
+          <restaurant-button variant="primary" icon="check_circle" (click)="showConfirmPagada.set(true)">{{ i18n.t('factura.marcar_pagada') }}</restaurant-button>
         }
 
         @if (f.estado === 'REGISTRADA' && conciliacionGil(); as c) {
           @if (estaConciliada(c.diferencias)) {
-            <restaurant-button variant="primary" icon="verified" (click)="showConfirmVerificar.set(true)">Verificar Factura</restaurant-button>
+            <restaurant-button variant="primary" icon="verified" (click)="showConfirmVerificar.set(true)">{{ i18n.t('factura.verificar') }}</restaurant-button>
           }
         }
       </div>
@@ -42,7 +42,7 @@
 
         <div class="parties-grid">
           <div class="party-info">
-            <span class="party-info__label">Proveedor</span>
+            <span class="party-info__label">{{ i18n.t('factura.proveedor') }}</span>
             <h3 class="party-info__name">{{ f.proveedorNombre }}</h3>
             <p class="party-info__doc">NIT {{ f.proveedorNit }}</p>
             <p class="party-info__location">
@@ -50,8 +50,8 @@
             </p>
           </div>
           <div class="party-info">
-            <span class="party-info__label">Recepción</span>
-            <h3 class="party-info__name">Documento recibido</h3>
+            <span class="party-info__label">{{ i18n.t('factura.recepcion') }}</span>
+            <h3 class="party-info__name">{{ i18n.t('factura.doc_recibido') }}</h3>
             <p class="party-info__doc">{{ f.fechaRecepcion | date:'dd MMM yyyy' }}</p>
             <p class="party-info__location">
               <span class="material-symbols-outlined">person</span> {{ f.instructorId || 'Sin instructor vinculado' }}
@@ -63,19 +63,19 @@
 
         <div class="metadata-grid">
           <div class="metadata-item">
-            <span class="metadata-item__label">Fecha Emisión</span>
+            <span class="metadata-item__label">{{ i18n.t('factura.fecha_emision') }}</span>
             <p class="metadata-item__value">{{ f.fechaEmision | date:'dd MMM yyyy' }}</p>
           </div>
           <div class="metadata-item">
-            <span class="metadata-item__label">Fecha Recepción</span>
+            <span class="metadata-item__label">{{ i18n.t('factura.fecha_recepcion') }}</span>
             <p class="metadata-item__value">{{ f.fechaRecepcion | date:'dd MMM yyyy' }}</p>
           </div>
           <div class="metadata-item">
-            <span class="metadata-item__label">Beneficiario ZESE</span>
-            <p class="metadata-item__value">{{ f.proveedorBeneficiarioZese ? 'Sí' : 'No' }}</p>
+            <span class="metadata-item__label">{{ i18n.t('factura.beneficiario_zese') }}</span>
+            <p class="metadata-item__value">{{ f.proveedorBeneficiarioZese ? i18n.t('comun.si') : i18n.t('comun.no') }}</p>
           </div>
           <div class="metadata-item">
-            <span class="metadata-item__label">Orden Compra</span>
+            <span class="metadata-item__label">{{ i18n.t('factura.orden_compra') }}</span>
             <p class="metadata-item__value">{{ f.ordenCompra || 'N/A' }}</p>
           </div>
         </div>
@@ -88,14 +88,14 @@
             <thead>
               <tr>
                 <th class="col-idx text-center">#</th>
-                <th class="col-desc">Descripción</th>
-                <th class="col-prod">Producto</th>
-                <th class="col-num text-right">Cant.</th>
-                <th class="col-num text-right">Precio Unit.</th>
-                <th class="col-num text-right">IVA %</th>
-                <th class="col-num text-right">Subtotal</th>
-                <th class="col-num text-right">IVA</th>
-                <th class="col-num text-right">Total</th>
+                <th class="col-desc">{{ i18n.t('factura.th_descripcion') }}</th>
+                <th class="col-prod">{{ i18n.t('factura.th_producto') }}</th>
+                <th class="col-num text-right">{{ i18n.t('factura.th_cant') }}</th>
+                <th class="col-num text-right">{{ i18n.t('factura.th_precio_unit') }}</th>
+                <th class="col-num text-right">{{ i18n.t('factura.th_iva') }}</th>
+                <th class="col-num text-right">{{ i18n.t('factura.th_subtotal') }}</th>
+                <th class="col-num text-right">{{ i18n.t('factura.th_iva_valor') }}</th>
+                <th class="col-num text-right">{{ i18n.t('factura.th_total') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -105,7 +105,7 @@
                   <td class="font-medium">{{ item.descripcion }}</td>
                   <td class="text-secondary">
                     @if (esPendiente(item)) {
-                      <span class="badge badge--orange" title="Esta línea aún no está asociada a un bien del catálogo">Sin bien</span>
+                      <span class="badge badge--orange" [title]="i18n.t('factura.sin_bien_hint')">{{ i18n.t('factura.sin_bien') }}</span>
                     } @else {
                       {{ item.productoId || '—' }}
                     }
@@ -120,7 +120,7 @@
               }
               @if (!f.lineas || f.lineas.length === 0) {
                 <tr>
-                  <td colspan="9" class="text-center text-secondary empty-row">No hay artículos registrados.</td>
+                  <td colspan="9" class="text-center text-secondary empty-row">{{ i18n.t('factura.sin_articulos') }}</td>
                 </tr>
               }
             </tbody>
@@ -135,18 +135,18 @@
         <section class="bento-card">
           <div class="card-section">
             <h4 class="card-section__title">
-              <span class="material-symbols-outlined text-primary">verified_user</span> Validación DIAN
+              <span class="material-symbols-outlined text-primary">verified_user</span> {{ i18n.t('factura.validacion_dian') }}
             </h4>
             <div class="status-tags">
-              <span class="badge badge--success-soft">CUFE registrado</span>
-              <span class="badge badge--surface">{{ f.proveedorBeneficiarioZese ? 'ZESE' : 'Régimen estándar' }}</span>
+              <span class="badge badge--success-soft">{{ i18n.t('factura.cufe_registrado') }}</span>
+              <span class="badge badge--surface">{{ f.proveedorBeneficiarioZese ? i18n.t('factura.zese') : i18n.t('factura.regimen_estandar') }}</span>
             </div>
             <div class="cufe-box">
               <div class="cufe-box__text">
-                <span class="cufe-box__label">CUFE</span>
+                <span class="cufe-box__label">{{ i18n.t('factura.cufe') }}</span>
                 <span class="cufe-box__value" [title]="f.cufe">{{ f.cufe ? (f.cufe | slice:0:10) + '...' + (f.cufe | slice:-5) : 'N/A' }}</span>
               </div>
-              <button class="icon-btn" title="Copiar CUFE" (click)="onCopiarCufe(f.cufe)">
+              <button class="icon-btn" [title]="i18n.t('factura.copiar_cufe')" (click)="onCopiarCufe(f.cufe)">
                 <span class="material-symbols-outlined">content_copy</span>
               </button>
             </div>
@@ -156,15 +156,15 @@
 
           <div class="card-section">
             <h4 class="card-section__title">
-              <span class="material-symbols-outlined text-outline">account_balance</span> Datos Bancarios
+              <span class="material-symbols-outlined text-outline">account_balance</span> {{ i18n.t('factura.datos_bancarios') }}
             </h4>
             <div class="bank-info">
               <div class="bank-info__icon">
                 <span class="material-symbols-outlined">account_balance</span>
               </div>
               <div class="bank-info__text">
-                <p class="bank-info__name">{{ f.infoBancariaBanco || 'Sin banco registrado' }}</p>
-                <p class="bank-info__type">{{ f.infoBancariaTipo || 'Tipo no reportado' }} • {{ f.infoBancariaCuenta || 'Sin cuenta' }}</p>
+                <p class="bank-info__name">{{ f.infoBancariaBanco || i18n.t('factura.sin_banco') }}</p>
+                <p class="bank-info__type">{{ f.infoBancariaTipo || i18n.t('factura.tipo_no_reportado') }} • {{ f.infoBancariaCuenta || i18n.t('factura.sin_cuenta') }}</p>
               </div>
             </div>
           </div>
@@ -175,10 +175,10 @@
           <section class="bento-card bento-card--linked">
             <div class="linked-header">
               <div>
-                <span class="linked-header__label">Orden de compra</span>
-                <h4 class="linked-header__title">{{ f.ordenCompra || 'Sin orden vinculada' }}</h4>
+                <span class="linked-header__label">{{ i18n.t('factura.orden_de_compra') }}</span>
+                <h4 class="linked-header__title">{{ f.ordenCompra || i18n.t('factura.sin_orden') }}</h4>
               </div>
-              <span class="badge badge--primary-soft">{{ f.instructorId ? 'CON INSTRUCTOR' : 'SIN INSTRUCTOR' }}</span>
+              <span class="badge badge--primary-soft">{{ f.instructorId ? i18n.t('factura.con_instructor') : i18n.t('factura.sin_instructor_badge') }}</span>
             </div>
 
             <div class="linked-details">
@@ -188,7 +188,7 @@
           </section>
 
           <section class="bento-card p-5">
-            <h4 class="card-section__title mb-3">Documentos Soporte</h4>
+            <h4 class="card-section__title mb-3">{{ i18n.t('factura.doc_soporte') }}</h4>
             <div class="docs-grid">
               <button class="doc-btn group">
                 <span class="material-symbols-outlined text-tertiary group-hover-bounce">description</span>
@@ -204,19 +204,19 @@
 
         <!-- Resumen Fiscal -->
         <section class="bento-card bento-card--summary">
-          <h3 class="summary__title">Resumen Fiscal</h3>
+          <h3 class="summary__title">{{ i18n.t('factura.resumen_fiscal') }}</h3>
 
           <div class="summary__body">
             <div class="summary-row">
-              <span class="summary-row__label">Subtotal</span>
+              <span class="summary-row__label">{{ i18n.t('factura.subtotal') }}</span>
               <span class="summary-row__value font-medium">{{ f.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
             </div>
             <div class="summary-row">
-              <span class="summary-row__label">Total IVA</span>
+              <span class="summary-row__label">{{ i18n.t('factura.total_iva') }}</span>
               <span class="summary-row__value font-medium">{{ f.totalIva | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
             </div>
             <div class="summary-row">
-              <span class="summary-row__label">Retención ZESE</span>
+              <span class="summary-row__label">{{ i18n.t('factura.retencion_zese') }}</span>
               <span class="summary-row__value font-medium">{{ (f.valorRetencionZese || 0) | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
             </div>
           </div>
@@ -224,13 +224,13 @@
           @if (f.valorNetoAPagar !== null && f.valorNetoAPagar !== undefined && f.valorNetoAPagar < f.total) {
             <div class="summary__body summary__body--nc">
               <div class="summary-row">
-                <span class="summary-row__label">Total FEL</span>
+                <span class="summary-row__label">{{ i18n.t('factura.total_fel') }}</span>
                 <span class="summary-row__value font-medium">{{ f.total | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
               </div>
               <div class="summary-row summary-row--deduction">
                 <span class="summary-row__label">
                   <span class="material-symbols-outlined summary-row__icon">remove_circle</span>
-                  Notas crédito
+                  {{ i18n.t('factura.notas_credito') }}
                 </span>
                 <span class="summary-row__value font-medium text-danger">
                   − {{ (f.total - f.valorNetoAPagar) | currency:'COP':'symbol-narrow':'1.0-0' }}
@@ -240,10 +240,10 @@
           }
 
           <div class="summary__footer">
-            <span class="summary__footer-label">{{ f.valorNetoAPagar !== null && f.valorNetoAPagar !== undefined && f.valorNetoAPagar < f.total ? 'Neto a pagar' : 'Total a Pagar' }}</span>
+            <span class="summary__footer-label">{{ f.valorNetoAPagar !== null && f.valorNetoAPagar !== undefined && f.valorNetoAPagar < f.total ? i18n.t('factura.neto_pagar') + '' : i18n.t('factura.total_pagar') }}</span>
             <div class="text-right">
               <span class="summary__footer-total">{{ (f.valorNetoAPagar ?? f.total) | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-              <p class="summary__footer-currency">COP • Pesos Colombianos</p>
+              <p class="summary__footer-currency">{{ i18n.t('factura.moneda') }}</p>
             </div>
           </div>
         </section>
@@ -255,20 +255,18 @@
           <div class="gil-conciliacion__header">
             <div class="card-section__title">
               <span class="material-symbols-outlined text-primary">compare_arrows</span>
-              Conciliación con GIL
+              {{ i18n.t('factura.conciliacion_gil') }}
             </div>
             <span class="gil-estado-badge"
               [class.gil-estado-badge--ok]="estaConciliada(c.diferencias)">
-              {{ estaConciliada(c.diferencias) ? 'Conciliada' : countPendientes(c.diferencias) + ' diferencia(s) pendiente(s)' }}
+              {{ estaConciliada(c.diferencias) ? i18n.t('factura.conciliada') : countPendientes(c.diferencias) + ' ' + i18n.t('factura.diferencias_pendientes') }}
             </span>
           </div>
 
           @if (f.estado === 'REGISTRADA') {
             @if (!mostrarConteo()) {
               <div class="gil-reconciliar-row">
-                <p class="gil-reconciliar-hint">
-                  ¿Lo recibido no coincide con lo facturado? Ajustá el conteo físico y volvé a conciliar.
-                </p>
+                <p class="gil-reconciliar-hint">{{ i18n.t('factura.reconciliar_hint') }}</p>
                 <restaurant-button variant="surface" icon="checklist" (click)="abrirConteo()">
                   Ajustar conteo físico
                 </restaurant-button>
@@ -276,7 +274,7 @@
             } @else {
               <div class="conteo-editor">
                 <div class="conteo-editor__head">
-                  <h5 class="conteo-editor__title">Conteo físico recibido</h5>
+                  <h5 class="conteo-editor__title">{{ i18n.t('factura.conteo_fisico') }}</h5>
                   <p class="conteo-editor__hint">
                     Editá la cantidad realmente recibida por ítem. Se precargó con lo facturado.
                   </p>
@@ -286,9 +284,9 @@
                   <table class="gil-table">
                     <thead>
                       <tr>
-                        <th>Ítem</th>
-                        <th class="text-right">Cant. solicitada (GIL)</th>
-                        <th class="text-right">Cant. recibida</th>
+                        <th>{{ i18n.t('factura.th_item') }}</th>
+                        <th class="text-right">{{ i18n.t('factura.th_cant_gil') }}</th>
+                        <th class="text-right">{{ i18n.t('factura.th_cant_recibida') }}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -309,7 +307,7 @@
                                 (input)="setConteo(pid, $event)"
                               />
                             } @else {
-                              <span class="text-secondary">Sin producto vinculado</span>
+                              <span class="text-secondary">{{ i18n.t('factura.sin_producto') }}</span>
                             }
                           </td>
                         </tr>
@@ -319,7 +317,7 @@
                 </div>
 
                 <div class="conteo-editor__actions">
-                  <button class="btn-cancel" type="button" (click)="cerrarConteo()">Cancelar</button>
+                  <button class="btn-cancel" type="button" (click)="cerrarConteo()">{{ i18n.t('comun.cancelar') }}</button>
                   <button class="gil-resolve-btn" type="button" [disabled]="loading()" (click)="confirmarConteoYConciliar()">
                     Confirmar conteo y conciliar
                   </button>
@@ -329,20 +327,20 @@
           }
 
           @if (c.diferencias.length === 0) {
-            <p class="gil-conciliacion__empty">Todos los ítems coinciden con el GIL.</p>
+            <p class="gil-conciliacion__empty">{{ i18n.t('factura.items_coinciden') }}</p>
           } @else {
             <div class="gil-table-wrapper">
               <table class="gil-table">
                 <thead>
                   <tr>
-                    <th>Descripción</th>
-                    <th class="text-right">Cant. GIL</th>
-                    <th class="text-right">Cant. FEL</th>
-                    <th class="text-right">Precio GIL</th>
-                    <th class="text-right">Precio FEL</th>
-                    <th class="text-right">Diferencia</th>
-                    <th class="text-center">Estado</th>
-                    <th>Observación / Acción</th>
+                    <th>{{ i18n.t('factura.th_descripcion') }}</th>
+                    <th class="text-right">{{ i18n.t('factura.th_cant_gil_short') }}</th>
+                    <th class="text-right">{{ i18n.t('factura.th_cant_fel') }}</th>
+                    <th class="text-right">{{ i18n.t('factura.th_precio_gil') }}</th>
+                    <th class="text-right">{{ i18n.t('factura.th_precio_fel') }}</th>
+                    <th class="text-right">{{ i18n.t('factura.th_diferencia') }}</th>
+                    <th class="text-center">{{ i18n.t('factura.th_estado') }}</th>
+                    <th>{{ i18n.t('factura.th_observacion') }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -358,7 +356,7 @@
                       </td>
                       <td class="text-center">
                         @if (dif.resuelta) {
-                          <span class="badge badge--success-soft">Resuelta</span>
+                          <span class="badge badge--success-soft">{{ i18n.t('factura.resuelta') }}</span>
                         } @else {
                           <span class="badge" [ngClass]="tipoDiferencia(dif).clase" [title]="dif.observacion || ''">
                             {{ tipoDiferencia(dif).label }}
@@ -376,14 +374,14 @@
                             (click)="abrirNotaCreditoModal(dif)"
                           >
                             <span class="material-symbols-outlined">receipt_long</span>
-                            Registrar nota crédito
+                            {{ i18n.t('factura.registrar_nc') }}
                           </button>
                         } @else {
                           <div class="gil-resolve-row">
                             <input
                               class="gil-obs-input"
                               type="text"
-                              placeholder="Observación"
+                              [placeholder]="i18n.t('factura.placeholder_obs')"
                               [value]="observaciones()[dif.gilItemId] ?? ''"
                               (input)="setObservacion(dif.gilItemId, $event)"
                             />
@@ -409,17 +407,17 @@
           <div class="gil-conciliacion__header">
             <div class="card-section__title">
               <span class="material-symbols-outlined text-primary">link</span>
-              Vincular GIL
+              {{ i18n.t('factura.vincular_gil') }}
             </div>
           </div>
-          <p class="gil-conciliacion__empty">Esta factura no tiene un GIL vinculado aún.</p>
+          <p class="gil-conciliacion__empty">{{ i18n.t('factura.sin_gil') }}</p>
           <div class="gil-vincular-row">
             <select
               class="gil-obs-input"
               [value]="gilParaVincular()"
               (change)="onGilVincularChange($event)"
             >
-              <option value="">Seleccioná un GIL...</option>
+              <option value="">{{ i18n.t('factura.sel_gil') }}</option>
               @for (gil of gilesDisponibles(); track gil.id) {
                 <option [value]="gil.id">{{ gil.numeroGil }} — {{ gil.destino }}</option>
               }
@@ -441,12 +439,12 @@
           <div class="card-section">
             <h4 class="card-section__title">
               <span class="material-symbols-outlined text-tertiary">rule</span>
-              Líneas sin bien asignado ({{ lineasPendientes().length }})
+              {{ i18n.t('factura.lineas_sin_bien') }} ({{ lineasPendientes().length }})
             </h4>
             <p class="pendientes-card__hint">
               Estas líneas no se resolvieron automáticamente al conciliar con el GIL. Asociá cada una a un
               bien existente del catálogo. Si el bien no existe,
-              <button type="button" class="link-btn" (click)="irACrearBien()">creálo primero en Bienes</button>.
+              <button type="button" class="link-btn" (click)="irACrearBien()">{{ i18n.t('factura.crear_bien') }}</button>.
             </p>
 
             @if (f.estado === 'REGISTRADA') {
@@ -466,9 +464,7 @@
                 }
               </ul>
             } @else {
-              <p class="pendientes-card__locked text-secondary">
-                Solo se pueden asociar líneas mientras la factura está en estado REGISTRADA.
-              </p>
+              <p class="pendientes-card__locked text-secondary">{{ i18n.t('factura.locked_hint') }}</p>
             }
           </div>
         </section>
@@ -479,7 +475,7 @@
   } @else {
     <div class="flex flex-col items-center justify-center p-12 text-secondary">
       <span class="material-symbols-outlined animate-spin text-4xl mb-4">sync</span>
-      <p>Cargando información de la factura...</p>
+      <p>{{ i18n.t('factura.cargando') }}</p>
     </div>
   }
 </div>
@@ -492,14 +488,11 @@
         <div class="modal-icon-wrapper modal-icon-wrapper--warning">
           <span class="material-symbols-outlined">verified</span>
         </div>
-        <h2 class="modal-title">Verificar Factura</h2>
-        <p class="modal-text">
-          Esta acción es <strong>irreversible</strong>. Se crearán las entradas de inventario
-          y el GIL asociado se cerrará automáticamente.
-        </p>
+        <h2 class="modal-title">{{ i18n.t('factura.modal_verificar_titulo') }}</h2>
+        <p class="modal-text">{{ i18n.t('factura.modal_verificar_texto') }}</p>
         <div class="modal-actions">
-          <button class="btn-cancel" type="button" (click)="showConfirmVerificar.set(false)">Cancelar</button>
-          <button class="btn-confirm" type="button" (click)="confirmarVerificar()">Confirmar verificación</button>
+          <button class="btn-cancel" type="button" (click)="showConfirmVerificar.set(false)">{{ i18n.t('comun.cancelar') }}</button>
+          <button class="btn-confirm" type="button" (click)="confirmarVerificar()">{{ i18n.t('factura.confirmar_verificacion') }}</button>
         </div>
       </div>
     </div>
@@ -514,13 +507,11 @@
         <div class="modal-icon-wrapper">
           <span class="material-symbols-outlined">payments</span>
         </div>
-        <h2 class="modal-title">Marcar como Pagada</h2>
-        <p class="modal-text">
-          Confirmá que el pago fue realizado. La factura pasará a estado <strong>PAGADA</strong>.
-        </p>
+        <h2 class="modal-title">{{ i18n.t('factura.modal_pagada_titulo') }}</h2>
+        <p class="modal-text">{{ i18n.t('factura.modal_pagada_texto') }}</p>
         <div class="modal-actions">
-          <button class="btn-cancel" type="button" (click)="showConfirmPagada.set(false)">Cancelar</button>
-          <button class="btn-confirm" type="button" (click)="confirmarPagada()">Confirmar pago</button>
+          <button class="btn-cancel" type="button" (click)="showConfirmPagada.set(false)">{{ i18n.t('comun.cancelar') }}</button>
+          <button class="btn-confirm" type="button" (click)="confirmarPagada()">{{ i18n.t('factura.confirmar_pago') }}</button>
         </div>
       </div>
     </div>
@@ -541,41 +532,41 @@
   <div class="modal-backdrop" (click)="cerrarBuscadorBien()">
     <div class="modal-container modal-container--wide" (click)="$event.stopPropagation()">
       <div class="buscador-bien">
-        <h2 class="modal-title">Buscar bien para asociar</h2>
+        <h2 class="modal-title">{{ i18n.t('factura.buscar_bien_titulo') }}</h2>
         @if (lineaPendienteActiva(); as desc) {
-          <p class="modal-text">Línea FEL: <strong>{{ desc }}</strong></p>
+          <p class="modal-text">{{ i18n.t('factura.linea_fel') }}: <strong>{{ desc }}</strong></p>
         }
         @if (bienAConfirmar(); as b) {
           <div class="confirm-pair">
             <div class="confirm-pair__side">
-              <span class="confirm-pair__label">Línea del FEL</span>
+              <span class="confirm-pair__label">{{ i18n.t('factura.linea_fel') }}</span>
               <span class="confirm-pair__value">{{ lineaPendienteActiva() }}</span>
             </div>
             <span class="material-symbols-outlined confirm-pair__arrow">arrow_forward</span>
             <div class="confirm-pair__side">
-              <span class="confirm-pair__label">Bien del catálogo</span>
+              <span class="confirm-pair__label">{{ i18n.t('factura.bien_catalogo') }}</span>
               <span class="confirm-pair__value"><strong>{{ b.codigoSena }}</strong> — {{ b.descripcion }}</span>
             </div>
           </div>
           <p class="confirm-pair__warn">
             <span class="material-symbols-outlined">info</span>
-            Verificá que correspondan: el sistema no valida que coincidan.
+            {{ i18n.t('factura.verificar_correspondencia') }}
           </p>
           <div class="modal-actions">
-            <button class="btn-cancel" type="button" (click)="volverABuscar()">Volver</button>
-            <button class="btn-confirm" type="button" (click)="confirmarAsociacion()">Confirmar asociación</button>
+            <button class="btn-cancel" type="button" (click)="volverABuscar()">{{ i18n.t('comun.volver') }}</button>
+            <button class="btn-confirm" type="button" (click)="confirmarAsociacion()">{{ i18n.t('factura.confirmar_asociacion') }}</button>
           </div>
         } @else {
           <input
             type="text"
             class="gil-obs-input buscador-bien__search"
-            placeholder="Buscar por nombre o código SENA…"
+            [placeholder]="i18n.t('factura.buscar_placeholder')"
             (input)="onBuscarBienCatalogo($any($event.target).value)" />
           <div class="buscador-bien__results">
             @if (catalogoLoading()) {
-              <p class="buscador-bien__empty">Buscando…</p>
+              <p class="buscador-bien__empty">{{ i18n.t('comun.buscando') }}</p>
             } @else if (catalogoBienes().length === 0) {
-              <p class="buscador-bien__empty">No se encontraron bienes. Probá con otro término.</p>
+              <p class="buscador-bien__empty">{{ i18n.t('factura.sin_bienes_busqueda') }}</p>
             } @else {
               <ul class="bien-result-list">
                 @for (bien of catalogoBienes(); track bien.id) {
@@ -594,7 +585,7 @@
             }
           </div>
           <div class="modal-actions">
-            <button class="btn-cancel" type="button" (click)="cerrarBuscadorBien()">Cerrar</button>
+            <button class="btn-cancel" type="button" (click)="cerrarBuscadorBien()">{{ i18n.t('comun.cerrar') }}</button>
           </div>
         }
       </div>

@@ -6,6 +6,7 @@ import { ProductoMenu } from '../../data-access/restaurante.facade';
 
 import { CardComponent, ConfirmDialogComponent } from '@restaurant/shared/ui';
 import { CurrencyCopPipe } from '@restaurant/shared/util';
+import { I18nService } from '../../i18n/i18n.service';
 
 @Component({
   selector: 'lib-pedidos-menu-grid',
@@ -23,6 +24,7 @@ export class PedidosMenuGridComponent {
   @Input() category: string = 'all';
   @Input() subcategory: string = '';
 
+  protected readonly i18n = inject(I18nService);
   private facade = inject(RestauranteFacade);
   private router = inject(Router);
   private route = inject(ActivatedRoute);

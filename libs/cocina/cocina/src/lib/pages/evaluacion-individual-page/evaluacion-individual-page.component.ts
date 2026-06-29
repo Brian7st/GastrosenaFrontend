@@ -9,6 +9,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { I18nService } from '../../i18n/i18n.service';
 import { CocinaFacade } from '../../data-access/cocina.facade';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 
@@ -75,6 +76,7 @@ export class EvaluacionIndividualPageComponent implements OnInit {
   readonly menuEvaluarAbierto = signal<boolean>(false);
 
   // ── Dependencias ──────────────────────────────────────────────────────────
+  protected readonly i18n = inject(I18nService);
   private facade = inject(CocinaFacade);
   private router = inject(Router);
   private route = inject(ActivatedRoute);

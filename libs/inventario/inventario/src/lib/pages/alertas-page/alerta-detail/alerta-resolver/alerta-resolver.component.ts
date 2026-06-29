@@ -12,6 +12,7 @@ import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { ButtonComponent } from '@restaurant/shared/ui';
 import { AccionResolver } from '../../../../models/alerta.model';
 import { AlertasFacade } from '../../../../data-access/alertas.facade';
+import { I18nService } from '../../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-alerta-resolver',
@@ -23,6 +24,7 @@ import { AlertasFacade } from '../../../../data-access/alertas.facade';
 })
 export class AlertaResolverComponent implements OnInit {
   private router  = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private route   = inject(ActivatedRoute);
   private fb      = inject(FormBuilder);
   private facade  = inject(AlertasFacade);

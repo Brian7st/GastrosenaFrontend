@@ -6,6 +6,7 @@ import { FacturasFacade } from '../../../data-access/facturas.facade';
 import { Factura, EstadoFactura } from '../../../models/facturas.model';
 import { ExportarComponent } from '../../../components/exportar/exportar.component';
 import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-facturas-list',
@@ -17,6 +18,7 @@ import { EmptyStateComponent } from '../../../components/empty-state/empty-state
 })
 export class FacturasListPageComponent implements OnInit {
   private facade = inject(FacturasFacade);
+  protected readonly i18n = inject(I18nService);
   private router = inject(Router);
 
   // State

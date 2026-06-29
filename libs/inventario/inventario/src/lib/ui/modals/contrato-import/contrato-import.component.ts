@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Output, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ContratoCabecera, ContratoImportRow, RegistrarContratoData } from '../../../models/contrato.model';
+import { I18nService } from '../../../i18n/i18n.service';
 
 export type ContratoImportPayload =
   | { tipo: 'csv'; data: RegistrarContratoData }
@@ -25,6 +26,8 @@ export class ContratoImportModalComponent {
   fechaInicio  = signal<string>('');
   fechaFin     = signal<string>('');
 
+  protected readonly i18n = inject(I18nService);
+
   // ── Archivo de ítems ────────────────────────────────────────────────────────
   isDragging    = signal(false);
   file          = signal<File | null>(null);
@@ -34,13 +37,13 @@ export class ContratoImportModalComponent {
   hasErrors     = signal(false);
   statusMessage = signal<string | null>(null);
 
-  readonly INSTRUCCIONES = [
-    'Complete el número y la vigencia del contrato; descargue la plantilla y cargue los ítems.',
-    'Ref. Artículo, Descripción y Vlr. Adjudicado son obligatorios por ítem. El código SENA es opcional.',
-    'Para Excel (.xlsx/.xls): el archivo debe respetar las columnas de la plantilla.',
-    'Para CSV: si algún ítem tiene errores, se rechaza el lote completo. Corrija antes de importar.',
-    'Al importar se crean o actualizan los bienes del catálogo cruzando por descripción.',
-  ];
+  readonly INSTRUCCIONES = computed(() => [
+    this.i18n.t('contrato-import.instruccion_1'),
+    this.i18n.t('contrato-import.instruccion_2'),
+    this.i18n.t('contrato-import.instruccion_3'),
+    this.i18n.t('contrato-import.instruccion_4'),
+    this.i18n.t('contrato-import.instruccion_5'),
+  ]);
 
   /** La cabecera es válida cuando hay número y un año de vigencia positivo. */
   readonly cabeceraValida = computed(() => this.numero().trim().length > 0 && this.vigencia() > 0);
@@ -96,7 +99,7 @@ export class ContratoImportModalComponent {
   }
 
   getValidacionClass(v?: string): string {
-    if (!v || v === 'Correcto') return 'valid--ok';
+    if (!v || v === this.i18n.t('contrato-import.valid_correcto')) return 'valid--ok';
     return 'valid--error';
   }
 
@@ -201,7 +204,7 @@ export class ContratoImportModalComponent {
     }
 
     if (!fileName.endsWith('.csv')) {
-      this.statusMessage.set('Formato no soportado. Suba un archivo .xlsx, .xls o .csv.');
+      this.statusMessage.set(this.i18n.t('contrato-import.msg_formato_no_soportado'));
       this.file.set(null);
       this.isProcessing.set(false);
       return;
@@ -212,9 +215,9 @@ export class ContratoImportModalComponent {
       const rows = this.parseCsv(text);
       this.previewData.set(rows);
       this.hasErrors.set(rows.some(row => !!row.error));
-      this.statusMessage.set(rows.length ? null : 'El archivo no contiene ítems válidos para importar.');
+      this.statusMessage.set(rows.length ? null : this.i18n.t('contrato-import.msg_sin_items'));
     } catch {
-      this.statusMessage.set('No se pudo leer el archivo CSV. Verifique la plantilla y vuelva a intentarlo.');
+      this.statusMessage.set(this.i18n.t('contrato-import.msg_error_lectura'));
     } finally {
       this.isProcessing.set(false);
     }
@@ -252,21 +255,21 @@ export class ContratoImportModalComponent {
         vrlAdjudicado: Number(record['vrlAdjudicado'] ?? ''),
         vrlAntes: this.toNullableNumber(record['vrlAntes']),
         ivaPorcentaje: this.toNullableNumber(record['ivaPorcentaje']),
-        validacion: 'Correcto',
+        validacion: this.i18n.t('contrato-import.valid_correcto'),
       };
 
       if (!row.refArticulo) {
-        row.validacion = 'Falta campo';
-        row.error = 'La referencia de artículo es obligatoria';
+        row.validacion = this.i18n.t('contrato-import.valid_falta_campo');
+        row.error = this.i18n.t('contrato-import.valid_ref_obligatoria');
       } else if (!row.descripcion) {
-        row.validacion = 'Falta campo';
-        row.error = 'La descripción es obligatoria';
+        row.validacion = this.i18n.t('contrato-import.valid_falta_campo');
+        row.error = this.i18n.t('contrato-import.valid_desc_obligatoria');
       } else if (!Number.isFinite(row.vrlAdjudicado) || row.vrlAdjudicado < 0) {
-        row.validacion = 'Valor inválido';
-        row.error = 'El valor adjudicado debe ser un número no negativo';
+        row.validacion = this.i18n.t('contrato-import.valid_valor_invalido');
+        row.error = this.i18n.t('contrato-import.valid_valor_invalido_msg');
       } else if (seenRefs.has(row.refArticulo)) {
-        row.validacion = 'Ref. duplicada';
-        row.error = 'Referencia de artículo duplicada en el archivo';
+        row.validacion = this.i18n.t('contrato-import.valid_ref_duplicada');
+        row.error = this.i18n.t('contrato-import.valid_ref_duplicada_msg');
       }
 
       if (row.refArticulo) seenRefs.add(row.refArticulo);

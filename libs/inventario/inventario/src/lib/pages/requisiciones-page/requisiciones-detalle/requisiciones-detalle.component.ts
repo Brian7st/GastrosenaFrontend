@@ -4,6 +4,7 @@ import { DecimalPipe, TitleCasePipe } from '@angular/common';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
 import { RequisicionItem } from '../../../models/requisicion.model';
+import { I18nService } from '../../../i18n/i18n.service';
 
 const CATEGORIA_LABELS: Record<string, string> = {
   'ABARROTES':              'Abarrotes y Secos',
@@ -39,6 +40,7 @@ const ESTADO_CLASS: Record<string, string> = {
 })
 export class RequisicionesDetalleComponent implements OnInit {
   private router  = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private route   = inject(ActivatedRoute);
   private facade  = inject(RequisicionesFacade);
 

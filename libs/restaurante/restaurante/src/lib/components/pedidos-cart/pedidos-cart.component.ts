@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
 import { ButtonComponent, LucideIconComponent, ConfirmDialogComponent } from '@restaurant/shared/ui';
 import { CurrencyCopPipe } from '@restaurant/shared/util';
+import { I18nService } from '../../i18n/i18n.service';
 
 @Component({
   selector: 'lib-pedidos-cart',
@@ -15,6 +16,7 @@ import { CurrencyCopPipe } from '@restaurant/shared/util';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PedidosCartComponent {
+  protected readonly i18n = inject(I18nService);
   private facade = inject(RestauranteFacade);
   private router = inject(Router);
 

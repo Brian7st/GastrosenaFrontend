@@ -2,14 +2,14 @@
   <!-- ── Header & Actions ─────────────────────────────────────────────────── -->
   <div class="page-header-row">
     <div>
-      <h1 class="page-title">Listado General de Actas de Legalización</h1>
-      <p class="page-subtitle">Registro documental y trazabilidad de materiales de formación por sesión.</p>
+      <h1 class="page-title">{{ i18n.t('acta.titulo') }}</h1>
+      <p class="page-subtitle">{{ i18n.t('acta.subtitulo') }}</p>
     </div>
     <div class="header-actions">
       <restaurant-button variant="primary" (click)="crearActa()">
         <div class="btn-icon-text">
           <lucide-icon name="plus-circle" [size]="20"></lucide-icon>
-          Nueva Acta
+          {{ i18n.t('acta.nueva') }}
         </div>
       </restaurant-button>
     </div>
@@ -20,18 +20,18 @@
     <div dtHeader class="dt-controls">
       <div class="dt-controls__title">
         <lucide-icon name="file-text" [size]="22" class="dt-controls__icon"></lucide-icon>
-        <h3 class="dt-controls__heading">Registro de Actas</h3>
+        <h3 class="dt-controls__heading">{{ i18n.t('acta.registro') }}</h3>
       </div>
       <div class="dt-controls__actions">
         <!-- Filtro por Estado -->
         <div class="dt-filter">
           <select class="dt-filter__select" (change)="onEstadoChange($event)">
-            <option value="">Todos los Estados</option>
-            <option value="BORRADOR">Borrador</option>
-            <option value="PENDIENTE_FIRMAS">Pendiente Firmas</option>
-            <option value="FIRMADA">Firmada</option>
-            <option value="REVISADA">Revisada</option>
-            <option value="ARCHIVADA">Archivada</option>
+            <option value="">{{ i18n.t('comun.todos_estados') }}</option>
+            <option value="BORRADOR">{{ i18n.t('acta.estado_borrador') }}</option>
+            <option value="PENDIENTE_FIRMAS">{{ i18n.t('acta.estado_pendiente_firmas') }}</option>
+            <option value="FIRMADA">{{ i18n.t('acta.estado_firmada') }}</option>
+            <option value="REVISADA">{{ i18n.t('acta.estado_revisada') }}</option>
+            <option value="ARCHIVADA">{{ i18n.t('acta.estado_archivada') }}</option>
           </select>
         </div>
         <!-- Filtro por Ficha -->
@@ -39,7 +39,7 @@
           <input
             type="text"
             class="dt-filter__input"
-            placeholder="Ficha..."
+            [placeholder]="i18n.t('acta.ficha_placeholder')"
             (input)="onFichaChange($event)"
           />
         </div>
@@ -49,7 +49,7 @@
           <input
             type="text"
             class="dt-search__input"
-            placeholder="Buscar por instructor..."
+            [placeholder]="i18n.t('acta.buscar_placeholder')"
             (input)="onSearch($event)"
           />
         </div>
@@ -58,13 +58,13 @@
 
     <thead>
       <tr>
-        <th style="text-align: center;">Consecutivo</th>
-        <th style="text-align: center;">Fecha Taller</th>
-        <th style="text-align: center;">Ficha</th>
-        <th style="text-align: center;">Chef / Instructor</th>
-        <th style="text-align: center;">Requisición</th>
-        <th style="text-align: center;">Estado</th>
-        <th style="text-align: center;">Acciones</th>
+        <th style="text-align: center;">{{ i18n.t('acta.th_consecutivo') }}</th>
+        <th style="text-align: center;">{{ i18n.t('acta.th_fecha') }}</th>
+        <th style="text-align: center;">{{ i18n.t('acta.th_ficha') }}</th>
+        <th style="text-align: center;">{{ i18n.t('acta.th_instructor') }}</th>
+        <th style="text-align: center;">{{ i18n.t('acta.th_requisicion') }}</th>
+        <th style="text-align: center;">{{ i18n.t('comun.estado') }}</th>
+        <th style="text-align: center;">{{ i18n.t('comun.acciones') }}</th>
       </tr>
     </thead>
     <tbody>
@@ -75,7 +75,7 @@
           </td>
           <td style="text-align: center;" class="actas-table__fecha">{{ acta.fecha }}</td>
           <td style="text-align: center;">
-            <p class="actas-table__ficha">Ficha {{ acta.fichaId }}</p>
+            <p class="actas-table__ficha">{{ i18n.t('acta.ficha_prefix') }} {{ acta.fichaId }}</p>
           </td>
           <td style="text-align: center;">
             <div class="actas-table__instructor" style="justify-content: center;">

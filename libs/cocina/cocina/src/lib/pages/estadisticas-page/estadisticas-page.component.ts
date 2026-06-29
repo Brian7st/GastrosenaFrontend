@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, signal, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { interval, Subscription } from 'rxjs';
+import { I18nService } from '../../i18n/i18n.service';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 import { ComandaService, EstadisticasKpi } from '../../data-access/comanda.service';
 import { Chart, registerables, ChartConfiguration } from 'chart.js';
@@ -19,6 +20,7 @@ function cssToken(name: string, fallback = '#888'): string {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestroy {
+  protected readonly i18n = inject(I18nService);
   private comandaService = inject(ComandaService);
 
   kpis = signal<EstadisticasKpi | null>(null);
@@ -80,7 +82,7 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
       error: (err) => {
         console.error('Error cargando estadísticas promedios:', err);
         // Fallback visual
-        this.kpis.set({ promedioDemoraGeneral: 0, platoMasRapido: 'Sin datos', totalPlatosDespachadosHoy: 0 });
+        this.kpis.set({ promedioDemoraGeneral: 0, platoMasRapido: this.i18n.t('estadisticas.sin_datos'), totalPlatosDespachadosHoy: 0 });
       }
     });
 
@@ -119,7 +121,7 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
             legend: { display: false },
             tooltip: {
               callbacks: {
-                label: (ctx) => `${ctx.parsed.y.toFixed(1)} min`
+                label: (ctx) => `${(ctx.parsed.y ?? 0).toFixed(1)} min`
               }
             }
           },

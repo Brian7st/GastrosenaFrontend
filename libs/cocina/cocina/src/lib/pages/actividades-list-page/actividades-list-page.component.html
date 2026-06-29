@@ -2,13 +2,13 @@
 
   <!-- ===== CABECERA ===== -->
   <div class="page-header">
-    <button id="btn-volver-actividades" class="back-btn" type="button" (click)="volver()" aria-label="Volver">
+    <button id="btn-volver-actividades" class="back-btn" type="button" (click)="volver()" [attr.aria-label]="i18n.t('general.volver')">
       <lucide-icon name="arrow-left" [size]="20"></lucide-icon>
     </button>
     <div class="header-info">
-      <h1 class="page-title">Actividades</h1>
+      <h1 class="page-title">{{ i18n.t('actividades-list.page.title') }}</h1>
       <p class="page-subtitle">
-        {{ actividadesFiltradas().length }} actividades registradas
+        {{ i18n.t('actividades-list.registradas').replace('{0}', actividadesFiltradas().length.toString()) }}
       </p>
     </div>
   </div>
@@ -16,8 +16,8 @@
   <!-- ===== BUSCADOR ===== -->
   <div class="search-bar">
     <restaurant-search-filter
-      label="Buscar por ficha"
-      placeholder="Escribí para filtrar..."
+      [label]="i18n.t('actividades-list.buscar_label')"
+      [placeholder]="i18n.t('actividades-list.buscar_placeholder')"
       [value]="filtroFicha()"
       (valueChange)="onFiltroChange($event)"
     ></restaurant-search-filter>
@@ -40,26 +40,26 @@
 
         <div class="card-meta">
           <div class="meta-item">
-            <span class="meta-label">Fecha</span>
+            <span class="meta-label">{{ i18n.t('actividades-list.fecha') }}</span>
             <span class="meta-value">{{ act.fecha }}</span>
           </div>
           <div class="meta-item">
-            <span class="meta-label">Jornada</span>
+            <span class="meta-label">{{ i18n.t('actividades-list.jornada') }}</span>
             <span class="meta-value">{{ act.jornada }}</span>
           </div>
           <div class="meta-item">
-            <span class="meta-label">Ficha</span>
+            <span class="meta-label">{{ i18n.t('actividades-list.ficha') }}</span>
             <span class="meta-value">{{ act.ficha }}</span>
           </div>
           <div class="meta-item">
-            <span class="meta-label">Trimestre</span>
+            <span class="meta-label">{{ i18n.t('actividades-list.trimestre') }}</span>
             <span class="meta-value">{{ act.trimestre }}</span>
           </div>
         </div>
 
         <div class="card-footer">
-          <span class="card-action">Evaluar aprendices →</span>
-          <button class="btn-delete-card" type="button" (click)="eliminarActividad(act.id, $event)" title="Eliminar actividad">
+          <span class="card-action">{{ i18n.t('actividades-list.evaluar') }}</span>
+          <button class="btn-delete-card" type="button" (click)="eliminarActividad(act.id, $event)" [title]="i18n.t('actividades-list.eliminar')">
             <lucide-icon name="trash-2" size="18"></lucide-icon>
           </button>
         </div>
@@ -72,11 +72,11 @@
     <div class="empty-state">
       <lucide-icon name="file-text" size="48" class="empty-icon-lucide"></lucide-icon>
       @if (filtroFicha()) {
-        <p class="empty-text">No se encontraron actividades con ficha "{{ filtroFicha() }}"</p>
+        <p class="empty-text">{{ i18n.t('actividades-list.no_resultados').replace('{0}', filtroFicha()) }}</p>
       } @else {
-        <p class="empty-text">No hay actividades registradas aún.</p>
+        <p class="empty-text">{{ i18n.t('actividades-list.vacio') }}</p>
         <button class="btn-primary" type="button" (click)="volver()">
-          CREAR ACTIVIDAD
+          {{ i18n.t('actividades-list.btn_crear') }}
         </button>
       }
     </div>

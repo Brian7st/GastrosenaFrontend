@@ -30,6 +30,7 @@ import {
   LucideWifiOff,
   provideLucideIcons,
 } from '@lucide/angular';
+import { I18nService } from '@restaurant/shell';
 import { DashboardService } from '../../data-access/dashboard.service';
 
 @Component({
@@ -71,6 +72,7 @@ import { DashboardService } from '../../data-access/dashboard.service';
 })
 export class DashboardPageComponent implements OnInit {
   protected readonly dashboard = inject(DashboardService);
+  protected readonly i18n = inject(I18nService);
 
   ngOnInit(): void {
     this.dashboard.loadDashboard();

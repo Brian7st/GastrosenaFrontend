@@ -1,6 +1,6 @@
 .dashboard-container {
   padding: var(--space-6, 25px);
-  background-color: var(--color-surface-secondary);
+  background-color: transparent;
   min-height: 100vh;
 
   /* Responsivo para el contenedor del encabezado principal */
@@ -499,7 +499,7 @@
 }
 
 .confirm-modal {
-  background: #ffffff;
+  background: var(--color-surface-primary);
   border-radius: 20px;
   padding: 36px 32px 28px;
   width: 400px;
@@ -550,12 +550,12 @@
     letter-spacing: 0.2px;
 
     &.confirm-btn-cancel {
-      background: #f1f5f9;
-      color: #475569;
-      border: 1.5px solid #e2e8f0;
+      background: var(--color-surface-secondary);
+      color: var(--color-text-secondary);
+      border: 1.5px solid var(--color-border);
 
       &:hover {
-        background: #e2e8f0;
+        background: var(--color-border);
         transform: translateY(-1px);
       }
     }

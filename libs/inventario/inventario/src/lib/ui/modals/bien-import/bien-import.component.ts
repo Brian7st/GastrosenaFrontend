@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BienImportRow } from '../../../models/inventario.model';
+import { I18nService } from '../../../i18n/i18n.service';
 
 export type BienImportPayload =
   | { tipo: 'csv'; filas: BienImportRow[] }
@@ -18,6 +19,8 @@ export class BienImportModalComponent {
   @Output() cancelar = new EventEmitter<void>();
   @Output() importar = new EventEmitter<BienImportPayload>();
 
+  protected readonly i18n = inject(I18nService);
+
   isDragging = signal(false);
   file = signal<File | null>(null);
   isExcel = signal(false);
@@ -26,13 +29,13 @@ export class BienImportModalComponent {
   hasErrors = signal(false);
   statusMessage = signal<string | null>(null);
 
-  readonly INSTRUCCIONES = [
-    'Descargue la plantilla y complétela con los datos de sus bienes.',
-    'Los únicos campos obligatorios son Nombre y Unidad de Medida.',
-    'El IVA se carga como fracción: 0 (exento), 0.05 o 0.19 — no como porcentaje.',
-    'Si un bien ya existe (por código o descripción) se actualiza y se completan los datos faltantes, no se duplica.',
-    'Si alguna fila tiene errores de formato, se rechaza el lote. Corrija antes de importar.',
-  ];
+  readonly INSTRUCCIONES = computed(() => [
+    this.i18n.t('bien-import.instruccion_1'),
+    this.i18n.t('bien-import.instruccion_2'),
+    this.i18n.t('bien-import.instruccion_3'),
+    this.i18n.t('bien-import.instruccion_4'),
+    this.i18n.t('bien-import.instruccion_5'),
+  ]);
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -73,7 +76,7 @@ export class BienImportModalComponent {
   }
 
   getValidacionClass(v?: string): string {
-    if (!v || v === 'Correcto') return 'valid--ok';
+    if (!v || v === this.i18n.t('bien-import.valid_correcto')) return 'valid--ok';
     return 'valid--error';
   }
 
@@ -144,7 +147,7 @@ export class BienImportModalComponent {
     }
 
     if (!fileName.endsWith('.csv')) {
-      this.statusMessage.set('Formato no soportado. Suba un archivo CSV generado desde la plantilla.');
+      this.statusMessage.set(this.i18n.t('bien-import.msg_formato_no_soportado'));
       this.isProcessing.set(false);
       return;
     }
@@ -154,9 +157,9 @@ export class BienImportModalComponent {
       const rows = this.parseCsv(text);
       this.previewData.set(rows);
       this.hasErrors.set(rows.some(row => !!row.error));
-      this.statusMessage.set(rows.length ? null : 'El archivo no contiene filas v�lidas para importar.');
+      this.statusMessage.set(rows.length ? null : this.i18n.t('bien-import.msg_sin_filas'));
     } catch {
-      this.statusMessage.set('No se pudo leer el archivo CSV. Verifique la plantilla y vuelva a intentarlo.');
+      this.statusMessage.set(this.i18n.t('bien-import.msg_error_lectura'));
     } finally {
       this.isProcessing.set(false);
     }
@@ -193,15 +196,15 @@ export class BienImportModalComponent {
         vrlAntes: record['vrlAntes'] !== undefined ? Number(record['vrlAntes']) : 0,
         iva: record['iva'] !== undefined ? Number(record['iva']) : 0,
         stockMinimo: record['stockMinimo'] !== undefined ? Number(record['stockMinimo']) : undefined,
-        validacion: 'Correcto',
+        validacion: this.i18n.t('bien-import.valid_correcto'),
       };
 
       if (!row.unidadMedida) {
-        row.validacion = 'Falta campo';
-        row.error = 'Unidad de Medida es obligatoria';
+        row.validacion = this.i18n.t('bien-import.valid_falta_campo');
+        row.error = this.i18n.t('bien-import.valid_um_obligatoria');
       } else if (row.codigoSena && seenCodes.has(row.codigoSena)) {
-        row.validacion = 'Código duplicado';
-        row.error = 'Código SENA duplicado en el archivo';
+        row.validacion = this.i18n.t('bien-import.valid_codigo_duplicado');
+        row.error = this.i18n.t('bien-import.valid_codigo_duplicado_msg');
       }
 
       if (row.codigoSena) seenCodes.add(row.codigoSena);

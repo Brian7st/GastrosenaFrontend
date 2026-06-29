@@ -13,6 +13,7 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
 import { ActaDocumentoComponent } from '../../../components/acta-documento/acta-documento.component';
 import { ActaEstado } from '../../../models/acta.model';
 import { ActasFacade } from '../../../data-access/actas.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-actas-detail',
@@ -30,6 +31,7 @@ import { ActasFacade } from '../../../data-access/actas.facade';
 })
 export class ActasDetailComponent implements OnInit {
   private router = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private route  = inject(ActivatedRoute);
   private facade = inject(ActasFacade);
 

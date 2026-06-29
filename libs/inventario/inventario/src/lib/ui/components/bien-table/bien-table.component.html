@@ -2,16 +2,16 @@
   <table class="bien-table">
     <thead>
       <tr>
-        <th>CÓD. SENA</th>
-        <th>CÓD. PROVEEDOR</th>
-        <th>Descripción</th>
-        <th>Categoría</th>
-        <th class="text-center">Stock</th>
-        <th class="text-center">Stock Mín.</th>
-        <th class="text-center">UM</th>
-        <th>Valor</th>
-        <th>Estado</th>
-        <th class="text-center">Acciones</th>
+        <th>{{ i18n.t('bien-table.th_cod_sena') }}</th>
+        <th>{{ i18n.t('bien-table.th_cod_proveedor') }}</th>
+        <th>{{ i18n.t('bien-table.th_descripcion') }}</th>
+        <th>{{ i18n.t('bien-table.th_categoria') }}</th>
+        <th class="text-center">{{ i18n.t('bien-table.th_stock') }}</th>
+        <th class="text-center">{{ i18n.t('bien-table.th_stock_min') }}</th>
+        <th class="text-center">{{ i18n.t('bien-table.th_um') }}</th>
+        <th>{{ i18n.t('bien-table.th_valor') }}</th>
+        <th>{{ i18n.t('bien-table.th_estado') }}</th>
+        <th class="text-center">{{ i18n.t('bien-table.th_acciones') }}</th>
       </tr>
     </thead>
     <tbody>
@@ -56,22 +56,22 @@
               @if (isAdded(bien)) {
                 <span class="catalog-added-label">
                   <span class="material-symbols-outlined" style="font-size:14px">check</span>
-                  Agregado
+                  {{ i18n.t('bien-table.agregado') }}
                 </span>
               } @else {
-                <button class="btn-catalog-add" type="button" (click)="onSelect(bien)" title="Agregar al pedido">
+                <button class="btn-catalog-add" type="button" (click)="onSelect(bien)" [title]="i18n.t('bien-table.agregar_title')">
                   <span class="material-symbols-outlined" style="font-size:14px">add</span>
-                  Agregar
+                  {{ i18n.t('bien-table.agregar') }}
                 </button>
               }
             } @else {
-              <button class="action-btn" (click)="onEdit(bien)" title="Editar">
+              <button class="action-btn" (click)="onEdit(bien)" [title]="i18n.t('bien-table.editar')">
                 <span class="material-symbols-outlined">edit</span>
               </button>
-              <button class="action-btn" (click)="onView(bien)" title="Ver Detalle">
+              <button class="action-btn" (click)="onView(bien)" [title]="i18n.t('bien-table.ver_detalle')">
                 <span class="material-symbols-outlined">visibility</span>
               </button>
-              <button class="action-btn danger" (click)="onDelete(bien)" title="Eliminar">
+              <button class="action-btn danger" (click)="onDelete(bien)" [title]="i18n.t('bien-table.eliminar')">
                 <span class="material-symbols-outlined">delete</span>
               </button>
             }
@@ -83,7 +83,7 @@
       <!-- Empty State / Loading placeholder logic can go here -->
       @if (bienes.length === 0 && !isLoading) {
 <tr>
-        <td colspan="10" class="empty-row">No se encontraron bienes con los filtros aplicados.</td>
+        <td colspan="10" class="empty-row">{{ i18n.t('bien-table.empty') }}</td>
       </tr>
 }
     </tbody>

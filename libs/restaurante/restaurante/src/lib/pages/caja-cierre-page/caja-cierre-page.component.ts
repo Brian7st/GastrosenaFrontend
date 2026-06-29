@@ -9,6 +9,7 @@ import {
 } from '@restaurant/shared/ui';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
 import { RestauranteService } from '../../data-access/restaurante.service';
+import { I18nService } from '../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-caja-cierre-page',
@@ -26,6 +27,7 @@ import { RestauranteService } from '../../data-access/restaurante.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CajaCierrePageComponent implements OnInit {
+  protected readonly i18n = inject(I18nService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   public facade = inject(RestauranteFacade);
@@ -95,8 +97,8 @@ export class CajaCierrePageComponent implements OnInit {
 
     this.alertDialog.set({
       open: true,
-      title: 'Caja Cerrada Exitosamente',
-      message: 'El cierre de turno ha sido registrado correctamente con los saldos calculados.'
+      title: this.i18n.t('cajaCierre.successTitle'),
+      message: this.i18n.t('cajaCierre.successMessage')
     });
   }
 

@@ -5,17 +5,17 @@
     <div class="dashboard-hero__content">
       <div class="dashboard-hero__badge">
         <svg lucideIcon="layout-dashboard" [size]="16"></svg>
-        <span>Panel General</span>
+        <span>{{ i18n.t('dashboard.badge') }}</span>
       </div>
-      <h1 class="dashboard-hero__title">Bienvenido a <span class="dashboard-hero__brand">GastroSENA</span></h1>
-      <p class="dashboard-hero__subtitle">Vista general del sistema en tiempo real.</p>
+      <h1 class="dashboard-hero__title">{{ i18n.t('dashboard.titulo').split('GastroSENA')[0] }}<span class="dashboard-hero__brand">GastroSENA</span></h1>
+      <p class="dashboard-hero__subtitle">{{ i18n.t('dashboard.subtitulo') }}</p>
     </div>
   </div>
 
   @if (dashboard.loading()) {
     <div class="dashboard__loading">
       <svg lucideIcon="loader" [size]="24" class="spin"></svg>
-      <span>Cargando datos del sistema...</span>
+      <span>{{ i18n.t('dashboard.cargando') }}</span>
     </div>
   } @else {
 
@@ -37,62 +37,62 @@
     <section class="dashboard__section">
       <h2 class="dashboard__section-title">
         <svg lucideIcon="activity" [size]="18"></svg>
-        Operaciones en tiempo real
+        {{ i18n.t('dashboard.seccion.operaciones') }}
       </h2>
       <div class="operations-grid">
         <a class="operation-card operation-card--cocina" routerLink="/app/cocina">
           <div class="operation-card__header">
             <svg lucideIcon="chef-hat" [size]="20"></svg>
-            <span>Cocina</span>
+            <span>{{ i18n.t('dashboard.op.cocina') }}</span>
           </div>
           @if (dashboard.operaciones().cocina; as cocina) {
             <div class="operation-card__metrics">
               <div class="operation-card__metric">
                 <svg lucideIcon="flame" [size]="14"></svg>
                 <span class="operation-card__metric-value">{{ cocina.totalPlatosDespachadosHoy }}</span>
-                <span class="operation-card__metric-label">platos hoy</span>
+                <span class="operation-card__metric-label">{{ i18n.t('dashboard.op.platos_hoy') }}</span>
               </div>
               <div class="operation-card__metric">
                 <svg lucideIcon="clock" [size]="14"></svg>
                 <span class="operation-card__metric-value">{{ cocina.promedioDemoraGeneral | number:'1.0-1' }} min</span>
-                <span class="operation-card__metric-label">promedio</span>
+                <span class="operation-card__metric-label">{{ i18n.t('dashboard.op.promedio') }}</span>
               </div>
               <div class="operation-card__metric">
                 <svg lucideIcon="trending-up" [size]="14"></svg>
                 <span class="operation-card__metric-value">{{ cocina.platoMasRapido }}</span>
-                <span class="operation-card__metric-label">más rápido</span>
+                <span class="operation-card__metric-label">{{ i18n.t('dashboard.op.mas_rapido') }}</span>
               </div>
             </div>
           } @else {
-            <p class="operation-card__empty">Sin conexión con cocina</p>
+            <p class="operation-card__empty">{{ i18n.t('dashboard.op.sin_conexion_cocina') }}</p>
           }
         </a>
 
         <a class="operation-card operation-card--bar" routerLink="/app/bar">
           <div class="operation-card__header">
             <svg lucideIcon="wine" [size]="20"></svg>
-            <span>Bar & Barismo</span>
+            <span>{{ i18n.t('dashboard.op.bar') }}</span>
           </div>
           @if (dashboard.operaciones().bar; as bar) {
             <div class="operation-card__metrics">
               <div class="operation-card__metric">
                 <svg lucideIcon="flame" [size]="14"></svg>
                 <span class="operation-card__metric-value">{{ bar.totalBebidasDespachadosHoy }}</span>
-                <span class="operation-card__metric-label">bebidas hoy</span>
+                <span class="operation-card__metric-label">{{ i18n.t('dashboard.op.bebidas_hoy') }}</span>
               </div>
               <div class="operation-card__metric">
                 <svg lucideIcon="clock" [size]="14"></svg>
                 <span class="operation-card__metric-value">{{ bar.promedioDemoraGeneral | number:'1.0-1' }} min</span>
-                <span class="operation-card__metric-label">promedio</span>
+                <span class="operation-card__metric-label">{{ i18n.t('dashboard.op.promedio') }}</span>
               </div>
               <div class="operation-card__metric">
                 <svg lucideIcon="trending-up" [size]="14"></svg>
                 <span class="operation-card__metric-value">{{ bar.bebidaMasRapida }}</span>
-                <span class="operation-card__metric-label">más rápida</span>
+                <span class="operation-card__metric-label">{{ i18n.t('dashboard.op.mas_rapida') }}</span>
               </div>
             </div>
           } @else {
-            <p class="operation-card__empty">Sin conexión con bar</p>
+            <p class="operation-card__empty">{{ i18n.t('dashboard.op.sin_conexion_bar') }}</p>
           }
         </a>
       </div>
@@ -101,23 +101,23 @@
     <section class="dashboard__section">
       <h2 class="dashboard__section-title">
         <svg lucideIcon="package" [size]="18"></svg>
-        Inventario y Presupuesto
+        {{ i18n.t('dashboard.seccion.inventario') }}
       </h2>
       <div class="inventory-grid">
         @if (dashboard.inventario().kpis; as inv) {
           <div class="summary-card">
             <div class="summary-card__header">
               <svg lucideIcon="package" [size]="16"></svg>
-              <span>Stock General</span>
+              <span>{{ i18n.t('dashboard.inv.stock_general') }}</span>
             </div>
             <div class="summary-card__body">
               <div class="summary-card__stat">
                 <span class="summary-card__stat-value">{{ inv.valorTotal | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-                <span class="summary-card__stat-label">Valor total en inventario</span>
+                <span class="summary-card__stat-label">{{ i18n.t('dashboard.inv.valor_total') }}</span>
               </div>
               <div class="summary-card__stat">
                 <span class="summary-card__stat-value">{{ inv.movimientosHoy }}</span>
-                <span class="summary-card__stat-label">Movimientos hoy</span>
+                <span class="summary-card__stat-label">{{ i18n.t('dashboard.inv.movimientos_hoy') }}</span>
               </div>
             </div>
           </div>
@@ -127,16 +127,16 @@
           <div class="summary-card">
             <div class="summary-card__header">
               <svg lucideIcon="dollar-sign" [size]="16"></svg>
-              <span>Presupuesto</span>
+              <span>{{ i18n.t('dashboard.inv.presupuesto') }}</span>
             </div>
             <div class="summary-card__body">
               <div class="summary-card__stat">
                 <span class="summary-card__stat-value">{{ pres.porcentajeEjecucion | number:'1.0-1' }}%</span>
-                <span class="summary-card__stat-label">Ejecución presupuestal</span>
+                <span class="summary-card__stat-label">{{ i18n.t('dashboard.inv.ejecucion') }}</span>
               </div>
               <div class="summary-card__stat">
                 <span class="summary-card__stat-value">{{ pres.saldoGlobal | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-                <span class="summary-card__stat-label">Saldo disponible</span>
+                <span class="summary-card__stat-label">{{ i18n.t('dashboard.inv.saldo') }}</span>
               </div>
             </div>
             <div class="summary-card__progress">
@@ -149,23 +149,23 @@
           <div class="summary-card">
             <div class="summary-card__header">
               <svg lucideIcon="file-text" [size]="16"></svg>
-              <span>Facturas</span>
+              <span>{{ i18n.t('dashboard.inv.facturas') }}</span>
             </div>
             <div class="summary-card__body">
               <div class="summary-card__stat">
                 <span class="summary-card__stat-value">{{ fact.totalGeneral }}</span>
-                <span class="summary-card__stat-label">Total facturas</span>
+                <span class="summary-card__stat-label">{{ i18n.t('dashboard.inv.total_facturas') }}</span>
               </div>
               <div class="summary-card__stat">
                 <span class="summary-card__stat-value">{{ fact.totalPagadas }}</span>
-                <span class="summary-card__stat-label">Pagadas</span>
+                <span class="summary-card__stat-label">{{ i18n.t('dashboard.inv.pagadas') }}</span>
               </div>
             </div>
             <div class="summary-card__tags">
-              <span class="summary-card__tag summary-card__tag--info">{{ fact.totalRegistradas }} registradas</span>
-              <span class="summary-card__tag summary-card__tag--success">{{ fact.totalVerificadas }} verificadas</span>
+              <span class="summary-card__tag summary-card__tag--info">{{ fact.totalRegistradas }} {{ i18n.t('dashboard.inv.registradas') }}</span>
+              <span class="summary-card__tag summary-card__tag--success">{{ fact.totalVerificadas }} {{ i18n.t('dashboard.inv.verificadas') }}</span>
               @if (fact.totalAnuladas > 0) {
-                <span class="summary-card__tag summary-card__tag--danger">{{ fact.totalAnuladas }} anuladas</span>
+                <span class="summary-card__tag summary-card__tag--danger">{{ fact.totalAnuladas }} {{ i18n.t('dashboard.inv.anuladas') }}</span>
               }
             </div>
           </div>
@@ -175,16 +175,16 @@
           <div class="summary-card summary-card--alert">
             <div class="summary-card__header">
               <svg lucideIcon="triangle-alert" [size]="16"></svg>
-              <span>Alertas Activas</span>
+              <span>{{ i18n.t('dashboard.inv.alertas') }}</span>
             </div>
             <div class="summary-card__body">
               <div class="summary-card__stat">
                 <span class="summary-card__stat-value summary-card__stat-value--danger">{{ alrt.alertasPendientes }}</span>
-                <span class="summary-card__stat-label">Pendientes</span>
+                <span class="summary-card__stat-label">{{ i18n.t('dashboard.inv.pendientes') }}</span>
               </div>
               <div class="summary-card__stat">
                 <span class="summary-card__stat-value">{{ alrt.alertasResueltas }}</span>
-                <span class="summary-card__stat-label">Resueltas</span>
+                <span class="summary-card__stat-label">{{ i18n.t('dashboard.inv.resueltas') }}</span>
               </div>
             </div>
           </div>
@@ -193,14 +193,14 @@
         @if (!dashboard.inventario().kpis && !dashboard.inventario().presupuesto && !dashboard.inventario().facturas && !dashboard.inventario().alertas) {
           <div class="empty-state">
             <svg lucideIcon="wifi-off" [size]="20"></svg>
-            <span>Sin datos de inventario disponibles</span>
+            <span>{{ i18n.t('dashboard.inv.sin_datos') }}</span>
           </div>
         }
       </div>
     </section>
 
     <section class="dashboard__section">
-      <h2 class="dashboard__section-title">Módulos del sistema</h2>
+      <h2 class="dashboard__section-title">{{ i18n.t('dashboard.seccion.modulos') }}</h2>
       <div class="modules-grid">
         @for (mod of dashboard.modulos(); track mod.label) {
           <a class="module-card" [routerLink]="mod.ruta">
@@ -223,7 +223,7 @@
     </section>
 
     <section class="dashboard__section">
-      <h2 class="dashboard__section-title">Actividad reciente</h2>
+      <h2 class="dashboard__section-title">{{ i18n.t('dashboard.seccion.actividad') }}</h2>
       <div class="activity-list">
         @for (item of dashboard.actividadReciente; track item.id) {
           <div class="activity-item">
@@ -237,7 +237,7 @@
         } @empty {
           <div class="empty-state">
             <svg lucideIcon="inbox" [size]="20"></svg>
-            <span>No hay actividad reciente</span>
+            <span>{{ i18n.t('dashboard.actividad.vacia') }}</span>
           </div>
         }
       </div>

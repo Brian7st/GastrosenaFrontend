@@ -7,16 +7,16 @@
       class="back-btn"
       type="button"
       (click)="volver(); $event.stopPropagation()"
-      aria-label="Volver"
+      [attr.aria-label]="i18n.t('general.volver')"
     >
       <lucide-icon name="arrow-left" [size]="20"></lucide-icon>
     </button>
 
     <div class="header-info" style="flex: 1;">
-      <h1 class="page-title">Evaluación Masiva</h1>
+      <h1 class="page-title">{{ i18n.t('evaluacion-masiva.page.title') }}</h1>
       <p class="page-subtitle">
-        Seleccione los aprendices a evaluar ·
-        <strong>{{ cantidadSeleccionados() }} seleccionado(s)</strong>
+        {{ i18n.t('evaluacion-masiva.subtitle') }}
+        <strong>{{ i18n.t('evaluacion-masiva.seleccionados').replace('{0}', cantidadSeleccionados().toString()) }}</strong>
       </p>
     </div>
 
@@ -28,7 +28,7 @@
         type="button"
         (click)="goToActividades(); $event.stopPropagation()"
       >
-        Ver actividades
+        {{ i18n.t('evaluacion-masiva.ver_actividades') }}
       </button>
 
       <button
@@ -37,7 +37,7 @@
         type="button"
         (click)="toggleModoSeleccion(); $event.stopPropagation()"
       >
-        {{ modoSeleccionAbierto() ? 'Cancelar Evaluación' : 'Evaluación Masiva' }}
+        {{ modoSeleccionAbierto() ? i18n.t('evaluacion-masiva.btn_cancelar') : i18n.t('evaluacion-masiva.btn_evaluar') }}
       </button>
     </div>
   </div>
@@ -114,7 +114,7 @@
 
       <div class="seccion-header">
         <span class="seccion-icon seccion-icon--activo"></span>
-        <span class="seccion-titulo">APRENDICES ACTIVOS</span>
+        <span class="seccion-titulo">{{ i18n.t('evaluacion-masiva.activos_titulo') }}</span>
         <span class="seccion-count">
           ({{ aprendicesActivos().length }})
         </span>
@@ -126,7 +126,7 @@
               [checked]="todosSeleccionados()" 
               (change)="toggleSelectAll()"
             >
-            <span style="font-size: 0.8rem; font-weight: bold; color: var(--color-primario);">Seleccionar Todos</span>
+            <span style="font-size: 0.8rem; font-weight: bold; color: var(--color-primario);">{{ i18n.t('evaluacion-masiva.seleccionar_todos') }}</span>
           </div>
         }
       </div>
@@ -151,7 +151,7 @@
                 [checked]="isSelected(aprendiz.id)"
                 (change)="toggleSelection(aprendiz.id)"
                 (click)="$event.stopPropagation()"
-                [attr.aria-label]="'Seleccionar ' + aprendiz.nombreCompleto"
+                [attr.aria-label]="aprendiz.nombreCompleto"
               />
             }
 
@@ -168,17 +168,17 @@
               </span>
 
               <span class="sub-info">
-                Ficha {{ aprendiz.ficha }} · {{ aprendiz.jornada }}
-              </span>
-            </div>
+                  {{ i18n.t('evaluacion-masiva.ficha') }}{{ aprendiz.ficha }}{{ i18n.t('evaluacion-masiva.separador') }}{{ aprendiz.jornada }}
+                </span>
+              </div>
 
-            <span
-              class="estado-badge"
-              [class.estado-pendiente]="aprendiz.estado === 'Pendiente'"
-              [class.estado-aprobo]="aprendiz.estado === 'Aprobó'"
-              [class.estado-no-aprobo]="aprendiz.estado === 'No Aprobó'"
-            >
-              {{ aprendiz.estado }}
+              <span
+                class="estado-badge"
+                [class.estado-pendiente]="aprendiz.estado === 'Pendiente'"
+                [class.estado-aprobo]="aprendiz.estado === 'Aprobó'"
+                [class.estado-no-aprobo]="aprendiz.estado === 'No Aprobó'"
+              >
+                {{ aprendiz.estado }}
             </span>
 
             @if (!modoSeleccionAbierto()) {
@@ -198,7 +198,7 @@
 
         <div class="seccion-header">
           <span class="seccion-icon seccion-icon--inactivo"></span>
-          <span class="seccion-titulo">NO ACTIVOS</span>
+          <span class="seccion-titulo">{{ i18n.t('evaluacion-masiva.inactivos_titulo') }}</span>
           <span class="seccion-count">
             ({{ aprendicesInactivos().length }})
           </span>
@@ -219,12 +219,12 @@
                 </span>
 
                 <span class="sub-info">
-                  Ficha {{ aprendiz.ficha }} · {{ aprendiz.jornada }}
+                {{ i18n.t('evaluacion-masiva.ficha') }}{{ aprendiz.ficha }}{{ i18n.t('evaluacion-masiva.separador') }}{{ aprendiz.jornada }}
                 </span>
               </div>
 
               <span class="estado-badge estado-inactivo">
-                Inactivo
+                {{ i18n.t('evaluacion-masiva.inactivo') }}
               </span>
 
             </div>
@@ -248,7 +248,7 @@
           <div
             class="evaluar-menu"
             role="menu"
-            aria-label="Opciones de evaluación"
+            [attr.aria-label]="i18n.t('evaluacion-masiva.menu_label')"
           >
 
             <button
@@ -259,7 +259,7 @@
               (click)="submitEvaluacionMasiva('aprobo')"
             >
               <span class="option-icon">✓</span>
-              Aprobó
+              {{ i18n.t('evaluacion-masiva.resultado_aprobo') }}
             </button>
 
             <button
@@ -270,7 +270,7 @@
               (click)="submitEvaluacionMasiva('no_aprobo')"
             >
               <span class="option-icon">✗</span>
-              No Aprobó
+              {{ i18n.t('evaluacion-masiva.resultado_no_aprobo') }}
             </button>
 
           </div>
@@ -285,7 +285,7 @@
           [attr.aria-expanded]="menuEvaluarAbierto()"
           aria-haspopup="menu"
         >
-          EVALUAR
+          {{ i18n.t('evaluacion-masiva.evaluar') }}
 
           <span
             class="evaluar-caret"

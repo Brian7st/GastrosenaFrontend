@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, Input, Output, EventEmitter, signal, ChangeDetectorRef } from "@angular/core";
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, ValidatorFn } from "@angular/forms";
 import { CommonModule } from "@angular/common";
+import { I18nService } from "../../i18n/i18n.service";
 import { CategoriaService } from "../../data-access/categoria.service";
 import { RecetaService } from "../../data-access/receta.service";
 import { IngredienteService } from "../../data-access/ingrediente.service";
@@ -27,6 +28,7 @@ export function noDuplicatesValidator(fieldName: string): ValidatorFn {
   styleUrl: './gestion-receta.component.scss'
 })
 export class GestionRecetaComponent implements OnInit {
+  protected readonly i18n = inject(I18nService);
   @Input() receta: Receta | null = null;
   @Output() close = new EventEmitter<boolean>(); // true if saved, false if cancelled
 
@@ -109,12 +111,12 @@ export class GestionRecetaComponent implements OnInit {
 
   agregarIngrediente() {
     if (this.ingredientesArr.hasError('duplicate')) {
-      alert("Por favor corrige los ingredientes duplicados antes de agregar uno nuevo.");
+      alert(this.i18n.t('gestion-receta.alert_ingredientes_duplicados'));
       return;
     }
     const lastCtrl = this.ingredientesArr.controls[this.ingredientesArr.length - 1];
     if (lastCtrl && !lastCtrl.get('nombreIngrediente')?.value?.trim()) {
-      alert("Debes completar el nombre del ingrediente actual antes de agregar otro.");
+      alert(this.i18n.t('gestion-receta.alert_ingrediente_incompleto'));
       return;
     }
 
@@ -132,12 +134,12 @@ export class GestionRecetaComponent implements OnInit {
 
   agregarPaso() {
     if (this.pasosArr.hasError('duplicate')) {
-      alert("Por favor corrige los pasos repetidos antes de agregar uno nuevo.");
+      alert(this.i18n.t('gestion-receta.alert_pasos_duplicados'));
       return;
     }
     const lastCtrl = this.pasosArr.controls[this.pasosArr.length - 1];
     if (lastCtrl && !lastCtrl.get('descripcionPaso')?.value?.trim()) {
-      alert("Debes completar la descripción del paso actual antes de agregar otro.");
+      alert(this.i18n.t('gestion-receta.alert_paso_incompleto'));
       return;
     }
 
@@ -171,13 +173,13 @@ export class GestionRecetaComponent implements OnInit {
 
       observable.subscribe({
         next: () => {
-          this.exitoModalTitulo.set(this.receta ? 'Receta actualizada correctamente' : 'Receta guardada correctamente');
-          this.exitoModalMensaje.set(this.receta ? 'Los cambios han sido guardados en el sistema.' : 'La nueva receta ha sido registrada en el sistema.');
+          this.exitoModalTitulo.set(this.receta ? this.i18n.t('gestion-receta.alerta_actualizada_titulo') : this.i18n.t('gestion-receta.alerta_guardada_titulo'));
+          this.exitoModalMensaje.set(this.receta ? this.i18n.t('gestion-receta.alerta_actualizada_msg') : this.i18n.t('gestion-receta.alerta_guardada_msg'));
           this.mostrarExitoModal.set(true);
         },
         error: (err) => {
           console.error('Error al guardar:', err);
-          let errorMsg = 'Error al guardar. Verifica la conexión con el backend.';
+          let errorMsg = this.i18n.t('gestion-receta.error_guardar');
           if (err.error) {
             if (typeof err.error === 'string') {
                errorMsg = err.error;
@@ -187,7 +189,7 @@ export class GestionRecetaComponent implements OnInit {
                errorMsg = JSON.stringify(err.error, null, 2);
             }
           }
-          alert('Error del Servidor:\n' + errorMsg);
+          alert(this.i18n.t('gestion-receta.error_servidor') + errorMsg);
           this.isSaving = false;
         }
       });
@@ -244,7 +246,7 @@ export class GestionRecetaComponent implements OnInit {
           const sizeInBytes = dataUrl.length * (3 / 4);
           const sizeInMB = sizeInBytes / (1024 * 1024);
           if (sizeInMB > 1) {
-            alert('La imagen es demasiado pesada incluso después de comprimir. Por favor, elige una imagen con menor resolución o recórtala.');
+            alert(this.i18n.t('gestion-receta.error_imagen_pesada'));
             return;
           }
 

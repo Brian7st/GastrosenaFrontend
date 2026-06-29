@@ -92,6 +92,84 @@ const VARS_OSCURO: Record<string, string> = {
 
   '--color-success-bg': '#1a3a1a',
   '--color-success-text': '#4ade80',
+  '--color-success': '#34d399',
+  '--color-success-bg-subtle': 'rgba(52, 211, 153, 0.12)',
+  '--color-success-border': '#065f46',
+  '--color-success-vivid': '#4ade80',
+
+  // Error
+  '--color-error': '#f87171',
+  '--color-error-bg': '#3a1a1a',
+  '--color-error-text': '#f87171',
+  '--color-error-border': '#4a2a2a',
+
+  // Danger
+  '--color-danger': '#f87171',
+  '--color-danger-bg-subtle': 'rgba(248, 113, 113, 0.12)',
+
+  // Terciario
+  '--color-terciario': '#f87171',
+  '--color-terciario-contenedor': '#7f1d1d',
+
+  // Primario (se mantiene el verde de marca)
+  '--color-primario': '#39a900',
+  '--color-primario-contenedor': '#39a900',
+  '--color-primario-hover': '#38a800',
+  '--color-primario-gradient-end': '#28a745',
+  '--color-en-primario': '#ffffff',
+  '--color-en-primario-contenedor': '#ccffcc',
+  '--color-brand-primary': '#39a900',
+
+  // Pizarra faltante
+  '--color-pizarra-950': '#e2e8f0',
+
+  // Esmeralda (invertida para dark)
+  '--color-esmeralda-50': '#1a3a2a',
+  '--color-esmeralda-100': '#1e4a34',
+  '--color-esmeralda-500': '#34d399',
+  '--color-esmeralda-600': '#10b981',
+  '--color-esmeralda-700': '#6ee7b7',
+  '--color-esmeralda-800': '#a7f3d0',
+  '--color-esmeralda-900': '#d1fae5',
+
+  // Estados de inventario/facturas
+  '--color-estado-registrada': '#60a5fa',
+  '--color-estado-registrada-bg': '#1a2a4a',
+  '--color-estado-verificada': '#fb923c',
+  '--color-estado-verificada-bg': '#2a1a0a',
+  '--color-estado-pagada': '#4ade80',
+  '--color-estado-pagada-bg': '#1a3a1a',
+  '--color-estado-anulada': '#f87171',
+  '--color-estado-anulada-bg': '#3a1a1a',
+  '--color-estado-activo': '#4ade80',
+  '--color-estado-activo-bg': '#1a3a1a',
+  '--color-estado-pendiente': '#fb923c',
+  '--color-estado-pendiente-bg': '#2a1a0a',
+  '--color-estado-bajo-stock': '#f87171',
+  '--color-estado-bajo-stock-bg': '#3a1a1a',
+  '--color-estado-inactivo': '#94a3b8',
+  '--color-estado-inactivo-bg': '#252526',
+
+  // Estados de cocina/platos
+  '--color-estado-espera-bg': 'rgba(251, 191, 36, 0.15)',
+  '--color-estado-espera-text': '#fbbf24',
+  '--color-estado-preparando-solid': '#60a5fa',
+  '--color-estado-listo-bg-soft': 'rgba(57, 169, 0, 0.15)',
+
+  // Prioridad
+  '--color-prioridad-alta-text': '#fbbf24',
+  '--color-prioridad-alta-bg': 'rgba(251, 191, 36, 0.15)',
+  '--color-prioridad-normal-bg': 'rgba(96, 165, 250, 0.15)',
+  '--color-prioridad-urgente-bg': 'rgba(248, 113, 113, 0.15)',
+
+  // Info extras
+  '--color-info-bg-subtle': 'rgba(96, 165, 250, 0.12)',
+  '--color-warning-bg-subtle': 'rgba(251, 191, 36, 0.12)',
+
+  // Charts
+  '--color-chart-bar': '#60a5fa',
+  '--color-chart-line': '#fbbf24',
+  '--color-chart-line-fill': 'rgba(251, 191, 36, 0.15)',
 };
 
 const VARS_CLARO: Record<string, string> = {

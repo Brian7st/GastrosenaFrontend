@@ -2,12 +2,12 @@
   <div class="modal-dialog import-dialog" (click)="$event.stopPropagation()">
     <div class="import-header">
       <div>
-        <h1 class="import-title">Cargar datos internos</h1>
-        <p class="import-subtitle">Cargue un archivo CSV o Excel con los bienes a importar.</p>
+        <h1 class="import-title">{{ i18n.t('bien-import.title') }}</h1>
+        <p class="import-subtitle">{{ i18n.t('bien-import.subtitle') }}</p>
       </div>
       <button class="btn-plantilla" (click)="onDescargarPlantilla()">
         <span class="material-symbols-outlined">download</span>
-        Descargar Plantilla
+        {{ i18n.t('bien-import.descargar_plantilla') }}
       </button>
     </div>
 
@@ -20,10 +20,10 @@
             <div class="drop-icon">
               <span class="material-symbols-outlined">upload_file</span>
             </div>
-            <h3>Arrastre su archivo aquí</h3>
-            <p>Archivos <strong>.xlsx</strong> o <strong>.csv</strong> generados desde la plantilla.</p>
+            <h3>{{ i18n.t('bien-import.drop_zone_title') }}</h3>
+            <p>{{ i18n.t('bien-import.drop_zone_hint') }}</p>
             <label class="btn-select-file">
-              Seleccionar Archivo
+              {{ i18n.t('bien-import.seleccionar_archivo') }}
               <input type="file" accept=".csv,.xlsx,.xls" (change)="onFileSelected($event)" />
             </label>
           </div>
@@ -46,10 +46,10 @@
         <div class="instrucciones-card">
           <div class="instr-header">
             <span class="material-symbols-outlined">info</span>
-            <h4>Instrucciones</h4>
+            <h4>{{ i18n.t('bien-import.instrucciones_title') }}</h4>
           </div>
           <ol class="instr-list">
-            @for (item of INSTRUCCIONES; track item; let i = $index) {
+            @for (item of INSTRUCCIONES(); track item; let i = $index) {
             <li>
               <span class="instr-num">{{ i + 1 }}</span>
               <span>{{ item }}</span>
@@ -57,10 +57,10 @@
             }
           </ol>
           <div class="server-status">
-            <p class="status-label">ESTADO</p>
+            <p class="status-label">{{ i18n.t('bien-import.estado_label') }}</p>
             <div class="status-value">
               <span class="status-dot"></span>
-              Listo para importar
+              {{ i18n.t('bien-import.listo') }}
             </div>
           </div>
         </div>
@@ -77,20 +77,20 @@
         <div class="preview-header">
           <div class="preview-title">
             <span class="material-symbols-outlined">visibility</span>
-            <h3>Vista Previa de Datos</h3>
+            <h3>{{ i18n.t('bien-import.vista_previa') }}</h3>
           </div>
           @if (!isProcessing()) {
-          <span class="preview-count">{{ previewData().length }} FILAS ENCONTRADAS</span>
+          <span class="preview-count">{{ previewData().length }} {{ i18n.t('bien-import.filas_encontradas') }}</span>
           }
           @if (isProcessing()) {
-          <span class="preview-count">Procesando...</span>
+          <span class="preview-count">{{ i18n.t('bien-import.procesando') }}</span>
           }
         </div>
 
         @if (isProcessing()) {
         <div class="processing-indicator">
           <span class="material-symbols-outlined spin">sync</span>
-          Analizando archivo...
+          {{ i18n.t('bien-import.analizando') }}
         </div>
         }
 
@@ -99,14 +99,14 @@
           <table class="preview-table">
             <thead>
               <tr>
-                <th>CÓD. SENA</th>
-                <th>DESCRIPCIÓN</th>
-                <th>CATEGORÍA</th>
-                <th>VLR ADJUDICADO</th>
-                <th>VLR ANTES IVA</th>
-                <th>IVA</th>
-                <th>CÓD. PROVEEDOR</th>
-                <th>UND. MEDIDA</th>
+                <th>{{ i18n.t('bien-import.th_cod_sena') }}</th>
+                <th>{{ i18n.t('bien-import.th_descripcion') }}</th>
+                <th>{{ i18n.t('bien-import.th_categoria') }}</th>
+                <th>{{ i18n.t('bien-import.th_vlr_adjudicado') }}</th>
+                <th>{{ i18n.t('bien-import.th_vlr_antes_iva') }}</th>
+                <th>{{ i18n.t('bien-import.th_iva') }}</th>
+                <th>{{ i18n.t('bien-import.th_cod_proveedor') }}</th>
+                <th>{{ i18n.t('bien-import.th_und_medida') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -131,11 +131,11 @@
     </div>
 
     <div class="import-footer">
-      <button class="btn-cancel" (click)="cancelar.emit()">Cancelar</button>
+      <button class="btn-cancel" (click)="cancelar.emit()">{{ i18n.t('bien-import.cancel') }}</button>
       <button class="btn-procesar" [disabled]="!file() || isProcessing() || (!isExcel() && (previewData().length === 0 || hasErrors()))"
         (click)="onProcesar()">
         <span class="material-symbols-outlined">check_circle</span>
-        Cargar datos internos
+        {{ i18n.t('bien-import.import') }}
       </button>
     </div>
   </div>

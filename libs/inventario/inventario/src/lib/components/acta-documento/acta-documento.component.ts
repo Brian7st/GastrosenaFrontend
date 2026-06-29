@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { UpperCasePipe } from '@angular/common';
 import { ActaLegalizacion } from '../../models/acta.model';
+import { I18nService } from '../../i18n/i18n.service';
 
 /**
  * Componente presentacional del formato oficial GOR-F-084 V02 del acta de
@@ -16,6 +17,7 @@ import { ActaLegalizacion } from '../../models/acta.model';
   styleUrl: './acta-documento.component.scss',
 })
 export class ActaDocumentoComponent {
+  protected readonly i18n = inject(I18nService);
   readonly acta = input.required<ActaLegalizacion>();
 
   /** Instructor Cuentadante: nombre tomado de la lista de asistentes. */

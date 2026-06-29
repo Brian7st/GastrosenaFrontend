@@ -8,6 +8,7 @@ import {
 import { Router } from '@angular/router';
 import { AlertasFacade } from '../../../data-access/alertas.facade';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-alertas-config',
@@ -19,6 +20,7 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
 })
 export class AlertasConfigComponent implements OnInit {
   private router = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private facade = inject(AlertasFacade);
 
   umbrales = this.facade.umbrales;

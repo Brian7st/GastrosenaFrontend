@@ -1,27 +1,27 @@
 <div class="reportes-wrapper">
 
   <restaurant-page-header
-    title="Reportes y Análisis"
-    subtitle="Genera y descarga reportes del sistema GastroSENA"
+    [title]="i18n.t('page.title')"
+    [subtitle]="i18n.t('page.subtitle')"
   />
 
   <!-- Filtros -->
   <div class="reportes-filtros">
     <restaurant-select-filter
-      label="TIPO DE REPORTE"
+      [label]="i18n.t('filter.tipo')"
       [value]="tipoSeleccionado()"
-      [options]="tipoOpciones"
+      [options]="tipoOpciones()"
       (valueChange)="tipoSeleccionado.set($event)"
     />
     <restaurant-select-filter
-      label="PERIODICIDAD"
+      [label]="i18n.t('filter.periodicidad')"
       [value]="periodicidadSeleccionada()"
-      [options]="periodicidadOpciones"
+      [options]="periodicidadOpciones()"
       (valueChange)="periodicidadSeleccionada.set($event)"
     />
     <restaurant-button variant="primary" (click)="onGenerarReporte()">
       <lucide-icon name="trending-up" [size]="16"></lucide-icon>
-      Generar Reporte
+      {{ i18n.t('btn.generar_reporte') }}
     </restaurant-button>
   </div>
 
@@ -36,7 +36,7 @@
           </h2>
         </div>
         <restaurant-status-badge
-          [label]="seccion.reportes.length + ' reportes'"
+          [label]="i18n.t('badge.reportes').replace('{count}', seccion.reportes.length)"
           variant="warning"
         />
       </div>
@@ -51,15 +51,15 @@
            <div class="reporte-card__actions">
   <restaurant-button variant="surface" (click)="descargarPdf(reporte.id)">
     <lucide-icon name="file-text" [size]="14"></lucide-icon>
-    PDF
+    {{ i18n.t('btn.pdf') }}
   </restaurant-button>
   <restaurant-button variant="primary" (click)="generarReporte(reporte.id)">
     <lucide-icon name="refresh-cw" [size]="14"></lucide-icon>
-    Generar
+    {{ i18n.t('btn.generar') }}
   </restaurant-button>
   <restaurant-button variant="surface" (click)="descargarReporte(reporte.id)">
     <lucide-icon name="file-spreadsheet" [size]="14"></lucide-icon>
-    Excel
+    {{ i18n.t('btn.excel') }}
   </restaurant-button>
 </div>
           </div>
@@ -70,15 +70,15 @@
 
   <!-- Reportes recientes -->
   <restaurant-data-table
-    tableTitle="Reportes recientes"
+    [tableTitle]="i18n.t('table.title')"
     tableIcon="file-text"
   >
     <thead>
       <tr>
-        <th>NOMBRE</th>
-        <th>FECHA</th>
-        <th>ESTADO</th>
-        <th>ACCIÓN</th>
+        <th>{{ i18n.t('th.nombre') }}</th>
+        <th>{{ i18n.t('th.fecha') }}</th>
+        <th>{{ i18n.t('th.estado') }}</th>
+        <th>{{ i18n.t('th.accion') }}</th>
       </tr>
     </thead>
     @for (reporte of reportesRecientes(); track reporte.id) {
@@ -94,7 +94,7 @@
         <td>
           <restaurant-button variant="surface" (click)="descargarReporte(reporte.id)">
             <lucide-icon name="download" [size]="14"></lucide-icon>
-            Descargar
+            {{ i18n.t('btn.descargar') }}
           </restaurant-button>
         </td>
       </tr>

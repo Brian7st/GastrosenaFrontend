@@ -97,13 +97,14 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
         },
         {
           label: 'Fichas',
+          tKey: 'nav.fichas',
           ruta: '/app/fichas',
           icono: 'book-open',
           // Solo ADMINISTRADOR e INSTRUCTOR pueden ver/gestionar fichas
           // (coincide con @RequireRole del FichaController en usuarios).
           roles: [Rol.ADMINISTRADOR, Rol.INSTRUCTOR],
           children: [
-            { label: 'Lista de Fichas', ruta: '/app/fichas', icono: 'list' },
+            { label: 'Lista de Fichas', tKey: 'nav.lista_fichas', ruta: '/app/fichas', icono: 'list' },
           ],
         },
         {
@@ -143,7 +144,7 @@ export const SIDEBAR_CONFIG: BarraLateralConfig = {
 
         {
           label: 'Reportes',
-          //tKey: 'nav.reportes',
+          tKey: 'nav.reportes',
           ruta: '/app/reportes',
           icono: 'pie-chart',
           permisos: ['MODULO_REPORTES_VER', 'REPORTES_GESTIONAR', 'generar_reporte_facturacion'],

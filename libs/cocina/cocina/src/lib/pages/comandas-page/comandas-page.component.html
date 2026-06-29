@@ -1,5 +1,5 @@
 <div class="comanda-container">
-  <restaurant-page-header title="Tablero de Comandas" subtitle="Gestión de pedidos en tiempo real"></restaurant-page-header>
+  <restaurant-page-header [title]="i18n.t('comandas.page.title')" [subtitle]="i18n.t('comandas.page.subtitle')"></restaurant-page-header>
 
   @if (errorToast()) {
   <div class="toast-error shadow">
@@ -11,8 +11,8 @@
   <div class="filters-container showcase__row" style="margin-bottom: var(--space-6);">
     <div style="flex: 1; min-width: 250px;">
       <restaurant-search-filter
-        label="Buscar comanda"
-        placeholder="Buscar por mesa, mesero o plato..."
+        [label]="i18n.t('comandas.buscar_label')"
+        [placeholder]="i18n.t('comandas.buscar_placeholder')"
         [value]="searchTerm()"
         (valueChange)="searchTerm.set($event)"
       ></restaurant-search-filter>
@@ -20,9 +20,9 @@
 
     <div style="min-width: 180px;">
       <restaurant-select-filter
-        label="Estado"
+        [label]="i18n.t('comandas.estado_label')"
         [value]="filtroEstado()"
-        [options]="opcionesEstado"
+        [options]="opcionesEstado()"
         (valueChange)="filtroEstado.set($event)"
       ></restaurant-select-filter>
     </div>
@@ -31,9 +31,9 @@
 
     <div style="min-width: 180px;">
       <restaurant-select-filter
-        label="Ordenar por"
+        [label]="i18n.t('comandas.ordenar_label')"
         [value]="filtroOrden()"
-        [options]="opcionesOrden"
+        [options]="opcionesOrden()"
         (valueChange)="filtroOrden.set($event)"
       ></restaurant-select-filter>
     </div>
@@ -45,7 +45,7 @@
     <!-- Columna: En Espera -->
     <div class="column col-espera kanban-column">
       <div class="col-header showcase__row" style="justify-content: space-between; margin-bottom: var(--space-4);">
-        <h5 class="m-0 fw-bold">En Espera</h5>
+        <h5 class="m-0 fw-bold">{{ i18n.t('comandas.columna_espera') }}</h5>
         <span class="showcase__value">{{ enEspera().length }}</span>
       </div>
       @for (c of enEspera(); track c.idComanda) {
@@ -59,7 +59,7 @@
     <!-- Columna: Preparando -->
     <div class="column col-preparando kanban-column">
       <div class="col-header showcase__row" style="justify-content: space-between; margin-bottom: var(--space-4);">
-        <h5 class="m-0 fw-bold">Preparando</h5>
+        <h5 class="m-0 fw-bold">{{ i18n.t('comandas.columna_preparando') }}</h5>
         <span class="showcase__value">{{ preparando().length }}</span>
       </div>
       @for (c of preparando(); track c.idComanda) {
@@ -73,7 +73,7 @@
     <!-- Columna: Listo -->
     <div class="column col-listo kanban-column">
       <div class="col-header showcase__row" style="justify-content: space-between; margin-bottom: var(--space-4);">
-        <h5 class="m-0 fw-bold">Listo</h5>
+        <h5 class="m-0 fw-bold">{{ i18n.t('comandas.columna_listo') }}</h5>
         <span class="showcase__value">{{ listos().length }}</span>
       </div>
       @for (c of listos(); track c.idComanda) {

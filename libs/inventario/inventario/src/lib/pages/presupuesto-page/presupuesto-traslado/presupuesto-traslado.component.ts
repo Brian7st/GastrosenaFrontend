@@ -3,6 +3,7 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 import { PresupuestoFacade } from '../../../data-access/presupuesto.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-presupuesto-traslado',
@@ -14,6 +15,7 @@ import { PresupuestoFacade } from '../../../data-access/presupuesto.facade';
 })
 export class PresupuestoTrasladoComponent {
   private router  = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private facade  = inject(PresupuestoFacade);
   private fb      = inject(FormBuilder);
 

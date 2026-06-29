@@ -8,7 +8,7 @@
     <div class="sheet-drawer__title-row">
       <div class="sheet-drawer__title-group">
         <lucide-icon name="truck" [size]="24" class="sheet-drawer__title-icon"></lucide-icon>
-        <span class="sheet-drawer__title">Despacho Físico</span>
+        <span class="sheet-drawer__title">{{ i18n.t('req.despacho_titulo') }}</span>
       </div>
       <button class="sheet-drawer__close" (click)="close()">
         <lucide-icon name="x" [size]="20"></lucide-icon>
@@ -16,11 +16,11 @@
     </div>
     <div class="sheet-drawer__info-row">
       <div class="sheet-drawer__info-card sheet-drawer__info-card--primary">
-        <span class="sheet-drawer__info-label">Orden de Requisición</span>
-        <span class="sheet-drawer__info-value">{{ requisicion()?.numero ?? 'Cargando...' }}</span>
+        <span class="sheet-drawer__info-label">{{ i18n.t('req.orden_requisicion') }}</span>
+        <span class="sheet-drawer__info-value">{{ requisicion()?.numero ?? i18n.t('comun.cargando') }}</span>
       </div>
       <div class="sheet-drawer__info-card">
-        <span class="sheet-drawer__info-label">Centro de Costo</span>
+        <span class="sheet-drawer__info-label">{{ i18n.t('req.centro_costo') }}</span>
         <span class="sheet-drawer__info-value">Gastronomía 102</span>
       </div>
     </div>
@@ -28,7 +28,7 @@
 
   <!-- Scrollable Content: Checklist -->
   <div class="sheet-drawer__body">
-    <h4 class="section-label">Ítems por Despachar</h4>
+    <h4 class="section-label">{{ i18n.t('req.items_despachar') }}</h4>
     <div class="checklist">
       @for (item of requisicion()?.items ?? []; track item.productoId) {
         <label class="checklist-item">
@@ -42,7 +42,7 @@
             <div class="checklist-item__row">
               <div class="checklist-item__info">
                 <span class="checklist-item__name">{{ item.productoNombre }}</span>
-                <span class="checklist-item__qty-label">Pedido: {{ item.cantidad }} {{ item.unidadMedida }}</span>
+                <span class="checklist-item__qty-label">{{ i18n.t('req.pedido') }}: {{ item.cantidad }} {{ item.unidadMedida }}</span>
               </div>
               <!-- Se despacha la cantidad solicitada: no se permite modificarla,
                    solo marcar el ítem como entregado. -->
@@ -56,23 +56,23 @@
     </div>
 
     <!-- Warehouse Details -->
-    <h4 class="section-label section-label--mt">Registro de Entrega</h4>
+    <h4 class="section-label section-label--mt">{{ i18n.t('req.registro_entrega') }}</h4>
     <div class="form-grid">
       <div class="form-field">
-        <label class="form-field__label">Hora de Entrega Real</label>
+        <label class="form-field__label">{{ i18n.t('req.hora_entrega') }}</label>
         <div class="form-field__input-wrapper">
           <lucide-icon name="clock" [size]="16" class="form-field__icon"></lucide-icon>
           <input class="form-field__input" type="time" value="14:30"/>
         </div>
       </div>
       <div class="form-field">
-        <label class="form-field__label">Ecónomo Responsable <span class="form-field__required">*</span></label>
+        <label class="form-field__label">{{ i18n.t('req.economo') }} <span class="form-field__required">*</span></label>
         <div class="form-field__input-wrapper">
           <lucide-icon name="user" [size]="16" class="form-field__icon"></lucide-icon>
           <input
             class="form-field__input"
             type="text"
-            placeholder="Documento del ecónomo"
+            [placeholder]="i18n.t('req.economo_placeholder')"
             [value]="economoId()"
             (input)="onEconomo($event)"
           />
@@ -80,8 +80,8 @@
       </div>
     </div>
     <div class="form-field form-field--full">
-      <label class="form-field__label">Observaciones de Bodega</label>
-      <textarea class="form-field__textarea" placeholder="Ej: Se entrega empaque sellado, requiere refrigeración..."></textarea>
+      <label class="form-field__label">{{ i18n.t('req.obs_bodega') }}</label>
+      <textarea class="form-field__textarea" [placeholder]="i18n.t('req.obs_bodega_placeholder')"></textarea>
     </div>
   </div>
 
@@ -92,8 +92,8 @@
     }
     <button class="sheet-drawer__cta" (click)="finalizarEntrega()" [disabled]="!puedeDespachar()">
       <lucide-icon name="check-circle" [size]="24"></lucide-icon>
-      {{ procesando() ? 'Despachando...' : 'Finalizar Entrega' }}
+      {{ procesando() ? i18n.t('req.despachando') : i18n.t('req.finalizar_entrega') }}
     </button>
-    <p class="sheet-drawer__disclaimer">Al finalizar se generará el soporte digital 45-S</p>
+    <p class="sheet-drawer__disclaimer">{{ i18n.t('req.disclaimer_45s') }}</p>
   </footer>
 </aside>

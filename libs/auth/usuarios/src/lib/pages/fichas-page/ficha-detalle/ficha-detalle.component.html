@@ -58,98 +58,94 @@
   </div>
  
   <!-- Lista -->
-  <div class="detalle__section">
-    <div class="detalle__section-header">
+  <restaurant-data-table>
+    <div dtHeader class="detalle__section-header">
       <h2 class="detalle__section-title">Aprendices asignados</h2>
       <button class="detalle__btn-primary" (click)="abrirModalAsignar()">
         <lucide-icon name="user-plus" [size]="16"></lucide-icon>
         Asignar Aprendiz
       </button>
     </div>
- 
-    @if (loading()) {
-      <div class="detalle__empty">
-        <lucide-icon name="loader" [size]="28"></lucide-icon>
-        <p>Cargando aprendices...</p>
-      </div>
-    } @else if (aprendices().length === 0) {
-      <div class="detalle__empty">
-        <lucide-icon name="users" [size]="36"></lucide-icon>
-        <p>No hay aprendices asignados a esta ficha</p>
-        <button class="detalle__btn-primary" (click)="abrirModalAsignar()">
-          <lucide-icon name="user-plus" [size]="14"></lucide-icon>
-          Asignar el primero
-        </button>
-      </div>
-    } @else {
-      <div class="detalle__table-wrapper">
-        <table class="detalle__table">
-          <thead>
-            <tr>
-              <th>Documento</th>
-              <th>Nombre</th>
-              <th>Email</th>
-              <th>Rol en ficha</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (aprendiz of aprendices(); track aprendiz.id) {
-              <tr [class.detalle__row--vocero]="esVocero(aprendiz.id)"
-                  [class.detalle__row--subvocero]="esSubvocero(aprendiz.id)">
-                <td>{{ aprendiz.documento }}</td>
-                <td>{{ aprendiz.nombre }} {{ aprendiz.apellidos }}</td>
-                <td>{{ aprendiz.email }}</td>
-                <td>
-                  @if (esVocero(aprendiz.id)) {
-                    <span class="detalle__badge detalle__badge--vocero"><lucide-icon name="star" [size]="12"></lucide-icon> Vocero</span>
-                  } @else if (esSubvocero(aprendiz.id)) {
-                    <span class="detalle__badge detalle__badge--subvocero"><lucide-icon name="award" [size]="12"></lucide-icon> Subvocero</span>
-                  } @else {
-                    <span class="detalle__badge detalle__badge--ninguno">Sin rol</span>
-                  }
-                </td>
-                <td>
-                  <div class="detalle__acciones">
-                    @if (!esVocero(aprendiz.id)) {
-                      <button
-                        class="detalle__btn-accion detalle__btn-accion--vocero"
-                        (click)="asignarVocero(aprendiz.id)"
-                        title="Asignar como vocero"
-                      >
-                        <lucide-icon name="star" [size]="14"></lucide-icon>
-                        Vocero
-                      </button>
-                    }
-                    @if (!esSubvocero(aprendiz.id)) {
-                      <button
-                        class="detalle__btn-accion detalle__btn-accion--subvocero"
-                        (click)="asignarSubvocero(aprendiz.id)"
-                        title="Asignar como subvocero"
-                      >
-                        <lucide-icon name="award" [size]="14"></lucide-icon>
-                        Subvocero
-                      </button>
-                    }
-                    @if (esVocero(aprendiz.id) || esSubvocero(aprendiz.id)) {
-                      <button
-                        class="detalle__btn-accion detalle__btn-accion--remover"
-                        (click)="removerRol(aprendiz.id)"
-                        title="Quitar rol"
-                      >
-                        <lucide-icon name="x" [size]="14"></lucide-icon>
-                        Quitar rol
-                      </button>
-                    }
-                  </div>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    }
-  </div>
+
+    <thead>
+      <tr>
+        <th>Documento</th>
+        <th>Nombre</th>
+        <th>Email</th>
+        <th>Rol en ficha</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (loading()) {
+        <tr>
+          <td colspan="5" class="detalle__empty-cell">
+            <lucide-icon name="loader" [size]="20"></lucide-icon>
+            Cargando aprendices...
+          </td>
+        </tr>
+      } @else if (aprendices().length === 0) {
+        <tr>
+          <td colspan="5" class="detalle__empty-cell">
+            <lucide-icon name="users" [size]="32"></lucide-icon>
+            No hay aprendices asignados a esta ficha
+          </td>
+        </tr>
+      } @else {
+        @for (aprendiz of aprendices(); track aprendiz.id) {
+          <tr [class.detalle__row--vocero]="esVocero(aprendiz.id)"
+              [class.detalle__row--subvocero]="esSubvocero(aprendiz.id)">
+            <td>{{ aprendiz.documento }}</td>
+            <td>{{ aprendiz.nombre }} {{ aprendiz.apellidos }}</td>
+            <td>{{ aprendiz.email }}</td>
+            <td>
+              @if (esVocero(aprendiz.id)) {
+                <span class="detalle__badge detalle__badge--vocero"><lucide-icon name="star" [size]="12"></lucide-icon> Vocero</span>
+              } @else if (esSubvocero(aprendiz.id)) {
+                <span class="detalle__badge detalle__badge--subvocero"><lucide-icon name="award" [size]="12"></lucide-icon> Subvocero</span>
+              } @else {
+                <span class="detalle__badge detalle__badge--ninguno">Sin rol</span>
+              }
+            </td>
+            <td>
+              <div class="detalle__acciones">
+                @if (!esVocero(aprendiz.id)) {
+                  <button
+                    class="detalle__btn-accion detalle__btn-accion--vocero"
+                    (click)="asignarVocero(aprendiz.id)"
+                    title="Asignar como vocero"
+                  >
+                    <lucide-icon name="star" [size]="14"></lucide-icon>
+                    Vocero
+                  </button>
+                }
+                @if (!esSubvocero(aprendiz.id)) {
+                  <button
+                    class="detalle__btn-accion detalle__btn-accion--subvocero"
+                    (click)="asignarSubvocero(aprendiz.id)"
+                    title="Asignar como subvocero"
+                  >
+                    <lucide-icon name="award" [size]="14"></lucide-icon>
+                    Subvocero
+                  </button>
+                }
+                @if (esVocero(aprendiz.id) || esSubvocero(aprendiz.id)) {
+                  <button
+                    class="detalle__btn-accion detalle__btn-accion--remover"
+                    (click)="removerRol(aprendiz.id)"
+                    title="Quitar rol"
+                  >
+                    <lucide-icon name="x" [size]="14"></lucide-icon>
+                    Quitar rol
+                  </button>
+                }
+              </div>
+            </td>
+          </tr>
+        }
+      }
+    </tbody>
+  </restaurant-data-table>
  
 </div>
  

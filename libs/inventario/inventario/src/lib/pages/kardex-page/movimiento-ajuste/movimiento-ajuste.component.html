@@ -12,8 +12,8 @@
           <lucide-icon name="sliders-horizontal" [size]="28"></lucide-icon>
         </div>
         <div>
-          <h3 class="modal-title">Ajuste de Inventario</h3>
-          <p class="modal-subtitle">Correcciones de stock: mermas, devoluciones, conteo físico, carga inicial.</p>
+          <h3 class="modal-title">{{ i18n.t('kardex.ajuste_titulo') }}</h3>
+          <p class="modal-subtitle">{{ i18n.t('kardex.ajuste_subtitulo') }}</p>
         </div>
       </div>
       <button class="close-btn" type="button" (click)="closeModal()">
@@ -24,9 +24,7 @@
     <!-- Aviso de canal controlado -->
     <div class="notice-banner">
       <lucide-icon name="info" [size]="16"></lucide-icon>
-      <span>
-        Las compras ingresan SOLO mediante la conciliación FEL. Este formulario es para ajustes auditables sin factura.
-      </span>
+      <span>{{ i18n.t('kardex.ajuste_aviso') }}</span>
     </div>
 
     <!-- Body -->
@@ -35,7 +33,7 @@
 
         <!-- Selector de producto -->
         <div class="form-group full-width">
-          <label for="busqueda-producto">PRODUCTO <span class="required">*</span></label>
+          <label for="busqueda-producto">{{ i18n.t('kardex.label_producto') }} <span class="required">*</span></label>
 
           @if (productoSeleccionado()) {
             <!-- Producto ya elegido -->
@@ -47,7 +45,7 @@
               </div>
               <span class="producto-seleccionado__stock">
                 <lucide-icon name="layers" [size]="14"></lucide-icon>
-                Stock actual:&nbsp;<strong>{{ stockActual() ?? '—' }}</strong>&nbsp;{{ unidadProducto() }}
+                {{ i18n.t('kardex.stock_actual') }}:&nbsp;<strong>{{ stockActual() ?? '—' }}</strong>&nbsp;{{ unidadProducto() }}
               </span>
               <button
                 type="button"
@@ -68,7 +66,7 @@
                   [value]="busqueda()"
                   (input)="onBusquedaChange($event)"
                   (focus)="selectorAbierto.set(true)"
-                  placeholder="Buscar por nombre o código SENA..."
+                  [placeholder]="i18n.t('kardex.buscar_producto')" 
                   class="form-input"
                   autocomplete="off">
                 @if (buscando()) {
@@ -100,13 +98,13 @@
           }
 
           @if (ajusteForm.get('productoId')?.invalid && ajusteForm.get('productoId')?.touched) {
-            <p class="error-hint">Seleccioná un producto del catálogo.</p>
+            <p class="error-hint">{{ i18n.t('kardex.error_producto') }}</p>
           }
         </div>
 
         <!-- Cantidad real / stock corregido -->
         <div class="form-group full-width">
-          <label for="cantidadNueva">STOCK CORREGIDO <span class="required">*</span></label>
+          <label for="cantidadNueva">{{ i18n.t('kardex.stock_corregido') }} <span class="required">*</span></label>
           <div class="input-wrapper">
             <lucide-icon name="package-check" class="input-icon" [size]="16"></lucide-icon>
             <input
@@ -119,7 +117,7 @@
               class="form-input">
           </div>
           @if (ajusteForm.get('cantidadNueva')?.invalid && ajusteForm.get('cantidadNueva')?.touched) {
-            <p class="error-hint">Ingresá la cantidad real (mínimo 0).</p>
+            <p class="error-hint">{{ i18n.t('kardex.error_cantidad') }}</p>
           }
           @if (ajusteDelta() !== null) {
             <span
@@ -128,17 +126,17 @@
               [class.ajuste-delta--alza]="ajusteDelta()! > 0">
               @if (ajusteDelta()! < 0) {
                 <lucide-icon name="trending-down" [size]="14"></lucide-icon>
-                Merma de {{ -ajusteDelta()! }} {{ unidadProducto() }}
+                {{ i18n.t('kardex.merma') }} {{ -ajusteDelta()! }} {{ unidadProducto() }}
               } @else if (ajusteDelta()! > 0) {
                 <lucide-icon name="trending-up" [size]="14"></lucide-icon>
-                Incremento de {{ ajusteDelta()! }} {{ unidadProducto() }}
+                {{ i18n.t('kardex.incremento') }} {{ ajusteDelta()! }} {{ unidadProducto() }}
               } @else {
                 <lucide-icon name="minus" [size]="14"></lucide-icon>
-                Sin cambios respecto al stock actual
+                {{ i18n.t('kardex.sin_cambios') }}
               }
             </span>
           } @else {
-            <span class="field-hint">Valor absoluto del stock después del ajuste, no un delta.</span>
+            <span class="field-hint">{{ i18n.t('kardex.hint_stock') }}</span>
           }
         </div>
 
@@ -149,23 +147,23 @@
               type="checkbox"
               formControlName="autorizado"
               class="form-checkbox">
-            <span>Ajuste autorizado</span>
+            <span>{{ i18n.t('kardex.ajuste_autorizado') }}</span>
           </label>
         </div>
 
         <!-- Motivo -->
         <div class="form-group full-width">
-          <label for="motivo">MOTIVO DEL AJUSTE <span class="required">*</span></label>
+          <label for="motivo">{{ i18n.t('kardex.motivo_label') }} <span class="required">*</span></label>
           <div class="input-wrapper input-wrapper--textarea">
             <textarea
               id="motivo"
               formControlName="motivo"
-              placeholder="Describí el motivo: merma, conteo físico, devolución, carga inicial, etc."
+              [placeholder]="i18n.t('kardex.motivo_placeholder')"
               rows="3"
               class="form-textarea"></textarea>
           </div>
           @if (ajusteForm.get('motivo')?.invalid && ajusteForm.get('motivo')?.touched) {
-            <p class="error-hint">El motivo es obligatorio.</p>
+            <p class="error-hint">{{ i18n.t('kardex.error_motivo') }}</p>
           }
         </div>
 
@@ -173,7 +171,7 @@
 
       <!-- Footer -->
       <div class="modal-footer">
-        <restaurant-button variant="surface" type="button" (click)="closeModal()">Cancelar</restaurant-button>
+        <restaurant-button variant="surface" type="button" (click)="closeModal()">{{ i18n.t('comun.cancelar') }}</restaurant-button>
         <restaurant-button variant="primary" type="submit" [disabled]="ajusteForm.invalid || facade.loading()">
           <lucide-icon name="check-circle" [size]="16"></lucide-icon>
           Registrar Ajuste

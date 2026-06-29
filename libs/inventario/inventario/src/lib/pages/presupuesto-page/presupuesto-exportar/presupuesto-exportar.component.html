@@ -6,8 +6,8 @@
           <lucide-icon name="bar-chart-3" [size]="22"></lucide-icon>
         </div>
         <div>
-          <h3 class="modal-title">Exportar Reportes de Ejecución</h3>
-          <p class="modal-subtitle">Configure los filtros para generar su informe detallado</p>
+          <h3 class="modal-title">{{ i18n.t('presupuesto.exportar_titulo') }}</h3>
+          <p class="modal-subtitle">{{ i18n.t('presupuesto.exportar_subtitulo') }}</p>
         </div>
       </div>
       <button class="close-btn" (click)="closeModal()">
@@ -16,19 +16,19 @@
     </div>
 
     <div class="modal-body">
-      <p class="placeholder-text">Formulario de filtros en construcción — Fase 3</p>
+      <p class="placeholder-text">{{ i18n.t('presupuesto.filtros_en_construccion') }}</p>
 
       <!-- Format selection -->
       <div class="format-section">
-        <p class="format-label">SELECCIONE EL FORMATO DE DESCARGA</p>
+        <p class="format-label">{{ i18n.t('comun.seleccione_formato') }}</p>
         <div class="format-grid">
           <button class="format-card" [class.selected]="formatoSeleccionado() === 'excel'" (click)="setFormato('excel')">
             <div class="format-icon format-icon--excel">
               <lucide-icon name="table" [size]="22"></lucide-icon>
             </div>
             <div class="format-text">
-              <span class="format-name">Generar Excel</span>
-              <span class="format-ext">Archivo .xlsx</span>
+              <span class="format-name">{{ i18n.t('comun.generar_excel') }}</span>
+              <span class="format-ext">{{ i18n.t('comun.archivo_xlsx') }}</span>
             </div>
           </button>
           <button class="format-card" [class.selected]="formatoSeleccionado() === 'pdf'" (click)="setFormato('pdf')">
@@ -36,24 +36,24 @@
               <lucide-icon name="file-text" [size]="22"></lucide-icon>
             </div>
             <div class="format-text">
-              <span class="format-name">Generar PDF</span>
-              <span class="format-ext">Archivo .pdf</span>
+              <span class="format-name">{{ i18n.t('comun.generar_pdf') }}</span>
+              <span class="format-ext">{{ i18n.t('comun.archivo_pdf') }}</span>
             </div>
           </button>
         </div>
         <p class="zese-note">
           <lucide-icon name="check-circle" [size]="14"></lucide-icon>
-          Incluye retenciones ZESE
+          {{ i18n.t('presupuesto.incluye_zese') }}
         </p>
       </div>
     </div>
 
     <div class="modal-footer">
-      <restaurant-button variant="surface" (click)="closeModal()">Restablecer Filtros</restaurant-button>
+      <restaurant-button variant="surface" (click)="closeModal()">{{ i18n.t('comun.restablecer_filtros') }}</restaurant-button>
       <restaurant-button variant="primary" (click)="onExportar()">
         <div class="btn-icon-text">
           <lucide-icon name="download" [size]="18"></lucide-icon>
-          Descargar Informe
+          {{ i18n.t('comun.descargar_informe') }}
         </div>
       </restaurant-button>
     </div>

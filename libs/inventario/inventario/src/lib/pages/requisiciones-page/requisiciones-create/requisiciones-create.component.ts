@@ -9,6 +9,7 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
 import { BienesService } from '../../../data-access/services/bienes.service';
 import { RequisicionDraftService } from '../../../data-access/requisicion-draft.service';
 import { Bien } from '../../../models/inventario.model';
+import { I18nService } from '../../../i18n/i18n.service';
 export interface CategoriaMeta {
   key:       string;   // texto libre — coincide con el campo categoria del backend
   label:     string;
@@ -32,6 +33,7 @@ interface CatState {
 })
 export class RequisicionesCreateComponent implements OnInit {
   private router        = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private fb            = inject(FormBuilder);
   private bienesService = inject(BienesService);
   readonly draft        = inject(RequisicionDraftService);

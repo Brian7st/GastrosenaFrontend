@@ -3,7 +3,7 @@
     @if (isBlocked()) {
       <div class="blocked-banner">
         <span class="material-symbols-outlined">lock</span>
-        <span>Factura bloqueada — estado: <strong>{{ f.estado }}</strong></span>
+        <span>{{ i18n.t('factura-edit.bloqueada') }}: <strong>{{ f.estado }}</strong></span>
       </div>
     }
 
@@ -18,11 +18,9 @@
           </div>
           <div class="page-header__title-row">
             <span class="material-symbols-outlined page-header__icon">edit_document</span>
-            <h1>Editar Factura FEL</h1>
+            <h1>{{ i18n.t('factura-edit.titulo') }}</h1>
           </div>
-          <p class="page-header__sub">
-            Modificando Documento: <strong class="page-header__doc-id">{{ f.numeroFactura }}</strong>
-          </p>
+          <p class="page-header__sub">{{ i18n.t('factura-edit.modificando') }}: <strong class="page-header__doc-id">{{ f.numeroFactura }}</strong></p>
         </div>
       </div>
     </div>
@@ -30,7 +28,7 @@
     <div class="edit-card">
       <div class="form-grid form-grid--2">
         <div class="form-field">
-          <label>NIT proveedor</label>
+          <label>{{ i18n.t('factura-edit.nit_proveedor') }}</label>
           <div class="input-with-badge">
             <input
               type="text"
@@ -45,7 +43,7 @@
           </div>
         </div>
         <div class="form-field">
-          <label>Proveedor</label>
+          <label>{{ i18n.t('factura-edit.proveedor') }}</label>
           <input
             type="text"
             id="field-proveedor-nombre"
@@ -58,7 +56,7 @@
 
       <div class="form-grid form-grid--2">
         <div class="form-field">
-          <label>CUFE</label>
+          <label>{{ i18n.t('factura-edit.cufe') }}</label>
           <input
             type="text"
             id="field-cufe"
@@ -68,7 +66,7 @@
           />
         </div>
         <div class="form-field">
-          <label>Fecha de Emisión</label>
+          <label>{{ i18n.t('factura-edit.fecha_emision') }}</label>
           <input
             type="date"
             id="field-fecha"
@@ -81,7 +79,7 @@
 
       <div class="form-grid form-grid--2">
         <div class="form-field">
-          <label>Fecha de Recepción</label>
+          <label>{{ i18n.t('factura-edit.fecha_recepcion') }}</label>
           <input
             type="date"
             id="field-fecha-recepcion"
@@ -91,7 +89,7 @@
           />
         </div>
         <div class="form-field">
-          <label>Orden de compra</label>
+          <label>{{ i18n.t('factura-edit.orden_compra') }}</label>
           <input
             type="text"
             id="field-orden-compra"
@@ -104,7 +102,7 @@
 
       <div class="form-grid form-grid--2">
         <div class="form-field">
-          <label>Banco</label>
+          <label>{{ i18n.t('factura-edit.banco') }}</label>
           <input
             type="text"
             id="field-banco"
@@ -114,7 +112,7 @@
           />
         </div>
         <div class="form-field">
-          <label>Número de cuenta</label>
+          <label>{{ i18n.t('factura-edit.numero_cuenta') }}</label>
           <input
             type="text"
             id="field-numero-cuenta"
@@ -127,10 +125,10 @@
 
       <div class="form-grid form-grid--2">
         <div class="form-field">
-          <label>Tipo de cuenta</label>
+          <label>{{ i18n.t('factura-edit.tipo_cuenta') }}</label>
           <div class="select-wrapper">
             <select id="field-tipo-cuenta" [ngModel]="tipoCuenta()" (ngModelChange)="tipoCuenta.set($event)" [disabled]="isBlocked()">
-              <option value="">Seleccione...</option>
+              <option value="">{{ i18n.t('comun.seleccione') }}</option>
               <option value="AHORROS">AHORROS</option>
               <option value="CORRIENTE">CORRIENTE</option>
             </select>
@@ -138,7 +136,7 @@
           </div>
         </div>
         <div class="form-field">
-          <label>Beneficiario ZESE</label>
+          <label>{{ i18n.t('factura-edit.beneficiario_zese') }}</label>
           <input
             type="checkbox"
             id="field-zese"
@@ -152,7 +150,7 @@
       <div class="section-header">
         <div class="section-header__left">
           <span class="material-symbols-outlined">table_rows</span>
-          <h3>Detalle de Productos/Servicios</h3>
+          <h3>{{ i18n.t('factura-edit.detalle_productos') }}</h3>
         </div>
         @if (!isBlocked()) {
           <button class="btn btn--add-item" (click)="onAgregarItem()">
@@ -166,11 +164,11 @@
         <table class="items-table">
           <thead>
             <tr>
-              <th>Cant.</th>
-              <th>Descripción</th>
-              <th>Precio U.</th>
-              <th>IVA (%)</th>
-              <th>Total</th>
+              <th>{{ i18n.t('factura-edit.th_cant') }}</th>
+              <th>{{ i18n.t('factura-edit.th_descripcion') }}</th>
+              <th>{{ i18n.t('factura-edit.th_precio_u') }}</th>
+              <th>{{ i18n.t('factura-edit.th_iva') }}</th>
+              <th>{{ i18n.t('factura-edit.th_total') }}</th>
               @if (!isBlocked()) {
                 <th></th>
               }
@@ -188,7 +186,7 @@
                 </td>
                 <td>
                   @if (!isBlocked()) {
-                    <input class="td-input td-input--desc" type="text" [ngModel]="item.descripcion" (ngModelChange)="onItemChange(i, 'descripcion', $event)" placeholder="Descripción del producto..." />
+                    <input class="td-input td-input--desc" type="text" [ngModel]="item.descripcion" (ngModelChange)="onItemChange(i, 'descripcion', $event)" [placeholder]="i18n.t('factura-edit.desc_placeholder')" />
                   } @else {
                     {{ item.descripcion }}
                   }
@@ -226,9 +224,7 @@
             }
             @if (localItems().length === 0) {
               <tr>
-                <td [attr.colspan]="isBlocked() ? 5 : 6" class="empty-row">
-                  Sin ítems registrados
-                </td>
+                <td [attr.colspan]="isBlocked() ? 5 : 6" class="empty-row">{{ i18n.t('factura-edit.sin_items') }}</td>
               </tr>
             }
           </tbody>
@@ -238,15 +234,15 @@
       <div class="bottom-section">
         <div class="totals-card">
           <div class="totals-row">
-            <span>Subtotal:</span>
+            <span>{{ i18n.t('factura.subtotal') }}:</span>
             <span>{{ formatMoney(f.subtotal) }}</span>
           </div>
           <div class="totals-row">
-            <span>Total IVA:</span>
+            <span>{{ i18n.t('factura.total_iva') }}:</span>
             <span>{{ formatMoney(f.totalIva) }}</span>
           </div>
           <div class="totals-row totals-row--total">
-            <span>TOTAL FEL:</span>
+            <span>{{ i18n.t('factura-edit.total_fel') }}:</span>
             <span class="totals-total-value">{{ formatMoney(f.total) }}</span>
           </div>
         </div>
@@ -261,7 +257,7 @@
         </button>
       }
       <div class="footer-right">
-        <button class="btn btn--ghost" (click)="onVolver()">Cancelar</button>
+        <button class="btn btn--ghost" (click)="onVolver()">{{ i18n.t('comun.cancelar') }}</button>
         <button class="btn btn--primary" id="btn-guardar-factura" [disabled]="isBlocked()" (click)="onGuardar()">
           <span class="material-symbols-outlined">save</span>
           Guardar Cambios
@@ -272,7 +268,7 @@
 } @else {
   <div class="loading-state">
     <div class="loading-spinner"></div>
-    <p>Cargando factura...</p>
+    <p>{{ i18n.t('factura.cargando') }}</p>
   </div>
 }
 

@@ -10,6 +10,7 @@ import {
 } from '@restaurant/shared/ui';
 import { DetallePedidoRequest, PedidoCreateRequest } from '../../models/restaurante.model';
 import { RestauranteService } from '../../data-access/restaurante.service';
+import { I18nService } from '../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-caja-nueva-page',
@@ -27,6 +28,7 @@ import { RestauranteService } from '../../data-access/restaurante.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CajaNuevaPageComponent {
+  protected readonly i18n = inject(I18nService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private restauranteService = inject(RestauranteService);
@@ -81,7 +83,7 @@ export class CajaNuevaPageComponent {
   generarFactura() {
     if (this.listaProductos().length === 0) return;
     
-    const notas = `Factura Manual. Cliente: ${this.nombreCliente() || 'Consumidor Final'} - Doc: ${this.documento()}`;
+    const notas = `${this.i18n.t('cajaNueva.manualInvoicePrefix')} ${this.i18n.t('cajaNueva.manualInvoiceCustomer')}: ${this.nombreCliente() || this.i18n.t('cajaNueva.manualInvoiceFinalConsumer')} - ${this.i18n.t('cajaNueva.manualInvoiceDoc')}: ${this.documento()}`;
 
     const request: PedidoCreateRequest = {
       // TODO: En facturación real, el usuario debe seleccionar una mesa.

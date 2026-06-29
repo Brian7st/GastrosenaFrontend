@@ -18,6 +18,7 @@ import {
 import { PaqueteProbatorio, PaqueteEstado } from '../../../models/paquete.model';
 import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 import { PaqueteFacade } from '../../../data-access/paquete.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-paquete-list',
@@ -36,6 +37,7 @@ import { PaqueteFacade } from '../../../data-access/paquete.facade';
 })
 export class PaqueteListComponent implements OnInit {
   private router = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private facade = inject(PaqueteFacade);
 
   // ── Estado reactivo desde facade ─────────────────────────────────────────

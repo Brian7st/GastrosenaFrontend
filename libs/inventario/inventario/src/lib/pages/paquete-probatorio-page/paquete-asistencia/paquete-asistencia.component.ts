@@ -18,6 +18,7 @@ import {
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { PaqueteFacade } from '../../../data-access/paquete.facade';
 import { AsistenciaFacade } from '../../../data-access/asistencia.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 import {
   EstadoAsistencia,
   UsuarioResponseDTO,
@@ -48,6 +49,7 @@ interface AprendizRow {
 })
 export class PaqueteAsistenciaComponent implements OnInit {
   private router      = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private route       = inject(ActivatedRoute);
   private paqueteFacade    = inject(PaqueteFacade);
   private asistenciaFacade = inject(AsistenciaFacade);

@@ -12,6 +12,7 @@ import { KardexFacade } from '../../../data-access/kardex.facade';
 import { BienesService } from '../../../data-access/services/bienes.service';
 import { AjusteMovimientoData } from '../../../models/movimiento.model';
 import { Bien } from '../../../models/inventario.model';
+import { I18nService } from '../../../i18n/i18n.service';
 
 /**
  * Canal controlado para correcciones de stock que no provienen de una factura FEL.
@@ -30,6 +31,7 @@ import { Bien } from '../../../models/inventario.model';
 })
 export class MovimientoAjusteComponent {
   private fb            = inject(FormBuilder);
+  protected readonly i18n = inject(I18nService);
   private router        = inject(Router);
   private bienesService = inject(BienesService);
   readonly facade       = inject(KardexFacade);

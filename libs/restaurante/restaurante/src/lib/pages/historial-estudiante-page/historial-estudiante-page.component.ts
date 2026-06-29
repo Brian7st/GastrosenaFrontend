@@ -12,6 +12,7 @@ import {
   StatusBadgeComponent
 } from '@restaurant/shared/ui';
 import { CurrencyCopPipe } from '@restaurant/shared/util';
+import { I18nService } from '../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-historial-estudiante-page',
@@ -32,6 +33,7 @@ import { CurrencyCopPipe } from '@restaurant/shared/util';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HistorialEstudiantePageComponent implements OnInit {
+  protected readonly i18n = inject(I18nService);
   private facade = inject(RestauranteFacade);
 
   public terminoBusqueda = signal<string>('');
@@ -79,7 +81,7 @@ export class HistorialEstudiantePageComponent implements OnInit {
 
   obtenerNombreMesa(mesaId: string): string {
     const mesa = this.facade.mesas().find(m => m.id === mesaId);
-    return mesa ? mesa.nombre : 'Mesa ' + mesaId.substring(0, 4);
+    return mesa ? mesa.nombre : this.i18n.t('historialEstudiante.table') + ' ' + mesaId.substring(0, 4);
   }
 
   marcarEntregado(pedidoId: string): void {

@@ -1,6 +1,6 @@
 import { Component, computed, signal, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { KpiCardComponent, LucideIconComponent } from '@restaurant/shared/ui';
+import { DataTableComponent, KpiCardComponent, LucideIconComponent } from '@restaurant/shared/ui';
 import { FichasService } from '../../../data-access/fichas.service';
 import { UsuariosService } from '../../../data-access/usuarios.service';
 import { UsuarioFichaService } from '../../../data-access/usuario-ficha.service';
@@ -10,7 +10,7 @@ import { Usuario } from '@restaurant/shared/models';
 @Component({
   selector: 'restaurant-ficha-detalle',
   standalone: true,
-  imports: [KpiCardComponent, LucideIconComponent],
+  imports: [DataTableComponent, KpiCardComponent, LucideIconComponent],
   templateUrl: './ficha-detalle.component.html',
   styleUrls: ['./ficha-detalle.component.scss']
 })

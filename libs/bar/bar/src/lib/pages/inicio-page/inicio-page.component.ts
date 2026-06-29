@@ -7,6 +7,7 @@ import { IncidenciaService } from '../../data-access/incidencia.service';
 import { ComandaService } from '../../data-access/comanda.service';
 import { AuditoriaIncidencia } from '../../models/incidencia.model';
 import { ComandaBarYBarismo } from '../../models/comanda.model';
+import { I18nService } from '../../i18n/i18n.service';
 import {
   LucideIconComponent,
   PageHeaderComponent,
@@ -37,6 +38,7 @@ import {
 export class InicioPageComponent implements OnInit, OnDestroy {
   private incidenciaService = inject(IncidenciaService);
   private comandaService = inject(ComandaService);
+  protected readonly i18n = inject(I18nService);
   private destroy$ = new Subject<void>();
 
   comandas = signal<ComandaBarYBarismo[]>([]);
@@ -61,25 +63,25 @@ export class InicioPageComponent implements OnInit, OnDestroy {
       .slice()
       .sort((a, b) => new Date(b.horaEntrada).getTime() - new Date(a.horaEntrada).getTime())
       .map(c => {
-        let estado = 'En espera';
+        let estadoKey = 'waiting';
         let clase = 'waiting';
         if (c.estadoPreparacion === 'PREPARANDO') {
-          estado = 'Preparando';
+          estadoKey = 'preparing';
           clase = 'preparing';
         } else if (c.estadoPreparacion === 'LISTO') {
-          estado = 'Listo';
+          estadoKey = 'ready';
           clase = 'ready';
         }
 
         const platos = c.items && c.items.length > 0
           ? c.items.map(i => `${i.cantidad}x ${i.nombre}`).join(', ')
-          : c.preparacion || 'Sin bebidas';
+          : c.preparacion || this.i18n.t('inicio.no-drinks');
 
         const tiempo = this.calcularTiempoTranscurrido(c.horaEntrada);
 
         return {
           mesa: c.numeroMesa.toString(),
-          estado,
+          estado: this.i18n.t(`inicio.status.${estadoKey}`),
           platos,
           tiempo,
           clase
@@ -88,8 +90,11 @@ export class InicioPageComponent implements OnInit, OnDestroy {
       .slice(0, 5);
   });
 
-  fechaActual = new Date().toLocaleDateString('es-ES', {
-    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  fechaActual = computed(() => {
+    const locale = this.i18n.currentLang() === 'en' ? 'en-US' : 'es-ES';
+    return new Date().toLocaleDateString(locale, {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+    });
   });
 
   // Modal de incidencias
@@ -156,19 +161,19 @@ export class InicioPageComponent implements OnInit, OnDestroy {
     const diffMs = ahora.getTime() - entrada.getTime();
     const diffMins = Math.max(0, Math.floor(diffMs / 60000));
     
-    if (diffMins < 1) return 'Hace un momento';
-    return `${diffMins} min`;
+    if (diffMins < 1) return this.i18n.t('inicio.date.just-now');
+    return `${diffMins} ${this.i18n.t('inicio.date.minutes')}`;
   }
 
   abrirModal(tipo: 'CANCELACION' | 'DEVOLUCION' | 'MODIFICACION') {
-    const titulos: Record<string, string> = {
-      'CANCELACION': 'Pedidos Cancelados Hoy - Bar',
-      'DEVOLUCION': 'Pedidos Devueltos Hoy - Bar',
-      'MODIFICACION': 'Pedidos Modificados Hoy - Bar'
+    const keys: Record<string, string> = {
+      'CANCELACION': 'inicio.modal.cancelled-title',
+      'DEVOLUCION': 'inicio.modal.returned-title',
+      'MODIFICACION': 'inicio.modal.modified-title'
     };
 
     this.modalTipo.set(tipo);
-    this.modalTitulo.set(titulos[tipo]);
+    this.modalTitulo.set(this.i18n.t(keys[tipo]));
     this.modalAbierto.set(true);
     this.cargando.set(true);
 
@@ -229,7 +234,7 @@ export class InicioPageComponent implements OnInit, OnDestroy {
     const desde = this.fechaEliminarDesde();
     const hasta = this.fechaEliminarHasta();
     if (!desde || !hasta) {
-      this.mensajeEliminar.set('Seleccioná ambas fechas primero');
+      this.mensajeEliminar.set(this.i18n.t('inicio.message.select-dates'));
       return;
     }
 
@@ -247,29 +252,31 @@ export class InicioPageComponent implements OnInit, OnDestroy {
         this.comandas.set(restantes);
         this.fechaEliminarDesde.set('');
         this.fechaEliminarHasta.set('');
-        this.mensajeEliminar.set(eliminadas > 0 ? `Se eliminaron ${eliminadas} comandas` : 'No hay comandas en ese rango');
+        this.mensajeEliminar.set(eliminadas > 0
+          ? `${this.i18n.t('inicio.message.deleted-range')} ${eliminadas} ${this.i18n.t('inicio.modal-listas.orders')}`
+          : this.i18n.t('inicio.message.no-orders-range'));
         setTimeout(() => this.mensajeEliminar.set(''), 3000);
       },
       error: (err) => {
         console.error('Error al limpiar comandas:', err);
-        this.mensajeEliminar.set('Error al eliminar comandas');
+        this.mensajeEliminar.set(this.i18n.t('inicio.message.delete-error'));
         setTimeout(() => this.mensajeEliminar.set(''), 3000);
       }
     });
   }
 
   eliminarComanda(idComanda: string) {
-    if (!confirm('¿Eliminar comanda #' + idComanda + '?')) return;
+    if (!confirm(this.i18n.t('inicio.confirm.delete-order') + idComanda + '?')) return;
     this.comandaService.eliminarComandaPorId(idComanda).subscribe({
       next: () => {
         const restantes = this.comandas().filter(c => c.idComanda !== idComanda);
         this.comandas.set(restantes);
-        this.mensajeEliminar.set('Comanda eliminada');
+        this.mensajeEliminar.set(this.i18n.t('inicio.message.order-deleted'));
         setTimeout(() => this.mensajeEliminar.set(''), 2000);
       },
       error: (err) => {
         console.error('Error al eliminar comanda:', err);
-        this.mensajeEliminar.set('Error al eliminar comanda');
+        this.mensajeEliminar.set(this.i18n.t('inicio.message.order-delete-error'));
         setTimeout(() => this.mensajeEliminar.set(''), 3000);
       }
     });
@@ -282,21 +289,22 @@ export class InicioPageComponent implements OnInit, OnDestroy {
   formatHora(fecha: string): string {
     if (!fecha) return '--:--';
     const d = new Date(fecha);
-    return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    const locale = this.i18n.currentLang() === 'en' ? 'en-US' : 'es-ES';
+    return d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
   }
 
   getEtiquetaTipo(tipo: string): string {
-    const etiquetas: Record<string, string> = {
-      'CANCELACION': 'Motivo de cancelación:',
-      'DEVOLUCION': 'Motivo de devolución:',
-      'MODIFICACION': 'Detalle de modificación:'
+    const map: Record<string, string> = {
+      'CANCELACION': 'inicio.modal.motive-cancellation',
+      'DEVOLUCION': 'inicio.modal.motive-return',
+      'MODIFICACION': 'inicio.modal.motive-modification'
     };
-    return etiquetas[tipo] || 'Motivo:';
+    return this.i18n.t(map[tipo] || 'inicio.modal.motive-default');
   }
 
-  getBadgeVariant(estado: string): 'success' | 'warning' | 'danger' | 'info' {
-    if (estado === 'Preparando') return 'warning';
-    if (estado === 'Listo') return 'success';
+  getBadgeVariant(clase: string): 'success' | 'warning' | 'danger' | 'info' {
+    if (clase === 'preparing') return 'warning';
+    if (clase === 'ready') return 'success';
     return 'info';
   }
 }

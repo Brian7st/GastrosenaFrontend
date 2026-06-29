@@ -14,6 +14,7 @@ import { LucideIconComponent, ButtonComponent, KpiCardComponent } from '@restaur
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { TomaFisicaItem, ConteoItemData } from '../../../models/conciliacion.model';
 import { ConciliacionFacade } from '../../../data-access/conciliacion.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 
 type TabActivo = 'todos' | 'diferencias' | 'pendientes';
 
@@ -35,6 +36,7 @@ type TabActivo = 'todos' | 'diferencias' | 'pendientes';
 })
 export class ConciliacionTomaFisicaComponent implements OnInit {
   private router   = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private route    = inject(ActivatedRoute);
   private location = inject(Location);
   private facade   = inject(ConciliacionFacade);

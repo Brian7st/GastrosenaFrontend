@@ -4,8 +4,8 @@
     <!-- ── Header ──────────────────────────────────────────────────── -->
     <div class="modal-header">
       <div class="modal-header__info">
-        <h2 class="modal-title">Resolver Alerta de Inventario</h2>
-        <p class="modal-subtitle">Acciones correctivas para discrepancias o bajos niveles.</p>
+        <h2 class="modal-title">{{ i18n.t('alerta.modal_resolver_titulo') }}</h2>
+        <p class="modal-subtitle">{{ i18n.t('alerta.modal_resolver_subtitulo') }}</p>
       </div>
       <button class="modal-close" (click)="cerrar()" aria-label="Cerrar modal">
         <span class="material-symbols-outlined">close</span>
@@ -19,12 +19,12 @@
           <span class="material-symbols-outlined">inventory_2</span>
         </div>
         <div>
-          <p class="bien-card__label">Activo Afectado</p>
+          <p class="bien-card__label">{{ i18n.t('alerta.activo_afectado') }}</p>
           <p class="bien-card__nombre">{{ a.nombreBien }}</p>
         </div>
         <div class="bien-card__badge">
           <span class="material-symbols-outlined">warning</span>
-          <span>Prioridad: {{ prioridadLabel() }}</span>
+          <span>{{ i18n.t('alerta.prioridad_label') }}: {{ prioridadLabel() }}</span>
         </div>
       </div>
     }
@@ -34,31 +34,29 @@
 
       <!-- Acción Tomada -->
       <div class="form-group">
-        <label class="form-label">
-          Acción Tomada <span class="form-required">*</span>
-        </label>
+        <label class="form-label">{{ i18n.t('alerta.accion_tomada') }} <span class="form-required">*</span></label>
         <div class="action-dropdown">
           <div class="action-dropdown__trigger">
             <span>
-              @if (accionSeleccionada() === '') { Seleccione una acción... }
-              @else if (accionSeleccionada() === 'gil') { Generar Formato GIL-F-014 }
-              @else if (accionSeleccionada() === 'entrada_manual') { Registrar Entrada Manual }
-              @else { Marcar como Revisada (Sin acción adicional) }
+              @if (accionSeleccionada() === '') { {{ i18n.t('alerta.seleccione_accion') }} }
+              @else if (accionSeleccionada() === 'gil') { {{ i18n.t('alerta.accion_gil') }} }
+              @else if (accionSeleccionada() === 'entrada_manual') { {{ i18n.t('alerta.accion_entrada') }} }
+              @else { {{ i18n.t('alerta.accion_revisada') }} }
             </span>
             <span class="material-symbols-outlined">expand_more</span>
           </div>
           <ul class="action-dropdown__list">
             <li class="action-dropdown__item" (click)="selectAccion('gil')">
               <span class="material-symbols-outlined action-dropdown__icon">description</span>
-              Generar Formato GIL-F-014
+              {{ i18n.t('alerta.accion_gil') }}
             </li>
             <li class="action-dropdown__item" (click)="selectAccion('entrada_manual')">
               <span class="material-symbols-outlined action-dropdown__icon">edit_document</span>
-              Registrar Entrada Manual
+              {{ i18n.t('alerta.accion_entrada') }}
             </li>
             <li class="action-dropdown__item" (click)="selectAccion('revisada')">
               <span class="material-symbols-outlined action-dropdown__icon">task_alt</span>
-              Marcar como Revisada (Sin acción adicional)
+              {{ i18n.t('alerta.accion_revisada') }}
             </li>
           </ul>
         </div>
@@ -66,34 +64,32 @@
 
       <!-- Documento de Referencia -->
       <div class="form-group">
-        <label class="form-label" for="referencia">Documento de Referencia</label>
+        <label class="form-label" for="referencia">{{ i18n.t('alerta.doc_referencia') }}</label>
         <input
           id="referencia"
           type="text"
           class="form-input"
-          placeholder="Ej: GIL-F-014-001"
+          [placeholder]="i18n.t('alerta.ref_placeholder')"
           formControlName="referencia"
         />
-        <span class="form-hint">Obligatorio si se genera formato GIL o entrada manual.</span>
+        <span class="form-hint">{{ i18n.t('alerta.ref_hint') }}</span>
       </div>
 
       <!-- Descripción -->
       <div class="form-group">
-        <label class="form-label" for="descripcion">
-          Descripción de la gestión <span class="form-required">*</span>
-        </label>
+        <label class="form-label" for="descripcion">{{ i18n.t('alerta.desc_gestion') }} <span class="form-required">*</span></label>
         <textarea
           id="descripcion"
           class="form-textarea"
           rows="4"
-          placeholder="Detalle los hallazgos y justificación de la acción..."
+          [placeholder]="i18n.t('alerta.desc_placeholder')"
           formControlName="descripcion"
         ></textarea>
       </div>
 
       <!-- Responsable (readonly) -->
       <div class="form-group">
-        <label class="form-label" for="responsable">Responsable</label>
+        <label class="form-label" for="responsable">{{ i18n.t('alerta.responsable') }}</label>
         <div class="input-readonly-wrap">
           <span class="material-symbols-outlined input-readonly-wrap__icon">person</span>
           <input
@@ -110,10 +106,10 @@
 
     <!-- ── Footer ──────────────────────────────────────────────────── -->
     <div class="modal-footer">
-      <restaurant-button variant="surface" (click)="cerrar()">Cancelar</restaurant-button>
+      <restaurant-button variant="surface" (click)="cerrar()">{{ i18n.t('comun.cancelar') }}</restaurant-button>
       <restaurant-button variant="primary" (click)="onConfirmar()">
         <span class="material-symbols-outlined">check_circle</span>
-        Confirmar Resolución
+        {{ i18n.t('alerta.confirmar_resolucion') }}
       </restaurant-button>
     </div>
 

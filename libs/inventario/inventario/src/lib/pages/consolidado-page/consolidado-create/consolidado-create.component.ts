@@ -14,6 +14,7 @@ import { ButtonComponent, DataTableComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { ElegibleConsolidado } from '../../../models/consolidado.model';
 import { ConsolidadoFacade } from '../../../data-access/consolidado.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 
 /**
  * Local row that wraps ElegibleConsolidado with mutable selection state.
@@ -41,6 +42,7 @@ interface SelectableRow {
 })
 export class ConsolidadoCreateComponent implements OnInit {
   private router   = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private location = inject(Location);
   private facade   = inject(ConsolidadoFacade);
 

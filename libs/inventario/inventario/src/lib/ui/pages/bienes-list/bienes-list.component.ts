@@ -13,6 +13,7 @@ import { EstadoContrato } from '../../../models/contrato.model';
 import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 import { ConfirmarCierreContratoModalComponent } from '../../../components/confirmar-cierre-contrato-modal/confirmar-cierre-contrato-modal.component';
 import { CATEGORIAS_BIEN } from '../../../models/categorias.model';
+import { I18nService } from '../../../i18n/i18n.service';
 
 type VistaGestion = 'bienes' | 'contratos';
 
@@ -40,6 +41,7 @@ export class BienesListPageComponent implements OnInit {
   private facade = inject(InventarioFacade);
   readonly contratosFacade = inject(ContratosFacade);
   private router = inject(Router);
+  protected readonly i18n = inject(I18nService);
 
   // State signals
   bienes      = this.facade.bienes;
@@ -92,7 +94,7 @@ export class BienesListPageComponent implements OnInit {
       if (resultado !== null) {
         const n = resultado.bienesDesactivados;
         this.feedbackCierre.set(
-          n === 1 ? '1 bien desactivado' : `${n} bienes desactivados`,
+          n === 1 ? this.i18n.t('bienes.bien_desactivado_one') : this.i18n.t('bienes.bien_desactivado_other').replace('{{ n }}', String(n)),
         );
         this.facade.cargarBienes();
       }
