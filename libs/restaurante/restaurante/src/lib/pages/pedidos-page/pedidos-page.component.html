@@ -41,8 +41,7 @@
     <div [style.pointer-events]="esPedidoSoloLectura() ? 'none' : 'auto'"
       [style.opacity]="esPedidoSoloLectura() ? '0.5' : '1'">
       <section class="categories-section">
-        <lib-pedidos-categories 
-          [categories]="facade.categoriasMenu()"
+        <lib-pedidos-categories
           (filterChanged)="onFilterChanged($event)">
         </lib-pedidos-categories>
       </section>

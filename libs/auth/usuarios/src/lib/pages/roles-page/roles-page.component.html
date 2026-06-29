@@ -118,7 +118,7 @@
             <th class="roles-page__col-check"></th>
             <th>{{ i18n.t('roles.col_aprendiz') }}</th>
             <th>{{ i18n.t('roles.col_rol_actual') }}</th>
-            <th>Último acceso</th>
+            <th>{{ i18n.t('roles.col_ficha') }}</th>
             <th>Fecha registro</th>
             <th>{{ i18n.t('roles.col_acciones') }}</th>
           </tr>
@@ -149,7 +149,9 @@
               <td>
                 <restaurant-usuario-rol-badge [rol]="u.rol"></restaurant-usuario-rol-badge>
               </td>
-              <td class="roles-page__fecha">{{ (u.ultimoAcceso | date:'dd/MM/yyyy') || '—' }}</td>
+              <td>
+                <span class="roles-page__fecha">{{ u.ficha || '—' }}</span>
+              </td>
               <td class="roles-page__fecha">{{ u.creadoEn | date:'dd/MM/yyyy' }}</td>
               <td>
                 <button
@@ -196,6 +198,10 @@
         </button>
       </div>
       <div class="detalle-modal__body">
+        <div class="detalle-modal__field">
+          <span class="detalle-modal__label">Ficha</span>
+          <span class="detalle-modal__value">{{ usuarioDetalle()!.ficha || '—' }}</span>
+        </div>
         <div class="detalle-modal__field">
           <span class="detalle-modal__label">Documento</span>
           <span class="detalle-modal__value">{{ usuarioDetalle()!.documento || '—' }}</span>

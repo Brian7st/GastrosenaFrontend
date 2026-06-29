@@ -1,63 +1,62 @@
 <div class="dashboard-container">
   <div class="dashboard-header-wrapper">
     <restaurant-page-header
-      title="Panel Principal"
-      subtitle="Gestión integral de Gastro SENA - Módulo Cocina"
+      [title]="i18n.t('inicio.page.title')"
+      [subtitle]="i18n.t('inicio.page.subtitle')"
       style="margin-bottom: 0;"
     ></restaurant-page-header>
-    
     <div class="date-badge">{{ fechaActual }}</div>
   </div>
 
   <div class="stats-grid">
-    <restaurant-kpi-card 
-      label="Comandas en espera" 
-      [value]="estadisticas().activos.toString()" 
-      icon="clock" 
+    <restaurant-kpi-card
+      [label]="i18n.t('inicio.kpi.espera')"
+      [value]="estadisticas().activos.toString()"
+      icon="clock"
       iconColor="orange"
     ></restaurant-kpi-card>
 
     <div (click)="abrirModal('LISTAS')" style="cursor: pointer;">
-      <restaurant-kpi-card 
-        label="Comandas listas" 
-        [value]="estadisticas().completados.toString()" 
-        icon="check-circle" 
+      <restaurant-kpi-card
+        [label]="i18n.t('inicio.kpi.listas')"
+        [value]="estadisticas().completados.toString()"
+        icon="check-circle"
         iconColor="green"
       ></restaurant-kpi-card>
     </div>
 
     <div (click)="abrirModal('CANCELACION')" style="cursor: pointer;">
-      <restaurant-kpi-card 
-        label="Canceladas" 
-        [value]="estadisticas().cancelados.toString()" 
-        icon="x-circle" 
+      <restaurant-kpi-card
+        [label]="i18n.t('inicio.kpi.canceladas')"
+        [value]="estadisticas().cancelados.toString()"
+        icon="x-circle"
         iconColor="red"
       ></restaurant-kpi-card>
     </div>
 
     <div (click)="abrirModal('DEVOLUCION')" style="cursor: pointer;">
-      <restaurant-kpi-card 
-        label="Devueltas" 
-        [value]="estadisticas().devueltos.toString()" 
-        icon="arrow-left-right" 
+      <restaurant-kpi-card
+        [label]="i18n.t('inicio.kpi.devueltas')"
+        [value]="estadisticas().devueltos.toString()"
+        icon="arrow-left-right"
         iconColor="yellow"
       ></restaurant-kpi-card>
     </div>
   </div>
 
   <section class="recent-section showcase__section">
-    <restaurant-section-title 
-      title="Últimas comandas en cocina" 
-      subtitle="Monitoreo rápido de actividad" 
+    <restaurant-section-title
+      [title]="i18n.t('inicio.ultimas.title')"
+      [subtitle]="i18n.t('inicio.ultimas.subtitle')"
       align="left"
     ></restaurant-section-title>
 
     <div class="order-list showcase__stack">
       <div class="order-item showcase__row" *ngFor="let pedido of pedidosPendientes()" style="justify-content: space-between; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-secondary);">
         <div class="left showcase__row">
-          <span class="showcase__value">Mesa {{ pedido.mesa }}</span>
-          <restaurant-status-badge 
-            [label]="pedido.estado" 
+          <span class="showcase__value">{{ i18n.t('inicio.mesa') }}{{ pedido.mesa }}</span>
+          <restaurant-status-badge
+            [label]="pedido.estado"
             [variant]="getBadgeVariant(pedido.estado)"
           ></restaurant-status-badge>
           <p class="order-details" style="margin: 0; font-size: var(--font-size-sm);">{{ pedido.platos }}</p>
@@ -69,7 +68,7 @@
     </div>
 
     <div style="margin-top: var(--space-4);">
-      <restaurant-button routerLink="/app/cocina/comandas" variant="primary" style="width: 100%; display: block;">Ir a Comandas →</restaurant-button>
+      <restaurant-button routerLink="/app/cocina/comandas" variant="primary" style="width: 100%; display: block;">{{ i18n.t('inicio.ir_comandas') }}</restaurant-button>
     </div>
   </section>
 </div>
@@ -91,25 +90,23 @@
           <div style="flex: 1;">
             <h2>{{ modalTitulo() }}</h2>
             @if (modalTipo() === 'CANCELACION') {
-               <p class="modal-subtitle" style="color: #dc2626;">Listado de pedidos cancelados con motivos y detalles</p>
+               <p class="modal-subtitle" style="color: #dc2626;">{{ i18n.t('inicio.modal.subtitle_cancelacion') }}</p>
             } @else if (modalTipo() === 'DEVOLUCION') {
-               <p class="modal-subtitle" style="color: #b5a48b;">Listado de pedidos devueltos con motivos y detalles</p>
+               <p class="modal-subtitle" style="color: #b5a48b;">{{ i18n.t('inicio.modal.subtitle_devolucion') }}</p>
             }
 
             @if (modalTipo() === 'LISTAS' || modalTipo() === 'CANCELACION' || modalTipo() === 'DEVOLUCION') {
-               <!-- Controles de filtrado y eliminación de fechas -->
                <div class="modal-controls" style="display: flex; gap: 10px; margin-top: 10px; align-items: center; flex-wrap: wrap;">
-                 <input type="text" [ngModel]="busquedaModal()" (ngModelChange)="busquedaModal.set($event)" placeholder="Buscar por fecha, mesero o #comanda..." class="form-input" style="flex: 1; padding: 6px 12px; border-radius: 4px; border: 1px solid var(--color-border);" />
-
+                 <input type="text" [ngModel]="busquedaModal()" (ngModelChange)="busquedaModal.set($event)" [placeholder]="i18n.t('inicio.buscar_placeholder')" class="form-input" style="flex: 1; padding: 6px 12px; border-radius: 4px; border: 1px solid var(--color-border);" />
                  <div class="delete-range-controls" style="display: flex; gap: 8px; align-items: center; border: 1px solid var(--color-danger, #d63031); padding: 6px 10px; border-radius: 20px; background: white;">
-                   <span style="font-size: 12px; color: var(--color-text-muted); font-weight: 500;">Eliminar entre:</span>
+                   <span style="font-size: 12px; color: var(--color-text-muted); font-weight: 500;">{{ i18n.t('inicio.eliminar_entre') }}</span>
                    <input type="date" [ngModel]="fechaInicioEliminar()" (ngModelChange)="fechaInicioEliminar.set($event)" [min]="minDateAnioActual" [max]="maxDateAnioActual" class="form-input form-date" style="border: none; outline: none; background: transparent; cursor: pointer; font-size: 12px;" />
                    <span style="color: var(--color-text-muted);">-</span>
                    <input type="date" [ngModel]="fechaFinEliminar()" (ngModelChange)="fechaFinEliminar.set($event)" [min]="minDateAnioActual" [max]="maxDateAnioActual" class="form-input form-date" style="border: none; outline: none; background: transparent; cursor: pointer; font-size: 12px;" />
                    <button class="btn-delete-range" (click)="eliminarPorRango()"
                      style="background: #fde8e8; color: #9b1c1c; border: 1.5px solid #f87171; padding: 5px 14px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 5px;"
-                     title="Eliminar en rango seleccionado">
-                      Eliminar
+                     [title]="i18n.t('inicio.eliminar_rango_tooltip')">
+                      {{ i18n.t('inicio.eliminar') }}
                    </button>
                  </div>
                </div>
@@ -125,12 +122,12 @@
         @if (cargando()) {
           <div class="modal-loading">
             <div class="spinner"></div>
-            <p>Cargando datos...</p>
+            <p>{{ i18n.t('inicio.cargando') }}</p>
           </div>
         } @else if (incidenciasFiltradas().length === 0) {
           <div class="modal-empty">
             <lucide-icon name="package" size="48"></lucide-icon>
-            <p>No hay coincidencias para mostrar</p>
+            <p>{{ i18n.t('inicio.sin_coincidencias') }}</p>
           </div>
         } @else {
           @for (inc of incidenciasFiltradas(); track inc.idAuditoria) {
@@ -138,11 +135,11 @@
               <div class="incidencia-left">
                 <div class="incidencia-meta">
                   <span class="comanda-id">#{{ inc.comanda.idComanda | slice:0:6 | uppercase }}</span>
-                  <span class="mesa-badge">Mesa {{ inc.comanda.numeroMesa ?? inc.comanda.mesa?.numeroMesa ?? '—' }}</span>
+                  <span class="mesa-badge">{{ i18n.t('inicio.mesa') }}{{ inc.comanda.numeroMesa ?? inc.comanda.mesa?.numeroMesa ?? '—' }}</span>
                 </div>
                 <div class="incidencia-info">
                   <span class="hora"><lucide-icon name="clock" size="14"></lucide-icon> {{ formatHora(inc.fechaRegistro) }}</span>
-                  <span class="mesero">Mesero: {{ inc.comanda.nombreMesero || 'No asignado' }}</span>
+                  <span class="mesero">{{ i18n.t('inicio.mesero') }} {{ inc.comanda.nombreMesero || i18n.t('inicio.no_asignado') }}</span>
                 </div>
               </div>
 
@@ -150,12 +147,12 @@
                 @if (modalTipo() === 'LISTAS' || modalTipo() === 'CANCELACION' || modalTipo() === 'DEVOLUCION') {
                   <button class="btn-delete-item" (click)="eliminarComandaIndividual(inc.idAuditoria)"
                     style="position: absolute; right: 0; top: 0; background: none; border: none; color: #d63031; cursor: pointer; padding: 2px;"
-                    title="Eliminar registro">
+                    [title]="i18n.t('inicio.eliminar_registro')">
                     <lucide-icon name="trash-2" [size]="20"></lucide-icon>
                   </button>
                 }
                 @if (inc.detalleModificado) {
-                  <p class="platos-label">Platos:</p>
+                  <p class="platos-label">{{ i18n.t('inicio.platos_label') }}</p>
                   <p class="platos-text">{{ inc.detalleModificado }}</p>
                 }
                 <div class="motivo-box" [ngClass]="'motivo-' + inc.tipoIncidencia.toLowerCase()">
@@ -169,7 +166,7 @@
       </div>
 
       <div class="modal-footer">
-        Total mostrado: <strong>{{ incidenciasFiltradas().length }} pedidos</strong>
+        {{ i18n.t('inicio.total_mostrado') }} <strong>{{ incidenciasFiltradas().length }}{{ i18n.t('inicio.pedidos') }}</strong>
       </div>
 
     </div>
@@ -194,10 +191,10 @@
 
       <div class="confirm-actions">
         @if (confirmAccion() !== 'info') {
-          <button class="confirm-btn confirm-btn-cancel" (click)="cancelarConfirm()">Cancelar</button>
-          <button class="confirm-btn confirm-btn-confirm" (click)="confirmarAccion()">Confirmar</button>
+          <button class="confirm-btn confirm-btn-cancel" (click)="cancelarConfirm()">{{ i18n.t('inicio.cancelar') }}</button>
+          <button class="confirm-btn confirm-btn-confirm" (click)="confirmarAccion()">{{ i18n.t('inicio.confirmar') }}</button>
         } @else {
-          <button class="confirm-btn confirm-btn-confirm" (click)="cancelarConfirm()">Entendido</button>
+          <button class="confirm-btn confirm-btn-confirm" (click)="cancelarConfirm()">{{ i18n.t('inicio.entendido') }}</button>
         }
       </div>
 

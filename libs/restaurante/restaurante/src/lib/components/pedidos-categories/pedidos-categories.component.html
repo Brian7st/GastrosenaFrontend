@@ -2,60 +2,33 @@
   <h2>{{ i18n.t('pedidosCategories.title') }}</h2>
 </div>
 
-<!-- Main Categories (Level 1) -->
+<!-- Main Categories -->
 <div class="categories-list">
-  
-  <div 
-    class="category-card" 
-    [class.active]="activeMainCategory() === 'all'"
-    (click)="selectMain('all')"
-  >
-    <div class="icon">
-      <lucide-icon name="layout-grid" [size]="24"></lucide-icon>
+  @for (cat of categories(); track cat.id) {
+    <div
+      class="category-card"
+      [class.active]="activeCategory() === cat.id"
+      (click)="selectCategory(cat.id)"
+    >
+      <div class="icon">
+        <lucide-icon [name]="cat.icon" [size]="24"></lucide-icon>
+      </div>
+      <span class="name">{{ cat.name }}</span>
     </div>
-    <span class="name">Todo</span>
-  </div>
-
-  <div 
-    class="category-card" 
-    [class.active]="activeMainCategory() === 'COMIDA'"
-    (click)="selectMain('COMIDA')"
-  >
-    <div class="icon">
-      <lucide-icon name="utensils" [size]="24"></lucide-icon>
-    </div>
-    <span class="name">Comidas</span>
-  </div>
-
-  <div 
-    class="category-card" 
-    [class.active]="activeMainCategory() === 'BEBIDA'"
-    (click)="selectMain('BEBIDA')"
-  >
-    <div class="icon">
-      <lucide-icon name="coffee" [size]="24"></lucide-icon>
-    </div>
-    <span class="name">Bebidas</span>
-  </div>
-
+  }
 </div>
 
-<!-- Subcategories (Level 2) -->
-<div class="subcategories-list" *ngIf="activeMainCategory() !== 'all' && currentSubcategories().length > 0">
-  <div 
-    class="subcategory-chip" 
-    [class.active]="activeSubCategory() === 'all'"
-    (click)="selectSub('all')"
-  >
-    Todas
+<!-- Subcategories (bebidas) -->
+@if (activeCategory() === 'bebidas') {
+  <div class="subcategories-list">
+    @for (sub of subcategoriesBebidas(); track sub.id) {
+      <div
+        class="subcategory-chip"
+        [class.active]="activeSubcategory() === sub.id"
+        (click)="selectSubcategory(sub.id)"
+      >
+        {{ sub.name }}
+      </div>
+    }
   </div>
-  
-  <div 
-    class="subcategory-chip" 
-    *ngFor="let sub of currentSubcategories()"
-    [class.active]="activeSubCategory() === sub.id"
-    (click)="selectSub(sub.id)"
-  >
-    {{ sub.name }}
-  </div>
-</div>
+}
