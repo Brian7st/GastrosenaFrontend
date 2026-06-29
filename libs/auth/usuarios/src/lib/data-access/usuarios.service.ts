@@ -31,6 +31,15 @@ export class UsuariosService extends BaseHttpService {
   private readonly resource = 'usuarios';
   private readonly authService = inject(AuthService);
 
+  private mapUsuario(u: any): UsuarioDetalle {
+    return {
+      ...u,
+      id:     u.idUsuario  ?? u.id,
+      activo: u.estado     ?? u.activo,
+      rol:    u.rol?.nombreRol ?? u.rol,
+    };
+  }
+
   getUsuarios(filtros?: Partial<FiltrosUsuarios>): Observable<PaginatedResponse<UsuarioDetalle>> {
     let params = new HttpParams();
     if (filtros?.busqueda) params = params.set('busqueda', filtros.busqueda);
@@ -41,12 +50,7 @@ export class UsuariosService extends BaseHttpService {
     return this.http.get<any>(this.buildUrl(this.resource), { params }).pipe(
       map(res => {
         const raw = Array.isArray(res) ? res : (res.content ?? []);
-        const content = raw.map((u: any) => ({
-          ...u,
-          id:     u.idUsuario  ?? u.id,
-          activo: u.estado     ?? u.activo,
-          rol:    u.rol?.nombreRol ?? u.rol,
-        }));
+        const content = raw.map((u: any) => this.mapUsuario(u));
         return {
           content,
           totalElements: res.totalElements ?? content.length,
@@ -59,7 +63,9 @@ export class UsuariosService extends BaseHttpService {
   }
 
   getUsuarioPorId(id: string): Observable<UsuarioDetalle> {
-    return this.http.get<UsuarioDetalle>(this.buildUrl(`${this.resource}/${id}`));
+    return this.http.get<any>(this.buildUrl(`${this.resource}/${id}`)).pipe(
+      map(u => this.mapUsuario(u))
+    );
   }
 
   getRoles(): Observable<RolOpcion[]> {
@@ -72,11 +78,15 @@ export class UsuariosService extends BaseHttpService {
 
   crearUsuario(data: CrearUsuarioRequest): Observable<UsuarioDetalle> {
     console.log('📤 Enviando POST /api/usuarios:', data);
-    return this.http.post<UsuarioDetalle>(this.buildUrl(this.resource), data);
+    return this.http.post<any>(this.buildUrl(this.resource), data).pipe(
+      map(u => this.mapUsuario(u))
+    );
   }
 
   actualizarUsuario(id: string, data: ActualizarUsuarioRequest): Observable<UsuarioDetalle> {
-    return this.http.put<UsuarioDetalle>(this.buildUrl(`${this.resource}/${id}`), data);
+    return this.http.put<any>(this.buildUrl(`${this.resource}/${id}`), data).pipe(
+      map(u => this.mapUsuario(u))
+    );
   }
 
   eliminarUsuario(id: string): Observable<void> {
@@ -87,15 +97,27 @@ export class UsuariosService extends BaseHttpService {
   }
 
   activarUsuario(id: string): Observable<UsuarioDetalle> {
-    return this.http.patch<UsuarioDetalle>(this.buildUrl(`${this.resource}/${id}/activar`), {});
+    return this.http.patch<any>(this.buildUrl(`${this.resource}/${id}/activar`), {}).pipe(
+      map(u => this.mapUsuario(u))
+    );
   }
 
   desactivarUsuario(id: string): Observable<UsuarioDetalle> {
-    return this.http.patch<UsuarioDetalle>(this.buildUrl(`${this.resource}/${id}/desactivar`), {});
+    return this.http.patch<any>(this.buildUrl(`${this.resource}/${id}/desactivar`), {}).pipe(
+      map(u => this.mapUsuario(u))
+    );
   }
 
   desbloquearCuenta(id: string): Observable<UsuarioDetalle> {
-    return this.http.patch<UsuarioDetalle>(this.buildUrl(`${this.resource}/${id}/desbloquear`), {});
+    return this.http.patch<any>(this.buildUrl(`${this.resource}/${id}/desbloquear`), {}).pipe(
+      map(u => this.mapUsuario(u))
+    );
+  }
+
+  bloquearCuenta(id: string): Observable<UsuarioDetalle> {
+    return this.http.patch<any>(this.buildUrl(`${this.resource}/${id}/bloquear`), {}).pipe(
+      map(u => this.mapUsuario(u))
+    );
   }
 
   importarMasivo(request: ImportarUsuariosRequest): Observable<ImportarUsuariosResponse> {
@@ -133,7 +155,6 @@ export class UsuariosService extends BaseHttpService {
     );
   }
 
-  // ==================== PERFIL ====================
   obtenerPerfil(): Observable<UsuarioDetalle> {
     return this.http.get<UsuarioDetalle>(this.buildUrl('perfil'));
   }
@@ -160,12 +181,7 @@ export class UsuariosService extends BaseHttpService {
     return this.http.get<any>(this.buildUrl(`${this.resource}?rol=APRENDIZ`)).pipe(
       map((res: any) => {
         const raw: any[] = Array.isArray(res) ? res : (res.content ?? []);
-        return raw.map((u: any) => ({
-          ...u,
-          id:     u.idUsuario ?? u.id,
-          activo: u.estado    ?? u.activo,
-          rol:    u.rol?.nombreRol ?? u.rol,
-        }));
+        return raw.map((u: any) => this.mapUsuario(u));
       })
     );
   }

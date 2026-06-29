@@ -57,12 +57,17 @@ export const UsuariosActions = createActionGroup({
     'Desbloquear Cuenta Exitoso':   props<{ usuario: UsuarioDetalle }>(),
     'Desbloquear Cuenta Fallido':   props<{ error: string }>(),
 
+    // ── Bloquear cuenta ───────────────────────────────────────────────────────
+    'Bloquear Cuenta':              props<{ id: string }>(),
+    'Bloquear Cuenta Exitoso':      props<{ usuario: UsuarioDetalle }>(),
+    'Bloquear Cuenta Fallido':      props<{ error: string }>(),
+
     // ── Importar masivo ───────────────────────────────────────────────────────
     'Importar Masivo':              props<{ request: ImportarUsuariosRequest }>(),
     'Importar Masivo Exitoso':      props<{ resultado: ImportarUsuariosResponse }>(),
     'Importar Masivo Fallido':      props<{ error: string }>(),
-    
-    // ── IMPORTAR MASIVO CON POLLING (NUEVAS) ──────────────────────────────────
+
+    // ── IMPORTAR MASIVO CON POLLING ───────────────────────────────────────────
     'Importar Masivo Iniciado':     props<{ tareaId: string; tipo: 'APRENDIZ' | 'INSTRUCTOR' }>(),
     'Importar Masivo Completado':   props<{ tareaId: string; resultado: ImportarUsuariosResponse }>(),
     'Importar Masivo Fallido Por Estado': props<{ tareaId: string; error: string }>(),
