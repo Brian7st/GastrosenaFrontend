@@ -4,8 +4,8 @@
     
     <!-- Modal Header -->
     <div class="modal-header">
-      <h3 class="modal-title">Exportar Historial de Movimientos</h3>
-      <p class="modal-subtitle">Configure los parámetros para generar su reporte de entradas y salidas.</p>
+      <h3 class="modal-title">{{ i18n.t('kardex.export_titulo') }}</h3>
+      <p class="modal-subtitle">{{ i18n.t('kardex.export_subtitulo') }}</p>
     </div>
 
     <!-- Modal Body -->
@@ -13,7 +13,7 @@
       
       <!-- Date Range Section -->
       <div class="form-section">
-        <label class="section-label">Rango de Fechas</label>
+        <label class="section-label">{{ i18n.t('kardex.rango_fechas') }}</label>
         <div class="date-grid">
           <div class="input-wrapper">
             <lucide-icon name="calendar" class="input-icon" [size]="18"></lucide-icon>
@@ -28,7 +28,7 @@
 
       <!-- Filter by Type -->
       <div class="form-section">
-        <label class="section-label">Tipo de Movimiento</label>
+        <label class="section-label">{{ i18n.t('kardex.tipo_movimiento') }}</label>
         <div class="chip-group">
           <button type="button" class="chip-btn" [class.active]="tipoSeleccionado() === 'entradas'" (click)="setTipo('entradas')">
             Entradas
@@ -44,7 +44,7 @@
 
       <!-- Format Selection -->
       <div class="form-section">
-        <label class="section-label">Formato de Archivo</label>
+        <label class="section-label">{{ i18n.t('kardex.formato_archivo') }}</label>
         <div class="format-grid">
           
           <!-- Excel Card -->
@@ -52,7 +52,7 @@
             <div class="format-icon excel-icon">
               <lucide-icon name="file-spreadsheet" [size]="24"></lucide-icon>
             </div>
-            <span class="format-title">Excel (.xlsx)</span>
+            <span class="format-title">{{ i18n.t('comun.excel_xlsx') }}</span>
             @if (formatoSeleccionado() === 'excel') {
 <div class="check-indicator">
               <lucide-icon name="check-circle" [size]="18"></lucide-icon>
@@ -65,7 +65,7 @@
             <div class="format-icon pdf-icon">
               <lucide-icon name="file-text" [size]="24"></lucide-icon>
             </div>
-            <span class="format-title">PDF (.pdf)</span>
+            <span class="format-title">{{ i18n.t('comun.pdf_pdf') }}</span>
             @if (formatoSeleccionado() === 'pdf') {
 <div class="check-indicator">
               <lucide-icon name="check-circle" [size]="18"></lucide-icon>
@@ -78,7 +78,7 @@
 
       <!-- Modal Footer Buttons -->
       <div class="modal-footer">
-        <restaurant-button variant="surface" (click)="closeModal()" type="button">Cancelar</restaurant-button>
+        <restaurant-button variant="surface" (click)="closeModal()" type="button">{{ i18n.t('comun.cancelar') }}</restaurant-button>
         <restaurant-button variant="primary" type="submit" [disabled]="exportForm.invalid">
           <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: bold;">
             <lucide-icon name="download" [size]="18"></lucide-icon>

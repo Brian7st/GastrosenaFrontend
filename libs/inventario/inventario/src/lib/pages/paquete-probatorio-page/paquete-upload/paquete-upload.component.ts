@@ -10,6 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 import { PaqueteService } from '../../../data-access/services/paquete.service';
 import { PaqueteFacade } from '../../../data-access/paquete.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-paquete-upload',
@@ -21,6 +22,7 @@ import { PaqueteFacade } from '../../../data-access/paquete.facade';
 })
 export class PaqueteUploadComponent {
   private router         = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private route          = inject(ActivatedRoute);
   private paqueteService = inject(PaqueteService);
   private facade         = inject(PaqueteFacade);

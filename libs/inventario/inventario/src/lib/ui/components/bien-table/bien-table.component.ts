@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Bien } from '../../../models/inventario.model';
 import { BienStatusBadgeComponent } from '../bien-status-badge/bien-status-badge.component';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-bien-table',
@@ -12,6 +13,7 @@ import { BienStatusBadgeComponent } from '../bien-status-badge/bien-status-badge
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BienTableComponent {
+  protected readonly i18n = inject(I18nService);
   @Input({ required: true }) bienes: Bien[] = [];
   @Input() isLoading = false;
   @Input() selectMode = false;

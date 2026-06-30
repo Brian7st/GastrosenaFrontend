@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 import { CocinaFacade } from '../../data-access/cocina.facade';
+import { I18nService } from '../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-actividad-page',
@@ -23,6 +24,7 @@ export class ActividadPageComponent {
 
   private router = inject(Router);
   private facade = inject(CocinaFacade);
+  protected readonly i18n = inject(I18nService);
 
   // ── Datos de fichas desde el facade ──────────────────────────────────────
   readonly fichas = this.facade.fichas;
@@ -54,20 +56,20 @@ export class ActividadPageComponent {
     { nombre: 'Inglés I', estado: 'Aprobado', clase: 'badge-aprobado' },
   ];
 
-  readonly jornadas = [
-    { value: 'diurna', label: 'Diurna' },
-    { value: 'mixta', label: 'Mixta' },
-    { value: 'nocturna', label: 'Nocturna' },
+  readonly jornadasKeys = [
+    { value: 'diurna',   tKey: 'actividad.jornada_diurna'   },
+    { value: 'mixta',    tKey: 'actividad.jornada_mixta'    },
+    { value: 'nocturna', tKey: 'actividad.jornada_nocturna' },
   ];
 
-  readonly trimestres = [
-    { value: 'trimestre1', label: 'Trimestre 1' },
-    { value: 'trimestre2', label: 'Trimestre 2' },
-    { value: 'trimestre3', label: 'Trimestre 3' },
-    { value: 'trimestre4', label: 'Trimestre 4' },
-    { value: 'trimestre5', label: 'Trimestre 5' },
-    { value: 'trimestre6', label: 'Trimestre 6' },
-    { value: 'trimestre7', label: 'Trimestre 7' },
+  readonly trimestresKeys = [
+    { value: 'trimestre1', tKey: 'actividad.trimestre_1' },
+    { value: 'trimestre2', tKey: 'actividad.trimestre_2' },
+    { value: 'trimestre3', tKey: 'actividad.trimestre_3' },
+    { value: 'trimestre4', tKey: 'actividad.trimestre_4' },
+    { value: 'trimestre5', tKey: 'actividad.trimestre_5' },
+    { value: 'trimestre6', tKey: 'actividad.trimestre_6' },
+    { value: 'trimestre7', tKey: 'actividad.trimestre_7' },
   ];
 
   // ── Validación del formulario ─────────────────────────────────────────────
@@ -115,10 +117,10 @@ export class ActividadPageComponent {
   // ── Acciones del formulario ───────────────────────────────────────────────
 
   crearActividad(): void {
-    const jornadaLabel =
-      this.jornadas.find(j => j.value === this.jornada())?.label ?? this.jornada();
-    const trimestreLabel =
-      this.trimestres.find(t => t.value === this.trimestre())?.label ?? this.trimestre();
+    const jornadaKey = this.jornadasKeys.find(j => j.value === this.jornada())?.tKey;
+    const jornadaLabel = jornadaKey ? this.i18n.t(jornadaKey) : this.jornada();
+    const trimestreKey = this.trimestresKeys.find(t => t.value === this.trimestre())?.tKey;
+    const trimestreLabel = trimestreKey ? this.i18n.t(trimestreKey) : this.trimestre();
 
     this.facade.crearActividad({
       nombre: this.nombreActividad() || 'Actividad sin nombre',

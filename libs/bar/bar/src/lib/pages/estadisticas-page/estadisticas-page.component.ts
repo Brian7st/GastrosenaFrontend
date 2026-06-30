@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 import { ComandaService, EstadisticasKpi, PromedioBebida } from '../../data-access/comanda.service';
 import { ComandaBarYBarismo } from '../../models/comanda.model';
 import { Chart, registerables, ChartConfiguration } from 'chart.js';
+import { I18nService } from '../../i18n/i18n.service';
 import {
   LucideIconComponent
 } from '@restaurant/shared/ui';
@@ -27,6 +28,7 @@ import {
 })
 export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private comandaService = inject(ComandaService);
+  protected readonly i18n = inject(I18nService);
 
   // ── KPIs ──────────────────────────────────────────────────────────────────
   kpis = signal<EstadisticasKpi | null>(null);
@@ -110,7 +112,7 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
     return {
       labels: stats.map(d => d.nombreReceta),
       datasets: [{
-        label: 'Tiempo Promedio (min)',
+        label: this.i18n.t('estadisticas.chart.label'),
         data: stats.map(d => d.promedioMinutos),
         backgroundColor: '#39a900',
         borderRadius: 4,
@@ -148,7 +150,7 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
             legend: { display: false },
             tooltip: {
               callbacks: {
-                label: (ctx) => `${ctx.parsed.y.toFixed(1)} min`
+                label: (ctx) => `${(ctx.parsed.y ?? 0).toFixed(1)} ${this.i18n.t('estadisticas.chart.tooltip')}`
               }
             }
           },
@@ -156,7 +158,7 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
             y: {
               beginAtZero: true,
               ticks: {
-                callback: (val) => `${val} min`
+                callback: (val) => `${val} ${this.i18n.t('estadisticas.chart.ticks')}`
               },
               grid: { color: 'rgba(0,0,0,0.05)' }
             },

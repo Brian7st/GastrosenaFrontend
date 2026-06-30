@@ -2,13 +2,13 @@
   <div class="back-action">
     <restaurant-button variant="ghost" routerLink="../pedidos">
       <lucide-icon name="arrow-left" [size]="18"></lucide-icon>
-      <span>Volver a Pedidos</span>
+      <span>{{ i18n.t('pedidosHubPage.backToOrders') }}</span>
     </restaurant-button>
   </div>
 
   <restaurant-page-header 
-    title="Centro de Pedidos"
-    subtitle="Selecciona el panel de gestión según tu rol">
+    [title]="i18n.t('pedidosHubPage.title')"
+    [subtitle]="i18n.t('pedidosHubPage.subtitle')">
   </restaurant-page-header>
 
   <div class="pedidos-hub-page__grid">
@@ -18,8 +18,8 @@
           <div class="hub-card__icon-wrapper instructor-icon">
             <lucide-icon name="clipboard-list" [size]="48"></lucide-icon>
           </div>
-          <h3 class="hub-card__title">Ver pedidos (Instructor)</h3>
-          <p class="hub-card__description">Supervisa y administra todos los pedidos realizados por los aprendices en el salón.</p>
+          <h3 class="hub-card__title">{{ i18n.t('pedidosHubPage.instructorTitle') }}</h3>
+          <p class="hub-card__description">{{ i18n.t('pedidosHubPage.instructorDescription') }}</p>
         </div>
       </restaurant-card>
     }
@@ -29,8 +29,8 @@
         <div class="hub-card__icon-wrapper student-icon">
           <lucide-icon name="user" [size]="48"></lucide-icon>
         </div>
-        <h3 class="hub-card__title">Mis Pedidos (Aprendiz)</h3>
-        <p class="hub-card__description">Revisa el historial de pedidos que has tomado durante tu turno actual.</p>
+        <h3 class="hub-card__title">{{ i18n.t('pedidosHubPage.studentTitle') }}</h3>
+        <p class="hub-card__description">{{ i18n.t('pedidosHubPage.studentDescription') }}</p>
       </div>
     </restaurant-card>
   </div>

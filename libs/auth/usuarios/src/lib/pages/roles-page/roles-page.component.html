@@ -119,6 +119,7 @@
             <th>{{ i18n.t('roles.col_aprendiz') }}</th>
             <th>{{ i18n.t('roles.col_rol_actual') }}</th>
             <th>{{ i18n.t('roles.col_ficha') }}</th>
+            <th>Fecha registro</th>
             <th>{{ i18n.t('roles.col_acciones') }}</th>
           </tr>
         </thead>
@@ -148,21 +149,24 @@
               <td>
                 <restaurant-usuario-rol-badge [rol]="u.rol"></restaurant-usuario-rol-badge>
               </td>
-              <td class="roles-page__ficha">{{ u.ficha || '—' }}</td>
+              <td>
+                <span class="roles-page__fecha">{{ u.ficha || '—' }}</span>
+              </td>
+              <td class="roles-page__fecha">{{ u.creadoEn | date:'dd/MM/yyyy' }}</td>
               <td>
                 <button
                   class="roles-page__action-btn"
                   type="button"
-                  (click)="onToggleSeleccion(u.id)"
-                  [attr.aria-label]="i18n.t('roles.seleccionar_todos') + ' ' + u.nombre"
+                  (click)="onVerDetalle(u)"
+                  [attr.aria-label]="'Ver detalle de ' + u.nombre"
                 >
-                  <lucide-icon name="user-cog" [size]="16"></lucide-icon>
+                  <lucide-icon name="eye" [size]="16"></lucide-icon>
                 </button>
               </td>
             </tr>
           } @empty {
             <tr>
-              <td colspan="5" class="roles-page__empty-cell">
+              <td colspan="7" class="roles-page__empty-cell">
                 <restaurant-empty-state
                   [title]="i18n.t('roles.sin_aprendices')"
                   [message]="i18n.t('roles.sin_aprendices_msg')"
@@ -176,3 +180,54 @@
   </section>
 
 </div>
+
+@if (usuarioDetalle()) {
+  <div class="modal-backdrop" (click)="onCerrarDetalle()">
+    <div class="modal detalle-modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <restaurant-usuario-avatar
+          [nombre]="usuarioDetalle()!.nombre"
+          [apellidos]="usuarioDetalle()!.apellidos"
+        ></restaurant-usuario-avatar>
+        <div class="detalle-modal__title-wrap">
+          <h3 class="detalle-modal__nombre">{{ usuarioDetalle()!.nombre }} {{ usuarioDetalle()!.apellidos }}</h3>
+          <restaurant-usuario-rol-badge [rol]="usuarioDetalle()!.rol"></restaurant-usuario-rol-badge>
+        </div>
+        <button class="detalle-modal__close" type="button" (click)="onCerrarDetalle()">
+          <lucide-icon name="x" [size]="18"></lucide-icon>
+        </button>
+      </div>
+      <div class="detalle-modal__body">
+        <div class="detalle-modal__field">
+          <span class="detalle-modal__label">Ficha</span>
+          <span class="detalle-modal__value">{{ usuarioDetalle()!.ficha || '—' }}</span>
+        </div>
+        <div class="detalle-modal__field">
+          <span class="detalle-modal__label">Documento</span>
+          <span class="detalle-modal__value">{{ usuarioDetalle()!.documento || '—' }}</span>
+        </div>
+        <div class="detalle-modal__field">
+          <span class="detalle-modal__label">Correo</span>
+          <span class="detalle-modal__value">{{ usuarioDetalle()!.email }}</span>
+        </div>
+        <div class="detalle-modal__field">
+          <span class="detalle-modal__label">Teléfono</span>
+          <span class="detalle-modal__value">{{ usuarioDetalle()!.telefono || '—' }}</span>
+        </div>
+
+        <div class="detalle-modal__field">
+          <span class="detalle-modal__label">Estado</span>
+          <span class="detalle-modal__value">{{ usuarioDetalle()!.activo ? 'Activo' : 'Inactivo' }}</span>
+        </div>
+        <div class="detalle-modal__field">
+          <span class="detalle-modal__label">Último acceso</span>
+          <span class="detalle-modal__value">{{ (usuarioDetalle()!.ultimoAcceso | date:'dd/MM/yyyy HH:mm') || '—' }}</span>
+        </div>
+        <div class="detalle-modal__field">
+          <span class="detalle-modal__label">Fecha registro</span>
+          <span class="detalle-modal__value">{{ usuarioDetalle()!.creadoEn | date:'dd/MM/yyyy' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+}

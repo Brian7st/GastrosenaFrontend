@@ -14,6 +14,7 @@ import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 import { SolicitudSesion } from '../../../models/solicitud-sesion.model';
 import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 import { AuthService } from '@restaurant/shared/auth';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'app-solicitudes-insumos-list',
@@ -36,6 +37,7 @@ import { AuthService } from '@restaurant/shared/auth';
 })
 export class SolicitudesInsumosListComponent implements OnInit {
   private router  = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private auth    = inject(AuthService);
   readonly facade = inject(SolicitudesFacade);
 

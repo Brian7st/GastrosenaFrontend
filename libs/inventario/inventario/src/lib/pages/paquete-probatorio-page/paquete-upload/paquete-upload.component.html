@@ -8,8 +8,8 @@
           <lucide-icon name="upload-cloud" [size]="20"></lucide-icon>
         </div>
         <div>
-          <h2 class="modal-title">Adjuntar Documento</h2>
-          <p class="modal-subtitle">Suba el archivo correspondiente al registro requerido.</p>
+          <h2 class="modal-title">{{ i18n.t('paquete.upload_titulo') }}</h2>
+          <p class="modal-subtitle">{{ i18n.t('paquete.upload_subtitulo') }}</p>
         </div>
       </div>
       <button class="modal-close-btn" (click)="cerrarModal()">
@@ -29,13 +29,11 @@
           <div class="upload-zone__icon">
             <lucide-icon name="file-down" [size]="32"></lucide-icon>
           </div>
-          <h3 class="upload-zone__title">
-            Arrastre y suelte su archivo aquí
-          </h3>
+          <h3 class="upload-zone__title">{{ i18n.t('paquete.upload_arrastrar') }}</h3>
           <p class="upload-zone__text">
-            O si prefiere, <label class="upload-zone__browse">busque en su equipo <input type="file" hidden accept=".pdf,.png,.jpg,.jpeg" (change)="onFileSelected($event)"></label>
+            {{ i18n.t('paquete.upload_o') }} <label class="upload-zone__browse">{{ i18n.t('paquete.upload_buscar') }} <input type="file" hidden accept=".pdf,.png,.jpg,.jpeg" (change)="onFileSelected($event)"></label>
           </p>
-          <p class="upload-zone__hint">Formatos soportados: PDF, JPG, PNG (Max 5MB)</p>
+          <p class="upload-zone__hint">{{ i18n.t('paquete.upload_hint') }}</p>
         </div>
       } @else {
         <!-- Selected File Preview -->
@@ -67,9 +65,7 @@
 
     <!-- ── Footer ────────────────────────────────────────────────────── -->
     <div class="modal-footer">
-      <button class="btn-secondary" (click)="cerrarModal()" [disabled]="procesando()">
-        Cancelar
-      </button>
+      <button class="btn-secondary" (click)="cerrarModal()" [disabled]="procesando()">{{ i18n.t('comun.cancelar') }}</button>
       <button
         class="btn-primary"
         [disabled]="!puedeAdjuntar()"
@@ -77,10 +73,10 @@
       >
         @if (procesando()) {
           <lucide-icon name="refresh-cw" [size]="16" class="spin-icon"></lucide-icon>
-          Adjuntando...
+          {{ i18n.t('paquete.adjuntando') }}
         } @else {
           <lucide-icon name="check" [size]="16"></lucide-icon>
-          Confirmar y Adjuntar
+          {{ i18n.t('paquete.confirmar_adjuntar') }}
         }
       </button>
     </div>

@@ -2,8 +2,8 @@
   <div class="modal-content" (click)="$event.stopPropagation()">
     <header class="form-card-header">
       <div class="header-titles">
-        <h2>{{ receta ? 'Editar Receta' : 'Nueva Receta' }}</h2>
-        <p>{{ receta ? 'Modifica los detalles del plato' : 'Crear una nueva receta para el módulo de cocina' }}</p>
+        <h2>{{ receta ? i18n.t('gestion-receta.titulo_editar') : i18n.t('gestion-receta.titulo_nueva') }}</h2>
+        <p>{{ receta ? i18n.t('gestion-receta.subtitulo_editar') : i18n.t('gestion-receta.subtitulo_nueva') }}</p>
       </div>
       <button type="button" class="btn-close" (click)="cancelar()">
         <lucide-icon name="x" size="24"></lucide-icon>
@@ -14,14 +14,14 @@
       <!-- Section 1: General Info -->
       <div class="form-grid">
         <div class="field Full">
-          <restaurant-input formControlName="nombreReceta" label="Nombre de la Receta *" placeholder="Ej: Pasta Carbonara"
-                 [error]="recipeForm.get('nombreReceta')?.hasError('soloLetras') ? 'El nombre solo puede contener letras y espacios.' : esCampoInvalido('nombreReceta') ? 'El nombre es obligatorio (min 5 letras).' : ''"></restaurant-input>
+          <restaurant-input formControlName="nombreReceta" [label]="i18n.t('gestion-receta.nombre_label')" [placeholder]="i18n.t('gestion-receta.nombre_placeholder')"
+                 [error]="recipeForm.get('nombreReceta')?.hasError('soloLetras') ? i18n.t('gestion-receta.error_solo_letras') : esCampoInvalido('nombreReceta') ? i18n.t('gestion-receta.error_nombre_obligatorio') : ''"></restaurant-input>
         </div>
 
         <div class="field">
-          <label>Categoría *</label>
+          <label>{{ i18n.t('gestion-receta.categoria_label') }}</label>
           <select formControlName="idCategoria" [class.error]="esCampoInvalido('idCategoria')">
-            <option value="">Seleccione</option>
+            <option value="">{{ i18n.t('gestion-receta.categoria_default') }}</option>
             @for (cat of catService.categorias(); track cat.idCategoria) {
               <option [value]="cat.idCategoria">{{ cat.nombreCategoria }}</option>
             }
@@ -29,32 +29,32 @@
         </div>
 
         <div class="field">
-          <restaurant-input type="number" formControlName="tiempoPreparacion" label="Tiempo de Preparación (min) *"
-            [error]="recipeForm.get('tiempoPreparacion')?.hasError('max') ? 'El tiempo no puede exceder 720 min.' : esCampoInvalido('tiempoPreparacion') ? 'El tiempo debe ser mayor a 0.' : ''"></restaurant-input>
+          <restaurant-input type="number" formControlName="tiempoPreparacion" [label]="i18n.t('gestion-receta.tiempo_label')"
+            [error]="recipeForm.get('tiempoPreparacion')?.hasError('max') ? i18n.t('gestion-receta.error_tiempo_max') : esCampoInvalido('tiempoPreparacion') ? i18n.t('gestion-receta.error_tiempo_min') : ''"></restaurant-input>
         </div>
 
         <div class="field">
-          <restaurant-input type="number" formControlName="precioUnitario" label="Precio Unitario ($) *"
-            [error]="recipeForm.get('precioUnitario')?.hasError('max') ? 'El precio excede el límite permitido.' : esCampoInvalido('precioUnitario') ? 'El precio no puede ser negativo.' : ''"></restaurant-input>
+          <restaurant-input type="number" formControlName="precioUnitario" [label]="i18n.t('gestion-receta.precio_label')"
+            [error]="recipeForm.get('precioUnitario')?.hasError('max') ? i18n.t('gestion-receta.error_precio_max') : esCampoInvalido('precioUnitario') ? i18n.t('gestion-receta.error_precio_min') : ''"></restaurant-input>
         </div>
 
         <div class="field">
-          <label>Temperatura *</label>
+          <label>{{ i18n.t('gestion-receta.temperatura_label') }}</label>
           <select formControlName="temperatura">
-            <option value="">Seleccione</option>
-            <option value="Caliente">Caliente</option>
-            <option value="Frío">Frío</option>
-            <option value="Ambiente">Ambiente</option>
+            <option value="">{{ i18n.t('gestion-receta.temp_default') }}</option>
+            <option value="Caliente">{{ i18n.t('gestion-receta.temp_caliente') }}</option>
+            <option value="Frío">{{ i18n.t('gestion-receta.temp_frio') }}</option>
+            <option value="Ambiente">{{ i18n.t('gestion-receta.temp_ambiente') }}</option>
           </select>
         </div>
 
         <div class="field Full image-upload-container">
-          <label>Imagen de la Receta (Opcional)</label>
+          <label>{{ i18n.t('gestion-receta.imagen_label') }}</label>
           <div class="file-upload-wrapper">
             <input type="file" id="fileInput" (change)="onFileSelected($event)" accept="image/*" class="file-input">
             <label for="fileInput" class="file-label">
               <lucide-icon name="upload-cloud" size="20"></lucide-icon>
-              <span>Subir imagen desde el explorador</span>
+              <span>{{ i18n.t('gestion-receta.subir_imagen') }}</span>
             </label>
           </div>
           <input type="hidden" formControlName="urlImagen">
@@ -62,7 +62,7 @@
           @if (recipeForm.get('urlImagen')?.value) {
             <div class="image-preview" style="position: relative; display: inline-block; margin-top: var(--space-3);">
               <img [src]="recipeForm.get('urlImagen')?.value" alt="Vista previa" style="display: block; max-width: 100%; border-radius: var(--radius-md);">
-              <button type="button" (click)="removerImagen()" title="Eliminar imagen" style="position: absolute; bottom: 8px; right: 8px; background: var(--color-danger); color: white; border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: background 0.2s; z-index: 10;">
+              <button type="button" (click)="removerImagen()" [title]="i18n.t('gestion-receta.eliminar_imagen')" style="position: absolute; bottom: 8px; right: 8px; background: var(--color-danger); color: white; border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: background 0.2s; z-index: 10;">
                 <lucide-icon name="trash-2" size="18"></lucide-icon>
               </button>
             </div>
@@ -73,33 +73,33 @@
       <!-- Section 2: Ingredients -->
       <section class="form-section">
         <div class="section-header" style="display: flex; justify-content: space-between; align-items: center;">
-          <h3>Ingredientes *</h3>
+          <h3>{{ i18n.t('gestion-receta.ingredientes_titulo') }}</h3>
           <restaurant-button type="button" variant="surface" (click)="agregarIngrediente()">
-            <lucide-icon name="plus" size="16"></lucide-icon> Agregar Ingrediente
+            <lucide-icon name="plus" size="16"></lucide-icon> {{ i18n.t('gestion-receta.agregar_ingrediente') }}
           </restaurant-button>
         </div>
 
         <div formArrayName="ingredientes" class="items-list">
           @if (ingredientesArr.hasError('duplicate')) {
             <div class="error-banner" style="background: var(--color-error-bg); border: 1px solid var(--color-error-border); color: var(--color-error-text); padding: var(--space-2); border-radius: var(--radius-md); margin-bottom: var(--space-4); font-size: var(--font-size-sm);">
-              ⚠️ Existen ingredientes con el mismo nombre. Por favor, modifícalos o elimínalos para continuar.
+              {{ i18n.t('gestion-receta.ing_duplicados_error') }}
             </div>
           }
           @for (ing of ingredientesArr.controls; track $index) {
             <div [formGroupName]="$index" class="item-row ingredient-row" style="display: flex; gap: var(--space-2); margin-bottom: var(--space-2);">
-              <restaurant-input type="text" formControlName="nombreIngrediente" placeholder="Nombre del ingrediente" style="flex: 3;"></restaurant-input>
-              <restaurant-input type="number" formControlName="cantidadRequerida" placeholder="Cantidad" style="flex: 1;"></restaurant-input>
+              <restaurant-input type="text" formControlName="nombreIngrediente" [placeholder]="i18n.t('gestion-receta.ing_nombre_placeholder')" style="flex: 3;"></restaurant-input>
+              <restaurant-input type="number" formControlName="cantidadRequerida" [placeholder]="i18n.t('gestion-receta.ing_cantidad_placeholder')" style="flex: 1;"></restaurant-input>
               <select formControlName="unidadMedida" class="flex-1" style="height: 40px; border-radius: var(--radius-md); border: 1px solid var(--color-border); padding: 0 8px;">
-                <option value="GR">Gramos (g)</option>
-                <option value="ML">Mililitros (ml)</option>
-                <option value="UN">Unidades</option>
+                <option value="GR">{{ i18n.t('gestion-receta.ing_unidad_gramos') }}</option>
+                <option value="ML">{{ i18n.t('gestion-receta.ing_unidad_mililitros') }}</option>
+                <option value="UN">{{ i18n.t('gestion-receta.ing_unidad_unidades') }}</option>
               </select>
               <restaurant-button type="button" variant="ghost" (click)="removerIngrediente($index)">
                 <lucide-icon name="trash-2" size="16" style="color: var(--color-danger)"></lucide-icon>
               </restaurant-button>
             </div>
           } @empty {
-            <p class="empty-list">No hay ingredientes. Haga clic en "+ Agregar Ingrediente".</p>
+            <p class="empty-list">{{ i18n.t('gestion-receta.sin_ingredientes') }}</p>
           }
         </div>
       </section>
@@ -107,40 +107,40 @@
       <!-- Section 3: Steps -->
       <section class="form-section">
         <div class="section-header" style="display: flex; justify-content: space-between; align-items: center;">
-          <h3>Instrucciones *</h3>
+          <h3>{{ i18n.t('gestion-receta.instrucciones_titulo') }}</h3>
           <restaurant-button type="button" variant="surface" (click)="agregarPaso()">
-            <lucide-icon name="plus" size="16"></lucide-icon> Agregar Paso
+            <lucide-icon name="plus" size="16"></lucide-icon> {{ i18n.t('gestion-receta.agregar_paso') }}
           </restaurant-button>
         </div>
 
         <div formArrayName="pasos" class="items-list">
           @if (pasosArr.hasError('duplicate')) {
             <div class="error-banner" style="background: var(--color-error-bg); border: 1px solid var(--color-error-border); color: var(--color-error-text); padding: var(--space-2); border-radius: var(--radius-md); margin-bottom: var(--space-4); font-size: var(--font-size-sm);">
-              ⚠️ Existen pasos con la misma descripción. Por favor, modifícalos o elimínalos para continuar.
+              {{ i18n.t('gestion-receta.pasos_duplicados_error') }}
             </div>
           }
           @for (paso of pasosArr.controls; track $index) {
             <div [formGroupName]="$index" class="item-row step-row" style="display: flex; gap: var(--space-2); margin-bottom: var(--space-2); align-items: flex-start;">
               <div class="step-badge" style="background: var(--color-primario); color: var(--color-en-primario); width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-pill); font-weight: bold;">{{ $index + 1 }}</div>
-              <textarea formControlName="descripcionPaso" placeholder="Paso {{ $index + 1 }}..." rows="2" style="flex: 1; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-2); font-family: inherit;"></textarea>
+              <textarea formControlName="descripcionPaso" [placeholder]="i18n.t('gestion-receta.paso_placeholder').replace('{0}', $index + 1)" rows="2" style="flex: 1; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-2); font-family: inherit;"></textarea>
               <restaurant-button type="button" variant="ghost" (click)="removerPaso($index)">
                 <lucide-icon name="trash-2" size="16" style="color: var(--color-danger)"></lucide-icon>
               </restaurant-button>
             </div>
           } @empty {
-            <p class="empty-list">No hay pasos definidos. Haga clic en "+ Agregar Paso".</p>
+            <p class="empty-list">{{ i18n.t('gestion-receta.sin_pasos') }}</p>
           }
         </div>
       </section>
 
       <!-- Actions -->
       <footer class="form-footer" style="display: flex; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--color-border);">
-        <restaurant-button type="button" variant="ghost" (click)="cancelar()">Cancelar</restaurant-button>
+        <restaurant-button type="button" variant="ghost" (click)="cancelar()">{{ i18n.t('gestion-receta.cancelar') }}</restaurant-button>
         <restaurant-button type="submit" variant="primary" [disabled]="recipeForm.invalid || isSaving">
           @if (isSaving) {
-            <span>Guardando...</span>
+            <span>{{ i18n.t('gestion-receta.guardando') }}</span>
           } @else {
-            {{ receta ? 'Actualizar Receta' : 'Crear Receta' }}
+            {{ receta ? i18n.t('gestion-receta.btn_actualizar') : i18n.t('gestion-receta.btn_crear') }}
           }
         </restaurant-button>
       </footer>
@@ -152,7 +152,7 @@
   [open]="mostrarExitoModal()"
   [title]="exitoModalTitulo()"
   [message]="exitoModalMensaje()"
-  confirmText="Aceptar"
+  [confirmText]="i18n.t('gestion-receta.aceptar')"
   [showCancel]="false"
   (confirm)="cerrarExitoModal()"
 ></restaurant-confirm-dialog>

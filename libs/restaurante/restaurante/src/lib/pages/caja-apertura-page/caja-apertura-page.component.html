@@ -5,8 +5,8 @@
         </button>
 
         <restaurant-page-header
-                title="Apertura de Caja"
-                subtitle="Definir el fondo base para iniciar el turno"
+                [title]="i18n.t('cajaApertura.title')"
+                [subtitle]="i18n.t('cajaApertura.subtitle')"
         ></restaurant-page-header>
     </div>
 
@@ -14,17 +14,17 @@
         <div class="card">
             <div class="block-header">
                 <div class="title-group">
-                    <h5>Base Inicial</h5>
-                    <span class="subtitle">Ingrese los datos para abrir la caja</span>
+                    <h5>{{ i18n.t('cajaApertura.initialBase') }}</h5>
+                    <span class="subtitle">{{ i18n.t('cajaApertura.initialBaseSubtitle') }}</span>
                 </div>
 
                 <div class="alert alert-warning mt-4" *ngIf="facade.turnoCaja()?.estado === 'ABIERTA'">
-                    <strong>¡Atención!</strong> Ya existe un turno de caja abierto en este momento.
+                    <strong>{{ i18n.t('cajaApertura.alertWarning') }}</strong>
                 </div>
             </div>
 
             <div class="input-group">
-                <label>Base de Caja (Efectivo)</label>
+                <label>{{ i18n.t('cajaApertura.cashBase') }}</label>
                 <input
                         type="number"
                         class="form-control"
@@ -35,17 +35,17 @@
             </div>
 
             <div class="input-group mt-4">
-                <label>Responsable</label>
+                <label>{{ i18n.t('cajaApertura.responsible') }}</label>
                 <input type="text" class="form-control" [value]="nombreCajero" disabled />
             </div>
 
             <div class="form-actions mt-4">
                 <restaurant-button variant="surface" (click)="volver()">
-                    Cancelar
+                    {{ i18n.t('cajaApertura.cancel') }}
                 </restaurant-button>
                 <restaurant-button variant="primary" (click)="confirmarApertura()" [disabled]="baseEfectivoCtrl.invalid || facade.turnoCaja()?.estado === 'ABIERTA'">
                     <lucide-icon name="log-in" [size]="18"></lucide-icon>
-                    <span>Abrir Caja</span>
+                    <span>{{ i18n.t('cajaApertura.openCash') }}</span>
                 </restaurant-button>
             </div>
         </div>

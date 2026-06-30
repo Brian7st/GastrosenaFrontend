@@ -4,20 +4,20 @@
   <div class="page-header-row">
     <div>
 
-      <h1 class="page-title">Alertas de Stock Mínimo</h1>
-      <p class="page-subtitle">Gestión proactiva de inventario crítico y riesgo financiero.</p>
+      <h1 class="page-title">{{ i18n.t('alerta.titulo') }}</h1>
+      <p class="page-subtitle">{{ i18n.t('alerta.subtitulo') }}</p>
     </div>
     <div class="header-actions">
       <restaurant-button variant="surface" (click)="onExportarCSV()">
         <div class="btn-icon-text">
           <lucide-icon name="download" [size]="20"></lucide-icon>
-          Exportar CSV
+          {{ i18n.t('alerta.exportar_csv') }}
         </div>
       </restaurant-button>
       <restaurant-button variant="surface" (click)="irAConfig()">
         <div class="btn-icon-text">
           <lucide-icon name="settings" [size]="20"></lucide-icon>
-          Configurar Umbrales
+          {{ i18n.t('alerta.configurar_umbrales') }}
         </div>
       </restaurant-button>
     </div>
@@ -26,13 +26,13 @@
   <!-- ── KPI Grid ─────────────────────────────────────────────────────────── -->
   <div class="kpi-grid">
     <restaurant-kpi-card
-      label="Críticas"
+      [label]="i18n.t('alerta.kpi_criticas')"
       [value]="kpiCriticas().toString()"
       icon="triangle-alert"
       iconColor="red"
     ></restaurant-kpi-card>
     <restaurant-kpi-card
-      label="Activas"
+      [label]="i18n.t('alerta.kpi_activas')"
       [value]="kpiActivas().toString()"
       icon="bell"
       iconColor="green"
@@ -52,21 +52,21 @@
           <input
             type="text"
             class="filter-bar__input"
-            placeholder="Buscar por código o nombre..."
+            [placeholder]="i18n.t('alerta.buscar_placeholder')"
             (input)="onSearch($event)"
           />
         </div>
         <select class="filter-bar__select" (change)="onPrioridadChange($event)">
-          <option value="">Prioridad</option>
-          <option value="ALTA">Alta</option>
-          <option value="MEDIA">Media</option>
-          <option value="BAJA">Baja</option>
+          <option value="">{{ i18n.t('alerta.filtro_prioridad') }}</option>
+          <option value="ALTA">{{ i18n.t('alerta.prioridad_alta') }}</option>
+          <option value="MEDIA">{{ i18n.t('alerta.prioridad_media') }}</option>
+          <option value="BAJA">{{ i18n.t('alerta.prioridad_baja') }}</option>
         </select>
         <select class="filter-bar__select" (change)="onEstadoChange($event)">
-          <option value="">Estado</option>
-          <option value="ACTIVA">Activa</option>
-          <option value="CRITICA">Crítica</option>
-          <option value="RESUELTA">Resuelta</option>
+          <option value="">{{ i18n.t('comun.estado') }}</option>
+          <option value="ACTIVA">{{ i18n.t('alerta.estado_activa') }}</option>
+          <option value="CRITICA">{{ i18n.t('alerta.estado_critica') }}</option>
+          <option value="RESUELTA">{{ i18n.t('alerta.estado_resuelta') }}</option>
         </select>
       </div>
 
@@ -103,7 +103,7 @@
 
               <div class="alerta-card__stats">
                 <div class="alerta-stat">
-                  <p class="alerta-stat__label">Stock Actual</p>
+                  <p class="alerta-stat__label">{{ i18n.t('alerta.stock_actual') }}</p>
                   <p class="alerta-stat__value" [class]="'alerta-stat__value--' + alerta.prioridad">
                     {{ alerta.stockActual ?? 0 }} / {{ alerta.stockMinimo ?? 0 }}{{ alerta.unidad ?? '' }}
                   </p>
@@ -118,7 +118,7 @@
                 class="btn-resolver"
                 (click)="irAResolver($event, alerta.id)"
               >
-                Resolver
+                {{ i18n.t('alerta.resolver') }}
               </button>
             </div>
           </div>
@@ -140,44 +140,44 @@
       <!-- Resumen de Alertas (datos reales: /reporting/alertas/resumen) -->
       <div class="lateral-card">
         <div class="lateral-card__header">
-          <h3 class="lateral-card__title">Resumen de Alertas</h3>
+          <h3 class="lateral-card__title">{{ i18n.t('alerta.resumen_titulo') }}</h3>
         </div>
         <div class="lateral-card__body">
           @if (resumen(); as r) {
             <div class="historial-item">
               <div>
-                <p class="historial-item__bien">Total de alertas</p>
+                <p class="historial-item__bien">{{ i18n.t('alerta.total_alertas') }}</p>
                 <p class="historial-item__accion">{{ r.totalAlertas }}</p>
               </div>
             </div>
             <div class="historial-item">
               <div>
-                <p class="historial-item__bien">Pendientes</p>
+                <p class="historial-item__bien">{{ i18n.t('alerta.pendientes') }}</p>
                 <p class="historial-item__accion">{{ r.alertasPendientes }}</p>
               </div>
             </div>
             <div class="historial-item">
               <div>
-                <p class="historial-item__bien">Resueltas</p>
+                <p class="historial-item__bien">{{ i18n.t('alerta.resueltas') }}</p>
                 <p class="historial-item__accion">{{ r.alertasResueltas }}</p>
               </div>
             </div>
             <div class="historial-item">
               <div>
-                <p class="historial-item__bien">Productos críticos</p>
+                <p class="historial-item__bien">{{ i18n.t('alerta.productos_criticos') }}</p>
                 <p class="historial-item__accion">{{ r.productosCriticos }}</p>
               </div>
             </div>
             @if (r.ultimaAlerta) {
               <div class="historial-item">
                 <div>
-                  <p class="historial-item__bien">Última alerta</p>
+                  <p class="historial-item__bien">{{ i18n.t('alerta.ultima_alerta') }}</p>
                   <p class="historial-item__tiempo">{{ r.ultimaAlerta }}</p>
                 </div>
               </div>
             }
           } @else {
-            <p class="text-secondary">Cargando resumen…</p>
+            <p class="text-secondary">{{ i18n.t('comun.cargando') }}</p>
           }
         </div>
       </div>
@@ -185,7 +185,7 @@
       <!-- Alertas por tipo -->
       @if (resumen()?.alertasPorTipo?.length) {
         <div class="lateral-card">
-          <h3 class="lateral-card__title lateral-card__title--pad">Alertas por tipo</h3>
+          <h3 class="lateral-card__title lateral-card__title--pad">{{ i18n.t('alerta.por_tipo') }}</h3>
           <div class="movimientos-list">
             @for (t of resumen()!.alertasPorTipo; track t.tipo) {
               <div class="movimiento-item">

@@ -3,8 +3,8 @@
   <!-- ── PAGE HEADER ── -->
   <div class="page-header">
     <div class="page-header__title">
-      <h1>Panel de Facturación</h1>
-      <p class="page-header__subtitle">Supervisión y control de documentos electrónicos en tiempo real.</p>
+      <h1>{{ i18n.t('facturas.titulo') }}</h1>
+      <p class="page-header__subtitle">{{ i18n.t('facturas.subtitulo') }}</p>
     </div>
     <div class="page-header__actions">
       <restaurant-button *hasPermission="'facturas:crear'" variant="ghost" (click)="onImportar()">
@@ -23,7 +23,7 @@
 <div class="kpi-grid">
 
     <restaurant-kpi-card
-      label="Total Facturas"
+      [label]="i18n.t('facturas.kpi_total')"
       [value]="k.totalFacturas | number"
       icon="file-text"
       iconColor="green"
@@ -32,7 +32,7 @@
     />
 
     <restaurant-kpi-card
-      label="Monto Mensual"
+      [label]="i18n.t('facturas.kpi_monto')"
       [value]="'$' + (k.montoMensual | number:'1.2-2')"
       icon="banknote"
       iconColor="blue"
@@ -43,19 +43,19 @@
     <restaurant-kpi-card variant="states">
       <div class="kpi-states-grid">
         <div class="kpi-state">
-          <span class="kpi-state__label">Registradas</span>
+          <span class="kpi-state__label">{{ i18n.t('facturas.kpi_registradas') }}</span>
           <span class="kpi-state__value kpi-state__value--blue">{{ k.registradas }}</span>
         </div>
         <div class="kpi-state">
-          <span class="kpi-state__label">Verificadas</span>
+          <span class="kpi-state__label">{{ i18n.t('facturas.kpi_verificadas') }}</span>
           <span class="kpi-state__value kpi-state__value--orange">{{ k.verificadas }}</span>
         </div>
         <div class="kpi-state">
-          <span class="kpi-state__label">Pagadas</span>
+          <span class="kpi-state__label">{{ i18n.t('facturas.kpi_pagadas') }}</span>
           <span class="kpi-state__value kpi-state__value--green">{{ k.pagadas | number }}</span>
         </div>
         <div class="kpi-state">
-          <span class="kpi-state__label">Anuladas</span>
+          <span class="kpi-state__label">{{ i18n.t('facturas.kpi_anuladas') }}</span>
           <span class="kpi-state__value kpi-state__value--red">{{ k.anuladas }}</span>
         </div>
       </div>
@@ -81,17 +81,17 @@
       <div dtHeader class="filter-panel">
         <div class="filter-panel__row">
           <div class="filter-group">
-            <label class="filter-label">Estado</label>
+            <label class="filter-label">{{ i18n.t('comun.estado') }}</label>
             <select class="filter-select" [value]="filtroEstado()" (change)="onFiltroEstadoChange($any($event.target).value)">
-              <option value="">Todos</option>
-              <option value="REGISTRADA">Registrada</option>
-              <option value="VERIFICADA">Verificada</option>
-              <option value="PAGADA">Pagada</option>
-              <option value="ANULADA">Anulada</option>
+              <option value="">{{ i18n.t('comun.todos') }}</option>
+              <option value="REGISTRADA">{{ i18n.t('facturas.estado_registrada') }}</option>
+              <option value="VERIFICADA">{{ i18n.t('facturas.estado_verificada') }}</option>
+              <option value="PAGADA">{{ i18n.t('facturas.estado_pagada') }}</option>
+              <option value="ANULADA">{{ i18n.t('facturas.estado_anulada') }}</option>
             </select>
           </div>
           <div class="filter-group">
-            <label class="filter-label">Proveedor (NIT)</label>
+            <label class="filter-label">{{ i18n.t('facturas.filtro_proveedor') }}</label>
             <input type="text" class="filter-input" placeholder="Ej. 900000001" [value]="filtroProveedor()" (input)="onFiltroProveedorChange($any($event.target).value)" />
           </div>
           <div class="filter-group filter-group--actions">
@@ -127,12 +127,12 @@
     @if (!loading()) {
 <thead>
       <tr>
-        <th class="col-proveedor">Proveedor</th>
-        <th class="col-orden">Orden de Compra</th>
-        <th class="col-total">Total</th>
-        <th class="col-fecha">Fecha</th>
-        <th class="col-estado">Estado</th>
-        <th class="col-acciones cell--actions">Acciones</th>
+        <th class="col-proveedor">{{ i18n.t('facturas.th_proveedor') }}</th>
+        <th class="col-orden">{{ i18n.t('facturas.th_orden') }}</th>
+        <th class="col-total">{{ i18n.t('facturas.th_total') }}</th>
+        <th class="col-fecha">{{ i18n.t('facturas.th_fecha') }}</th>
+        <th class="col-estado">{{ i18n.t('comun.estado') }}</th>
+        <th class="col-acciones cell--actions">{{ i18n.t('comun.acciones') }}</th>
       </tr>
     </thead>
 }
@@ -203,7 +203,7 @@
     @if (!loading() && facturas().length > 0) {
 <div dtFooter class="dt-footer">
       <span class="dt-page-info">
-        Mostrando {{ facturas().length }} de {{ paginacion().totalElements | number }} facturas
+        {{ i18n.t('facturas.mostrando', { count: facturas().length.toString(), total: (paginacion().totalElements | number) ?? '' }) }}
       </span>
       <div class="dt-pagination">
         <button class="dt-page-btn" [disabled]="paginacion().page === 0" (click)="onIrAPagina(paginacion().page - 1)">

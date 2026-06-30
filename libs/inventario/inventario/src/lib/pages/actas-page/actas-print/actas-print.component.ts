@@ -7,6 +7,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActasFacade } from '../../../data-access/actas.facade';
 import { ActaDocumentoComponent } from '../../../components/acta-documento/acta-documento.component';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-actas-print',
@@ -18,6 +19,7 @@ import { ActaDocumentoComponent } from '../../../components/acta-documento/acta-
 })
 export class ActasPrintComponent implements OnInit {
   private route = inject(ActivatedRoute);
+  protected readonly i18n = inject(I18nService);
   private router = inject(Router);
   private facade = inject(ActasFacade);
 

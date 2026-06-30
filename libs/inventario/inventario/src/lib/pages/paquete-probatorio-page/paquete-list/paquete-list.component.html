@@ -2,14 +2,14 @@
 <div class="paquete-page">
   <div class="paquete-page__header">
     <div class="paquete-page__header-text">
-      <h1 class="paquete-page__title">Gestión de Paquetes Probatorios</h1>
-      <p class="paquete-page__subtitle">Dossier de auditoría legal para legalización de materiales de formación.</p>
+      <h1 class="paquete-page__title">{{ i18n.t('paquete.titulo') }}</h1>
+      <p class="paquete-page__subtitle">{{ i18n.t('paquete.subtitulo') }}</p>
     </div>
     <div class="header-actions">
       <restaurant-button *hasPermission="'paquete:crear'" variant="primary" (click)="crearPaquete()">
         <div class="btn-icon-text">
           <lucide-icon name="plus" [size]="20"></lucide-icon>
-          Crear Expediente
+          {{ i18n.t('paquete.crear') }}
         </div>
       </restaurant-button>
     </div>
@@ -17,16 +17,16 @@
 
   <!-- ── KPI Cards ──────────────────────────────────────────────────── -->
   <div class="kpi-grid">
-    <restaurant-kpi-card label="TOTAL" [value]="kpiTotal().toString()" icon="folders"
+    <restaurant-kpi-card [label]="i18n.t('paquete.kpi_total')" [value]="kpiTotal().toString()" icon="folders"
       iconColor="blue" trend="Total de paquetes" [trendUp]="null"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="INCOMPLETOS" [value]="kpiIncompleto().toString()" icon="file-edit"
+    <restaurant-kpi-card [label]="i18n.t('paquete.kpi_incompletos')" [value]="kpiIncompleto().toString()" icon="file-edit"
       iconColor="orange" trend="Incompletos" [trendUp]="null"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="COMPLETOS" [value]="kpiCompleto().toString()" icon="check-circle"
+    <restaurant-kpi-card [label]="i18n.t('paquete.kpi_completos')" [value]="kpiCompleto().toString()" icon="check-circle"
       iconColor="green" trend="Aprobados" [trendUp]="true"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="ARCHIVADOS" [value]="kpiArchivado().toString()" icon="archive"
+    <restaurant-kpi-card [label]="i18n.t('paquete.kpi_archivados')" [value]="kpiArchivado().toString()" icon="archive"
       iconColor="gray" trend="Histórico" [trendUp]="null"></restaurant-kpi-card>
   </div>
 
@@ -35,16 +35,16 @@
     <div dtHeader class="dt-controls">
       <div class="dt-controls__title">
         <lucide-icon name="folder-archive" [size]="22" class="dt-controls__icon"></lucide-icon>
-        <h3 class="dt-controls__heading">Gestión de Paquetes Probatorios</h3>
+        <h3 class="dt-controls__heading">{{ i18n.t('paquete.tabla_titulo') }}</h3>
       </div>
       <div class="dt-controls__actions">
         <!-- Filtros integrados -->
         <div class="dt-filter">
           <select class="dt-filter__select" (change)="onEstadoChange($event)">
-            <option value="">Todos los estados</option>
-            <option value="INCOMPLETO">Incompleto</option>
-            <option value="COMPLETO">Completo</option>
-            <option value="ARCHIVADO">Archivado</option>
+            <option value="">{{ i18n.t('comun.todos_estados') }}</option>
+            <option value="INCOMPLETO">{{ i18n.t('paquete.estado_incompleto') }}</option>
+            <option value="COMPLETO">{{ i18n.t('paquete.estado_completo') }}</option>
+            <option value="ARCHIVADO">{{ i18n.t('paquete.estado_archivado') }}</option>
           </select>
         </div>
 
@@ -53,7 +53,7 @@
           <input
             type="text"
             class="dt-search__input"
-            placeholder="Buscar ID, instructor..."
+            [placeholder]="i18n.t('paquete.buscar')"
             (input)="onSearch($event)"
           />
         </div>
@@ -62,13 +62,13 @@
 
     <thead>
       <tr>
-        <th>ID Expediente</th>
-        <th>Detalle / Ficha</th>
-        <th class="text-center">Estado</th>
-        <th>Documentos Base</th>
-        <th>Responsable</th>
-        <th>Fecha</th>
-        <th class="text-center">Acciones</th>
+        <th>{{ i18n.t('paquete.th_id') }}</th>
+        <th>{{ i18n.t('paquete.th_detalle') }}</th>
+        <th class="text-center">{{ i18n.t('comun.estado') }}</th>
+        <th>{{ i18n.t('paquete.th_docs') }}</th>
+        <th>{{ i18n.t('paquete.th_responsable') }}</th>
+        <th>{{ i18n.t('comun.fecha') }}</th>
+        <th class="text-center">{{ i18n.t('comun.acciones') }}</th>
       </tr>
     </thead>
     <tbody>
@@ -87,7 +87,7 @@
           <!-- Detalle / Ficha -->
           <td>
             <p class="paquete-table__titulo">{{ paquete.titulo }}</p>
-            <p class="paquete-table__ficha">Ficha {{ paquete.fichaId }}</p>
+            <p class="paquete-table__ficha">{{ i18n.t('acta.ficha_prefix') }} {{ paquete.fichaId }}</p>
           </td>
 
           <!-- Estado -->
@@ -107,7 +107,7 @@
                 } @else {
                   <lucide-icon name="circle" [size]="14" class="paquete-table__doc-icon--pending"></lucide-icon>
                 }
-                <span>Acta</span>
+                <span>{{ i18n.t('paquete.doc_acta') }}</span>
               </div>
               <div class="paquete-table__doc-item" [class.paquete-table__doc-item--missing]="!paquete.requisicionId">
                 @if (paquete.requisicionId) {
@@ -115,7 +115,7 @@
                 } @else {
                   <lucide-icon name="circle" [size]="14" class="paquete-table__doc-icon--pending"></lucide-icon>
                 }
-                <span>Requisición</span>
+                <span>{{ i18n.t('paquete.doc_req') }}</span>
               </div>
               <div class="paquete-table__doc-item" [class.paquete-table__doc-item--missing]="!paquete.registroAsistenciaAdjunto">
                 @if (paquete.registroAsistenciaAdjunto) {
@@ -123,7 +123,7 @@
                 } @else {
                   <lucide-icon name="circle" [size]="14" class="paquete-table__doc-icon--pending"></lucide-icon>
                 }
-                <span>Asistencia</span>
+                <span>{{ i18n.t('paquete.doc_asistencia') }}</span>
               </div>
             </div>
           </td>
@@ -176,7 +176,7 @@
       }
     </tbody>
     <div dtFooter class="dt-footer">
-      <span class="dt-page-info">Mostrando {{ filteredPaquetes().length }} de {{ allPaquetes().length }} expedientes</span>
+      <span class="dt-page-info">{{ i18n.t('paquete.mostrando', { count: filteredPaquetes().length.toString(), total: allPaquetes().length.toString() }) }}</span>
       <div class="dt-pagination">
         <button class="dt-page-btn" disabled>
           <lucide-icon name="chevron-left" [size]="18"></lucide-icon>

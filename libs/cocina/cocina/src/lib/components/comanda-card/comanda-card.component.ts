@@ -10,6 +10,7 @@ import {
   effect,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { I18nService } from '../../i18n/i18n.service';
 import {
   Comanda,
   PlatoDetalle,
@@ -27,6 +28,7 @@ import { ButtonComponent, LucideIconComponent } from '@restaurant/shared/ui';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ComandaCardComponent implements OnInit, OnDestroy {
+  protected readonly i18n = inject(I18nService);
   comanda = input.required<Comanda>();
 
   onIniciarPlato = output<string>();
@@ -112,9 +114,9 @@ export class ComandaCardComponent implements OnInit, OnDestroy {
     this.vistaActual.set('receta');
     this.recetaActiva.set({
       idReceta: 'ERROR',
-      nombreReceta: 'Receta no disponible en el Backend',
+      nombreReceta: this.i18n.t('comanda-card.receta_no_disponible'),
       nombreCategoria: '', tiempoPreparacion: 0, temperatura: '',
-      ingredientes: [], pasos: [{idPaso:'e', orden:1, descripcionPaso: 'Hubo un error de conexión al buscar esta receta en el servidor Java. Revise el log de IntelliJ.', notasAdicionales: ''}]
+      ingredientes: [], pasos: [{idPaso:'e', orden:1, descripcionPaso: this.i18n.t('comanda-card.error_paso'), notasAdicionales: ''}]
     });
   }
 

@@ -18,23 +18,23 @@
     </tr>
     <tr>
       <td class="gor-cell gor-cell--header" colspan="4">
-        NOMBRE DEL COMITÉ O DE LA REUNIÓN: LEGALIZACIÓN MATERIALES DE FORMACIÓN POR SESIÓN.
+        {{ i18n.t('acta-doc.nombre_comite') }}
       </td>
     </tr>
     <tr>
-      <td class="gor-cell gor-cell--label">CIUDAD Y FECHA:</td>
+      <td class="gor-cell gor-cell--label">{{ i18n.t('acta-doc.ciudad_fecha') }}</td>
       <td class="gor-cell gor-cell--value">{{ fechaFormateada() }}</td>
-      <td class="gor-cell gor-cell--label">HORA INICIO:</td>
+      <td class="gor-cell gor-cell--label">{{ i18n.t('acta-doc.hora_inicio') }}</td>
       <td class="gor-cell gor-cell--value">{{ formatHora(a.horaInicio) }}</td>
     </tr>
     <tr>
-      <td class="gor-cell gor-cell--label" colspan="2">LUGAR Y/O ENLACE:</td>
-      <td class="gor-cell gor-cell--label">HORA FIN:</td>
+      <td class="gor-cell gor-cell--label" colspan="2">{{ i18n.t('acta-doc.lugar_enlace') }}</td>
+      <td class="gor-cell gor-cell--label">{{ i18n.t('acta-doc.hora_fin') }}</td>
       <td class="gor-cell gor-cell--value">{{ formatHora(a.horaFin) }}</td>
     </tr>
     <tr>
       <td class="gor-cell gor-cell--value" colspan="2">{{ (a.lugar ?? 'Escuela de Gastronomía') | uppercase }}</td>
-      <td class="gor-cell gor-cell--label" colspan="2">DIRECCIÓN / REGIONAL / CENTRO:</td>
+      <td class="gor-cell gor-cell--label" colspan="2">{{ i18n.t('acta-doc.dir_regional') }}</td>
     </tr>
     <tr>
       <td class="gor-cell" colspan="2"></td>
@@ -45,7 +45,7 @@
   <!-- AGENDA -->
   <table class="gor-table gor-table--full">
     <tr>
-      <td class="gor-cell gor-cell--section-header" colspan="4">AGENDA O PUNTOS PARA DESARROLLAR:</td>
+      <td class="gor-cell gor-cell--section-header" colspan="4">{{ i18n.t('acta-doc.agenda') }}</td>
     </tr>
     <tr>
       <td class="gor-cell gor-cell--text" colspan="4">
@@ -54,7 +54,7 @@
       </td>
     </tr>
     <tr>
-      <td class="gor-cell gor-cell--section-header" colspan="4">OBJETIVO(S) DE LA REUNIÓN:</td>
+      <td class="gor-cell gor-cell--section-header" colspan="4">{{ i18n.t('acta-doc.objetivos') }}</td>
     </tr>
     <tr>
       <td class="gor-cell gor-cell--text" colspan="4">
@@ -66,7 +66,7 @@
   <!-- DESARROLLO -->
   <table class="gor-table gor-table--full">
     <tr>
-      <td class="gor-cell gor-cell--section-center">DESARROLLO DE LA REUNIÓN</td>
+      <td class="gor-cell gor-cell--section-center">{{ i18n.t('acta-doc.desarrollo') }}</td>
     </tr>
     <tr>
       <td class="gor-cell gor-cell--text gor-cell--develop">
@@ -85,7 +85,7 @@
   <!-- CONCLUSIONES -->
   <table class="gor-table gor-table--full">
     <tr>
-      <td class="gor-cell gor-cell--section-center">CONCLUSIONES</td>
+      <td class="gor-cell gor-cell--section-center">{{ i18n.t('acta-doc.conclusiones') }}</td>
     </tr>
     <tr>
       <td class="gor-cell gor-cell--text">
@@ -99,13 +99,13 @@
   <!-- COMPROMISOS -->
   <table class="gor-table gor-table--full">
     <tr>
-      <td class="gor-cell gor-cell--section-center" colspan="4">ESTABLECIMIENTO Y ACEPTACIÓN DE COMPROMISOS</td>
+      <td class="gor-cell gor-cell--section-center" colspan="4">{{ i18n.t('acta-doc.compromisos') }}</td>
     </tr>
     <tr>
-      <td class="gor-cell gor-cell--col-header">ACTIVIDAD /DECISIÓN</td>
-      <td class="gor-cell gor-cell--col-header">FECHA</td>
-      <td class="gor-cell gor-cell--col-header">RESPONSABLE</td>
-      <td class="gor-cell gor-cell--col-header">FIRMA O PARTICIPACIÓN VIRTUAL</td>
+      <td class="gor-cell gor-cell--col-header">{{ i18n.t('acta-doc.th_actividad') }}</td>
+      <td class="gor-cell gor-cell--col-header">{{ i18n.t('acta-doc.th_fecha') }}</td>
+      <td class="gor-cell gor-cell--col-header">{{ i18n.t('acta-doc.th_responsable') }}</td>
+      <td class="gor-cell gor-cell--col-header">{{ i18n.t('acta-doc.th_firma') }}</td>
     </tr>
     @for (c of (a.compromisos ?? []); track c.actividad) {
       <tr>
@@ -123,13 +123,13 @@
   <!-- ASISTENTES -->
   <table class="gor-table gor-table--full">
     <tr>
-      <td class="gor-cell gor-cell--section-center" colspan="5">DE: ASISTENTES Y APROBACIÓN DECISIONES</td>
+      <td class="gor-cell gor-cell--section-center" colspan="5">{{ i18n.t('acta-doc.asistentes') }}</td>
     </tr>
     <tr>
-      <td class="gor-cell gor-cell--col-header">NOMBRE</td>
-      <td class="gor-cell gor-cell--col-header">DEPENDENCIA / EMPRESA</td>
-      <td class="gor-cell gor-cell--col-header">APRUEBA (SI/NO)</td>
-      <td class="gor-cell gor-cell--col-header">OBSERVACIÓN</td>
+      <td class="gor-cell gor-cell--col-header">{{ i18n.t('acta-doc.th_nombre') }}</td>
+      <td class="gor-cell gor-cell--col-header">{{ i18n.t('acta-doc.th_dependencia') }}</td>
+      <td class="gor-cell gor-cell--col-header">{{ i18n.t('acta-doc.th_aprueba') }}</td>
+      <td class="gor-cell gor-cell--col-header">{{ i18n.t('acta-doc.th_observacion') }}</td>
       <td class="gor-cell gor-cell--col-header">FIRMA O PARTICIPACIÓN VIRTUAL</td>
     </tr>
     @for (firmante of (a.asistentes ?? []); track firmante.nombre) {
@@ -142,7 +142,7 @@
       </tr>
     }
     @if ((a.asistentes ?? []).length === 0) {
-      <tr><td class="gor-cell gor-cell--text gor-cell--center" colspan="5">Sin asistentes registrados</td></tr>
+      <tr><td class="gor-cell gor-cell--text gor-cell--center" colspan="5">{{ i18n.t('acta-doc.sin_asistentes') }}</td></tr>
     }
   </table>
 
@@ -157,7 +157,7 @@
   <!-- ANEXOS -->
   <table class="gor-table gor-table--full">
     <tr>
-      <td class="gor-cell gor-cell--section-center">ANEXOS</td>
+      <td class="gor-cell gor-cell--section-center">{{ i18n.t('acta-doc.anexos') }}</td>
     </tr>
     <tr>
       <td class="gor-cell gor-cell--anexos"></td>

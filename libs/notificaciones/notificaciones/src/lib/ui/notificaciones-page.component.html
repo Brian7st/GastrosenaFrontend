@@ -1,8 +1,8 @@
 <div class="notificaciones-wrapper">
 
   <restaurant-page-header
-    title="Notificaciones"
-    subtitle="Panel, historial y alertas en tiempo real."
+    [title]="i18n.t('page.title')"
+    [subtitle]="i18n.t('page.subtitle')"
   />
 
   <div class="notificaciones-topbar">
@@ -10,29 +10,29 @@
       @if (noLeidas() > 0) {
         <span class="notificaciones-badge">
           <lucide-icon name="bell" [size]="16"></lucide-icon>
-          {{ noLeidas() }} notificación{{ noLeidas() > 1 ? 'es' : '' }} sin leer
+          {{ noLeidas() === 1 ? i18n.t('badge.no_leidas').replace('{count}', noLeidas()) : i18n.t('badge.no_leidas_plural').replace('{count}', noLeidas()) }}
         </span>
       } @else {
         <span class="notificaciones-badge notificaciones-badge--vacio">
           <lucide-icon name="bell-off" [size]="16"></lucide-icon>
-          Todo al día
+          {{ i18n.t('badge.al_dia') }}
         </span>
       }
     </div>
     <restaurant-button variant="surface" (click)="marcarTodasLeidas()">
       <lucide-icon name="check-circle" [size]="14"></lucide-icon>
-      Marcar todas como leídas
+      {{ i18n.t('btn.marcar_todas') }}
     </restaurant-button>
   </div>
 
   @if (loading()) {
-    <div class="notificaciones-loading">Cargando...</div>
+    <div class="notificaciones-loading">{{ i18n.t('loading') }}</div>
   } @else {
     <div class="notificaciones-lista-simple">
       @if (notificaciones().length === 0) {
         <div class="notificaciones-empty">
           <lucide-icon name="bell-off" [size]="40"></lucide-icon>
-          <p>No hay notificaciones</p>
+          <p>{{ i18n.t('empty') }}</p>
         </div>
       } @else {
         @for (n of notificaciones(); track n.idNotificacion) {
@@ -50,7 +50,7 @@
               <p class="notificacion-item__mensaje">{{ n.mensaje }}</p>
               <div class="notificacion-item__meta">
                 <restaurant-status-badge
-                  [label]="n.leida ? 'Leída' : 'No leída'"
+                  [label]="n.leida ? i18n.t('estado.leida') : i18n.t('estado.no_leida')"
                   [variant]="n.leida ? 'success' : 'warning'"
                 />
                 <span class="notificacion-item__fecha">
@@ -59,7 +59,7 @@
               </div>
               @if (!n.leida) {
                 <restaurant-button variant="ghost" (click)="marcarComoLeida(n.idNotificacion)">
-                  Marcar como leída
+                  {{ i18n.t('btn.marcar_leida') }}
                 </restaurant-button>
               }
             </div>

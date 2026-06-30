@@ -11,7 +11,7 @@
         <div class="modal-card__icon-wrap">
           <lucide-icon name="pen-tool" [size]="20"></lucide-icon>
         </div>
-        <h2 class="modal-card__title">Confirmar Recepción de Insumos</h2>
+        <h2 class="modal-card__title">{{ i18n.t('req.firmar_titulo') }}</h2>
       </div>
       <button class="modal-card__close" type="button" (click)="close()">
         <lucide-icon name="x" [size]="20"></lucide-icon>
@@ -33,12 +33,12 @@
 
       <!-- Items List — datos reales de la requisición -->
       <div class="items-list">
-        <h3 class="items-list__label">Insumos Despachados</h3>
+        <h3 class="items-list__label">{{ i18n.t('req.insumos_despachados') }}</h3>
         <div class="items-list__rows">
           @if (facade.loading()) {
-            <p class="items-list__empty">Cargando insumos...</p>
+            <p class="items-list__empty">{{ i18n.t('comun.cargando') }}</p>
           } @else if (items().length === 0) {
-            <p class="items-list__empty">Sin insumos registrados.</p>
+            <p class="items-list__empty">{{ i18n.t('req.sin_insumos') }}</p>
           } @else {
             @for (item of items(); track item.productoId) {
               <div class="item-row">
@@ -48,7 +48,7 @@
                 </div>
                 <div class="item-row__info">
                   <p class="item-row__name">{{ item.productoNombre }}</p>
-                  <p class="item-row__code">Código: {{ item.productoId }}</p>
+                  <p class="item-row__code">{{ i18n.t('comun.codigo') }}: {{ item.productoId }}</p>
                 </div>
                 <lucide-icon name="check-circle" [size]="20" class="item-row__check"></lucide-icon>
               </div>
@@ -64,14 +64,14 @@
         <div class="signature-block">
           <h4 class="signature-block__title">
             <lucide-icon name="user" [size]="16"></lucide-icon>
-            Firma Instructor
+            {{ i18n.t('req.firma_instructor') }}
           </h4>
           <div class="form-field">
-            <label class="form-field__label">Nombre del Instructor</label>
+            <label class="form-field__label">{{ i18n.t('req.nombre_instructor') }}</label>
             <input class="form-field__input" type="text" readonly [value]="instructor()" />
           </div>
           <div class="form-field">
-            <label class="form-field__label">Fecha de Firma</label>
+            <label class="form-field__label">{{ i18n.t('req.fecha_firma') }}</label>
             <input class="form-field__input" type="text" readonly [value]="hoy" />
           </div>
         </div>
@@ -80,24 +80,24 @@
         <div class="signature-block">
           <h4 class="signature-block__title">
             <lucide-icon name="graduation-cap" [size]="16"></lucide-icon>
-            Firma Vocero de Aprendices
+            {{ i18n.t('req.firma_vocero') }}
           </h4>
           <div class="form-field">
-            <label class="form-field__label">Nombre Completo <span class="form-field__required">*</span></label>
+            <label class="form-field__label">{{ i18n.t('req.nombre_completo') }} <span class="form-field__required">*</span></label>
             <input
               class="form-field__input form-field__input--editable"
               type="text"
-              placeholder="Ej. Ana María López"
+              [placeholder]="i18n.t('req.vocero_nombre_placeholder')"
               [value]="voceroNombre()"
               (input)="setVoceroNombre($event)"
             />
           </div>
           <div class="form-field">
-            <label class="form-field__label">Documento de Identidad <span class="form-field__required">*</span></label>
+            <label class="form-field__label">{{ i18n.t('req.doc_identidad') }} <span class="form-field__required">*</span></label>
             <input
               class="form-field__input form-field__input--editable"
               type="text"
-              placeholder="Ej. 1002345678"
+              [placeholder]="i18n.t('req.doc_placeholder')"
               [value]="voceroDocumento()"
               (input)="setVoceroDocumento($event)"
             />
@@ -120,7 +120,7 @@
           </div>
         </div>
         <span class="verify-check__label">
-          He verificado la calidad y cantidad de los productos recibidos.
+          {{ i18n.t('req.verificado_check') }}
         </span>
       </label>
 
@@ -133,7 +133,7 @@
 
     <!-- Modal Footer -->
     <div class="modal-card__footer">
-      <button class="btn-ghost" type="button" (click)="close()">Cancelar</button>
+      <button class="btn-ghost" type="button" (click)="close()">{{ i18n.t('comun.cancelar') }}</button>
       <button
         class="btn-primary"
         type="button"
@@ -141,7 +141,7 @@
         (click)="firmar()"
       >
         <lucide-icon name="shield-check" [size]="18"></lucide-icon>
-        {{ firmando() ? 'Firmando...' : 'Confirmar y Firmar Recepción' }}
+        {{ firmando() ? i18n.t('req.firmando') : i18n.t('req.confirmar_firmar') }}
       </button>
     </div>
 

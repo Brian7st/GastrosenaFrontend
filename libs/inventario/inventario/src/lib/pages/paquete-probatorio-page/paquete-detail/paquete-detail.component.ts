@@ -19,6 +19,7 @@ import {
   TimelineEntry,
 } from '../../../models/paquete.model';
 import { PaqueteFacade } from '../../../data-access/paquete.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-paquete-detail',
@@ -38,6 +39,7 @@ import { PaqueteFacade } from '../../../data-access/paquete.facade';
 })
 export class PaqueteDetailComponent implements OnInit {
   private route  = inject(ActivatedRoute);
+  protected readonly i18n = inject(I18nService);
   private router = inject(Router);
   private facade = inject(PaqueteFacade);
 

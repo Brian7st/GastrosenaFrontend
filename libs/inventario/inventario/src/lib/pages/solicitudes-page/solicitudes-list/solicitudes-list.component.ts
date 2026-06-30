@@ -5,6 +5,7 @@ import { ButtonComponent, DataTableComponent, KpiCardComponent, KeywordConfirmMo
 import { SolicitudGil, EstadoGil } from '../../../models/solicitudes-gil.model';
 import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-solicitudes-list',
@@ -18,6 +19,7 @@ export class SolicitudesListComponent implements OnInit {
 
   private facade = inject(SolicitudesFacade);
   private router  = inject(Router);
+  protected readonly i18n = inject(I18nService);
 
   solicitudes = this.facade.solicitudes;
   loading     = this.facade.loading;
@@ -52,14 +54,14 @@ export class SolicitudesListComponent implements OnInit {
   finalizadasPagina = computed(() => this.solicitudes().filter(s => s.estado === 'CERRADO').length);
 
   // ─── Opciones filtros ──────────────────────────────────────────────────────
-  estadoOptions = [
-    { value: '',                  label: 'Filtrar por Estado'  },
-    { value: 'BORRADOR',          label: 'Borrador'            },
-    { value: 'EMITIDO',           label: 'Emitido'             },
-    { value: 'ENVIADO_PROVEEDOR', label: 'Enviado a Proveedor' },
-    { value: 'VERIFICADO',        label: 'Verificado'          },
-    { value: 'CERRADO',           label: 'Cerrado'             },
-  ];
+  estadoOptions = computed(() => [
+    { value: '',                  label: this.i18n.t('solicitudes-list.filter_placeholder') },
+    { value: 'BORRADOR',          label: this.i18n.t('solicitudes-list.estado_borrador') },
+    { value: 'EMITIDO',           label: this.i18n.t('solicitudes-list.estado_emitido') },
+    { value: 'ENVIADO_PROVEEDOR', label: this.i18n.t('solicitudes-list.estado_enviado_proveedor') },
+    { value: 'VERIFICADO',        label: this.i18n.t('solicitudes-list.estado_verificado') },
+    { value: 'CERRADO',           label: this.i18n.t('solicitudes-list.estado_cerrado') },
+  ]);
 
   // ─── Helpers ───────────────────────────────────────────────────────────────
   getInitials(nombre: string): string {

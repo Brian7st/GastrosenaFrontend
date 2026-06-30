@@ -4,10 +4,10 @@
     <div class="card-header">
       <div class="header-left">
         <div class="header-title">
-          <h4 class="mesa-text">Mesa {{ comanda().numeroMesa }}</h4>
+          <h4 class="mesa-text">{{ i18n.t('comanda-card.mesa') }}{{ comanda().numeroMesa }}</h4>
         </div>
         <div class="mesero-text">
-          <span class="mesero-label">Mesero: </span>
+          <span class="mesero-label">{{ i18n.t('comanda-card.mesero') }}</span>
           <span class="mesero-name">{{ comanda().nombreMesero }}</span>
         </div>
       </div>
@@ -23,7 +23,7 @@
       
       @if (comanda().notasAdicionales) {
         <div class="nota-especial">
-          <div class="nota-titulo">NOTA ESPECIAL</div>
+          <div class="nota-titulo">{{ i18n.t('comanda-card.nota_especial') }}</div>
           <div class="nota-texto">{{ comanda().notasAdicionales }}</div>
         </div>
       }
@@ -46,17 +46,17 @@
 
               <div class="plato-actions">
                 @if (plato.estado === 'ESPERA') {
-                  <restaurant-button (click)="iniciar(plato)" class="btn-override-warning">Preparar</restaurant-button>
+                  <restaurant-button (click)="iniciar(plato)" class="btn-override-warning">{{ i18n.t('comanda-card.preparar') }}</restaurant-button>
                 }
                 @if (plato.estado === 'PREPARANDO') {
-                  <restaurant-button (click)="finalizar(plato)" class="btn-override-success">Terminado</restaurant-button>
+                  <restaurant-button (click)="finalizar(plato)" class="btn-override-success">{{ i18n.t('comanda-card.terminado') }}</restaurant-button>
                 }
                 
-                <button class="btn-round btn-detalle" (click)="verDetalles()" title="Ver Detalles">
+                <button class="btn-round btn-detalle" (click)="verDetalles()" [title]="i18n.t('comanda-card.ver_detalles')">
                   <lucide-icon name="eye" style="width: 18px;"></lucide-icon>
                 </button>
                 
-                <button class="btn-round btn-receta" (click)="alternarReceta(plato)" title="Ver Receta">
+                <button class="btn-round btn-receta" (click)="alternarReceta(plato)" [title]="i18n.t('comanda-card.ver_receta')">
                   <lucide-icon name="book-open" style="width: 18px;"></lucide-icon>
                 </button>
               </div>
@@ -65,7 +65,7 @@
             @if (plato.notas) {
               <div class="plato-nota">
                 <lucide-icon name="info" class="flex-shrink-0" style="width: 16px; height: 16px;"></lucide-icon>
-                <span>Nota: {{ plato.notas }}</span>
+                <span>{{ i18n.t('comanda-card.nota') }}{{ plato.notas }}</span>
               </div>
             }
           </div>
@@ -75,7 +75,7 @@
     
     @if (comanda().estado !== 'LISTO' && comanda().estado !== 'PREPARANDO') {
       <div class="contenedor-boton-comanda">
-        <restaurant-button (click)="iniciarTodos()" class="btn-override-brand">Preparar Comanda</restaurant-button>
+        <restaurant-button (click)="iniciarTodos()" class="btn-override-brand">{{ i18n.t('comanda-card.preparar_comanda') }}</restaurant-button>
       </div>
     }
 
@@ -91,51 +91,51 @@
       <!-- Header -->
       <div class="modal-header-custom">
         <div class="modal-header-titles">
-          <h4 class="modal-title">Detalles del Pedido - Mesa {{ comanda().numeroMesa }}</h4>
-          <p class="modal-subtitle">Información completa del pedido #{{ comanda().idComanda | slice:0:8 }}</p>
+          <h4 class="modal-title">{{ i18n.t('comanda-card.detalles_titulo') }}{{ comanda().numeroMesa }}</h4>
+          <p class="modal-subtitle">{{ i18n.t('comanda-card.detalles_subtitulo').replace('{0}', comanda().idComanda | slice:0:8) }}</p>
         </div>
       </div>
 
       <!-- Info Grid -->
       <div class="modal-info-grid">
         <div class="info-item">
-          <strong>Mesa:</strong> <span>{{ comanda().numeroMesa }}</span>
+          <strong>{{ i18n.t('comanda-card.mesa_label') }}</strong> <span>{{ comanda().numeroMesa }}</span>
         </div>
         <div class="info-item">
-          <strong>Estado:</strong> 
+          <strong>{{ i18n.t('comanda-card.estado_label') }}</strong> 
           <span class="comanda-estado-badge" [ngClass]="'estado-' + (comanda().estado || '').toLowerCase()">{{ comanda().estado }}</span>
         </div>
 
         <div class="info-item">
-          <strong>Mesero:</strong> <span>{{ comanda().nombreMesero }}</span>
+          <strong>{{ i18n.t('comanda-card.mesero_label') }}</strong> <span>{{ comanda().nombreMesero }}</span>
         </div>
         <div class="info-item">
-          <strong>Hora de pedido:</strong> <span>{{ comanda().horaEntrada | date:'HH:mm' }}</span>
+          <strong>{{ i18n.t('comanda-card.hora_label') }}</strong> <span>{{ comanda().horaEntrada | date:'HH:mm' }}</span>
         </div>
       </div>
 
       @if (comanda().notasAdicionales) {
-        <div class="modal-section-title">Notas especiales:</div>
+        <div class="modal-section-title">{{ i18n.t('comanda-card.notas_especiales') }}</div>
         <div class="modal-nota-caja">
           <span>{{ comanda().notasAdicionales }}</span>
         </div>
       }
 
-      <div class="modal-section-title mt-4">Items del pedido:</div>
+      <div class="modal-section-title mt-4">{{ i18n.t('comanda-card.items_label') }}</div>
       <div class="modal-items-list">
         @for (plato of comanda().detalles; track plato.idDetalleComanda) {
           <div class="modal-item-row">
             <div class="item-details">
               <span class="item-name">{{ plato.cantidad }}x {{ plato.nombrePlato || plato.receta?.nombre }}</span>
               @if (plato.notas) {
-                <span class="item-note">Nota: {{ plato.notas }}</span>
+                <span class="item-note">{{ i18n.t('comanda-card.nota') }}{{ plato.notas }}</span>
               } @else {
-                <span class="item-note">Nota: Sin especificaciones</span>
+                <span class="item-note">{{ i18n.t('comanda-card.nota') }}{{ i18n.t('comanda-card.nota_sin_especificar') }}</span>
               }
             </div>
             <div class="item-status-group">
               <span class="item-time">
-                @if (plato.estado === 'ESPERA') { 15min }
+                @if (plato.estado === 'ESPERA') { {{ i18n.t('comanda-card.tiempo_15min') }} }
                 @else { {{ plato.duracionMinutos || getTiempoTranscurrido(plato.horaInicioPreparacion) }}min }
               </span>
               <span class="comanda-estado-badge text-uppercase" [ngClass]="'estado-' + (plato.estado || '').toLowerCase()">{{ plato.estado }}</span>
@@ -145,7 +145,7 @@
       </div>
 
       <div class="mt-5 pt-3" style="border-top: 1px solid var(--color-pizarra-100); margin-top: 32px !important;">
-        <restaurant-button (click)="cerrarVista()" class="btn-override-warning" style="display: block; width: 100%;">Cerrar Detalles</restaurant-button>
+        <restaurant-button (click)="cerrarVista()" class="btn-override-warning" style="display: block; width: 100%;">{{ i18n.t('comanda-card.cerrar_detalles') }}</restaurant-button>
       </div>
     </div>
   </div>
@@ -161,9 +161,9 @@
         <div class="modal-header-titles">
           <h3 class="modal-receta-title">
             <lucide-icon name="book" class="icon-title"></lucide-icon> 
-            <span>{{ recetaActiva()?.nombreReceta || 'Cargando...' }}</span>
+            <span>{{ recetaActiva()?.nombreReceta || i18n.t('comanda-card.cargando') }}</span>
           </h3>
-          <p class="modal-subtitle">Receta completa con ingredientes y procedimiento paso a paso</p>
+          <p class="modal-subtitle">{{ i18n.t('comanda-card.receta_subtitulo') }}</p>
         </div>
       </div>
 
@@ -171,12 +171,12 @@
         <div class="modal-receta-body">
           <!-- Columna Izquierda (Info General e Ingredientes) -->
           <div class="receta-col-left">
-            <div class="modal-section-title">Información General</div>
+            <div class="modal-section-title">{{ i18n.t('comanda-card.info_general') }}</div>
             <div class="receta-info-row">
               <span>{{ receta.tiempoPreparacion }}min</span>
             </div>
             
-            <div class="modal-section-title">Ingredientes</div>
+            <div class="modal-section-title">{{ i18n.t('comanda-card.ingredientes') }}</div>
             <div class="receta-ingredientes-list">
               @for (ing of receta.ingredientes; track ing.idIngrediente) {
                 <div class="ingrediente-item">
@@ -189,7 +189,7 @@
           
           <!-- Columna Derecha (Instrucciones) -->
           <div class="receta-col-right">
-            <div class="modal-section-title">Instrucciones</div>
+            <div class="modal-section-title">{{ i18n.t('comanda-card.instrucciones') }}</div>
             <div class="receta-pasos-list">
               @for (paso of receta.pasos; track paso.idPaso) {
                 <div class="paso-item">
@@ -197,7 +197,7 @@
                   <div class="paso-content">
                     <p class="paso-desc">{{ paso.descripcionPaso }}</p>
                     @if (paso.notasAdicionales) {
-                      <div class="paso-nota">Nota: {{ paso.notasAdicionales }}</div>
+                      <div class="paso-nota">{{ i18n.t('comanda-card.nota_paso') }}{{ paso.notasAdicionales }}</div>
                     }
                   </div>
                 </div>
@@ -207,13 +207,13 @@
         </div>
 
         <div class="mt-5 pt-3" style="border-top: 1px solid var(--color-pizarra-100); margin-top: 32px !important;">
-          <restaurant-button (click)="cerrarVista()" class="btn-override-warning" style="display: block; width: 100%;">Cerrar Receta</restaurant-button>
+          <restaurant-button (click)="cerrarVista()" class="btn-override-warning" style="display: block; width: 100%;">{{ i18n.t('comanda-card.cerrar_receta') }}</restaurant-button>
         </div>
       } @else {
         <!-- ESTADO DE CARGA -->
         <div class="receta-loading">
           <div class="spinner"></div>
-          <p>Cargando receta desde el servidor Java...</p>
+          <p>{{ i18n.t('comanda-card.cargando_receta') }}</p>
         </div>
       }
     </div>

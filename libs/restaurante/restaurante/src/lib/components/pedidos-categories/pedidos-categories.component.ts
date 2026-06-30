@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideIconComponent } from '@restaurant/shared/ui';
-import { CategoriaMenu } from '../../models/restaurante.model';
+import { I18nService } from '../../i18n/i18n.service';
 
 @Component({
   selector: 'lib-pedidos-categories',
@@ -12,35 +12,38 @@ import { CategoriaMenu } from '../../models/restaurante.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PedidosCategoriesComponent {
-  @Input() categories: CategoriaMenu[] = [];
-  
-  @Output() filterChanged = new EventEmitter<{main: string, sub: string}>();
+  protected readonly i18n = inject(I18nService);
 
-  activeMainCategory = signal<string>('all');
-  activeSubCategory = signal<string>('all');
+  @Output() categorySelected = new EventEmitter<string>();
+  @Output() subcategorySelected = new EventEmitter<string>();
 
-  // Propiedad computada para obtener las subcategorías según la categoría principal activa
-  currentSubcategories = computed(() => {
-    const main = this.activeMainCategory();
-    if (main === 'all') return [];
-    return this.categories.filter(c => c.type === main);
-  });
+  categories = computed(() => [
+    { id: 'all', name: this.i18n.t('pedidosCategories.all'), icon: 'layout-grid' },
+    { id: 'entrada', name: this.i18n.t('pedidosCategories.entrada'), icon: 'clipboard-list' },
+    { id: 'plato_fuerte', name: this.i18n.t('pedidosCategories.platoFuerte'), icon: 'utensils' },
+    { id: 'postre', name: this.i18n.t('pedidosCategories.postre'), icon: 'cake' },
+    { id: 'bebidas', name: this.i18n.t('pedidosCategories.bebidas'), icon: 'coffee' },
+  ]);
 
-  selectMain(mainId: string) {
-    this.activeMainCategory.set(mainId);
-    this.activeSubCategory.set('all'); // Resetear subcategoría al cambiar la principal
-    this.emitFilter();
+  subcategoriesBebidas = computed(() => [
+    { id: 'calientes', name: this.i18n.t('pedidosCategories.calientes') },
+    { id: 'frias', name: this.i18n.t('pedidosCategories.frias') },
+    { id: 'sin_alcohol', name: this.i18n.t('pedidosCategories.sinAlcohol') },
+    { id: 'con_alcohol', name: this.i18n.t('pedidosCategories.conAlcohol') },
+  ]);
+
+  activeCategory = signal<string>('all');
+  activeSubcategory = signal<string>('');
+
+  selectCategory(id: string) {
+    this.activeCategory.set(id);
+    this.activeSubcategory.set('');
+    this.categorySelected.emit(id);
+    this.subcategorySelected.emit('');
   }
 
-  selectSub(subId: string) {
-    this.activeSubCategory.set(subId);
-    this.emitFilter();
-  }
-
-  private emitFilter() {
-    this.filterChanged.emit({
-      main: this.activeMainCategory(),
-      sub: this.activeSubCategory()
-    });
+  selectSubcategory(id: string) {
+    this.activeSubcategory.set(id);
+    this.subcategorySelected.emit(id);
   }
 }

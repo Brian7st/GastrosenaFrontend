@@ -6,6 +6,7 @@ import { DecimalPipe } from '@angular/common';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 import { RequisicionDraftService, ItemDraft } from '../../../data-access/requisicion-draft.service';
 import { RequisicionesService } from '../../../data-access/services/requisiciones.service';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-requisiciones-resumen',
@@ -17,6 +18,7 @@ import { RequisicionesService } from '../../../data-access/services/requisicione
 })
 export class RequisicionesResumenComponent {
   private router  = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private service = inject(RequisicionesService);
   readonly draft  = inject(RequisicionDraftService);
 

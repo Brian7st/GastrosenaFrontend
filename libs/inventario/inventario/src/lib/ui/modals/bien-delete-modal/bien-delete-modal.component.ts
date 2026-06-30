@@ -1,10 +1,11 @@
 import {
   ChangeDetectionStrategy, Component, EventEmitter,
-  Input, Output, signal, computed
+  Input, Output, signal, computed, inject
 } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { Bien } from '../../../models/inventario.model';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-bien-delete-modal',
@@ -21,6 +22,7 @@ export class BienDeleteModalComponent {
   // eslint-disable-next-line @angular-eslint/no-output-native
   @Output() confirm = new EventEmitter<void>();
 
+  protected readonly i18n = inject(I18nService);
   keyword = signal('');
 
   /** Si el bien tiene stock activo, el modo es "bloqueado" */
@@ -28,7 +30,7 @@ export class BienDeleteModalComponent {
 
   /** Solo habilitar el botón Eliminar cuando se escribe ELIMINAR (modo libre) */
   canDelete = computed(() =>
-    !this.isBloqueado() && this.keyword().trim().toUpperCase() === 'ELIMINAR'
+    !this.isBloqueado() && this.keyword().trim().toUpperCase() === this.i18n.t('bien-modal.keyword')
   );
 
   onKeywordChange(val: string): void {

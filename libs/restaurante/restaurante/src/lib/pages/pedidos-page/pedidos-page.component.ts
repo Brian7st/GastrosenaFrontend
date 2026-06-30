@@ -8,6 +8,7 @@ import { PedidosCartComponent } from '../../components/pedidos-cart/pedidos-cart
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
 import { LucideIconComponent, ButtonComponent, ConfirmDialogComponent } from '@restaurant/shared/ui';
 import { RouterLink } from '@angular/router';
+import { I18nService } from '../../i18n/i18n.service';
 
 @Component({
   selector: 'lib-pedidos-page',
@@ -28,6 +29,7 @@ import { RouterLink } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PedidosPageComponent {
+  protected readonly i18n = inject(I18nService);
   public facade = inject(RestauranteFacade);
   private router = inject(Router);
   private route = inject(ActivatedRoute);

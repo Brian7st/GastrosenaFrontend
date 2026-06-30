@@ -10,6 +10,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LucideIconComponent } from '@restaurant/shared/ui';
+import { I18nService } from '../../i18n/i18n.service';
 
 import {
   CocinaFacade,
@@ -28,6 +29,7 @@ import { EvaluacionService } from '../../data-access/evaluacion.service';
 export class EvaluacionMasivaPageComponent implements OnInit {
 
   // ── Inyecciones ─────────────────────────────
+  protected readonly i18n = inject(I18nService);
   private facade = inject(CocinaFacade);
   private evaluacionService = inject(EvaluacionService);
   private router = inject(Router);

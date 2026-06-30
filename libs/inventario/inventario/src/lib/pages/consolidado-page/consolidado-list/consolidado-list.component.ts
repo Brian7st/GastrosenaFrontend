@@ -8,6 +8,7 @@ import { Consolidado } from '../../../models/consolidado.model';
 import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 import { ConsolidadoFacade } from '../../../data-access/consolidado.facade';
 import { PresupuestoFacade } from '../../../data-access/presupuesto.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-consolidado-list',
@@ -19,6 +20,7 @@ import { PresupuestoFacade } from '../../../data-access/presupuesto.facade';
 })
 export class ConsolidadoListComponent implements OnInit {
   private router = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private facade = inject(ConsolidadoFacade);
   private presupuestoFacade = inject(PresupuestoFacade);
 

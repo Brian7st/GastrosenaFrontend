@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { EmptyStateComponent, PageHeaderComponent } from '@restaurant/shared/ui';
+import { I18nService } from '../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-restaurante-page',
@@ -7,15 +8,17 @@ import { EmptyStateComponent, PageHeaderComponent } from '@restaurant/shared/ui'
   imports: [PageHeaderComponent, EmptyStateComponent],
   template: `
     <restaurant-page-header
-      title="Restaurante"
-      subtitle="Mesas, salón, comandas y atención."
+      [title]="i18n.t('restaurantePage.title')"
+      [subtitle]="i18n.t('restaurantePage.subtitle')"
     ></restaurant-page-header>
 
     <restaurant-empty-state
-      title="Base del dominio creada"
-      message="Esta librería ya existe con la estructura oficial del monorepo. El siguiente paso es migrar la implementación legacy respetando los boundaries."
+      [title]="i18n.t('restaurantePage.createdTitle')"
+      [message]="i18n.t('restaurantePage.createdMessage')"
     ></restaurant-empty-state>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RestaurantePageComponent {}
+export class RestaurantePageComponent {
+  protected readonly i18n = inject(I18nService);
+}

@@ -14,11 +14,11 @@
           </span>
         </div>
         <h2 class="modal-title">
-          {{ isBlocked ? 'Reversión Bloqueada' : '¿Está seguro de reversar este consolidado?' }}
+          {{ isBlocked ? i18n.t('consolidado.modal_revertir_bloqueado') : i18n.t('consolidado.modal_revertir_pregunta') }}
         </h2>
         @if (!isBlocked) {
 <p class="modal-subtitle">
-          Esta acción es <span class="font-bold text-tertiary">irreversible</span> y deshará la agrupación contable de los comprobantes asociados. Todos los registros volverán a estado pendiente.
+          {{ i18n.t('consolidado.modal_revertir_body') }}
         </p>
 }
       </div>
@@ -27,7 +27,7 @@
       <div class="summary-panel" [class.summary-panel--blocked]="isBlocked">
         @if (!isBlocked) {
 <div class="summary-panel__header">
-          <span class="summary-panel__label">Consolidado a Reversar</span>
+          <span class="summary-panel__label">{{ i18n.t('consolidado.modal_consolidado_label') }}</span>
           <span class="summary-panel__value">{{ consolidadoId }}</span>
         </div>
 }
@@ -35,11 +35,11 @@
         @if (!isBlocked) {
 <div class="summary-panel__body">
           <div class="summary-row">
-            <span class="summary-row__label">Período</span>
+            <span class="summary-row__label">{{ i18n.t('consolidado.modal_periodo') }}</span>
             <span class="summary-row__value">{{ periodo }}</span>
           </div>
           <div class="summary-row">
-            <span class="summary-row__label">Comprobantes a liberar</span>
+            <span class="summary-row__label">{{ i18n.t('consolidado.modal_comprobantes') }}</span>
             <span class="summary-row__value">{{ comprobantes }}</span>
           </div>
         </div>
@@ -47,7 +47,7 @@
 
         @if (!isBlocked) {
 <div class="summary-panel__footer">
-          <span class="summary-panel__total-label">Valor Total a Reversar</span>
+          <span class="summary-panel__total-label">{{ i18n.t('consolidado.modal_total_reversar') }}</span>
           <span class="summary-panel__total-value">{{ total }}</span>
         </div>
 }
@@ -71,7 +71,7 @@
 <div class="blocked-banner">
         <span class="material-symbols-outlined text-error">error</span>
         <p class="blocked-banner__text">
-          Este consolidado ya fue reportado a tesorería — reversión no permitida
+          {{ i18n.t('consolidado.modal_bloqueado_texto') }}
         </p>
       </div>
 }
@@ -79,9 +79,7 @@
       <!-- Security Input (Confirm only) -->
       @if (!isBlocked) {
 <div class="security-box">
-        <label class="security-box__label" for="security-confirm">
-          Escriba la palabra "REVERSAR" para confirmar
-        </label>
+        <label class="security-box__label" for="security-confirm">{{ i18n.t('consolidado.modal_security_label') }}</label>
         <input 
           id="security-confirm" 
           type="text" 
@@ -102,27 +100,21 @@
             [disabled]="!isValid"
             (click)="onConfirm()">
             <span class="material-symbols-outlined">delete_forever</span>
-            Confirmar Reversión
+            {{ i18n.t('consolidado.confirmar_reversion') }}
           </button>
-          <button class="modal-btn modal-btn--cancel" (click)="onClose()">
-            Cancelar
-          </button>
+          <button class="modal-btn modal-btn--cancel" (click)="onClose()">{{ i18n.t('comun.cancelar') }}</button>
         
 }
 
         @if (isBlocked) {
 
-          <button class="modal-btn modal-btn--cancel modal-btn--full" (click)="onClose()">
-            Entendido
-          </button>
+          <button class="modal-btn modal-btn--cancel modal-btn--full" (click)="onClose()">{{ i18n.t('comun.entendido') }}</button>
         
 }
       </div>
 
       <!-- Extra Caution Hint -->
-      <p class="modal-hint">
-        Se registrará un log de auditoría con su usuario y marca de tiempo al realizar esta acción.
-      </p>
+      <p class="modal-hint">{{ i18n.t('consolidado.modal_audit_hint') }}</p>
 
     </div>
   </div>

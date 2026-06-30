@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ButtonComponent, StatusBadgeComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 
 interface ConsolidacionItem {
   id: string;
@@ -24,6 +25,7 @@ interface ConsolidacionItem {
 })
 export class SolicitudesInsumosConsolidacionComponent implements OnInit {
   private router = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private route  = inject(ActivatedRoute);
   private facade = inject(SolicitudesFacade);
 

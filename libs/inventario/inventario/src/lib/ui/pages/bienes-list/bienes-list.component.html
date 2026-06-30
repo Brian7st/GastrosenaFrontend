@@ -1,21 +1,21 @@
 <!-- Page Header Actions -->
 <div class="page-header-row">
   <div>
-    <h1 class="page-title">Gestión de Bienes</h1>
-    <p class="page-subtitle">Control exhaustivo y trazabilidad de activos de formación.</p>
+    <h1 class="page-title">{{ i18n.t('bienes.title') }}</h1>
+    <p class="page-subtitle">{{ i18n.t('bienes.subtitle') }}</p>
   </div>
   <div class="header-actions">
-    <restaurant-button *hasPermission="'bienes:importar'" variant="surface" (click)="onImportBienes()">
+    <restaurant-button variant="surface" (click)="onImportBienes()">
       <span class="material-symbols-outlined">file_upload</span>
-      Cargar datos internos
+      {{ i18n.t('bienes.import') }}
     </restaurant-button>
-    <restaurant-button *hasPermission="'bienes:exportar'" variant="surface" (click)="onExportBienes()">
+    <restaurant-button variant="surface" (click)="onExportBienes()">
       <span class="material-symbols-outlined">file_download</span>
-      Exportar
+      {{ i18n.t('bienes.export') }}
     </restaurant-button>
-    <restaurant-button *hasPermission="'bienes:crear'" variant="primary" (click)="onNuevoBien()">
+    <restaurant-button variant="primary" (click)="onNuevoBien()">
       <span class="material-symbols-outlined">add</span>
-      Nuevo Bien
+      {{ i18n.t('bienes.new') }}
     </restaurant-button>
   </div>
 </div>
@@ -25,29 +25,29 @@
 <div class="kpi-grid">
 
   <restaurant-kpi-card
-    label="Valor Total Inventario"
+    [label]="i18n.t('bien-kpi.valor_total')"
     [value]="k.valorTotal | currency:'COP':'symbol-narrow':'1.0-0'"
     icon="landmark"
     iconColor="green"
-    [trend]="'+' + (k.tendenciaValor ?? 0) + '% vs mes anterior'"
+    [trend]="'+' + (k.tendenciaValor ?? 0) + '% ' + i18n.t('bien-kpi.vs_mes_anterior')"
     [trendUp]="true"
   />
 
   <restaurant-kpi-card
-    label="Bienes en Alerta"
-    [value]="k.totalAlertas + ' Items'"
+    [label]="i18n.t('bien-kpi.bienes_alerta')"
+    [value]="k.totalAlertas + ' ' + i18n.t('bien-kpi.items')"
     icon="warehouse"
     iconColor="red"
-    trend="Crítico"
+    [trend]="i18n.t('bien-kpi.critico')"
     [trendUp]="false"
   />
 
   <restaurant-kpi-card
-    label="Movimientos Recientes"
-    [value]="k.movimientosHoy + ' Altas'"
+    [label]="i18n.t('bien-kpi.movimientos_recientes')"
+    [value]="k.movimientosHoy + ' ' + i18n.t('bien-kpi.altas')"
     icon="refresh-cw"
     iconColor="blue"
-    trend="Hoy"
+    [trend]="i18n.t('bien-kpi.hoy')"
     [trendUp]="null"
   />
 
@@ -55,14 +55,14 @@
 }
 
 <!-- Toggle de vistas: Bienes / Contratos -->
-<div class="vista-toggle" role="group" aria-label="Seleccionar vista">
+<div class="vista-toggle" role="group" [attr.aria-label]="i18n.t('bienes.toggle_bienes')">
   <button
     class="vista-toggle__btn"
     [class.vista-toggle__btn--active]="vista() === 'bienes'"
     (click)="cambiarVista('bienes')"
     type="button">
     <span class="material-symbols-outlined">inventory_2</span>
-    Bienes
+    {{ i18n.t('bienes.toggle_bienes') }}
   </button>
   <button
     class="vista-toggle__btn"
@@ -70,7 +70,7 @@
     (click)="cambiarVista('contratos')"
     type="button">
     <span class="material-symbols-outlined">description</span>
-    Contratos
+    {{ i18n.t('bienes.toggle_contratos') }}
   </button>
 </div>
 
@@ -78,9 +78,9 @@
 @if (vista() === 'bienes') {
 <!-- Dashboard Card Container (Tabla) -->
 <restaurant-data-table
-  tableTitle="Lista de Bienes"
+  [tableTitle]="i18n.t('bienes.table_title')"
   tableIcon="package"
-  searchPlaceholder="Buscar por código o nombre..."
+  [searchPlaceholder]="i18n.t('bienes.search_placeholder')"
   [showFilterButton]="true"
   [filterActive]="showFilters()"
   [filterCount]="filtrosActivos()"
@@ -93,26 +93,26 @@
     <div dtHeader class="filter-panel">
       <div class="filter-panel__row">
         <div class="filter-group">
-          <label class="filter-label">Categoría</label>
+          <label class="filter-label">{{ i18n.t('bienes.filter_categoria') }}</label>
           <select class="filter-select" [value]="filtroCategoria()" (change)="onFiltroCategoria($any($event.target).value)">
-            <option value="">Todas</option>
+            <option value="">{{ i18n.t('bienes.filter_todas') }}</option>
             @for (cat of CATEGORIAS; track cat) {
               <option [value]="cat">{{ cat }}</option>
             }
           </select>
         </div>
         <div class="filter-group">
-          <label class="filter-label">Estado</label>
+          <label class="filter-label">{{ i18n.t('bienes.filter_estado') }}</label>
           <select class="filter-select" [value]="filtroEstado()" (change)="onFiltroEstado($any($event.target).value)">
-            <option value="">Todos</option>
-            <option value="Activo">Activo</option>
-            <option value="Inactivo">Inactivo</option>
+            <option value="">{{ i18n.t('bienes.filter_todos') }}</option>
+            <option value="Activo">{{ i18n.t('bienes.filter_activo') }}</option>
+            <option value="Inactivo">{{ i18n.t('bienes.filter_inactivo') }}</option>
           </select>
         </div>
         <div class="filter-group filter-group--actions">
           <button class="filter-clear-btn" (click)="onLimpiarFiltros()" [disabled]="filtrosActivos() === 0">
             <span class="material-symbols-outlined">clear_all</span>
-            Limpiar
+            {{ i18n.t('bienes.filter_limpiar') }}
           </button>
         </div>
       </div>
@@ -122,14 +122,14 @@
   <!-- Cabecera de tabla -->
   <thead>
     <tr>
-      <th>CÓD. SENA</th>
-      <th>Descripción</th>
-      <th class="text-center">Stock</th>
-      <th class="text-center">Stock Mín.</th>
-      <th class="text-center">UM</th>
-      <th>Valor</th>
-      <th>Estado</th>
-      <th class="text-center">Acciones</th>
+      <th>{{ i18n.t('bienes.th_cod_sena') }}</th>
+      <th>{{ i18n.t('bienes.th_descripcion') }}</th>
+      <th class="text-center">{{ i18n.t('bienes.th_stock') }}</th>
+      <th class="text-center">{{ i18n.t('bienes.th_stock_min') }}</th>
+      <th class="text-center">{{ i18n.t('bienes.th_um') }}</th>
+      <th>{{ i18n.t('bienes.th_valor') }}</th>
+      <th>{{ i18n.t('bienes.th_estado') }}</th>
+      <th class="text-center">{{ i18n.t('bienes.th_acciones') }}</th>
     </tr>
   </thead>
 
@@ -142,7 +142,7 @@
         </td>
       </tr>
     } @else {
-      @for (bien of bienes(); track bien.id) {
+      @for (bien of bienes(); track bien) {
 <tr class="table-row">
             <td>
               <span class="code-mono">{{ bien.codigoSena }}</span>
@@ -170,19 +170,19 @@
             </td>
             <td class="text-center">
               <div class="actions-row">
-                <button *hasPermission="'bienes:editar'" class="action-icon" (click)="onEditar(bien)" title="Editar">
+                <button class="action-icon" (click)="onEditar(bien)" [title]="i18n.t('bien-table.editar')">
                   <span class="material-symbols-outlined">edit</span>
                 </button>
-                <button class="action-icon" (click)="onVerDetalle(bien)" title="Ver detalle">
+                <button class="action-icon" (click)="onVerDetalle(bien)" [title]="i18n.t('bien-table.ver_detalle')">
                   <span class="material-symbols-outlined">visibility</span>
                 </button>
                 @if (bien.estado === 'Activo') {
-                  <button *hasPermission="'bienes:editar'" class="action-icon action-icon--warning" (click)="onDesactivar(bien)" title="Desactivar">
+                  <button class="action-icon action-icon--warning" (click)="onDesactivar(bien)" [title]="i18n.t('bien-table.desactivar')">
                     <span class="material-symbols-outlined">toggle_off</span>
                   </button>
                 }
                 @if (bien.estado === 'Inactivo') {
-                  <button *hasPermission="'bienes:editar'" class="action-icon action-icon--success" (click)="onActivar(bien)" title="Activar">
+                  <button class="action-icon action-icon--success" (click)="onActivar(bien)" [title]="i18n.t('bien-table.activar')">
                     <span class="material-symbols-outlined">toggle_on</span>
                   </button>
                 }
@@ -194,8 +194,8 @@
             <td colspan="8">
               <inventario-empty-state
                 icon="inventory_2"
-                title="Sin bienes registrados"
-                message="No se encontraron bienes con los filtros aplicados."
+                [title]="i18n.t('bienes.empty_title')"
+                [message]="i18n.t('bienes.empty_message')"
               />
             </td>
           </tr>
@@ -206,7 +206,7 @@
   <!-- Paginación (slot [dtFooter]) -->
   <div dtFooter class="dt-footer">
     <p class="dt-page-info">
-      Mostrando {{ bienes().length }} de {{ paginacion().totalElements }} bienes
+      {{ i18n.t('bienes.pagina_info').replace('{{ count }}', String(bienes().length)).replace('{{ total }}', String(paginacion().totalElements)) }}
     </p>
     <div class="dt-pagination">
       <button class="dt-page-btn"
@@ -235,40 +235,40 @@
 <!-- ── Vista: Contratos ───────────────────────────────────────────────────── -->
 @if (vista() === 'contratos') {
 <div class="contratos-toolbar">
-  <restaurant-button *hasPermission="'bienes:importar'" variant="primary" (click)="onAbrirImportarContrato()">
+  <restaurant-button variant="primary" (click)="onAbrirImportarContrato()">
     <span class="material-symbols-outlined">file_upload</span>
-    Importar contrato
+    {{ i18n.t('bienes.import_contrato') }}
   </restaurant-button>
 </div>
 
 @if (ultimaImportacion(); as imp) {
 <div class="import-result">
   <span class="material-symbols-outlined">check_circle</span>
-  Contrato importado: {{ imp.productosCreados }} bienes creados, {{ imp.productosActualizados }} actualizados.
+  {{ i18n.t('bienes.contrato_importado').replace('{{ creados }}', String(imp.productosCreados)).replace('{{ actualizados }}', String(imp.productosActualizados)) }}
 </div>
 }
 
 @if (feedbackCierre(); as feedback) {
 <div class="import-result import-result--cierre">
   <span class="material-symbols-outlined">lock</span>
-  Contrato cerrado: {{ feedback }}.
+  {{ i18n.t('bienes.contrato_cerrado').replace('{{ feedback }}', feedback) }}
 </div>
 }
 
 <restaurant-data-table
   class="tabla-contratos"
-  tableTitle="Contratos de adjudicación"
+  [tableTitle]="i18n.t('bienes.contratos_table_title')"
   tableIcon="file-text"
   [showFilterButton]="false"
 >
   <thead>
     <tr>
-      <th>N.º Contrato</th>
-      <th>Descripción</th>
-      <th class="text-center">Vigencia</th>
-      <th class="text-center">Ítems</th>
-      <th>Estado</th>
-      <th class="text-center">Acciones</th>
+      <th>{{ i18n.t('bienes.th_nro_contrato') }}</th>
+      <th>{{ i18n.t('bienes.th_descripcion') }}</th>
+      <th class="text-center">{{ i18n.t('bienes.th_vigencia') }}</th>
+      <th class="text-center">{{ i18n.t('bienes.th_items') }}</th>
+      <th>{{ i18n.t('bienes.th_estado') }}</th>
+      <th class="text-center">{{ i18n.t('bienes.th_acciones') }}</th>
     </tr>
   </thead>
 
@@ -302,11 +302,11 @@
           </td>
           <td class="text-center">
             <div class="actions-row">
-              <button class="action-icon" (click)="onVerDetalleContrato(contrato.id)" title="Ver detalle">
+              <button class="action-icon" (click)="onVerDetalleContrato(contrato.id)" [title]="i18n.t('bien-table.ver_detalle')">
                 <span class="material-symbols-outlined">visibility</span>
               </button>
               @if (contrato.estado === 'VIGENTE') {
-                <button *hasPermission="'bienes:editar'" class="action-icon action-icon--warning" (click)="onCerrarContrato(contrato.id)" title="Cerrar contrato">
+                <button class="action-icon action-icon--warning" (click)="onCerrarContrato(contrato.id)" [title]="i18n.t('bienes.cerrar_contrato')">
                   <span class="material-symbols-outlined">lock</span>
                 </button>
               }
@@ -318,8 +318,8 @@
           <td colspan="6">
             <inventario-empty-state
               icon="description"
-              title="Sin contratos registrados"
-              message="Importá un contrato para cargar precios adjudicados y crear bienes automáticamente."
+              [title]="i18n.t('bienes.contratos_empty_title')"
+              [message]="i18n.t('bienes.contratos_empty_message')"
             />
           </td>
         </tr>

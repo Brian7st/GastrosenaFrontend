@@ -4,6 +4,7 @@ import { BackButtonComponent } from '../../../components/back-button/back-button
 import { FacturasFacade } from '../../../data-access/facturas.facade';
 import { FacturaLinea } from '../../../models/facturas.model';
 import { BienGilResponse } from '../../../data-access/api/procurement.api';
+import { I18nService } from '../../../i18n/i18n.service';
 
 export type ImportStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -17,6 +18,7 @@ export type ImportStatus = 'idle' | 'loading' | 'success' | 'error';
 })
 export class FacturaImportPageComponent implements OnInit {
   private facade = inject(FacturasFacade);
+  protected readonly i18n = inject(I18nService);
   private router = inject(Router);
 
   isDragOver = signal(false);

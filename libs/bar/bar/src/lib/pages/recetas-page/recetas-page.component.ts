@@ -6,6 +6,7 @@ import { Receta } from '../../models/receta.model';
 import { DetalleRecetaComponent } from '../../components/detalle-receta/detalle-receta.component';
 import { GestionRecetaComponent } from '../../components/gestion-receta/gestion-receta.component';
 import { GestionCategoriasComponent } from '../../components/gestion-categorias/gestion-categorias.component';
+import { I18nService } from '../../i18n/i18n.service';
 import {
   LucideIconComponent,
   PageHeaderComponent,
@@ -43,6 +44,7 @@ import {
 export class RecetasPageComponent implements OnInit {
   public recetaService = inject(RecetaService);
   public catService = inject(CategoriaService);
+  protected readonly i18n = inject(I18nService);
 
   searchTerm = signal<string>('');
   categoriaSeleccionada = signal<string>('');
@@ -60,12 +62,15 @@ export class RecetasPageComponent implements OnInit {
   alertType = signal<'success' | 'error' | 'warning' | 'info'>('info');
 
   opcionesCategoria = computed(() => {
+    this.i18n.currentLang();
     const cats = this.catService.categorias();
     return [
-      { label: 'Todas las categorías', value: '' },
+      { label: this.i18n.t('recetas.filter.all-categories'), value: '' },
       ...cats.map(c => ({ label: c.nombreCategoria, value: c.nombreCategoria.toLowerCase() }))
     ];
   });
+
+  emptyMessage = computed(() => `${this.i18n.t('recetas.empty.message')} '${this.searchTerm()}'`);
 
   recetasFiltradas = computed(() => {
     const term = this.searchTerm().toLowerCase().trim();
@@ -137,12 +142,12 @@ export class RecetasPageComponent implements OnInit {
     if (id) {
       this.recetaService.eliminarReceta(id).subscribe({
         next: () => {
-          this.mostrarAlerta('success', 'Receta eliminada correctamente');
+          this.mostrarAlerta('success', this.i18n.t('recetas.alert.deleted'));
           this.recetaService.listar();
         },
         error: (err) => {
           console.error('Error al eliminar:', err);
-          this.mostrarAlerta('error', 'No se pudo eliminar la receta.');
+          this.mostrarAlerta('error', this.i18n.t('recetas.alert.delete-error'));
         }
       });
     }

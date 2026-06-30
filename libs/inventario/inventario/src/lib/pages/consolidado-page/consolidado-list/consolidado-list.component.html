@@ -2,15 +2,15 @@
   <!-- Header Section -->
   <div class="page-header">
     <div class="page-header__left">
-      <h1 class="page-header__title">Consolidado de Ejecución Presupuestal</h1>
-      <p class="page-header__subtitle">Análisis contable y consolidación de comprobantes GIL-F014 para la vigencia fiscal actual.</p>
+      <h1 class="page-header__title">{{ i18n.t('consolidado.titulo') }}</h1>
+      <p class="page-header__subtitle">{{ i18n.t('consolidado.subtitulo') }}</p>
     </div>
     <div class="page-header__actions">
       <restaurant-button variant="ghost" (click)="openExportModal()">
-        <span class="material-symbols-outlined btn-icon">download</span> Exportar
+        <span class="material-symbols-outlined btn-icon">download</span> {{ i18n.t('comun.exportar') }}
       </restaurant-button>
-      <restaurant-button *hasPermission="'consolidado:crear'" variant="primary" routerLink="/app/inventario/consolidado/nuevo">
-        <span class="material-symbols-outlined btn-icon">add</span> Generar Nuevo Consolidado
+      <restaurant-button variant="primary" routerLink="/app/inventario/consolidado/nuevo">
+        <span class="material-symbols-outlined btn-icon">add</span> {{ i18n.t('consolidado.nuevo') }}
       </restaurant-button>
     </div>
   </div>
@@ -18,21 +18,21 @@
   <!-- KPI Grid derivado de la lista real -->
   <div class="kpi-grid">
     <restaurant-kpi-card
-      label="Total Ejecutado"
+      [label]="i18n.t('consolidado.kpi_total_ejecutado')"
       [value]="kpiTotalEjecutado() | currency:'COP':'symbol-narrow':'1.0-0'"
       icon="bar-chart-2"
       iconColor="blue">
     </restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="Generados"
+      [label]="i18n.t('consolidado.kpi_generados')"
       [value]="kpiGenerados()"
       icon="file-text"
       iconColor="orange">
     </restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="Reversados"
+      [label]="i18n.t('consolidado.kpi_reversados')"
       [value]="kpiReversados()"
       icon="undo-2"
       iconColor="red">
@@ -55,11 +55,11 @@
       <div dtHeader class="filter-panel">
         <div class="filter-panel__row">
           <div class="filter-group">
-            <label class="filter-label">Estado</label>
+            <label class="filter-label">{{ i18n.t('comun.estado') }}</label>
             <select class="filter-select" [value]="filtroEstado()" (change)="onFilterEstado($any($event.target).value)">
-              <option value="">Todos</option>
-              <option value="GENERADO">Generado</option>
-              <option value="REVERSADO">Reversado</option>
+              <option value="">{{ i18n.t('comun.todos') }}</option>
+              <option value="GENERADO">{{ i18n.t('consolidado.estado_generado') }}</option>
+              <option value="REVERSADO">{{ i18n.t('consolidado.estado_reversado') }}</option>
             </select>
           </div>
           <div class="filter-group filter-group--actions">
@@ -74,11 +74,11 @@
 
     <thead>
       <tr>
-        <th class="th-center">ID Consolidado</th>
-        <th class="th-center">Fecha Generación</th>
-        <th class="th-center">Total Consolidado</th>
-        <th class="th-center">Estado Contable</th>
-        <th class="th-center">Acciones</th>
+        <th class="th-center">{{ i18n.t('consolidado.th_id') }}</th>
+        <th class="th-center">{{ i18n.t('consolidado.th_fecha_gen') }}</th>
+        <th class="th-center">{{ i18n.t('consolidado.th_total') }}</th>
+        <th class="th-center">{{ i18n.t('consolidado.th_estado_contable') }}</th>
+        <th class="th-center">{{ i18n.t('comun.acciones') }}</th>
       </tr>
     </thead>
     <tbody class="text-black text-center">
@@ -104,7 +104,7 @@
               <button class="icon-btn-action" title="Ver Detalles" (click)="goToDetail(item.numero)">
                 <span class="material-symbols-outlined">visibility</span>
               </button>
-              <button *hasPermission="'consolidado:crear'" class="icon-btn-action icon-btn-action--danger" title="Reversar / Eliminar" (click)="reversar(item.id)">
+              <button class="icon-btn-action icon-btn-action--danger" title="Reversar / Eliminar" (click)="reversar(item.id)">
                 <span class="material-symbols-outlined">undo</span>
               </button>
             </div>
@@ -124,7 +124,7 @@
     </tbody>
     
     <div dtFooter class="dt-footer">
-      <span class="dt-page-info">Mostrando {{ consolidadosPaginados().length }} de {{ filteredConsolidados().length }} consolidados</span>
+      <span class="dt-page-info">{{ i18n.t('consolidado.mostrando', { count: consolidadosPaginados().length.toString(), total: filteredConsolidados().length.toString() }) }}</span>
       <div class="dt-pagination">
         <button class="dt-page-btn" [disabled]="paginaActual() === 1" (click)="anterior()">
           <span class="material-symbols-outlined">chevron_left</span>
@@ -143,13 +143,13 @@
   <div class="insights-grid">
     <div class="insight-card insight-card--primary">
       <div class="insight-card__content">
-        <h3 class="insight-card__title">Ejecución Presupuestal</h3>
+        <h3 class="insight-card__title">{{ i18n.t('consolidado.ejecucion_presupuestal') }}</h3>
         @if (porcentajeEjecucion() !== null) {
           <p class="insight-card__text">El presupuesto vigente registra un {{ porcentajeEjecucion() | number:'1.2-2' }}% de ejecución (comprometido + pagado sobre el total asignado).</p>
         } @else {
-          <p class="insight-card__text">Sin datos de presupuesto para la vigencia actual.</p>
+          <p class="insight-card__text">{{ i18n.t('consolidado.sin_datos_presupuesto') }}</p>
         }
-        <button class="insight-card__btn" (click)="verPresupuesto()">Ver detalle</button>
+        <button class="insight-card__btn" (click)="verPresupuesto()">{{ i18n.t('comun.ver_detalle') }}</button>
       </div>
       <div class="insight-card__visual">
         <div class="progress-circle">

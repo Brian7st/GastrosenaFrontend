@@ -4,14 +4,14 @@
        ═══════════════════════════════════════════════════════════════════════ -->
   <div class="page-header-row">
     <div>
-      <h1 class="page-title">Bandeja de Requisiciones 45-S</h1>
-      <p class="page-subtitle">Gestión de Formatos de Bienes y Servicios — Ciclo completo</p>
+      <h1 class="page-title">{{ i18n.t('req.titulo') }}</h1>
+      <p class="page-subtitle">{{ i18n.t('req.subtitulo') }}</p>
     </div>
     <div class="header-actions">
       <restaurant-button *hasPermission="'requisiciones:crear'" variant="primary" routerLink="nueva">
         <div class="btn-icon-text">
           <lucide-icon name="plus" [size]="20"></lucide-icon>
-          Nueva Requisición
+          {{ i18n.t('req.nueva') }}
         </div>
       </restaurant-button>
     </div>
@@ -21,16 +21,16 @@
        KPI ROW
        ═══════════════════════════════════════════════════════════════════════ -->
   <div class="kpi-grid">
-    <restaurant-kpi-card label="BORRADORES" [value]="kpiBorradores()" icon="file-edit"
+    <restaurant-kpi-card [label]="i18n.t('req.kpi_borradores')" [value]="kpiBorradores()" icon="file-edit"
       iconColor="blue" trend="Pendientes de envío" [trendUp]="null"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="ENVIADAS" [value]="kpiEnviadas()" icon="send"
+    <restaurant-kpi-card [label]="i18n.t('req.kpi_enviadas')" [value]="kpiEnviadas()" icon="send"
       iconColor="orange" trend="Esperando aprobación" [trendUp]="null"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="EN DESPACHO" [value]="kpiEnDespacho()" icon="truck"
+    <restaurant-kpi-card [label]="i18n.t('req.kpi_en_despacho')" [value]="kpiEnDespacho()" icon="truck"
       iconColor="green" trend="En preparación" [trendUp]="null"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="FIRMADAS" [value]="kpiFirmadas()" icon="check-circle"
+    <restaurant-kpi-card [label]="i18n.t('req.kpi_firmadas')" [value]="kpiFirmadas()" icon="check-circle"
       iconColor="green" trend="Completadas" [trendUp]="null"></restaurant-kpi-card>
   </div>
 
@@ -43,7 +43,7 @@
     <div class="kanban-column">
       <div class="kanban-column__header">
         <div class="kanban-column__title-group">
-          <h3 class="kanban-column__title">Borrador</h3>
+          <h3 class="kanban-column__title">{{ i18n.t('req.col_borrador') }}</h3>
           <span class="kanban-column__count">{{ borradores().length }}</span>
         </div>
       </div>
@@ -55,7 +55,7 @@
                 <span class="kanban-card__id">REQ-{{ req.numero }}</span>
                 <span class="kanban-card__badge kanban-card__badge--borrador">
                   <lucide-icon name="file-edit" [size]="12"></lucide-icon>
-                  Borrador
+                  {{ i18n.t('req.badge_borrador') }}
                 </span>
               </div>
               <button class="kanban-card__menu">
@@ -76,7 +76,7 @@
           </div>
         }
         @if (borradores().length === 0) {
-          <p class="kanban-empty">Sin borradores</p>
+          <p class="kanban-empty">{{ i18n.t('req.sin_borradores') }}</p>
         }
       </div>
     </div>
@@ -85,7 +85,7 @@
     <div class="kanban-column">
       <div class="kanban-column__header">
         <div class="kanban-column__title-group">
-          <h3 class="kanban-column__title">Pendiente Aprobación</h3>
+          <h3 class="kanban-column__title">{{ i18n.t('req.col_pendiente') }}</h3>
           <span class="kanban-column__count kanban-column__count--warning">{{ enviadas().length }}</span>
         </div>
       </div>
@@ -97,7 +97,7 @@
                 <span class="kanban-card__id">REQ-{{ req.numero }}</span>
                 <span class="kanban-card__badge kanban-card__badge--enviada">
                   <lucide-icon name="send" [size]="12"></lucide-icon>
-                  Enviada
+                  {{ i18n.t('req.badge_enviada') }}
                 </span>
               </div>
               <button class="kanban-card__menu">
@@ -118,7 +118,7 @@
           </div>
         }
         @if (enviadas().length === 0) {
-          <p class="kanban-empty">Sin enviadas</p>
+          <p class="kanban-empty">{{ i18n.t('req.sin_enviadas') }}</p>
         }
       </div>
     </div>
@@ -127,7 +127,7 @@
     <div class="kanban-column">
       <div class="kanban-column__header">
         <div class="kanban-column__title-group">
-          <h3 class="kanban-column__title">En Despacho</h3>
+          <h3 class="kanban-column__title">{{ i18n.t('req.col_despacho') }}</h3>
           <span class="kanban-column__count kanban-column__count--info">{{ enDespacho().length }}</span>
         </div>
       </div>
@@ -138,7 +138,7 @@
               <span class="kanban-card__id">REQ-{{ req.numero }}</span>
               <span class="kanban-card__badge kanban-card__badge--despacho">
                 <lucide-icon name="truck" [size]="12"></lucide-icon>
-                En preparación
+                {{ i18n.t('req.badge_preparacion') }}
               </span>
             </div>
             <p class="kanban-card__desc">{{ req.programa }} — Ficha {{ req.fichaId }}</p>
@@ -155,7 +155,7 @@
           </div>
         }
         @if (enDespacho().length === 0) {
-          <p class="kanban-empty">Sin despachos activos</p>
+          <p class="kanban-empty">{{ i18n.t('req.sin_despachos') }}</p>
         }
       </div>
     </div>
@@ -164,7 +164,7 @@
     <div class="kanban-column">
       <div class="kanban-column__header">
         <div class="kanban-column__title-group">
-          <h3 class="kanban-column__title">Firmadas</h3>
+          <h3 class="kanban-column__title">{{ i18n.t('req.col_firmadas') }}</h3>
           <span class="kanban-column__count kanban-column__count--success">{{ firmadas().length }}</span>
         </div>
       </div>
@@ -175,7 +175,7 @@
               <span class="kanban-card__id">REQ-{{ req.numero }}</span>
               <span class="kanban-card__badge kanban-card__badge--firmada">
                 <lucide-icon name="shield-check" [size]="12"></lucide-icon>
-                Firmada
+                {{ i18n.t('req.badge_firmada') }}
               </span>
             </div>
             <p class="kanban-card__desc">{{ req.programa }} — Ficha {{ req.fichaId }}</p>
@@ -192,7 +192,7 @@
           </div>
         }
         @if (firmadas().length === 0) {
-          <p class="kanban-empty">Sin firmadas</p>
+          <p class="kanban-empty">{{ i18n.t('req.sin_firmadas') }}</p>
         }
       </div>
     </div>

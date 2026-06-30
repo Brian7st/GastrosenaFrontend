@@ -6,6 +6,7 @@ import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { ExportarComponent } from '../../../components/exportar/exportar.component';
 import { KardexFacade } from '../../../data-access/kardex.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-movimiento-detail',
@@ -17,6 +18,7 @@ import { KardexFacade } from '../../../data-access/kardex.facade';
 })
 export class MovimientoDetailComponent implements OnInit {
   private router = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private route  = inject(ActivatedRoute);
   private facade = inject(KardexFacade);
 

@@ -6,20 +6,20 @@
 
       <div class="blocked-banner">
         <span class="material-symbols-outlined">block</span>
-        Bien con stock activo — no se puede eliminar
+        {{ i18n.t('bien-modal.blocked_message') }}
       </div>
 
       <div class="dialog-body">
         <div class="warning-icon">
           <span class="material-symbols-outlined">warning</span>
         </div>
-        <h3>No se puede eliminar — este bien tiene {{ bien.stockActual }} unidades en stock</h3>
-        <p>Esta acción es irreversible. Todos los datos asociados a este inventario se perderán permanentemente.</p>
+        <h3>{{ i18n.t('bien-modal.blocked_title').replace('{{ stock }}', String(bien.stockActual)) }}</h3>
+        <p>{{ i18n.t('bien-modal.warning_message') }}</p>
       </div>
 
       <div class="dialog-footer">
-        <button class="btn-cancel-green" (click)="cancel.emit()">Cancelar</button>
-        <button class="btn-delete" disabled>Eliminar</button>
+        <button class="btn-cancel-green" (click)="cancel.emit()">{{ i18n.t('bien-modal.cancel') }}</button>
+        <button class="btn-delete" disabled>{{ i18n.t('bien-modal.delete') }}</button>
       </div>
 
     </div>
@@ -34,15 +34,15 @@
         <div class="warning-icon">
           <span class="material-symbols-outlined">warning</span>
         </div>
-        <h3>¿Estás seguro de eliminar este bien?</h3>
-        <p>Esta acción es irreversible. Todos los datos asociados a este inventario se perderán permanentemente.</p>
+        <h3>{{ i18n.t('bien-modal.confirm_title') }}</h3>
+        <p>{{ i18n.t('bien-modal.warning_message') }}</p>
 
         <div class="keyword-box">
-          <p>Por seguridad, escribe la palabra <strong>ELIMINAR</strong> para continuar</p>
+          <p>{{ i18n.t('bien-modal.keyword_hint') }} <strong>{{ i18n.t('bien-modal.keyword') }}</strong></p>
           <input
             class="keyword-input"
             type="text"
-            placeholder="Escribe ELIMINAR aquí"
+            [placeholder]="i18n.t('bien-modal.keyword_placeholder')"
             [ngModel]="keyword()"
             (ngModelChange)="onKeywordChange($event)"
           />
@@ -50,12 +50,12 @@
       </div>
 
       <div class="dialog-footer">
-        <button class="btn-cancel-neutral" (click)="cancel.emit()">Cancelar</button>
+        <button class="btn-cancel-neutral" (click)="cancel.emit()">{{ i18n.t('bien-modal.cancel') }}</button>
         <button class="btn-delete btn-delete--active"
                 [disabled]="!canDelete()"
                 [class.btn-delete--disabled]="!canDelete()"
                 (click)="onConfirm()">
-          Eliminar
+          {{ i18n.t('bien-modal.delete') }}
         </button>
       </div>
 

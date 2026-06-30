@@ -18,6 +18,7 @@ import {
 import { ActaEstado } from '../../../models/acta.model';
 import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
 import { ActasFacade } from '../../../data-access/actas.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-actas-list',
@@ -36,6 +37,7 @@ import { ActasFacade } from '../../../data-access/actas.facade';
 })
 export class ActasListComponent implements OnInit {
   private router = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private facade = inject(ActasFacade);
 
   // ── Estado reactivo ──────────────────────────────────────────────────────

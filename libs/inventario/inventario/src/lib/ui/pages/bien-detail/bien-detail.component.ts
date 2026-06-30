@@ -8,6 +8,7 @@ import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { ButtonComponent, StatusBadgeComponent, HasPermissionDirective } from '@restaurant/shared/ui';
 import { BienFormComponent } from '../../../ui/modals/bien-form/bien-form.component';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-bien-detail',
@@ -22,6 +23,7 @@ export class BienDetailPageComponent implements OnInit {
   private router = inject(Router);
   private facade = inject(InventarioFacade);
   private movimientosService = inject(MovimientosService);
+  protected readonly i18n = inject(I18nService);
 
   bien = this.facade.bienSeleccionado;
   loading = this.facade.loading;
@@ -84,13 +86,13 @@ export class BienDetailPageComponent implements OnInit {
 
   getTipoLabel(tipo: string): string {
     const map: Record<string, string> = {
-      ENTRADA: 'Entrada',
-      SALIDA: 'Salida',
-      RESERVA: 'Reserva',
-      LIBERACION: 'Liberación',
-      AJUSTE: 'Ajuste',
-      AJUSTE_POSITIVO: 'Ajuste (+)',
-      AJUSTE_NEGATIVO: 'Ajuste (−)',
+      ENTRADA: this.i18n.t('bien-detail.tipo_entrada'),
+      SALIDA: this.i18n.t('bien-detail.tipo_salida'),
+      RESERVA: this.i18n.t('bien-detail.tipo_reserva'),
+      LIBERACION: this.i18n.t('bien-detail.tipo_liberacion'),
+      AJUSTE: this.i18n.t('bien-detail.tipo_ajuste'),
+      AJUSTE_POSITIVO: this.i18n.t('bien-detail.tipo_ajuste_positivo'),
+      AJUSTE_NEGATIVO: this.i18n.t('bien-detail.tipo_ajuste_negativo'),
     };
     return map[tipo] ?? tipo;
   }

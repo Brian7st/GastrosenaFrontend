@@ -150,15 +150,22 @@
   text-overflow: ellipsis;
 }
  
-// ── SECTION ──────────────────────────────────
-.detalle__section {
-  background: var(--color-superficie-contenedor-mas-bajo);
-  border: 1px solid rgba(0, 0, 0, 0.03);
-  border-radius: 0.75rem;
-  box-shadow: var(--shadow-card);
-  overflow: hidden;
+// ── SECTION (restaurant-data-table) ──────────────────────────────────
+restaurant-data-table {
+  margin-top: var(--space-6);
 }
- 
+
+// ::ng-deep para perforar la encapsulación y llegar al dt-table interno
+:host ::ng-deep restaurant-data-table .dt-table {
+  table-layout: fixed;
+
+  th:nth-child(1), td:nth-child(1) { width: 14%; }
+  th:nth-child(2), td:nth-child(2) { width: 18%; }
+  th:nth-child(3), td:nth-child(3) { width: 30%; word-break: break-all; }
+  th:nth-child(4), td:nth-child(4) { width: 16%; }
+  th:nth-child(5), td:nth-child(5) { width: 22%; }
+}
+
 .detalle__section-header {
   display: flex;
   align-items: center;
@@ -198,61 +205,18 @@
   }
 }
  
-// ── EMPTY ─────────────────────────────────────
-.detalle__empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
-  padding: var(--space-10, var(--space-8));
+// ── EMPTY CELL (dentro de tbody) ─────────────────────────────────────
+.detalle__empty-cell {
+  text-align: center;
+  padding: var(--space-10, var(--space-8)) var(--space-4) !important;
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
- 
-  p { margin: 0; }
-  .detalle__btn-primary { margin-top: var(--space-2); }
-}
- 
-// ── TABLE ─────────────────────────────────────
-.detalle__table-wrapper {
-  overflow-x: auto;
-}
- 
-.detalle__table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--font-size-sm);
-  font-family: var(--font-family-base);
- 
-  thead tr {
-    background: var(--color-superficie-contenedor-bajo);
-    border-bottom: 1px solid var(--color-border);
-  }
- 
-  th {
-    text-align: left;
-    padding: var(--space-2) var(--space-4);
-    font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-semibold);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--color-text-secondary);
-    white-space: nowrap;
-  }
- 
-  tbody tr {
-    border-bottom: 1px solid var(--color-border);
-    transition: background var(--duration-fast) var(--ease-standard);
- 
-    &:last-child { border-bottom: none; }
-    &:hover { background: var(--color-superficie-contenedor-bajo); }
-  }
- 
-  td {
-    padding: var(--space-3) var(--space-4);
-    color: var(--color-text-heading);
-    font-weight: var(--font-weight-medium);
-    vertical-align: middle;
+  vertical-align: middle;
+
+  lucide-icon {
+    display: block;
+    margin: 0 auto var(--space-2);
+    opacity: 0.5;
   }
 }
  

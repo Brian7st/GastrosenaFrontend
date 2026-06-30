@@ -11,6 +11,7 @@ import { InventarioFacade } from '../../../data-access/inventario.facade';
 import { ProgramasService, Programa } from '../../../data-access/services/programas.service';
 import { SolicitudSesionItem } from '../../../models/solicitud-sesion.model';
 import { Bien } from '../../../models/inventario.model';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-solicitudes-insumos-form',
@@ -22,6 +23,7 @@ import { Bien } from '../../../models/inventario.model';
 })
 export class SolicitudesInsumosFormComponent implements OnInit {
   private router         = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private route          = inject(ActivatedRoute);
   readonly facade        = inject(SolicitudesFacade);
   readonly inventario    = inject(InventarioFacade);

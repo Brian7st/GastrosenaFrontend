@@ -9,17 +9,21 @@ import {
   LucideIconComponent,
 } from '@restaurant/shared/ui';
 import { ReportesFacade } from '../data-access/reportes.facade';
-import { GenerarReporteRequest, ReporteReciente, TipoReporte, PeriodicidadReporte } from '../models/reportes.model';
+import { GenerarReporteRequest, TipoReporte, PeriodicidadReporte } from '../models/reportes.model';
+import { I18nService } from '../i18n/i18n.service';
 
 interface Reporte {
   id: string;
-  titulo: string;
-  descripcion: string;
+  tKey: string;
+  dKey: string;
+  titulo?: string;
+  descripcion?: string;
   tipo: string;
 }
 
 interface SeccionReportes {
-  rol: string;
+  rolKey: string;
+  rol?: string;
   icono: string;
   color: string;
   reportes: Reporte[];
@@ -43,6 +47,7 @@ interface SeccionReportes {
 })
 export class ReportesPageComponent implements OnInit {
   private readonly facade = inject(ReportesFacade);
+  protected readonly i18n = inject(I18nService);
 
   readonly tipoSeleccionado = signal<TipoReporte | 'todos'>('todos');
   readonly periodicidadSeleccionada = signal<PeriodicidadReporte | ''>('');
@@ -53,61 +58,73 @@ export class ReportesPageComponent implements OnInit {
   readonly generando = this.facade.generando;
   readonly error = this.facade.error;
 
-  readonly tipoOpciones = [
-    { label: 'Todos los tipos', value: 'todos' },
-    { label: 'Contadora',      value: 'contadora' },
-    { label: 'Administrador',  value: 'administrador' },
-    { label: 'Chef',           value: 'chef' },
-  ];
+  readonly tipoOpciones = computed(() => [
+    { label: this.i18n.t('filter.tipo.todos'), value: 'todos' },
+    { label: this.i18n.t('filter.tipo.contadora'), value: 'contadora' },
+    { label: this.i18n.t('filter.tipo.administrador'), value: 'administrador' },
+    { label: this.i18n.t('filter.tipo.chef'), value: 'chef' },
+  ]);
 
-  readonly periodicidadOpciones = [
-    { label: 'Seleccionar',  value: ''           },
-    { label: 'Diario',       value: 'diario'     },
-    { label: 'Semanal',      value: 'semanal'    },
-    { label: 'Mensual',      value: 'mensual'    },
-    { label: 'Trimestral',   value: 'trimestral' },
-  ];
+  readonly periodicidadOpciones = computed(() => [
+    { label: this.i18n.t('filter.periodicidad.seleccionar'), value: '' },
+    { label: this.i18n.t('filter.periodicidad.diario'), value: 'diario' },
+    { label: this.i18n.t('filter.periodicidad.semanal'), value: 'semanal' },
+    { label: this.i18n.t('filter.periodicidad.mensual'), value: 'mensual' },
+    { label: this.i18n.t('filter.periodicidad.trimestral'), value: 'trimestral' },
+  ]);
 
-  readonly secciones: SeccionReportes[] = [
+  private readonly seccionesBase: SeccionReportes[] = [
     {
-      rol: 'Contadora',
+      rolKey: 'rol.contadora',
       icono: 'bar-chart-2',
       color: 'warning',
       reportes: [
-        { id: 'bienes',        titulo: 'Bienes',         descripcion: 'Listado detallado de bienes registrados en el sistema.',      tipo: 'contadora' },
-        { id: 'insumos',       titulo: 'Insumos',        descripcion: 'Relación de insumos consumidos y disponibles en cocina.',     tipo: 'contadora' },
-        { id: 'facturacion',   titulo: 'Facturación',    descripcion: 'Resumen de facturas emitidas en el período seleccionado.',    tipo: 'contadora' },
-        { id: 'inventario',    titulo: 'Inventario',     descripcion: 'Estado actual del inventario con entradas y salidas.',        tipo: 'contadora' },
-        { id: 'prefactura',    titulo: 'Pre-factura',    descripcion: 'Pre-facturas generadas pendientes de aprobación.',            tipo: 'contadora' },
-        { id: 'factura-global',titulo: 'Factura Global', descripcion: 'Consolidado global de todas las facturas del período.',      tipo: 'contadora' },
-        { id: 'presupuesto',   titulo: 'Presupuesto',    descripcion: 'Comparativo entre presupuesto asignado y gasto real.',       tipo: 'contadora' },
-        { id: 'conciliacion',  titulo: 'Conciliación',   descripcion: 'Conciliación de ingresos y egresos contables.',              tipo: 'contadora' },
+        { id: 'bienes',        tKey: 'reporte.bienes',         dKey: 'reporte.bienes.desc',         tipo: 'contadora' },
+        { id: 'insumos',       tKey: 'reporte.insumos',        dKey: 'reporte.insumos.desc',        tipo: 'contadora' },
+        { id: 'facturacion',   tKey: 'reporte.facturacion',    dKey: 'reporte.facturacion.desc',    tipo: 'contadora' },
+        { id: 'inventario',    tKey: 'reporte.inventario',     dKey: 'reporte.inventario.desc',     tipo: 'contadora' },
+        { id: 'prefactura',    tKey: 'reporte.prefactura',     dKey: 'reporte.prefactura.desc',     tipo: 'contadora' },
+        { id: 'factura-global',tKey: 'reporte.factura_global', dKey: 'reporte.factura_global.desc', tipo: 'contadora' },
+        { id: 'presupuesto',   tKey: 'reporte.presupuesto',    dKey: 'reporte.presupuesto.desc',    tipo: 'contadora' },
+        { id: 'conciliacion',  tKey: 'reporte.conciliacion',   dKey: 'reporte.conciliacion.desc',   tipo: 'contadora' },
       ],
     },
     {
-      rol: 'Administrador',
+      rolKey: 'rol.administrador',
       icono: 'user',
       color: 'danger',
       reportes: [
-        { id: 'pedidos-cocina',titulo: 'Pedidos de Cocina',      descripcion: 'Volumen y tiempos de pedidos procesados por cocina.',          tipo: 'administrador' },
-        { id: 'ventas-mesero', titulo: 'Ventas por Mesero',      descripcion: 'Total de ventas generadas por cada mesero en el período.',     tipo: 'administrador' },
+        { id: 'pedidos-cocina', tKey: 'reporte.pedidos_cocina',     dKey: 'reporte.pedidos_cocina.desc',     tipo: 'administrador' },
+        { id: 'ventas-mesero',  tKey: 'reporte.ventas_mesero',      dKey: 'reporte.ventas_mesero.desc',      tipo: 'administrador' },
       ],
     },
     {
-      rol: 'Chef',
+      rolKey: 'rol.chef',
       icono: 'chef-hat',
       color: 'warning',
       reportes: [
-        { id: 'pedidos-cocina-chef',  titulo: 'Pedidos de Cocina', descripcion: 'Pedidos recibidos, en proceso y completados en cocina.',           tipo: 'chef' },
-        { id: 'ventas-mesero-chef',   titulo: 'Ventas por Mesero', descripcion: 'Consulta de platos más vendidos según mesero asignado.',           tipo: 'chef' },
+        { id: 'pedidos-cocina-chef', tKey: 'reporte.pedidos_cocina_chef',   dKey: 'reporte.pedidos_cocina_chef.desc',   tipo: 'chef' },
+        { id: 'ventas-mesero-chef',  tKey: 'reporte.ventas_mesero_chef',    dKey: 'reporte.ventas_mesero_chef.desc',    tipo: 'chef' },
       ],
     },
   ];
 
+  readonly secciones = computed(() =>
+    this.seccionesBase.map(s => ({
+      ...s,
+      rol: this.i18n.t(s.rolKey),
+      reportes: s.reportes.map(r => ({
+        ...r,
+        titulo: this.i18n.t(r.tKey),
+        descripcion: this.i18n.t(r.dKey),
+      })),
+    }))
+  );
+
   readonly seccionesFiltradas = computed(() => {
     const tipo = this.tipoSeleccionado();
-    if (tipo === 'todos') return this.secciones;
-    return this.secciones.filter(s => s.rol.toLowerCase() === tipo);
+    if (tipo === 'todos') return this.secciones();
+    return this.secciones().filter(s => s.rolKey === `rol.${tipo}`);
   });
 
   ngOnInit(): void {

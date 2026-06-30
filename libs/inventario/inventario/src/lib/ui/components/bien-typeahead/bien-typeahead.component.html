@@ -27,7 +27,7 @@
           <span class="typeahead__price">{{ bien.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
         </li>
       } @empty {
-        <li class="typeahead__empty">Sin coincidencias en el catálogo.</li>
+        <li class="typeahead__empty">{{ i18n.t('bien-typeahead.sin_coincidencias') }}</li>
       }
     </ul>
   }

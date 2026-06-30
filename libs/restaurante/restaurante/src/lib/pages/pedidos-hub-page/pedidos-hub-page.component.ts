@@ -1,9 +1,9 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LucideIconComponent, CardComponent, PageHeaderComponent, ButtonComponent } from '@restaurant/shared/ui';
-import { inject } from '@angular/core';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
+import { I18nService } from '../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-pedidos-hub-page',
@@ -21,6 +21,7 @@ import { RestauranteFacade } from '../../data-access/restaurante.facade';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PedidosHubPageComponent {
+  protected readonly i18n = inject(I18nService);
   private facade = inject(RestauranteFacade);
   puedeAdministrarMesas = this.facade.puedeAdministrarMesas;
 }

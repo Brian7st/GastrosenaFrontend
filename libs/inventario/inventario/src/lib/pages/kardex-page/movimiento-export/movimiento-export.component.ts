@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { KardexFacade } from '../../../data-access/kardex.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-movimiento-export',
@@ -15,6 +16,7 @@ import { KardexFacade } from '../../../data-access/kardex.facade';
 })
 export class MovimientoExportComponent {
   private fb = inject(FormBuilder);
+  protected readonly i18n = inject(I18nService);
   private router = inject(Router);
   private facade = inject(KardexFacade);
 

@@ -6,18 +6,18 @@
       <inventario-back-button (clicked)="onCancel()" />
       <div class="header-titles-col">
         <div class="breadcrumbs">
-          <a (click)="onCancel()" class="breadcrumb-link">Solicitudes</a>
+          <a (click)="onCancel()" class="breadcrumb-link">{{ i18n.t('si.breadcrumb') }}</a>
           <span class="material-symbols-outlined separator">chevron_right</span>
-          <span class="current">{{ isEdit() ? 'Editar' : 'Nueva' }}</span>
+          <span class="current">{{ isEdit() ? i18n.t('comun.editar') : i18n.t('si.nueva_bc') }}</span>
         </div>
         <div class="header-titles">
           <div class="title-row">
-            <h2 class="page-title">{{ isEdit() ? 'Editar Solicitud de Insumos' : 'Nueva Solicitud de Insumos' }}</h2>
+            <h2 class="page-title">{{ isEdit() ? i18n.t('si.editar_titulo') : i18n.t('si.nueva_titulo') }}</h2>
             @if (isEdit()) {
-              <span class="status-badge status-badge--edicion">EN EDICIÓN</span>
+              <span class="status-badge status-badge--edicion">{{ i18n.t('si.en_edicion') }}</span>
               <span class="status-badge status-badge--codigo">{{ solicitudCodigo() }}</span>
             } @else {
-              <span class="status-badge status-badge--borrador">NUEVA</span>
+              <span class="status-badge status-badge--borrador">{{ i18n.t('si.nueva_badge') }}</span>
             }
           </div>
         </div>
@@ -31,7 +31,7 @@
   <div class="form-card">
     <h3 class="section-title">
       <span class="material-symbols-outlined section-icon">info</span>
-      Información General
+      {{ i18n.t('si.info_general') }}
     </h3>
 
     <div class="form-grid">
@@ -40,7 +40,7 @@
       <div class="form-col">
 
         <div class="form-group">
-          <label class="form-label">Fecha de Solicitud</label>
+          <label class="form-label">{{ i18n.t('si.fecha_solicitud') }}</label>
           <div class="readonly-input">
             <span class="readonly-text">{{ fechaSolicitud() }}</span>
             <span class="material-symbols-outlined icon-locked">lock</span>
@@ -48,11 +48,11 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Número de Ficha <span class="required-mark">*</span></label>
+          <label class="form-label">{{ i18n.t('si.numero_ficha') }} <span class="required-mark">*</span></label>
           <input
             type="text"
             class="form-control"
-            placeholder="Ej. 2560892"
+            [placeholder]="i18n.t('si.ph_ficha')"
             [value]="fichaId()"
             (input)="fichaId.set($any($event.target).value)"
           />
@@ -62,13 +62,13 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Programa de Formación <span class="required-mark">*</span></label>
+          <label class="form-label">{{ i18n.t('si.programa') }} <span class="required-mark">*</span></label>
           <select
             class="form-control"
             [value]="programaId()"
             (change)="programaId.set($any($event.target).value)"
           >
-            <option value="" disabled>Seleccione un programa…</option>
+            <option value="" disabled>{{ i18n.t('si.seleccione_programa') }}</option>
             @for (programa of programas(); track programa.codigo) {
               <option [value]="programa.codigo">{{ programa.nombre }}</option>
             }
@@ -84,11 +84,11 @@
       <div class="form-col">
 
         <div class="form-group">
-          <label class="form-label">Nombre del Instructor <span class="required-mark">*</span></label>
+          <label class="form-label">{{ i18n.t('si.instructor_nombre') }} <span class="required-mark">*</span></label>
           <input
             type="text"
             class="form-control"
-            placeholder="Ej. Carlos Rodríguez"
+            [placeholder]="i18n.t('si.ph_instructor')"
             [value]="instructorId()"
             (input)="instructorId.set($any($event.target).value)"
           />
@@ -98,15 +98,15 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Identificación del Instructor</label>
+          <label class="form-label">{{ i18n.t('si.identificacion') }}</label>
           <input
             type="text"
             class="form-control"
-            placeholder="Ej. 1234567890"
+            [placeholder]="i18n.t('si.ph_identificacion')"
             [value]="identificacionInstructor()"
             (input)="identificacionInstructor.set($any($event.target).value)"
           />
-          <p class="field-hint">Cédula o número de identificación (opcional)</p>
+          <p class="field-hint">{{ i18n.t('si.hint_identificacion') }}</p>
         </div>
 
       </div>
@@ -121,11 +121,11 @@
     <div class="section-header-row">
       <h3 class="section-title m-0">
         <span class="material-symbols-outlined section-icon">shopping_cart</span>
-        Ítems Solicitados
+        {{ i18n.t('si.items_solicitados') }}
       </h3>
       <restaurant-button variant="ghost" class="btn-add-item" (click)="onAbrirSelectorBien()">
         <span class="material-symbols-outlined">add</span>
-        Agregar desde catálogo
+        {{ i18n.t('si.agregar_catalogo') }}
       </restaurant-button>
     </div>
 
@@ -154,14 +154,14 @@
         </colgroup>
         <thead>
           <tr>
-            <th>Insumo</th>
-            <th class="text-center">Cant.</th>
-            <th>Unidad</th>
-            <th class="text-right">Valor Unit.</th>
-            <th class="text-right">Total</th>
-            <th>Cód. Almacén</th>
-            <th class="text-right">IVA (%)</th>
-            <th class="text-center">Acciones</th>
+            <th>{{ i18n.t('si.th_insumo') }}</th>
+            <th class="text-center">{{ i18n.t('si.th_cant') }}</th>
+            <th>{{ i18n.t('si.th_unidad') }}</th>
+            <th class="text-right">{{ i18n.t('si.th_valor_unit') }}</th>
+            <th class="text-right">{{ i18n.t('comun.total') }}</th>
+            <th>{{ i18n.t('si.th_cod_almacen') }}</th>
+            <th class="text-right">{{ i18n.t('si.th_iva') }}</th>
+            <th class="text-center">{{ i18n.t('comun.acciones') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -195,7 +195,7 @@
                 <input
                   type="text"
                   class="form-control-table"
-                  placeholder="Ej. ALM-01"
+                  [placeholder]="i18n.t('si.ph_almacen')"
                   [value]="item.codigoAlmacen ?? ''"
                   (input)="onCodigoAlmacenChange(i, $any($event.target).value)"
                 />
@@ -222,7 +222,7 @@
             <tr>
               <td colspan="8" class="empty-state-cell">
                 <span class="material-symbols-outlined empty-icon">shopping_cart</span>
-                No hay ítems. Usá el botón "Agregar desde catálogo".
+                {{ i18n.t('si.sin_items') }}
               </td>
             </tr>
           }
@@ -248,9 +248,9 @@
 
   <!-- Footer -->
   <div class="actions-footer">
-    <restaurant-button variant="ghost" (click)="onCancel()">Cancelar</restaurant-button>
+    <restaurant-button variant="ghost" (click)="onCancel()">{{ i18n.t('comun.cancelar') }}</restaurant-button>
     <restaurant-button variant="primary" (click)="onSave()" [disabled]="facade.loading()">
-      {{ facade.loading() ? (isEdit() ? 'Guardando...' : 'Enviando...') : (isEdit() ? 'Guardar cambios' : 'Enviar solicitud') }}
+      {{ facade.loading() ? (isEdit() ? i18n.t('comun.guardando') : i18n.t('si.enviando')) : (isEdit() ? i18n.t('si.guardar_cambios') : i18n.t('si.enviar')) }}
       <span class="material-symbols-outlined right-icon">{{ isEdit() ? 'save' : 'arrow_forward' }}</span>
     </restaurant-button>
   </div>
@@ -269,7 +269,7 @@
       <div class="catalog-header">
         <h3 class="catalog-title">
           <span class="material-symbols-outlined" style="color:var(--color-primario)">inventory_2</span>
-          Catálogo de Bienes
+          {{ i18n.t('si.catalogo_titulo') }}
         </h3>
         <button type="button" class="catalog-close" (click)="mostrarSelectorBien.set(false)">
           <span class="material-symbols-outlined">close</span>
@@ -281,7 +281,7 @@
         <input
           type="text"
           class="catalog-search-input"
-          placeholder="Buscar por nombre o código SENA..."
+          [placeholder]="i18n.t('si.buscar_bien')"
           (input)="onBuscarBienCatalogo($any($event.target).value)"
         />
       </div>
@@ -290,17 +290,17 @@
         @if (catalogoLoading()) {
           <div class="catalog-empty">
             <span class="material-symbols-outlined catalog-empty-icon">hourglass_empty</span>
-            Cargando catálogo...
+            {{ i18n.t('si.cargando_catalogo') }}
           </div>
         } @else {
           <table class="catalog-table">
             <thead>
               <tr>
-                <th>Cód. SENA</th>
-                <th>Nombre del Bien</th>
-                <th>Unidad</th>
-                <th class="text-right">Precio</th>
-                <th class="text-center">Acción</th>
+                <th>{{ i18n.t('comun.codigo_sena') }}</th>
+                <th>{{ i18n.t('si.th_nombre_bien') }}</th>
+                <th>{{ i18n.t('si.th_unidad') }}</th>
+                <th class="text-right">{{ i18n.t('si.th_precio') }}</th>
+                <th class="text-center">{{ i18n.t('comun.accion') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -318,12 +318,12 @@
                     @if (addedCodigosSena().includes(bien.codigoSena ?? '')) {
                       <span class="catalog-added-label">
                         <span class="material-symbols-outlined" style="font-size:14px">check</span>
-                        Agregado
+                        {{ i18n.t('si.agregado') }}
                       </span>
                     } @else {
                       <button type="button" class="btn-catalog-add" (click)="onSeleccionarBien(bien)">
                         <span class="material-symbols-outlined" style="font-size:14px">add</span>
-                        Agregar
+                        {{ i18n.t('si.agregar') }}
                       </button>
                     }
                   </td>
@@ -333,7 +333,7 @@
                 <tr>
                   <td colspan="5" class="catalog-empty">
                     <span class="material-symbols-outlined catalog-empty-icon">search_off</span>
-                    No se encontraron bienes
+                    {{ i18n.t('si.sin_bienes') }}
                   </td>
                 </tr>
               }

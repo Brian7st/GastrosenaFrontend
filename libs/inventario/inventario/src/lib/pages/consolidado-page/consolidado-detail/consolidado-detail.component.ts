@@ -7,6 +7,7 @@ import { ExportarConsolidadoModalComponent } from '../components/exportar-consol
 import { ReversarConsolidadoModalComponent } from '../components/reversar-consolidado-modal/reversar-consolidado-modal.component';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { ConsolidadoFacade } from '../../../data-access/consolidado.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-consolidado-detail',
@@ -18,6 +19,7 @@ import { ConsolidadoFacade } from '../../../data-access/consolidado.facade';
 })
 export class ConsolidadoDetailComponent implements OnInit {
   private router = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private route  = inject(ActivatedRoute);
   private facade = inject(ConsolidadoFacade);
 

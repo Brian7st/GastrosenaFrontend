@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, inject, Input, Output, signal } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
+import { I18nService } from '../../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-reversar-consolidado-modal',
@@ -11,6 +12,7 @@ import { FormsModule } from '@angular/forms';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReversarConsolidadoModalComponent {
+  protected readonly i18n = inject(I18nService);
   @Input() consolidadoId = '';
   @Input() periodo = '';
   @Input() total = '';

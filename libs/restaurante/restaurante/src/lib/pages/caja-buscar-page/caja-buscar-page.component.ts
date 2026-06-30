@@ -13,6 +13,7 @@ import {
 } from '@restaurant/shared/ui';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
 import { RestauranteService } from '../../data-access/restaurante.service';
+import { I18nService } from '../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-caja-buscar-page',
@@ -33,6 +34,7 @@ import { RestauranteService } from '../../data-access/restaurante.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CajaBuscarPageComponent implements OnInit {
+  protected readonly i18n = inject(I18nService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   public facade = inject(RestauranteFacade);
@@ -130,6 +132,12 @@ export class CajaBuscarPageComponent implements OnInit {
     return result;
   });
 
+  protected getInvoiceCountText(): string {
+    return this.i18n
+      .t('cajaBuscar.invoicesCount')
+      .replace('{{ count }}', String(this.facturasFiltradas().length));
+  }
+
   @HostListener('document:click', ['$event'])
   cerrarDropdowns() {
     this.dropdownMesaAbierto.set(false);
@@ -157,12 +165,20 @@ export class CajaBuscarPageComponent implements OnInit {
     const facturas = this.facturasFiltradas();
     if (facturas.length === 0) return;
 
-    const encabezados = ['N° Factura', 'Mesa', 'Cajero ID', 'Fecha Emision', 'Metodo Pago', 'Total', 'Estado'];
+    const encabezados = [
+      this.i18n.t('cajaBuscar.invoiceNumber'),
+      this.i18n.t('cajaBuscar.tableHeader'),
+      this.i18n.t('cajaBuscar.cashierId'),
+      this.i18n.t('cajaBuscar.date'),
+      this.i18n.t('cajaBuscar.paymentMethod'),
+      this.i18n.t('cajaBuscar.total'),
+      this.i18n.t('cajaBuscar.status'),
+    ];
     const lineas = facturas.map(f => {
       const fecha = new Date(f.fechaEmision).toLocaleString('es-CO');
       return [
         f.numeroFactura,
-        f.nombreMesa || 'Para Llevar',
+        f.nombreMesa || this.i18n.t('cajaBuscar.takeAway'),
         f.cajeroId,
         fecha,
         f.metodoPago,

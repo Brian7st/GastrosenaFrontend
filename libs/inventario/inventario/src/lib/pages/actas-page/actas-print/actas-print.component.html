@@ -1,24 +1,24 @@
 <!-- Barra de control (oculta al imprimir) -->
 <div class="print-toolbar no-print">
   <button class="print-toolbar__btn print-toolbar__btn--back" (click)="volver()">
-    ← Volver al acta
+    {{ i18n.t('acta.volver_acta') }}
   </button>
   <button class="print-toolbar__btn print-toolbar__btn--print" (click)="imprimir()">
-    🖨 Imprimir / Guardar PDF
+    {{ i18n.t('acta.imprimir_guardar') }}
   </button>
   <button
     class="print-toolbar__btn print-toolbar__btn--print"
     [disabled]="loading()"
     (click)="exportarPdf()"
   >
-    📄 Descargar PDF oficial
+    {{ i18n.t('acta.descargar_pdf') }}
   </button>
 </div>
 
 @if (loading()) {
-  <div class="print-loading no-print">Cargando acta...</div>
+  <div class="print-loading no-print">{{ i18n.t('acta.cargando') }}</div>
 } @else if (acta(); as a) {
   <inventario-acta-documento [acta]="a" />
 } @else {
-  <div class="print-loading no-print">Acta no encontrada.</div>
+  <div class="print-loading no-print">{{ i18n.t('acta.no_encontrada') }}</div>
 }

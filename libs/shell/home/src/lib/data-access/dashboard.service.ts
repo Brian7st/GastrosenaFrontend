@@ -2,6 +2,8 @@ import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { I18nService } from '@restaurant/shell';
+import { AuthService } from '@restaurant/shared/auth';
 import {
   KpiCard,
   ModuleCard,
@@ -18,6 +20,8 @@ import {
 @Injectable({ providedIn: 'root' })
 export class DashboardService {
   private readonly http = inject(HttpClient);
+  private readonly i18n = inject(I18nService);
+  private readonly auth = inject(AuthService);
 
   readonly loading = signal(true);
 
@@ -38,32 +42,33 @@ export class DashboardService {
     const alertas = this._alertas();
     const facturas = this._facturas();
 
+    const t = (k: string) => this.i18n.t(k);
     return [
       {
-        label: 'Pedidos Activos',
+        label: t('dashboard.kpi.pedidos_activos'),
         value: String(this._pedidosActivos()),
-        trend: 'En preparación',
+        trend: t('dashboard.kpi.en_preparacion'),
         trendType: this._pedidosActivos() > 0 ? 'info' : 'neutral',
         icon: 'utensils',
       },
       {
-        label: 'Mesas Ocupadas',
+        label: t('dashboard.kpi.mesas_ocupadas'),
         value: totalMesas > 0 ? `${ocupadas} / ${totalMesas}` : '—',
-        trend: `${porcentaje}% ocupación`,
+        trend: `${porcentaje}% ${t('dashboard.kpi.ocupacion')}`,
         trendType: porcentaje > 80 ? 'alert' : porcentaje > 50 ? 'positive' : 'neutral',
         icon: 'layout-grid',
       },
       {
-        label: 'Alertas de Stock',
+        label: t('dashboard.kpi.alertas_stock'),
         value: alertas ? String(alertas.alertasPendientes) : '—',
-        trend: alertas ? `${alertas.productosCriticos} productos críticos` : 'Sin datos',
+        trend: alertas ? `${alertas.productosCriticos} ${t('dashboard.kpi.productos_criticos')}` : t('dashboard.kpi.sin_datos'),
         trendType: alertas && alertas.alertasPendientes > 0 ? 'alert' : 'neutral',
         icon: 'triangle-alert',
       },
       {
-        label: 'Facturas Pendientes',
+        label: t('dashboard.kpi.facturas_pendientes'),
         value: facturas ? String(facturas.totalRegistradas) : '—',
-        trend: facturas ? `$${this.formatMoney(facturas.montoRegistradas)} por verificar` : 'Sin datos',
+        trend: facturas ? `$${this.formatMoney(facturas.montoRegistradas)} ${t('dashboard.kpi.por_verificar')}` : t('dashboard.kpi.sin_datos'),
         trendType: facturas && facturas.totalRegistradas > 5 ? 'alert' : 'neutral',
         icon: 'receipt',
       },
@@ -85,33 +90,87 @@ export class DashboardService {
   readonly modulos = computed<ModuleCard[]>(() => {
     const alertas = this._alertas();
     const facturas = this._facturas();
-    return [
-      { label: 'Cocina', description: 'Pedidos, recetas y tiempos', icon: 'chef-hat', ruta: '/app/cocina' },
-      { label: 'Bar', description: 'Bebidas y barismo', icon: 'wine', ruta: '/app/bar' },
-      { label: 'Restaurante', description: 'Mesas, pedidos y caja', icon: 'utensils', ruta: '/app/restaurante' },
+    const rol = this.auth.currentUser()?.rol ?? '';
+    const t = (k: string) => this.i18n.t(k);
+
+    const todos: ModuleCard[] = [
       {
-        label: 'Inventario',
-        description: 'Bienes, stock y conciliación',
+        label: t('nav.cocina'),
+        description: t('dashboard.mod.cocina.desc'),
+        icon: 'chef-hat',
+        ruta: '/app/cocina',
+        roles: ['ADMINISTRADOR', 'INSTRUCTOR', 'CHEF', 'AUXILIAR_COCINA', 'APRENDIZ'],
+      },
+      {
+        label: t('nav.bar'),
+        description: t('dashboard.mod.bar.desc'),
+        icon: 'wine',
+        ruta: '/app/bar',
+        roles: ['ADMINISTRADOR', 'INSTRUCTOR', 'BARTENDER', 'APRENDIZ'],
+      },
+      {
+        label: t('nav.restaurante'),
+        description: t('dashboard.mod.restaurante.desc'),
+        icon: 'utensils',
+        ruta: '/app/restaurante',
+        roles: ['ADMINISTRADOR', 'INSTRUCTOR', 'MESERO', 'CAJERO', 'APRENDIZ'],
+      },
+      {
+        label: t('nav.inventario'),
+        description: t('dashboard.mod.inventario.desc'),
         icon: 'package',
         ruta: '/app/inventario',
         badgeCount: alertas?.alertasPendientes ?? undefined,
         badgeType: alertas && alertas.alertasPendientes > 0 ? 'alert' : undefined,
+        roles: ['ADMINISTRADOR', 'CONTADORA', 'INSTRUCTOR'],
       },
-
       {
-        label: 'Facturación',
-        description: 'FEL, CUFE y facturas',
+        label: t('dashboard.mod.facturacion'),
+        description: t('dashboard.mod.facturacion.desc'),
         icon: 'file-text',
         ruta: '/app/inventario/facturas',
         badgeCount: facturas?.totalRegistradas ?? undefined,
         badgeType: facturas && facturas.totalRegistradas > 0 ? 'info' : undefined,
+        roles: ['ADMINISTRADOR', 'CONTADORA', 'CAJERO'],
       },
-      { label: 'Presupuesto', description: 'Techos y ejecución ZESE', icon: 'wallet', ruta: '/app/inventario/presupuesto' },
-      { label: 'Requisiciones', description: 'Solicitudes y actas', icon: 'clipboard-list', ruta: '/app/inventario/requisiciones' },
-      { label: 'Reportes', description: 'Exportables PDF y Excel', icon: 'bar-chart-2', ruta: '/app/reportes' },
-      { label: 'Usuarios', description: 'Roles y permisos', icon: 'users', ruta: '/app/usuarios' },
-      { label: 'Notificaciones', description: 'Alertas en tiempo real', icon: 'bell', ruta: '/app/notificaciones' },
+      {
+        label: t('dashboard.mod.presupuesto'),
+        description: t('dashboard.mod.presupuesto.desc'),
+        icon: 'wallet',
+        ruta: '/app/inventario/presupuesto',
+        roles: ['ADMINISTRADOR', 'CONTADORA'],
+      },
+      {
+        label: t('dashboard.mod.requisiciones'),
+        description: t('dashboard.mod.requisiciones.desc'),
+        icon: 'clipboard-list',
+        ruta: '/app/inventario/requisiciones',
+        roles: ['ADMINISTRADOR', 'CONTADORA', 'INSTRUCTOR'],
+      },
+      {
+        label: t('dashboard.mod.reportes'),
+        description: t('dashboard.mod.reportes.desc'),
+        icon: 'bar-chart-2',
+        ruta: '/app/reportes',
+        roles: ['ADMINISTRADOR', 'CONTADORA', 'INSTRUCTOR'],
+      },
+      {
+        label: t('dashboard.mod.usuarios'),
+        description: t('dashboard.mod.usuarios.desc'),
+        icon: 'users',
+        ruta: '/app/usuarios',
+        roles: ['ADMINISTRADOR'],
+      },
+      {
+        label: t('dashboard.mod.notificaciones'),
+        description: t('dashboard.mod.notificaciones.desc'),
+        icon: 'bell',
+        ruta: '/app/notificaciones',
+        roles: ['ADMINISTRADOR', 'CONTADORA', 'INSTRUCTOR', 'CHEF', 'MESERO', 'BARTENDER', 'AUXILIAR_COCINA', 'CAJERO', 'APRENDIZ'],
+      },
     ];
+
+    return todos.filter(m => !m.roles || m.roles.includes(rol));
   });
 
   readonly actividadReciente: ActividadReciente[] = [];

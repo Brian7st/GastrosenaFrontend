@@ -110,7 +110,7 @@ export class EstadisticasPageComponent implements OnInit, AfterViewInit, OnDestr
             legend: { display: false },
             tooltip: {
               callbacks: {
-                label: (ctx) => `${ctx.parsed.y.toFixed(1)} min`
+                label: (ctx) => `${(ctx.parsed.y ?? 0).toFixed(1)} min`
               }
             }
           },

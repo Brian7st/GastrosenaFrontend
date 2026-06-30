@@ -8,6 +8,7 @@ import { FacturaLinea } from '../../../models/facturas.model';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { ActualizarFacturaRequest } from '../../../data-access/api/sourcing.api';
 import type { InfoBancariaTipo } from '../../../data-access/api/sourcing.api';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-factura-edit',
@@ -19,6 +20,7 @@ import type { InfoBancariaTipo } from '../../../data-access/api/sourcing.api';
 })
 export class FacturaEditPageComponent implements OnInit {
   private facade = inject(FacturasFacade);
+  protected readonly i18n = inject(I18nService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 

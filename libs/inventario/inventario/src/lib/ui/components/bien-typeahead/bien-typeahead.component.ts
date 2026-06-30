@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 import { catchError, of } from 'rxjs';
 import { BienesService } from '../../../data-access/services/bienes.service';
 import { Bien } from '../../../models/inventario.model';
+import { I18nService } from '../../../i18n/i18n.service';
 
 /**
  * Typeahead sobre el catálogo de bienes — replica la "virtud VLOOKUP" del Excel.
@@ -32,8 +33,9 @@ import { Bien } from '../../../models/inventario.model';
 })
 export class BienTypeaheadComponent implements OnInit {
   private bienesService = inject(BienesService);
+  protected readonly i18n = inject(I18nService);
 
-  @Input() placeholder = 'Buscar por código o descripción…';
+  @Input() placeholder = '';
 
   /** Emite el bien elegido (trae cód almacén y precio del catálogo enriquecido). */
   @Output() seleccionar = new EventEmitter<Bien>();
@@ -56,6 +58,9 @@ export class BienTypeaheadComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    if (!this.placeholder) {
+      this.placeholder = this.i18n.t('bien-typeahead.placeholder');
+    }
     this.loading.set(true);
     this.bienesService.buscarCatalogo()
       .pipe(catchError(() => of([] as Bien[])))

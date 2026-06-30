@@ -18,13 +18,13 @@
         <restaurant-button *hasPermission="'alertas:configurar_umbrales'" variant="surface" (click)="irAUmbral()">
           <div class="btn-icon-text">
             <lucide-icon name="settings" [size]="18"></lucide-icon>
-            Editar Umbral
+            {{ i18n.t('alerta.editar_umbral') }}
           </div>
         </restaurant-button>
         <restaurant-button *hasPermission="'alertas:resolver'" variant="primary" (click)="abrirResolver()">
           <div class="btn-icon-text">
             <lucide-icon name="check-circle" [size]="18"></lucide-icon>
-            Resolver Ahora
+            {{ i18n.t('alerta.resolver_ahora') }}
           </div>
         </restaurant-button>
       </div>
@@ -46,17 +46,17 @@
             </div>
             <div>
               <h2 class="estado-card__titulo">
-                @if (a.estado === 'CRITICA') { Estado Crítico }
-                @else if (a.prioridad === 'ALTA') { Stock Bajo }
-                @else { Bajo Umbral }
+                @if (a.estado === 'CRITICA') { {{ i18n.t('alerta.estado_critico') }} }
+                @else if (a.prioridad === 'ALTA') { {{ i18n.t('alerta.stock_bajo') }} }
+                @else { {{ i18n.t('alerta.bajo_umbral') }} }
               </h2>
               <p class="estado-card__subtitulo">
-                @if (a.estado === 'CRITICA') { Requiere atención inmediata }
-                @else { Monitorear y gestionar
+                @if (a.estado === 'CRITICA') { {{ i18n.t('alerta.atencion_inmediata') }} }
+                @else { {{ i18n.t('alerta.monitorear') }}
               }</p>
             </div>
             <restaurant-status-badge
-              label="Bajo Stock"
+              [label]="i18n.t('alerta.bajo_stock')"
               [variant]="prioridadVariant()"
               class="estado-card__badge"
             ></restaurant-status-badge>
@@ -64,14 +64,14 @@
 
           <div class="stock-grid">
             <div>
-              <p class="stock-label">STOCK ACTUAL</p>
+              <p class="stock-label">{{ i18n.t('alerta.stock_actual_label') }}</p>
               <p class="stock-value" [class]="'stock-value--' + a.prioridad.toLowerCase()">
                 {{ a.stockActual ?? 0 }}
                 <span class="stock-unit">{{ a.unidad ?? '' }}</span>
               </p>
             </div>
             <div>
-              <p class="stock-label">UMBRAL MÍNIMO</p>
+              <p class="stock-label">{{ i18n.t('alerta.umbral_minimo') }}</p>
               <p class="stock-value stock-value--neutral">
                 {{ a.stockMinimo ?? 0 }}
                 <span class="stock-unit">{{ a.unidad ?? '' }}</span>
@@ -82,7 +82,7 @@
           <!-- Barra de progreso -->
           <div class="progress-section">
             <div class="progress-header">
-              <span>Capacidad: {{ porcentajeStock().toFixed(0) }}%</span>
+              <span>{{ i18n.t('alerta.capacidad') }}: {{ porcentajeStock().toFixed(0) }}%</span>
             </div>
             <div class="progress-track">
               <div
@@ -96,12 +96,12 @@
 
         <!-- Descripción de la alerta -->
         <section class="chart-card">
-          <h2 class="chart-card__title">Descripción</h2>
+          <h2 class="chart-card__title">{{ i18n.t('comun.descripcion') }}</h2>
           <p class="descripcion-text">{{ a.descripcion }}</p>
           @if (a.fechaResolucion) {
             <p class="resolucion-fecha">
               <span class="material-symbols-outlined">check_circle</span>
-              Resuelta: {{ a.fechaResolucion }}
+              {{ i18n.t('alerta.resuelta') }}: {{ a.fechaResolucion }}
             </p>
           }
         </section>

@@ -6,6 +6,7 @@ import {
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Bien, BienFormDto } from '../../../models/inventario.model';
 import { CATEGORIAS_BIEN } from '../../../models/categorias.model';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-bien-form',
@@ -17,6 +18,7 @@ import { CATEGORIAS_BIEN } from '../../../models/categorias.model';
 })
 export class BienFormComponent implements OnInit {
   private fb = inject(FormBuilder);
+  protected readonly i18n = inject(I18nService);
 
   @Input() mode: 'create' | 'edit' = 'create';
   @Input() bien?: Bien;

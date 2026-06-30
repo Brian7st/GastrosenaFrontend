@@ -20,6 +20,7 @@ import {
 } from '../../../models/alerta.model';
 import { AlertasFacade } from '../../../data-access/alertas.facade';
 import { EmptyStateComponent } from '../../../components/empty-state/empty-state.component';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-alertas-list',
@@ -31,6 +32,7 @@ import { EmptyStateComponent } from '../../../components/empty-state/empty-state
 })
 export class AlertasListComponent implements OnInit {
   private router = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private facade = inject(AlertasFacade);
 
   // ── Estado reactivo ──────────────────────────────────────────────────────

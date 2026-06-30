@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { LucideIconComponent, ButtonComponent, KpiCardComponent, HasPermissionDirective } from '@restaurant/shared/ui';
 import { ConciliacionFacade } from '../../../data-access/conciliacion.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-conciliacion-dashboard',
@@ -21,6 +22,7 @@ import { ConciliacionFacade } from '../../../data-access/conciliacion.facade';
 })
 export class ConciliacionDashboardComponent implements OnInit {
   protected facade = inject(ConciliacionFacade);
+  protected readonly i18n = inject(I18nService);
 
   // Signals expuestos desde la facade (solo lectura)
   conciliaciones     = this.facade.conciliaciones;

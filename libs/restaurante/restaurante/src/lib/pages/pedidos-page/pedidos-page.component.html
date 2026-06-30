@@ -16,14 +16,14 @@
 
       <div class="search-bar">
         <lucide-icon name="search" [size]="18" class="search-icon"></lucide-icon>
-        <input type="text" placeholder="Buscar platillo..." [ngModel]="searchTerm()"
+        <input type="text" [placeholder]="i18n.t('pedidosPage.searchPlaceholder')" [ngModel]="searchTerm()"
           (ngModelChange)="searchTerm.set($event)" />
       </div>
 
       <div class="historial-action">
         <restaurant-button variant="surface" routerLink="../historial-pedidos">
           <lucide-icon name="clipboard-list" [size]="18"></lucide-icon>
-          <span>Historial</span>
+          <span>{{ i18n.t('pedidosPage.history') }}</span>
         </restaurant-button>
       </div>
 
@@ -41,8 +41,7 @@
     <div [style.pointer-events]="esPedidoSoloLectura() ? 'none' : 'auto'"
       [style.opacity]="esPedidoSoloLectura() ? '0.5' : '1'">
       <section class="categories-section">
-        <lib-pedidos-categories 
-          [categories]="facade.categoriasMenu()"
+        <lib-pedidos-categories
           (filterChanged)="onFilterChanged($event)">
         </lib-pedidos-categories>
       </section>
@@ -65,9 +64,9 @@
 
 <restaurant-confirm-dialog
   [open]="mostrarModalAccesoDenegado()"
-  title="Acceso Denegado"
-  message="Tu rol no te permite ingresar al módulo de Caja."
-  confirmText="Aceptar"
+  [title]="i18n.t('pedidosPage.accessDeniedTitle')"
+  [message]="i18n.t('pedidosPage.accessDeniedMessage')"
+  [confirmText]="i18n.t('pedidosPage.accessDeniedConfirm')"
   [showCancel]="false"
   (confirm)="cerrarModalAccesoDenegado()"
 ></restaurant-confirm-dialog>

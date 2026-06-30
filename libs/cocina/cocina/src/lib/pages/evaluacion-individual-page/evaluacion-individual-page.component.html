@@ -7,12 +7,12 @@
       class="back-btn"
       type="button"
       (click)="volver(); $event.stopPropagation()"
-      aria-label="Volver"
+      [attr.aria-label]="i18n.t('general.volver')"
     >
       <lucide-icon name="arrow-left" [size]="20"></lucide-icon>
     </button>
 
-    <h1 class="page-title">Evaluación Individual</h1>
+    <h1 class="page-title">{{ i18n.t('evaluacion-individual.page.title') }}</h1>
   </div>
 
   <!-- ===== TARJETA APRENDIZ ===== -->
@@ -34,21 +34,21 @@
     <div class="meta-grid">
 
       <div class="meta-item">
-        <span class="meta-label">Jornada</span>
+        <span class="meta-label">{{ i18n.t('evaluacion-individual.jornada') }}</span>
         <span class="meta-value meta-value--primary">
           {{ aprendiz().jornada }}
         </span>
       </div>
 
       <div class="meta-item">
-        <span class="meta-label">Número de Ficha</span>
+        <span class="meta-label">{{ i18n.t('evaluacion-individual.ficha') }}</span>
         <span class="meta-value">
           {{ aprendiz().numeroFicha }}
         </span>
       </div>
 
       <div class="meta-item">
-        <span class="meta-label">Actividad</span>
+        <span class="meta-label">{{ i18n.t('evaluacion-individual.actividad') }}</span>
         <span class="meta-value">
           {{ aprendiz().actividad ?? '—' }}
         </span>
@@ -66,7 +66,7 @@
 
         <div class="obs-header">
           <span class="obs-icon">📋</span>
-          <span class="obs-title">Observaciones</span>
+          <span class="obs-title">{{ i18n.t('evaluacion-individual.observaciones') }}</span>
         </div>
 
         <div class="obs-body">
@@ -75,7 +75,7 @@
             id="textarea-observaciones"
             class="obs-textarea"
             rows="4"
-            placeholder="Anote observaciones sobre el desempeño del aprendiz en esta actividad..."
+            [placeholder]="i18n.t('evaluacion-individual.obs_placeholder')"
             [(ngModel)]="observaciones"
             (click)="$event.stopPropagation()"
           ></textarea>
@@ -91,7 +91,7 @@
               <div
                 class="evaluar-menu"
                 role="menu"
-                aria-label="Opciones de evaluación"
+                [attr.aria-label]="i18n.t('evaluacion-masiva.menu_label')"
               >
 
                 <button
@@ -102,7 +102,7 @@
                   (click)="submitEvaluacionIndividual('aprobo')"
                 >
                   <span class="option-icon">✓</span>
-                  Aprobó
+                  {{ i18n.t('evaluacion-individual.aprobo') }}
                 </button>
 
                 <button
@@ -113,7 +113,7 @@
                   (click)="submitEvaluacionIndividual('no_aprobo')"
                 >
                   <span class="option-icon">✗</span>
-                  No Aprobó
+                  {{ i18n.t('evaluacion-individual.no_aprobo') }}
                 </button>
 
               </div>
@@ -127,7 +127,7 @@
               [attr.aria-expanded]="menuEvaluarAbierto()"
               aria-haspopup="menu"
             >
-              EVALUAR
+              {{ i18n.t('evaluacion-individual.evaluar') }}
               <span
                 class="evaluar-caret"
                 [class.caret-up]="menuEvaluarAbierto()"
@@ -147,7 +147,7 @@
 
         <div class="historial-header">
           <span class="obs-icon">📋</span>
-          <span class="obs-title">Historial de Evaluaciones</span>
+          <span class="obs-title">{{ i18n.t('evaluacion-individual.historial_titulo') }}</span>
         </div>
 
         @for (registro of historialEvaluaciones(); track $index) {
@@ -166,7 +166,7 @@
               </span>
 
               @if (registro.esRevaluacion) {
-                <span class="revaluacion-tag">Re-evaluación</span>
+                <span class="revaluacion-tag">{{ i18n.t('evaluacion-individual.re_evaluacion') }}</span>
               }
 
               <span class="registro-fecha">{{ registro.fecha }}</span>
@@ -175,7 +175,7 @@
             @if (registro.observaciones) {
               <p class="registro-obs">{{ registro.observaciones }}</p>
             } @else {
-              <p class="registro-obs registro-obs--vacio">Sin observaciones adicionales.</p>
+              <p class="registro-obs registro-obs--vacio">{{ i18n.t('evaluacion-individual.sin_observaciones') }}</p>
             }
 
           </div>
@@ -190,7 +190,7 @@
               type="button"
               (click)="abrirRevaluar(); $event.stopPropagation()"
             >
-              <span>↻</span> Re-evaluar
+              <span>↻</span> {{ i18n.t('evaluacion-individual.re_evaluar') }}
             </button>
           </div>
         }
@@ -201,11 +201,11 @@
 
             <div class="revaluar-form-header">
               <span class="obs-icon">🔄</span>
-              <span class="obs-title">Nueva evaluación</span>
+              <span class="obs-title">{{ i18n.t('evaluacion-individual.nueva_evaluacion') }}</span>
             </div>
 
             <div class="revaluar-resultado-row">
-              <label class="revaluar-label">Resultado</label>
+              <label class="revaluar-label">{{ i18n.t('evaluacion-individual.resultado') }}</label>
               <div class="revaluar-opciones">
                 <button
                   type="button"
@@ -213,7 +213,7 @@
                   [class.opcion-btn--aprobado]="resultadoRevaluar() === 'Aprobado'"
                   (click)="resultadoRevaluar.set('Aprobado')"
                 >
-                  ✓ Aprobado
+                  ✓ {{ i18n.t('evaluacion-individual.aprobado') }}
                 </button>
                 <button
                   type="button"
@@ -221,7 +221,7 @@
                   [class.opcion-btn--reprobado]="resultadoRevaluar() === 'No Aprobado'"
                   (click)="resultadoRevaluar.set('No Aprobado')"
                 >
-                  ✗ No Aprobado
+                  ✗ {{ i18n.t('evaluacion-individual.no_aprobado') }}
                 </button>
               </div>
             </div>
@@ -230,7 +230,7 @@
               id="textarea-revaluar"
               class="obs-textarea"
               rows="3"
-              placeholder="Observaciones de la re-evaluación..."
+              [placeholder]="i18n.t('evaluacion-individual.reevaluar_placeholder')"
               [(ngModel)]="observacionesRevaluar"
             ></textarea>
 
@@ -240,7 +240,7 @@
                 class="btn-cancelar-revaluar"
                 (click)="cancelarRevaluar()"
               >
-                Cancelar
+                {{ i18n.t('evaluacion-individual.cancelar') }}
               </button>
               <button
                 id="btn-confirmar-revaluar"
@@ -249,7 +249,7 @@
                 [disabled]="!resultadoRevaluar()"
                 (click)="submitRevaluar()"
               >
-                Confirmar
+                {{ i18n.t('evaluacion-individual.confirmar') }}
               </button>
             </div>
 

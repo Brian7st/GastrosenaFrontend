@@ -10,6 +10,7 @@ import {
 import { ComandaService } from '../../data-access/comanda.service';
 import { ComandaBarYBarismo, ComandaItem } from '../../models/comanda.model';
 import { ComandaCardComponent } from '../../components/comanda-card/comanda-card.component';
+import { I18nService } from '../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-bar-comandas-page',
@@ -28,6 +29,7 @@ import { ComandaCardComponent } from '../../components/comanda-card/comanda-card
 })
 export class ComandasComponent implements OnInit, OnDestroy {
   private comandaService = inject(ComandaService);
+  protected readonly i18n = inject(I18nService);
   private pollingSub: Subscription | null = null;
 
   searchTerm = signal('');
@@ -38,25 +40,25 @@ export class ComandasComponent implements OnInit, OnDestroy {
   comandas = signal<ComandaBarYBarismo[]>([]);
   errorToast = signal<string | null>(null);
 
-  opcionesEstado = [
-    { label: 'Todos los estados', value: 'Todos los estados' },
+  opcionesEstado = computed(() => [
+    { label: this.i18n.t('comandas.filter.all-statuses'), value: 'Todos los estados' },
     { label: 'PENDIENTE', value: 'PENDIENTE' },
     { label: 'PREPARANDO', value: 'PREPARANDO' },
     { label: 'LISTO', value: 'LISTO' }
-  ];
+  ]);
   
-  opcionesPrioridad = [
-    { label: 'Todas las prioridades', value: 'Todas las prioridades' },
-    { label: 'Urgente', value: 'urgente' },
-    { label: 'Alta', value: 'alta' },
-    { label: 'Normal', value: 'normal' }
-  ];
+  opcionesPrioridad = computed(() => [
+    { label: this.i18n.t('comandas.filter.all-priorities'), value: 'Todas las prioridades' },
+    { label: this.i18n.t('comandas.filter.priority-urgent'), value: 'urgente' },
+    { label: this.i18n.t('comandas.filter.priority-high'), value: 'alta' },
+    { label: this.i18n.t('comandas.filter.priority-normal'), value: 'normal' }
+  ]);
   
-  opcionesOrden = [
-    { label: 'Prioridad', value: 'Prioridad' },
-    { label: 'Hora de llegada', value: 'Hora de llegada' },
-    { label: 'Tiempo estimado', value: 'Tiempo estimado' }
-  ];
+  opcionesOrden = computed(() => [
+    { label: this.i18n.t('comandas.filter.sort-priority'), value: 'Prioridad' },
+    { label: this.i18n.t('comandas.filter.sort-arrival'), value: 'Hora de llegada' },
+    { label: this.i18n.t('comandas.filter.sort-estimated'), value: 'Tiempo estimado' }
+  ]);
 
   ngOnInit(): void {
     this.cargarComandas();
@@ -84,7 +86,7 @@ export class ComandasComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error fetching comandas:', err);
-        this.mostrarError('Error de conexión con el backend');
+        this.mostrarError(this.i18n.t('comandas.error.connection'));
       }
     });
   }
@@ -97,14 +99,14 @@ export class ComandasComponent implements OnInit, OnDestroy {
   onIniciarPlato(idDetalle: string) {
     this.comandaService.iniciarDetalle(idDetalle).subscribe({
       next: () => this.actualizarEstadoItem(idDetalle, 'PREPARANDO'),
-      error: (err) => this.mostrarError('Error al iniciar bebida: ' + err.message)
+      error: (err) => this.mostrarError(this.i18n.t('comandas.error.start-drink') + err.message)
     });
   }
 
   onFinalizarPlato(idDetalle: string) {
     this.comandaService.finalizarDetalle(idDetalle).subscribe({
       next: () => this.actualizarEstadoItem(idDetalle, 'LISTO'),
-      error: (err) => this.mostrarError('Error al finalizar bebida: ' + err.message)
+      error: (err) => this.mostrarError(this.i18n.t('comandas.error.finish-drink') + err.message)
     });
   }
 

@@ -3,7 +3,7 @@
   <inventario-back-button (clicked)="goBack()" />
 
   <!-- ── Título ──────────────────────────────────────────────────────── -->
-  <h2 class="acta-create__title">Generación de Acta</h2>
+  <h2 class="acta-create__title">{{ i18n.t('acta.crear_titulo') }}</h2>
 
   <!-- ── Stepper Horizontal ─────────────────────────────────────────── -->
   <div class="acta-create__stepper">
@@ -28,18 +28,18 @@
         <div class="acta-create__card-glow"></div>
         <h3 class="acta-create__card-title">
           <lucide-icon name="map-pin" [size]="18" class="acta-create__card-icon"></lucide-icon>
-          Contexto Institucional
+          {{ i18n.t('acta.contexto_institucional') }}
         </h3>
         <div class="acta-create__fields">
           <div class="acta-create__field">
-            <label class="acta-create__label">Lugar</label>
+            <label class="acta-create__label">{{ i18n.t('acta.lugar') }}</label>
             <div class="acta-create__readonly-field">
               Escuela de Gastronomía
               <lucide-icon name="lock" [size]="14" class="acta-create__lock-icon"></lucide-icon>
             </div>
           </div>
           <div class="acta-create__field">
-            <label class="acta-create__label">Regional</label>
+            <label class="acta-create__label">{{ i18n.t('acta.regional') }}</label>
             <div class="acta-create__readonly-field">
               Regional Quindío — CCYT
               <lucide-icon name="lock" [size]="14" class="acta-create__lock-icon"></lucide-icon>
@@ -52,42 +52,42 @@
       <div class="acta-create__card acta-create__card--session">
         <h3 class="acta-create__card-title">
           <lucide-icon name="file-text" [size]="18" class="acta-create__card-icon"></lucide-icon>
-          Datos de la Sesión
+          {{ i18n.t('acta.datos_sesion') }}
         </h3>
         <div class="acta-create__form-grid">
           <div class="acta-create__form-field acta-create__form-field--full">
-            <label class="acta-create__label">Fecha de la Sesión</label>
+            <label class="acta-create__label">{{ i18n.t('acta.fecha_sesion') }}</label>
             <div class="acta-create__input-wrapper">
               <lucide-icon name="calendar" [size]="16" class="acta-create__input-icon"></lucide-icon>
               <input type="date" class="acta-create__input" formControlName="fecha" />
             </div>
           </div>
           <div class="acta-create__form-field">
-            <label class="acta-create__label">Hora Inicio</label>
+            <label class="acta-create__label">{{ i18n.t('acta.hora_inicio') }}</label>
             <div class="acta-create__input-wrapper">
               <lucide-icon name="clock" [size]="16" class="acta-create__input-icon"></lucide-icon>
               <input type="time" class="acta-create__input" formControlName="horaInicio" />
             </div>
           </div>
           <div class="acta-create__form-field">
-            <label class="acta-create__label">Hora Fin</label>
+            <label class="acta-create__label">{{ i18n.t('acta.hora_fin') }}</label>
             <div class="acta-create__input-wrapper">
               <lucide-icon name="clock" [size]="16" class="acta-create__input-icon"></lucide-icon>
               <input type="time" class="acta-create__input" formControlName="horaFin" />
             </div>
           </div>
           <div class="acta-create__form-field">
-            <label class="acta-create__label">Ficha de Caracterización</label>
+            <label class="acta-create__label">{{ i18n.t('acta.ficha_caract') }}</label>
             <div class="acta-create__input-wrapper">
               <lucide-icon name="hash" [size]="16" class="acta-create__input-icon"></lucide-icon>
               <input type="text" class="acta-create__input" formControlName="fichaId" placeholder="Ej: 2456789" />
             </div>
           </div>
           <div class="acta-create__form-field">
-            <label class="acta-create__label">Instructor Responsable</label>
+            <label class="acta-create__label">{{ i18n.t('acta.instructor_resp') }}</label>
             <div class="acta-create__input-wrapper">
               <lucide-icon name="user" [size]="16" class="acta-create__input-icon"></lucide-icon>
-              <input type="text" class="acta-create__input" formControlName="instructorId" placeholder="ID del instructor" />
+              <input type="text" class="acta-create__input" formControlName="instructorId" [placeholder]="i18n.t('acta.instructor_placeholder')" />
             </div>
           </div>
         </div>
@@ -97,12 +97,12 @@
       <div class="acta-create__card acta-create__card--full">
         <h3 class="acta-create__card-title">
           <lucide-icon name="list" [size]="18" class="acta-create__card-icon"></lucide-icon>
-          Agenda de la Sesión
+          {{ i18n.t('acta.agenda') }}
         </h3>
         <textarea
           class="acta-create__textarea"
           rows="5"
-          placeholder="Describa los puntos a tratar durante la sesión..."
+          [placeholder]="i18n.t('acta.agenda_placeholder')"
         ></textarea>
       </div>
     </div>
@@ -114,20 +114,20 @@
       <div class="acta-create__card acta-create__card--full">
         <h3 class="acta-create__card-title">
           <lucide-icon name="book-open" [size]="18" class="acta-create__card-icon"></lucide-icon>
-          Desarrollo de la Sesión
+          {{ i18n.t('acta.desarrollo') }}
         </h3>
         <div class="acta-create__form-grid">
           <div class="acta-create__form-field acta-create__form-field--full">
-            <label class="acta-create__label">Resultado de Aprendizaje (RA)</label>
-            <textarea class="acta-create__textarea" rows="3" formControlName="resultadoAprendizaje" placeholder="Describa el resultado de aprendizaje esperado..."></textarea>
+            <label class="acta-create__label">{{ i18n.t('acta.ra') }}</label>
+            <textarea class="acta-create__textarea" rows="3" formControlName="resultadoAprendizaje" [placeholder]="i18n.t('acta.ra_placeholder')"></textarea>
           </div>
           <div class="acta-create__form-field acta-create__form-field--full">
-            <label class="acta-create__label">Actividades Ejecutadas</label>
-            <textarea class="acta-create__textarea" rows="3" formControlName="actividadesRealizadas" placeholder="Describa las actividades desarrolladas en la sesión..."></textarea>
+            <label class="acta-create__label">{{ i18n.t('acta.actividades') }}</label>
+            <textarea class="acta-create__textarea" rows="3" formControlName="actividadesRealizadas" [placeholder]="i18n.t('acta.actividades_placeholder')"></textarea>
           </div>
           <div class="acta-create__form-field acta-create__form-field--full">
-            <label class="acta-create__label">Observaciones Generales</label>
-            <textarea class="acta-create__textarea" rows="3" placeholder="Observaciones adicionales sobre el desarrollo..."></textarea>
+            <label class="acta-create__label">{{ i18n.t('acta.observaciones') }}</label>
+            <textarea class="acta-create__textarea" rows="3" [placeholder]="i18n.t('acta.obs_placeholder')"></textarea>
           </div>
         </div>
       </div>
@@ -140,7 +140,7 @@
       <div class="acta-create__card acta-create__card--full acta-create__card--preview">
         <h3 class="acta-create__card-title">
           <lucide-icon name="file-check" [size]="18" class="acta-create__card-icon"></lucide-icon>
-          Vista Previa del Acta
+          {{ i18n.t('acta.vista_previa') }}
         </h3>
         <div class="acta-create__preview-notice">
           <lucide-icon name="info" [size]="18"></lucide-icon>
@@ -148,15 +148,15 @@
         </div>
         <div class="acta-create__preview-summary">
           <div class="acta-create__preview-item">
-            <span class="acta-create__preview-label">Estado inicial</span>
-            <restaurant-status-badge label="Firmada" variant="success"></restaurant-status-badge>
+            <span class="acta-create__preview-label">{{ i18n.t('acta.estado_inicial') }}</span>
+            <restaurant-status-badge [label]="i18n.t('acta.estado_firmada')" variant="success"></restaurant-status-badge>
           </div>
           <div class="acta-create__preview-item">
-            <span class="acta-create__preview-label">Ficha</span>
+            <span class="acta-create__preview-label">{{ i18n.t('acta.th_ficha') }}</span>
             <span class="acta-create__preview-value">{{ form.get('fichaId')?.value }}</span>
           </div>
           <div class="acta-create__preview-item">
-            <span class="acta-create__preview-label">Firmantes</span>
+            <span class="acta-create__preview-label">{{ i18n.t('acta.firmantes') }}</span>
             <span class="acta-create__preview-value">{{ firmantes().length }} persona(s)</span>
           </div>
         </div>
@@ -178,13 +178,13 @@
     }
     @if (currentStep() < 3) {
       <button class="acta-create__btn-next" type="button" (click)="nextStep()">
-        Siguiente
+        {{ i18n.t('comun.siguiente') }}
         <lucide-icon name="arrow-right" [size]="18"></lucide-icon>
       </button>
     } @else {
       <button class="acta-create__btn-generate" type="button" (click)="generarActa()" [disabled]="enviando()">
         <lucide-icon name="check" [size]="18"></lucide-icon>
-        {{ enviando() ? 'Generando...' : 'Generar Acta' }}
+        {{ enviando() ? i18n.t('acta.generando') : i18n.t('acta.generar') }}
       </button>
     }
   </div>

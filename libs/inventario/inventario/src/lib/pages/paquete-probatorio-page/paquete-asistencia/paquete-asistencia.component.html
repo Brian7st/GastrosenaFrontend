@@ -5,7 +5,7 @@
   <div class="asistencia-page__header">
     <div class="asistencia-page__header-text">
       <inventario-back-button (clicked)="volver()" />
-      <h1 class="asistencia-page__title">Llamado de asistencia</h1>
+      <h1 class="asistencia-page__title">{{ i18n.t('paquete.asistencia_titulo') }}</h1>
     </div>
     <restaurant-status-badge [label]="badgeLabel()" [variant]="badgeVariant()"></restaurant-status-badge>
   </div>
@@ -13,7 +13,7 @@
   <!-- ── Tarjeta de Contexto ────────────────────────────────────────────── -->
   <div class="asistencia-page__context-card">
     <div class="context-card__field">
-      <span class="context-card__label">Ficha</span>
+      <span class="context-card__label">{{ i18n.t('acta.th_ficha') }}</span>
       <select class="context-card__select" (change)="onFichaChange($event)">
         @for (ficha of fichasDisponibles(); track ficha.id) {
           <option [value]="ficha.numero" [selected]="ficha.numero === fichaSeleccionadaNumero()">
@@ -26,7 +26,7 @@
     <div class="context-card__divider"></div>
 
     <div class="context-card__field">
-      <span class="context-card__label">Instructor</span>
+      <span class="context-card__label">{{ i18n.t('acta.th_instructor') }}</span>
       <div class="context-card__instructor">
         <div class="context-card__avatar">{{ getInicialesPaquete() }}</div>
         <span class="context-card__instructor-name">{{ instructorNombre() }}</span>
@@ -36,7 +36,7 @@
     <div class="context-card__divider"></div>
 
     <div class="context-card__field">
-      <span class="context-card__label">Programa</span>
+      <span class="context-card__label">{{ i18n.t('paquete.programa') }}</span>
       <span class="context-card__value">
         {{ fichaSeleccionada()?.programa ?? '—' }}
       </span>
@@ -47,7 +47,7 @@
     <div class="context-card__field">
       <span class="context-card__label">
         <lucide-icon name="calendar" [size]="14"></lucide-icon>
-        Fecha de sesión
+        {{ i18n.t('paquete.fecha_sesion') }}
       </span>
       <input
         type="date"
@@ -61,7 +61,7 @@
   <!-- ── KPI Cards ──────────────────────────────────────────────────────── -->
   <div class="asistencia-page__kpi-grid">
     <restaurant-kpi-card
-      label="TOTAL"
+      [label]="i18n.t('paquete.asistencia_total')"
       [value]="kpiTotal().toString()"
       icon="users"
       iconColor="blue"
@@ -70,7 +70,7 @@
     ></restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="ASISTIÓ"
+      [label]="i18n.t('paquete.asistio')"
       [value]="kpiAsistio().toString()"
       icon="check-circle-2"
       iconColor="green"
@@ -79,7 +79,7 @@
     ></restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="TARDE"
+      [label]="i18n.t('paquete.tarde')"
       [value]="kpiTarde().toString()"
       icon="clock"
       iconColor="orange"
@@ -88,7 +88,7 @@
     ></restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="EXCUSA"
+      [label]="i18n.t('paquete.excusa')"
       [value]="kpiExcusa().toString()"
       icon="file-text"
       iconColor="blue"
@@ -97,7 +97,7 @@
     ></restaurant-kpi-card>
 
     <restaurant-kpi-card
-      label="NO ASISTIÓ"
+      [label]="i18n.t('paquete.no_asistio')"
       [value]="kpiNoAsistio().toString()"
       icon="x"
       iconColor="red"
@@ -111,7 +111,7 @@
     <div dtHeader class="dt-controls">
       <div class="dt-controls__title">
         <lucide-icon name="user" [size]="22" class="dt-controls__icon"></lucide-icon>
-        <h3 class="dt-controls__heading">Lista de aprendices</h3>
+        <h3 class="dt-controls__heading">{{ i18n.t('paquete.lista_aprendices') }}</h3>
       </div>
       <div class="dt-controls__actions">
         <div class="dt-search">
@@ -119,14 +119,14 @@
           <input
             type="text"
             class="dt-search__input"
-            placeholder="Buscar aprendiz..."
+            [placeholder]="i18n.t('paquete.buscar_aprendiz')"
             (input)="onSearch($event)"
           />
         </div>
         <restaurant-button variant="surface" (click)="marcarTodosAsistio()">
           <div class="btn-icon-text">
             <lucide-icon name="check-check" [size]="16"></lucide-icon>
-            Marcar todos: asistió
+            {{ i18n.t('paquete.marcar_todos') }}
           </div>
         </restaurant-button>
       </div>
@@ -135,9 +135,9 @@
     <thead>
       <tr>
         <th class="col-num">#</th>
-        <th>Aprendiz</th>
-        <th>Documento</th>
-        <th class="col-estado">Estado</th>
+        <th>{{ i18n.t('paquete.th_aprendiz') }}</th>
+        <th>{{ i18n.t('paquete.th_documento') }}</th>
+        <th class="col-estado">{{ i18n.t('comun.estado') }}</th>
       </tr>
     </thead>
     <tbody>
@@ -171,7 +171,7 @@
                 title="Asistió"
               >
                 <lucide-icon name="check-circle-2" [size]="14"></lucide-icon>
-                Asistió
+                {{ i18n.t('paquete.asistio') }}
               </button>
               <button
                 type="button"
@@ -181,7 +181,7 @@
                 title="Tarde"
               >
                 <lucide-icon name="clock" [size]="14"></lucide-icon>
-                Tarde
+                {{ i18n.t('paquete.tarde') }}
               </button>
               <button
                 type="button"
@@ -191,7 +191,7 @@
                 title="Excusa"
               >
                 <lucide-icon name="file-text" [size]="14"></lucide-icon>
-                Excusa
+                {{ i18n.t('paquete.excusa') }}
               </button>
               <button
                 type="button"
@@ -201,7 +201,7 @@
                 title="No asistió"
               >
                 <lucide-icon name="x" [size]="14"></lucide-icon>
-                No asistió
+                {{ i18n.t('paquete.no_asistio') }}
               </button>
             </div>
           </td>
@@ -210,7 +210,7 @@
         <tr>
           <td colspan="4" class="asistencia-table__empty">
             <lucide-icon name="search" [size]="24"></lucide-icon>
-            <p>No se encontraron aprendices con la búsqueda aplicada.</p>
+            <p>{{ i18n.t('paquete.sin_aprendices') }}</p>
           </td>
         </tr>
       }
@@ -221,16 +221,16 @@
   <div class="asistencia-page__footer">
     <p class="asistencia-page__footer-hint">
       <lucide-icon name="save" [size]="14"></lucide-icon>
-      Revisá el estado de cada aprendiz antes de guardar. Este registro queda vinculado al paquete probatorio.
+      {{ i18n.t('paquete.asistencia_hint') }}
     </p>
     <div class="asistencia-page__footer-actions">
       <restaurant-button variant="surface" (click)="cancelar()">
-        Cancelar
+        {{ i18n.t('comun.cancelar') }}
       </restaurant-button>
       <restaurant-button variant="primary" [disabled]="loading()" (click)="guardar()">
         <div class="btn-icon-text">
           <lucide-icon name="save" [size]="16"></lucide-icon>
-          {{ loading() ? 'Guardando...' : 'Guardar asistencia' }}
+          {{ loading() ? i18n.t('paquete.guardando') : i18n.t('paquete.guardar_asistencia') }}
         </div>
       </restaurant-button>
     </div>
@@ -242,6 +242,6 @@
 @if (!paquete()) {
   <div class="asistencia-page__no-paquete">
     <lucide-icon name="alert-circle" [size]="24"></lucide-icon>
-    <p>No se pudo cargar el paquete. Por favor, volvé al listado.</p>
+    <p>{{ i18n.t('paquete.error_carga') }}</p>
   </div>
 }

@@ -9,6 +9,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 import { PaqueteFacade } from '../../../data-access/paquete.facade';
 import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-paquete-req-detail',
@@ -20,6 +21,7 @@ import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
 })
 export class PaqueteReqDetailComponent implements OnInit {
   private router               = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private route                = inject(ActivatedRoute);
   private facade               = inject(PaqueteFacade);
   private requisicionesFacade  = inject(RequisicionesFacade);

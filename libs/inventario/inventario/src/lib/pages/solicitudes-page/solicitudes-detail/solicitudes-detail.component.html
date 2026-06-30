@@ -10,23 +10,23 @@
 
     <div class="header-actions">
       <inventario-back-button (clicked)="onVolver()" />
-      <button *hasPermission="'gil:editar'" class="btn-action" (click)="onEditar()" [disabled]="estadoActual() !== 'BORRADOR'">
-        <span class="material-symbols-outlined">edit</span> Editar
+      <button class="btn-action" (click)="onEditar()" [disabled]="estadoActual() !== 'BORRADOR'">
+        <span class="material-symbols-outlined">edit</span> {{ i18n.t('comun.editar') }}
       </button>
       <button class="btn-action" (click)="onDownloadPdf()">
-        <span class="material-symbols-outlined">picture_as_pdf</span> Descargar PDF
+        <span class="material-symbols-outlined">picture_as_pdf</span> {{ i18n.t('solicitudes-detail.descargar_pdf') }}
       </button>
 
       <div class="action-group">
         @if (estadoActual() === 'BORRADOR') {
-          <button *hasPermission="'gil:emitir'" class="btn-primary" (click)="onEnviarAprobacion()">
-            Enviar a Aprobación
+          <button class="btn-primary" (click)="onEnviarAprobacion()">
+            {{ i18n.t('solicitudes-detail.enviar_aprobacion') }}
           </button>
         }
         @if (estadoActual() === 'EMITIDO') {
-          <button *hasPermission="'gil:emitir'" class="btn-primary" (click)="onToggleEnviarProveedor()">
+          <button class="btn-primary" (click)="onToggleEnviarProveedor()">
             <span class="material-symbols-outlined">local_shipping</span>
-            Enviar a Proveedor
+            {{ i18n.t('solicitudes-detail.enviar_proveedor') }}
           </button>
         }
       </div>
@@ -39,14 +39,14 @@
       <div class="panel-header">
         <span class="material-symbols-outlined icon-primary">forward_to_inbox</span>
         <div>
-          <h4>Enviar GIL al Proveedor</h4>
-          <p>Se enviará un correo con el GIL adjunto en PDF.</p>
+          <h4>{{ i18n.t('solicitudes-detail.enviar_gil_titulo') }}</h4>
+          <p>{{ i18n.t('solicitudes-detail.enviar_gil_hint') }}</p>
         </div>
       </div>
 
       <div class="panel-form">
         <div class="form-group">
-          <label>Correo del Proveedor <span class="required">*</span></label>
+          <label>{{ i18n.t('solicitudes-detail.correo_proveedor') }} <span class="required">*</span></label>
           <input
             type="email"
             class="form-control"
@@ -56,7 +56,7 @@
         </div>
 
         <div class="form-group">
-          <label>Nombre del Proveedor</label>
+          <label>{{ i18n.t('solicitudes-detail.nombre_proveedor') }}</label>
           <input
             type="text"
             class="form-control"
@@ -66,7 +66,7 @@
         </div>
 
         <div class="form-group form-group--full">
-          <label>Asunto</label>
+          <label>{{ i18n.t('solicitudes-detail.asunto') }}</label>
           <input
             type="text"
             class="form-control"
@@ -77,20 +77,20 @@
         <div class="form-group form-group--full">
           <div class="adjunto-chip">
             <span class="material-symbols-outlined">picture_as_pdf</span>
-            <span>{{ solicitudId() }}.pdf — adjunto automáticamente</span>
+            <span>{{ solicitudId() }}.pdf — {{ i18n.t('solicitudes-detail.adjunto_auto') }}</span>
           </div>
         </div>
       </div>
 
       <div class="panel-actions">
         <restaurant-button variant="ghost" (click)="onToggleEnviarProveedor()">
-          Cancelar
+          {{ i18n.t('comun.cancelar') }}
         </restaurant-button>
-        <restaurant-button *hasPermission="'gil:emitir'" variant="primary"
+        <restaurant-button variant="primary"
           [disabled]="!correoProveedor()"
           (click)="onConfirmarEnvioProveedor()">
           <span class="material-symbols-outlined">send</span>
-          Enviar correo
+          {{ i18n.t('solicitudes-detail.enviar_correo') }}
         </restaurant-button>
       </div>
     </div>
@@ -128,16 +128,16 @@
   <div class="card card--session">
     <div class="card-header-icon">
       <span class="material-symbols-outlined icon-primary">event_note</span>
-      <h3>Identificación de la Solicitud</h3>
+      <h3>{{ i18n.t('solicitudes-detail.identificacion') }}</h3>
     </div>
 
     <div class="grid-3-col">
       <div class="info-block">
-        <label>Jefe de Oficina / Coordinador</label>
+        <label>{{ i18n.t('solicitudes-edit.jefe_oficina') }}</label>
         <p>{{ solicitud()?.jefeOficinaCoordinador ?? '—' }}</p>
       </div>
       <div class="info-block">
-        <label>Código de Grupo</label>
+        <label>{{ i18n.t('solicitudes-edit.codigo_grupo') }}</label>
         <p>{{ solicitud()?.codigoGrupo ?? '—' }}</p>
       </div>
     </div>
@@ -153,21 +153,21 @@
 
       <!-- Card: Estado de Solicitud -->
       <div class="card card--summary">
-        <h3 class="card-subtitle">Estado de Solicitud</h3>
+        <h3 class="card-subtitle">{{ i18n.t('solicitudes-detail.estado_solicitud') }}</h3>
         <div class="status-row">
           <div class="badge badge--state">
             <span class="pulse-dot"></span> {{ estadoActual() }}
           </div>
-          <span class="date-created">Creado el {{ fechaCreacion() }}</span>
+          <span class="date-created">{{ i18n.t('solicitudes-detail.creado_el') }} {{ fechaCreacion() }}</span>
         </div>
 
         <div class="summary-details">
           <div class="total-block">
-            <p class="label">Total Estimado</p>
+            <p class="label">{{ i18n.t('solicitudes-detail.total_estimado') }}</p>
             <p class="value-money">{{ totalEstimado() | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
           </div>
           <div class="owner-block">
-            <p class="label">Responsable (Instructor)</p>
+            <p class="label">{{ i18n.t('solicitudes-detail.responsable') }}</p>
             <div class="owner-info">
               <div class="owner-avatar">{{ solicitanteIniciales() }}</div>
               <p class="owner-name">{{ solicitud()?.solicitante ?? '—' }}</p>
@@ -178,22 +178,22 @@
 
       <!-- Card: Información General -->
       <div class="card card--general">
-        <h3 class="card-subtitle">Información General</h3>
+        <h3 class="card-subtitle">{{ i18n.t('si.info_general') }}</h3>
         <div class="info-stack">
           <div class="info-item">
-            <label>Regional</label>
+            <label>{{ i18n.t('solicitudes-edit.regional_nombre_label') }}</label>
             <p>{{ solicitud()?.regionalNombre ?? '—' }}</p>
           </div>
           <div class="info-item">
-            <label>Centro de Formación</label>
+            <label>{{ i18n.t('solicitudes-detail.centro_formacion') }}</label>
             <p>{{ solicitud()?.centroCostosNombre ?? '—' }}</p>
           </div>
           <div class="info-item">
-            <label>Área / Programa</label>
+            <label>{{ i18n.t('solicitudes-detail.area_programa') }}</label>
             <p>{{ solicitud()?.area ?? '—' }}</p>
           </div>
           <div class="info-item">
-            <label>Cuentadante Responsable</label>
+            <label>{{ i18n.t('solicitudes-detail.cuentadante') }}</label>
             @for (c of solicitud()?.cuentadantes ?? []; track c.cedula) {
               <p>{{ c.nombre }}</p>
             } @empty {
@@ -201,7 +201,7 @@
             }
           </div>
           <div class="info-item">
-            <label>Destino del Bien</label>
+            <label>{{ i18n.t('solicitudes-edit.destino_bienes') }}</label>
             <p>{{ solicitud()?.destinoBienes ?? '—' }}</p>
           </div>
         </div>
@@ -215,18 +215,18 @@
       <div class="card card--table p-0">
         <div class="card-header card-header--bg">
           <span class="material-symbols-outlined icon-primary">list_alt</span>
-          <h3>Bienes Solicitados Originalmente</h3>
+          <h3>{{ i18n.t('solicitudes-detail.bienes_orig') }}</h3>
         </div>
         <div class="table-wrap">
           <table class="styled-table">
             <thead>
               <tr>
-                <th>Código SENA</th>
-                <th>Descripción</th>
-                <th class="text-center">UM</th>
-                <th class="text-center">Cant.</th>
-                <th class="text-right">Valor Unitario</th>
-                <th class="text-right">Subtotal</th>
+                <th>{{ i18n.t('comun.codigo_sena') }}</th>
+                <th>{{ i18n.t('solicitudes-edit.th_descripcion') }}</th>
+                <th class="text-center">{{ i18n.t('solicitudes-edit.th_um') }}</th>
+                <th class="text-center">{{ i18n.t('si.th_cant') }}</th>
+                <th class="text-right">{{ i18n.t('solicitudes-edit.th_valor_unit') }}</th>
+                <th class="text-right">{{ i18n.t('solicitudes-edit.th_subtotal') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -241,7 +241,7 @@
                 </tr>
               } @empty {
                 <tr>
-                  <td colspan="6" class="empty-state">Sin bienes registrados</td>
+                  <td colspan="6" class="empty-state">{{ i18n.t('solicitudes-detail.sin_bienes') }}</td>
                 </tr>
               }
             </tbody>
@@ -260,7 +260,7 @@
     </div>
     <div class="audit-status">
       <span class="material-symbols-outlined">verified</span>
-      <span>Validado bajo estándar SENA-GIL-2024</span>
+      <span>{{ i18n.t('solicitudes-detail.validado') }}</span>
     </div>
   </div>
 

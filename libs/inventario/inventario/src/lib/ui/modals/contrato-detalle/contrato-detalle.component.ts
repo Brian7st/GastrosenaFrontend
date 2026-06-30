@@ -4,10 +4,12 @@ import {
   EventEmitter,
   Input,
   Output,
+  inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonComponent, LoadingSkeletonComponent } from '@restaurant/shared/ui';
 import { Contrato, EstadoContrato } from '../../../models/contrato.model';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-contrato-detalle',
@@ -18,6 +20,8 @@ import { Contrato, EstadoContrato } from '../../../models/contrato.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContratoDetalleComponent {
+  protected readonly i18n = inject(I18nService);
+
   @Input() contrato: Contrato | undefined;
   @Input() loading = false;
   @Output() cerrar = new EventEmitter<void>();

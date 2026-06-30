@@ -8,7 +8,7 @@
     <!-- Header -->
     <div class="modal-card__header">
       <div>
-        <h2 class="modal-card__title">Resumen y Confirmación</h2>
+        <h2 class="modal-card__title">{{ i18n.t('req.resumen_titulo') }}</h2>
         <p class="modal-card__subtitle">
           Ficha {{ draft.contexto().fichaId }} — {{ draft.contexto().fecha }}
           {{ draft.contexto().horaSesion }}
@@ -53,7 +53,7 @@
                           <span class="item-card__stock-badge">Agotado</span>
                         }
                       </div>
-                      <p class="item-card__code">Código: {{ item.bien.codigoSena }}</p>
+                      <p class="item-card__code">{{ i18n.t('comun.codigo') }}: {{ item.bien.codigoSena }}</p>
                     </div>
                   </div>
                   <div class="item-card__right"
@@ -79,10 +79,10 @@
     <div class="modal-card__footer">
       <div class="modal-footer__summary">
         <div>
-          <p class="modal-footer__total-label">Total de la Solicitud</p>
-          <h3 class="modal-footer__total-value">{{ draft.totalUnidades() }} Unidades</h3>
+          <p class="modal-footer__total-label">{{ i18n.t('req.total_solicitud') }}</p>
+          <h3 class="modal-footer__total-value">{{ draft.totalUnidades() }} {{ i18n.t('req.unidades') }}</h3>
         </div>
-        <p class="modal-footer__note">Este pedido será procesado por el almacén del SENA.</p>
+        <p class="modal-footer__note">{{ i18n.t('req.pedido_nota') }}</p>
       </div>
       <!-- Slot de mensaje con espacio reservado: el error no debe mover los botones -->
       <div class="modal-footer__error-slot" [class.modal-footer__error-slot--visible]="!!error()">
@@ -91,16 +91,14 @@
         }
       </div>
       <div class="modal-footer__actions">
-        <button class="btn-secondary" (click)="volver()" [disabled]="enviando()">
-          Volver a Editar
-        </button>
+        <button class="btn-secondary" (click)="volver()" [disabled]="enviando()">{{ i18n.t('req.volver_editar') }}</button>
         <button class="btn-primary" (click)="confirmar()"
                 [disabled]="enviando() || draft.totalItems() === 0">
           @if (enviando()) {
             <lucide-icon name="loader-2" [size]="18"></lucide-icon>
-            Enviando...
+            {{ i18n.t('req.enviando') }}
           } @else {
-            Confirmar Pedido y Enviar a Almacén
+            {{ i18n.t('req.confirmar_pedido') }}
             <lucide-icon name="send" [size]="18"></lucide-icon>
           }
         </button>

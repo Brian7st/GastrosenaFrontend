@@ -11,6 +11,7 @@ import {
 } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-solicitudes-insumos-detail',
@@ -32,6 +33,7 @@ import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 })
 export class SolicitudesInsumosDetailComponent implements OnInit {
   private router = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private route  = inject(ActivatedRoute);
   readonly facade = inject(SolicitudesFacade);
 

@@ -6,7 +6,7 @@
 
     <div class="detail-header__content">
       <restaurant-page-header
-        title="Solicitud de Insumos"
+        [title]="i18n.t('si.titulo_detalle')"
         [subtitle]="solicitud() ? 'Ficha ' + solicitud()!.fichaId : ''"
       />
       @if (solicitud()) {
@@ -17,7 +17,7 @@
     </div>
 
     @if (solicitud()?.estado === 'CREADA') {
-      <restaurant-button variant="outline" (clicked)="onEdit()">Editar</restaurant-button>
+      <restaurant-button variant="outline" (clicked)="onEdit()">{{ i18n.t('comun.editar') }}</restaurant-button>
     }
   </div>
 
@@ -29,8 +29,8 @@
   <!-- Not found -->
   @else if (!loading() && !solicitud()) {
     <restaurant-empty-state
-      title="Solicitud no encontrada"
-      message="No se pudo cargar el detalle de esta solicitud."
+      [title]="i18n.t('si.no_encontrada')"
+      [message]="i18n.t('si.no_encontrada_msg')"
     />
   }
 
@@ -38,36 +38,36 @@
   @else if (solicitud()) {
     <!-- Info General -->
     <section class="detail-section">
-      <restaurant-section-title title="Información General" align="left" />
+      <restaurant-section-title [title]="i18n.t('si.info_general')" align="left" />
 
       <div class="info-grid">
         <div class="info-item">
-          <span class="info-label">Ficha</span>
+          <span class="info-label">{{ i18n.t('req.ficha') }}</span>
           <span class="info-value">{{ solicitud()!.fichaId }}</span>
         </div>
         <div class="info-item">
-          <span class="info-label">Programa</span>
+          <span class="info-label">{{ i18n.t('si.programa_label') }}</span>
           <span class="info-value">{{ solicitud()!.programaId }}</span>
         </div>
         <div class="info-item">
-          <span class="info-label">Instructor</span>
+          <span class="info-label">{{ i18n.t('req.instructor') }}</span>
           <span class="info-value">{{ solicitud()!.instructorId }}</span>
         </div>
         @if (solicitud()!.identificacionInstructor) {
           <div class="info-item">
-            <span class="info-label">Identificación</span>
+            <span class="info-label">{{ i18n.t('si.identificacion') }}</span>
             <span class="info-value">{{ solicitud()!.identificacionInstructor }}</span>
           </div>
         }
         @if (solicitud()!.fechaSolicitud) {
           <div class="info-item">
-            <span class="info-label">Fecha</span>
+            <span class="info-label">{{ i18n.t('comun.fecha') }}</span>
             <span class="info-value">{{ solicitud()!.fechaSolicitud | date:'dd/MM/yyyy' }}</span>
           </div>
         }
         @if (solicitud()!.numeroSolicitud) {
           <div class="info-item">
-            <span class="info-label">Número</span>
+            <span class="info-label">{{ i18n.t('si.numero') }}</span>
             <span class="info-value">{{ solicitud()!.numeroSolicitud }}</span>
           </div>
         }
@@ -78,7 +78,7 @@
     <section class="detail-section">
       <div class="section-header-row">
         <restaurant-section-title
-          [title]="'Insumos solicitados'"
+          [title]="i18n.t('si.items_solicitados')"
           align="left"
         />
         <span class="badge-count">{{ totalItems() }} ítem{{ totalItems() !== 1 ? 's' : '' }}</span>
@@ -86,21 +86,21 @@
 
       @if (solicitud()!.items.length === 0) {
         <restaurant-empty-state
-          title="Sin ítems"
-          message="Esta solicitud no tiene insumos registrados."
+          [title]="i18n.t('si.sin_items_titulo')"
+          [message]="i18n.t('si.sin_items_msg')"
         />
       } @else {
         <div class="table-wrapper">
           <table class="items-table">
             <thead>
               <tr>
-                <th>Código SENA</th>
-                <th>Nombre</th>
-                <th>Unidad</th>
-                <th class="text-right">Cantidad</th>
+                <th>{{ i18n.t('comun.codigo_sena') }}</th>
+                <th>{{ i18n.t('si.th_nombre') }}</th>
+                <th>{{ i18n.t('si.th_unidad') }}</th>
+                <th class="text-right">{{ i18n.t('si.th_cant') }}</th>
                 @if (solicitud()!.items[0].valorUnitario !== undefined) {
-                  <th class="text-right">Valor unit.</th>
-                  <th class="text-right">Total</th>
+                  <th class="text-right">{{ i18n.t('si.th_valor_unit') }}</th>
+                  <th class="text-right">{{ i18n.t('comun.total') }}</th>
                 }
               </tr>
             </thead>

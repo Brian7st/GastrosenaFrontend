@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { ButtonComponent, HasPermissionDirective } from '@restaurant/shared/ui';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-solicitudes-detail',
@@ -16,6 +17,7 @@ import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 })
 export class SolicitudesDetailComponent implements OnInit {
   private router = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private route  = inject(ActivatedRoute);
   private facade = inject(SolicitudesFacade);
 

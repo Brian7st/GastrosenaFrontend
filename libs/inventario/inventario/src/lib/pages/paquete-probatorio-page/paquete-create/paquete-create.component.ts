@@ -12,6 +12,7 @@ import { LucideIconComponent, ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { PaqueteService } from '../../../data-access/services/paquete.service';
 import { ActasFacade } from '../../../data-access/actas.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-paquete-create',
@@ -23,6 +24,7 @@ import { ActasFacade } from '../../../data-access/actas.facade';
 })
 export class PaqueteCreateComponent {
   private router         = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private route          = inject(ActivatedRoute);
   private fb             = inject(FormBuilder);
   private paqueteService = inject(PaqueteService);

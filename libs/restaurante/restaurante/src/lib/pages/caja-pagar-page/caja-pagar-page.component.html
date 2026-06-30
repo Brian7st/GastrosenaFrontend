@@ -3,43 +3,43 @@
         <button class="back-btn" (click)="volver()">
             <lucide-icon name="arrow-left" [size]="20"></lucide-icon>
         </button>
-        <restaurant-page-header title="Registrar Pago"
-            subtitle="Cuentas pendientes por recaudar e imprimir comprobante"></restaurant-page-header>
+        <restaurant-page-header [title]="i18n.t('cajaPagar.title')"
+            [subtitle]="i18n.t('cajaPagar.subtitle')"></restaurant-page-header>
     </div>
 
     <div class="main-content-block">
-        <restaurant-data-table tableTitle="Pedidos por Cobrar" tableIcon="dollar-sign" class="mt-4 data-table-wrapper">
+        <restaurant-data-table [tableTitle]="i18n.t('cajaPagar.tableTitle')" tableIcon="dollar-sign" class="mt-4 data-table-wrapper">
             <ng-container dtHeader>
-                <span class="subtitle">Seleccione el pedido que desea facturar</span>
+                <span class="subtitle">{{ i18n.t('cajaPagar.subtitleTable') }}</span>
             </ng-container>
 
             <thead>
                 <tr>
-                    <th>Mesa</th>
-                    <th>Cajero</th>
-                    <th>Total Pedido</th>
-                    <th class="text-center">Acción</th>
+                    <th>{{ i18n.t('cajaPagar.table') }}</th>
+                    <th>{{ i18n.t('cajaPagar.cashier') }}</th>
+                    <th>{{ i18n.t('cajaPagar.totalOrder') }}</th>
+                    <th class="text-center">{{ i18n.t('cajaPagar.action') }}</th>
                 </tr>
             </thead>
             <tbody>
                 @for (pedido of pedidosPorPagar(); track pedido.id) {
                 <tr>
-                    <td><strong>{{ pedido.nombreMesa || 'Para Llevar' }}</strong></td>
+                    <td><strong>{{ pedido.nombreMesa || i18n.t('cajaPagar.takeAway') }}</strong></td>
                     <td title="{{ pedido.meseroId }}"><span class="badge-count">{{ pedido.meseroId | slice:0:8
                             }}...</span></td>
                     <td class="amount-pending">{{ pedido.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
                     <td class="text-center">
                         <restaurant-button variant="primary" (click)="abrirCobro(pedido)" class="cobrar-btn">
                             <lucide-icon name="dollar-sign" [size]="16"></lucide-icon>
-                            <span>Cobrar</span>
+                            <span>{{ i18n.t('cajaPagar.collect') }}</span>
                         </restaurant-button>
                     </td>
                 </tr>
                 } @empty {
                 <tr>
                     <td colspan="4" class="p-0 border-0">
-                        <restaurant-empty-state title="Todo al día"
-                            message="No hay pedidos pendientes por cobrar en este momento.">
+                        <restaurant-empty-state [title]="i18n.t('cajaPagar.allPaidTitle')"
+                            [message]="i18n.t('cajaPagar.allPaidMessage')">
                         </restaurant-empty-state>
                     </td>
                 </tr>
@@ -53,7 +53,7 @@
         <div class="modal-card" (click)="$event.stopPropagation()">
 
             <div class="modal-header">
-                <h3>Procesar Pago - Pedido #{{ pedidoSeleccionado()?.id | slice:0:8 | uppercase }}</h3>
+                <h3>{{ i18n.t('cajaPagar.processPayment').replace('{{ id }}', (pedidoSeleccionado()?.id | slice:0:8 | uppercase) || '') }}</h3>
                 <button class="close-btn" (click)="cerrarModal()">
                     <lucide-icon name="x" [size]="20"></lucide-icon>
                 </button>
@@ -61,73 +61,73 @@
 
             <div class="modal-body">
                 <div class="total-badge">
-                    <span class="lbl">Subtotal Pedido:</span>
+                    <span class="lbl">{{ i18n.t('cajaPagar.subtotal') }}</span>
                     <span class="val">{{ pedidoSeleccionado()?.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
                 </div>
 
                 <div class="tip-section mt-4 mb-4">
-                    <span class="section-hint">Propina sugerida o voluntaria:</span>
+                    <span class="section-hint">{{ i18n.t('cajaPagar.tipHint') }}</span>
                     <div class="method-cards-grid">
                         <div class="method-card small"
                             [class.active]="tipoPropina() === 'NADA'" (click)="seleccionarTipoPropina('NADA')">
-                            <span>$0</span>
+                            <span>{{ i18n.t('cajaPagar.tipZero') }}</span>
                         </div>
                         <div class="method-card small"
                             [class.active]="tipoPropina() === 'DIEZ_PORCIENTO'"
                             (click)="seleccionarTipoPropina('DIEZ_PORCIENTO')">
-                            <span>10% Sugerida</span>
+                            <span>{{ i18n.t('cajaPagar.tipSuggested') }}</span>
                         </div>
                         <div class="method-card small"
                             [class.active]="tipoPropina() === 'OTRO'" (click)="seleccionarTipoPropina('OTRO')">
-                            <span>Otro valor</span>
+                            <span>{{ i18n.t('cajaPagar.tipOther') }}</span>
                         </div>
                     </div>
 
                     @if (tipoPropina() === 'OTRO') {
                     <div class="input-group mt-3">
-                        <input type="number" class="form-control" placeholder="Monto exacto en pesos ($)"
+                        <input type="number" class="form-control" [placeholder]="i18n.t('cajaPagar.tipPlaceholder')"
                             [value]="propinaManual() || ''" (input)="actualizarPropinaManual($event)" />
                     </div>
                     }
 
                     <div class="total-badge primary mt-3">
-                        <span class="lbl">Total Final a Cobrar:</span>
+                        <span class="lbl">{{ i18n.t('cajaPagar.totalToCollect') }}</span>
                         <span class="val">{{ totalACobrar() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
                     </div>
                 </div>
 
-                <span class="section-hint">Seleccione el método de pago:</span>
+                <span class="section-hint">{{ i18n.t('cajaPagar.selectMethod') }}</span>
 
                 <div class="method-cards-grid">
                     <div class="method-card"
                         [class.active]="metodoSeleccionado() === 'EFECTIVO'" (click)="seleccionarMetodo('EFECTIVO')">
                         <lucide-icon name="banknote" [size]="24"></lucide-icon>
-                        <span>Efectivo</span>
+                        <span>{{ i18n.t('cajaPagar.cash') }}</span>
                     </div>
                     <div class="method-card"
                         [class.active]="metodoSeleccionado() === 'TARJETA'" (click)="seleccionarMetodo('TARJETA')">
                         <lucide-icon name="credit-card" [size]="24"></lucide-icon>
-                        <span>Tarjeta</span>
+                        <span>{{ i18n.t('cajaPagar.card') }}</span>
                     </div>
                     <div class="method-card"
                         [class.active]="metodoSeleccionado() === 'TRANSFERENCIA'"
                         (click)="seleccionarMetodo('TRANSFERENCIA')">
                         <lucide-icon name="arrow-right-left" [size]="24"></lucide-icon>
-                        <span>Transferencia</span>
+                        <span>{{ i18n.t('cajaPagar.transfer') }}</span>
                     </div>
                 </div>
 
                 @if (metodoSeleccionado() === 'EFECTIVO') {
                 <div class="cash-calculator-box mt-4">
                     <div class="input-group">
-                        <label>Monto Recibido en Efectivo:</label>
-                        <input id="cashReceived" type="number" class="form-control" placeholder="¿Con cuánto paga?"
+                        <label>{{ i18n.t('cajaPagar.cashReceived') }}</label>
+                        <input id="cashReceived" type="number" class="form-control" [placeholder]="i18n.t('cajaPagar.cashPlaceholder')"
                             [value]="montoRecibido() === 0 ? '' : montoRecibido()"
                             (input)="actualizarMontoRecibido($event)" (keydown)="preventInvalidChars($event)" />
                     </div>
 
                     <div class="change-row">
-                        <span class="change-lbl">Cambio / Devuelta:</span>
+                        <span class="change-lbl">{{ i18n.t('cajaPagar.change') }}</span>
                         <span class="change-val"
                             [class.negative]="calcularDevuelta() < 0" [class.positive]="calcularDevuelta() >= 0">
                             {{ calcularDevuelta() | currency:'COP':'symbol-narrow':'1.0-0' }}
@@ -139,20 +139,20 @@
                 @if (metodoSeleccionado() === 'TARJETA' || metodoSeleccionado() === 'TRANSFERENCIA') {
                 <div class="alert alert-info mt-4">
                     <lucide-icon name="info" [size]="16"></lucide-icon>
-                    <span>Al confirmar, el sistema procesará la transacción electrónica de forma inmediata.</span>
+                    <span>{{ i18n.t('cajaPagar.electronicInfo') }}</span>
                 </div>
                 }
             </div>
 
             <div class="modal-footer">
                 <restaurant-button variant="ghost" (click)="cerrarModal()">
-                    <span>Cancelar</span>
+                    <span>{{ i18n.t('cajaPagar.cancel') }}</span>
                 </restaurant-button>
 
                 <restaurant-button variant="primary" [disabled]="!esPagoValido()" (click)="confirmarPago()">
                     <div class="btn-content-centered">
                         <lucide-icon name="check" [size]="18"></lucide-icon>
-                        <span>Confirmar Pago</span>
+                        <span>{{ i18n.t('cajaPagar.confirmPayment') }}</span>
                     </div>
                 </restaurant-button>
             </div>
@@ -161,7 +161,7 @@
     }
 
     <restaurant-confirm-dialog [open]="alertDialog().open" [title]="alertDialog().title"
-        [message]="alertDialog().message" [confirmText]="alertDialog().confirmText || 'Aceptar'"
-        [cancelText]="alertDialog().cancelText || 'Cancelar'" [showCancel]="alertDialog().type === 'confirm'"
+        [message]="alertDialog().message" [confirmText]="alertDialog().confirmText || i18n.t('mesasPage.acceptDefault')"
+        [cancelText]="alertDialog().cancelText || i18n.t('mesasPage.cancelDefault')" [showCancel]="alertDialog().type === 'confirm'"
         (confirm)="confirmAlertDialog()" (cancel)="cerrarAlertDialog()"></restaurant-confirm-dialog>
 </div>

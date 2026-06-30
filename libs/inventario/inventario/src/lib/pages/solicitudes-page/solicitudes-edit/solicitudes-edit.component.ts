@@ -13,6 +13,7 @@ import { ButtonComponent } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { BienSolicitud, ActualizarSolicitudData } from '../../../models/solicitudes-gil.model';
 import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-solicitudes-edit',
@@ -24,6 +25,7 @@ import { SolicitudesFacade } from '../../../data-access/solicitudes.facade';
 })
 export class SolicitudesEditComponent implements OnInit {
   private router = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private route  = inject(ActivatedRoute);
   private facade = inject(SolicitudesFacade);
 

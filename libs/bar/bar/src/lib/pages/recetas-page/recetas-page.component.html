@@ -1,12 +1,12 @@
 <div class="modulo-container">
   <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-4);">
-    <restaurant-page-header title="Gestión de Recetas" subtitle="Administrá el recetario de Bar y Barismo" style="margin-bottom: 0;"></restaurant-page-header>
+    <restaurant-page-header [title]="i18n.t('recetas.page.title')" [subtitle]="i18n.t('recetas.page.subtitle')" style="margin-bottom: 0;"></restaurant-page-header>
     <div style="display: flex; gap: var(--space-3);">
       <restaurant-button variant="surface" (click)="abrirGestionCategorias()">
-        <lucide-icon name="list" size="18" style="margin-right: var(--space-2);"></lucide-icon> Gestionar Categorías
+        <lucide-icon name="list" size="18" style="margin-right: var(--space-2);"></lucide-icon> {{ i18n.t('recetas.actions.manage-categories') }}
       </restaurant-button>
       <restaurant-button variant="primary" (click)="abrirNuevaReceta()">
-        <lucide-icon name="plus" size="18" style="margin-right: var(--space-2);"></lucide-icon> Nueva Receta
+        <lucide-icon name="plus" size="18" style="margin-right: var(--space-2);"></lucide-icon> {{ i18n.t('recetas.actions.new-recipe') }}
       </restaurant-button>
     </div>
   </div>
@@ -15,8 +15,8 @@
   <div class="recetas-filters">
     <div class="filter-search">
       <restaurant-search-filter 
-        label="Buscar recetas" 
-        placeholder="Buscar por nombre, categoría..." 
+        [label]="i18n.t('recetas.filter.search-label')" 
+        [placeholder]="i18n.t('recetas.filter.search-placeholder')" 
         [value]="searchTerm()" 
         (valueChange)="searchTerm.set($event)"
       ></restaurant-search-filter>
@@ -24,7 +24,7 @@
     
     <div class="filter-category">
       <restaurant-select-filter
-        label="Categoría"
+        [label]="i18n.t('recetas.filter.category-label')"
         [value]="categoriaSeleccionada()"
         [options]="opcionesCategoria()"
         (valueChange)="categoriaSeleccionada.set($event)"
@@ -36,7 +36,7 @@
     @for (receta of recetasFiltradas(); track receta.idReceta) {
       <restaurant-card 
         [title]="receta.nombreReceta" 
-        [subtitle]="receta.nombreCategoria || 'Sin categoría'" 
+        [subtitle]="receta.nombreCategoria || i18n.t('recetas.card.no-category')" 
         [imageUrl]="receta.urlImagen || 'https://placehold.co/600x400/f8f9fa/a0aec0?text=Sin+Imagen'" 
         [price]="receta.precioUnitario || 0"
       >
@@ -57,7 +57,7 @@
             </div>
           </div>
           <div class="action-buttons" style="display: flex; gap: var(--space-2); align-items: center; justify-content: space-between; margin-top: auto; padding-top: var(--space-4); border-top: 1px solid var(--color-border);">
-            <restaurant-button variant="primary" (click)="verDetalle(receta)" style="flex: 1;">Ver Detalle</restaurant-button>
+            <restaurant-button variant="primary" (click)="verDetalle(receta)" style="flex: 1;">{{ i18n.t('recetas.card.view-detail') }}</restaurant-button>
             <div style="display: flex; gap: var(--space-2);">
               <restaurant-button variant="surface" (click)="editarReceta(receta)"><lucide-icon name="pencil" size="16"></lucide-icon></restaurant-button>
               <restaurant-button variant="ghost" (click)="prepararEliminacion(receta.idReceta)"><lucide-icon name="trash-2" size="16"></lucide-icon></restaurant-button>
@@ -67,8 +67,8 @@
       </restaurant-card>
     } @empty {
       <restaurant-empty-state 
-        title="Sin resultados" 
-        message="No se encontraron recetas con '{{ searchTerm() }}'"
+        [title]="i18n.t('recetas.empty.title')" 
+        [message]="emptyMessage()"
       ></restaurant-empty-state>
     }
   </div>
@@ -96,8 +96,8 @@
   <!-- Modal para confirmar eliminación -->
   <restaurant-confirm-dialog
     [open]="confirmDeleteOpen()"
-    title="¿Eliminar receta?"
-    message="Esta acción no se puede deshacer. La receta será eliminada permanentemente del sistema."
+    [title]="i18n.t('recetas.confirm-delete.title')"
+    [message]="i18n.t('recetas.confirm-delete.message')"
     (confirm)="confirmarEliminacion()"
     (cancel)="cancelarEliminacion()"
   ></restaurant-confirm-dialog>

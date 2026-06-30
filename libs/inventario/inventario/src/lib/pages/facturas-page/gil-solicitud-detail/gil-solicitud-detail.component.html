@@ -9,7 +9,7 @@
         Volver
       </button>
       <span class="breadcrumb-sep">/</span>
-      <span class="breadcrumb-label">Solicitudes GIL</span>
+      <span class="breadcrumb-label">{{ i18n.t('factura.solicitudes_gil') }}</span>
     </div>
     <div class="topbar__actions">
       <restaurant-button *hasPermission="'gil:editar'" variant="ghost" (click)="onEditar()">
@@ -64,16 +64,16 @@
       <div class="detail-card">
         <div class="detail-card__header">
           <lucide-icon name="calendar" [size]="18"></lucide-icon>
-          <h2>Información de la Sesión</h2>
+          <h2>{{ i18n.t('factura.info_sesion') }}</h2>
         </div>
         <div class="info-grid">
           <div class="info-item">
-            <span class="info-item__label">Nombre del Vocero</span>
+            <span class="info-item__label">{{ i18n.t('factura.nombre_vocero') }}</span>
             <span class="info-item__value">{{ s.nombreVocero }}</span>
           </div>
           @if (s.resultadoAprendizaje) {
             <div class="info-item info-item--full">
-              <span class="info-item__label">Resultado de Aprendizaje (RA)</span>
+              <span class="info-item__label">{{ i18n.t('factura.resultado_aprendizaje') }}</span>
               <span class="info-item__value">{{ s.resultadoAprendizaje }}</span>
             </div>
           }
@@ -84,7 +84,7 @@
       <div class="two-col-layout">
         <!-- Estado Card -->
         <div class="detail-card status-card">
-          <span class="info-item__label">Estado de Solicitud</span>
+          <span class="info-item__label">{{ i18n.t('comun.estado') }}</span>
           <div class="status-badge-wrap">
             <restaurant-status-badge
               [label]="s.estadoSolicitud"
@@ -93,48 +93,48 @@
             <span class="status-date">Creado el {{ s.fechaCreacion | date:'dd MMM yyyy' }}</span>
           </div>
           <div class="total-amount">{{ formatMoney(s.totalEstimado) }}</div>
-          <span class="total-label">Total Estimado</span>
+          <span class="total-label">{{ i18n.t('factura.total_estimado') }}</span>
           <div class="responsable-chip">
             <div class="responsable-avatar">{{ getResponsableIniciales(s.responsable) }}</div>
             <span class="responsable-nombre">{{ s.responsable }}</span>
           </div>
-          <span class="responsable-rol">Responsable (Instructor)</span>
+          <span class="responsable-rol">{{ i18n.t('factura.responsable_instructor') }}</span>
         </div>
 
         <!-- Información General -->
         <div class="detail-card">
-          <span class="info-section-label">Información General</span>
+          <span class="info-section-label">{{ i18n.t('factura.informacion_general') }}</span>
           <div class="info-stack">
             <div class="info-item">
-              <span class="info-item__label">Regional</span>
+              <span class="info-item__label">{{ i18n.t('factura.regional') }}</span>
               <span class="info-item__value">{{ s.regional }}</span>
             </div>
             <div class="info-item">
-              <span class="info-item__label">Centro de Formación</span>
+              <span class="info-item__label">{{ i18n.t('factura.centro_formacion') }}</span>
               <span class="info-item__value">{{ s.centroFormacion }}</span>
             </div>
             <div class="info-item">
-              <span class="info-item__label">Área / Programa</span>
+              <span class="info-item__label">{{ i18n.t('factura.area_programa') }}</span>
               <span class="info-item__value">{{ s.areaPrograma }}</span>
             </div>
             <div class="info-item">
-              <span class="info-item__label">Cuentadante(s)</span>
+              <span class="info-item__label">{{ i18n.t('factura.cuentadantes') }}</span>
               <span class="info-item__value">{{ (s.cuentadantes?.length ? s.cuentadantes : [s.cuentadanteResponsable]).join(', ') || '—' }}</span>
             </div>
             @if (s.solicitante) {
               <div class="info-item">
-                <span class="info-item__label">Solicitante</span>
+                <span class="info-item__label">{{ i18n.t('factura.solicitante') }}</span>
                 <span class="info-item__value">{{ s.solicitante }}</span>
               </div>
             }
             @if (s.codigoGrupo) {
               <div class="info-item">
-                <span class="info-item__label">Código de Grupo</span>
+                <span class="info-item__label">{{ i18n.t('factura.codigo_grupo') }}</span>
                 <span class="info-item__value">{{ s.codigoGrupo }}</span>
               </div>
             }
             <div class="info-item">
-              <span class="info-item__label">Destino del Bien</span>
+              <span class="info-item__label">{{ i18n.t('factura.destino_bien') }}</span>
               <span class="info-item__value">{{ s.destinoBien }}</span>
             </div>
           </div>
@@ -150,7 +150,7 @@
       <div class="detail-card">
         <div class="detail-card__header">
           <lucide-icon name="package" [size]="18"></lucide-icon>
-          <h2>Bienes del GIL</h2>
+          <h2>{{ i18n.t('factura.bienes_gil') }}</h2>
           <span class="count-badge">{{ (s.bienes?.length ?? 0) }} ÍTEMS</span>
         </div>
 
@@ -159,13 +159,13 @@
             <table class="pf-items-table">
               <thead>
                 <tr>
-                  <th>Código SENA</th>
-                  <th>Descripción</th>
-                  <th>Unidad</th>
-                  <th class="td--center">Cant.</th>
-                  <th class="td--right">Vr. Unitario</th>
-                  <th class="td--center">IVA %</th>
-                  <th class="td--right">Subtotal</th>
+                  <th>{{ i18n.t('comun.codigo_sena') }}</th>
+                  <th>{{ i18n.t('comun.descripcion') }}</th>
+                  <th>{{ i18n.t('comun.unidad') }}</th>
+                  <th class="td--center">{{ i18n.t('comun.cant') }}</th>
+                  <th class="td--right">{{ i18n.t('comun.vr_unitario') }}</th>
+                  <th class="td--center">{{ i18n.t('comun.iva_pct') }}</th>
+                  <th class="td--right">{{ i18n.t('comun.subtotal') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -183,14 +183,14 @@
               </tbody>
               <tfoot>
                 <tr>
-                  <td colspan="6" class="td--right td--bold">Total estimado</td>
+                  <td colspan="6" class="td--right td--bold">{{ i18n.t('factura.total_estimado') }}</td>
                   <td class="td--right td--bold">{{ formatMoney(s.totalEstimado) }}</td>
                 </tr>
               </tfoot>
             </table>
           </div>
         } @else {
-          <p class="empty-hint">Este GIL no tiene bienes registrados.</p>
+          <p class="empty-hint">{{ i18n.t('factura.gil_sin_bienes') }}</p>
         }
       </div>
 
@@ -202,7 +202,7 @@
 
   <div class="loading-state">
     <div class="loading-spinner"></div>
-    <p>Cargando solicitud GIL...</p>
+    <p>{{ i18n.t('factura.cargando_gil') }}</p>
   </div>
 
 }

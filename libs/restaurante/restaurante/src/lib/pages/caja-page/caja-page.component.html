@@ -1,24 +1,24 @@
 <div class="caja-page">
   <div class="caja-page__header">
-    <restaurant-page-header title="Gestión de Caja"
-      subtitle="Panel de control para facturación y procesamiento de pagos"></restaurant-page-header>
+    <restaurant-page-header [title]="i18n.t('cajaPage.title')"
+      [subtitle]="i18n.t('cajaPage.subtitle')"></restaurant-page-header>
   </div>
 
   <div class="alert alert-danger mt-4" *ngIf="!facade.isCajaAbierta()" style="margin: 0 var(--space-6) var(--space-6);">
-    <strong>¡Caja Cerrada!</strong> Debes realizar la apertura de caja para poder facturar o registrar pagos.
+    <strong>{{ i18n.t('cajaPage.cashClosed') }}</strong> {{ i18n.t('cajaPage.cashClosedHint') }}
   </div>
 
   <div class="caja-page__stats">
-    <restaurant-kpi-card label="Pedidos Listos" [value]="facade.cajaStats().pedidosListos.toString()"
+    <restaurant-kpi-card [label]="i18n.t('cajaPage.kpiReadyOrders')" [value]="facade.cajaStats().pedidosListos.toString()"
       icon="check-circle" iconColor="green"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="Mesas por Pagar" [value]="facade.cajaStats().mesasPorPagar.toString()"
+    <restaurant-kpi-card [label]="i18n.t('cajaPage.kpiTablesToPay')" [value]="facade.cajaStats().mesasPorPagar.toString()"
       icon="credit-card" iconColor="blue"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="Facturas Hoy" [value]="facade.cajaStats().facturasHoy.toString()" icon="file-text"
+    <restaurant-kpi-card [label]="i18n.t('cajaPage.kpiInvoicesToday')" [value]="facade.cajaStats().facturasHoy.toString()" icon="file-text"
       iconColor="red"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="Total Facturado"
+    <restaurant-kpi-card [label]="i18n.t('cajaPage.kpiTotalBilled')"
       [value]="(facade.cajaStats().totalFacturado | currency:'USD':'symbol':'1.0-0') || '$0'" icon="check-circle"
       iconColor="orange"></restaurant-kpi-card>
   </div>
@@ -28,40 +28,40 @@
       <div class="action-card search-card">
         <div class="action-header">
           <lucide-icon name="search" [size]="24" class="icon-blue"></lucide-icon>
-          <h3 class="text-blue">Buscar Factura</h3>
+          <h3 class="text-blue">{{ i18n.t('cajaPage.searchInvoice') }}</h3>
         </div>
-        <p class="action-desc">Consultar facturas existentes</p>
+        <p class="action-desc">{{ i18n.t('cajaPage.searchInvoiceDesc') }}</p>
         <div class="action-info">
-          <span>Total facturas:</span>
+          <span>{{ i18n.t('cajaPage.totalInvoices') }}</span>
           <span class="badge-count">{{ facade.cajaStats().facturasHoy }}</span>
         </div>
         <restaurant-button variant="primary" class="full-width" (click)="irABuscar()">
           <lucide-icon name="search" [size]="18"></lucide-icon>
-          <span>Ir al Buscador</span>
+          <span>{{ i18n.t('cajaPage.goToSearch') }}</span>
         </restaurant-button>
       </div>
 
       <div class="action-card pay-card">
         <div class="action-header">
           <lucide-icon name="credit-card" [size]="24" class="icon-purple"></lucide-icon>
-          <h3 class="text-purple">Registrar Pago</h3>
+          <h3 class="text-purple">{{ i18n.t('cajaPage.registerPayment') }}</h3>
         </div>
-        <p class="action-desc">Procesar pagos de mesas activas</p>
+        <p class="action-desc">{{ i18n.t('cajaPage.registerPaymentDesc') }}</p>
         <div class="action-info">
-          <span>Mesas por pagar:</span>
+          <span>{{ i18n.t('cajaPage.tablesToPayLabel') }}</span>
           <span class="badge-count">{{ facade.cajaStats().mesasPorPagar }}</span>
         </div>
         <restaurant-button variant="primary" class="full-width" (click)="irARegistrarPago()"
           [disabled]="!facade.isCajaAbierta()">
           <lucide-icon name="credit-card" [size]="18"></lucide-icon>
-          <span>Procesar Pagos</span>
+          <span>{{ i18n.t('cajaPage.processPayments') }}</span>
         </restaurant-button>
       </div>
     </div>
   </section>
 
   <div class="caja-page__section-title">
-    <h2>Control de Efectivo y Auditoría</h2>
+    <h2>{{ i18n.t('cajaPage.cashControl') }}</h2>
   </div>
 
   <section class="caja-page__actions">
@@ -69,38 +69,38 @@
       <div class="action-card opening-card">
         <div class="action-header">
           <lucide-icon name="check-circle" [size]="24" class="icon-orange"></lucide-icon>
-          <h3 class="text-orange">Apertura de Caja</h3>
+          <h3 class="text-orange">{{ i18n.t('cajaPage.cashOpening') }}</h3>
         </div>
-        <p class="action-desc">Definir fondo base e iniciar turno</p>
+        <p class="action-desc">{{ i18n.t('cajaPage.cashOpeningDesc') }}</p>
         <restaurant-button variant="primary" class="full-width" (click)="irAApertura()">
           <lucide-icon name="check-circle" [size]="18"></lucide-icon>
-          <span>Abrir Caja</span>
+          <span>{{ i18n.t('cajaPage.openCash') }}</span>
         </restaurant-button>
       </div>
 
       <div class="action-card movements-card">
         <div class="action-header">
           <lucide-icon name="arrow-left-right" [size]="24" class="icon-gray"></lucide-icon>
-          <h3 class="text-gray">Movimientos</h3>
+          <h3 class="text-gray">{{ i18n.t('cajaPage.movements') }}</h3>
         </div>
-        <p class="action-desc">Historial de pedidos facturados</p>
+        <p class="action-desc">{{ i18n.t('cajaPage.movementsDesc') }}</p>
         <restaurant-button variant="primary" class="full-width" (click)="irAMovimientos()"
           [disabled]="!facade.isCajaAbierta()">
           <lucide-icon name="arrow-left-right" [size]="18"></lucide-icon>
-          <span>Movimientos registrados</span>
+          <span>{{ i18n.t('cajaPage.registeredMovements') }}</span>
         </restaurant-button>
       </div>
 
       <div class="action-card closing-card">
         <div class="action-header">
           <lucide-icon name="x" [size]="24" class="icon-red"></lucide-icon>
-          <h3 class="text-red">Cierre de Caja</h3>
+          <h3 class="text-red">{{ i18n.t('cajaPage.cashClosing') }}</h3>
         </div>
-        <p class="action-desc">Arqueo ciego y reporte Z del turno</p>
+        <p class="action-desc">{{ i18n.t('cajaPage.cashClosingDesc') }}</p>
         <restaurant-button variant="primary" class="full-width" (click)="irACierre()"
           [disabled]="!facade.isCajaAbierta()">
           <lucide-icon name="x" [size]="18"></lucide-icon>
-          <span>Cerrar Caja</span>
+          <span>{{ i18n.t('cajaPage.closeCash') }}</span>
         </restaurant-button>
       </div>
     </div>

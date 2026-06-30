@@ -15,6 +15,7 @@ import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
 import { Mesa } from '../../models/restaurante.model';
 import { CurrencyCopPipe } from '@restaurant/shared/util';
+import { I18nService } from '../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-mesas-page',
@@ -37,6 +38,7 @@ import { CurrencyCopPipe } from '@restaurant/shared/util';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MesasPageComponent {
+  protected readonly i18n = inject(I18nService);
   private facade = inject(RestauranteFacade);
   private router  = inject(Router);
   private route   = inject(ActivatedRoute);
@@ -118,11 +120,11 @@ export class MesasPageComponent {
   // ── Mesas en servicio (Ocupadas / Por pagar) ──────────────────────────────────
   mesasEnServicio = computed(() => {
     const meseros = [
-      'M01 - Juan Pérez', 
-      'M02 - Ana Gómez', 
-      'M03 - Carlos Ruiz', 
-      'M04 - María López', 
-      'M05 - Luisa Fernanda'
+      'W01 - John Smith', 
+      'W02 - Anna Gomez', 
+      'W03 - Charles Ruiz', 
+      'W04 - Mary Lopez', 
+      'W05 - Luisa Fernanda'
     ];
     return this.mesasActivas()
       .filter(m => m.estado === 'OCUPADA' || m.estado === 'POR_PAGAR')
@@ -144,7 +146,7 @@ export class MesasPageComponent {
   editObservaciones = signal('');
 
   // ── Opciones de Zona (Autocomplete) ──────────────────────────────────────────
-  opcionesZonas = ['Salón Principal', 'Terraza', 'Salón VIP', 'Barra'];
+  opcionesZonas = ['Main Hall', 'Terrace', 'VIP Room', 'Bar'];
 
   showNuevaZonaDropdown = signal(false);
   filteredNuevaZonas = computed(() => {
@@ -253,11 +255,11 @@ export class MesasPageComponent {
   }
 
   mostrarExito(mensaje: string) {
-    this.alertDialog.set({ open: true, title: '¡Éxito!', message: mensaje, type: 'success' });
+    this.alertDialog.set({ open: true, title: this.i18n.t('mesasPage.successTitle'), message: mensaje, type: 'success' });
   }
 
   mostrarError(mensaje: string) {
-    this.alertDialog.set({ open: true, title: 'Atención', message: mensaje, type: 'error' });
+    this.alertDialog.set({ open: true, title: this.i18n.t('mesasPage.errorTitle'), message: mensaje, type: 'error' });
   }
 
   pedirConfirmacion(title: string, message: string, onConfirm: () => void) {
@@ -266,8 +268,8 @@ export class MesasPageComponent {
       title,
       message,
       type: 'confirm',
-      confirmText: 'Aceptar',
-      cancelText: 'Cancelar',
+      confirmText: this.i18n.t('mesasPage.accept'),
+      cancelText: this.i18n.t('mesasPage.cancelAction'),
       onConfirm
     });
   }
@@ -286,11 +288,11 @@ export class MesasPageComponent {
     capacidad = Number(capacidad);
 
     if (!rawNombre) {
-      this.mostrarError('El número o identificador de la mesa es obligatorio.');
+      this.mostrarError(this.i18n.t('mesasPage.requiredName'));
       return;
     }
     if (capacidad < 1 || capacidad > 20 || isNaN(capacidad)) {
-      this.mostrarError('La capacidad debe ser entre 1 y 20 personas.');
+      this.mostrarError(this.i18n.t('mesasPage.invalidCapacity'));
       return;
     }
 
@@ -298,7 +300,7 @@ export class MesasPageComponent {
       next: (resultado) => {
         if (resultado === true) {
           this.cerrarModales();
-          this.mostrarExito(`La mesa "${nombre}" ha sido creada correctamente.`);
+          this.mostrarExito(this.i18n.t('mesasPage.createdSuccess').replace('{{ name }}', nombre));
         } else {
           this.mostrarError(resultado as string);
         }
@@ -330,11 +332,11 @@ export class MesasPageComponent {
     const obsCambiada = obs !== (mesa.observaciones || '');
 
     if (!rawNombre) {
-      this.mostrarError('El número o identificador de la mesa es obligatorio.');
+      this.mostrarError(this.i18n.t('mesasPage.requiredName'));
       return;
     }
     if (capacidad < 1 || capacidad > 20) {
-      this.mostrarError('La capacidad debe ser entre 1 y 20 personas.');
+      this.mostrarError(this.i18n.t('mesasPage.invalidCapacity'));
       return;
     }
 
@@ -349,13 +351,13 @@ export class MesasPageComponent {
           this.cerrarModales();
           if (obs && obsCambiada) {
             if (mesa.estado !== 'LIBRE') {
-              this.mostrarExito('Observaciones actualizadas, pero la mesa no se desactivó porque está ocupada.');
+              this.mostrarExito(this.i18n.t('mesasPage.updatedWithObs'));
             } else {
               this.facade.cambiarEstadoActivoMesa(mesa.id, false);
-              this.mostrarExito('Mesa actualizada y desactivada por daños/observaciones.');
+              this.mostrarExito(this.i18n.t('mesasPage.updatedAndDeactivated'));
             }
           } else {
-            this.mostrarExito('Mesa actualizada correctamente.');
+            this.mostrarExito(this.i18n.t('mesasPage.updatedSuccess'));
           }
         } else {
           this.mostrarError(resultado as string);
@@ -420,12 +422,12 @@ export class MesasPageComponent {
             }
           } else {
             this.pedirConfirmacion(
-              'Mesa sin comanda activa',
-              `La mesa figura como ${mesa.estado}, pero no tiene ningún pedido en curso.\n\n¿Deseas forzar su liberación para corregir este problema?`,
+              this.i18n.t('mesasPage.noActiveOrderTitle'),
+              this.i18n.t('mesasPage.noActiveOrderMessage').replace('{{ status }}', mesa.estado),
               () => {
                 this.facade.liberarMesa(id).subscribe(res => {
                   if (res === true) {
-                    this.mostrarExito('Mesa liberada correctamente.');
+                    this.mostrarExito(this.i18n.t('mesasPage.releasedSuccess'));
                   } else {
                     this.mostrarError(res as string);
                   }
@@ -445,7 +447,7 @@ export class MesasPageComponent {
     this.cerrarModales();
     this.facade.liberarMesa(id).subscribe(res => {
       if (res === true) {
-        this.mostrarExito('Mesa liberada correctamente.');
+        this.mostrarExito(this.i18n.t('mesasPage.releasedSuccess'));
       } else {
         this.mostrarError(res as string);
       }
@@ -478,17 +480,17 @@ export class MesasPageComponent {
     if (!activo) {
       const mesa = this.facade.mesas().find(m => m.id === id);
       if (mesa && mesa.estado !== 'LIBRE') {
-        this.mostrarError('No se puede desactivar una mesa que está ocupada o por pagar.');
+        this.mostrarError(this.i18n.t('mesasPage.cannotDeactivateOccupied'));
         return;
       }
 
       this.pedirConfirmacion(
-        'Desactivar mesa',
-        '¿Desactivar esta mesa? Quedará oculta del salón.',
+        this.i18n.t('mesasPage.deactivateConfirmTitle'),
+        this.i18n.t('mesasPage.deactivateConfirmMessage'),
         () => {
           this.facade.cambiarEstadoActivoMesa(id, activo).subscribe(res => {
             if (res === true) {
-              this.mostrarExito('Mesa desactivada correctamente.');
+              this.mostrarExito(this.i18n.t('mesasPage.deactivatedSuccess'));
             } else {
               this.mostrarError(res as string);
             }
@@ -498,7 +500,7 @@ export class MesasPageComponent {
     } else {
       this.facade.cambiarEstadoActivoMesa(id, activo).subscribe(res => {
         if (res === true) {
-          this.mostrarExito('Mesa activada correctamente.');
+          this.mostrarExito(this.i18n.t('mesasPage.activatedSuccess'));
         } else {
           this.mostrarError(res as string);
         }

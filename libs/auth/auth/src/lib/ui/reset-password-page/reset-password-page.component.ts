@@ -8,6 +8,7 @@ import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, Validati
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '@restaurant/shared/auth';
 import { AlertComponent, InputComponent, ButtonComponent } from '@restaurant/shared/ui';
+import { I18nService } from '../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-reset-password-page',
@@ -22,6 +23,7 @@ export class ResetPasswordPageComponent {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly fb = inject(FormBuilder);
+  protected readonly i18n = inject(I18nService);
 
   readonly loading = signal(false);
   readonly errorMsg = signal('');
@@ -57,7 +59,7 @@ export class ResetPasswordPageComponent {
     }
 
     if (!this.token) {
-      this.errorMsg.set('Token inválido. Solicita un nuevo enlace de recuperación.');
+      this.errorMsg.set(this.i18n.t('reset.error_token'));
       return;
     }
 
@@ -67,7 +69,7 @@ export class ResetPasswordPageComponent {
 
     try {
       await this.authService.resetPassword(this.token, this.form.value.password!);
-      this.successMsg.set('Contraseña actualizada correctamente. Redirigiendo al inicio de sesión...');
+      this.successMsg.set(this.i18n.t('reset.success'));
       setTimeout(() => this.router.navigateByUrl('/auth/login'), 3000);
     } catch (err: any) {
       const mensaje = err.error?.error || 'Error al restablecer la contraseña. El enlace pudo haber expirado.';

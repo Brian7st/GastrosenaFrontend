@@ -17,6 +17,7 @@ import { WizardStep } from '../../../models/acta.model';
 import { ActasService } from '../../../data-access/services/actas.service';
 import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
 import { CrearActaRequest, AsistenteRequest } from '../../../data-access/api/legalization.api';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-actas-create',
@@ -33,6 +34,7 @@ import { CrearActaRequest, AsistenteRequest } from '../../../data-access/api/leg
 })
 export class ActasCreateComponent {
   private router               = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private route                = inject(ActivatedRoute);
   private fb                   = inject(FormBuilder);
   private actasService         = inject(ActasService);

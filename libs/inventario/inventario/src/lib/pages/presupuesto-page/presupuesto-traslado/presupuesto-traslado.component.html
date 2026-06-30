@@ -9,27 +9,27 @@
       </button>
     </div>
     <div class="modal-body">
-      <h3 class="modal-title">Traslado de Recursos Presupuestales</h3>
-      <p class="modal-subtitle">Transfiere fondos entre rubros del mismo presupuesto.</p>
+      <h3 class="modal-title">{{ i18n.t('presupuesto.traslado_titulo') }}</h3>
+      <p class="modal-subtitle">{{ i18n.t('presupuesto.traslado_subtitulo') }}</p>
 
       <form [formGroup]="form" class="traslado-form">
         <div class="form-field">
-          <label class="form-label" for="presupuestoId">Presupuesto (Ficha / Programa)</label>
+          <label class="form-label" for="presupuestoId">{{ i18n.t('presupuesto.traslado_presupuesto') }}</label>
           <select id="presupuestoId" class="form-select" formControlName="presupuestoId">
-            <option value="">Seleccione un presupuesto</option>
+            <option value="">{{ i18n.t('comun.seleccione_presupuesto') }}</option>
             @for (p of presupuestos(); track p.id) {
               <option [value]="p.id">{{ p.label }}</option>
             }
           </select>
           @if (form.controls.presupuestoId.invalid && form.controls.presupuestoId.touched) {
-            <span class="field-error">Requerido</span>
+            <span class="field-error">{{ i18n.t('comun.requerido') }}</span>
           }
         </div>
 
         <div class="form-field">
-          <label class="form-label" for="rubroOrigenId">Rubro Origen (ID)</label>
+          <label class="form-label" for="rubroOrigenId">{{ i18n.t('presupuesto.rubro_origen') }}</label>
           <select id="rubroOrigenId" class="form-select" formControlName="rubroOrigenId">
-            <option value="">Seleccione el rubro origen</option>
+            <option value="">{{ i18n.t('presupuesto.sel_rubro_origen') }}</option>
             @for (r of rubros(); track r.id) {
               <option [value]="r.id">{{ r.codigo }} — {{ r.descripcion }}</option>
             }
@@ -40,9 +40,9 @@
         </div>
 
         <div class="form-field">
-          <label class="form-label" for="rubroDestinoId">Rubro Destino (ID)</label>
+          <label class="form-label" for="rubroDestinoId">{{ i18n.t('presupuesto.rubro_destino') }}</label>
           <select id="rubroDestinoId" class="form-select" formControlName="rubroDestinoId">
-            <option value="">Seleccione el rubro destino</option>
+            <option value="">{{ i18n.t('presupuesto.sel_rubro_destino') }}</option>
             @for (r of rubros(); track r.id) {
               <option [value]="r.id">{{ r.codigo }} — {{ r.descripcion }}</option>
             }
@@ -53,7 +53,7 @@
         </div>
 
         <div class="form-field">
-          <label class="form-label" for="monto">Monto a Trasladar (COP)</label>
+          <label class="form-label" for="monto">{{ i18n.t('presupuesto.monto_trasladar') }}</label>
           <input
             id="monto"
             class="form-input"
@@ -62,18 +62,18 @@
             formControlName="monto"
             placeholder="0" />
           @if (form.controls.monto.invalid && form.controls.monto.touched) {
-            <span class="field-error">Monto requerido y mayor a 0</span>
+            <span class="field-error">{{ i18n.t('presupuesto.error_monto') }}</span>
           }
         </div>
       </form>
     </div>
     <div class="modal-footer">
-      <restaurant-button variant="surface" (click)="closeModal()">Cancelar</restaurant-button>
+      <restaurant-button variant="surface" (click)="closeModal()">{{ i18n.t('comun.cancelar') }}</restaurant-button>
       <restaurant-button
         variant="primary"
         [disabled]="form.invalid || loading()"
         (click)="onSubmit()">
-        Confirmar Traslado
+        {{ i18n.t('presupuesto.confirmar_traslado') }}
       </restaurant-button>
     </div>
   </div>

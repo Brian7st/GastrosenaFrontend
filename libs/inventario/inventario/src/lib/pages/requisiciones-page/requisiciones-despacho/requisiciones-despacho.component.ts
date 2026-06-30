@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } 
 import { Router, ActivatedRoute } from '@angular/router';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-requisiciones-despacho',
@@ -13,6 +14,7 @@ import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
 })
 export class RequisicionesDespachoComponent implements OnInit {
   private router  = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private route   = inject(ActivatedRoute);
   readonly facade = inject(RequisicionesFacade);
 

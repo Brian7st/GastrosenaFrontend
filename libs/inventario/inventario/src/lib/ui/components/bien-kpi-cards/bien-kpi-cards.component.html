@@ -7,11 +7,11 @@
       </div>
       @if (kpis.tendenciaValor !== undefined) {
 <span class="kpi-card__badge kpi-card__badge--success">
-        +{{ kpis.tendenciaValor }}% vs mes anterior
+        +{{ kpis.tendenciaValor }}% {{ i18n.t('bien-kpi.vs_mes_anterior') }}
       </span>
 }
     </div>
-    <p class="kpi-card__label">Valor Total Inventario</p>
+    <p class="kpi-card__label">{{ i18n.t('bien-kpi.valor_total') }}</p>
     <h4 class="kpi-card__value">{{ kpis.valorTotal | currency:'COP':'symbol':'1.0-0' }}</h4>
   </div>
 
@@ -21,10 +21,10 @@
       <div class="kpi-card__icon kpi-card__icon--danger">
         <span class="material-symbols-outlined">warning</span>
       </div>
-      <span class="kpi-card__badge kpi-card__badge--danger">Crítico</span>
+      <span class="kpi-card__badge kpi-card__badge--danger">{{ i18n.t('bien-kpi.critico') }}</span>
     </div>
-    <p class="kpi-card__label">Bienes en Alerta</p>
-    <h4 class="kpi-card__value">{{ kpis.totalAlertas }} Items</h4>
+    <p class="kpi-card__label">{{ i18n.t('bien-kpi.bienes_alerta') }}</p>
+    <h4 class="kpi-card__value">{{ kpis.totalAlertas }} {{ i18n.t('bien-kpi.items') }}</h4>
   </div>
 
   <!-- Movimientos Recientes -->
@@ -33,9 +33,9 @@
       <div class="kpi-card__icon kpi-card__icon--info">
         <span class="material-symbols-outlined">history</span>
       </div>
-      <span class="kpi-card__badge kpi-card__badge--info">Hoy</span>
+      <span class="kpi-card__badge kpi-card__badge--info">{{ i18n.t('bien-kpi.hoy') }}</span>
     </div>
-    <p class="kpi-card__label">Movimientos Recientes</p>
-    <h4 class="kpi-card__value">{{ kpis.movimientosHoy }} Altas</h4>
+    <p class="kpi-card__label">{{ i18n.t('bien-kpi.movimientos_recientes') }}</p>
+    <h4 class="kpi-card__value">{{ kpis.movimientosHoy }} {{ i18n.t('bien-kpi.altas') }}</h4>
   </div>
 </div>

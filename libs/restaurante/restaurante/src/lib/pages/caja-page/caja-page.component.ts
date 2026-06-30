@@ -8,6 +8,7 @@ import {
   LucideIconComponent
 } from '@restaurant/shared/ui';
 import { RestauranteFacade } from '../../data-access/restaurante.facade';
+import { I18nService } from '../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-caja-page',
@@ -25,6 +26,7 @@ import { RestauranteFacade } from '../../data-access/restaurante.facade';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CajaPageComponent implements OnInit {
+  protected readonly i18n = inject(I18nService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   facade = inject(RestauranteFacade);

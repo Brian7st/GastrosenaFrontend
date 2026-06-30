@@ -7,7 +7,7 @@
         <lucide-icon name="clock" [size]="24"></lucide-icon>
       </div>
       <div class="kpi-info">
-        <h3>PROMEDIO GENERAL</h3>
+        <h3>{{ i18n.t('estadisticas.promedio_general') }}</h3>
         <p class="kpi-value">{{ promedioFormateado() || '00:00' }}</p>
       </div>
     </div>
@@ -17,7 +17,7 @@
         <lucide-icon name="check-circle" [size]="24"></lucide-icon>
       </div>
       <div class="kpi-info">
-        <h3>PLATO MÁS RÁPIDO</h3>
+        <h3>{{ i18n.t('estadisticas.plato_mas_rapido') }}</h3>
         <p class="kpi-value">{{ kpis()?.platoMasRapido || '—' }}</p>
       </div>
     </div>
@@ -27,7 +27,7 @@
         <lucide-icon name="clipboard-list" [size]="24"></lucide-icon>
       </div>
       <div class="kpi-info">
-        <h3>PLATOS PREPARADOS</h3>
+        <h3>{{ i18n.t('estadisticas.platos_preparados') }}</h3>
         <p class="kpi-value">{{ kpis()?.totalPlatosDespachadosHoy || 0 }}</p>
       </div>
     </div>

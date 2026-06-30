@@ -3,10 +3,8 @@
   <!-- ===== CABECERA ===== -->
   <div class="page-header">
     <div class="header-left">
-      <h1 class="page-title">Actividad</h1>
-      <p class="page-subtitle">
-        Registro y evaluación de actividades académicas para aprendices.
-      </p>
+      <h1 class="page-title">{{ i18n.t('actividad.page.title') }}</h1>
+      <p class="page-subtitle">{{ i18n.t('actividad.page.subtitle') }}</p>
     </div>
   </div>
 
@@ -18,12 +16,12 @@
 
       <!-- Fecha -->
       <div class="form-group full-width">
-        <label class="form-label" for="act-fecha">Fecha</label>
+        <label class="form-label" for="act-fecha">{{ i18n.t('actividad.fecha') }}</label>
         <input
           id="act-fecha"
           type="date"
           class="form-input"
-          placeholder="dd/mm/aaaa"
+          [placeholder]="i18n.t('actividad.fecha_placeholder')"
           min="2020-01-01"
           max="2050-12-31"
           (change)="fecha.set($any($event.target).value)"
@@ -34,24 +32,24 @@
       <div class="form-row">
         <div class="form-group">
           <label class="form-label" for="act-nombre">
-            Nombre de actividad <span class="required">*</span>
+            {{ i18n.t('actividad.nombre_label') }}
           </label>
           <input
             id="act-nombre"
             type="text"
             class="form-input"
-            placeholder="Ej: Fundamentos de Redes"
+            [placeholder]="i18n.t('actividad.nombre_placeholder')"
             (input)="nombreActividad.set($any($event.target).value)"
           />
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="act-jornada">Jornada</label>
+          <label class="form-label" for="act-jornada">{{ i18n.t('actividad.jornada_label') }}</label>
           <div class="select-wrapper">
             <select id="act-jornada" class="form-select" (change)="jornada.set($any($event.target).value)">
-              <option value="" disabled selected>Seleccione una jornada</option>
-              @for (j of jornadas; track j.value) {
-                <option [value]="j.value">{{ j.label }}</option>
+              <option value="" disabled selected>{{ i18n.t('actividad.jornada_placeholder') }}</option>
+              @for (j of jornadasKeys; track j.value) {
+                <option [value]="j.value">{{ i18n.t(j.tKey) }}</option>
               }
             </select>
             <lucide-icon name="chevron-down" size="16" class="select-icon"></lucide-icon>
@@ -62,7 +60,7 @@
       <!-- Número de ficha — buscador con dropdown -->
       <div class="form-group full-width ficha-search-wrapper">
         <label class="form-label" for="act-ficha">
-          Número de ficha <span class="required">*</span>
+          {{ i18n.t('actividad.ficha_label') }} <span class="required">*</span>
         </label>
 
         <div class="ficha-combobox" [class.is-open]="fichaDropdownOpen()">
@@ -73,7 +71,7 @@
               id="act-ficha"
               type="text"
               class="form-input ficha-input"
-              placeholder="Buscar ficha por número..."
+              [placeholder]="i18n.t('actividad.ficha_placeholder')"
               [value]="fichaBusqueda()"
               (input)="onFichaBusquedaInput($any($event.target).value)"
               (focus)="abrirFichaDropdown()"
@@ -92,9 +90,9 @@
           @if (fichaDropdownOpen()) {
             <div class="ficha-dropdown">
               @if (fichasCargando()) {
-                <div class="ficha-empty">Cargando fichas…</div>
+                <div class="ficha-empty">{{ i18n.t('actividad.cargando_fichas') }}</div>
               } @else if (fichasFiltradas().length === 0) {
-                <div class="ficha-empty">No se encontraron fichas</div>
+                <div class="ficha-empty">{{ i18n.t('actividad.sin_fichas') }}</div>
               } @else {
                 @for (f of fichasFiltradas(); track f.id) {
                   <button
@@ -117,30 +115,30 @@
         @if (numeroFicha()) {
           <p class="ficha-selected-hint">
             <lucide-icon name="check" size="12"></lucide-icon>
-            Ficha <strong>{{ numeroFicha() }}</strong> seleccionada
+            {{ i18n.t('actividad.ficha_seleccionada') }} <strong>{{ numeroFicha() }}</strong>
           </p>
         }
       </div>
 
       <!-- Pasos de la actividad -->
       <div class="form-group full-width">
-        <label class="form-label" for="act-pasos">Pasos de la actividad</label>
+        <label class="form-label" for="act-pasos">{{ i18n.t('actividad.pasos_label') }}</label>
         <textarea
           id="act-pasos"
           class="form-textarea"
           rows="5"
-          placeholder="Describa detalladamente los pasos realizados en la actividad..."
+          [placeholder]="i18n.t('actividad.pasos_placeholder')"
           (input)="pasosActividad.set($any($event.target).value)"
         ></textarea>
       </div>
 
       <!-- Trimestre -->
       <div class="form-group">
-        <label class="form-label" for="act-trimestre">Trimestre</label>
+        <label class="form-label" for="act-trimestre">{{ i18n.t('actividad.trimestre_label') }}</label>
         <div class="select-wrapper">
           <select id="act-trimestre" class="form-select" (change)="trimestre.set($any($event.target).value)">
-            @for (t of trimestres; track t.value) {
-              <option [value]="t.value">{{ t.label }}</option>
+            @for (t of trimestresKeys; track t.value) {
+              <option [value]="t.value">{{ i18n.t(t.tKey) }}</option>
             }
           </select>
           <lucide-icon name="chevron-down" size="16" class="select-icon"></lucide-icon>
@@ -151,16 +149,14 @@
       <div class="form-actions">
         <div class="form-actions-row">
           <button id="btn-ver-actividades" class="btn-outline" type="button" (click)="verActividades()">
-            VER ACTIVIDADES
+            {{ i18n.t('actividad.btn_ver') }}
           </button>
           <button id="btn-crear-actividad" class="btn-primary" type="button" [disabled]="!esFormularioValido" (click)="crearActividad()">
-            CREAR ACTIVIDAD
+            {{ i18n.t('actividad.btn_crear') }}
           </button>
         </div>
 
-        <p class="form-hint">
-          Asegúrese de que todos los campos obligatorios (*) estén completos antes de evaluar.
-        </p>
+        <p class="form-hint">{{ i18n.t('actividad.hint') }}</p>
       </div>
 
     </div><!-- /form-card -->
@@ -172,17 +168,17 @@
       <div class="panel-card panel-guide">
         <div class="panel-header">
           <lucide-icon name="info" size="18" class="panel-icon info-icon"></lucide-icon>
-          <h3>Guía de Evaluación</h3>
+          <h3>{{ i18n.t('actividad.guia_titulo') }}</h3>
         </div>
         <p class="panel-text">
-          Las actividades se evalúan basándose en las competencias técnicas definidas en el
-          <a href="#" class="link-registro">programa oficial</a>.
+          {{ i18n.t('actividad.guia_texto') }}
+          <a href="#" class="link-registro">{{ i18n.t('actividad.guia_enlace') }}</a>.
         </p>
       </div>
 
       <!-- Historial reciente -->
       <div class="panel-card panel-historial">
-        <h3>Historial Reciente</h3>
+        <h3>{{ i18n.t('actividad.historial_titulo') }}</h3>
         <div class="badges-list">
           @for (item of historialReciente; track item.nombre) {
             <span class="activity-badge" [ngClass]="item.clase">

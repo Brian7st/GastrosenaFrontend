@@ -8,6 +8,7 @@ import { Router, RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '@restaurant/shared/auth';
 import { AlertComponent, InputComponent, ButtonComponent } from '@restaurant/shared/ui';
+import { I18nService } from '../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-forgot-password-page',
@@ -21,6 +22,7 @@ export class ForgotPasswordPageComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
+  protected readonly i18n = inject(I18nService);
 
   readonly loading    = signal(false);
   readonly errorMsg   = signal('');
@@ -43,10 +45,10 @@ export class ForgotPasswordPageComponent {
     try {
       const { email } = this.form.getRawValue();
       await this.authService.recuperarContrasena(email!);
-      this.successMsg.set('Si el correo existe, recibirás las instrucciones en tu bandeja.');
+      this.successMsg.set(this.i18n.t('forgot.success'));
       setTimeout(() => this.router.navigateByUrl('/auth/login'), 3000);
     } catch {
-      this.errorMsg.set('Ocurrió un error. Intentá de nuevo más tarde.');
+      this.errorMsg.set(this.i18n.t('forgot.error'));
     } finally {
       this.loading.set(false);
     }

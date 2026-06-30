@@ -8,6 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { SearchFilterComponent, LucideIconComponent } from '@restaurant/shared/ui';
+import { I18nService } from '../../i18n/i18n.service';
 
 import { CocinaFacade } from '../../data-access/cocina.facade';
 
@@ -20,6 +21,7 @@ import { CocinaFacade } from '../../data-access/cocina.facade';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ActividadesListPageComponent {
+  protected readonly i18n = inject(I18nService);
   private facade = inject(CocinaFacade);
   private router = inject(Router);
 

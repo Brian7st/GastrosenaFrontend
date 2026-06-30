@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
   signal,
 } from '@angular/core';
@@ -8,6 +9,7 @@ import { Router, RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '@restaurant/shared/auth';
 import { AlertComponent, InputComponent, ButtonComponent } from '@restaurant/shared/ui';
+import { I18nService } from '../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-login-page',
@@ -21,6 +23,7 @@ export class LoginPageComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
+  protected readonly i18n = inject(I18nService);
 
   readonly loading = signal(false);
   readonly errorMsg = signal('');
@@ -31,13 +34,13 @@ export class LoginPageComponent {
     contrasena: ['', [Validators.required, Validators.minLength(6)]],
   });
 
-  readonly panelFeatures = [
-    'Gestión de inventario en tiempo real',
-    'Control de cocina y órdenes',
-    'Módulo de cafetería y bar',
-    'Reportes y estadísticas',
-    'Administración de recetas',
-  ];
+  readonly panelFeatures = computed(() => [
+    this.i18n.t('panel.feature1'),
+    this.i18n.t('panel.feature2'),
+    this.i18n.t('panel.feature3'),
+    this.i18n.t('panel.feature4'),
+    this.i18n.t('panel.feature5'),
+  ]);
 
   get emailCtrl() {
     return this.form.get('email')!;
@@ -63,7 +66,7 @@ export class LoginPageComponent {
       // El menú/guards ya filtran qué módulos ve cada rol.
       await this.router.navigateByUrl('/app/dashboard');
     } catch (err) {
-      this.errorMsg.set('Credenciales inválidas. Verificá tu correo y contraseña.');
+      this.errorMsg.set(this.i18n.t('login.error'));
     } finally {
       this.loading.set(false);
     }

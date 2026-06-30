@@ -4,15 +4,15 @@
   <div class="breadcrumb">
     <inventario-back-button (clicked)="onVolver()" />
     <nav class="breadcrumb-nav">
-      <span class="breadcrumb-link" (click)="onVolver()">Inventario</span>
+      <span class="breadcrumb-link" (click)="onVolver()">{{ i18n.t('bien-export.breadcrumb_inventario') }}</span>
       <span class="material-symbols-outlined breadcrumb-sep">chevron_right</span>
-      <span class="breadcrumb-current">Exportar</span>
+      <span class="breadcrumb-current">{{ i18n.t('bien-export.breadcrumb_exportar') }}</span>
     </nav>
   </div>
 
   <div class="export-title-block">
-    <h1 class="page-title">Exportar Reporte de Bienes</h1>
-    <p class="page-subtitle">Generá un archivo con el inventario actual de bienes: catálogo, precios unitarios y existencias vigentes del almacén SENA.</p>
+    <h1 class="page-title">{{ i18n.t('bien-export.title') }}</h1>
+    <p class="page-subtitle">{{ i18n.t('bien-export.subtitle') }}</p>
   </div>
 
   <div class="export-layout">
@@ -23,7 +23,7 @@
       <div class="form-section">
         <div class="form-section__header">
           <span class="material-symbols-outlined section-icon text-primary">download</span>
-          <h3>Formato de Exportación</h3>
+          <h3>{{ i18n.t('bien-export.formato') }}</h3>
         </div>
 
         <div class="format-cards">
@@ -44,7 +44,7 @@
             </div>
 
             <span class="format-label">{{ f.label }}</span>
-            <span class="format-sub">{{ f.sub }}</span>
+            <span class="format-sub">{{ f.id === 'excel' ? i18n.t('bien-export.formato_sub_excel') : i18n.t('bien-export.formato_sub_pdf') }}</span>
           </button>
 }
         </div>
@@ -54,14 +54,14 @@
       <div class="form-section">
         <div class="form-section__header">
           <span class="material-symbols-outlined section-icon text-primary">tune</span>
-          <h3>Opciones</h3>
+          <h3>{{ i18n.t('bien-export.opciones') }}</h3>
         </div>
 
         <div class="checkbox-row">
           <label class="checkbox-label">
             <input type="checkbox" [ngModel]="soloActivos()" (ngModelChange)="soloActivos.set($event)" />
             <span class="custom-checkbox"><span class="material-symbols-outlined check-icon">check</span></span>
-            Excluir bienes sin existencias
+            {{ i18n.t('bien-export.excluir_sin_existencias') }}
           </label>
         </div>
       </div>
@@ -73,7 +73,7 @@
 
       <div class="info-box">
         <span class="material-symbols-outlined info-icon">info</span>
-        <p>El reporte incluye el catálogo completo de bienes, precios unitarios y niveles de stock vigentes. Excel y PDF los genera el servidor; CSV se arma con los bienes cargados en pantalla.</p>
+        <p>{{ i18n.t('bien-export.info') }}</p>
       </div>
 
       <!-- Main Action Button -->
@@ -85,8 +85,8 @@
 <span class="material-symbols-outlined spin">sync</span>
 }
         <div class="btn-text">
-          <span class="btn-main-text">{{ isGenerating() ? 'Generando...' : 'Generar y Descargar' }}</span>
-          <span class="btn-sub-text">PROCESAR REPORTE AHORA</span>
+          <span class="btn-main-text">{{ isGenerating() ? i18n.t('bien-export.generando') : i18n.t('bien-export.generar_descargar') }}</span>
+          <span class="btn-sub-text">{{ i18n.t('bien-export.procesar_sub') }}</span>
         </div>
       </button>
 

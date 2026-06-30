@@ -1,15 +1,15 @@
 <div class="mesas-page">
   <!-- Header con botón de acción principal -->
   <div class="mesas-page__header">
-    <restaurant-page-header title="Control de Mesas"
-      subtitle="Gestión de salón y pedidos en tiempo real"></restaurant-page-header>
+    <restaurant-page-header [title]="i18n.t('mesasPage.title')"
+      [subtitle]="i18n.t('mesasPage.subtitle')"></restaurant-page-header>
 
     <div class="header-actions">
       <div class="main-search-wrapper">
         <div class="input-group search-input-group">
           <span class="input-group-text search-icon-addon">
             <lucide-icon name="search" [size]="16"></lucide-icon>
-            MESA
+            {{ i18n.t('mesasPage.mesaLabel') }}
           </span>
           <input 
             type="text" 
@@ -18,19 +18,19 @@
             maxlength="3"
             (keypress)="soloNumeros($event)"
             class="form-control" 
-            placeholder="Ej: 7, 12..." 
+            [placeholder]="i18n.t('mesasPage.searchPlaceholder')" 
             [ngModel]="searchQueryMain()" 
             (ngModelChange)="searchQueryMain.set($event)">
         </div>
       </div>
       <restaurant-button variant="surface" (click)="abrirModal('gestion-mesas')">
         <lucide-icon name="layout-grid" [size]="18"></lucide-icon>
-        <span>Mesas</span>
+        <span>{{ i18n.t('mesasPage.mesas') }}</span>
       </restaurant-button>
       @if (puedeAdministrarMesas()) {
         <restaurant-button (click)="abrirModal('agregar')">
           <lucide-icon name="plus" [size]="18"></lucide-icon>
-          <span>Agregar Mesa</span>
+          <span>{{ i18n.t('mesasPage.addTable') }}</span>
         </restaurant-button>
       }
     </div>
@@ -38,13 +38,13 @@
 
   <!-- KPIs de Dashboard migrados -->
   <div class="mesas-page__stats">
-    <restaurant-kpi-card label="Mesas Totales" [value]="stats().totalMesas.toString()" icon="users"
+    <restaurant-kpi-card [label]="i18n.t('mesasPage.kpiTotalTables')" [value]="stats().totalMesas.toString()" icon="users"
       iconColor="blue"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="Ocupación" [value]="stats().porcentajeOcupacion + '%'" icon="layout-grid"
-      iconColor="green" [trend]="stats().mesasOcupadas + ' ocupadas'"></restaurant-kpi-card>
+    <restaurant-kpi-card [label]="i18n.t('mesasPage.kpiOccupancy')" [value]="stats().porcentajeOcupacion + '%'" icon="layout-grid"
+      iconColor="green" [trend]="stats().mesasOcupadas + ' ' + i18n.t('mesasPage.occupied')"></restaurant-kpi-card>
 
-    <restaurant-kpi-card label="Mesas en atención" [value]="mesasEnServicio().length.toString()" icon="users"
+    <restaurant-kpi-card [label]="i18n.t('mesasPage.kpiInService')" [value]="mesasEnServicio().length.toString()" icon="users"
       class="clickable-card" (click)="abrirModal('lista-ocupadas')"></restaurant-kpi-card>
   </div>
 
@@ -58,7 +58,7 @@
             [label]="mesa.estado"
             [variant]="getBadgeType(mesa.estado)"
           ></restaurant-status-badge>
-          <button class="icon-action-btn" (click)="abrirModal('editar', mesa)" title="Editar mesa">
+          <button class="icon-action-btn" (click)="abrirModal('editar', mesa)" [title]="i18n.t('mesasPage.editTable')">
             <lucide-icon name="pencil" [size]="16"></lucide-icon>
           </button>
         </div>
@@ -78,7 +78,7 @@
         <div class="mesa-card__info-row">
           <div class="mesa-card__info">
             <lucide-icon name="users" [size]="14"></lucide-icon>
-            <span>{{ mesa.capacidad }} cap.</span>
+            <span>{{ mesa.capacidad }} {{ i18n.t('mesasPage.capacity') }}</span>
           </div>
         </div>
       </div>
@@ -86,20 +86,20 @@
       <div class="mesa-card__footer">
         @if (mesa.estado === 'LIBRE') {
           <restaurant-button class="full-width" variant="primary" (click)="abrirModal('abrir', mesa)">
-            <span>Asignar Mesa</span>
+            <span>{{ i18n.t('mesasPage.assignTable') }}</span>
           </restaurant-button>
         } @else {
           <div class="mesa-card__actions flex-col gap-2">
             <div class="flex gap-2">
               @if (mesa.estado === 'OCUPADA') {
                 <restaurant-button class="flex-1" variant="primary" (click)="verPedido(mesa.id)">
-                  <span>Pedido</span>
+                  <span>{{ i18n.t('mesasPage.order') }}</span>
                 </restaurant-button>
               }
               @if (mesa.estado === 'POR_PAGAR' || mesa.estado === 'LISTO_PARA_SERVIR') {
                 <restaurant-button class="flex-1" variant="surface" (click)="verPedido(mesa.id)">
                   <lucide-icon name="receipt" [size]="16"></lucide-icon>
-                  <span>Ver Cuenta</span>
+                  <span>{{ i18n.t('mesasPage.viewBill') }}</span>
                 </restaurant-button>
               }
             </div>
@@ -112,16 +112,16 @@
   <!-- Filtros de Mesas -->
   <div class="mesas-filters" style="display: flex; gap: 10px; margin-bottom: 1.5rem;">
     <restaurant-button [variant]="filtroEstado() === 'TODAS' ? 'primary' : 'outline'" (click)="filtroEstado.set('TODAS')">
-      Todas
+      {{ i18n.t('mesasPage.all') }}
     </restaurant-button>
     <restaurant-button [variant]="filtroEstado() === 'LIBRE' ? 'primary' : 'outline'" (click)="filtroEstado.set('LIBRE')">
-      Libres
+      {{ i18n.t('mesasPage.available') }}
     </restaurant-button>
     <restaurant-button [variant]="filtroEstado() === 'OCUPADA' ? 'primary' : 'outline'" (click)="filtroEstado.set('OCUPADA')">
-      Ocupadas
+      {{ i18n.t('mesasPage.occupied') }}
     </restaurant-button>
     <restaurant-button [variant]="filtroEstado() === 'POR_PAGAR' ? 'primary' : 'outline'" (click)="filtroEstado.set('POR_PAGAR')">
-      Por Pagar
+      {{ i18n.t('mesasPage.toPay') }}
     </restaurant-button>
   </div>
 
@@ -131,7 +131,7 @@
     @if ((filtroEstado() === 'TODAS' || filtroEstado() === 'LIBRE') && filteredMesasLibres().length > 0) {
       <div class="mesas-group mb-4">
         <h3 class="mesas-group__title text-success" style="margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
-          <lucide-icon name="check-circle" [size]="20"></lucide-icon> Mesas Libres
+          <lucide-icon name="check-circle" [size]="20"></lucide-icon> {{ i18n.t('mesasPage.freeTables') }}
         </h3>
         <div class="mesas-grid">
           @for (mesa of filteredMesasLibres(); track mesa.id) {
@@ -144,7 +144,7 @@
     @if ((filtroEstado() === 'TODAS' || filtroEstado() === 'OCUPADA') && filteredMesasOcupadas().length > 0) {
       <div class="mesas-group mb-4" [style.marginTop]="(filtroEstado() === 'TODAS' && filteredMesasLibres().length > 0) ? '2rem' : '0'">
         <h3 class="mesas-group__title text-danger" style="margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
-          <lucide-icon name="users" [size]="20"></lucide-icon> Mesas Ocupadas
+          <lucide-icon name="users" [size]="20"></lucide-icon> {{ i18n.t('mesasPage.occupiedTables') }}
         </h3>
         <div class="mesas-grid">
           @for (mesa of filteredMesasOcupadas(); track mesa.id) {
@@ -157,7 +157,7 @@
     @if ((filtroEstado() === 'TODAS' || filtroEstado() === 'POR_PAGAR') && filteredMesasPorPagar().length > 0) {
       <div class="mesas-group mb-4" [style.marginTop]="(filtroEstado() === 'TODAS' && (filteredMesasLibres().length > 0 || filteredMesasOcupadas().length > 0)) ? '2rem' : '0'">
         <h3 class="mesas-group__title text-warning" style="margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; color: #d97706;">
-          <lucide-icon name="receipt" [size]="20"></lucide-icon> Mesas Por Pagar
+          <lucide-icon name="receipt" [size]="20"></lucide-icon> {{ i18n.t('mesasPage.toPayTables') }}
         </h3>
         <div class="mesas-grid">
           @for (mesa of filteredMesasPorPagar(); track mesa.id) {
@@ -169,8 +169,8 @@
 
     @if (filteredMesasActivasMain().length === 0) {
       <div class="empty-container">
-        <restaurant-empty-state title="No hay mesas configuradas"
-          message="Comienza agregando una nueva mesa para el salón."></restaurant-empty-state>
+        <restaurant-empty-state [title]="i18n.t('mesasPage.noTablesTitle')"
+          [message]="i18n.t('mesasPage.noTablesMessage')"></restaurant-empty-state>
       </div>
     }
   </section>
@@ -179,7 +179,7 @@
   @if (mesasCargando()) {
   <div class="loading-banner">
     <lucide-icon name="loader" [size]="18"></lucide-icon>
-    <span>Cargando mesas desde el servidor...</span>
+    <span>{{ i18n.t('mesasPage.loading') }}</span>
   </div>
   }
   @if (mesasError()) {
@@ -187,7 +187,7 @@
     <lucide-icon name="alert-triangle" [size]="18"></lucide-icon>
     <span>{{ mesasError() }}</span>
     <restaurant-button variant="ghost" (click)="recargarMesas()">
-      <span>Reintentar</span>
+      <span>{{ i18n.t('mesasPage.retry') }}</span>
     </restaurant-button>
   </div>
   }
@@ -203,16 +203,16 @@
         
         @if (modalActivo() === 'agregar') {
           <div class="modal-header-colored">
-            <h3>Crear Nueva Mesa</h3>
+            <h3>{{ i18n.t('mesasPage.createTable') }}</h3>
             <button class="close-btn" (click)="cerrarModales()">
               <lucide-icon name="x" [size]="20"></lucide-icon>
             </button>
           </div>
           <div class="modal-body-custom">
             <div class="form-group">
-              <label>Nombre de la Mesa</label>
+              <label>{{ i18n.t('mesasPage.tableName') }}</label>
               <div class="input-group">
-                <span class="input-group-text">MESA</span>
+                <span class="input-group-text">{{ i18n.t('mesasPage.mesaLabel') }}</span>
                 <input 
                   type="text" 
                   inputmode="numeric" 
@@ -222,12 +222,12 @@
                   [ngModel]="nuevoNombre()" 
                   (ngModelChange)="nuevoNombre.set($event)" 
                   class="form-control" 
-                  placeholder="Ej: 1, 2, 3...">
+                  [placeholder]="i18n.t('mesasPage.mesaNumberPlaceholder')">
               </div>
             </div>
             
             <div class="form-group">
-              <label>Capacidad (personas)</label>
+              <label>{{ i18n.t('mesasPage.capacityLabel') }}</label>
               <div class="capacity-control">
                 <button type="button" class="capacity-btn" (click)="decrementarCapacidad('nueva')">
                   <lucide-icon name="minus" [size]="16"></lucide-icon>
@@ -240,7 +240,7 @@
             </div>
 
             <div class="form-group">
-              <label>Zona / Ubicación</label>
+              <label>{{ i18n.t('mesasPage.zoneLabel') }}</label>
               <div class="autocomplete-wrapper">
                 <input 
                   type="text" 
@@ -249,7 +249,7 @@
                   (focus)="showNuevaZonaDropdown.set(true)"
                   (blur)="onBlurZona('nueva')"
                   class="form-control" 
-                  placeholder="Ej: Salón Principal, Terraza, VIP...">
+                  [placeholder]="i18n.t('mesasPage.zonePlaceholder')">
                 
                 @if (showNuevaZonaDropdown() && filteredNuevaZonas().length > 0) {
                   <ul class="autocomplete-dropdown">
@@ -263,12 +263,12 @@
           </div>
           <div class="modal-actions">
             <restaurant-button variant="ghost" (click)="cerrarModales()">
-              <span>Cancelar</span>
+              <span>{{ i18n.t('mesasPage.cancelAction') }}</span>
             </restaurant-button>
             <restaurant-button variant="primary" (click)="crearMesa()">
               <div class="btn-content-centered">
                 <lucide-icon name="check-circle" [size]="18"></lucide-icon>
-                <span>Guardar Mesa</span>
+                <span>{{ i18n.t('mesasPage.saveTable') }}</span>
               </div>
             </restaurant-button>
           </div>
@@ -276,14 +276,14 @@
 
         @if (modalActivo() === 'abrir') {
           <div class="modal-header-colored">
-            <h3>Abrir {{ mesaSeleccionada()?.nombre }}</h3>
+            <h3>{{ i18n.t('mesasPage.openTable') }} {{ mesaSeleccionada()?.nombre }}</h3>
             <button class="close-btn" (click)="cerrarModales()">
               <lucide-icon name="x" [size]="20"></lucide-icon>
             </button>
           </div>
           <div class="modal-body-custom">
             <div class="form-group">
-              <label>Número de Comensales</label>
+              <label>{{ i18n.t('mesasPage.dinersLabel') }}</label>
               <div class="capacity-control">
                 <button type="button" class="capacity-btn" (click)="decrementarComensales()">
                   <lucide-icon name="minus" [size]="16"></lucide-icon>
@@ -304,17 +304,17 @@
           </div>
           <div class="modal-actions">
             <restaurant-button variant="ghost" (click)="cerrarModales()">
-              <span>Cancelar</span>
+              <span>{{ i18n.t('mesasPage.cancelAction') }}</span>
             </restaurant-button>
             <restaurant-button variant="primary" (click)="abrirMesa(mesaSeleccionada()!.id)">
-              <span>Confirmar Asignación</span>
+              <span>{{ i18n.t('mesasPage.confirmAssignment') }}</span>
             </restaurant-button>
           </div>
         }
 
         @if (modalActivo() === 'lista-ocupadas') {
           <div class="modal-header-colored">
-            <h3>Mesas en Servicio</h3>
+            <h3>{{ i18n.t('mesasPage.tablesInService') }}</h3>
             <button class="close-btn" (click)="cerrarModales()">
               <lucide-icon name="x" [size]="20"></lucide-icon>
             </button>
@@ -324,8 +324,8 @@
               <div class="empty-state-container">
                 <restaurant-empty-state
                   icon="check-circle"
-                  title="Todo despejado"
-                  description="No hay mesas ocupadas ni por pagar en este momento."
+                  [title]="i18n.t('mesasPage.allClearTitle')"
+                  [description]="i18n.t('mesasPage.allClearDescription')"
                 ></restaurant-empty-state>
               </div>
             } @else {
@@ -333,17 +333,17 @@
                 <table class="restaurant-table">
                   <thead>
                     <tr>
-                      <th>Mesa</th>
-                      <th>Ubicación</th>
-                      <th>Mesero</th>
-                      <th>Estado</th>
+                      <th>{{ i18n.t('mesasPage.tableHeader') }}</th>
+                      <th>{{ i18n.t('mesasPage.locationHeader') }}</th>
+                      <th>{{ i18n.t('mesasPage.waiterHeader') }}</th>
+                      <th>{{ i18n.t('mesasPage.statusHeader') }}</th>
                     </tr>
                   </thead>
                   <tbody>
                     @for (mesa of mesasEnServicio(); track mesa.id) {
                       <tr>
                         <td class="fw-bold">{{ mesa.nombre }}</td>
-                        <td>{{ mesa.zona || 'Sin zona' }}</td>
+                        <td>{{ mesa.zona || i18n.t('mesasPage.noZone') }}</td>
                         <td>{{ mesa.meseroAsignado }}</td>
                         <td>
                           <restaurant-status-badge 
@@ -362,16 +362,16 @@
 
         @if (modalActivo() === 'editar') {
           <div class="modal-header-colored">
-            <h3>Editar {{ mesaSeleccionada()?.nombre }}</h3>
+            <h3>{{ i18n.t('mesasPage.editTableTitle') }} {{ mesaSeleccionada()?.nombre }}</h3>
             <button class="close-btn" (click)="cerrarModales()">
               <lucide-icon name="x" [size]="20"></lucide-icon>
             </button>
           </div>
           <div class="modal-body-custom">
             <div class="form-group">
-              <label>Nombre de la Mesa</label>
+              <label>{{ i18n.t('mesasPage.tableName') }}</label>
               <div class="input-group">
-                <span class="input-group-text">MESA</span>
+                <span class="input-group-text">{{ i18n.t('mesasPage.mesaLabel') }}</span>
                 <input
                   type="text"
                   inputmode="numeric" 
@@ -381,12 +381,12 @@
                   [ngModel]="editNombre()"
                   (ngModelChange)="editNombre.set($event)"
                   class="form-control"
-                  placeholder="Ej: 1, 2, 3..."
+                  [placeholder]="i18n.t('mesasPage.mesaNumberPlaceholder')"
                 >
               </div>
             </div>
             <div class="form-group">
-              <label>Capacidad (personas)</label>
+              <label>{{ i18n.t('mesasPage.capacityLabel') }}</label>
               <div class="capacity-control">
                 <button type="button" class="capacity-btn" (click)="decrementarCapacidad('editar')">
                   <lucide-icon name="minus" [size]="16"></lucide-icon>
@@ -405,7 +405,7 @@
               </div>
             </div>
             <div class="form-group">
-              <label>Zona / Ubicación</label>
+              <label>{{ i18n.t('mesasPage.zoneLabel') }}</label>
               <div class="autocomplete-wrapper">
                 <input
                   type="text"
@@ -414,7 +414,7 @@
                   (focus)="showEditZonaDropdown.set(true)"
                   (blur)="onBlurZona('editar')"
                   class="form-control"
-                  placeholder="Ej: Salón Principal, Terraza, VIP..."
+                  [placeholder]="i18n.t('mesasPage.zonePlaceholder')"
                 >
                 @if (showEditZonaDropdown() && filteredEditZonas().length > 0) {
                   <ul class="autocomplete-dropdown">
@@ -426,24 +426,24 @@
               </div>
             </div>
             <div class="form-group">
-              <label>Observaciones (Opcional)</label>
+              <label>{{ i18n.t('mesasPage.observationsLabel') }}</label>
               <textarea 
                 [ngModel]="editObservaciones()" 
                 (ngModelChange)="editObservaciones.set($event)" 
                 class="form-control" 
                 rows="2" 
                 maxlength="80"
-                placeholder="Ej: Mesa inestable, rayada, etc. (Máx 80 caracteres)"></textarea>
+                [placeholder]="i18n.t('mesasPage.observationsPlaceholder')"></textarea>
             </div>
           </div>
           <div class="modal-actions">
             <restaurant-button variant="ghost" (click)="cerrarModales()">
-              <span>Cancelar</span>
+              <span>{{ i18n.t('mesasPage.cancelAction') }}</span>
             </restaurant-button>
             <restaurant-button variant="primary" (click)="guardarEdicion()">
               <div class="btn-content-centered">
                 <lucide-icon name="save" [size]="18"></lucide-icon>
-                <span>Guardar Cambios</span>
+                <span>{{ i18n.t('mesasPage.saveChanges') }}</span>
               </div>
             </restaurant-button>
           </div>
@@ -451,27 +451,27 @@
 
         @if (modalActivo() === 'liberar' || modalActivo() === 'cobrar') {
           <div class="modal-header-colored">
-            <h3>¿Liberar {{ mesaSeleccionada()?.nombre }}?</h3>
+            <h3>{{ i18n.t('mesasPage.releaseTitle') }} {{ mesaSeleccionada()?.nombre }}?</h3>
             <button class="close-btn" (click)="cerrarModales()">
               <lucide-icon name="x" [size]="20"></lucide-icon>
             </button>
           </div>
           <div class="modal-body-custom">
-            <p>Se cerrará la cuenta y la mesa quedará Libre.</p>
+            <p>{{ i18n.t('mesasPage.releaseMessage') }}</p>
           </div>
           <div class="modal-actions">
             <restaurant-button variant="ghost" (click)="cerrarModales()">
-              <span>Cancelar</span>
+              <span>{{ i18n.t('mesasPage.cancelAction') }}</span>
             </restaurant-button>
             <restaurant-button variant="primary" (click)="liberarMesa(mesaSeleccionada()!.id)">
-              <span>Liberar Mesa</span>
+              <span>{{ i18n.t('mesasPage.releaseTable') }}</span>
             </restaurant-button>
           </div>
         }
 
         @if (modalActivo() === 'gestion-mesas') {
           <div class="modal-header-colored">
-            <h3>Gestión de Mesas</h3>
+            <h3>{{ i18n.t('mesasPage.tableManagement') }}</h3>
             <button class="close-btn" (click)="cerrarModales()">
               <lucide-icon name="x" [size]="20"></lucide-icon>
             </button>
@@ -479,10 +479,10 @@
           <div class="modal-body-custom modal-body-custom--flex">
             <div class="tabs-container">
               <button class="tab-btn" [class.active]="tabActivo() === 'desactivar'" (click)="tabActivo.set('desactivar')">
-                Desactivar
+                {{ i18n.t('mesasPage.deactivateTab') }}
               </button>
               <button class="tab-btn" [class.active]="tabActivo() === 'activar'" (click)="tabActivo.set('activar')">
-                Activar
+                {{ i18n.t('mesasPage.activateTab') }}
               </button>
             </div>
 
@@ -490,7 +490,7 @@
               <div class="input-group search-input-group">
                 <span class="input-group-text search-icon-addon">
                   <lucide-icon name="search" [size]="16"></lucide-icon>
-                  MESA
+                  {{ i18n.t('mesasPage.mesaLabel') }}
                 </span>
                 <input 
                   type="text" 
@@ -499,7 +499,7 @@
                   maxlength="3"
                   (keypress)="soloNumeros($event)"
                   class="form-control" 
-                  placeholder="Ej: 7, 12..." 
+            [placeholder]="i18n.t('mesasPage.searchPlaceholder')"
                   [ngModel]="searchQueryGestionMesas()" 
                   (ngModelChange)="searchQueryGestionMesas.set($event)">
               </div>
@@ -516,12 +516,12 @@
                       </div>
                       <restaurant-button variant="danger" [disabled]="m.estado !== 'LIBRE'"
                         (click)="cambiarEstadoMesa(m.id, false)"
-                        [title]="m.estado !== 'LIBRE' ? 'No se puede desactivar una mesa ocupada' : ''">
-                        <span>Desactivar</span>
+                        [title]="m.estado !== 'LIBRE' ? i18n.t('mesasPage.cannotDeactivateOccupied') : ''">
+                        <span>{{ i18n.t('mesasPage.deactivateButton') }}</span>
                       </restaurant-button>
                     </div>
                   } @empty {
-                    <p class="empty-msg">No hay mesas activas disponibles.</p>
+                    <p class="empty-msg">{{ i18n.t('mesasPage.noActiveTables') }}</p>
                   }
                 </div>
               } @else {
@@ -531,7 +531,7 @@
                       <div class="mesa-list-info">
                         <div class="mesa-list-info-header">
                           <span class="mesa-list-number">{{ m.nombre }}</span>
-                          <span class="badge-inactiva">Desactivada</span>
+                          <span class="badge-inactiva">{{ i18n.t('mesasPage.deactivatedBadge') }}</span>
                         </div>
                         @if (m.observaciones) {
                           <div class="mesa-obs-text">
@@ -541,11 +541,11 @@
                         }
                       </div>
                       <restaurant-button variant="primary" (click)="cambiarEstadoMesa(m.id, true)">
-                        <span>Activar</span>
+                        <span>{{ i18n.t('mesasPage.activateButton') }}</span>
                       </restaurant-button>
                     </div>
                   } @empty {
-                    <p class="empty-msg">No hay mesas desactivadas.</p>
+                    <p class="empty-msg">{{ i18n.t('mesasPage.noDeactivatedTables') }}</p>
                   }
                 </div>
               }
@@ -562,11 +562,11 @@
 @if (modalActivo() === 'ver-cuenta' && pedidoCuenta()) {
   <div class="custom-modal-backdrop" (click)="cerrarModales()">
     <section class="custom-modal-dialog" (click)="$event.stopPropagation()">
-      <strong class="modal-title" style="margin-bottom: 1.5rem; display: block; text-align: center;">Detalle de la Cuenta</strong>
+      <strong class="modal-title" style="margin-bottom: 1.5rem; display: block; text-align: center;">{{ i18n.t('mesasPage.billDetail') }}</strong>
       
       <div class="modal-order-summary">
         @if (comidasPedidoCuenta().length > 0) {
-          <h5 class="category-title">Comidas</h5>
+          <h5 class="category-title">{{ i18n.t('mesasPage.foodCategory') }}</h5>
           <ul class="summary-list">
             @for (item of comidasPedidoCuenta(); track item.productoId) {
               <li class="summary-item-container">
@@ -586,7 +586,7 @@
         }
 
         @if (bebidasPedidoCuenta().length > 0) {
-          <h5 class="category-title mt-3">Bebidas</h5>
+          <h5 class="category-title mt-3">{{ i18n.t('mesasPage.drinksCategory') }}</h5>
           <ul class="summary-list">
             @for (item of bebidasPedidoCuenta(); track item.productoId) {
               <li class="summary-item-container">
@@ -607,18 +607,18 @@
 
         @if (pedidoCuenta()?.observacionesGenerales) {
           <div class="summary-notes">
-            <strong>Observaciones:</strong> {{ pedidoCuenta()?.observacionesGenerales }}
+            <strong>{{ i18n.t('mesasPage.observationsSummary') }}</strong> {{ pedidoCuenta()?.observacionesGenerales }}
           </div>
         }
 
         <div class="summary-total-row">
-          <span>Total:</span>
+          <span>{{ i18n.t('mesasPage.totalLabel') }}</span>
           <strong>{{ totalCuenta() | currencyCop }}</strong>
         </div>
       </div>
 
       <div class="modal-actions" style="display: flex; justify-content: center; gap: 12px; margin-top: 1.5rem;">
-        <restaurant-button variant="primary" (click)="cerrarModales()">Cerrar Cuenta</restaurant-button>
+        <restaurant-button variant="primary" (click)="cerrarModales()">{{ i18n.t('mesasPage.closeBill') }}</restaurant-button>
       </div>
     </section>
   </div>
@@ -629,8 +629,8 @@
   [open]="alertDialog().open"
   [title]="alertDialog().title"
   [message]="alertDialog().message"
-  [confirmText]="alertDialog().confirmText || 'Aceptar'"
-  [cancelText]="alertDialog().cancelText || 'Cancelar'"
+  [confirmText]="alertDialog().confirmText || i18n.t('mesasPage.acceptDefault')"
+  [cancelText]="alertDialog().cancelText || i18n.t('mesasPage.cancelDefault')"
   [showCancel]="alertDialog().type === 'confirm'"
   (confirm)="confirmAlertDialog()"
   (cancel)="cerrarAlertDialog()"
@@ -638,9 +638,9 @@
 
 <restaurant-confirm-dialog
   [open]="mostrarModalAccesoDenegado()"
-  title="Acceso Denegado"
-  message="Tu rol no te permite ingresar al módulo de Caja."
-  confirmText="Aceptar"
+  [title]="i18n.t('mesasPage.accessDeniedTitle')"
+  [message]="i18n.t('mesasPage.accessDeniedMessage')"
+  [confirmText]="i18n.t('mesasPage.acceptDefault')"
   [showCancel]="false"
   (confirm)="cerrarModalAccesoDenegado()"
 ></restaurant-confirm-dialog>

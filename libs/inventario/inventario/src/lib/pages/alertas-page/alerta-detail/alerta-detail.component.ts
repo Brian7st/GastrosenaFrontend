@@ -10,6 +10,7 @@ import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { StatusBadgeComponent, ButtonComponent, LucideIconComponent, HasPermissionDirective } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { AlertasFacade } from '../../../data-access/alertas.facade';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'restaurant-alerta-detail',
@@ -21,6 +22,7 @@ import { AlertasFacade } from '../../../data-access/alertas.facade';
 })
 export class AlertaDetailComponent implements OnInit {
   private router  = inject(Router);
+  protected readonly i18n = inject(I18nService);
   private route   = inject(ActivatedRoute);
   private facade  = inject(AlertasFacade);
 

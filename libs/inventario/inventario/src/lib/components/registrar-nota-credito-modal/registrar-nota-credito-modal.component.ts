@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   EventEmitter,
+  inject,
   Input,
   OnChanges,
   Output,
@@ -11,6 +12,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ConciliacionGilDiferencia, Factura, MotivoNotaCredito, RegistrarNotaCreditoRequest } from '../../models/facturas.model';
+import { I18nService } from '../../i18n/i18n.service';
 
 @Component({
   selector: 'inventario-registrar-nota-credito-modal',
@@ -21,6 +23,7 @@ import { ConciliacionGilDiferencia, Factura, MotivoNotaCredito, RegistrarNotaCre
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegistrarNotaCreditoModalComponent implements OnChanges {
+  protected readonly i18n = inject(I18nService);
   @Input() isOpen = false;
   @Input() factura: Factura | null = null;
   /** Diferencia SOBREFACTURACION que origina la nota crédito */

@@ -5,13 +5,13 @@
 
 <!-- Header -->
 <div class="page-header">
-  <h1 class="page-title">Vista previa — Consolidación de ítems</h1>
-  <p class="page-subtitle">Revise los ítems consolidados de múltiples solicitudes antes de generar el documento GIL (Guía de Ingreso y/o Salida).</p>
+  <h1 class="page-title">{{ i18n.t('si.consolidacion_titulo') }}</h1>
+  <p class="page-subtitle">{{ i18n.t('si.consolidacion_subtitulo') }}</p>
 </div>
 
 <!-- Origen de datos -->
 <div class="origen-datos">
-  <span class="origen-label">Origen de datos:</span>
+  <span class="origen-label">{{ i18n.t('si.origen_datos') }}</span>
   <div class="origen-tags">
     @for (orig of origenes(); track orig) {
 <span class="origen-tag">{{ orig }}</span>
@@ -23,8 +23,8 @@
 <div class="consolidacion-card">
   <!-- Cabecera -->
   <div class="card-header">
-    <h2 class="card-title">Ítems Consolidados</h2>
-    <span class="items-badge">{{ itemsConsolidados().length }} Ítems Únicos</span>
+    <h2 class="card-title">{{ i18n.t('si.items_consolidados') }}</h2>
+    <span class="items-badge">{{ itemsConsolidados().length }} {{ i18n.t('si.items_unicos') }}</span>
   </div>
 
   <!-- Tabla -->
@@ -32,10 +32,10 @@
     <table class="consolidacion-table">
       <thead>
         <tr>
-          <th>Ítem</th>
-          <th>Unidad</th>
-          <th>Desglose por Solicitud</th>
-          <th class="text-right">Total Consolidado</th>
+          <th>{{ i18n.t('si.th_item') }}</th>
+          <th>{{ i18n.t('si.th_unidad') }}</th>
+          <th>{{ i18n.t('si.th_desglose') }}</th>
+          <th class="text-right">{{ i18n.t('si.th_total_consolidado') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -84,7 +84,7 @@
 <!-- Footer -->
 <div class="page-footer" style="justify-content: flex-end;">
   <restaurant-button variant="primary" (click)="onConfirm()">
-    Confirmar y Generar GIL
+    {{ i18n.t('si.confirmar_gil') }}
     <span class="material-symbols-outlined" style="margin-left: 8px;">arrow_forward</span>
   </restaurant-button>
 </div>
