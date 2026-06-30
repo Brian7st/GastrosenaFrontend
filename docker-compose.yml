@@ -222,7 +222,7 @@ services:
       - gastrosena-net
 
   barbarismo:
-    image: jhojanalvarez71/ga-ms-barbarismo:3.1
+    image: jhojanalvarez71/ga-ms-barbarismo:latest
     container_name: gastrosena-barbarismo
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://barbarismo-db:3306/ProyectoFormativo?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
