@@ -17,20 +17,31 @@ export interface ActividadDTO {
 
 export type CreateActividadDTO = Omit<ActividadDTO, 'id' | 'estado'>;
 
+/** DTO de ficha devuelto por el microservicio de usuarios vía API Gateway */
 export interface FichaDTO {
-  id: number;
+  /** UUID de la ficha */
+  id: string;
   numero: string;
   nombre?: string;
   programa?: string;
 }
 
+/** DTO de aprendiz mapeado desde el microservicio de usuarios vía API Gateway.
+ *  El campo `inactivo` se deriva del campo `estado` del usuario:
+ *  inactivo = !usuario.estado (false = activo, true = inactivo).
+ */
 export interface AprendizDTO {
+  /** ID numérico del aprendiz en el microservicio de cocina (Long del backend) */
   id: number;
   nombreCompleto: string;
   inicial: string;
+  /** Número de ficha al que pertenece (string del número visible) */
   ficha: string;
   jornada: string;
-  inactivo?: boolean;
+  /** true = inactivo (estado desactivado en el microservicio de usuarios) */
+  inactivo: boolean;
+  /** Estado de evaluación — se llena dinámicamente en el frontend */
+  estado: 'Pendiente' | 'Aprobó' | 'No Aprobó';
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -75,13 +86,30 @@ export class FichaService {
   }
 }
 
+/** DTO que devuelve el microservicio de usuarios para cada usuario/aprendiz */
+export interface UsuarioFichaDTO {
+  idUsuario: string;
+  documento: string;
+  nombre: string;
+  apellidos: string;
+  email: string;
+  telefono: string;
+  /** true = activo, false = inactivo */
+  estado: boolean;
+  rol: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AprendizService {
   private http = inject(HttpClient);
-  private readonly BASE = `${GATEWAY}/api/aprendices`;
+  private readonly BASE = `${GATEWAY}/api/fichas`;
 
-  /** Obtiene todos los aprendices desde el microservicio de usuarios vía el gateway */
-  getAll(): Observable<AprendizDTO[]> {
-    return this.http.get<AprendizDTO[]>(this.BASE);
+  /**
+   * Obtiene los aprendices (rol AUXILIAR_COCINA) de una ficha dado su UUID.
+   * El microservicio de usuarios los expone en:
+   * GET /api/fichas/{fichaUuid}/aprendices
+   */
+  getByFichaId(fichaId: string): Observable<UsuarioFichaDTO[]> {
+    return this.http.get<UsuarioFichaDTO[]>(`${this.BASE}/${fichaId}/aprendices`);
   }
 }

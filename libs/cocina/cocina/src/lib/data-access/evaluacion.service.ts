@@ -5,8 +5,8 @@ import { Observable } from 'rxjs';
 // ── DTOs alineados con el backend ─────────────────────────────────────────────
 
 /**
- * Registro de evaluación guardado en la BD.
- * El frontend cruza este dato con su lista de aprendices (mock o microservicio externo).
+ * Registro de evaluación guardado en BD (GET /api/actividades/{id}/evaluaciones).
+ * El backend usa Long para aprendizId (se persiste sin FK al microservicio externo).
  */
 export interface EvaluacionResponseDTO {
   aprendizId: number;
@@ -30,7 +30,7 @@ export class EvaluacionService {
 
   /**
    * Obtiene los registros de evaluación persistidos en BD para una actividad.
-   * El frontend usa esta lista para actualizar el estado de cada aprendiz del mock.
+   * El frontend usa esta lista para actualizar el estado de cada aprendiz.
    */
   getEvaluacionesPorActividad(actividadId: number): Observable<EvaluacionResponseDTO[]> {
     return this.http.get<EvaluacionResponseDTO[]>(`${this.BASE}/${actividadId}/evaluaciones`);

@@ -16,15 +16,15 @@
   </div>
 
   <!-- ===== TARJETA APRENDIZ ===== -->
+  @if (aprendiz(); as a) {
   <div class="card aprendiz-card">
 
     <!-- Perfil -->
     <div class="aprendiz-perfil">
-      <div class="avatar-lg">{{ aprendiz().inicial }}</div>
+      <div class="avatar-lg">{{ a.inicial }}</div>
 
       <div class="aprendiz-info">
-        <p class="aprendiz-nombre">{{ aprendiz().nombreCompleto }}</p>
-        <p class="aprendiz-doc">{{ aprendiz().documento }}</p>
+        <p class="aprendiz-nombre">{{ a.nombreCompleto }}</p>
       </div>
     </div>
 
@@ -36,21 +36,21 @@
       <div class="meta-item">
         <span class="meta-label">{{ i18n.t('evaluacion-individual.jornada') }}</span>
         <span class="meta-value meta-value--primary">
-          {{ aprendiz().jornada }}
+          {{ a.jornada }}
         </span>
       </div>
 
       <div class="meta-item">
         <span class="meta-label">{{ i18n.t('evaluacion-individual.ficha') }}</span>
         <span class="meta-value">
-          {{ aprendiz().numeroFicha }}
+          {{ a.numeroFicha }}
         </span>
       </div>
 
       <div class="meta-item">
         <span class="meta-label">{{ i18n.t('evaluacion-individual.actividad') }}</span>
         <span class="meta-value">
-          {{ aprendiz().actividad ?? '—' }}
+          {{ a.actividad ?? '—' }}
         </span>
       </div>
 
@@ -261,5 +261,10 @@
     }
 
   </div>
+  } @else {
+    <div class="card aprendiz-card" style="text-align:center; padding: 2rem;">
+      <p style="color: var(--color-text-secondary);">Aprendiz no encontrado.</p>
+    </div>
+  }
 
 </div>
