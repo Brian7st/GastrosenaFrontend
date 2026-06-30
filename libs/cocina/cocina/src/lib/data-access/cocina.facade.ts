@@ -14,13 +14,46 @@ import { EvaluacionService } from './evaluacion.service';
 
 // ── Tipos públicos exportados ──────────────────────────────────────────────────
 
-export type ActividadMock = ActividadDTO;
-export type { FichaDTO, AprendizDTO };
+export type AprendizMock = AprendizDTO;
 
-// ─────────────────────────────────────────────────────────────────────────────
-
-/** Rol del microservicio de usuarios que representa a un auxiliar de cocina */
-const ROL_AUXILIAR_COCINA = 'AUXILIAR_COCINA';
+const APRENDICES_MOCK: AprendizMock[] = [
+  {
+    id: 1,
+    nombreCompleto: 'Juan Pérez',
+    inicial: 'J',
+    ficha: '2561234',
+    jornada: 'Diurna',
+    inactivo: false,
+    estado: 'Pendiente'
+  },
+  {
+    id: 2,
+    nombreCompleto: 'María Gómez',
+    inicial: 'M',
+    ficha: '2561234',
+    jornada: 'Diurna',
+    inactivo: false,
+    estado: 'Pendiente'
+  },
+  {
+    id: 3,
+    nombreCompleto: 'Carlos Ruiz',
+    inicial: 'C',
+    ficha: '2561235',
+    jornada: 'Mixta',
+    inactivo: true,
+    estado: 'Pendiente'
+  },
+  {
+    id: 4,
+    nombreCompleto: 'Ana Martínez',
+    inicial: 'A',
+    ficha: '2561235',
+    jornada: 'Mixta',
+    inactivo: false,
+    estado: 'Pendiente'
+  }
+];
 
 @Injectable({ providedIn: 'root' })
 export class CocinaFacade {
@@ -49,71 +82,27 @@ export class CocinaFacade {
       next: (data) => {
         this.fichas.set(data || []);
         this.fichasCargando.set(false);
-        // Una vez que tenemos las fichas, cargamos los aprendices de todas ellas
-        this.cargarAprendices(data || []);
+        // Una vez que tenemos las fichas, cargamos los aprendices (desde el mock temporalmente)
+        this.cargarAprendices();
       },
       error: (err) => {
         console.error('Error al cargar fichas desde el microservicio de usuarios:', err);
         this.fichasCargando.set(false);
+        // Aún si falla, cargamos el mock para que la vista funcione
+        this.cargarAprendices();
       }
     });
   }
 
-  // ── Aprendices (solo rol AUXILIAR_COCINA, desde microservicio de usuarios) ─
+  // ── Aprendices (Mock temporal) ─────────────────────────────────────────────
 
-  /**
-   * Carga los aprendices de todas las fichas disponibles en paralelo.
-   * Filtra únicamente los usuarios con rol AUXILIAR_COCINA.
-   * El campo `inactivo` se deriva de `!usuario.estado` (el módulo de usuarios
-   * gestiona los estados activo/inactivo).
-   */
-  cargarAprendices(fichas: FichaDTO[]): void {
-    if (fichas.length === 0) {
-      this.aprendices.set([]);
-      return;
-    }
-
+  cargarAprendices(): void {
     this.aprendicesCargando.set(true);
-
-    // Obtener aprendices de cada ficha en paralelo
-    const peticiones = fichas.map(ficha =>
-      this.aprendizService.getByFichaId(ficha.id).pipe(
-        catchError((err) => {
-          console.error(`Error al cargar aprendices de ficha ${ficha.numero}:`, err);
-          return of([] as UsuarioFichaDTO[]);
-        }),
-        map((usuarios: UsuarioFichaDTO[]) =>
-          usuarios
-            .filter(u => u.rol === ROL_AUXILIAR_COCINA)
-            .map((u): AprendizDTO => ({
-              // El backend de cocina usa Long para aprendizId. Como el id del
-              // usuario en su microservicio viaja como string (ej. "1", "2"),
-              // lo parseamos a Number para que coincida con el Long de BD.
-              id: Number(u.idUsuario) || 0,
-              nombreCompleto: `${u.nombre} ${u.apellidos}`.trim(),
-              inicial: u.nombre.charAt(0).toUpperCase(),
-              ficha: ficha.numero,
-              jornada: 'Diurna', // La jornada viene de la ficha, no del usuario
-              inactivo: !u.estado, // estado=false en usuarios → inactivo en cocina
-              estado: 'Pendiente', // se actualizará al cruzar con evaluaciones
-            }))
-        )
-      )
-    );
-
-    forkJoin(peticiones).subscribe({
-      next: (resultados) => {
-        // Aplanar resultados de todas las fichas
-        const todos = resultados.flat();
-        this.aprendices.set(todos);
-        this.aprendicesCargando.set(false);
-      },
-      error: (err) => {
-        console.error('Error al cargar aprendices:', err);
-        this.aprendices.set([]);
-        this.aprendicesCargando.set(false);
-      }
-    });
+    // Asignar directamente el mock, simulando respuesta exitosa
+    setTimeout(() => {
+      this.aprendices.set(APRENDICES_MOCK);
+      this.aprendicesCargando.set(false);
+    }, 300);
   }
 
   // ── Actividades ───────────────────────────────────────────────────────────
