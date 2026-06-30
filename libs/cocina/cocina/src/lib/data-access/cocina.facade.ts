@@ -1,68 +1,122 @@
-import { Injectable, signal, inject } from '@angular/core';
-import { ActividadService, ActividadDTO, FichaService, FichaDTO, AprendizService, AprendizDTO } from './actividad.service';
+import { Injectable, signal, inject, computed } from '@angular/core';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import {
+  ActividadService,
+  ActividadDTO,
+  FichaService,
+  FichaDTO,
+  AprendizService,
+  AprendizDTO,
+  UsuarioFichaDTO,
+} from './actividad.service';
 import { EvaluacionService } from './evaluacion.service';
 
-export interface AprendizMock {
-  id: number;
-  nombreCompleto: string;
-  inicial: string;
-  ficha: string;
-  jornada: 'Diurna' | 'Nocturna' | 'Mixta';
-  estado: 'Pendiente' | 'Aprobó' | 'No Aprobó';
-  inactivo?: boolean;
-}
+// ── Tipos públicos exportados ──────────────────────────────────────────────────
 
 export type ActividadMock = ActividadDTO;
-export type { FichaDTO };
+export type { FichaDTO, AprendizDTO };
 
-const APRENDICES_MOCK: AprendizMock[] = [
-  { id: 1, nombreCompleto: 'Camila Rodriguez Torres',  inicial: 'C', ficha: '2561234', jornada: 'Diurna',   estado: 'Pendiente' },
-  { id: 2, nombreCompleto: 'Andrés Felipe Mora',       inicial: 'A', ficha: '2561234', jornada: 'Diurna',   estado: 'Pendiente' },
-  { id: 3, nombreCompleto: 'Laura Valentina Gómez',    inicial: 'L', ficha: '2489012', jornada: 'Mixta',    estado: 'Pendiente' },
-  { id: 4, nombreCompleto: 'María Fernanda Castro',    inicial: 'M', ficha: '2561234', jornada: 'Diurna',   estado: 'Pendiente' },
-  { id: 5, nombreCompleto: 'Valeria Ospina Herrera',   inicial: 'V', ficha: '2632456', jornada: 'Mixta',    estado: 'Pendiente' },
-  { id: 6, nombreCompleto: 'Juan Pérez Inactivo',      inicial: 'J', ficha: '0000000', jornada: 'Diurna',   estado: 'Pendiente', inactivo: true },
-  { id: 7, nombreCompleto: 'Ana López Inactiva',       inicial: 'A', ficha: '0000000', jornada: 'Nocturna', estado: 'Pendiente', inactivo: true }
-];
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Rol del microservicio de usuarios que representa a un auxiliar de cocina */
+const ROL_AUXILIAR_COCINA = 'AUXILIAR_COCINA';
 
 @Injectable({ providedIn: 'root' })
 export class CocinaFacade {
-  private actividadService = inject(ActividadService);
-  private fichaService     = inject(FichaService);
-  private aprendizService  = inject(AprendizService);
+  private actividadService  = inject(ActividadService);
+  private fichaService      = inject(FichaService);
+  private aprendizService   = inject(AprendizService);
   private evaluacionService = inject(EvaluacionService);
 
-  readonly aprendices = signal<AprendizMock[]>([]);
-  readonly actividades = signal<ActividadMock[]>([]);
-  readonly fichas      = signal<FichaDTO[]>([]);
-  readonly fichasCargando = signal<boolean>(false);
+  // ── Estado ────────────────────────────────────────────────────────────────
+  readonly aprendices        = signal<AprendizDTO[]>([]);
+  readonly actividades       = signal<ActividadDTO[]>([]);
+  readonly fichas            = signal<FichaDTO[]>([]);
+  readonly fichasCargando    = signal<boolean>(false);
+  readonly aprendicesCargando = signal<boolean>(false);
 
   constructor() {
     this.cargarActividades();
     this.cargarFichas();
-    this.cargarAprendices();
   }
 
-  cargarAprendices(): void {
-    this.aprendizService.getAll().subscribe({
+  // ── Fichas (microservicio de usuarios vía API Gateway) ───────────────────
+
+  cargarFichas(): void {
+    this.fichasCargando.set(true);
+    this.fichaService.getAll().subscribe({
       next: (data) => {
-        const mapeados: AprendizMock[] = (data || []).map(a => ({
-          id: a.id,
-          nombreCompleto: a.nombreCompleto,
-          inicial: a.inicial || a.nombreCompleto.charAt(0).toUpperCase(),
-          ficha: a.ficha,
-          jornada: a.jornada as 'Diurna' | 'Nocturna' | 'Mixta',
-          estado: 'Pendiente', // por defecto
-          inactivo: a.inactivo
-        }));
-        this.aprendices.set(mapeados);
+        this.fichas.set(data || []);
+        this.fichasCargando.set(false);
+        // Una vez que tenemos las fichas, cargamos los aprendices de todas ellas
+        this.cargarAprendices(data || []);
       },
       error: (err) => {
-        console.warn('No se pudieron cargar aprendices reales, usando mock:', err);
-        this.aprendices.set(APRENDICES_MOCK);
+        console.error('Error al cargar fichas desde el microservicio de usuarios:', err);
+        this.fichasCargando.set(false);
       }
     });
   }
+
+  // ── Aprendices (solo rol AUXILIAR_COCINA, desde microservicio de usuarios) ─
+
+  /**
+   * Carga los aprendices de todas las fichas disponibles en paralelo.
+   * Filtra únicamente los usuarios con rol AUXILIAR_COCINA.
+   * El campo `inactivo` se deriva de `!usuario.estado` (el módulo de usuarios
+   * gestiona los estados activo/inactivo).
+   */
+  cargarAprendices(fichas: FichaDTO[]): void {
+    if (fichas.length === 0) {
+      this.aprendices.set([]);
+      return;
+    }
+
+    this.aprendicesCargando.set(true);
+
+    // Obtener aprendices de cada ficha en paralelo
+    const peticiones = fichas.map(ficha =>
+      this.aprendizService.getByFichaId(ficha.id).pipe(
+        catchError((err) => {
+          console.error(`Error al cargar aprendices de ficha ${ficha.numero}:`, err);
+          return of([] as UsuarioFichaDTO[]);
+        }),
+        map((usuarios: UsuarioFichaDTO[]) =>
+          usuarios
+            .filter(u => u.rol === ROL_AUXILIAR_COCINA)
+            .map((u): AprendizDTO => ({
+              // El backend de cocina usa Long para aprendizId. Como el id del
+              // usuario en su microservicio viaja como string (ej. "1", "2"),
+              // lo parseamos a Number para que coincida con el Long de BD.
+              id: Number(u.idUsuario) || 0,
+              nombreCompleto: `${u.nombre} ${u.apellidos}`.trim(),
+              inicial: u.nombre.charAt(0).toUpperCase(),
+              ficha: ficha.numero,
+              jornada: 'Diurna', // La jornada viene de la ficha, no del usuario
+              inactivo: !u.estado, // estado=false en usuarios → inactivo en cocina
+              estado: 'Pendiente', // se actualizará al cruzar con evaluaciones
+            }))
+        )
+      )
+    );
+
+    forkJoin(peticiones).subscribe({
+      next: (resultados) => {
+        // Aplanar resultados de todas las fichas
+        const todos = resultados.flat();
+        this.aprendices.set(todos);
+        this.aprendicesCargando.set(false);
+      },
+      error: (err) => {
+        console.error('Error al cargar aprendices:', err);
+        this.aprendices.set([]);
+        this.aprendicesCargando.set(false);
+      }
+    });
+  }
+
+  // ── Actividades ───────────────────────────────────────────────────────────
 
   cargarActividades(): void {
     this.actividadService.getAll().subscribe({
@@ -71,25 +125,19 @@ export class CocinaFacade {
     });
   }
 
-  cargarFichas(): void {
-    this.fichasCargando.set(true);
-    this.fichaService.getAll().subscribe({
-      next: (data) => {
-        this.fichas.set(data || []);
-        this.fichasCargando.set(false);
-      },
-      error: (err) => {
-        console.warn('No se pudieron cargar fichas desde el microservicio de usuarios:', err);
-        this.fichasCargando.set(false);
-      }
-    });
-  }
+  // ── Evaluaciones ──────────────────────────────────────────────────────────
 
+  /**
+   * Actualiza el estado de evaluación de un aprendiz en el estado local.
+   * Se llama tras un submit exitoso al backend de cocina.
+   */
   actualizarEstado(id: number, estado: 'Aprobó' | 'No Aprobó'): void {
-    this.aprendices.update(aprendices =>
-      aprendices.map(a => a.id === id ? { ...a, estado } : a)
+    this.aprendices.update(lista =>
+      lista.map(a => a.id === id ? { ...a, estado } : a)
     );
   }
+
+  // ── Actividades CRUD ──────────────────────────────────────────────────────
 
   crearActividad(data: Omit<ActividadMock, 'id' | 'estado'>): void {
     this.actividadService.create(data).subscribe({

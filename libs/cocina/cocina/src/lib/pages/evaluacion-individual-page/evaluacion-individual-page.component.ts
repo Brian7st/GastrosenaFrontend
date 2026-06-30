@@ -10,17 +10,17 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { I18nService } from '../../i18n/i18n.service';
-import { CocinaFacade } from '../../data-access/cocina.facade';
+import { CocinaFacade, AprendizDTO } from '../../data-access/cocina.facade';
 import { EvaluacionService } from '../../data-access/evaluacion.service';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 
 // ─── Modelos ──────────────────────────────────────────────────────────────────
 
-export interface AprendizIndividualMock {
+/** Vista de un aprendiz en la página de evaluación individual */
+export interface AprendizIndividualView {
   id: number;
   nombreCompleto: string;
   inicial: string;
-  documento: string;
   jornada: string;
   numeroFicha: string;
   actividad: string | null;
@@ -32,18 +32,6 @@ export interface RegistroEvaluacion {
   fecha: string;
   esRevaluacion: boolean;
 }
-
-// ─── Datos mock ───────────────────────────────────────────────────────────────
-
-const APRENDIZ_MOCK: AprendizIndividualMock = {
-  id: 1,
-  nombreCompleto: 'Camila Rodriguez Torres',
-  inicial: 'C',
-  documento: 'CC 1032456789',
-  jornada: 'Diurna',
-  numeroFicha: '2561234',
-  actividad: null,
-};
 
 // ─── Componente ───────────────────────────────────────────────────────────────
 
@@ -58,7 +46,7 @@ const APRENDIZ_MOCK: AprendizIndividualMock = {
 export class EvaluacionIndividualPageComponent implements OnInit {
 
   // ── Datos ────────────────────────────────────────────────────────────────
-  readonly aprendiz = signal<AprendizIndividualMock>(APRENDIZ_MOCK);
+  readonly aprendiz = signal<AprendizIndividualView | null>(null);
 
   // ── Historial de evaluaciones ─────────────────────────────────────────────
   readonly historialEvaluaciones = signal<RegistroEvaluacion[]>([]);
@@ -89,20 +77,18 @@ export class EvaluacionIndividualPageComponent implements OnInit {
       const id = Number(params['id']);
 
       if (id) {
-        const aprendizEncontrado = this.facade.aprendices().find(a => a.id === id);
+        const encontrado = this.facade.aprendices().find(a => a.id === id);
 
-        if (aprendizEncontrado) {
-          // Buscar la actividad más reciente
+        if (encontrado) {
           const actividades = this.facade.actividades();
           const actividadNombre = actividades.length > 0 ? actividades[0].nombre : null;
 
           this.aprendiz.set({
-            ...APRENDIZ_MOCK,
-            id: aprendizEncontrado.id,
-            nombreCompleto: aprendizEncontrado.nombreCompleto,
-            inicial: aprendizEncontrado.inicial,
-            numeroFicha: aprendizEncontrado.ficha,
-            jornada: aprendizEncontrado.jornada,
+            id: encontrado.id,
+            nombreCompleto: encontrado.nombreCompleto,
+            inicial: encontrado.inicial,
+            numeroFicha: encontrado.ficha,
+            jornada: encontrado.jornada,
             actividad: actividadNombre,
           });
         }
@@ -123,6 +109,9 @@ export class EvaluacionIndividualPageComponent implements OnInit {
   // ── Submit evaluación inicial ─────────────────────────────────────────────
 
   submitEvaluacionIndividual(resultado: 'aprobo' | 'no_aprobo'): void {
+    const aprendiz = this.aprendiz();
+    if (!aprendiz) return;
+
     const resultadoLabel: 'Aprobado' | 'No Aprobado' =
       resultado === 'aprobo' ? 'Aprobado' : 'No Aprobado';
 
@@ -137,29 +126,25 @@ export class EvaluacionIndividualPageComponent implements OnInit {
     };
 
     const payload = [{
-      aprendizId: this.aprendiz().id,
+      aprendizId: aprendiz.id,
       resultado: resultado,
       observaciones: this.observaciones.trim()
     }];
 
-    console.log(
-      '[EvaluacionIndividual] Submit:',
-      JSON.stringify(payload, null, 2)
-    );
-
-    // Obtener la actividad asociada
     const actividades = this.facade.actividades();
-    const actividad = actividades.find(a => a.nombre === this.aprendiz().actividad);
-    const actividadId = actividad ? actividad.id : 1; // Fallback o manejar null si es necesario
+    const actividad = actividades.find(a => a.nombre === aprendiz.actividad);
+    if (!actividad) {
+      console.error('No se encontró la actividad asociada al aprendiz');
+      return;
+    }
 
-    this.evaluacionService.evaluarAprendices(actividadId, payload).subscribe({
+    this.evaluacionService.evaluarAprendices(actividad.id, payload).subscribe({
       next: () => {
         this.historialEvaluaciones.update(h => [...h, nuevoRegistro]);
 
         const estadoFacade = resultado === 'aprobo' ? 'Aprobó' : 'No Aprobó';
-        this.facade.actualizarEstado(this.aprendiz().id, estadoFacade);
+        this.facade.actualizarEstado(aprendiz.id, estadoFacade);
 
-        // Limpiar formulario y cerrar menú
         this.observaciones = '';
         this.menuEvaluarAbierto.set(false);
       },
@@ -184,8 +169,9 @@ export class EvaluacionIndividualPageComponent implements OnInit {
   }
 
   submitRevaluar(): void {
+    const aprendiz = this.aprendiz();
     const resultado = this.resultadoRevaluar();
-    if (!resultado) return;
+    if (!resultado || !aprendiz) return;
 
     const nuevoRegistro: RegistroEvaluacion = {
       resultado: resultado as 'Aprobado' | 'No Aprobado',
@@ -198,22 +184,24 @@ export class EvaluacionIndividualPageComponent implements OnInit {
     };
 
     const payload = [{
-      aprendizId: this.aprendiz().id,
+      aprendizId: aprendiz.id,
       resultado: resultado === 'Aprobado' ? 'aprobo' as const : 'no_aprobo' as const,
       observaciones: this.observacionesRevaluar.trim()
     }];
 
-    // Obtener la actividad asociada
     const actividades = this.facade.actividades();
-    const actividad = actividades.find(a => a.nombre === this.aprendiz().actividad);
-    const actividadId = actividad ? actividad.id : 1; // Fallback
+    const actividad = actividades.find(a => a.nombre === aprendiz.actividad);
+    if (!actividad) {
+      console.error('No se encontró la actividad para re-evaluar');
+      return;
+    }
 
-    this.evaluacionService.evaluarAprendices(actividadId, payload).subscribe({
+    this.evaluacionService.evaluarAprendices(actividad.id, payload).subscribe({
       next: () => {
         this.historialEvaluaciones.update(h => [...h, nuevoRegistro]);
 
         const estadoFacade = resultado === 'Aprobado' ? 'Aprobó' : 'No Aprobó';
-        this.facade.actualizarEstado(this.aprendiz().id, estadoFacade);
+        this.facade.actualizarEstado(aprendiz.id, estadoFacade);
 
         this.modoRevaluar.set(false);
         this.resultadoRevaluar.set('');
