@@ -3,11 +3,6 @@
   "//gateway": "El gateway valida el JWT y enruta a cada microservicio por DNS de Docker.",
   "//agente": "El agente IA (9000) aún no pasa por el gateway: ruta directa, debe ir ANTES del catch-all /api.",
 
-  "/api/agente": {
-    "target": "http://localhost:9000",
-    "secure": false,
-    "changeOrigin": true
-  },
   "/api": {
     "target": "http://localhost:8088",
     "secure": false,

@@ -146,17 +146,14 @@ export class HomeService {
   getBarismoItems(): Observable<FeaturedItem[]> {
     return this.http.get<BarMenuDTO[]>('/api/barybarismo/recetas/menu')
       .pipe(
-        map(items => items
-          .filter(r => r.nombreCategoria?.toLowerCase().includes('caf') || r.nombreCategoria?.toLowerCase().includes('caliente'))
-          .map(r => ({
-            id: r.idReceta,
-            title: r.nombreReceta,
-            description: r.nombreCategoria,
-            imageUrl: r.urlImagen,
-            price: r.precioUnitario,
-            category: r.nombreCategoria,
-          }))
-        ),
+        map(items => items.map(r => ({
+          id: r.idReceta,
+          title: r.nombreReceta,
+          description: r.nombreCategoria,
+          imageUrl: r.urlImagen,
+          price: r.precioUnitario,
+          category: r.nombreCategoria,
+        }))),
         catchError(() => of([])),
       );
   }
