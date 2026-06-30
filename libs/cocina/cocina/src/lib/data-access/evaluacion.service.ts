@@ -26,7 +26,7 @@ export interface EvaluacionRequestDTO {
 @Injectable({ providedIn: 'root' })
 export class EvaluacionService {
   private http = inject(HttpClient);
-  private readonly BASE = 'http://localhost:8088/api/actividades';
+  private readonly BASE = '/api/actividades';
 
   /**
    * Obtiene los registros de evaluación persistidos en BD para una actividad.
