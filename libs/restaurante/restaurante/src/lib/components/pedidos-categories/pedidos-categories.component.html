@@ -2,7 +2,7 @@
   <h2>{{ i18n.t('pedidosCategories.title') }}</h2>
 </div>
 
-<!-- Main Categories -->
+<!-- Categorías dinámicas (derivadas de las recetas) -->
 <div class="categories-list">
   @for (cat of categories(); track cat.id) {
     <div
@@ -17,18 +17,3 @@
     </div>
   }
 </div>
-
-<!-- Subcategories (bebidas) -->
-@if (activeCategory() === 'bebidas') {
-  <div class="subcategories-list">
-    @for (sub of subcategoriesBebidas(); track sub.id) {
-      <div
-        class="subcategory-chip"
-        [class.active]="activeSubcategory() === sub.id"
-        (click)="selectSubcategory(sub.id)"
-      >
-        {{ sub.name }}
-      </div>
-    }
-  </div>
-}

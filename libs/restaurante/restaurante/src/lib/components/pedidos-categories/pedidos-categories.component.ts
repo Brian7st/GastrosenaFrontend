@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Output, signal, inject, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideIconComponent } from '@restaurant/shared/ui';
 import { I18nService } from '../../i18n/i18n.service';
+import { RestauranteFacade } from '../../data-access/restaurante.facade';
 
 @Component({
   selector: 'lib-pedidos-categories',
@@ -13,37 +14,20 @@ import { I18nService } from '../../i18n/i18n.service';
 })
 export class PedidosCategoriesComponent {
   protected readonly i18n = inject(I18nService);
+  private readonly facade = inject(RestauranteFacade);
 
-  @Output() categorySelected = new EventEmitter<string>();
-  @Output() subcategorySelected = new EventEmitter<string>();
+  @Output() filterChanged = new EventEmitter<{ main: string; sub: string }>();
 
-  categories = computed(() => [
-    { id: 'all', name: this.i18n.t('pedidosCategories.all'), icon: 'layout-grid' },
-    { id: 'entrada', name: this.i18n.t('pedidosCategories.entrada'), icon: 'clipboard-list' },
-    { id: 'plato_fuerte', name: this.i18n.t('pedidosCategories.platoFuerte'), icon: 'utensils' },
-    { id: 'postre', name: this.i18n.t('pedidosCategories.postre'), icon: 'cake' },
-    { id: 'bebidas', name: this.i18n.t('pedidosCategories.bebidas'), icon: 'coffee' },
-  ]);
+  // Categorías dinámicas derivadas de las recetas (incluye "Todo" al inicio).
+  // Así el filtro de restaurante queda consistente con las categorías que se
+  // crean en cocina: si aparece una receta con una categoría nueva, su chip
+  // aparece solo.
+  readonly categories = this.facade.categoriasMenu;
 
-  subcategoriesBebidas = computed(() => [
-    { id: 'calientes', name: this.i18n.t('pedidosCategories.calientes') },
-    { id: 'frias', name: this.i18n.t('pedidosCategories.frias') },
-    { id: 'sin_alcohol', name: this.i18n.t('pedidosCategories.sinAlcohol') },
-    { id: 'con_alcohol', name: this.i18n.t('pedidosCategories.conAlcohol') },
-  ]);
+  readonly activeCategory = signal<string>('all');
 
-  activeCategory = signal<string>('all');
-  activeSubcategory = signal<string>('');
-
-  selectCategory(id: string) {
+  selectCategory(id: string): void {
     this.activeCategory.set(id);
-    this.activeSubcategory.set('');
-    this.categorySelected.emit(id);
-    this.subcategorySelected.emit('');
-  }
-
-  selectSubcategory(id: string) {
-    this.activeSubcategory.set(id);
-    this.subcategorySelected.emit(id);
+    this.filterChanged.emit({ main: id, sub: 'all' });
   }
 }
