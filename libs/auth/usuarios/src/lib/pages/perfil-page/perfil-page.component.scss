@@ -61,6 +61,10 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
+  border-radius: 50%;
+  position: absolute;
+  inset: 0;
 }
 
 .perfil-header__avatar-overlay {
