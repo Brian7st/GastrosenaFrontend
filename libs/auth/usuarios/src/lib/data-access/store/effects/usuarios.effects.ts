@@ -137,7 +137,24 @@ export const desbloquearCuenta$ = createEffect(
   { functional: true },
 );
 
-// ─── IMPORTAR MASIVO CON POLLING (CORREGIDO) ──────────────────────────────────
+// ── NUEVO: Bloquear cuenta ────────────────────────────────────────────────────
+export const bloquearCuenta$ = createEffect(
+  (actions$ = inject(Actions), svc = inject(UsuariosService)) =>
+    actions$.pipe(
+      ofType(UsuariosActions.bloquearCuenta),
+      concatMap(({ id }) =>
+        svc.bloquearCuenta(id).pipe(
+          map(usuario => UsuariosActions.bloquearCuentaExitoso({ usuario })),
+          catchError((err: unknown) =>
+            of(UsuariosActions.bloquearCuentaFallido({ error: extractErrorMessage(err) })),
+          ),
+        ),
+      ),
+    ),
+  { functional: true },
+);
+
+// ─── IMPORTAR MASIVO CON POLLING ──────────────────────────────────────────────
 export const importarMasivo$ = createEffect(
   (actions$ = inject(Actions), svc = inject(UsuariosService)) =>
     actions$.pipe(
@@ -225,8 +242,6 @@ export const recargarTrasImportacionCompletada$ = createEffect(
   { functional: true },
 );
 
-// ──────────────────────────────────────────────────────────────────────────────
-
 export const exportarUsuarios$ = createEffect(
   (actions$ = inject(Actions), svc = inject(UsuariosService)) =>
     actions$.pipe(
@@ -313,6 +328,24 @@ export const recargarTrasEliminar$ = createEffect(
   (actions$ = inject(Actions)) =>
     actions$.pipe(
       ofType(UsuariosActions.eliminarUsuarioExitoso),
+      map(() => UsuariosActions.cargarUsuarios({})),
+    ),
+  { functional: true },
+);
+
+export const recargarTrasBloquear$ = createEffect(
+  (actions$ = inject(Actions)) =>
+    actions$.pipe(
+      ofType(UsuariosActions.bloquearCuentaExitoso),
+      map(() => UsuariosActions.cargarUsuarios({})),
+    ),
+  { functional: true },
+);
+
+export const recargarTrasDesbloquear$ = createEffect(
+  (actions$ = inject(Actions)) =>
+    actions$.pipe(
+      ofType(UsuariosActions.desbloquearCuentaExitoso),
       map(() => UsuariosActions.cargarUsuarios({})),
     ),
   { functional: true },

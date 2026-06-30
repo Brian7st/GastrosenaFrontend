@@ -45,6 +45,7 @@ import { UsuarioDetalle } from '../../models/usuarios.model';
 export class CuentasPageComponent implements OnInit {
   protected readonly i18n = inject(I18nService);
   private readonly facade = inject(UsuariosFacade);
+  private pollingInterval: ReturnType<typeof setInterval> | null = null;
 
   readonly usuarios = toSignal(this.facade.usuarios$, { initialValue: [] as UsuarioDetalle[] });
   readonly loading  = toSignal(this.facade.loading$,  { initialValue: false });
@@ -79,13 +80,24 @@ export class CuentasPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.facade.cargarUsuarios();
+
+        this.pollingInterval = setInterval(() => {
+      this.facade.cargarUsuarios();
+    }, 60000);
   }
 
   onDesbloquear(id: string): void {
     this.facade.desbloquearCuenta(id);
   }
 
-  onBloquear(id: string): void {
-    this.facade.desactivarUsuario(id);
+onBloquear(id: string): void {
+  this.facade.bloquearCuenta(id); // antes decía desactivarUsuario
+}
+
+  ngOnDestroy(): void {
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+    }
   }
+  
 }

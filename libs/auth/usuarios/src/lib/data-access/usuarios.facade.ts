@@ -90,6 +90,10 @@ export class UsuariosFacade {
     this.store.dispatch(UsuariosActions.desbloquearCuenta({ id }));
   }
 
+bloquearCuenta(id: string): void {
+  this.store.dispatch(UsuariosActions.bloquearCuenta({ id }));
+}
+
   importarMasivo(request: ImportarUsuariosRequest): void {
     this.store.dispatch(UsuariosActions.importarMasivo({ request }));
   }

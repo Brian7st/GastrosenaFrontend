@@ -142,13 +142,14 @@
             <td>
               <button
                 class="lista-page__badge lista-page__badge--toggle"
-                [class.lista-page__badge--activo]="u.activo"
-                [class.lista-page__badge--inactivo]="!u.activo"
+                  [class.lista-page__badge--bloqueado]="u.cuentaBloqueada"
+                  [class.lista-page__badge--activo]="!u.cuentaBloqueada && u.activo"
+                  [class.lista-page__badge--inactivo]="!u.cuentaBloqueada && !u.activo"
                 type="button"
                 (click)="onCambiarEstado(u)"
                 [attr.aria-label]="(u.activo ? i18n.t('lista.desactivar') : i18n.t('lista.activar'))"
               >
-                {{ u.activo ? i18n.t('lista.activo') : i18n.t('lista.inactivo') }}
+                {{ u.cuentaBloqueada ? 'Bloqueada' : u.activo ? i18n.t('lista.activo') : i18n.t('lista.inactivo') }}
               </button>
             </td>
             <td class="lista-page__last-access">

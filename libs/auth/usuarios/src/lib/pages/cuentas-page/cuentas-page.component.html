@@ -93,9 +93,10 @@
               <span
                 class="cuentas-page__estado"
                 [class.cuentas-page__estado--bloqueada]="u.cuentaBloqueada"
-                [class.cuentas-page__estado--activa]="!u.cuentaBloqueada"
+                [class.cuentas-page__estado--inactiva]="!u.cuentaBloqueada && !u.activo"
+                [class.cuentas-page__estado--activa]="!u.cuentaBloqueada && u.activo"
               >
-                {{ u.cuentaBloqueada ? i18n.t('cuentas.bloqueada') : i18n.t('cuentas.activa') }}
+                {{ u.cuentaBloqueada ? 'Bloqueada' : u.activo ? 'Activa' : 'Inactiva' }}
               </span>
             </td>
             <td class="cuentas-page__last-access">
@@ -111,7 +112,7 @@
                   <lucide-icon name="unlock" [size]="14"></lucide-icon>
                   {{ i18n.t('cuentas.desbloquear') }}
                 </button>
-              } @else {
+              } @else if (u.activo) {
                 <button
                   class="cuentas-page__action-btn cuentas-page__action-btn--lock"
                   type="button"
@@ -120,6 +121,8 @@
                   <lucide-icon name="lock" [size]="14"></lucide-icon>
                   {{ i18n.t('cuentas.bloquear') }}
                 </button>
+              } @else {
+                <span class="cuentas-page__sin-accion">—</span>
               }
             </td>
           </tr>
