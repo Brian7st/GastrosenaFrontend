@@ -39,14 +39,9 @@
   &__price { font-weight: 700; color: var(--color-success); }
 }
 
-.bar-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-.bar-col  { &__title { font-weight: 600; margin-bottom: 1rem; font-size: 1.125rem; color: var(--color-text-primary); } }
-.bar-item {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 0.75rem 0; border-bottom: 1px solid var(--color-border);
-  &__name  { font-weight: 500; font-size: 0.9375rem; color: var(--color-text-primary); }
-  &__desc  { font-size: 0.8rem; color: var(--color-text-secondary); }
-  &__price { font-weight: 700; color: var(--color-success); white-space: nowrap; margin-left: 1rem; }
+.menu-empty {
+  grid-column: 1 / -1; text-align: center; padding: 3rem 1rem;
+  color: var(--color-text-secondary); font-size: 0.9375rem;
 }
 
 .tag { display: inline-block; font-size: 1.75rem; font-weight: 600; padding: 0.25rem 0.75rem; border-radius: 9999px;
