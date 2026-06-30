@@ -173,6 +173,7 @@ export class RolesPageComponent implements OnInit {
     };
     this.facade.asignarRolMasivo(request);
     this.seleccionados.set(new Set());
+    
   }
 
   estaSeleccionado(id: string): boolean {

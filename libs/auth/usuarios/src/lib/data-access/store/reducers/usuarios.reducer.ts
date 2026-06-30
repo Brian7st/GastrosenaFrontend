@@ -233,5 +233,9 @@ export const usuariosFeature = createFeature({
     on(UsuariosActions.limpiarSeleccion, state => ({
       ...state, usuarioSeleccionado: null,
     })),
+
+    on(UsuariosActions.limpiarMensajeExport, state => ({
+  ...state, mensajeExport: null,
+    })),
   ),
 });
