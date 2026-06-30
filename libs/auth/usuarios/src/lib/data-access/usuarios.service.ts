@@ -34,9 +34,10 @@ export class UsuariosService extends BaseHttpService {
   private mapUsuario(u: any): UsuarioDetalle {
     return {
       ...u,
-      id:     u.idUsuario  ?? u.id,
-      activo: u.estado     ?? u.activo,
-      rol:    u.rol?.nombreRol ?? u.rol,
+      id:       u.idUsuario        ?? u.id,
+      activo:   u.estado           ?? u.activo,
+      rol:      u.rol?.nombreRol   ?? u.rol,
+      creadoEn: u.fechaCreacion    ?? u.creadoEn,
     };
   }
 

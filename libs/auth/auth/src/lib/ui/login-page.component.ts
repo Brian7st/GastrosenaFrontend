@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '@restaurant/shared/auth';
 import { AlertComponent, InputComponent, ButtonComponent } from '@restaurant/shared/ui';
 import { I18nService } from '../i18n/i18n.service';
@@ -66,7 +67,15 @@ export class LoginPageComponent {
       // El menú/guards ya filtran qué módulos ve cada rol.
       await this.router.navigateByUrl('/app/dashboard');
     } catch (err) {
-      this.errorMsg.set(this.i18n.t('login.error'));
+      if (err instanceof HttpErrorResponse && err.status === 423) {
+        const minutos = err.error?.minutosRestantes;
+        const msg = minutos !== -1
+          ? this.i18n.t('login.error_bloqueada_temporal').replace('{minutos}', String(Math.max(1, minutos)))
+          : this.i18n.t('login.error_bloqueada_permanente');
+        this.errorMsg.set(msg);
+      } else {
+        this.errorMsg.set(this.i18n.t('login.error'));
+      }
     } finally {
       this.loading.set(false);
     }
