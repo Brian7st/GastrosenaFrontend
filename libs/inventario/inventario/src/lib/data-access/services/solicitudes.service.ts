@@ -50,6 +50,7 @@ export interface GilPdfBody {
   centroNombre: string;
   solicitante: string;
   fecha: string;
+  cuentadantes: { nombre: string; cedula: string }[];
   items: GilPdfItem[];
 }
 

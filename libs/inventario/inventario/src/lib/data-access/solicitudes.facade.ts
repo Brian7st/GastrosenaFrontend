@@ -403,6 +403,10 @@ export class SolicitudesFacade {
       centroNombre: s.centroCostosNombre,
       solicitante: s.solicitante,
       fecha: s.fechaSolicitud,
+      cuentadantes: (s.cuentadantes ?? []).map(c => ({
+        nombre: c.nombre,
+        cedula: c.cedula ?? '',
+      })),
       items: (s.bienes ?? []).map(b => ({
         codigo: b.codigoSena,
         descripcion: b.descripcion,
