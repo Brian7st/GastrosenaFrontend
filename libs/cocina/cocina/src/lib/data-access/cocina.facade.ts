@@ -14,6 +14,8 @@ import { EvaluacionService } from './evaluacion.service';
 
 // ── Tipos públicos exportados ──────────────────────────────────────────────────
 
+export type ActividadMock = ActividadDTO;
+export type { FichaDTO, AprendizDTO };
 export type AprendizMock = AprendizDTO;
 
 const APRENDICES_MOCK: AprendizMock[] = [
