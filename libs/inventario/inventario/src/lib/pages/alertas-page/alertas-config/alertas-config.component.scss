@@ -1,0 +1,308 @@
+/* ==========================================================================
+   Configuración de Umbrales y Notificaciones
+   ========================================================================== */
+
+.page-container {
+  padding: 0;
+  min-height: 100%;
+}
+
+// ── Action Header (patrón Kardex) ──────────────────────────────────────────
+.action-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 2rem 2rem 1.5rem;
+  flex-wrap: wrap;
+
+  .header-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+  }
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background: var(--color-superficie-contenedor-alto);
+  border: none;
+  color: var(--color-en-superficie);
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  margin-top: 0.375rem;
+
+  &:hover { background: var(--color-superficie-contenedor-mas-alto); }
+}
+
+.breadcrumb-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-en-superficie);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.375rem;
+
+  span:not(.active) { color: var(--color-pizarra-500, #666); }
+  .active { color: var(--color-en-superficie); }
+}
+
+.page-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--color-en-superficie);
+  letter-spacing: -0.02em;
+  margin: 0 0 0.5rem;
+
+  @media (min-width: 768px) { font-size: 2rem; }
+}
+
+.page-subtitle {
+  font-size: 0.9375rem;
+  color: var(--color-contorno);
+  margin: 0;
+  line-height: 1.6;
+}
+
+// ── Botones de Header ──────────────────────────────────────────────────────
+.btn-reset {
+  background: transparent;
+  border: none;
+  color: var(--color-primario);
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover { background: color-mix(in srgb, var(--color-primario) 8%, transparent); }
+}
+
+.btn-save {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-primario-gradient-end) 100%);
+  color: var(--color-en-primario);
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primario) 25%, transparent);
+  transition: opacity 0.2s, box-shadow 0.2s;
+
+  .material-symbols-outlined { font-size: 1.125rem; }
+  &:hover { opacity: 0.92; box-shadow: 0 4px 16px color-mix(in srgb, var(--color-primario) 35%, transparent); }
+}
+
+// ── Lista de Umbrales ──────────────────────────────────────────────────────
+.umbrales-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+// ── Ítem de Umbral ─────────────────────────────────────────────────────────
+.umbral-item {
+  background: var(--color-surface-primary);
+  border-radius: 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--color-superficie-contenedor-mas-alto) 60%, transparent);
+  padding: 1.25rem 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  transition: background 0.2s;
+
+  @media (min-width: 640px) {
+    grid-template-columns: 2fr 1fr 1fr 2fr;
+    align-items: center;
+  }
+
+  &--alerta {
+    border-left: 4px solid var(--color-terciario, #ba1830);
+    background: color-mix(in srgb, var(--color-terciario, #ba1830) 2%, transparent);
+  }
+
+  // ── Bien ──────────────────────────────────────────────────────────────
+  &__bien {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
+  }
+
+  &__icon-wrap {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.625rem;
+    background: var(--color-superficie-contenedor-alto);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-contorno);
+    flex-shrink: 0;
+
+    .material-symbols-outlined { font-size: 1.25rem; }
+
+    &--alerta {
+      background: color-mix(in srgb, var(--color-terciario, #ba1830) 10%, transparent);
+      color: var(--color-terciario, #ba1830);
+    }
+  }
+
+  &__nombre {
+    font-family: 'Manrope', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-en-superficie);
+    margin: 0 0 0.125rem;
+  }
+
+  &__categoria {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-contorno);
+    font-weight: 500;
+    margin: 0;
+  }
+
+  &__alerta-badge {
+    display: inline-block;
+    margin-top: 0.375rem;
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--color-terciario, #ba1830);
+    background: color-mix(in srgb, var(--color-terciario, #ba1830) 12%, transparent);
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+  }
+
+  // ── Fields ─────────────────────────────────────────────────────────────
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+
+    &--center {
+      align-items: flex-start;
+
+      @media (min-width: 640px) { align-items: center; }
+    }
+
+    &--correos { flex: 1; }
+  }
+}
+
+// ── Field Label & Input ────────────────────────────────────────────────────
+.field-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-contorno);
+
+  &--alerta { color: var(--color-terciario, #ba1830); }
+  &--dim    { color: color-mix(in srgb, var(--color-contorno) 50%, transparent); }
+}
+
+.field-input {
+  background: var(--color-superficie-contenedor-bajo);
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-en-superficie);
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  transition: all 0.2s;
+
+  &:focus {
+    background: var(--color-surface-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primario) 25%, transparent);
+  }
+
+  &--alerta {
+    border: 1px solid color-mix(in srgb, var(--color-terciario, #ba1830) 40%, transparent);
+    background: color-mix(in srgb, var(--color-terciario, #ba1830) 4%, transparent);
+  }
+
+  &--disabled {
+    background: var(--color-superficie-contenedor-mas-alto);
+    color: color-mix(in srgb, var(--color-contorno) 50%, transparent);
+    cursor: not-allowed;
+
+    &::placeholder { color: color-mix(in srgb, var(--color-contorno) 50%, transparent); }
+    &:focus { box-shadow: none; }
+  }
+}
+
+// ── Toggle CSS nativo (patrón iOS/Material) ────────────────────────────────
+.toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 44px;
+  height: 24px;
+  cursor: pointer;
+
+  input[type="checkbox"] {
+    opacity: 0;
+    position: absolute;
+    width: 0;
+    height: 0;
+  }
+
+  &__track {
+    position: absolute;
+    inset: 0;
+    background: var(--color-superficie-contenedor-mas-alto);
+    border-radius: 9999px;
+    transition: background 0.2s;
+  }
+
+  &__thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: var(--color-surface-primary);
+    border-radius: 50%;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+    z-index: 1;
+  }
+
+  // Estado activo (checked)
+  input:checked ~ .toggle__track {
+    background: var(--color-primario-gradient-end);
+  }
+
+  input:checked ~ .toggle__thumb {
+    transform: translateX(20px);
+  }
+}

@@ -15,9 +15,33 @@ coverage/
 .env
 .env.*
 
-# Docs (guías de referencia, no van al repo)
+# Docs — solo se ignoran los md sueltos de referencia personal
+# Los md de proyecto sí se trackean (ver excepciones abajo)
 *.md
+!README.md
+!AGENTS.md
+!CLAUDE.md
+!libs/**/CLAUDE.md
+!.github/**/*.md
+!.ai/**/*.md
+!docs/**/*.md
 
 # OS
 .DS_Store
 Thumbs.db
+log_implementacion.md
+
+# Documentos locales de desarrollo (no subir al repo)
+docs/informacionRestaurante/
+BACKLOG_FRONTEND_ORGANIZADO.md
+
+# Inteligencia Artificial - prompts y especificaciones locales
+.ai/domains/inventario.md
+.ai/prompts/vistas/
+.ai/prompts/conectar-vista-backend.md
+
+# Playwright E2E
+/test-results/
+/e2e/.report/
+/e2e/.auth/
+/playwright-report/

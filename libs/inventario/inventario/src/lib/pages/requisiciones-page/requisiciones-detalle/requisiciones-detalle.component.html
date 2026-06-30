@@ -1,0 +1,188 @@
+<!-- Overlay Backdrop -->
+<div class="sheet-overlay" (click)="close()"></div>
+
+<!-- SIDE SHEET: Detalle de Requisición -->
+<aside class="sheet-panel">
+
+  <!-- Header -->
+  <header class="sheet-panel__header">
+    <div class="sheet-panel__header-top">
+      <div class="sheet-panel__badge-row">
+        @if (loading()) {
+          <span class="sheet-panel__status-badge sheet-panel__status-badge--draft">{{ i18n.t('comun.cargando') }}</span>
+        } @else {
+          <span class="sheet-panel__status-badge sheet-panel__status-badge--{{ estadoClass() }}">
+            {{ estadoLabel() }}
+          </span>
+          <span class="sheet-panel__date">{{ requisicion()?.fecha ?? '' }}</span>
+        }
+      </div>
+      <h2 class="sheet-panel__title">
+        {{ requisicion()?.numero ?? reqId() }}
+      </h2>
+    </div>
+    <button class="sheet-panel__close" (click)="exportarPdf()" [disabled]="loading()" title="Exportar PDF">
+      <lucide-icon name="download" [size]="20"></lucide-icon>
+    </button>
+    <button class="sheet-panel__close" (click)="close()">
+      <lucide-icon name="x" [size]="20"></lucide-icon>
+    </button>
+  </header>
+
+  <!-- Scrollable Canvas -->
+  <div class="sheet-panel__body">
+
+    @if (loading()) {
+      <div class="loading-notice">
+        <lucide-icon name="loader-2" [size]="20"></lucide-icon>
+        {{ i18n.t('req.cargando') }}
+      </div>
+    } @else if (!requisicion()) {
+      <div class="loading-notice">
+        <lucide-icon name="alert-circle" [size]="20"></lucide-icon>
+        {{ i18n.t('req.error_carga') }}
+      </div>
+    } @else {
+
+      <!-- Section 1: Información de la Sesión -->
+      <section class="detail-section">
+        <h3 class="detail-section__title">
+          <lucide-icon name="info" [size]="20" class="detail-section__icon"></lucide-icon>
+          {{ i18n.t('req.info_sesion') }}
+        </h3>
+        <div class="info-grid">
+          <div class="info-cell">
+            <div class="info-cell__icon-wrap"><lucide-icon name="hash" [size]="20"></lucide-icon></div>
+            <div>
+              <p class="info-cell__label">{{ i18n.t('req.ficha') }}</p>
+              <p class="info-cell__value">{{ requisicion()?.fichaId ?? '—' }}</p>
+            </div>
+          </div>
+          <div class="info-cell">
+            <div class="info-cell__icon-wrap"><lucide-icon name="user" [size]="20"></lucide-icon></div>
+            <div>
+              <p class="info-cell__label">{{ i18n.t('req.instructor') }}</p>
+              <p class="info-cell__value">{{ requisicion()?.instructorNombre || requisicion()?.instructorId || '—' }}</p>
+            </div>
+          </div>
+          <div class="info-cell">
+            <div class="info-cell__icon-wrap"><lucide-icon name="calendar" [size]="20"></lucide-icon></div>
+            <div>
+              <p class="info-cell__label">{{ i18n.t('req.fecha_programada') }}</p>
+              <p class="info-cell__value">{{ requisicion()?.fecha ?? '—' }}</p>
+            </div>
+          </div>
+          <div class="info-cell">
+            <div class="info-cell__icon-wrap"><lucide-icon name="calendar" [size]="20"></lucide-icon></div>
+            <div>
+              <p class="info-cell__label">{{ i18n.t('req.dia') }}</p>
+              <p class="info-cell__value">{{ (requisicion()?.diaSemana | titlecase) || '—' }}</p>
+            </div>
+          </div>
+          <div class="info-cell">
+            <div class="info-cell__icon-wrap"><lucide-icon name="clock" [size]="20"></lucide-icon></div>
+            <div>
+              <p class="info-cell__label">{{ i18n.t('req.hora_sesion') }}</p>
+              <p class="info-cell__value">{{ requisicion()?.horaSesion ?? '—' }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 2: Ítems por Categoría -->
+      <section class="detail-section">
+        <div class="detail-section__header-row">
+          <h3 class="detail-section__title">
+            <lucide-icon name="package" [size]="20" class="detail-section__icon"></lucide-icon>
+            {{ i18n.t('req.items_solicitados') }}
+          </h3>
+          <span class="detail-section__counter">{{ i18n.t('req.total_items', { count: totalItems().toString() }) }}</span>
+        </div>
+
+        @if (totalItems() === 0) {
+          <div class="loading-notice">
+            <lucide-icon name="inbox" [size]="16"></lucide-icon>
+            Sin ítems registrados.
+          </div>
+        } @else {
+          @for (grupo of itemsPorCategoria(); track grupo.cat) {
+            <div class="items-category">
+              <h4 class="items-category__label">
+                <span class="items-category__dot"></span>
+                {{ grupo.label }}
+              </h4>
+              <div class="items-table">
+                <div class="items-table__head">
+                  <div class="items-table__col items-table__col--name">{{ i18n.t('req.th_item') }}</div>
+                  <div class="items-table__col items-table__col--center">{{ i18n.t('req.th_um') }}</div>
+                  <div class="items-table__col items-table__col--right">{{ i18n.t('req.th_solicitada') }}</div>
+                </div>
+                @for (item of grupo.items; track item.productoId) {
+                  <div class="items-table__row">
+                    <div class="items-table__col items-table__col--name">{{ item.productoNombre }}</div>
+                    <div class="items-table__col items-table__col--center items-table__col--muted">
+                      {{ item.unidadMedida }}
+                    </div>
+                    <div class="items-table__col items-table__col--right">
+                      {{ item.cantidad | number:'1.0-2' }}
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        }
+      </section>
+
+    }
+  </div>
+
+  <!-- Error inline -->
+  @if (error()) {
+    <div class="sheet-panel__error">
+      <lucide-icon name="alert-circle" [size]="16"></lucide-icon>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Footer Actions -->
+  <footer class="sheet-panel__footer">
+
+    <!-- Enviar al Economato — solo cuando BORRADOR (RF-5.9.2) -->
+    @if (estado() === 'BORRADOR') {
+      <button *hasPermission="'requisiciones:enviar'" class="btn-primary" (click)="enviar()" [disabled]="loading()">
+        <lucide-icon name="send" [size]="18"></lucide-icon>
+        {{ i18n.t('req.enviar_economato') }}
+      </button>
+    }
+
+    <!-- Registrar Despacho — solo cuando ENVIADA (RF-5.9.3) -->
+    @if (estado() === 'ENVIADA') {
+      <button *hasPermission="'requisiciones:despachar'" class="btn-primary"
+              [routerLink]="['/app/inventario/requisiciones/despacho', reqId()]">
+        <lucide-icon name="truck" [size]="18"></lucide-icon>
+        {{ i18n.t('req.registrar_despacho') }}
+      </button>
+    }
+
+    <!-- Confirmar Recepción / Firmar — solo cuando DESPACHADA (RF-5.9.6) -->
+    @if (estado() === 'DESPACHADA') {
+      <button *hasPermission="'requisiciones:firmar'" class="btn-primary"
+              [routerLink]="['/app/inventario/requisiciones/firmar', reqId()]">
+        <lucide-icon name="pen-tool" [size]="18"></lucide-icon>
+        {{ i18n.t('req.confirmar_recepcion') }}
+      </button>
+    }
+
+    <!-- Crear Acta — solo cuando FIRMADA (RF-5.9.6) -->
+    @if (estado() === 'FIRMADA') {
+      <button *hasPermission="'actas:crear'" class="btn-primary"
+              [routerLink]="['/app/inventario/actas/nueva']"
+              [queryParams]="{ requisicionId: reqId() }">
+        <lucide-icon name="file-plus" [size]="18"></lucide-icon>
+        {{ i18n.t('req.crear_acta') }}
+      </button>
+    }
+
+  </footer>
+</aside>

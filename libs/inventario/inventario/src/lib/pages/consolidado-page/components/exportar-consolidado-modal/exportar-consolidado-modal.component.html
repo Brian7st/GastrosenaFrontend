@@ -1,0 +1,69 @@
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="modal-header__title-row">
+        <div class="icon-box">
+          <span class="material-symbols-outlined icon-box__icon">ios_share</span>
+        </div>
+        <h2 class="modal-header__title">{{ i18n.t('consolidado.modal_exportar_titulo') }}</h2>
+      </div>
+      <p class="modal-header__subtitle">{{ i18n.t('consolidado.modal_exportar_subtitulo') }}</p>
+    </div>
+
+    <!-- Content: Format Selection -->
+    <div class="modal-body">
+      <div class="format-options">
+        <!-- Option 1: Excel -->
+        <button 
+          class="format-card" 
+          [class.format-card--active]="selectedFormat() === 'excel'"
+          (click)="selectedFormat.set('excel')">
+          <div class="format-card__icon-wrap">
+            <span class="material-symbols-outlined format-card__icon text-primary">table_chart</span>
+          </div>
+          <h3 class="format-card__title">{{ i18n.t('consolidado.excel_titulo') }}</h3>
+          <p class="format-card__desc">{{ i18n.t('consolidado.excel_desc') }}</p>
+          <div class="format-card__tag">
+            <span class="material-symbols-outlined">check_circle</span>
+            <span>{{ i18n.t('consolidado.excel_zese_tag') }}</span>
+          </div>
+          @if (selectedFormat() === 'excel') {
+            <div class="format-card__check">
+              <span class="material-symbols-outlined">check_circle</span>
+            </div>
+          }
+        </button>
+
+        <!-- Option 2: PDF -->
+        <button
+          class="format-card"
+          [class.format-card--active]="selectedFormat() === 'pdf'"
+          (click)="selectedFormat.set('pdf')">
+          <div class="format-card__icon-wrap">
+            <span class="material-symbols-outlined format-card__icon text-tertiary">picture_as_pdf</span>
+          </div>
+          <h3 class="format-card__title">{{ i18n.t('consolidado.pdf_titulo') }}</h3>
+          <p class="format-card__desc">{{ i18n.t('consolidado.pdf_desc') }}</p>
+          @if (selectedFormat() === 'pdf') {
+            <div class="format-card__check">
+              <span class="material-symbols-outlined">check_circle</span>
+            </div>
+          }
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button class="modal-btn modal-btn--cancel" (click)="onClose()">{{ i18n.t('comun.cerrar') }}</button>
+      <button class="modal-btn modal-btn--primary" (click)="onExport()">
+        <span class="material-symbols-outlined">download</span>
+        {{ i18n.t('consolidado.iniciar_descarga') }}
+      </button>
+    </div>
+    
+    <!-- Branding Accent -->
+    <div class="modal-accent"></div>
+  </div>
+</div>

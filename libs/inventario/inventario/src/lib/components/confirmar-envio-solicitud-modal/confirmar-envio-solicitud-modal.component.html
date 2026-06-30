@@ -1,0 +1,25 @@
+@if (isOpen) {
+  <div class="modal-backdrop" (click)="cancelled.emit()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      <div class="modal-content">
+        <div class="icon-wrapper" [class.icon-wrapper--edit]="isEdit">
+          <span class="material-symbols-outlined">{{ isEdit ? 'edit_note' : 'send' }}</span>
+        </div>
+
+        <h2 class="modal-title">{{ isEdit ? 'Guardar cambios' : 'Enviar solicitud' }}</h2>
+        <p class="modal-text">
+          {{ isEdit
+            ? 'Los cambios se guardarán en la solicitud. Podés seguir editándola mientras esté en estado Creada.'
+            : 'La solicitud será enviada para revisión. Podrás editarla mientras esté en estado Creada.' }}
+        </p>
+
+        <div class="modal-actions">
+          <button class="btn-cancel" type="button" (click)="cancelled.emit()">Cancelar</button>
+          <button class="btn-confirm" type="button" (click)="confirmed.emit()">
+            {{ isEdit ? 'Sí, guardar' : 'Sí, enviar' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

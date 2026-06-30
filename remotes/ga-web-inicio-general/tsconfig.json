@@ -3,6 +3,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "baseUrl": "./",
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
@@ -13,7 +14,15 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "ES2022",
-    "module": "preserve"
+    "module": "preserve",
+    "paths": {
+      "@restaurant/shared/ui": ["../../libs/shared/ui/src/index.ts"],
+      "@restaurant/shared/models": ["../../libs/shared/models/src/index.ts"],
+      "@restaurant/shared/util": ["../../libs/shared/util/src/index.ts"],
+      "@restaurant/shared/auth": ["../../libs/shared/auth/src/index.ts"],
+      "@restaurant/shared/api": ["../../libs/shared/api/src/index.ts"],
+      "@restaurant/shared/state": ["../../libs/shared/state/src/index.ts"]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

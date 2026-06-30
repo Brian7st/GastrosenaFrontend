@@ -1,0 +1,19 @@
+<div class="categories-header">
+  <h2>{{ i18n.t('pedidosCategories.title') }}</h2>
+</div>
+
+<!-- Categorías dinámicas (derivadas de las recetas) -->
+<div class="categories-list">
+  @for (cat of categories(); track cat.id) {
+    <div
+      class="category-card"
+      [class.active]="activeCategory() === cat.id"
+      (click)="selectCategory(cat.id)"
+    >
+      <div class="icon">
+        <lucide-icon [name]="cat.icon" [size]="24"></lucide-icon>
+      </div>
+      <span class="name">{{ cat.name }}</span>
+    </div>
+  }
+</div>

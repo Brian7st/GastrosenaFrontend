@@ -1,0 +1,183 @@
+<div class="consolidado-page">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="page-header__left">
+      <h1 class="page-header__title">{{ i18n.t('consolidado.titulo') }}</h1>
+      <p class="page-header__subtitle">{{ i18n.t('consolidado.subtitulo') }}</p>
+    </div>
+    <div class="page-header__actions">
+      <restaurant-button variant="ghost" (click)="openExportModal()">
+        <span class="material-symbols-outlined btn-icon">download</span> {{ i18n.t('comun.exportar') }}
+      </restaurant-button>
+      <restaurant-button variant="primary" routerLink="/app/inventario/consolidado/nuevo">
+        <span class="material-symbols-outlined btn-icon">add</span> {{ i18n.t('consolidado.nuevo') }}
+      </restaurant-button>
+    </div>
+  </div>
+
+  <!-- KPI Grid derivado de la lista real -->
+  <div class="kpi-grid">
+    <restaurant-kpi-card
+      [label]="i18n.t('consolidado.kpi_total_ejecutado')"
+      [value]="kpiTotalEjecutado() | currency:'COP':'symbol-narrow':'1.0-0'"
+      icon="bar-chart-2"
+      iconColor="blue">
+    </restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      [label]="i18n.t('consolidado.kpi_generados')"
+      [value]="kpiGenerados()"
+      icon="file-text"
+      iconColor="orange">
+    </restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      [label]="i18n.t('consolidado.kpi_reversados')"
+      [value]="kpiReversados()"
+      icon="undo-2"
+      iconColor="red">
+    </restaurant-kpi-card>
+  </div>
+
+  <!-- Table Section: Consolidados Históricos -->
+  <restaurant-data-table
+    tableTitle="Consolidados Históricos"
+    tableIcon="history"
+    searchPlaceholder="Buscar reporte o ID..."
+    [showFilterButton]="true"
+    [filterActive]="showFilters()"
+    [filterCount]="filtrosActivos()"
+    (searchChange)="onSearch($event)"
+    (filterToggle)="onToggleFilters()">
+
+    <!-- Panel de filtros colapsable (slot [dtHeader]) -->
+    @if (showFilters()) {
+      <div dtHeader class="filter-panel">
+        <div class="filter-panel__row">
+          <div class="filter-group">
+            <label class="filter-label">{{ i18n.t('comun.estado') }}</label>
+            <select class="filter-select" [value]="filtroEstado()" (change)="onFilterEstado($any($event.target).value)">
+              <option value="">{{ i18n.t('comun.todos') }}</option>
+              <option value="GENERADO">{{ i18n.t('consolidado.estado_generado') }}</option>
+              <option value="REVERSADO">{{ i18n.t('consolidado.estado_reversado') }}</option>
+            </select>
+          </div>
+          <div class="filter-group filter-group--actions">
+            <button class="filter-clear-btn" (click)="onLimpiarFiltros()" [disabled]="filtrosActivos() === 0">
+              <span class="material-symbols-outlined">clear_all</span>
+              Limpiar
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <thead>
+      <tr>
+        <th class="th-center">{{ i18n.t('consolidado.th_id') }}</th>
+        <th class="th-center">{{ i18n.t('consolidado.th_fecha_gen') }}</th>
+        <th class="th-center">{{ i18n.t('consolidado.th_total') }}</th>
+        <th class="th-center">{{ i18n.t('consolidado.th_estado_contable') }}</th>
+        <th class="th-center">{{ i18n.t('comun.acciones') }}</th>
+      </tr>
+    </thead>
+    <tbody class="text-black text-center">
+      @for (item of consolidadosPaginados(); track item.id) {
+      <tr>
+          <td>
+            <span class="td-value-primary td-mono">#{{ item.numero }}</span>
+          </td>
+          <td>
+            <div class="td-flex-col">
+              <span class="td-medium">{{ item.fechaGeneracion }}</span>
+              <span class="td-muted">{{ item.lineas.length }} línea(s)</span>
+            </div>
+          </td>
+          <td>
+            <span class="td-bold">{{ item.totales.valorNeto | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+          </td>
+          <td>
+            <restaurant-status-badge [label]="item.estado" [variant]="getVariantFromEstado(item.estado)"></restaurant-status-badge>
+          </td>
+          <td class="text-center">
+            <div class="action-buttons justify-center">
+              <button class="icon-btn-action" title="Ver Detalles" (click)="goToDetail(item.numero)">
+                <span class="material-symbols-outlined">visibility</span>
+              </button>
+              <button class="icon-btn-action icon-btn-action--danger" title="Reversar / Eliminar" (click)="reversar(item.id)">
+                <span class="material-symbols-outlined">undo</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="5">
+            <inventario-empty-state
+              icon="summarize"
+              title="Sin consolidados"
+              message="No hay consolidados generados para el período actual."
+            />
+          </td>
+        </tr>
+      }
+    </tbody>
+    
+    <div dtFooter class="dt-footer">
+      <span class="dt-page-info">{{ i18n.t('consolidado.mostrando', { count: consolidadosPaginados().length.toString(), total: filteredConsolidados().length.toString() }) }}</span>
+      <div class="dt-pagination">
+        <button class="dt-page-btn" [disabled]="paginaActual() === 1" (click)="anterior()">
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        @for (p of paginas(); track p) {
+          <button class="dt-page-btn" [class.dt-page-btn--active]="paginaActual() === p" (click)="irAPagina(p)">{{ p }}</button>
+        }
+        <button class="dt-page-btn" [disabled]="paginaActual() === totalPaginas()" (click)="siguiente()">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+      </div>
+    </div>
+  </restaurant-data-table>
+
+  <!-- Ejecución presupuestal (dato real: GET /budget/presupuestos/resumen) -->
+  <div class="insights-grid">
+    <div class="insight-card insight-card--primary">
+      <div class="insight-card__content">
+        <h3 class="insight-card__title">{{ i18n.t('consolidado.ejecucion_presupuestal') }}</h3>
+        @if (porcentajeEjecucion() !== null) {
+          <p class="insight-card__text">El presupuesto vigente registra un {{ porcentajeEjecucion() | number:'1.2-2' }}% de ejecución (comprometido + pagado sobre el total asignado).</p>
+        } @else {
+          <p class="insight-card__text">{{ i18n.t('consolidado.sin_datos_presupuesto') }}</p>
+        }
+        <button class="insight-card__btn" (click)="verPresupuesto()">{{ i18n.t('comun.ver_detalle') }}</button>
+      </div>
+      <div class="insight-card__visual">
+        <div class="progress-circle">
+          <span>{{ porcentajeEjecucion() !== null ? (porcentajeEjecucion() | number:'1.2-2') + '%' : '—' }}</span>
+        </div>
+      </div>
+      <div class="insight-card__decor"></div>
+    </div>
+  </div>
+
+  @if (showExportModal()) {
+<restaurant-exportar-consolidado-modal
+   
+    (close)="closeExportModal()"
+    (export)="onExport($event)">
+  </restaurant-exportar-consolidado-modal>
+}
+
+  @if (showReversarModal() && selectedReversarItem()) {
+<restaurant-reversar-consolidado-modal
+   
+    [consolidadoId]="selectedReversarItem()!.id"
+    [periodo]="selectedReversarItem()!.fechaGeneracion"
+    [total]="(selectedReversarItem()!.totales.valorNeto | currency:'COP':'symbol-narrow':'1.0-0') ?? ''"
+    [comprobantes]="selectedReversarItem()!.lineas.length"
+    [isBlocked]="isReversarBlocked()"
+    (close)="closeReversarModal()"
+    (confirm)="confirmReversar()">
+  </restaurant-reversar-consolidado-modal>
+}
+</div>

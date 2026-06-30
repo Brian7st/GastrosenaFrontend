@@ -1,0 +1,41 @@
+.rol-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+
+  &--admin {
+    background: var(--color-info-bg);
+    color: var(--color-info-text);
+  }
+
+  &--contadora,
+  &--instructor {
+    background: var(--color-brand-primary-soft);
+    color: var(--color-brand-primary-strong);
+  }
+
+  &--chef,
+  &--lider-bar,
+  &--admin-cocina,
+  &--admin-bar {
+    background: var(--color-warning-bg);
+    color: var(--color-warning-text);
+  }
+
+  &--cajero {
+    background: var(--color-error-bg);
+    color: var(--color-error-text);
+  }
+
+  &--mesero,
+  &--bartender,
+  &--auxiliar,
+  &--default {
+    background: var(--color-superficie-contenedor);
+    color: var(--color-text-secondary);
+  }
+}

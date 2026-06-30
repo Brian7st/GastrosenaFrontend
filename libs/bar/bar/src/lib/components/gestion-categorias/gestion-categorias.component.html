@@ -1,0 +1,79 @@
+<div class="modal-overlay" (click)="cerrar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 style="margin: 0; font-size: var(--font-size-xl);">Gestión de Categorías</h2>
+      <restaurant-button variant="ghost" (click)="cerrar()">
+        <lucide-icon name="x" size="20"></lucide-icon>
+      </restaurant-button>
+    </div>
+
+    <div class="modal-body">
+      @if (alertMessage()) {
+        <div style="margin-bottom: 24px;">
+          <restaurant-alert [type]="alertType()" [message]="alertMessage()"></restaurant-alert>
+        </div>
+      }
+
+      <div class="form-card" style="background: var(--color-surface-primary); padding: 24px; border-radius: 12px; margin-bottom: 24px; border: 1px solid var(--color-border); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+        <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--color-text-primary); font-weight: 600; margin-bottom: 16px;">
+          {{ categoriaEnEdicion ? 'Editar Categoría' : 'Nueva Categoría' }}
+        </h3>
+
+        <div style="display: flex; gap: 16px; align-items: flex-end;">
+          <div style="flex: 1;">
+            <restaurant-input
+              label="Nombre de la Categoría"
+              placeholder="Ej: Cócteles"
+              [(ngModel)]="nuevaCategoriaNombre"
+              (keyup.enter)="guardarCategoria()"
+            ></restaurant-input>
+          </div>
+          <restaurant-button variant="primary" (click)="guardarCategoria()">
+            {{ categoriaEnEdicion ? 'Actualizar' : 'Agregar' }}
+          </restaurant-button>
+          @if (categoriaEnEdicion) {
+            <restaurant-button variant="ghost" (click)="cancelarEdicion()">
+              Cancelar
+            </restaurant-button>
+          }
+        </div>
+      </div>
+
+      <div class="lista-categorias">
+        <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--color-text-primary); font-weight: 600; margin-bottom: 16px;">Categorías Existentes</h3>
+
+        @if (categoriaService.categorias().length === 0) {
+          <restaurant-empty-state
+            title="Sin categorías"
+            message="No hay categorías registradas."
+          ></restaurant-empty-state>
+        }
+
+        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+          @for (cat of categoriaService.categorias(); track cat.idCategoria) {
+            <li style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: var(--color-surface-primary); border: 1px solid var(--color-border); border-radius: 12px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); transition: transform 0.2s, box-shadow 0.2s;">
+              <span style="font-weight: 500; color: var(--color-text-primary); font-size: 1rem;">{{ cat.nombreCategoria }}</span>
+              <div style="display: flex; gap: 8px;">
+                <restaurant-button variant="surface" (click)="editarCategoria(cat)">
+                  <lucide-icon name="pencil" size="16"></lucide-icon>
+                </restaurant-button>
+                <restaurant-button variant="ghost" style="color: var(--color-danger);" (click)="eliminarCategoria(cat.idCategoria!)">
+                  <lucide-icon name="trash-2" size="16"></lucide-icon>
+                </restaurant-button>
+              </div>
+            </li>
+          }
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<restaurant-confirm-dialog
+  [open]="confirmDeleteOpen()"
+  title="¿Eliminar categoría?"
+  message="Si la categoría está siendo usada por recetas, no se podrá borrar. ¿Estás seguro de continuar?"
+  (confirm)="confirmarEliminacion()"
+  (cancel)="cancelarEliminacion()"
+></restaurant-confirm-dialog>

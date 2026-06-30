@@ -1,0 +1,105 @@
+@if (isOpen) {
+  <div class="modal-backdrop" (click)="onCancelar()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      <div class="modal-content nc-modal">
+
+        <div class="modal-icon-wrapper modal-icon-wrapper--warning">
+          <span class="material-symbols-outlined">receipt_long</span>
+        </div>
+
+        <h2 class="modal-title">{{ i18n.t('nc.titulo') }}</h2>
+        <p class="modal-text">{{ i18n.t('nc.descripcion') }}</p>
+
+        <div class="nc-form">
+
+          <!-- Motivo -->
+          <div class="nc-form__field">
+            <label class="nc-form__label" for="nc-motivo">{{ i18n.t('nc.motivo') }}</label>
+            <select
+              id="nc-motivo"
+              class="nc-form__select"
+              [value]="motivo()"
+              (change)="onMotivo($any($event.target).value)"
+            >
+              @for (m of motivosDisponibles; track m.valor) {
+                <option [value]="m.valor">{{ m.etiqueta }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Fecha de emisión -->
+          <div class="nc-form__field">
+            <label class="nc-form__label" for="nc-fecha">{{ i18n.t('nc.fecha_emision') }}</label>
+            <input
+              id="nc-fecha"
+              type="date"
+              class="nc-form__input"
+              [value]="fechaEmision()"
+              (input)="onFecha($any($event.target).value)"
+            />
+          </div>
+
+          <!-- Línea: productoId -->
+          <div class="nc-form__field">
+            <label class="nc-form__label" for="nc-producto">{{ i18n.t('nc.producto') }}</label>
+            <input
+              id="nc-producto"
+              type="text"
+              class="nc-form__input"
+              readonly
+              [value]="productoId()"
+            />
+          </div>
+
+          <!-- Línea: cantidad y valor unitario -->
+          <div class="nc-form__row">
+            <div class="nc-form__field">
+              <label class="nc-form__label" for="nc-cantidad">{{ i18n.t('nc.cantidad') }}</label>
+              <input
+                id="nc-cantidad"
+                type="number"
+                min="0"
+                class="nc-form__input"
+                [value]="cantidad()"
+                (input)="onCantidad($any($event.target).value)"
+              />
+            </div>
+            <div class="nc-form__field">
+              <label class="nc-form__label" for="nc-precio">{{ i18n.t('nc.valor_unitario') }}</label>
+              <input
+                id="nc-precio"
+                type="number"
+                min="0"
+                class="nc-form__input"
+                [value]="valorUnitario()"
+                (input)="onValorUnitario($any($event.target).value)"
+              />
+            </div>
+          </div>
+
+          <!-- Resumen -->
+          <div class="nc-summary">
+            <span class="nc-summary__label">{{ i18n.t('nc.total') }}</span>
+            <span class="nc-summary__value">
+              {{ valorTotal() | currency:'COP':'symbol-narrow':'1.0-0' }}
+            </span>
+          </div>
+
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-cancel" type="button" (click)="onCancelar()">{{ i18n.t('comun.cancelar') }}</button>
+          <button
+            class="btn-confirm"
+            type="button"
+            [disabled]="!esValido()"
+            (click)="onConfirmar()"
+          >
+            {{ i18n.t('nc.registrar') }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+}

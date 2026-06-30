@@ -1,0 +1,267 @@
+<!-- ══════════════════════════════════════════════════════════════════════════
+     Header y Acciones Principales
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="detail-page-container">
+
+  <div class="action-header">
+    <div class="header-left">
+      <h2 class="title">{{ solicitudId() }}</h2>
+    </div>
+
+    <div class="header-actions">
+      <inventario-back-button (clicked)="onVolver()" />
+      <button class="btn-action" (click)="onEditar()" [disabled]="estadoActual() !== 'BORRADOR'">
+        <span class="material-symbols-outlined">edit</span> {{ i18n.t('comun.editar') }}
+      </button>
+      <button class="btn-action" (click)="onDownloadPdf()">
+        <span class="material-symbols-outlined">picture_as_pdf</span> {{ i18n.t('solicitudes-detail.descargar_pdf') }}
+      </button>
+
+      <div class="action-group">
+        @if (estadoActual() === 'BORRADOR') {
+          <button class="btn-primary" (click)="onEnviarAprobacion()">
+            {{ i18n.t('solicitudes-detail.enviar_aprobacion') }}
+          </button>
+        }
+        @if (estadoActual() === 'EMITIDO') {
+          <button class="btn-primary" (click)="onToggleEnviarProveedor()">
+            <span class="material-symbols-outlined">local_shipping</span>
+            {{ i18n.t('solicitudes-detail.enviar_proveedor') }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Panel: Enviar a Proveedor por correo ───────────────────────────── -->
+  @if (showEnviarProveedorForm()) {
+    <div class="enviar-proveedor-panel">
+      <div class="panel-header">
+        <span class="material-symbols-outlined icon-primary">forward_to_inbox</span>
+        <div>
+          <h4>{{ i18n.t('solicitudes-detail.enviar_gil_titulo') }}</h4>
+          <p>{{ i18n.t('solicitudes-detail.enviar_gil_hint') }}</p>
+        </div>
+      </div>
+
+      <div class="panel-form">
+        <div class="form-group">
+          <label>{{ i18n.t('solicitudes-detail.correo_proveedor') }} <span class="required">*</span></label>
+          <input
+            type="email"
+            class="form-control"
+            placeholder="proveedor@empresa.com"
+            [value]="correoProveedor()"
+            (input)="correoProveedor.set($any($event.target).value)" />
+        </div>
+
+        <div class="form-group">
+          <label>{{ i18n.t('solicitudes-detail.nombre_proveedor') }}</label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Ej. Distribuidora Nacional S.A.S."
+            [value]="nombreProveedor()"
+            (input)="nombreProveedor.set($any($event.target).value)" />
+        </div>
+
+        <div class="form-group form-group--full">
+          <label>{{ i18n.t('solicitudes-detail.asunto') }}</label>
+          <input
+            type="text"
+            class="form-control"
+            [value]="asuntoCorreo() || 'Solicitud de bienes ' + solicitudId()"
+            (input)="asuntoCorreo.set($any($event.target).value)" />
+        </div>
+
+        <div class="form-group form-group--full">
+          <div class="adjunto-chip">
+            <span class="material-symbols-outlined">picture_as_pdf</span>
+            <span>{{ solicitudId() }}.pdf — {{ i18n.t('solicitudes-detail.adjunto_auto') }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-actions">
+        <restaurant-button variant="ghost" (click)="onToggleEnviarProveedor()">
+          {{ i18n.t('comun.cancelar') }}
+        </restaurant-button>
+        <restaurant-button variant="primary"
+          [disabled]="!correoProveedor()"
+          (click)="onConfirmarEnvioProveedor()">
+          <span class="material-symbols-outlined">send</span>
+          {{ i18n.t('solicitudes-detail.enviar_correo') }}
+        </restaurant-button>
+      </div>
+    </div>
+  }
+
+  <!-- ══════════════════════════════════════════════════════════════════════════
+       Timeline Visual
+  ══════════════════════════════════════════════════════════════════════════ -->
+  <div class="timeline-container">
+    <div class="timeline-line-bg"></div>
+    <div class="timeline-line-active" [style.width]="(estados.indexOf(estadoActual()) * 20) + '%'"></div>
+
+    <div class="timeline-nodes">
+      @for (est of estados; track est) {
+        <div class="node">
+          <div class="node-icon"
+               [ngClass]="{
+                 'node-icon--active': isActive(est) || isPast(est),
+                 'node-icon--pending': !isActive(est) && !isPast(est)
+               }">
+            <span class="material-symbols-outlined">{{ getIcon(est) }}</span>
+          </div>
+          <span class="node-label"
+                [ngClass]="{'node-label--active': isActive(est) || isPast(est)}">
+            {{ est }}
+          </span>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════
+       Identificación de la Solicitud
+  ══════════════════════════════════════════════════════════════════════════ -->
+  <div class="card card--session">
+    <div class="card-header-icon">
+      <span class="material-symbols-outlined icon-primary">event_note</span>
+      <h3>{{ i18n.t('solicitudes-detail.identificacion') }}</h3>
+    </div>
+
+    <div class="grid-3-col">
+      <div class="info-block">
+        <label>{{ i18n.t('solicitudes-edit.jefe_oficina') }}</label>
+        <p>{{ solicitud()?.jefeOficinaCoordinador ?? '—' }}</p>
+      </div>
+      <div class="info-block">
+        <label>{{ i18n.t('solicitudes-edit.codigo_grupo') }}</label>
+        <p>{{ solicitud()?.codigoGrupo ?? '—' }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════
+       Bento Grid Layout (Left Col vs Right Col)
+  ══════════════════════════════════════════════════════════════════════════ -->
+  <div class="bento-grid">
+
+    <!-- Left Column (Resumen y General) -->
+    <div class="bento-col-left">
+
+      <!-- Card: Estado de Solicitud -->
+      <div class="card card--summary">
+        <h3 class="card-subtitle">{{ i18n.t('solicitudes-detail.estado_solicitud') }}</h3>
+        <div class="status-row">
+          <div class="badge badge--state">
+            <span class="pulse-dot"></span> {{ estadoActual() }}
+          </div>
+          <span class="date-created">{{ i18n.t('solicitudes-detail.creado_el') }} {{ fechaCreacion() }}</span>
+        </div>
+
+        <div class="summary-details">
+          <div class="total-block">
+            <p class="label">{{ i18n.t('solicitudes-detail.total_estimado') }}</p>
+            <p class="value-money">{{ totalEstimado() | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
+          </div>
+          <div class="owner-block">
+            <p class="label">{{ i18n.t('solicitudes-detail.responsable') }}</p>
+            <div class="owner-info">
+              <div class="owner-avatar">{{ solicitanteIniciales() }}</div>
+              <p class="owner-name">{{ solicitud()?.solicitante ?? '—' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Información General -->
+      <div class="card card--general">
+        <h3 class="card-subtitle">{{ i18n.t('si.info_general') }}</h3>
+        <div class="info-stack">
+          <div class="info-item">
+            <label>{{ i18n.t('solicitudes-edit.regional_nombre_label') }}</label>
+            <p>{{ solicitud()?.regionalNombre ?? '—' }}</p>
+          </div>
+          <div class="info-item">
+            <label>{{ i18n.t('solicitudes-detail.centro_formacion') }}</label>
+            <p>{{ solicitud()?.centroCostosNombre ?? '—' }}</p>
+          </div>
+          <div class="info-item">
+            <label>{{ i18n.t('solicitudes-detail.area_programa') }}</label>
+            <p>{{ solicitud()?.area ?? '—' }}</p>
+          </div>
+          <div class="info-item">
+            <label>{{ i18n.t('solicitudes-detail.cuentadante') }}</label>
+            @for (c of solicitud()?.cuentadantes ?? []; track c.cedula) {
+              <p>{{ c.nombre }}</p>
+            } @empty {
+              <p>—</p>
+            }
+          </div>
+          <div class="info-item">
+            <label>{{ i18n.t('solicitudes-edit.destino_bienes') }}</label>
+            <p>{{ solicitud()?.destinoBienes ?? '—' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column (Bienes y Observaciones) -->
+    <div class="bento-col-right">
+
+      <!-- Card: Bienes Solicitados -->
+      <div class="card card--table p-0">
+        <div class="card-header card-header--bg">
+          <span class="material-symbols-outlined icon-primary">list_alt</span>
+          <h3>{{ i18n.t('solicitudes-detail.bienes_orig') }}</h3>
+        </div>
+        <div class="table-wrap">
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>{{ i18n.t('comun.codigo_sena') }}</th>
+                <th>{{ i18n.t('solicitudes-edit.th_descripcion') }}</th>
+                <th class="text-center">{{ i18n.t('solicitudes-edit.th_um') }}</th>
+                <th class="text-center">{{ i18n.t('si.th_cant') }}</th>
+                <th class="text-right">{{ i18n.t('solicitudes-edit.th_valor_unit') }}</th>
+                <th class="text-right">{{ i18n.t('solicitudes-edit.th_subtotal') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (bien of solicitud()?.bienes ?? []; track bien.codigoSena) {
+                <tr>
+                  <td class="text-muted">{{ bien.codigoSena }}</td>
+                  <td class="font-semibold">{{ bien.descripcion }}</td>
+                  <td class="text-center">{{ bien.unidadMedida }}</td>
+                  <td class="text-center">{{ bien.cantidad }}</td>
+                  <td class="text-right">{{ bien.valorUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                  <td class="text-right font-bold text-primary">{{ bien.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="6" class="empty-state">{{ i18n.t('solicitudes-detail.sin_bienes') }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer Stats -->
+  <div class="audit-footer">
+    <div class="audit-info">
+      <span>ID: {{ solicitud()?.id }}</span>
+      <span>GIL: {{ solicitudId() }}</span>
+    </div>
+    <div class="audit-status">
+      <span class="material-symbols-outlined">verified</span>
+      <span>{{ i18n.t('solicitudes-detail.validado') }}</span>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,129 @@
+<div class="detail-page">
+
+  <!-- Header -->
+  <div class="detail-header">
+    <inventario-back-button (clicked)="goBack()" />
+
+    <div class="detail-header__content">
+      <restaurant-page-header
+        [title]="i18n.t('si.titulo_detalle')"
+        [subtitle]="solicitud() ? 'Ficha ' + solicitud()!.fichaId : ''"
+      />
+      @if (solicitud()) {
+        <restaurant-status-badge [variant]="getEstadoVariant(solicitud()!.estado)">
+          {{ solicitud()!.estado }}
+        </restaurant-status-badge>
+      }
+    </div>
+
+    @if (solicitud()?.estado === 'CREADA') {
+      <restaurant-button variant="outline" (clicked)="onEdit()">{{ i18n.t('comun.editar') }}</restaurant-button>
+    }
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <restaurant-loading-skeleton [lines]="6" />
+  }
+
+  <!-- Not found -->
+  @else if (!loading() && !solicitud()) {
+    <restaurant-empty-state
+      [title]="i18n.t('si.no_encontrada')"
+      [message]="i18n.t('si.no_encontrada_msg')"
+    />
+  }
+
+  <!-- Content -->
+  @else if (solicitud()) {
+    <!-- Info General -->
+    <section class="detail-section">
+      <restaurant-section-title [title]="i18n.t('si.info_general')" align="left" />
+
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">{{ i18n.t('req.ficha') }}</span>
+          <span class="info-value">{{ solicitud()!.fichaId }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">{{ i18n.t('si.programa_label') }}</span>
+          <span class="info-value">{{ solicitud()!.programaId }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">{{ i18n.t('req.instructor') }}</span>
+          <span class="info-value">{{ solicitud()!.instructorId }}</span>
+        </div>
+        @if (solicitud()!.identificacionInstructor) {
+          <div class="info-item">
+            <span class="info-label">{{ i18n.t('si.identificacion') }}</span>
+            <span class="info-value">{{ solicitud()!.identificacionInstructor }}</span>
+          </div>
+        }
+        @if (solicitud()!.fechaSolicitud) {
+          <div class="info-item">
+            <span class="info-label">{{ i18n.t('comun.fecha') }}</span>
+            <span class="info-value">{{ solicitud()!.fechaSolicitud | date:'dd/MM/yyyy' }}</span>
+          </div>
+        }
+        @if (solicitud()!.numeroSolicitud) {
+          <div class="info-item">
+            <span class="info-label">{{ i18n.t('si.numero') }}</span>
+            <span class="info-value">{{ solicitud()!.numeroSolicitud }}</span>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- Ítems -->
+    <section class="detail-section">
+      <div class="section-header-row">
+        <restaurant-section-title
+          [title]="i18n.t('si.items_solicitados')"
+          align="left"
+        />
+        <span class="badge-count">{{ totalItems() }} ítem{{ totalItems() !== 1 ? 's' : '' }}</span>
+      </div>
+
+      @if (solicitud()!.items.length === 0) {
+        <restaurant-empty-state
+          [title]="i18n.t('si.sin_items_titulo')"
+          [message]="i18n.t('si.sin_items_msg')"
+        />
+      } @else {
+        <div class="table-wrapper">
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th>{{ i18n.t('comun.codigo_sena') }}</th>
+                <th>{{ i18n.t('si.th_nombre') }}</th>
+                <th>{{ i18n.t('si.th_unidad') }}</th>
+                <th class="text-right">{{ i18n.t('si.th_cant') }}</th>
+                @if (solicitud()!.items[0].valorUnitario !== undefined) {
+                  <th class="text-right">{{ i18n.t('si.th_valor_unit') }}</th>
+                  <th class="text-right">{{ i18n.t('comun.total') }}</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of solicitud()!.items; track item.codigoSena) {
+                <tr>
+                  <td class="code-cell">{{ item.codigoSena }}</td>
+                  <td>
+                    <span class="item-name">{{ item.nombreBien ?? item.descripcion ?? '—' }}</span>
+                  </td>
+                  <td>{{ item.unidadMedida }}</td>
+                  <td class="text-right">{{ item.cantidad }}</td>
+                  @if (item.valorUnitario !== undefined) {
+                    <td class="text-right">{{ item.valorUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                    <td class="text-right font-semibold">{{ (item.total ?? item.valorUnitario * item.cantidad) | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  }
+
+</div>

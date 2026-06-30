@@ -1,0 +1,261 @@
+/* ==========================================================================
+   Requisiciones — Bandeja Kanban (Dashboard)
+   Design System: The Precision Ledger
+   Tokens: _variables.scss
+   ========================================================================== */
+
+.page-container {
+  padding: var(--space-8);
+}
+
+/* ── Page Header ────────────────────────────────────────────────────────────── */
+.page-header-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+}
+
+.page-title {
+  font-family: var(--font-family-headline);
+  font-size: var(--font-size-2xl);
+  font-weight: 800;
+  color: var(--color-en-superficie);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.page-subtitle {
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  margin: var(--space-1) 0 0;
+  font-size: var(--font-size-md);
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.btn-icon-text {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 700;
+}
+
+/* ── KPI Grid ───────────────────────────────────────────────────────────────── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ── Kanban Board ───────────────────────────────────────────────────────────── */
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: var(--space-6);
+  overflow-x: auto;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1280px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ── Kanban Column ──────────────────────────────────────────────────────────── */
+.kanban-column {
+  min-width: 0;
+}
+
+.kanban-column__header {
+  padding-bottom: var(--space-4);
+  border-bottom: 2px solid var(--color-superficie-contenedor);
+  margin-bottom: var(--space-4);
+}
+
+.kanban-column__title-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.kanban-column__title {
+  font-family: var(--font-family-headline);
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  color: var(--color-en-superficie);
+  margin: 0;
+}
+
+.kanban-column__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  background-color: var(--color-superficie-contenedor-alto);
+  color: var(--color-pizarra-600);
+
+  &--warning {
+    background-color: var(--color-warning-bg);
+    color: var(--color-warning-text);
+  }
+
+  &--info {
+    background-color: var(--color-info-bg);
+    color: var(--color-info-text);
+  }
+
+  &--success {
+    background-color: var(--color-success-bg);
+    color: var(--color-success-text);
+  }
+}
+
+.kanban-column__cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ── Kanban Card ────────────────────────────────────────────────────────────── */
+.kanban-card {
+  background-color: var(--color-superficie-contenedor-mas-bajo);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-5);
+  cursor: pointer;
+  transition: box-shadow var(--duration-fast) var(--ease-standard),
+              transform var(--duration-fast) var(--ease-standard);
+  border-left: 4px solid transparent;
+
+  &:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-2px);
+  }
+
+  &--borrador {
+    border-left-color: var(--color-error-text);
+  }
+
+  &--enviada {
+    border-left-color: var(--color-warning-interactive);
+  }
+
+  &--despacho {
+    border-left-color: var(--color-info-text);
+  }
+
+  &--firmada {
+    border-left-color: var(--color-primario);
+  }
+}
+
+.kanban-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.kanban-card__id {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: var(--color-primario);
+  background-color: var(--color-brand-primary-soft);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.kanban-card__menu {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-pill);
+  background: var(--color-superficie-contenedor);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-pizarra-400);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+
+  &:hover {
+    background: var(--color-superficie-contenedor-alto);
+    color: var(--color-en-superficie);
+  }
+}
+
+.kanban-card__desc {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-en-superficie);
+  margin: 0 0 var(--space-3);
+}
+
+.kanban-card__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.kanban-card__meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-xs);
+  color: var(--color-pizarra-400);
+  font-weight: var(--font-weight-medium);
+}
+
+.kanban-card__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+
+  &--borrador {
+    background-color: var(--color-superficie-contenedor-alto);
+    color: var(--color-pizarra-600);
+  }
+
+  &--enviada {
+    background-color: var(--color-warning-badge-bg);
+    color: var(--color-warning-badge-text);
+  }
+
+  &--despacho {
+    background-color: var(--color-info-bg);
+    color: var(--color-info-text);
+  }
+
+  &--firmada {
+    background-color: var(--color-success-bg);
+    color: var(--color-success-text);
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "bar",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/bar/bar/src",
+  "tags": ["scope:bar", "type:feature"],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": ["libs/bar/**/*.ts", "libs/bar/**/*.html"]
+      }
+    },
+    "build": {
+      "executor": "@angular-devkit/build-angular:ng-packagr",
+      "options": {
+        "project": "libs/bar/bar/ng-package.json"
+      }
+    }
+  }
+}

@@ -1,0 +1,126 @@
+.caja-apertura-page {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  min-height: calc(100vh - var(--topbar-height));
+  background-color: var(--color-fondo);
+
+  .header-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-4);
+
+ .back-btn {
+       background: var(--color-surface);
+       border: 1px solid var(--color-border);
+       border-radius: var(--radius-md);
+       width: 40px;
+       height: 40px;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       cursor: pointer;
+       color: var(--color-text-primary);
+       box-shadow: var(--shadow-sm);
+       transition: all 0.2s;
+
+       &:hover {
+         background: var(--color-background-soft);
+       }
+     }
+
+    restaurant-page-header {
+      ::ng-deep .page-header {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .form-block {
+    display: block;
+    max-width: 600px;
+    
+    .card {
+      background-color: var(--color-surface-primary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: var(--space-6);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+  }
+
+  .block-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: var(--space-4);
+
+    .title-group {
+      display: flex;
+      flex-direction: column;
+
+      h5 {
+        margin: 0;
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-text-heading);
+      }
+      .subtitle {
+        font-size: var(--font-size-sm);
+        color: var(--color-text-secondary);
+      }
+    }
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+
+    label {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-secondary);
+    }
+  }
+
+  .form-control {
+    padding: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+    background-color: var(--color-surface-primary);
+    outline: none;
+    width: 100%;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &:focus {
+      border-color: var(--color-brand-primary);
+      box-shadow: var(--focus-ring);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      background-color: var(--color-surface-hover);
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-4);
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-4);
+  }
+
+  .mt-4 { margin-top: var(--space-4); }
+}

@@ -1,0 +1,73 @@
+import { ChangeDetectionStrategy, Component, inject, computed, signal, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
+import { PedidosCategoriesComponent } from '../../components/pedidos-categories/pedidos-categories.component';
+import { PedidosMenuGridComponent } from '../../components/pedidos-menu-grid/pedidos-menu-grid.component';
+import { PedidosCartComponent } from '../../components/pedidos-cart/pedidos-cart.component';
+import { RestauranteFacade } from '../../data-access/restaurante.facade';
+import { LucideIconComponent, ButtonComponent, ConfirmDialogComponent } from '@restaurant/shared/ui';
+import { RouterLink } from '@angular/router';
+import { I18nService } from '../../i18n/i18n.service';
+
+@Component({
+  selector: 'lib-pedidos-page',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    PedidosCategoriesComponent,
+    PedidosMenuGridComponent,
+    PedidosCartComponent,
+    LucideIconComponent,
+    ButtonComponent,
+    ConfirmDialogComponent
+  ],
+  templateUrl: './pedidos-page.component.html',
+  styleUrls: ['./pedidos-page.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class PedidosPageComponent implements OnInit {
+  protected readonly i18n = inject(I18nService);
+  public facade = inject(RestauranteFacade);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
+  ngOnInit(): void {
+    // El facade es singleton (providedIn: 'root') y solo carga el menú en su
+    // constructor, así que las recetas/categorías creadas en Cocina durante la
+    // sesión no se reflejaban sin un reload completo. Refrescamos al entrar.
+    this.facade.cargarMenu();
+  }
+
+  searchTerm = signal('');
+  selectedMainCategory = signal('all');
+  selectedSubCategory = signal('all');
+
+  onFilterChanged(event: {main: string, sub: string}) {
+    this.selectedMainCategory.set(event.main);
+    this.selectedSubCategory.set(event.sub);
+  }
+
+  mesaActual = computed(() => {
+    const pedido = this.facade.pedidoActivo();
+    if (!pedido) return null;
+    return this.facade.mesas().find(m => m.id.toString() === pedido.mesaId);
+  });
+
+  esPedidoSoloLectura = computed(() => {
+    const p = this.facade.pedidoActivo();
+    return p ? p.estado !== 'BORRADOR' : false;
+  });
+
+  nombreUsuario = this.facade.nombreUsuario;
+  mostrarModalAccesoDenegado = this.facade.mostrarModalAccesoDenegado;
+  cerrarModalAccesoDenegado = () => this.facade.cerrarModalAccesoDenegado();
+
+  fechaActual = new Date();
+
+  volverAMesas() {
+    this.router.navigate(['../mesas'], { relativeTo: this.route });
+  }
+}

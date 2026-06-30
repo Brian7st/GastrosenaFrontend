@@ -1,0 +1,181 @@
+<div class="page-container">
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       HEADER
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="page-header-row">
+    <div>
+      <div class="title-group">
+        <inventario-back-button (clicked)="goBack()" />
+        <h1 class="page-title">{{ i18n.t('conciliacion.toma_titulo') }}@if (categoria()) {<span class="page-title-cat"> · {{ categoria() }}</span>}</h1>
+      </div>
+      <div class="header-meta">
+        <div class="meta-item">
+          <lucide-icon name="calendar" [size]="16"></lucide-icon>
+          <input
+            type="date"
+            class="meta-input"
+            [ngModel]="fecha()"
+            (ngModelChange)="fecha.set($event)"
+            aria-label="Fecha de la toma física">
+        </div>
+        <div class="meta-divider"></div>
+        <div class="meta-item">
+          <lucide-icon name="user" [size]="16"></lucide-icon>
+          <input
+            type="text"
+            class="meta-input"
+            [ngModel]="responsable()"
+            (ngModelChange)="responsable.set($event)"
+            [placeholder]="i18n.t('conciliacion.responsable_placeholder')"
+            aria-label="Responsable del conteo">
+        </div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="location-selector">
+        <span>{{ i18n.t('conciliacion.almacen_principal') }}</span>
+        <lucide-icon name="chevron-down" [size]="16"></lucide-icon>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       SUMMARY CARDS
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="summary-grid">
+    <restaurant-kpi-card
+      [label]="i18n.t('conciliacion.kpi_items_totales')"
+      [value]="itemsTotales()"
+      iconName="list"
+      iconVariant="neutral">
+    </restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      [label]="i18n.t('conciliacion.kpi_precision_card')"
+      [value]="precision() + '%'"
+      iconName="check-circle"
+      iconVariant="success">
+    </restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      [label]="i18n.t('conciliacion.kpi_diferencias_card')"
+      [value]="diferenciasCount()"
+      iconName="alert-triangle"
+      iconVariant="alert">
+    </restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      [label]="i18n.t('conciliacion.kpi_impacto')"
+      [value]="formatCurrency(impactoFinanciero())"
+      iconName="trending-down"
+      iconVariant="alert">
+    </restaurant-kpi-card>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       CONTROLS
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="table-controls">
+    <div class="tabs-group">
+      <button class="tab-btn" [class.tab-btn--active]="activeTab() === 'todos'" (click)="setTab('todos')">{{ i18n.t('conciliacion.tab_todos') }}</button>
+      <button class="tab-btn" [class.tab-btn--active]="activeTab() === 'diferencias'" (click)="setTab('diferencias')">{{ i18n.t('conciliacion.tab_diferencias') }}</button>
+      <button class="tab-btn" [class.tab-btn--active]="activeTab() === 'pendientes'" (click)="setTab('pendientes')">{{ i18n.t('conciliacion.tab_pendientes') }}</button>
+    </div>
+    
+    <div class="actions-group">
+      <restaurant-button variant="ghost">
+        <div class="btn-icon-text">
+          <lucide-icon name="save" [size]="18"></lucide-icon>
+          {{ i18n.t('conciliacion.guardar_borrador') }}
+        </div>
+      </restaurant-button>
+      <restaurant-button variant="ghost">
+        <div class="btn-icon-text">
+          <lucide-icon name="download" [size]="18"></lucide-icon>
+          {{ i18n.t('conciliacion.exportar_acta') }}
+        </div>
+      </restaurant-button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       INTERACTIVE TABLE
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="interactive-table-wrapper">
+    <table class="interactive-table">
+      <thead>
+        <tr>
+          <th>{{ i18n.t('comun.cod_sena') }}</th>
+          <th>{{ i18n.t('conciliacion.th_categoria') }}</th>
+          <th>{{ i18n.t('conciliacion.th_producto') }}</th>
+          <th class="text-right">{{ i18n.t('conciliacion.th_stock_sis') }}</th>
+          <th class="text-center">{{ i18n.t('conciliacion.th_conteo_fisico') }}</th>
+          <th class="text-center">{{ i18n.t('conciliacion.th_dif') }}</th>
+          <th class="text-right">{{ i18n.t('conciliacion.th_valor_unit') }}</th>
+          <th class="text-right">{{ i18n.t('conciliacion.th_impacto_total') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of filteredItems(); track item.id) {
+          <tr>
+            <td class="font-medium text-secondary">{{ item.codigoSena }}</td>
+            <td class="text-secondary">{{ item.categoria }}</td>
+            <td class="font-bold text-primary">{{ item.producto }}</td>
+            <td class="text-right">{{ item.stockSistema }}</td>
+            <td class="text-center">
+              <input type="number" class="input-conteo" 
+                     [ngModel]="item.conteoFisico" 
+                     (ngModelChange)="updateConteoFisico(item.id, $event)"
+                     placeholder="--">
+            </td>
+            <td class="text-center">
+              @if (getDiferencia(item) !== null) {
+                <span class="dif-badge" 
+                      [class.dif-badge--zero]="getDiferencia(item) === 0"
+                      [class.dif-badge--neg]="(getDiferencia(item) || 0) < 0"
+                      [class.dif-badge--pos]="(getDiferencia(item) || 0) > 0">
+                  {{ (getDiferencia(item) || 0) > 0 ? '+' : '' }}{{ getDiferencia(item) }}
+                </span>
+              } @else {
+                <span class="text-disabled">-</span>
+              }
+            </td>
+            <td class="text-right text-secondary">${{ item.valorUnitario | number }}</td>
+            <td class="text-right font-medium" 
+                [class.text-red]="(getImpactoTotal(item) || 0) < 0"
+                [class.text-orange]="(getImpactoTotal(item) || 0) > 0">
+              {{ formatCurrency(getImpactoTotal(item)) }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       FOOTER ACTIONS
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="page-footer">
+    @if (pendientesCount() > 0) {
+      <div class="warning-alert">
+        <lucide-icon name="alert-circle" [size]="16"></lucide-icon>
+        <span>{{ i18n.t('conciliacion.items_sin_contar', { count: pendientesCount().toString() }) }}</span>
+      </div>
+    } @else {
+      <div></div>
+    }
+    
+    <restaurant-button variant="primary" [disabled]="!puedeFinalizar()" (click)="finalizar()">
+      <div class="btn-icon-text">
+        @if (loading()) {
+          {{ i18n.t('comun.procesando') }}
+        } @else {
+          {{ i18n.t('conciliacion.finalizar') }}
+          <lucide-icon name="arrow-right" [size]="18"></lucide-icon>
+        }
+      </div>
+    </restaurant-button>
+  </div>
+
+</div>

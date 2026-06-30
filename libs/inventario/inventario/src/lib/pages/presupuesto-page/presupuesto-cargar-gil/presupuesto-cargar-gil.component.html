@@ -1,0 +1,107 @@
+<div class="slideover-overlay" (click)="closePanel()">
+  <div class="slideover-panel" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="slideover-header">
+      <div>
+        <h2 class="slideover-title">{{ i18n.t('presupuesto.cargar_gil_titulo') }}</h2>
+        <p class="slideover-subtitle">Solicitudes en estado <span class="estado-validado">Validado</span></p>
+      </div>
+      <button class="close-btn" (click)="closePanel()">
+        <lucide-icon name="x" [size]="20"></lucide-icon>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="slideover-body">
+      @if (error()) {
+        <p class="field-error">{{ error() }}</p>
+      }
+
+      <div class="form-group">
+        <label class="form-label">{{ i18n.t('presupuesto.presupuesto_label') }} <span class="required-mark">*</span></label>
+        <select class="form-control" [value]="presupuestoId()"
+                (change)="onPresupuestoChange($any($event.target).value)">
+          <option value="" disabled>{{ i18n.t('comun.seleccione_presupuesto') }}</option>
+          @for (p of presupuestos(); track p.id) {
+            <option [value]="p.id">{{ p.programaFormacion }} — Ficha {{ p.fichaId }} ({{ p.vigencia }})</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">{{ i18n.t('presupuesto.rubro_label') }} <span class="required-mark">*</span></label>
+        <select class="form-control" [value]="rubroId()"
+                (change)="rubroId.set($any($event.target).value)"
+                [disabled]="!presupuestoId()">
+          <option value="" disabled>{{ i18n.t('comun.seleccione_rubro') }}</option>
+          @for (r of rubrosDelPresupuesto(); track r.id) {
+            <option [value]="r.id">{{ r.codigo }} — {{ r.descripcion }} (disp: {{ r.saldoDisponible | number }})</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">{{ i18n.t('presupuesto.gil_label') }} <span class="required-mark">*</span></label>
+        <select class="form-control" [value]="gilId()" (change)="onGilChange($any($event.target).value)">
+          <option value="" disabled>{{ i18n.t('comun.seleccione_gil') }}</option>
+          @for (g of gilesVerificados(); track g.id) {
+            <option [value]="g.id">{{ g.numeroGil }}</option>
+          }
+        </select>
+        @if (gilesVerificados().length === 0) {
+          <p class="hint-text">{{ i18n.t('presupuesto.sin_gils') }}</p>
+        }
+        @if (cargandoFel()) {
+          <p class="hint-text">{{ i18n.t('presupuesto.buscando_fel') }}</p>
+        } @else if (felNumero()) {
+          <div class="fel-vinculado">
+            <lucide-icon name="file-check" [size]="14"></lucide-icon>
+            <span>FEL vinculado: <strong>{{ felNumero() }}</strong></span>
+            <span class="fel-badge fel-badge--auto">{{ i18n.t('presupuesto.pago_automatico') }}</span>
+          </div>
+        } @else if (gilId()) {
+          <p class="hint-text">{{ i18n.t('presupuesto.sin_fel') }}</p>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">{{ i18n.t('presupuesto.concepto_label') }} <span class="required-mark">*</span></label>
+        <input type="text" class="form-control" [placeholder]="i18n.t('presupuesto.concepto_placeholder')"
+               [value]="concepto()" (input)="concepto.set($any($event.target).value)" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">{{ i18n.t('presupuesto.monto_label') }} <span class="required-mark">*</span></label>
+        <input type="number" class="form-control" placeholder="0"
+               [value]="monto()" (input)="monto.set(+$any($event.target).value)" />
+      </div>
+
+      <div class="form-check">
+        <label><input type="checkbox" [checked]="aplicarZESE()"
+                      (change)="aplicarZESE.set($any($event.target).checked)" /> {{ i18n.t('presupuesto.aplicar_zese') }}</label>
+      </div>
+      <div class="form-check">
+        <label><input type="checkbox" [checked]="autorizarSobregiro()"
+                      (change)="autorizarSobregiro.set($any($event.target).checked)" /> {{ i18n.t('presupuesto.autorizar_sobregiro') }}</label>
+      </div>
+
+      @if (submitAttempted() && !formularioValido()) {
+        <p class="field-error">{{ i18n.t('presupuesto.error_formulario') }}</p>
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="slideover-footer">
+      <div class="footer-summary">
+        <span class="footer-label">{{ i18n.t('presupuesto.monto_comprometer') }}</span>
+        <span class="footer-total">{{ monto() | number }}</span>
+      </div>
+      <restaurant-button variant="primary" [disabled]="loading()" (click)="onComprometer()">
+        <div class="btn-icon-text">
+          <lucide-icon [name]="felCufe() ? 'circle-check-big' : 'clipboard-check'" [size]="18"></lucide-icon>
+          {{ felCufe() ? i18n.t('presupuesto.comprometer_pagar') : i18n.t('presupuesto.comprometer') }}
+        </div>
+      </restaurant-button>
+    </div>
+  </div>
+</div>

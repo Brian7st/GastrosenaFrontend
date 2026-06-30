@@ -1,0 +1,233 @@
+<div class="roles-page">
+
+  <restaurant-page-header
+    [title]="i18n.t('roles.titulo')"
+    [subtitle]="i18n.t('roles.subtitulo')"
+  ></restaurant-page-header>
+
+  <!-- KPI Cards -->
+  <div class="roles-page__kpis">
+    <restaurant-kpi-card
+      [label]="i18n.t('roles.kpi_total')"
+      [value]="totalAprendices().toString()"
+      icon="users"
+      iconColor="blue"
+    ></restaurant-kpi-card>
+    <restaurant-kpi-card
+      [label]="i18n.t('roles.kpi_con_rol')"
+      [value]="totalConRol().toString()"
+      icon="shield-check"
+      iconColor="green"
+    ></restaurant-kpi-card>
+  </div>
+
+  <!-- SECCIÓN 1: Cards de roles de simulación -->
+  <section class="roles-page__section">
+    <h2 class="roles-page__section-title">{{ i18n.t('roles.section_roles') }}</h2>
+    <div class="roles-page__grid">
+      @for (rol of rolesInfo; track rol.rol) {
+        <div class="roles-page__card roles-page__card--{{ getRolClass(rol.rol) }}">
+
+          <div class="roles-page__card-header">
+            <div class="roles-page__card-icon">
+              <lucide-icon [name]="rol.icono" [size]="22"></lucide-icon>
+            </div>
+            <div class="roles-page__card-meta">
+              <h3 class="roles-page__card-title">{{ i18n.t(rol.etiquetaTKey) ?? rol.etiqueta }}</h3>
+              <p class="roles-page__card-desc">{{ i18n.t(rol.descripcionTKey) ?? rol.descripcion }}</p>
+            </div>
+          </div>
+
+          <ul class="roles-page__permisos">
+            @for (permiso of rol.permisos; track permiso; let idx = $index) {
+              <li class="roles-page__permiso">
+                <lucide-icon name="check" [size]="13" class="roles-page__permiso-icon"></lucide-icon>
+                <span>{{ i18n.t(rol.permisosTKeys[idx]) ?? permiso }}</span>
+              </li>
+            }
+          </ul>
+
+          <div class="roles-page__card-footer">
+            <lucide-icon name="users" [size]="14" class="roles-page__footer-icon"></lucide-icon>
+            <span class="roles-page__footer-label">
+              {{ conteoPorRol().get(rol.rol) ?? 0 }}
+              {{ i18n.t('roles.section_aprendices') }}
+            </span>
+          </div>
+
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- SECCIÓN 2: Tabla de aprendices -->
+  <section class="roles-page__section">
+    <h2 class="roles-page__section-title">{{ i18n.t('roles.section_aprendices') }}</h2>
+
+    <!-- Toolbar de asignación masiva -->
+    <div class="roles-page__toolbar">
+      <label class="roles-page__check-all">
+        <input
+          class="roles-page__checkbox"
+          type="checkbox"
+          [checked]="todosSeleccionados()"
+          (change)="onToggleTodos()"
+        >
+        {{ i18n.t('roles.seleccionar_todos') }}
+      </label>
+
+      @if (seleccionados().size > 0) {
+        <span class="roles-page__badge-count">
+          {{ seleccionados().size }} {{ i18n.t('roles.seleccionados') }}
+        </span>
+      }
+
+      <select
+        class="roles-page__rol-select"
+        [value]="rolAsignacion()"
+        (change)="onRolChange($event)"
+      >
+        <option value="">{{ i18n.t('roles.seleccionar_rol') }}</option>
+        @for (r of rolesInfo; track r.rol) {
+          <option [value]="r.rol">{{ i18n.t(r.etiquetaTKey) ?? r.etiqueta }}</option>
+        }
+      </select>
+
+      <button
+        class="roles-page__asignar-btn"
+        type="button"
+        [disabled]="!puedeAsignar() || loadingAsignacion()"
+        (click)="onAsignarRol()"
+      >
+        @if (loadingAsignacion()) {
+          <lucide-icon name="loader-circle" [size]="14"></lucide-icon>
+          {{ i18n.t('roles.asignando') }}
+        } @else {
+          <lucide-icon name="user-check" [size]="14"></lucide-icon>
+          {{ i18n.t('roles.asignar_rol') }}
+        }
+      </button>
+    </div>
+
+    @if (loading()) {
+      <restaurant-loading-skeleton [lines]="5"></restaurant-loading-skeleton>
+    } @else {
+      <restaurant-data-table>
+        <thead>
+          <tr>
+            <th class="roles-page__col-check"></th>
+            <th>{{ i18n.t('roles.col_aprendiz') }}</th>
+            <th>{{ i18n.t('roles.col_rol_actual') }}</th>
+            <th>{{ i18n.t('roles.col_ficha') }}</th>
+            <th>Fecha registro</th>
+            <th>{{ i18n.t('roles.col_acciones') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (u of aprendices(); track u.id) {
+            <tr [class.roles-page__row--selected]="estaSeleccionado(u.id)">
+              <td class="roles-page__col-check">
+                <input
+                  class="roles-page__checkbox"
+                  type="checkbox"
+                  [checked]="estaSeleccionado(u.id)"
+                  (change)="onToggleSeleccion(u.id)"
+                >
+              </td>
+              <td>
+                <div class="roles-page__user">
+                  <restaurant-usuario-avatar
+                    [nombre]="u.nombre"
+                    [apellidos]="u.apellidos"
+                  ></restaurant-usuario-avatar>
+                  <div>
+                    <p class="roles-page__user-name">{{ u.nombre }} {{ u.apellidos }}</p>
+                    <p class="roles-page__user-email">{{ u.email }}</p>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <restaurant-usuario-rol-badge [rol]="u.rol"></restaurant-usuario-rol-badge>
+              </td>
+              <td>
+                <span class="roles-page__fecha">{{ u.ficha || '—' }}</span>
+              </td>
+              <td class="roles-page__fecha">{{ u.creadoEn | date:'dd/MM/yyyy' }}</td>
+              <td>
+                <button
+                  class="roles-page__action-btn"
+                  type="button"
+                  (click)="onVerDetalle(u)"
+                  [attr.aria-label]="'Ver detalle de ' + u.nombre"
+                >
+                  <lucide-icon name="eye" [size]="16"></lucide-icon>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="roles-page__empty-cell">
+                <restaurant-empty-state
+                  [title]="i18n.t('roles.sin_aprendices')"
+                  [message]="i18n.t('roles.sin_aprendices_msg')"
+                ></restaurant-empty-state>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </restaurant-data-table>
+    }
+  </section>
+
+</div>
+
+@if (usuarioDetalle()) {
+  <div class="modal-backdrop" (click)="onCerrarDetalle()">
+    <div class="modal detalle-modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <restaurant-usuario-avatar
+          [nombre]="usuarioDetalle()!.nombre"
+          [apellidos]="usuarioDetalle()!.apellidos"
+        ></restaurant-usuario-avatar>
+        <div class="detalle-modal__title-wrap">
+          <h3 class="detalle-modal__nombre">{{ usuarioDetalle()!.nombre }} {{ usuarioDetalle()!.apellidos }}</h3>
+          <restaurant-usuario-rol-badge [rol]="usuarioDetalle()!.rol"></restaurant-usuario-rol-badge>
+        </div>
+        <button class="detalle-modal__close" type="button" (click)="onCerrarDetalle()">
+          <lucide-icon name="x" [size]="18"></lucide-icon>
+        </button>
+      </div>
+      <div class="detalle-modal__body">
+        <div class="detalle-modal__field">
+          <span class="detalle-modal__label">Ficha</span>
+          <span class="detalle-modal__value">{{ usuarioDetalle()!.ficha || '—' }}</span>
+        </div>
+        <div class="detalle-modal__field">
+          <span class="detalle-modal__label">Documento</span>
+          <span class="detalle-modal__value">{{ usuarioDetalle()!.documento || '—' }}</span>
+        </div>
+        <div class="detalle-modal__field">
+          <span class="detalle-modal__label">Correo</span>
+          <span class="detalle-modal__value">{{ usuarioDetalle()!.email }}</span>
+        </div>
+        <div class="detalle-modal__field">
+          <span class="detalle-modal__label">Teléfono</span>
+          <span class="detalle-modal__value">{{ usuarioDetalle()!.telefono || '—' }}</span>
+        </div>
+
+        <div class="detalle-modal__field">
+          <span class="detalle-modal__label">Estado</span>
+          <span class="detalle-modal__value">{{ usuarioDetalle()!.activo ? 'Activo' : 'Inactivo' }}</span>
+        </div>
+        <div class="detalle-modal__field">
+          <span class="detalle-modal__label">Último acceso</span>
+          <span class="detalle-modal__value">{{ (usuarioDetalle()!.ultimoAcceso | date:'dd/MM/yyyy HH:mm') || '—' }}</span>
+        </div>
+        <div class="detalle-modal__field">
+          <span class="detalle-modal__label">Fecha registro</span>
+          <span class="detalle-modal__value">{{ usuarioDetalle()!.creadoEn | date:'dd/MM/yyyy' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+}

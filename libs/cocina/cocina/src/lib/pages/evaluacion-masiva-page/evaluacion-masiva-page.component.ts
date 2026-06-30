@@ -1,0 +1,279 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
+
+import { CommonModule } from '@angular/common';
+import { Router, ActivatedRoute } from '@angular/router';
+import { LucideIconComponent } from '@restaurant/shared/ui';
+import { I18nService } from '../../i18n/i18n.service';
+
+import {
+  CocinaFacade,
+  ActividadMock,
+} from '../../data-access/cocina.facade';
+import { EvaluacionService } from '../../data-access/evaluacion.service';
+
+@Component({
+  selector: 'restaurant-evaluacion-masiva-page',
+  standalone: true,
+  imports: [CommonModule, LucideIconComponent],
+  templateUrl: './evaluacion-masiva-page.component.html',
+  styleUrl: './evaluacion-masiva-page.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class EvaluacionMasivaPageComponent implements OnInit {
+
+  // ── Inyecciones ─────────────────────────────
+  protected readonly i18n = inject(I18nService);
+  private facade = inject(CocinaFacade);
+  private evaluacionService = inject(EvaluacionService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
+  // ── Actividad actual ─────────────────────────
+  readonly actividadId = signal<number | null>(null);
+
+  readonly actividad = computed<ActividadMock | null>(() => {
+    const id = this.actividadId();
+
+    if (!id) {
+      return null;
+    }
+
+    return (
+      this.facade.actividades().find(a => a.id === id) ?? null
+    );
+  });
+
+  readonly menuEstadoAbierto = signal<boolean>(false);
+
+  readonly estadosActividad: Array<
+    'Activa' | 'Pendiente' | 'Finalizada'
+  > = ['Activa', 'Pendiente', 'Finalizada'];
+
+  // ── Datos ────────────────────────────────────
+  readonly aprendices = this.facade.aprendices;
+
+  readonly aprendicesActivos = computed(() => {
+    const act = this.actividad();
+    if (!act) return [];
+    return this.aprendices().filter(a => !a.inactivo && a.ficha === act.ficha);
+  });
+
+  readonly aprendicesInactivos = computed(() => {
+    const act = this.actividad();
+    if (!act) return [];
+    return this.aprendices().filter(a => a.inactivo && a.ficha === act.ficha);
+  });
+
+  // ── Selección ────────────────────────────────
+  readonly modoSeleccionAbierto = signal<boolean>(false);
+
+  readonly seleccionados = signal<Set<number>>(new Set());
+
+  readonly cantidadSeleccionados = computed(
+    () => this.seleccionados().size
+  );
+
+  readonly todosSeleccionados = computed(() => {
+    const activos = this.aprendicesActivos();
+
+    return (
+      activos.length > 0 &&
+      activos.every(a => this.seleccionados().has(a.id))
+    );
+  });
+
+  readonly algunoSeleccionado = computed(
+    () =>
+      this.cantidadSeleccionados() > 0 &&
+      !this.todosSeleccionados()
+  );
+
+  // ── UI ───────────────────────────────────────
+  readonly menuEvaluarAbierto = signal<boolean>(false);
+
+  // ── Init ─────────────────────────────────────
+  ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+
+      const id = Number(params['actividadId']);
+
+      if (id) {
+        this.actividadId.set(id);
+      }
+    });
+  }
+
+  // ── Estado actividad ─────────────────────────
+  toggleMenuEstado(): void {
+    this.menuEstadoAbierto.update(v => !v);
+  }
+
+  cerrarMenuEstado(): void {
+    this.menuEstadoAbierto.set(false);
+  }
+
+  cambiarEstadoActividad(
+    estado: 'Activa' | 'Pendiente' | 'Finalizada'
+  ): void {
+
+    const id = this.actividadId();
+
+    if (id) {
+      this.facade.actualizarEstadoActividad(id, estado);
+    }
+
+    this.menuEstadoAbierto.set(false);
+  }
+
+  getEstadoActividadClass(estado: string): string {
+
+    switch (estado) {
+
+      case 'Activa':
+        return 'act-estado-activa';
+
+      case 'Pendiente':
+        return 'act-estado-pendiente';
+
+      case 'Finalizada':
+        return 'act-estado-finalizada';
+
+      default:
+        return '';
+    }
+  }
+
+  // ── Selección ────────────────────────────────
+  toggleModoSeleccion(): void {
+
+    this.modoSeleccionAbierto.update(v => !v);
+
+    if (!this.modoSeleccionAbierto()) {
+
+      this.seleccionados.set(new Set());
+
+      this.cerrarMenuEvaluar();
+    }
+  }
+
+  isSelected(id: number): boolean {
+    return this.seleccionados().has(id);
+  }
+
+  toggleSelection(id: number): void {
+
+    if (!this.modoSeleccionAbierto()) {
+      return;
+    }
+
+    const actual = new Set(this.seleccionados());
+
+    if (actual.has(id)) {
+      actual.delete(id);
+    } else {
+      actual.add(id);
+    }
+
+    this.seleccionados.set(actual);
+  }
+
+  toggleSelectAll(): void {
+
+    if (!this.modoSeleccionAbierto()) {
+      return;
+    }
+
+    if (this.todosSeleccionados()) {
+
+      this.seleccionados.set(new Set());
+
+    } else {
+
+      const todos = new Set(
+        this.aprendicesActivos().map(a => a.id)
+      );
+
+      this.seleccionados.set(todos);
+    }
+  }
+
+  // ── Menú evaluar ─────────────────────────────
+  toggleMenuEvaluar(): void {
+    this.menuEvaluarAbierto.update(v => !v);
+  }
+
+  cerrarMenuEvaluar(): void {
+    this.menuEvaluarAbierto.set(false);
+  }
+
+  cerrarTodosMenus(): void {
+    this.cerrarMenuEvaluar();
+    this.cerrarMenuEstado();
+  }
+
+  // ── Evaluación masiva ────────────────────────
+  submitEvaluacionMasiva(
+    resultado: 'aprobo' | 'no_aprobo'
+  ): void {
+
+    const ids = Array.from(this.seleccionados());
+    const actividadId = this.actividadId();
+    
+    if (!actividadId || ids.length === 0) return;
+
+    const estadoStr =
+      resultado === 'aprobo'
+        ? 'Aprobó'
+        : 'No Aprobó';
+
+    // 1. Crear el payload para el backend
+    const requests = ids.map(id => ({
+      aprendizId: id,
+      resultado: resultado,
+      observaciones: 'Evaluación masiva'
+    }));
+
+    // 2. Enviar petición al backend
+    this.evaluacionService.evaluarAprendices(actividadId, requests).subscribe({
+      next: () => {
+        // 3. Actualizar la vista local si el backend responde exitosamente
+        for (const id of ids) {
+          this.facade.actualizarEstado(id, estadoStr);
+        }
+        this.seleccionados.set(new Set());
+        this.menuEvaluarAbierto.set(false);
+        this.modoSeleccionAbierto.set(false);
+      },
+      error: (err) => {
+        console.error('Error al guardar la evaluación masiva', err);
+        // Opcional: Mostrar mensaje de error al usuario
+      }
+    });
+  }
+
+  // ── Navegación ───────────────────────────────
+  volver(): void {
+    window.history.back();
+  }
+
+  goToIndividual(id: number): void {
+
+    this.router.navigate(
+      ['/app/cocina/evaluacion-individual'],
+      {
+        queryParams: { id },
+      }
+    );
+  }
+
+  goToActividades(): void {
+    this.router.navigate(['/app/cocina/actividades']);
+  }
+}

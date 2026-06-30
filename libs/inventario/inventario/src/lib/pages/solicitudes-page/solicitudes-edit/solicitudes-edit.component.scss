@@ -1,0 +1,509 @@
+/* ==========================================================================
+   Editar Solicitud GIL-F-014
+   ========================================================================== */
+
+.edit-page-container {
+  padding: 2rem;
+  width: 100%;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.header-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.header-titles {
+  .title {
+    font-family: 'Manrope', sans-serif;
+    font-size: 1.875rem;
+    font-weight: 800;
+    color: var(--color-text-heading);
+    margin: 0 0 0.25rem;
+    letter-spacing: -0.025em;
+  }
+  .subtitle {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+}
+
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  .badge--active {
+    background: rgba(57, 169, 0, 0.1);
+    color: var(--color-primario);
+    font-weight: 700;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .header-id {
+    color: var(--color-text-disabled);
+    font-size: 0.875rem;
+  }
+}
+
+/* ── Grid Principal ─────────────────────────────────────────────────────── */
+.edit-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: 2fr 1fr;
+    align-items: start;
+
+    /* Fila 1: Información Institucional | Historial + Resumen */
+    .info-card     { grid-column: 1; grid-row: 1; }
+    .sidebar-col   { grid-column: 2; grid-row: 1; }
+    /* Fila 2: el resto del formulario, ancho completo */
+    .form-col-full { grid-column: 1 / -1; grid-row: 2; }
+  }
+}
+
+.form-col-full {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0; /* permite que la tabla ancha use overflow-x interno en vez de desbordar el grid */
+}
+
+.info-card {
+  min-width: 0;
+  align-self: start;
+}
+
+/* ── Form Cards ─────────────────────────────────────────────────────────── */
+.form-card {
+  background: var(--color-surface-primary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-pizarra-100);
+  box-shadow: var(--shadow-xs);
+  padding: 1.5rem;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-pizarra-50);
+
+  .icon-primary { color: var(--color-primario); font-size: 24px; }
+  h3 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-pizarra-800);
+    margin: 0;
+  }
+}
+
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  @media (min-width: 640px) { grid-template-columns: repeat(2, 1fr); }
+}
+
+.col-span-2 {
+  grid-column: span 1;
+  @media (min-width: 640px) { grid-column: span 2; }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: var(--color-text-disabled);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-left: 0.25rem;
+
+    .required { color: var(--color-error); margin-left: 0.25rem; }
+  }
+
+  .form-control {
+    background: var(--color-pizarra-100);
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    color: var(--color-pizarra-800);
+    transition: box-shadow var(--duration-fast) var(--ease-standard);
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(57, 169, 0, 0.2);
+    }
+    &::placeholder { color: var(--color-text-disabled); }
+  }
+
+  textarea.form-control {
+    resize: none; /* tamaño fijo: el usuario no puede redimensionar el cuadro */
+  }
+}
+
+/* ── Tabla Bienes Solicitados ────────────────────────────────────────────── */
+.table-container {
+  overflow-x: auto;
+  border: 1px solid var(--color-pizarra-200);
+  border-radius: var(--radius-lg);
+}
+
+.styled-table {
+  width: 100%;
+  text-align: left;
+  white-space: nowrap;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+
+  thead {
+    background: var(--color-pizarra-50);
+    border-bottom: 1px solid var(--color-pizarra-200);
+
+    th {
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-text-disabled);
+      text-transform: uppercase;
+    }
+  }
+
+  tbody {
+    tr {
+      transition: background-color var(--duration-fast) var(--ease-standard);
+      border-bottom: 1px solid var(--color-pizarra-200);
+      &:last-child { border-bottom: none; }
+      &:hover { background: var(--color-pizarra-50); }
+    }
+    td { padding: 0.75rem 1rem; }
+  }
+}
+
+/* Utilities */
+.w-full { width: 100%; }
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.text-dark { color: var(--color-pizarra-800); }
+.text-muted { color: var(--color-text-secondary); }
+.font-medium { font-weight: 500; }
+.font-bold { font-weight: 700; }
+
+/* Botones icono y enlace */
+.btn-icon {
+  background: none; border: none;
+  padding: 0.25rem;
+  border-radius: 50%;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center; justify-content: center;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+
+  &--danger {
+    color: var(--color-danger);
+    &:hover { background: var(--color-error-bg); }
+  }
+  .material-symbols-outlined { font-size: 18px; }
+}
+
+.btn-link {
+  background: none; border: none; padding: 0;
+  font-size: 0.875rem; font-weight: 700;
+  color: var(--color-primario);
+  cursor: pointer;
+  display: flex; align-items: center; gap: 0.25rem;
+
+  &:hover { text-decoration: underline; }
+}
+
+/* ── Action Buttons Footer ──────────────────────────────────────────────── */
+.actions-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1rem;
+}
+
+/* ── Columna Sidebar ────────────────────────────────────────────────────── */
+.sidebar-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
+  align-self: start;
+}
+
+.side-card {
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid transparent;
+
+  h4 {
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin: 0 0 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &--history {
+    background: var(--color-pizarra-50);
+    border-color: var(--color-pizarra-100);
+    h4 { color: var(--color-pizarra-800); }
+    .icon-history { font-size: 16px; }
+  }
+
+  &--summary {
+    background: rgba(57, 169, 0, 0.05);
+    border-color: rgba(57, 169, 0, 0.1);
+    h4 { color: var(--color-primario); }
+  }
+}
+
+/* Historial Timeline */
+.history-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 0.75rem;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 24px;
+    bottom: -16px;
+    width: 2px;
+    background: var(--color-pizarra-200);
+  }
+
+  &--last::before { display: none; }
+
+  .timeline-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    z-index: 10;
+
+    .material-symbols-outlined { font-size: 12px; font-weight: 700; }
+
+    &--completed {
+      background: var(--color-success-bg-subtle);
+      color: var(--color-estado-activo);
+    }
+    &--current {
+      background: var(--color-estado-activo);
+      color: var(--color-en-primario);
+    }
+  }
+
+  .timeline-content {
+    .history-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-pizarra-800);
+      margin: 0;
+    }
+    .history-date {
+      font-size: 0.625rem;
+      color: var(--color-text-secondary);
+      margin: 0;
+    }
+  }
+}
+
+/* Resumen */
+.summary-text {
+  font-size: 0.75rem;
+  color: var(--color-en-primario-contenedor);
+  line-height: 1.6;
+  margin: 0 0 1rem;
+}
+
+.summary-total {
+  padding-top: 1rem;
+  border-top: 1px solid rgba(57, 169, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--color-primario);
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
+}
+
+/* ── Resumen sidebar ────────────────────────────────────────────────────── */
+.summary-value {
+  font-weight: 700;
+  color: var(--color-primario);
+}
+
+/* ── Feedback banners ───────────────────────────────────────────────────── */
+.feedback-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.25rem;
+  border-radius: var(--radius-lg);
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+
+  .material-symbols-outlined { font-size: 20px; flex-shrink: 0; }
+  p { margin: 0; }
+  strong { font-weight: 700; }
+
+  &--success {
+    background: var(--color-success-bg-subtle);
+    color: var(--color-estado-activo);
+    border: 1px solid var(--color-esmeralda-200);
+  }
+  &--error {
+    background: var(--color-error-bg);
+    color: var(--color-danger);
+    border: 1px solid var(--color-error-border);
+  }
+  &--warning {
+    background: var(--color-warning-bg);
+    color: var(--color-warning-text);
+    border: 1px solid var(--color-warning-border);
+  }
+}
+
+/* ── Loading ─────────────────────────────────────────────────────────────── */
+.loading-placeholder {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 1s linear infinite; }
+
+/* ── Cuentadantes ────────────────────────────────────────────────────────── */
+.cuentadantes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.cuentadante-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--color-pizarra-100);
+  border-radius: var(--radius-lg);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+
+  .material-symbols-outlined { font-size: 16px; color: var(--color-primario); }
+  .chip-nombre { font-weight: 600; flex: 1; }
+  .chip-cedula { color: var(--color-text-secondary); font-size: 0.75rem; }
+}
+
+/* ── Tabla vacía ─────────────────────────────────────────────────────────── */
+.empty-row td,
+.empty-row {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+
+  .material-symbols-outlined {
+    display: block;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.4;
+  }
+}
+
+.empty-hint {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  font-style: italic;
+  margin: 0 0 0.5rem;
+}
+
+/* Pointer-events none */
+.pointer-events-none { pointer-events: none; }
+.opacity-50 { opacity: 0.5; }
+
+/* Imagen Decorativa */
+.image-card {
+  height: 12rem;
+  width: 100%;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  position: relative;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--duration-slow) var(--ease-standard);
+  }
+
+  &:hover img { transform: scale(1.05); }
+
+  .image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+    display: flex;
+    align-items: flex-end;
+    padding: 1rem;
+
+    p {
+      color: white;
+      font-size: 0.625rem;
+      font-weight: 500;
+      font-style: italic;
+      opacity: 0.8;
+      margin: 0;
+    }
+  }
+}

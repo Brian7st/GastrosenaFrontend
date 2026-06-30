@@ -1,0 +1,102 @@
+import { inject, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { PaqueteProbatorio } from '../../models/paquete.model';
+import { PaqueteResponse, PaquetesPageResponse, CrearPaqueteRequest, TrazabilidadRequest } from '../api/legalization.api';
+import { paqueteFromApi } from '../mappers/legalization.mapper';
+
+const API = '/api/v1';
+
+@Injectable({ providedIn: 'root' })
+export class PaqueteService {
+  private http = inject(HttpClient);
+
+  getPaquetes(): Observable<PaqueteProbatorio[]> {
+    return this.http
+      .get<PaquetesPageResponse>(`${API}/legalization/paquetes`)
+      .pipe(
+        map(resp => resp.contenido.map(paqueteFromApi)),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  getPaqueteById(id: string): Observable<PaqueteProbatorio | undefined> {
+    return this.http
+      .get<PaqueteResponse>(`${API}/legalization/paquetes/${id}`)
+      .pipe(
+        map(paqueteFromApi),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** La facade pasa Partial<PaqueteProbatorio> — el service construye el request tipado. */
+  crearPaquete(data: Partial<PaqueteProbatorio>): Observable<PaqueteProbatorio> {
+    const request: CrearPaqueteRequest = {
+      actaId:        data.actaId        ?? '',
+      requisicionId: data.requisicionId ?? '',
+      fichaId:       data.fichaId       ?? '',
+      instructorId:  data.instructorId  ?? '',
+    };
+    return this.http
+      .post<PaqueteResponse>(`${API}/legalization/paquetes`, request)
+      .pipe(
+        map(paqueteFromApi),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  adjuntarAsistencia(paqueteId: string): Observable<boolean> {
+    return this.http
+      .patch<void>(`${API}/legalization/paquetes/${paqueteId}/adjuntar-asistencia`, {})
+      .pipe(
+        map(() => true),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  vincularTrazabilidad(paqueteId: string, datos: TrazabilidadRequest): Observable<boolean> {
+    return this.http
+      .patch<void>(`${API}/legalization/paquetes/${paqueteId}/trazabilidad`, datos)
+      .pipe(
+        map(() => true),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** Firma anterior: adjuntarDocumento(paqueteId, file) → ahora adjuntarAsistencia */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  adjuntarDocumento(paqueteId: string, _file: File): Observable<boolean> {
+    return this.adjuntarAsistencia(paqueteId);
+  }
+
+  /** GET /api/reportes/paquete — el PDF lo genera el microservicio de reportes. */
+  exportarPaquete(id: string): Observable<Blob> {
+    return this.http
+      .get(`/api/reportes/paquete`, {
+        params: { id, formato: 'PDF' },
+        responseType: 'blob',
+      })
+      .pipe(catchError(err => throwError(() => err)));
+  }
+
+  /** PATCH /legalization/paquetes/{id}/revisar — transición COMPLETO → REVISADO. */
+  revisarPaquete(id: string, revisorId: string): Observable<boolean> {
+    return this.http
+      .patch<void>(`${API}/legalization/paquetes/${id}/revisar`, { revisorId })
+      .pipe(
+        map(() => true),
+        catchError(err => throwError(() => err))
+      );
+  }
+
+  /** PATCH /legalization/paquetes/{id}/archivar */
+  archivarPaquete(id: string): Observable<boolean> {
+    return this.http
+      .patch<void>(`${API}/legalization/paquetes/${id}/archivar`, {})
+      .pipe(
+        map(() => true),
+        catchError(err => throwError(() => err))
+      );
+  }
+}

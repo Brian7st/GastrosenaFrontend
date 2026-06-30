@@ -1,0 +1,178 @@
+<!-- Overlay/Backdrop -->
+<div class="req-detail__backdrop" (click)="cerrarPanel()"></div>
+
+<!-- Side Sheet Panel -->
+<aside class="req-detail__sheet" (click)="$event.stopPropagation()">
+
+  @if (requisicion(); as req) {
+    <!-- Header -->
+    <header class="req-detail__header">
+      <div class="req-detail__header-info">
+        <div class="req-detail__status-row">
+          <span class="req-detail__badge">{{ req.estado }}</span>
+          <span class="req-detail__date">{{ req.fecha }}</span>
+        </div>
+        <h2 class="req-detail__title">REQ-{{ req.numero }}</h2>
+      </div>
+
+      <div class="req-detail__header-actions">
+        <button class="req-detail__action-btn" title="Incluir en paquete probatorio" (click)="incluirEnPaquete()">
+          <lucide-icon name="folder-archive" [size]="20"></lucide-icon>
+        </button>
+        <button class="req-detail__action-btn" title="Cerrar detalle" (click)="cerrarPanel()">
+          <lucide-icon name="x" [size]="20"></lucide-icon>
+        </button>
+      </div>
+    </header>
+
+    <!-- Scrollable Body -->
+    <div class="req-detail__body custom-scrollbar">
+
+      <!-- Section 1: Info Sesión -->
+      <section class="req-detail__section">
+        <h3 class="req-detail__section-title">
+          <lucide-icon name="info" [size]="20" class="icon-primary"></lucide-icon>
+          {{ i18n.t('req.info_sesion') }}
+        </h3>
+
+        <div class="req-detail__info-grid">
+          <div class="req-detail__info-card">
+            <div class="req-detail__info-icon"><lucide-icon name="hash" [size]="20"></lucide-icon></div>
+            <div>
+              <p class="req-detail__info-label">{{ i18n.t('req.ficha') }}</p>
+              <p class="req-detail__info-value">{{ req.fichaId }}</p>
+            </div>
+          </div>
+          <div class="req-detail__info-card">
+            <div class="req-detail__info-icon"><lucide-icon name="user" [size]="20"></lucide-icon></div>
+            <div>
+              <p class="req-detail__info-label">{{ i18n.t('req.instructor') }}</p>
+              <p class="req-detail__info-value">{{ req.instructorNombre || req.instructorId }}</p>
+            </div>
+          </div>
+          <div class="req-detail__info-card">
+            <div class="req-detail__info-icon"><lucide-icon name="calendar" [size]="20"></lucide-icon></div>
+            <div>
+              <p class="req-detail__info-label">{{ i18n.t('req.fecha_programada') }}</p>
+              <p class="req-detail__info-value">{{ req.fecha }}</p>
+            </div>
+          </div>
+          <div class="req-detail__info-card">
+            <div class="req-detail__info-icon"><lucide-icon name="clock" [size]="20"></lucide-icon></div>
+            <div>
+              <p class="req-detail__info-label">{{ i18n.t('paquete.horario') }}</p>
+              <p class="req-detail__info-value">{{ req.horaSesion }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 2: Items -->
+      <section class="req-detail__section">
+        <div class="req-detail__items-header">
+          <h3 class="req-detail__section-title">
+            <lucide-icon name="package" [size]="20" class="icon-primary"></lucide-icon>
+            {{ i18n.t('req.items_solicitados') }}
+          </h3>
+          <span class="req-detail__total-badge">{{ i18n.t('req.total_items', { count: req.items.length.toString() }) }}</span>
+        </div>
+
+        <div class="req-detail__category">
+          <div class="req-detail__table-header">
+            <div class="col-code">{{ i18n.t('comun.codigo_sena') }}</div>
+            <div class="col-name">{{ i18n.t('req.th_item') }}</div>
+            <div class="col-um">{{ i18n.t('req.th_um') }}</div>
+            <div class="col-qty">{{ i18n.t('req.th_solicitada') }}</div>
+            <div class="col-delivered">{{ i18n.t('paquete.th_entregada') }}</div>
+          </div>
+
+          @for (item of req.items; track item.productoId) {
+            <div class="req-detail__table-row">
+              <div class="col-code">{{ item.productoId }}</div>
+              <div class="col-name">{{ item.productoNombre }}</div>
+              <div class="col-um">{{ item.unidadMedida }}</div>
+              <div class="col-qty">{{ item.cantidad }}</div>
+              <div class="col-delivered"><span class="highlight-qty">{{ item.cantidad }}</span></div>
+            </div>
+          }
+        </div>
+      </section>
+
+      <!-- Section 3: Timeline -->
+      <section class="req-detail__section">
+        <h3 class="req-detail__section-title">
+          <lucide-icon name="history" [size]="20" class="icon-primary"></lucide-icon>
+          {{ i18n.t('paquete.historial_estados') }}
+        </h3>
+
+        <div class="req-detail__timeline">
+          <!-- Ghost Line -->
+          <div class="req-detail__timeline-line"></div>
+
+          <div class="req-detail__timeline-item">
+            <div class="req-detail__timeline-icon"><lucide-icon name="file-edit" [size]="14"></lucide-icon></div>
+            <div class="req-detail__timeline-content">
+              <h4>{{ i18n.t('req.col_borrador') }}</h4>
+              <p>{{ i18n.t('paquete.tl_borrador', { nombre: req.instructorNombre || req.instructorId }) }}</p>
+              <span class="date">{{ req.fecha }}</span>
+            </div>
+          </div>
+
+          @if (req.estado !== 'BORRADOR') {
+            <div class="req-detail__timeline-item">
+              <div class="req-detail__timeline-icon"><lucide-icon name="send" [size]="14"></lucide-icon></div>
+              <div class="req-detail__timeline-content">
+                <h4>{{ i18n.t('req.badge_enviada') }}</h4>
+                <p>{{ i18n.t('paquete.tl_enviada') }}</p>
+                <span class="date">{{ req.fecha }}</span>
+              </div>
+            </div>
+          }
+
+          @if (req.estado === 'DESPACHADA' || req.estado === 'FIRMADA' || req.estado === 'LEGALIZADA') {
+            <div class="req-detail__timeline-item req-detail__timeline-item--active">
+              <div class="req-detail__timeline-icon"><lucide-icon name="truck" [size]="14"></lucide-icon></div>
+              <div class="req-detail__timeline-content">
+                <h4>{{ i18n.t('paquete.tl_despachada_titulo') }}</h4>
+                <p>{{ i18n.t('paquete.tl_despachada') }}</p>
+                <span class="date">{{ req.fecha }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Footer Actions -->
+    <footer class="req-detail__footer">
+      <button class="btn-secondary">
+        <lucide-icon name="download" [size]="18"></lucide-icon>
+        {{ i18n.t('paquete.descargar_soporte') }}
+      </button>
+      <button class="btn-primary" (click)="incluirEnPaquete()">
+        <div class="btn-primary-inner">
+          <lucide-icon name="pen-tool" [size]="18"></lucide-icon>
+          {{ i18n.t('paquete.firmar_recibido') }}
+        </div>
+        <span class="btn-hint">{{ i18n.t('paquete.pasara_firmada') }}</span>
+      </button>
+    </footer>
+  } @else {
+    <!-- Loading state -->
+    <header class="req-detail__header">
+      <div class="req-detail__header-info">
+        <p class="req-detail__info-label">{{ i18n.t('req.cargando') }}</p>
+      </div>
+      <div class="req-detail__header-actions">
+        <button class="req-detail__action-btn" title="Cerrar detalle" (click)="cerrarPanel()">
+          <lucide-icon name="x" [size]="20"></lucide-icon>
+        </button>
+      </div>
+    </header>
+    <div class="req-detail__body custom-scrollbar">
+      <p class="req-detail__info-label">{{ i18n.t('req.cargando') }}</p>
+    </div>
+  }
+
+</aside>

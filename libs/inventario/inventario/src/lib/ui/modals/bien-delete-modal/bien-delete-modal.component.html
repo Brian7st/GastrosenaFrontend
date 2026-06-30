@@ -1,0 +1,68 @@
+<!-- Modo: BLOQUEADO POR STOCK -->
+@if (isBloqueado()) {
+
+  <div class="modal-overlay" (click)="cancel.emit()">
+    <div class="delete-dialog" (click)="$event.stopPropagation()">
+
+      <div class="blocked-banner">
+        <span class="material-symbols-outlined">block</span>
+        {{ i18n.t('bien-modal.blocked_message') }}
+      </div>
+
+      <div class="dialog-body">
+        <div class="warning-icon">
+          <span class="material-symbols-outlined">warning</span>
+        </div>
+        <h3>{{ i18n.t('bien-modal.blocked_title', { stock: bien.stockActual }) }}</h3>
+        <p>{{ i18n.t('bien-modal.warning_message') }}</p>
+      </div>
+
+      <div class="dialog-footer">
+        <button class="btn-cancel-green" (click)="cancel.emit()">{{ i18n.t('bien-modal.cancel') }}</button>
+        <button class="btn-delete" disabled>{{ i18n.t('bien-modal.delete') }}</button>
+      </div>
+
+    </div>
+  </div>
+
+} @else {
+
+  <div class="modal-overlay" (click)="cancel.emit()">
+    <div class="delete-dialog" (click)="$event.stopPropagation()">
+
+      <div class="dialog-body">
+        <div class="warning-icon">
+          <span class="material-symbols-outlined">warning</span>
+        </div>
+        <h3>{{ i18n.t('bien-modal.confirm_title') }}</h3>
+        <p>{{ i18n.t('bien-modal.warning_message') }}</p>
+
+        <div class="keyword-box">
+          <p>{{ i18n.t('bien-modal.keyword_hint') }} <strong>{{ i18n.t('bien-modal.keyword') }}</strong></p>
+          <input
+            class="keyword-input"
+            type="text"
+            [placeholder]="i18n.t('bien-modal.keyword_placeholder')"
+            [ngModel]="keyword()"
+            (ngModelChange)="onKeywordChange($event)"
+          />
+        </div>
+      </div>
+
+      <div class="dialog-footer">
+        <button class="btn-cancel-neutral" (click)="cancel.emit()">{{ i18n.t('bien-modal.cancel') }}</button>
+        <button class="btn-delete btn-delete--active"
+                [disabled]="!canDelete()"
+                [class.btn-delete--disabled]="!canDelete()"
+                (click)="onConfirm()">
+          {{ i18n.t('bien-modal.delete') }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+}
+
+<!-- Modo: CONFIRMACIÓN CON PALABRA CLAVE -->
+

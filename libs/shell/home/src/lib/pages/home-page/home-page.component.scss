@@ -1,0 +1,8 @@
+:host {
+  display: block;
+}
+
+:host ::ng-deep restaurant-card .card__image {
+  height: auto !important;
+  aspect-ratio: 5 / 3 !important;
+}

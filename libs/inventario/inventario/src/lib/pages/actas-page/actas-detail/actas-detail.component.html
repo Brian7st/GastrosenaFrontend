@@ -1,0 +1,76 @@
+@if (loading()) {
+  <!-- ── Estado de carga ─────────────────────────────────────────────── -->
+  <div class="acta-detail__loading">
+    <lucide-icon name="loader-2" [size]="32"></lucide-icon>
+    <p>{{ i18n.t('acta.cargando') }}</p>
+  </div>
+} @else if (acta(); as a) {
+
+  <!-- ── Contextual Action Bar (Top) ─────────────────────────────────── -->
+  <header class="acta-detail__topbar">
+    <div class="acta-detail__topbar-left">
+      <inventario-back-button (clicked)="volver()" />
+      <div class="acta-detail__topbar-divider"></div>
+      <span class="acta-detail__topbar-title">{{ a.numeroActa }}</span>
+    </div>
+    <div class="acta-detail__topbar-right">
+      <button class="acta-detail__export-btn"
+              [routerLink]="['/app/inventario/actas', a.id, 'imprimir']">
+        <lucide-icon name="printer" [size]="16"></lucide-icon>
+        {{ i18n.t('acta.imprimir_descargar') }}
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Main Content Canvas ────────────────────────────────────────── -->
+  <main class="acta-detail__canvas">
+
+    <!-- ── Management Action Bar ──────────────────────────────────────── -->
+    <div class="acta-detail__action-bar">
+      <div class="acta-detail__action-bar-left">
+        <span class="acta-detail__action-bar-label">{{ i18n.t('comun.estado') }}:</span>
+        <restaurant-status-badge
+          [label]="getEstadoLabel(a.estado)"
+          [variant]="getEstadoVariant(a.estado)"
+        ></restaurant-status-badge>
+      </div>
+      <div class="acta-detail__action-bar-right">
+
+        <!-- FIRMADA → Aprobar + Crear Paquete -->
+        @if (a.estado === 'FIRMADA') {
+          <button *hasPermission="'actas:revisar'" class="acta-detail__btn-aprobar" (click)="revisarActa()">
+            <lucide-icon name="check-circle" [size]="16"></lucide-icon>
+            {{ i18n.t('acta.aprobar') }}
+          </button>
+          <button *hasPermission="'paquete:crear'" class="acta-detail__btn-aprobar"
+                  [routerLink]="['/app/inventario/paquete-probatorio/nuevo']"
+                  [queryParams]="{ actaId: a.id, requisicionId: a.requisicionId }">
+            <lucide-icon name="package" [size]="16"></lucide-icon>
+            {{ i18n.t('acta.crear_paquete') }}
+          </button>
+        }
+
+        <!-- REVISADA → Archivar -->
+        @if (a.estado === 'REVISADA') {
+          <button *hasPermission="'actas:archivar'" class="acta-detail__btn-archivar" (click)="cambiarEstado('ARCHIVADA')">
+            <lucide-icon name="archive" [size]="16"></lucide-icon>
+            {{ i18n.t('acta.archivar') }}
+          </button>
+        }
+
+      </div>
+    </div>
+
+    <!-- ── Documento oficial GOR-F-084 ────────────────────────────────── -->
+    <inventario-acta-documento [acta]="a" />
+
+  </main>
+
+} @else {
+  <!-- ── Acta no encontrada ──────────────────────────────────────────── -->
+  <div class="acta-detail__loading">
+    <lucide-icon name="file-x" [size]="32"></lucide-icon>
+    <p>{{ i18n.t('acta.no_encontrada') }}</p>
+    <button class="acta-detail__btn-archivar" (click)="volver()">{{ i18n.t('acta.volver_listado') }}</button>
+  </div>
+}

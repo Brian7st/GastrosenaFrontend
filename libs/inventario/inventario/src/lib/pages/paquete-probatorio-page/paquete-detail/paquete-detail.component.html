@@ -1,0 +1,205 @@
+@if (loading() && !paquete()) {
+  <div class="paquete-detail__state">
+    <lucide-icon name="loader-2" [size]="24"></lucide-icon>
+    <p>{{ i18n.t('paquete.cargando') }}</p>
+  </div>
+} @else if (!paquete()) {
+  <div class="paquete-detail__state">
+    <lucide-icon name="alert-circle" [size]="24"></lucide-icon>
+    <p>{{ facadeError() || 'No se pudo cargar el paquete probatorio.' }}</p>
+    <inventario-back-button (clicked)="volver()" />
+  </div>
+}
+
+@if (paquete(); as p) {
+<div class="paquete-detail">
+
+  <!-- ── Status Banner ─────────────────────────────────────────────── -->
+  @if (isCompleto()) {
+    <div class="paquete-detail__banner paquete-detail__banner--success">
+      <lucide-icon name="check-circle-2" [size]="18"></lucide-icon>
+      <span>{{ i18n.t('paquete.banner_completo') }}</span>
+    </div>
+  } @else {
+    <div class="paquete-detail__banner paquete-detail__banner--error">
+      <lucide-icon name="alert-circle" [size]="18"></lucide-icon>
+      <span>{{ i18n.t('paquete.banner_incompleto') }}</span>
+    </div>
+  }
+
+  <!-- ── Header ────────────────────────────────────────────────────── -->
+  <div class="paquete-detail__header">
+    <div class="paquete-detail__header-left">
+      <inventario-back-button (clicked)="volver()" />
+      <div class="paquete-detail__header-title-row">
+        <h1 class="paquete-detail__title">{{ i18n.t('paquete.detalle_titulo') }}: {{ p.expediente }}</h1>
+        <restaurant-status-badge
+          [label]="getEstadoLabel(p.estado)"
+          [variant]="getEstadoVariant(p.estado)"
+        ></restaurant-status-badge>
+      </div>
+    </div>
+    <div class="paquete-detail__header-actions">
+      @if (isCompleto()) {
+        <restaurant-button variant="surface" (click)="exportarPaquete()">
+          <lucide-icon name="download" [size]="16"></lucide-icon>
+          {{ i18n.t('paquete.exportar') }}
+        </restaurant-button>
+
+        @if (puedeRevisar()) {
+          <restaurant-button variant="primary" [disabled]="loading()" (click)="revisarPaquete()">
+            <lucide-icon name="clipboard-check" [size]="16"></lucide-icon>
+            {{ loading() ? i18n.t('paquete.revisando') : i18n.t('paquete.revisar') }}
+          </restaurant-button>
+        } @else if (puedeArchivar()) {
+          <restaurant-button variant="primary" [disabled]="loading()" (click)="archivarExpediente()">
+            <lucide-icon name="archive" [size]="16"></lucide-icon>
+            {{ i18n.t('paquete.archivar') }}
+          </restaurant-button>
+        } @else {
+          <restaurant-button variant="surface" [disabled]="true">
+            <lucide-icon name="archive" [size]="16"></lucide-icon>
+            {{ i18n.t('paquete.archivar') }}
+          </restaurant-button>
+        }
+      } @else {
+        <restaurant-button variant="surface" [disabled]="true">
+          <lucide-icon name="archive" [size]="16"></lucide-icon>
+          {{ i18n.t('paquete.archivar') }}
+        </restaurant-button>
+        <p class="paquete-detail__btn-hint">
+          <lucide-icon name="alert-triangle" [size]="12"></lucide-icon>
+          {{ i18n.t('paquete.docs_requeridos_hint') }}
+        </p>
+      }
+    </div>
+  </div>
+
+  <!-- ── Bento Grid ────────────────────────────────────────────────── -->
+  <div class="paquete-detail__grid">
+
+    <!-- Left Column (8/12) -->
+    <div class="paquete-detail__main">
+
+      <!-- Documentos del Paquete -->
+      <section>
+        <div class="paquete-detail__section-header">
+          <lucide-icon name="folders" [size]="18" class="paquete-detail__section-icon"></lucide-icon>
+          <h3 class="paquete-detail__section-title">{{ i18n.t('paquete.docs_paquete') }}</h3>
+        </div>
+        <div class="paquete-detail__docs-grid">
+
+          <!-- Acta de Legalización -->
+          <div class="paquete-detail__doc-card" [class.paquete-detail__doc-card--missing]="!p.actaId">
+            <div class="paquete-detail__doc-icon-wrapper" [class.paquete-detail__doc-icon-wrapper--missing]="!p.actaId">
+              <lucide-icon name="file-text" [size]="20"></lucide-icon>
+            </div>
+            <h4 class="paquete-detail__doc-name">{{ i18n.t('paquete.doc_acta_titulo') }}</h4>
+            @if (p.actaId) {
+              <p class="paquete-detail__doc-sub">{{ p.actaId }}</p>
+              <div class="paquete-detail__doc-footer">
+                <a class="paquete-detail__doc-link" (click)="verDocumento('acta')" role="button" style="cursor:pointer;">
+                  {{ i18n.t('paquete.ver_doc') }} <lucide-icon name="arrow-right" [size]="14"></lucide-icon>
+                </a>
+                <button class="paquete-detail__doc-change" (click)="cambiarDocumento('acta')">
+                  <lucide-icon name="refresh-cw" [size]="12"></lucide-icon> {{ i18n.t('paquete.cambiar') }}
+                </button>
+              </div>
+            } @else {
+              <p class="paquete-detail__doc-missing-text">{{ i18n.t('paquete.falta_adjuntar') }}</p>
+              <button class="paquete-detail__doc-upload-btn" (click)="irAdjuntar()">
+                <lucide-icon name="upload" [size]="14"></lucide-icon> {{ i18n.t('paquete.adjuntar') }}
+              </button>
+            }
+          </div>
+
+          <!-- Requisición -->
+          <div class="paquete-detail__doc-card" [class.paquete-detail__doc-card--missing]="!p.requisicionId">
+            <div class="paquete-detail__doc-icon-wrapper" [class.paquete-detail__doc-icon-wrapper--missing]="!p.requisicionId">
+              <lucide-icon name="scroll-text" [size]="20"></lucide-icon>
+            </div>
+            <h4 class="paquete-detail__doc-name">{{ i18n.t('paquete.doc_req_titulo') }}</h4>
+            @if (p.requisicionId) {
+              <p class="paquete-detail__doc-sub">{{ i18n.t('paquete.doc_vinculado') }}</p>
+              <div class="paquete-detail__doc-footer">
+                <a class="paquete-detail__doc-link" [routerLink]="['./requisicion']">
+                  {{ i18n.t('paquete.ver_doc') }} <lucide-icon name="arrow-right" [size]="14"></lucide-icon>
+                </a>
+                <button class="paquete-detail__doc-change" (click)="cambiarDocumento('requisicion')">
+                  <lucide-icon name="refresh-cw" [size]="12"></lucide-icon> {{ i18n.t('paquete.cambiar') }}
+                </button>
+              </div>
+            } @else {
+              <p class="paquete-detail__doc-missing-text">Falta adjuntar</p>
+              <button class="paquete-detail__doc-upload-btn" (click)="irAdjuntar()">
+                <lucide-icon name="upload" [size]="14"></lucide-icon> Adjuntar
+              </button>
+            }
+          </div>
+
+          <!-- Registro de Asistencia — navega a /asistencia -->
+          <div class="paquete-detail__doc-card" [class.paquete-detail__doc-card--missing]="!p.registroAsistenciaAdjunto">
+            <div class="paquete-detail__doc-icon-wrapper" [class.paquete-detail__doc-icon-wrapper--missing]="!p.registroAsistenciaAdjunto">
+              <lucide-icon name="users" [size]="20"></lucide-icon>
+            </div>
+            <h4 class="paquete-detail__doc-name">{{ i18n.t('paquete.doc_asistencia_titulo') }}</h4>
+            @if (p.registroAsistenciaAdjunto) {
+              <p class="paquete-detail__doc-sub">{{ i18n.t('paquete.doc_adjunto') }}</p>
+              <div class="paquete-detail__doc-footer">
+                <a class="paquete-detail__doc-link" (click)="verDocumento('asistencia')" role="button" style="cursor:pointer;">
+                  {{ i18n.t('paquete.ver_doc') }} <lucide-icon name="arrow-right" [size]="14"></lucide-icon>
+                </a>
+                <button class="paquete-detail__doc-change" (click)="cambiarDocumento('asistencia')">
+                  <lucide-icon name="refresh-cw" [size]="12"></lucide-icon> {{ i18n.t('paquete.cambiar') }}
+                </button>
+              </div>
+            } @else {
+              <p class="paquete-detail__doc-missing-text">{{ i18n.t('paquete.falta_asistencia') }}</p>
+              <button class="paquete-detail__doc-upload-btn" (click)="irAdjuntar()">
+                <lucide-icon name="users" [size]="14"></lucide-icon> {{ i18n.t('paquete.tomar_asistencia') }}
+              </button>
+            }
+          </div>
+
+        </div>
+      </section>
+    </div>
+
+    <!-- Right Column (4/12) — Timeline -->
+    <div class="paquete-detail__sidebar">
+      <section class="paquete-detail__timeline-section">
+        <div class="paquete-detail__section-header">
+          <lucide-icon name="clock" [size]="18" class="paquete-detail__section-icon"></lucide-icon>
+          <h3 class="paquete-detail__section-title">{{ i18n.t('paquete.historial') }}</h3>
+        </div>
+        <div class="paquete-detail__timeline">
+          @for (entry of timeline(); track entry.estado + entry.activo) {
+            <div
+              class="paquete-detail__timeline-node"
+              [class.paquete-detail__timeline-node--active]="entry.activo"
+              [class.paquete-detail__timeline-node--faded]="!entry.activo"
+            >
+              <div
+                class="paquete-detail__timeline-dot"
+                [class.paquete-detail__timeline-dot--error]="entry.tipo === 'error'"
+                [class.paquete-detail__timeline-dot--success]="entry.tipo === 'success'"
+              ></div>
+              <div class="paquete-detail__timeline-content">
+                <p class="paquete-detail__timeline-estado" [class.paquete-detail__timeline-estado--error]="entry.tipo === 'error'">
+                  {{ entry.estado }}
+                </p>
+                <p class="paquete-detail__timeline-fecha">{{ entry.fecha }}</p>
+                @if (entry.detalle) {
+                  <p class="paquete-detail__timeline-detalle">{{ entry.detalle }}</p>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <router-outlet></router-outlet>
+</div>
+}

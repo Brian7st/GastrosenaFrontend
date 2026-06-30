@@ -1,0 +1,83 @@
+@use 'libs/shared/ui/src/lib/tokens/index.scss' as tokens;
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: var(--space-6);
+  margin-top: var(--space-8);
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.kpi-card {
+  background: var(--color-surface-primary);
+  padding: var(--space-6);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-4);
+  }
+
+  &__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &--primary { 
+      background: rgba(0, 184, 148, 0.1); 
+      color: var(--color-success);
+    }
+    &--danger { 
+      background: rgba(214, 48, 49, 0.1); 
+      color: var(--color-danger);
+    }
+    &--info { 
+      background: rgba(9, 132, 227, 0.1); 
+      color: var(--color-info);
+    }
+  }
+
+  &__badge {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-pill);
+
+    &--success { color: var(--color-success); }
+    &--danger { color: var(--color-danger); }
+    &--info { color: var(--color-text-secondary); }
+  }
+
+  &__label {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+  }
+
+  &__value {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    margin: var(--space-1) 0 0 0;
+    font-family: 'Manrope', sans-serif;
+  }
+}

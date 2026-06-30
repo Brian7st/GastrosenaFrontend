@@ -1,0 +1,161 @@
+<div class="page-container">
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       HEADER
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="page-header-row">
+    <div>
+      <h1 class="page-title">{{ i18n.t('conciliacion.titulo') }}</h1>
+    </div>
+    <div class="header-actions">
+      <restaurant-button variant="surface" routerLink="historial">
+        <div class="btn-icon-text">
+          <lucide-icon name="history" [size]="20"></lucide-icon>
+          {{ i18n.t('conciliacion.ver_historial') }}
+        </div>
+      </restaurant-button>
+      <restaurant-button *hasPermission="'conciliacion:registrar_conteo'" variant="primary" routerLink="toma-fisica">
+        <div class="btn-icon-text">
+          <lucide-icon name="plus" [size]="20"></lucide-icon>
+          {{ i18n.t('conciliacion.nueva') }}
+        </div>
+      </restaurant-button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       KPI GRID
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="kpi-grid">
+    <restaurant-kpi-card
+      [label]="i18n.t('conciliacion.kpi_precision')"
+      [value]="precisionPromedio() + '%'"
+      icon="check-circle-2"
+      iconColor="green"
+      trend="Exactitud global"
+      [trendUp]="precisionPromedio() >= 90"
+    ></restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      [label]="i18n.t('conciliacion.kpi_total')"
+      [value]="totalConciliaciones()"
+      icon="calendar"
+      iconColor="blue"
+      trend="en el historial"
+      [trendUp]="null"
+    ></restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      [label]="i18n.t('conciliacion.kpi_diferencias')"
+      [value]="diferenciasTotal()"
+      icon="alert-triangle"
+      iconColor="red"
+      trend="detectadas"
+      [trendUp]="false"
+    ></restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      [label]="i18n.t('comun.estado')"
+      [value]="precisionPromedio() >= 90 ? i18n.t('conciliacion.optimo') : i18n.t('conciliacion.revisar')"
+      icon="check-circle-2"
+      [iconColor]="precisionPromedio() >= 90 ? 'green' : 'orange'"
+      trend="umbral: 90%"
+      [trendUp]="precisionPromedio() >= 90"
+    ></restaurant-kpi-card>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       MAIN LAYOUT: Categorías (Izquierda) + Sidebar (Derecha)
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="main-layout-grid">
+    
+    <!-- LEFT CONTENT -->
+    <div class="main-content">
+      <div class="section-header">
+        <h2 class="section-title">{{ i18n.t('conciliacion.toma_fisica_titulo') }}</h2>
+      </div>
+
+      <div class="categorias-grid">
+        @if (facade.loading()) {
+          <p class="text-secondary">{{ i18n.t('conciliacion.cargando_categorias') }}</p>
+        } @else if (categorias().length === 0) {
+          <p class="text-secondary">{{ i18n.t('conciliacion.sin_productos') }}</p>
+        } @else {
+          @for (cat of categorias(); track cat.nombre) {
+            <a
+              class="categoria-card"
+              routerLink="toma-fisica"
+              [queryParams]="{ categoria: cat.nombre }"
+              [attr.aria-label]="'Iniciar toma física de ' + cat.nombre">
+              <div class="categoria-icon-box">
+                <lucide-icon [name]="iconoDeCategoria(cat.nombre)" [size]="24"></lucide-icon>
+              </div>
+              <div class="categoria-info">
+                <h3 class="categoria-name">{{ cat.nombre }}</h3>
+                <p class="categoria-status">{{ cat.totalItems }} {{ i18n.t('conciliacion.items_activos') }}</p>
+              </div>
+              <div class="categoria-arrow">
+                <lucide-icon name="chevron-right" [size]="20"></lucide-icon>
+              </div>
+            </a>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <div class="sidebar-content">
+      
+      <!-- TENDENCIA DE MERMA -->
+      <div class="sidebar-card">
+        <div class="sidebar-card-header">
+          <h3 class="sidebar-card-title">{{ i18n.t('conciliacion.tendencia_merma') }} <span class="sidebar-card-subtitle">({{ i18n.t('conciliacion.seis_meses') }})</span></h3>
+        </div>
+        <div class="tendencia-chart">
+          @for (item of tendencias(); track item.mes) {
+            <div class="chart-col">
+              <div class="chart-bar-container">
+                <div class="chart-bar" [class.chart-bar--current]="item.isCurrent" [style.height.%]="item.merma"></div>
+              </div>
+              <span class="chart-label" [class.chart-label--current]="item.isCurrent">{{ item.label }}</span>
+            </div>
+          } @empty {
+            <p class="text-secondary">{{ i18n.t('conciliacion.sin_conciliaciones') }}</p>
+          }
+        </div>
+      </div>
+
+      <!-- ACTIVIDAD RECIENTE -->
+      <div class="sidebar-card">
+        <div class="sidebar-card-header">
+          <h3 class="sidebar-card-title">{{ i18n.t('conciliacion.actividad_reciente') }}</h3>
+        </div>
+        <div class="actividad-list">
+          @for (act of actividades(); track act.id) {
+            <div class="actividad-item">
+              <div class="actividad-indicator">
+                <div class="indicator-ring" [ngClass]="'indicator-ring--' + act.estado">
+                  <div class="indicator-dot"></div>
+                </div>
+              </div>
+              <div class="actividad-content">
+                <p class="actividad-ubicacion">{{ act.ubicacion }}</p>
+                <p class="actividad-detalle" [ngClass]="{'actividad-detalle--alert': act.estado === 'alert'}">
+                  {{ act.detalle }}
+                </p>
+                <p class="actividad-tiempo">{{ act.fecha }}</p>
+              </div>
+            </div>
+          } @empty {
+            <p class="text-secondary">{{ i18n.t('conciliacion.sin_actividad') }}</p>
+          }
+        </div>
+        <div class="sidebar-card-footer">
+          <button class="btn-full-width" routerLink="historial">{{ i18n.t('conciliacion.ver_todo_historial') }}</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

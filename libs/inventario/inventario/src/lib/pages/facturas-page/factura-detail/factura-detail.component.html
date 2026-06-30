@@ -1,0 +1,594 @@
+<div class="factura-detail-page">
+  @if (factura(); as f) {
+
+    <!-- ── HEADER ── -->
+    <header class="page-header">
+      <div class="page-header__left">
+        <inventario-back-button (clicked)="goBack()" />
+        <nav class="breadcrumb">
+          <ol>
+            <li><a routerLink="/app/inventario/facturas">{{ i18n.t('factura.breadcrumb') }}</a></li>
+            <li class="separator"><span class="material-symbols-outlined">chevron_right</span></li>
+            <li class="current">{{ f.numeroFactura }}</li>
+          </ol>
+        </nav>
+        <div class="page-header__title-row">
+          <h1 class="page-header__title">{{ i18n.t('factura.titulo') }} {{ f.numeroFactura }}</h1>
+          <span class="badge" [ngClass]="'badge--' + (f.estado === 'VERIFICADA' ? 'verificada' : (f.estado === 'ANULADA' ? 'error' : 'primary-soft'))">{{ f.estado }}</span>
+        </div>
+      </div>
+
+      <div class="page-header__actions">
+        <restaurant-button variant="surface" icon="print" (click)="descargarOImprimir()">{{ i18n.t('factura.imprimir') }}</restaurant-button>
+
+        @if (f.estado === 'VERIFICADA') {
+          <restaurant-button variant="primary" icon="check_circle" (click)="showConfirmPagada.set(true)">{{ i18n.t('factura.marcar_pagada') }}</restaurant-button>
+        }
+
+        @if (f.estado === 'REGISTRADA' && conciliacionGil(); as c) {
+          @if (estaConciliada(c.diferencias)) {
+            <restaurant-button variant="primary" icon="verified" (click)="showConfirmVerificar.set(true)">{{ i18n.t('factura.verificar') }}</restaurant-button>
+          }
+        }
+      </div>
+    </header>
+
+    <!-- ── CONTENIDO PRINCIPAL ── -->
+    <div class="detail-layout">
+
+      <!-- Proveedor + metadata -->
+      <section class="bento-card bento-card--accent">
+        <div class="bento-card__accent-bg"></div>
+
+        <div class="parties-grid">
+          <div class="party-info">
+            <span class="party-info__label">{{ i18n.t('factura.proveedor') }}</span>
+            <h3 class="party-info__name">{{ f.proveedorNombre }}</h3>
+            <p class="party-info__doc">NIT {{ f.proveedorNit }}</p>
+            <p class="party-info__location">
+              <span class="material-symbols-outlined">location_on</span> Armenia
+            </p>
+          </div>
+          <div class="party-info">
+            <span class="party-info__label">{{ i18n.t('factura.recepcion') }}</span>
+            <h3 class="party-info__name">{{ i18n.t('factura.doc_recibido') }}</h3>
+            <p class="party-info__doc">{{ f.fechaRecepcion | date:'dd MMM yyyy' }}</p>
+            <p class="party-info__location">
+              <span class="material-symbols-outlined">person</span> {{ f.instructorId || 'Sin instructor vinculado' }}
+            </p>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="metadata-grid">
+          <div class="metadata-item">
+            <span class="metadata-item__label">{{ i18n.t('factura.fecha_emision') }}</span>
+            <p class="metadata-item__value">{{ f.fechaEmision | date:'dd MMM yyyy' }}</p>
+          </div>
+          <div class="metadata-item">
+            <span class="metadata-item__label">{{ i18n.t('factura.fecha_recepcion') }}</span>
+            <p class="metadata-item__value">{{ f.fechaRecepcion | date:'dd MMM yyyy' }}</p>
+          </div>
+          <div class="metadata-item">
+            <span class="metadata-item__label">{{ i18n.t('factura.beneficiario_zese') }}</span>
+            <p class="metadata-item__value">{{ f.proveedorBeneficiarioZese ? i18n.t('comun.si') : i18n.t('comun.no') }}</p>
+          </div>
+          <div class="metadata-item">
+            <span class="metadata-item__label">{{ i18n.t('factura.orden_compra') }}</span>
+            <p class="metadata-item__value">{{ f.ordenCompra || 'N/A' }}</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tabla de artículos -->
+      <section class="bento-card p-0 detail-table-card">
+        <div class="detail-table-scroll">
+          <restaurant-data-table tableTitle="Detalle de Artículos" tableIcon="list_alt">
+            <thead>
+              <tr>
+                <th class="col-idx text-center">#</th>
+                <th class="col-desc">{{ i18n.t('factura.th_descripcion') }}</th>
+                <th class="col-prod">{{ i18n.t('factura.th_producto') }}</th>
+                <th class="col-num text-right">{{ i18n.t('factura.th_cant') }}</th>
+                <th class="col-num text-right">{{ i18n.t('factura.th_precio_unit') }}</th>
+                <th class="col-num text-right">{{ i18n.t('factura.th_iva') }}</th>
+                <th class="col-num text-right">{{ i18n.t('factura.th_subtotal') }}</th>
+                <th class="col-num text-right">{{ i18n.t('factura.th_iva_valor') }}</th>
+                <th class="col-num text-right">{{ i18n.t('factura.th_total') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of f.lineas; track item; let i = $index) {
+                <tr>
+                  <td class="text-center text-secondary">{{ i + 1 }}</td>
+                  <td class="font-medium">{{ item.descripcion }}</td>
+                  <td class="text-secondary">
+                    @if (esPendiente(item)) {
+                      <span class="badge badge--orange" [title]="i18n.t('factura.sin_bien_hint')">{{ i18n.t('factura.sin_bien') }}</span>
+                    } @else {
+                      {{ item.productoId || '—' }}
+                    }
+                  </td>
+                  <td class="text-right">{{ item.cantidad }}</td>
+                  <td class="text-right">{{ item.precioUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                  <td class="text-right text-secondary">{{ item.porcentajeIva ?? item.iva }}%</td>
+                  <td class="text-right">{{ (item.subtotal ?? 0) | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                  <td class="text-right">{{ (item.valorIva ?? 0) | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                  <td class="text-right font-semibold">{{ item.total | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                </tr>
+              }
+              @if (!f.lineas || f.lineas.length === 0) {
+                <tr>
+                  <td colspan="9" class="text-center text-secondary empty-row">{{ i18n.t('factura.sin_articulos') }}</td>
+                </tr>
+              }
+            </tbody>
+          </restaurant-data-table>
+        </div>
+      </section>
+
+      <!-- Tarjetas inferiores: DIAN + Orden Compra + Resumen Fiscal -->
+      <div class="bottom-cards-grid">
+
+        <!-- DIAN + Banco -->
+        <section class="bento-card">
+          <div class="card-section">
+            <h4 class="card-section__title">
+              <span class="material-symbols-outlined text-primary">verified_user</span> {{ i18n.t('factura.validacion_dian') }}
+            </h4>
+            <div class="status-tags">
+              <span class="badge badge--success-soft">{{ i18n.t('factura.cufe_registrado') }}</span>
+              <span class="badge badge--surface">{{ f.proveedorBeneficiarioZese ? i18n.t('factura.zese') : i18n.t('factura.regimen_estandar') }}</span>
+            </div>
+            <div class="cufe-box">
+              <div class="cufe-box__text">
+                <span class="cufe-box__label">{{ i18n.t('factura.cufe') }}</span>
+                <span class="cufe-box__value" [title]="f.cufe">{{ f.cufe ? (f.cufe | slice:0:10) + '...' + (f.cufe | slice:-5) : 'N/A' }}</span>
+              </div>
+              <button class="icon-btn" [title]="i18n.t('factura.copiar_cufe')" (click)="onCopiarCufe(f.cufe)">
+                <span class="material-symbols-outlined">content_copy</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="card-section">
+            <h4 class="card-section__title">
+              <span class="material-symbols-outlined text-outline">account_balance</span> {{ i18n.t('factura.datos_bancarios') }}
+            </h4>
+            <div class="bank-info">
+              <div class="bank-info__icon">
+                <span class="material-symbols-outlined">account_balance</span>
+              </div>
+              <div class="bank-info__text">
+                <p class="bank-info__name">{{ f.infoBancariaBanco || i18n.t('factura.sin_banco') }}</p>
+                <p class="bank-info__type">{{ f.infoBancariaTipo || i18n.t('factura.tipo_no_reportado') }} • {{ f.infoBancariaCuenta || i18n.t('factura.sin_cuenta') }}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Orden de compra + Documentos -->
+        <div class="cards-stack">
+          <section class="bento-card bento-card--linked">
+            <div class="linked-header">
+              <div>
+                <span class="linked-header__label">{{ i18n.t('factura.orden_de_compra') }}</span>
+                <h4 class="linked-header__title">{{ f.ordenCompra || i18n.t('factura.sin_orden') }}</h4>
+              </div>
+              <span class="badge badge--primary-soft">{{ f.instructorId ? i18n.t('factura.con_instructor') : i18n.t('factura.sin_instructor_badge') }}</span>
+            </div>
+
+            <div class="linked-details">
+              <p><span class="material-symbols-outlined">person</span> {{ f.instructorId || 'Sin instructor vinculado' }}</p>
+              <p class="font-bold"><span class="material-symbols-outlined">payments</span> {{ f.total | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
+            </div>
+          </section>
+
+          <section class="bento-card p-5">
+            <h4 class="card-section__title mb-3">{{ i18n.t('factura.doc_soporte') }}</h4>
+            <div class="docs-grid">
+              <button class="doc-btn group">
+                <span class="material-symbols-outlined text-tertiary group-hover-bounce">description</span>
+                <span class="doc-btn__name">Factura.pdf</span>
+              </button>
+              <button class="doc-btn group">
+                <span class="material-symbols-outlined text-primary group-hover-bounce">code</span>
+                <span class="doc-btn__name">Attached.xml</span>
+              </button>
+            </div>
+          </section>
+        </div>
+
+        <!-- Resumen Fiscal -->
+        <section class="bento-card bento-card--summary">
+          <h3 class="summary__title">{{ i18n.t('factura.resumen_fiscal') }}</h3>
+
+          <div class="summary__body">
+            <div class="summary-row">
+              <span class="summary-row__label">{{ i18n.t('factura.subtotal') }}</span>
+              <span class="summary-row__value font-medium">{{ f.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-row__label">{{ i18n.t('factura.total_iva') }}</span>
+              <span class="summary-row__value font-medium">{{ f.totalIva | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-row__label">{{ i18n.t('factura.retencion_zese') }}</span>
+              <span class="summary-row__value font-medium">{{ (f.valorRetencionZese || 0) | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+            </div>
+          </div>
+
+          @if (f.valorNetoAPagar !== null && f.valorNetoAPagar !== undefined && f.valorNetoAPagar < f.total) {
+            <div class="summary__body summary__body--nc">
+              <div class="summary-row">
+                <span class="summary-row__label">{{ i18n.t('factura.total_fel') }}</span>
+                <span class="summary-row__value font-medium">{{ f.total | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+              </div>
+              <div class="summary-row summary-row--deduction">
+                <span class="summary-row__label">
+                  <span class="material-symbols-outlined summary-row__icon">remove_circle</span>
+                  {{ i18n.t('factura.notas_credito') }}
+                </span>
+                <span class="summary-row__value font-medium text-danger">
+                  − {{ (f.total - f.valorNetoAPagar) | currency:'COP':'symbol-narrow':'1.0-0' }}
+                </span>
+              </div>
+            </div>
+          }
+
+          <div class="summary__footer">
+            <span class="summary__footer-label">{{ f.valorNetoAPagar !== null && f.valorNetoAPagar !== undefined && f.valorNetoAPagar < f.total ? i18n.t('factura.neto_pagar') + '' : i18n.t('factura.total_pagar') }}</span>
+            <div class="text-right">
+              <span class="summary__footer-total">{{ (f.valorNetoAPagar ?? f.total) | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+              <p class="summary__footer-currency">{{ i18n.t('factura.moneda') }}</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Conciliación GIL -->
+      @if (conciliacionGil(); as c) {
+        <section class="bento-card gil-conciliacion">
+          <div class="gil-conciliacion__header">
+            <div class="card-section__title">
+              <span class="material-symbols-outlined text-primary">compare_arrows</span>
+              {{ i18n.t('factura.conciliacion_gil') }}
+            </div>
+            <span class="gil-estado-badge"
+              [class.gil-estado-badge--ok]="estaConciliada(c.diferencias)">
+              {{ estaConciliada(c.diferencias) ? i18n.t('factura.conciliada') : countPendientes(c.diferencias) + ' ' + i18n.t('factura.diferencias_pendientes') }}
+            </span>
+          </div>
+
+          @if (f.estado === 'REGISTRADA') {
+            @if (!mostrarConteo()) {
+              <div class="gil-reconciliar-row">
+                <p class="gil-reconciliar-hint">{{ i18n.t('factura.reconciliar_hint') }}</p>
+                <restaurant-button variant="surface" icon="checklist" (click)="abrirConteo()">
+                  Ajustar conteo físico
+                </restaurant-button>
+              </div>
+            } @else {
+              <div class="conteo-editor">
+                <div class="conteo-editor__head">
+                  <h5 class="conteo-editor__title">{{ i18n.t('factura.conteo_fisico') }}</h5>
+                  <p class="conteo-editor__hint">
+                    Editá la cantidad realmente recibida por ítem. Se precargó con lo facturado.
+                  </p>
+                </div>
+
+                <div class="gil-table-wrapper">
+                  <table class="gil-table">
+                    <thead>
+                      <tr>
+                        <th>{{ i18n.t('factura.th_item') }}</th>
+                        <th class="text-right">{{ i18n.t('factura.th_cant_gil') }}</th>
+                        <th class="text-right">{{ i18n.t('factura.th_cant_recibida') }}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (b of gilBienes(); track $index) {
+                        <tr>
+                          <td>
+                            <span class="conteo-item-code">{{ b.codigoSena }}</span>
+                            <span class="conteo-item-name">{{ b.descripcion }}</span>
+                          </td>
+                          <td class="text-right text-secondary">{{ b.cantidad }} {{ b.unidadMedida }}</td>
+                          <td class="text-right">
+                            @if (b.productoId; as pid) {
+                              <input
+                                type="number"
+                                min="0"
+                                class="gil-obs-input conteo-input"
+                                [value]="conteoRecibido()[pid] ?? ''"
+                                (input)="setConteo(pid, $event)"
+                              />
+                            } @else {
+                              <span class="text-secondary">{{ i18n.t('factura.sin_producto') }}</span>
+                            }
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="conteo-editor__actions">
+                  <button class="btn-cancel" type="button" (click)="cerrarConteo()">{{ i18n.t('comun.cancelar') }}</button>
+                  <button class="gil-resolve-btn" type="button" [disabled]="loading()" (click)="confirmarConteoYConciliar()">
+                    Confirmar conteo y conciliar
+                  </button>
+                </div>
+              </div>
+            }
+          }
+
+          @if (c.diferencias.length === 0) {
+            <p class="gil-conciliacion__empty">{{ i18n.t('factura.items_coinciden') }}</p>
+          } @else {
+            <div class="gil-table-wrapper">
+              <table class="gil-table">
+                <thead>
+                  <tr>
+                    <th>{{ i18n.t('factura.th_descripcion') }}</th>
+                    <th class="text-right">{{ i18n.t('factura.th_cant_gil_short') }}</th>
+                    <th class="text-right">{{ i18n.t('factura.th_cant_fel') }}</th>
+                    <th class="text-right">{{ i18n.t('factura.th_precio_gil') }}</th>
+                    <th class="text-right">{{ i18n.t('factura.th_precio_fel') }}</th>
+                    <th class="text-right">{{ i18n.t('factura.th_diferencia') }}</th>
+                    <th class="text-center">{{ i18n.t('factura.th_estado') }}</th>
+                    <th>{{ i18n.t('factura.th_observacion') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (dif of c.diferencias; track dif.gilItemId) {
+                    <tr [class.gil-table__row--alerta]="!dif.resuelta && dif.diferencia !== 0">
+                      <td>{{ dif.descripcion }}</td>
+                      <td class="text-right">{{ dif.cantidadGil }}</td>
+                      <td class="text-right">{{ dif.cantidadFactura }}</td>
+                      <td class="text-right">{{ dif.precioUnitarioGil | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                      <td class="text-right">{{ dif.precioUnitarioFactura | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                      <td class="text-right" [class.text-danger]="dif.diferencia !== 0">
+                        {{ dif.diferencia | currency:'COP':'symbol-narrow':'1.0-0' }}
+                      </td>
+                      <td class="text-center">
+                        @if (dif.resuelta) {
+                          <span class="badge badge--success-soft">{{ i18n.t('factura.resuelta') }}</span>
+                        } @else {
+                          <span class="badge" [ngClass]="tipoDiferencia(dif).clase" [title]="dif.observacion || ''">
+                            {{ tipoDiferencia(dif).label }}
+                          </span>
+                        }
+                      </td>
+                      <td>
+                        @if (dif.resuelta) {
+                          <span class="gil-obs-text">{{ dif.observacion || '—' }}</span>
+                        } @else if (esSobrefacturacion(dif)) {
+                          <button
+                            class="gil-resolve-btn gil-resolve-btn--nc"
+                            type="button"
+                            [disabled]="loading()"
+                            (click)="abrirNotaCreditoModal(dif)"
+                          >
+                            <span class="material-symbols-outlined">receipt_long</span>
+                            {{ i18n.t('factura.registrar_nc') }}
+                          </button>
+                        } @else {
+                          <div class="gil-resolve-row">
+                            <input
+                              class="gil-obs-input"
+                              type="text"
+                              [placeholder]="i18n.t('factura.placeholder_obs')"
+                              [value]="observaciones()[dif.gilItemId] ?? ''"
+                              (input)="setObservacion(dif.gilItemId, $event)"
+                            />
+                            <button
+                              class="gil-resolve-btn"
+                              [disabled]="!(observaciones()[dif.gilItemId])"
+                              (click)="resolverDiferencia(dif.gilItemId)"
+                            >
+                              Resolver
+                            </button>
+                          </div>
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </section>
+      } @else if (conciliacionCargada()) {
+        <section class="bento-card gil-conciliacion">
+          <div class="gil-conciliacion__header">
+            <div class="card-section__title">
+              <span class="material-symbols-outlined text-primary">link</span>
+              {{ i18n.t('factura.vincular_gil') }}
+            </div>
+          </div>
+          <p class="gil-conciliacion__empty">{{ i18n.t('factura.sin_gil') }}</p>
+          <div class="gil-vincular-row">
+            <select
+              class="gil-obs-input"
+              [value]="gilParaVincular()"
+              (change)="onGilVincularChange($event)"
+            >
+              <option value="">{{ i18n.t('factura.sel_gil') }}</option>
+              @for (gil of gilesDisponibles(); track gil.id) {
+                <option [value]="gil.id">{{ gil.numeroGil }} — {{ gil.destino }}</option>
+              }
+            </select>
+            <button
+              class="gil-resolve-btn"
+              [disabled]="!gilParaVincular()"
+              (click)="vincularGil()"
+            >
+              Vincular
+            </button>
+          </div>
+        </section>
+      }
+
+      <!-- Cola de revisión: líneas FEL que quedaron sin bien tras la conciliación -->
+      @if (lineasPendientes().length > 0) {
+        <section class="bento-card pendientes-card">
+          <div class="card-section">
+            <h4 class="card-section__title">
+              <span class="material-symbols-outlined text-tertiary">rule</span>
+              {{ i18n.t('factura.lineas_sin_bien') }} ({{ lineasPendientes().length }})
+            </h4>
+            <p class="pendientes-card__hint">
+              Estas líneas no se resolvieron automáticamente al conciliar con el GIL. Asociá cada una a un
+              bien existente del catálogo. Si el bien no existe,
+              <button type="button" class="link-btn" (click)="irACrearBien()">{{ i18n.t('factura.crear_bien') }}</button>.
+            </p>
+
+            @if (f.estado === 'REGISTRADA') {
+              <ul class="pendientes-list">
+                @for (linea of lineasPendientes(); track linea.descripcion) {
+                  <li class="pendientes-list__item">
+                    <span class="pendientes-list__desc font-medium">{{ linea.descripcion }}</span>
+                    <div class="pendientes-list__action">
+                      <restaurant-button
+                        variant="primary"
+                        (click)="abrirBuscadorBien(linea.descripcion)">
+                        <span class="material-symbols-outlined">search</span>
+                        Buscar bien…
+                      </restaurant-button>
+                    </div>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="pendientes-card__locked text-secondary">{{ i18n.t('factura.locked_hint') }}</p>
+            }
+          </div>
+        </section>
+      }
+
+    </div>
+
+  } @else {
+    <div class="flex flex-col items-center justify-center p-12 text-secondary">
+      <span class="material-symbols-outlined animate-spin text-4xl mb-4">sync</span>
+      <p>{{ i18n.t('factura.cargando') }}</p>
+    </div>
+  }
+</div>
+
+<!-- ── Confirmation: Verificar Factura ─────────────────────────────────── -->
+@if (showConfirmVerificar()) {
+  <div class="modal-backdrop" (click)="showConfirmVerificar.set(false)">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      <div class="modal-content">
+        <div class="modal-icon-wrapper modal-icon-wrapper--warning">
+          <span class="material-symbols-outlined">verified</span>
+        </div>
+        <h2 class="modal-title">{{ i18n.t('factura.modal_verificar_titulo') }}</h2>
+        <p class="modal-text">{{ i18n.t('factura.modal_verificar_texto') }}</p>
+        <div class="modal-actions">
+          <button class="btn-cancel" type="button" (click)="showConfirmVerificar.set(false)">{{ i18n.t('comun.cancelar') }}</button>
+          <button class="btn-confirm" type="button" (click)="confirmarVerificar()">{{ i18n.t('factura.confirmar_verificacion') }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Confirmation: Marcar como Pagada ────────────────────────────────── -->
+@if (showConfirmPagada()) {
+  <div class="modal-backdrop" (click)="showConfirmPagada.set(false)">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      <div class="modal-content">
+        <div class="modal-icon-wrapper">
+          <span class="material-symbols-outlined">payments</span>
+        </div>
+        <h2 class="modal-title">{{ i18n.t('factura.modal_pagada_titulo') }}</h2>
+        <p class="modal-text">{{ i18n.t('factura.modal_pagada_texto') }}</p>
+        <div class="modal-actions">
+          <button class="btn-cancel" type="button" (click)="showConfirmPagada.set(false)">{{ i18n.t('comun.cancelar') }}</button>
+          <button class="btn-confirm" type="button" (click)="confirmarPagada()">{{ i18n.t('factura.confirmar_pago') }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Modal: Registrar nota crédito ───────────────────────────────────── -->
+<inventario-registrar-nota-credito-modal
+  [isOpen]="notaCreditoModalAbierto()"
+  [factura]="factura()"
+  [diferencia]="diferenciaNotaCredito()"
+  (confirmar)="onConfirmarNotaCredito($event)"
+  (cancelar)="cerrarNotaCreditoModal()"
+/>
+
+<!-- ── Buscador de bien para asociar línea pendiente ───────────────────── -->
+@if (buscadorBienAbierto()) {
+  <div class="modal-backdrop" (click)="cerrarBuscadorBien()">
+    <div class="modal-container modal-container--wide" (click)="$event.stopPropagation()">
+      <div class="buscador-bien">
+        <h2 class="modal-title">{{ i18n.t('factura.buscar_bien_titulo') }}</h2>
+        @if (lineaPendienteActiva(); as desc) {
+          <p class="modal-text">{{ i18n.t('factura.linea_fel') }}: <strong>{{ desc }}</strong></p>
+        }
+        @if (bienAConfirmar(); as b) {
+          <div class="confirm-pair">
+            <div class="confirm-pair__side">
+              <span class="confirm-pair__label">{{ i18n.t('factura.linea_fel') }}</span>
+              <span class="confirm-pair__value">{{ lineaPendienteActiva() }}</span>
+            </div>
+            <span class="material-symbols-outlined confirm-pair__arrow">arrow_forward</span>
+            <div class="confirm-pair__side">
+              <span class="confirm-pair__label">{{ i18n.t('factura.bien_catalogo') }}</span>
+              <span class="confirm-pair__value"><strong>{{ b.codigoSena }}</strong> — {{ b.descripcion }}</span>
+            </div>
+          </div>
+          <p class="confirm-pair__warn">
+            <span class="material-symbols-outlined">info</span>
+            {{ i18n.t('factura.verificar_correspondencia') }}
+          </p>
+          <div class="modal-actions">
+            <button class="btn-cancel" type="button" (click)="volverABuscar()">{{ i18n.t('comun.volver') }}</button>
+            <button class="btn-confirm" type="button" (click)="confirmarAsociacion()">{{ i18n.t('factura.confirmar_asociacion') }}</button>
+          </div>
+        } @else {
+          <input
+            type="text"
+            class="gil-obs-input buscador-bien__search"
+            [placeholder]="i18n.t('factura.buscar_placeholder')"
+            (input)="onBuscarBienCatalogo($any($event.target).value)" />
+          <div class="buscador-bien__results">
+            @if (catalogoLoading()) {
+              <p class="buscador-bien__empty">{{ i18n.t('comun.buscando') }}</p>
+            } @else if (catalogoBienes().length === 0) {
+              <p class="buscador-bien__empty">{{ i18n.t('factura.sin_bienes_busqueda') }}</p>
+            } @else {
+              <ul class="bien-result-list">
+                @for (bien of catalogoBienes(); track bien.id) {
+                  <li class="bien-result">
+                    <div class="bien-result__info">
+                      <span class="bien-result__code">{{ bien.codigoSena }}</span>
+                      <span class="bien-result__name">{{ bien.descripcion }}</span>
+                      <span class="bien-result__meta">{{ bien.unidadMedida }}</span>
+                    </div>
+                    <restaurant-button variant="primary" (click)="onBienCatalogoSeleccionado(bien)">
+                      Seleccionar
+                    </restaurant-button>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+          <div class="modal-actions">
+            <button class="btn-cancel" type="button" (click)="cerrarBuscadorBien()">{{ i18n.t('comun.cerrar') }}</button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

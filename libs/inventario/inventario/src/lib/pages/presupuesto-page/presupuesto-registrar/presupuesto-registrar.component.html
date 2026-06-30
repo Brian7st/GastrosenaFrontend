@@ -1,0 +1,143 @@
+<div class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">{{ i18n.t('presupuesto.registrar_titulo') }}</h3>
+        <p class="modal-subtitle">{{ i18n.t('presupuesto.registrar_subtitulo') }}</p>
+      </div>
+      <button class="close-btn" (click)="closeModal()">
+        <lucide-icon name="x" [size]="20"></lucide-icon>
+      </button>
+    </div>
+
+    <!-- Modal Form -->
+    <form [formGroup]="registroForm" (ngSubmit)="onSubmit()" class="modal-body">
+      <!-- Ficha de caracterización -->
+      <div class="form-field">
+        <label class="field-label">{{ i18n.t('presupuesto.ficha_label') }} <span class="required">*</span></label>
+        <div class="input-wrapper">
+          <lucide-icon name="hash" [size]="18" class="field-icon"></lucide-icon>
+          <input type="text" formControlName="fichaId" class="form-input"
+                 placeholder="Ej: 2556789">
+        </div>
+      </div>
+
+      <!-- Programa de formación -->
+      <div class="form-field">
+        <label class="field-label">{{ i18n.t('presupuesto.programa_label') }} <span class="required">*</span></label>
+        <div class="select-wrapper">
+          <lucide-icon name="building-2" [size]="18" class="field-icon"></lucide-icon>
+          <select formControlName="programaFormacion" class="form-select">
+            <option value="" disabled>{{ i18n.t('comun.seleccione_programa') }}</option>
+            @for (programa of programas(); track programa.codigo) {
+              <option [value]="programa.codigo">{{ programa.nombre }}</option>
+            }
+          </select>
+          <lucide-icon name="chevron-down" [size]="18" class="select-chevron"></lucide-icon>
+        </div>
+      </div>
+
+      <!-- Vigencia Fiscal -->
+      <div class="form-field">
+        <label class="field-label">{{ i18n.t('presupuesto.vigencia_label') }} <span class="required">*</span></label>
+        <div class="select-wrapper">
+          <lucide-icon name="calendar" [size]="18" class="field-icon"></lucide-icon>
+          <select formControlName="vigencia" class="form-select">
+            @for (v of VIGENCIAS; track v) {
+              <option [value]="v">{{ v }}</option>
+            }
+          </select>
+          <lucide-icon name="chevron-down" [size]="18" class="select-chevron"></lucide-icon>
+        </div>
+      </div>
+
+      <!-- Fecha de aprobación -->
+      <div class="form-field">
+        <label class="field-label">{{ i18n.t('presupuesto.fecha_aprobacion_label') }} <span class="required">*</span></label>
+        <div class="input-wrapper">
+          <lucide-icon name="calendar-check" [size]="18" class="field-icon"></lucide-icon>
+          <input type="date" formControlName="fechaAprobacion" class="form-input">
+        </div>
+      </div>
+
+      <!-- Nombre del Rubro -->
+      <div class="form-field">
+        <label class="field-label">{{ i18n.t('presupuesto.rubro_nombre_label') }} <span class="required">*</span></label>
+        <div class="input-wrapper">
+          <lucide-icon name="tag" [size]="18" class="field-icon"></lucide-icon>
+          <input type="text" formControlName="rubroDescripcion" class="form-input"
+                 placeholder="Ej: Adquisición de Materiales de Formación">
+        </div>
+      </div>
+
+      <!-- Código del Rubro -->
+      <div class="form-field">
+        <label class="field-label">{{ i18n.t('presupuesto.rubro_codigo_label') }} <span class="required">*</span></label>
+        <div class="input-wrapper">
+          <lucide-icon name="hash" [size]="18" class="field-icon"></lucide-icon>
+          <input type="text" formControlName="rubroCodigo" class="form-input"
+                 placeholder="Ej: 2-0-4-01">
+        </div>
+      </div>
+
+      <!-- Dimensión SIIF: posición presupuestal -->
+      <div class="form-field">
+        <label class="field-label">{{ i18n.t('presupuesto.posicion_label') }} <span class="required">*</span></label>
+        <div class="input-wrapper">
+          <lucide-icon name="list-tree" [size]="18" class="field-icon"></lucide-icon>
+          <input type="text" formControlName="rubroPosicionPresupuestal" class="form-input"
+                 placeholder="Ej: A-02-02-02-008">
+        </div>
+      </div>
+
+      <!-- Dimensión SIIF: dependencia -->
+      <div class="form-field">
+        <label class="field-label">{{ i18n.t('presupuesto.dependencia_label') }} <span class="required">*</span></label>
+        <div class="input-wrapper">
+          <lucide-icon name="building" [size]="18" class="field-icon"></lucide-icon>
+          <input type="text" formControlName="rubroDependencia" class="form-input"
+                 placeholder="Ej: Regional Quindío">
+        </div>
+      </div>
+
+      <!-- Dimensión SIIF: fuente de financiación -->
+      <div class="form-field">
+        <label class="field-label">{{ i18n.t('presupuesto.fuente_label') }} <span class="required">*</span></label>
+        <div class="select-wrapper">
+          <lucide-icon name="landmark" [size]="18" class="field-icon"></lucide-icon>
+          <select formControlName="rubroFuente" class="form-select">
+            @for (f of FUENTES; track f) {
+              <option [value]="f">{{ f }}</option>
+            }
+          </select>
+          <lucide-icon name="chevron-down" [size]="18" class="select-chevron"></lucide-icon>
+        </div>
+      </div>
+
+      <!-- Bolsa de Dinero Inicial -->
+      <div class="form-field">
+        <label class="field-label">{{ i18n.t('presupuesto.bolsa_label') }} <span class="required">*</span></label>
+        <div class="money-input-wrapper">
+          <span class="money-prefix">$</span>
+          <input type="number" formControlName="montoAsignado" class="form-input form-input--money"
+                 placeholder="0.00">
+          <span class="money-suffix">COP</span>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer">
+        <restaurant-button variant="surface" type="button" (click)="closeModal()">
+          {{ i18n.t('comun.cancelar') }}
+        </restaurant-button>
+        <restaurant-button variant="primary" type="submit" [disabled]="registroForm.invalid">
+          <div class="btn-icon-text">
+            <lucide-icon name="save" [size]="18"></lucide-icon>
+            {{ i18n.t('presupuesto.guardar') }}
+          </div>
+        </restaurant-button>
+      </div>
+    </form>
+  </div>
+</div>

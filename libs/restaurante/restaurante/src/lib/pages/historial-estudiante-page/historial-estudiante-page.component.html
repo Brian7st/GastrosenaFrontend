@@ -1,0 +1,178 @@
+<div class="historial-instructor-page">
+  <div class="back-action">
+    <restaurant-button variant="ghost" routerLink="../historial-pedidos">
+      <lucide-icon name="arrow-left" [size]="18"></lucide-icon>
+      <span>{{ i18n.t('historialEstudiante.back') }}</span>
+    </restaurant-button>
+  </div>
+
+  <restaurant-page-header [title]="i18n.t('historialEstudiante.title')"
+    [subtitle]="i18n.t('historialEstudiante.subtitle')">
+  </restaurant-page-header>
+
+  <div class="filters-bar">
+    <div class="search-bar">
+      <lucide-icon name="search" [size]="18"></lucide-icon>
+      <input type="text" [placeholder]="i18n.t('historialEstudiante.searchPlaceholder')" [ngModel]="terminoBusqueda()"
+        (ngModelChange)="terminoBusqueda.set($event)" />
+    </div>
+  </div>
+
+  <ng-template #ordenCardTemplate let-orden="orden">
+    <restaurant-card class="ticket-card">
+      <div class="ticket-card__header" style="flex-wrap: wrap; gap: var(--space-2);">
+        <div class="ticket-card__title">
+          <lucide-icon name="user" [size]="20"></lucide-icon>
+          <h3 style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0;">
+            {{ i18n.t('historialEstudiante.order') }} {{ orden.id ? orden.id.substring(0, 8) : 'N/A' }}
+          </h3>
+        </div>
+        @if (orden.estado) {
+        <restaurant-status-badge [label]="formatearEstado(orden.estado)"
+          [variant]="getBadgeType(orden.estado)"></restaurant-status-badge>
+        }
+      </div>
+
+      <div class="ticket-card__body">
+        <div class="ticket-info-row">
+          <span class="ticket-label">{{ i18n.t('historialEstudiante.table') }}:</span>
+          <span class="ticket-value">{{ obtenerNombreMesa(orden.mesaId) }}</span>
+        </div>
+        <div class="ticket-info-row">
+          <span class="ticket-label">{{ i18n.t('historialEstudiante.date') }}:</span>
+          <span class="ticket-value">{{ orden.fechaCreacion | date:'d/MM/yyyy' }}</span>
+        </div>
+
+          <div class="ticket-items" *ngIf="orden.detalles && orden.detalles.length > 0">
+            <div class="ticket-scroll-wrapper">
+              @if (obtenerComidas(orden.detalles).length > 0) {
+                <h4>{{ i18n.t('historialEstudiante.meals') }}</h4>
+                <ul style="max-height: none; overflow: visible; padding-right: 0;">
+                  @for (item of obtenerComidas(orden.detalles); track item.productoId) {
+                    <li>
+                      <span class="item-qty">{{ item.cantidad }}x</span>
+                      <span class="item-name">{{ item.nombreProducto }}</span>
+                      <span class="item-price">{{ (item.cantidad * item.precioUnitario) | currencyCop }}</span>
+                    </li>
+                  }
+                </ul>
+              }
+
+              @if (obtenerBebidas(orden.detalles).length > 0) {
+                <h4 style="margin-top: var(--space-3);">{{ i18n.t('historialEstudiante.drinks') }}</h4>
+                <ul style="max-height: none; overflow: visible; padding-right: 0;">
+                  @for (item of obtenerBebidas(orden.detalles); track item.productoId) {
+                    <li>
+                      <span class="item-qty">{{ item.cantidad }}x</span>
+                      <span class="item-name">{{ item.nombreProducto }}</span>
+                      <span class="item-price">{{ (item.cantidad * item.precioUnitario) | currencyCop }}</span>
+                    </li>
+                  }
+                </ul>
+              }
+            </div>
+          </div>
+      </div>
+
+      <div class="ticket-card__footer">
+        <span class="ticket-total-label">{{ i18n.t('historialEstudiante.total') }}</span>
+        <span class="ticket-total-value">{{ orden.subtotal | currency }}</span>
+      </div>
+
+      @if (orden.estado === 'LISTO_PARA_SERVIR') {
+      <div class="ticket-card__actions"
+        style="display: flex; justify-content: center; padding: 0 var(--space-4) var(--space-4) var(--space-4); margin-top: var(--space-4);">
+        <restaurant-button style="width: 100%; display: flex; justify-content: center;" variant="primary"
+          (click)="marcarEntregado(orden.id)">
+          <div class="btn-content-centered"
+            style="display: flex; align-items: center; justify-content: center; gap: var(--space-2); width: 100%;">
+            <lucide-icon name="check-circle" [size]="18"></lucide-icon>
+            <span>{{ i18n.t('historialEstudiante.deliverOrder') }}</span>
+          </div>
+        </restaurant-button>
+      </div>
+      }
+    </restaurant-card>
+  </ng-template>
+
+  <div class="mesas-filters" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 1.5rem; margin-top: 1rem;">
+    <restaurant-button [variant]="filtroEstado() === 'TODAS' ? 'primary' : 'outline'" (click)="filtroEstado.set('TODAS')">
+      {{ i18n.t('historialEstudiante.all') }}
+    </restaurant-button>
+    <restaurant-button [variant]="filtroEstado() === 'LISTO_PARA_SERVIR' ? 'primary' : 'outline'" (click)="filtroEstado.set('LISTO_PARA_SERVIR')">
+      {{ i18n.t('historialEstudiante.readyToServe') }}
+    </restaurant-button>
+    <restaurant-button [variant]="filtroEstado() === 'EN_PREPARACION' ? 'primary' : 'outline'" (click)="filtroEstado.set('EN_PREPARACION')">
+      {{ i18n.t('historialEstudiante.inPreparation') }}
+    </restaurant-button>
+    <restaurant-button [variant]="filtroEstado() === 'ENVIADO_COCINA' ? 'primary' : 'outline'" (click)="filtroEstado.set('ENVIADO_COCINA')">
+      {{ i18n.t('historialEstudiante.sentToKitchen') }}
+    </restaurant-button>
+    <restaurant-button [variant]="filtroEstado() === 'OTRAS' ? 'primary' : 'outline'" (click)="filtroEstado.set('OTRAS')">
+      {{ i18n.t('historialEstudiante.history') }}
+    </restaurant-button>
+  </div>
+
+  <div class="mesas-page__content" style="margin-top: var(--space-4);">
+    @if ((filtroEstado() === 'TODAS' || filtroEstado() === 'LISTO_PARA_SERVIR') && ordenesListo().length > 0) {
+      <div class="mesas-group mb-4">
+        <h3 class="mesas-group__title" style="margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; color: #d97706;">
+          <lucide-icon name="bell-ring" [size]="20"></lucide-icon> {{ i18n.t('historialEstudiante.readySection') }}
+        </h3>
+        <div class="historial-grid" style="margin-top: 0;">
+          @for (orden of ordenesListo(); track orden.id) {
+            <ng-container *ngTemplateOutlet="ordenCardTemplate; context: { orden: orden }"></ng-container>
+          }
+        </div>
+      </div>
+    }
+
+    @if ((filtroEstado() === 'TODAS' || filtroEstado() === 'EN_PREPARACION') && ordenesPreparacion().length > 0) {
+      <div class="mesas-group mb-4">
+        <h3 class="mesas-group__title text-warning" style="margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+          <lucide-icon name="chef-hat" [size]="20"></lucide-icon> {{ i18n.t('historialEstudiante.preparationSection') }}
+        </h3>
+        <div class="historial-grid" style="margin-top: 0;">
+          @for (orden of ordenesPreparacion(); track orden.id) {
+            <ng-container *ngTemplateOutlet="ordenCardTemplate; context: { orden: orden }"></ng-container>
+          }
+        </div>
+      </div>
+    }
+
+    @if ((filtroEstado() === 'TODAS' || filtroEstado() === 'ENVIADO_COCINA') && ordenesEnviado().length > 0) {
+      <div class="mesas-group mb-4">
+        <h3 class="mesas-group__title text-primary" style="margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; color: #3b82f6;">
+          <lucide-icon name="send" [size]="20"></lucide-icon> {{ i18n.t('historialEstudiante.sentSection') }}
+        </h3>
+        <div class="historial-grid" style="margin-top: 0;">
+          @for (orden of ordenesEnviado(); track orden.id) {
+            <ng-container *ngTemplateOutlet="ordenCardTemplate; context: { orden: orden }"></ng-container>
+          }
+        </div>
+      </div>
+    }
+
+
+
+    @if ((filtroEstado() === 'TODAS' || filtroEstado() === 'OTRAS') && ordenesOtras().length > 0) {
+      <div class="mesas-group mb-4">
+        <h3 class="mesas-group__title text-success" style="margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; color: #10b981;">
+          <lucide-icon name="check-circle" [size]="20"></lucide-icon> {{ i18n.t('historialEstudiante.historySection') }}
+        </h3>
+        <div class="historial-grid" style="margin-top: 0;">
+          @for (orden of ordenesOtras(); track orden.id) {
+            <ng-container *ngTemplateOutlet="ordenCardTemplate; context: { orden: orden }"></ng-container>
+          }
+        </div>
+      </div>
+    }
+
+    @if (misOrdenes().length === 0) {
+      <div class="empty-state">
+        <lucide-icon name="user" [size]="48" color="var(--color-text-tertiary)"></lucide-icon>
+        <p>{{ i18n.t('historialEstudiante.empty') }}</p>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,37 @@
+<div class="pedidos-hub-page">
+  <div class="back-action">
+    <restaurant-button variant="ghost" routerLink="../pedidos">
+      <lucide-icon name="arrow-left" [size]="18"></lucide-icon>
+      <span>{{ i18n.t('pedidosHubPage.backToOrders') }}</span>
+    </restaurant-button>
+  </div>
+
+  <restaurant-page-header 
+    [title]="i18n.t('pedidosHubPage.title')"
+    [subtitle]="i18n.t('pedidosHubPage.subtitle')">
+  </restaurant-page-header>
+
+  <div class="pedidos-hub-page__grid">
+    @if (puedeAdministrarMesas()) {
+      <restaurant-card class="hub-card" routerLink="../historial-instructor">
+        <div class="hub-card__content">
+          <div class="hub-card__icon-wrapper instructor-icon">
+            <lucide-icon name="clipboard-list" [size]="48"></lucide-icon>
+          </div>
+          <h3 class="hub-card__title">{{ i18n.t('pedidosHubPage.instructorTitle') }}</h3>
+          <p class="hub-card__description">{{ i18n.t('pedidosHubPage.instructorDescription') }}</p>
+        </div>
+      </restaurant-card>
+    }
+
+    <restaurant-card class="hub-card" routerLink="../historial-estudiante">
+      <div class="hub-card__content">
+        <div class="hub-card__icon-wrapper student-icon">
+          <lucide-icon name="user" [size]="48"></lucide-icon>
+        </div>
+        <h3 class="hub-card__title">{{ i18n.t('pedidosHubPage.studentTitle') }}</h3>
+        <p class="hub-card__description">{{ i18n.t('pedidosHubPage.studentDescription') }}</p>
+      </div>
+    </restaurant-card>
+  </div>
+</div>

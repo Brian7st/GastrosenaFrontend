@@ -1,0 +1,7 @@
+{
+  "name": "reportes",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/reportes/reportes/src",
+  "tags": ["scope:reportes", "type:feature"]
+}

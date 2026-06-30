@@ -1,0 +1,83 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  signal,
+  computed,
+  inject,
+  OnInit,
+} from '@angular/core';
+
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
+import { ButtonComponent } from '@restaurant/shared/ui';
+import { AccionResolver } from '../../../../models/alerta.model';
+import { AlertasFacade } from '../../../../data-access/alertas.facade';
+import { I18nService } from '../../../../i18n/i18n.service';
+
+@Component({
+  selector: 'restaurant-alerta-resolver',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [ReactiveFormsModule, RouterModule, ButtonComponent],
+  templateUrl: './alerta-resolver.component.html',
+  styleUrl: './alerta-resolver.component.scss',
+})
+export class AlertaResolverComponent implements OnInit {
+  private router  = inject(Router);
+  protected readonly i18n = inject(I18nService);
+  private route   = inject(ActivatedRoute);
+  private fb      = inject(FormBuilder);
+  private facade  = inject(AlertasFacade);
+
+  alerta = this.facade.alertaSeleccionada;
+  accionSeleccionada = signal<AccionResolver | ''>('');
+
+  resolverForm: FormGroup = this.fb.group({
+    accion:      ['', Validators.required],
+    referencia:  [''],
+    descripcion: ['', Validators.required],
+    responsable: [{ value: 'Administrador Centro de Formación', disabled: true }],
+  });
+
+  async ngOnInit(): Promise<void> {
+    // El id está en el padre (alertas/:id/resolver)
+    const id = this.route.parent?.snapshot.paramMap.get('id');
+    if (id && this.facade.alertaSeleccionada()?.id !== id) {
+       const alerta = await this.facade.cargarAlerta(id);
+       if (!alerta) {
+         this.router.navigate(['/app/inventario/alertas']);
+         return;
+       }
+    } else if (!id) {
+       this.router.navigate(['/app/inventario/alertas']);
+       return;
+     }
+  }
+
+  prioridadLabel = computed(() => {
+    const map: Record<string, string> = {
+      ALTA: 'Alta', MEDIA: 'Media', BAJA: 'Baja',
+    };
+    return map[this.alerta()?.prioridad ?? 'ALTA'] ?? 'Alta';
+  });
+
+  selectAccion(accion: AccionResolver): void {
+    this.accionSeleccionada.set(accion);
+    this.resolverForm.patchValue({ accion });
+  }
+
+  onConfirmar(): void {
+    if (this.resolverForm.valid) {
+      const id = this.alerta()?.id;
+      if (id) {
+        this.facade.resolverAlerta(id, this.resolverForm.getRawValue() as Record<string, unknown>);
+      }
+      this.cerrar();
+    }
+  }
+
+  cerrar(): void {
+    const id = this.alerta()?.id;
+    this.router.navigate(['/app/inventario/alertas', id]);
+  }
+}

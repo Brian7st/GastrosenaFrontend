@@ -1,0 +1,275 @@
+<!-- ══════════════════════════════════════════════════════════════════════════
+     Contenedor Principal de la Vista Formulario
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="form-page-container">
+
+  <div class="page-header">
+    <inventario-back-button (clicked)="onCancel()" />
+    <div>
+      <h2 class="page-title">{{ i18n.t('solicitudes-form.title') }}</h2>
+      <p class="page-subtitle">{{ i18n.t('solicitudes-form.subtitle') }}</p>
+    </div>
+  </div>
+
+  <!-- Main Form Card -->
+  <div class="form-card">
+    <div class="form-grid">
+      <!-- Columna 1 -->
+      <div class="form-col">
+        <div class="form-group">
+          <label class="form-label">{{ i18n.t('solicitudes-form.label_codigo_solicitud') }}</label>
+          <div class="readonly-input">
+            <span class="readonly-text">{{ i18n.t('solicitudes-form.codigo_placeholder') }}</span>
+            <span class="material-symbols-outlined icon-locked">lock</span>
+          </div>
+          <p class="form-hint">{{ i18n.t('solicitudes-form.hint_generado') }}</p>
+        </div>
+
+        <!-- Regional: código numérico + nombre -->
+        <div class="form-group">
+          <label class="form-label">{{ i18n.t('solicitudes-form.label_regional_codigo') }} <span class="required-asterisk">*</span></label>
+          <input
+            type="number"
+            class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['regionalCodigo']"
+            [placeholder]="i18n.t('solicitudes-generar.placeholder_ejemplo', { valor: '63' })"
+            min="1"
+            [value]="regionalCodigo() ?? ''"
+            (input)="regionalCodigo.set(+$any($event.target).value || null)"
+          />
+          @if (submitAttempted() && errores()['regionalCodigo']) {
+            <p class="field-error">{{ errores()['regionalCodigo'] }}</p>
+          }
+          <p class="form-hint">{{ i18n.t('solicitudes-form.hint_regional_codigo') }}</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">{{ i18n.t('solicitudes-form.label_regional_nombre') }} <span class="required-asterisk">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['regionalNombre']"
+            [placeholder]="i18n.t('solicitudes-generar.placeholder_ejemplo', { valor: 'Quindío' })"
+            [value]="regionalNombre()"
+            (input)="regionalNombre.set($any($event.target).value)"
+          />
+          @if (submitAttempted() && errores()['regionalNombre']) {
+            <p class="field-error">{{ errores()['regionalNombre'] }}</p>
+          }
+        </div>
+
+        <!-- Cuentadante con cédula -->
+        <div class="form-group">
+          <label class="form-label">{{ i18n.t('solicitudes-form.label_cuentadantes') }} <span class="required-asterisk">*</span></label>
+
+          @if (submitAttempted() && errores()['cuentadantes']) {
+            <p class="field-error">{{ errores()['cuentadantes'] }}</p>
+          }
+          <!-- Lista de cuentadantes confirmados -->
+          @if (cuentadantes().length > 0) {
+            <div class="cuentadantes-list">
+              @for (c of cuentadantes(); track c; let i = $index) {
+                <div class="cuentadante-chip">
+                  <span class="material-symbols-outlined">person</span>
+                  <span class="cuentadante-nombre">{{ c.nombre }}</span>
+                  <span class="cuentadante-cedula">CC {{ c.cedula }}</span>
+                  <button class="btn-chip-remove" type="button" (click)="onRemoveCuentadante(i)" [title]="i18n.t('solicitudes-form.quitar')">
+                    <span class="material-symbols-outlined">close</span>
+                  </button>
+                </div>
+              }
+            </div>
+          }
+
+          <button class="btn-link btn-link--add mt-2" type="button" (click)="onAddCuentadante()">
+            <span class="material-symbols-outlined">{{ mostrarNuevaCuenta() ? 'remove' : 'add' }}</span>
+            {{ mostrarNuevaCuenta() ? i18n.t('solicitudes-form.cancelar') : i18n.t('solicitudes-form.agregar_cuentadante') }}
+          </button>
+
+          <div class="nueva-cuenta-panel" [class.nueva-cuenta-panel--visible]="mostrarNuevaCuenta()">
+            <div class="form-group mt-2">
+              <label class="form-label">{{ i18n.t('solicitudes-form.label_nombre_cuentadante') }}</label>
+              <input
+                type="text"
+                class="form-control"
+                [placeholder]="i18n.t('solicitudes-generar.placeholder_ejemplo', { valor: 'Juan Pablo Gómez' })"
+                [value]="nuevaCuenta()"
+                (input)="nuevaCuenta.set($any($event.target).value)"
+              />
+            </div>
+            <div class="form-group mt-2">
+              <label class="form-label">{{ i18n.t('solicitudes-form.label_cedula') }} <span class="required-asterisk">*</span></label>
+              <input
+                type="text"
+                class="form-control"
+                [placeholder]="i18n.t('solicitudes-generar.placeholder_ejemplo', { valor: '1001234567' })"
+                [value]="nuevaCuentaCedula()"
+                (input)="nuevaCuentaCedula.set($any($event.target).value)"
+              />
+            </div>
+            <button
+              class="btn-link btn-link--add mt-2"
+              type="button"
+              [disabled]="!nuevaCuenta().trim() || !nuevaCuentaCedula().trim()"
+              (click)="onConfirmarCuentadante()">
+              <span class="material-symbols-outlined">check_circle</span>
+              {{ i18n.t('solicitudes-form.confirmar_cuentadante') }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Código de Grupo -->
+        <div class="form-group">
+          <label class="form-label">{{ i18n.t('solicitudes-form.label_codigo_grupo') }}</label>
+          <input
+            type="text"
+            class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['codigoGrupo']"
+            [placeholder]="i18n.t('solicitudes-generar.placeholder_ejemplo', { valor: '2670687' })"
+            [value]="codigoGrupo()"
+            (input)="codigoGrupo.set($any($event.target).value)"
+          />
+          @if (submitAttempted() && errores()['codigoGrupo']) {
+            <p class="field-error">{{ errores()['codigoGrupo'] }}</p>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">{{ i18n.t('solicitudes-form.label_fecha') }} <span class="required-asterisk">*</span></label>
+          <input
+            type="date"
+            class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['fechaSolicitud']"
+            [value]="fechaSolicitud()"
+            (input)="fechaSolicitud.set($any($event.target).value)"
+          />
+          @if (submitAttempted() && errores()['fechaSolicitud']) {
+            <p class="field-error">{{ errores()['fechaSolicitud'] }}</p>
+          }
+        </div>
+      </div>
+
+      <!-- Columna 2 -->
+      <div class="form-col">
+        <div class="form-group">
+          <label class="form-label">{{ i18n.t('solicitudes-form.label_area') }} <span class="required-asterisk">*</span></label>
+          <select
+            class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['area']"
+            [value]="area()"
+            (change)="area.set($any($event.target).value)">
+            <option value="">{{ i18n.t('solicitudes-form.placeholder_area') }}</option>
+            @for (a of AREAS; track a) {
+              <option [value]="a">{{ a }}</option>
+            }
+          </select>
+          @if (submitAttempted() && errores()['area']) {
+            <p class="field-error">{{ errores()['area'] }}</p>
+          }
+        </div>
+
+        <!-- Centro de Costos: código numérico + nombre -->
+        <div class="form-group">
+          <label class="form-label">{{ i18n.t('solicitudes-form.label_centro_costos_codigo') }} <span class="required-asterisk">*</span></label>
+          <input
+            type="number"
+            class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['centroCostosCodigo']"
+            [placeholder]="i18n.t('solicitudes-generar.placeholder_ejemplo', { valor: '953810' })"
+            min="1"
+            [value]="centroCostosCodigo() ?? ''"
+            (input)="centroCostosCodigo.set(+$any($event.target).value || null)"
+          />
+          @if (submitAttempted() && errores()['centroCostosCodigo']) {
+            <p class="field-error">{{ errores()['centroCostosCodigo'] }}</p>
+          } @else {
+            <p class="form-hint">{{ i18n.t('solicitudes-form.hint_centro_costos_codigo') }}</p>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">{{ i18n.t('solicitudes-form.label_centro_costos_nombre') }} <span class="required-asterisk">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['centroCostosNombre']"
+            [placeholder]="i18n.t('solicitudes-generar.placeholder_ejemplo', { valor: 'Comercio y Turismo' })"
+            [value]="centroCostosNombre()"
+            (input)="centroCostosNombre.set($any($event.target).value)"
+          />
+          @if (submitAttempted() && errores()['centroCostosNombre']) {
+            <p class="field-error">{{ errores()['centroCostosNombre'] }}</p>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">{{ i18n.t('solicitudes-form.label_destino_bienes') }} <span class="required-asterisk">*</span></label>
+          <select
+            class="form-control"
+            [value]="destinoBienes()"
+            (change)="destinoBienes.set($any($event.target).value)">
+            @for (d of DESTINOS; track d.value) {
+              <option [value]="d.value">{{ d.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">{{ i18n.t('solicitudes-form.label_jefe_oficina') }} <span class="required-asterisk">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['jefeOficinaCoordinador']"
+            [placeholder]="i18n.t('solicitudes-generar.placeholder_ejemplo', { valor: 'María García Rincón' })"
+            [value]="jefeOficinaCoordinador()"
+            (input)="jefeOficinaCoordinador.set($any($event.target).value)"
+          />
+          @if (submitAttempted() && errores()['jefeOficinaCoordinador']) {
+            <p class="field-error">{{ errores()['jefeOficinaCoordinador'] }}</p>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">{{ i18n.t('solicitudes-form.label_solicitante') }} <span class="required-asterisk">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            [class.form-control--error]="submitAttempted() && errores()['solicitante']"
+            [placeholder]="i18n.t('solicitudes-generar.placeholder_ejemplo', { valor: 'Ing. Ricardo Sarmiento' })"
+            [value]="solicitante()"
+            (input)="solicitante.set($any($event.target).value)"
+          />
+          @if (submitAttempted() && errores()['solicitante']) {
+            <p class="field-error">{{ errores()['solicitante'] }}</p>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Observaciones -->
+  <div class="form-card mb-12">
+    <label class="form-label mb-4">{{ i18n.t('solicitudes-form.label_observaciones') }}</label>
+    <textarea
+      class="form-control"
+      rows="4"
+      [placeholder]="i18n.t('solicitudes-form.placeholder_observaciones')"
+      [value]="observaciones()"
+      (input)="observaciones.set($any($event.target).value)">
+    </textarea>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="actions-footer">
+    <restaurant-button variant="ghost" (click)="onCancel()">{{ i18n.t('solicitudes-form.boton_cancelar') }}</restaurant-button>
+    <restaurant-button
+      variant="primary"
+      [disabled]="!formularioValido()"
+      (click)="onSave()">
+      <span class="material-symbols-outlined">save</span>
+      {{ i18n.t('solicitudes-form.boton_crear') }}
+    </restaurant-button>
+  </div>
+
+</div>
+

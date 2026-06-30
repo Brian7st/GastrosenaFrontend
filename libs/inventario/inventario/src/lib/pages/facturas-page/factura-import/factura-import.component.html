@@ -1,0 +1,450 @@
+<div class="factura-import-page">
+  <header class="page-header">
+    <inventario-back-button (clicked)="goBack()" />
+    <div>
+      <h1 class="page-header__title">{{ i18n.t('factura-import.titulo') }}</h1>
+      <p class="page-header__subtitle">{{ i18n.t('factura-import.subtitulo') }}</p>
+    </div>
+  </header>
+
+  <!-- Stepper -->
+  <nav class="wizard-steps" aria-label="Pasos de importación">
+    @for (p of pasos; track p.n) {
+      <button
+        type="button"
+        class="wizard-step"
+        [class.wizard-step--active]="paso() === p.n"
+        [class.wizard-step--done]="paso() > p.n"
+        [disabled]="!puedeAvanzar(p.n)"
+        (click)="irAPaso(p.n)"
+      >
+        <span class="wizard-step__num">
+          @if (paso() > p.n) {
+            <span class="material-symbols-outlined">check</span>
+          } @else {
+            {{ p.n }}
+          }
+        </span>
+        <span class="wizard-step__label">{{ p.label }}</span>
+      </button>
+    }
+  </nav>
+
+  <!-- Alertas globales (estado de importación / conciliación) -->
+  @if (importStatus() !== 'idle') {
+    <div class="alerts-container">
+      @if (importStatus() === 'loading') {
+        <div class="alert alert--info">
+          <span class="material-symbols-outlined alert__spin">progress_activity</span>
+          <span class="alert__text font-medium">Procesando {{ fileName() }}…</span>
+        </div>
+      }
+      @if (importStatus() === 'error') {
+        <div class="alert alert--error">
+          <span class="material-symbols-outlined">error</span>
+          <div class="alert__content">
+            <h4 class="alert__title">No se pudo importar la factura</h4>
+            <p class="alert__text">{{ error() }}</p>
+          </div>
+        </div>
+      }
+      @if (importStatus() === 'success') {
+        <div class="alert alert--success">
+          <span class="material-symbols-outlined">check_circle</span>
+          <span class="alert__text font-medium">Factura importada correctamente desde {{ fileName() }} · {{ totalItems() }} ítems detectados</span>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ══════════════════ PASO 1 · Subir XML ══════════════════ -->
+  @if (paso() === 1) {
+    <div class="import-grid">
+      <div class="upload-zone-wrapper">
+        <div
+          class="upload-zone"
+          [class.upload-zone--active]="isDragOver()"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave()"
+          (drop)="onDrop($event)"
+          (click)="fileInput.click()"
+        >
+          <div class="upload-zone__icon-wrapper">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">code</span>
+          </div>
+          <h3 class="upload-zone__title">{{ i18n.t('factura-import.upload_titulo') }}</h3>
+          <p class="upload-zone__subtitle">{{ i18n.t('factura-import.upload_subtitulo') }}</p>
+          <button class="btn btn--primary" (click)="fileInput.click(); $event.stopPropagation()">
+            Seleccionar archivo
+          </button>
+          <input #fileInput type="file" accept=".xml" hidden (change)="onFileInput($event)">
+        </div>
+      </div>
+
+      <div class="instructions-card">
+        <h3 class="instructions-card__title">
+          <span class="material-symbols-outlined">help</span>
+          {{ i18n.t('factura-import.como_funciona') }}
+        </h3>
+        <ul class="instructions-list">
+          <li>
+            <div class="step-badge">1</div>
+            <p>Subí el XML de la factura electrónica original. El sistema extrae automáticamente los datos del documento.</p>
+          </li>
+          <li>
+            <div class="step-badge">2</div>
+            <p>Revisás los datos extraídos antes de continuar.</p>
+          </li>
+          <li>
+            <div class="step-badge">3</div>
+            <p>Vinculás un GIL y cruzás los ítems recibidos contra lo solicitado.</p>
+          </li>
+          <li>
+            <div class="step-badge">4</div>
+            <p>Confirmás el resultado del cruce y registrás la factura.</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  }
+
+  <!-- ══════════════════ PASO 2 · Revisar datos ══════════════════ -->
+  @if (paso() === 2 && facturaImportada()) {
+    <div class="review-section">
+      <h2 class="review-section__title">{{ i18n.t('factura-import.datos_titulo') }}</h2>
+
+      <div class="data-card">
+        <div class="form-grid">
+          <div class="field-group">
+            <label class="field-label">{{ i18n.t('factura-import.nro_factura') }}</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.numeroFactura ?? ''"/>
+          </div>
+          <div class="field-group col-span-2">
+            <label class="field-label">{{ i18n.t('factura.cufe') }}</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.cufe ?? ''"/>
+          </div>
+          <div class="field-group">
+            <label class="field-label">{{ i18n.t('factura-import.proveedor_nit') }}</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.proveedorNit ?? ''"/>
+          </div>
+          <div class="field-group col-span-2">
+            <label class="field-label">{{ i18n.t('factura-import.proveedor_nombre') }}</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.proveedorNombre ?? ''"/>
+          </div>
+          <div class="field-group">
+            <label class="field-label">{{ i18n.t('factura.fecha_emision') }}</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.fechaEmision ?? ''"/>
+          </div>
+          <div class="field-group">
+            <label class="field-label">{{ i18n.t('factura.fecha_recepcion') }}</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.fechaRecepcion ?? ''"/>
+          </div>
+          <div class="field-group">
+            <label class="field-label">{{ i18n.t('factura-import.estado') }}</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.estado ?? ''"/>
+          </div>
+          <div class="field-group">
+            <label class="field-label">{{ i18n.t('factura.orden_compra') }}</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.ordenCompra ?? 'No reportada'"/>
+          </div>
+          <div class="field-group">
+            <label class="field-label">{{ i18n.t('factura-import.instructor') }}</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.instructorId ?? 'No vinculado'"/>
+          </div>
+          <div class="field-group">
+            <label class="field-label">{{ i18n.t('factura.beneficiario_zese') }}</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.proveedorBeneficiarioZese ? 'Sí' : 'No'"/>
+          </div>
+          <div class="field-group">
+            <label class="field-label">{{ i18n.t('factura-edit.banco') }}</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.infoBancariaBanco ?? 'No reportado'"/>
+          </div>
+          <div class="field-group">
+            <label class="field-label">{{ i18n.t('factura-import.cuenta') }}</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.infoBancariaCuenta ?? 'No reportada'"/>
+          </div>
+          <div class="field-group">
+            <label class="field-label">{{ i18n.t('factura-edit.tipo_cuenta') }}</label>
+            <input class="field-input field-input--readonly" readonly type="text" [value]="facturaImportada()?.infoBancariaTipo ?? 'No reportado'"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="items-summary-grid">
+        <div class="table-card">
+          <div class="table-wrapper">
+            <table class="fel-table">
+              <thead>
+                <tr>
+                  <th class="w-12 text-center">#</th>
+                  <th>Producto</th>
+                  <th>Descripción</th>
+                  <th class="text-right">Cant.</th>
+                  <th class="text-right">V. Unitario</th>
+                  <th class="text-center">IVA</th>
+                  <th class="text-right">Subtotal</th>
+                  <th class="text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (linea of facturaImportada()?.lineas ?? []; track $index) {
+                  <tr>
+                    <td class="text-center text-secondary">{{ $index + 1 }}</td>
+                    <td class="text-secondary">{{ linea.productoId || 'Sin producto' }}</td>
+                    <td class="font-bold">{{ linea.descripcion }}</td>
+                    <td class="text-right">{{ linea.cantidad }}</td>
+                    <td class="text-right">{{ formatMoney(linea.precioUnitario) }}</td>
+                    <td class="text-center">
+                      <span [class]="ivaBadgeClass(linea.porcentajeIva)">{{ linea.porcentajeIva ?? linea.iva ?? 0 }}%</span>
+                    </td>
+                    <td class="text-right font-bold">{{ formatMoney(linea.subtotal) }}</td>
+                    <td class="text-right font-bold">{{ formatMoney(linea.total) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <h3 class="summary-card__title">{{ i18n.t('factura.resumen_fiscal') }}</h3>
+          <div class="summary-card__body">
+            <div class="summary-row">
+              <span class="summary-label">{{ i18n.t('factura.subtotal') }}</span>
+              <span class="summary-value">{{ formatMoney(facturaImportada()?.subtotal) }}</span>
+            </div>
+            <div class="summary-divider"></div>
+            @for (item of totalIvaPorTarifa(); track item.porcentaje) {
+              <div class="summary-row summary-row--sm">
+                <span class="summary-label">IVA ({{ item.porcentaje }}%)</span>
+                <span class="summary-value">{{ formatMoney(item.valor) }}</span>
+              </div>
+            }
+            <div class="summary-divider"></div>
+            <div class="summary-row summary-row--sm">
+              <span class="summary-label">{{ i18n.t('factura.total_iva') }}</span>
+              <span class="summary-value">{{ formatMoney(facturaImportada()?.totalIva) }}</span>
+            </div>
+            <div class="summary-row summary-row--sm">
+              <span class="summary-label">{{ i18n.t('factura.retencion_zese') }}</span>
+              <span class="summary-value text-tertiary">-{{ formatMoney(facturaImportada()?.valorRetencionZese) }}</span>
+            </div>
+          </div>
+          <div class="summary-card__footer">
+            <span class="total-label">{{ i18n.t('factura.total_pagar') }}</span>
+            <span class="total-value">{{ formatMoney(facturaImportada()?.total) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ══════════════════ PASO 3 · Vincular GIL y cruzar ══════════════════ -->
+  @if (paso() === 3 && facturaImportada()) {
+    <div class="review-section">
+      <h2 class="review-section__title">{{ i18n.t('factura-import.vincular_titulo') }}</h2>
+
+      <div class="data-card">
+        <div class="field-group gil-vincular-field">
+          <label class="field-label">{{ i18n.t('factura-import.gil_vincular') }}</label>
+          <select class="field-input" [value]="gilId()" (change)="onGilSelect($event)">
+            <option value="">{{ i18n.t('factura-import.sin_gil_option') }}</option>
+            @for (gil of gilesDisponibles(); track gil.id) {
+              <option [value]="gil.id">{{ gil.numeroGil }} — {{ gil.destino }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      @if (!gilId()) {
+        <div class="alert alert--info">
+          <span class="material-symbols-outlined">info</span>
+          <span class="alert__text">Seleccioná un GIL para cruzar los ítems recibidos, o finalizá sin conciliar para solo registrar la factura.</span>
+        </div>
+      }
+
+      @if (showManualMapping()) {
+        <div class="matching-section">
+          <div class="matching-header">
+            <div>
+              <h2 class="matching-header__title">{{ i18n.t('factura-import.cruce_titulo') }}</h2>
+              <p class="matching-header__subtitle">
+                Verificá que cada ítem del GIL esté asignado al ítem correcto de la factura y ajustá la cantidad recibida.
+                El sistema hace una asignación automática por descripción — podés corregirla.
+              </p>
+            </div>
+            <div class="matching-legend">
+              <span class="badge badge--green">{{ i18n.t('factura-import.coincide') }}</span>
+              <span class="badge badge--orange">{{ i18n.t('factura-import.diferencia') }}</span>
+              <span class="badge badge--gray">{{ i18n.t('factura-import.sin_asignar') }}</span>
+            </div>
+          </div>
+
+          <div class="table-card">
+            <div class="table-wrapper">
+              <table class="matching-table">
+                <thead>
+                  <tr>
+                    <th>{{ i18n.t('factura-import.th_item_gil') }}</th>
+                    <th class="text-right">{{ i18n.t('factura-import.th_cant_sol') }}</th>
+                    <th class="text-right">{{ i18n.t('factura-import.th_v_unit_gil') }}</th>
+                    <th>{{ i18n.t('factura-import.th_item_fel') }}</th>
+                    <th class="text-right">{{ i18n.t('factura-import.th_cant_rec') }}</th>
+                    <th class="text-right">{{ i18n.t('factura-import.th_v_unit_fel') }}</th>
+                    <th class="text-center">{{ i18n.t('factura.th_estado') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (bien of gilBienes(); track $index; let i = $index) {
+                    <tr [class]="matchRowClass(i)">
+                      <td>
+                        <div class="item-cell">
+                          <span class="item-code">{{ bien.codigoSena }}</span>
+                          <span class="item-name">{{ bien.descripcion }}</span>
+                        </div>
+                      </td>
+                      <td class="text-right text-secondary">{{ bien.cantidad }} {{ bien.unidadMedida }}</td>
+                      <td class="text-right text-secondary">{{ formatMoney(bien.valorUnitario) }}</td>
+                      <td>
+                        <select
+                          class="field-input field-input--sm"
+                          [value]="manualLinks()[i] ?? ''"
+                          (change)="onLinkChange(i, $event)"
+                          (click)="$event.stopPropagation()"
+                        >
+                          <option value="" [selected]="manualLinks()[i] === null || manualLinks()[i] === undefined">{{ i18n.t('factura-import.sin_asignar_opt') }}</option>
+                          @for (linea of facturaImportada()?.lineas ?? []; track $index; let fi = $index) {
+                            <option [value]="fi" [selected]="manualLinks()[i] === fi">{{ fi + 1 }}. {{ linea.descripcion }}</option>
+                          }
+                        </select>
+                      </td>
+                      <td class="text-right">
+                        <input
+                          type="number"
+                          min="0"
+                          class="field-input field-input--sm count-input"
+                          [value]="cantidadesRecibidas()[i] ?? ''"
+                          (input)="onCantidadRecibidaChange(i, $event)"
+                          (click)="$event.stopPropagation()"
+                        />
+                      </td>
+                      <td class="text-right font-bold">
+                        @if (manualLinks()[i] !== null && manualLinks()[i] !== undefined) {
+                          <span [class.text-diferencia]="(getLinea(manualLinks()[i]!)?.precioUnitario ?? 0) !== bien.valorUnitario">
+                            {{ formatMoney(getLinea(manualLinks()[i]!)?.precioUnitario) }}
+                          </span>
+                        } @else {
+                          <span class="text-secondary">—</span>
+                        }
+                      </td>
+                      <td class="text-center">
+                        <span [class]="matchStatusClass(i)">{{ matchStatusLabel(i) }}</span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (conciliacionError()) {
+        <div class="alert alert--error">
+          <span class="material-symbols-outlined">error</span>
+          <div class="alert__content">
+            <h4 class="alert__title">No se pudo conciliar con el GIL</h4>
+            <p class="alert__text">{{ conciliacionError() }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ══════════════════ PASO 4 · Resultado ══════════════════ -->
+  @if (paso() === 4 && conciliacionImportacion(); as conciliacion) {
+    <div class="review-section">
+      <div class="conciliacion-header">
+        <h2 class="review-section__title">{{ i18n.t('factura-import.resultado_titulo') }}</h2>
+        <span class="conciliacion-estado" [class.conciliacion-estado--ok]="conciliacion.diferencias.length === 0">
+          {{ conciliacion.diferencias.length === 0 ? 'Sin diferencias' : conciliacion.diferencias.length + ' diferencia(s) encontrada(s)' }}
+        </span>
+      </div>
+
+      @if (conciliacion.diferencias.length > 0) {
+        <div class="table-card">
+          <div class="table-wrapper">
+            <table class="fel-table">
+              <thead>
+                <tr>
+                  <th>Descripción</th>
+                  <th class="text-right">Cant. GIL</th>
+                  <th class="text-right">Cant. FEL</th>
+                  <th class="text-right">{{ i18n.t('factura-import.th_cant_rec') }}</th>
+                  <th class="text-right">Precio GIL</th>
+                  <th class="text-right">Precio FEL</th>
+                  <th class="text-right">Diferencia</th>
+                  <th>Motivo</th>
+                  <th class="text-center">Resuelta</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (dif of conciliacion.diferencias; track dif.gilItemId) {
+                  <tr [class.conciliacion-row--alerta]="!dif.resuelta && dif.diferencia !== 0">
+                    <td>{{ dif.descripcion }}</td>
+                    <td class="text-right">{{ dif.cantidadGil }}</td>
+                    <td class="text-right">{{ dif.cantidadFactura }}</td>
+                    <td class="text-right">{{ dif.cantidadRecibida ?? '—' }}</td>
+                    <td class="text-right">{{ formatMoney(dif.precioUnitarioGil) }}</td>
+                    <td class="text-right">{{ formatMoney(dif.precioUnitarioFactura) }}</td>
+                    <td class="text-right" [class.text-tertiary]="dif.diferencia !== 0">{{ formatMoney(dif.diferencia) }}</td>
+                    <td class="text-secondary">{{ dif.observacion || '—' }}</td>
+                    <td class="text-center">
+                      <span class="badge" [class.badge--green]="dif.resuelta" [class.badge--gray]="!dif.resuelta">
+                        {{ dif.resuelta ? i18n.t('comun.si') : i18n.t('comun.no') }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      } @else {
+        <p class="conciliacion-vacia">{{ i18n.t('factura.items_coinciden') }}</p>
+      }
+    </div>
+  }
+</div>
+
+<!-- Footer contextual por paso -->
+<div class="sticky-footer">
+  <button class="btn btn--ghost" (click)="goBack()">{{ i18n.t('comun.cancelar') }}</button>
+
+  <div class="footer-actions">
+    @switch (paso()) {
+      @case (1) {
+        <!-- el avance es automático al importar el XML -->
+      }
+      @case (2) {
+        <button class="btn btn--outline" (click)="resetImport()">{{ i18n.t('factura-import.importar_otra') }}</button>
+        <button class="btn btn--primary" (click)="siguiente()">{{ i18n.t('comun.continuar') }}</button>
+      }
+      @case (3) {
+        <button class="btn btn--outline" (click)="atras()">{{ i18n.t('comun.atras') }}</button>
+        @if (canConciliar()) {
+          @if (missingCounts()) {
+            <p class="count-warning">Hay ítems sin conteo físico. Podés conciliar igual, pero la verificación lo exigirá.</p>
+          }
+          <button class="btn btn--primary" [disabled]="loading()" (click)="onConciliar()">{{ i18n.t('factura-import.conciliar') }}</button>
+        } @else {
+          <button class="btn btn--primary" [disabled]="!facturaImportada()" (click)="viewImportedFactura()">{{ i18n.t('factura-import.finalizar_sin_conciliar') }}</button>
+        }
+      }
+      @case (4) {
+        <button class="btn btn--outline" (click)="resetImport()">{{ i18n.t('factura-import.importar_otra') }}</button>
+        <button class="btn btn--primary" [disabled]="!facturaImportada()" (click)="viewImportedFactura()">{{ i18n.t('factura-import.ver_registrada') }}</button>
+      }
+    }
+  </div>
+</div>

@@ -1,0 +1,63 @@
+# GastroSENA — Reglas para Cursor
+
+## ANTES DE CUALQUIER CAMBIO
+
+Antes de escribir cualquier línea de código, preguntá al desarrollador:
+
+1. ¿En qué dominio trabajás?
+   (shell | auth | cocina | bar | restaurante | inventario | abastecimiento | facturacion | presupuesto | requisiciones | reportes | notificaciones | shared)
+
+2. ¿Cuál es el RF o descripción del cambio?
+
+3. ¿Qué tipo de cambio es? (feat | fix | chore | refactor | test)
+
+4. ¿El cambio toca un solo dominio? Si toca más de uno, detener y coordinar con Arquitectura.
+
+Luego leer el archivo `.ai/domains/{dominio}.md` antes de proceder.
+
+## Restricciones de módulos
+
+- Solo modificar archivos dentro de `libs/{dominio-confirmado}/`
+- Importar shared SOLO con alias: `@restaurant/shared/auth`, `@restaurant/shared/ui`, etc.
+- NUNCA importar entre features directamente
+- NUNCA modificar `libs/shared/**` sin aprobación de Arquitectura
+
+## Estándares Angular
+
+- Siempre `standalone: true` y `ChangeDetectionStrategy.OnPush`
+- Usar `inject()` en vez de constructor injection
+- Signals para estado local del componente
+- Sin lógica en componentes — toda la lógica va en el facade
+- Sin estilos inline — todo en `.scss`
+- Sin colores hardcodeados — usar `var(--color-*)` de `_variables.scss`
+
+## TypeScript
+
+- Sin `any` — usar tipos genéricos o `unknown`
+- Sin `!` non-null assertions innecesarios
+- Interfaces para contratos de objetos
+
+## Commits — formato obligatorio
+
+```
+{tipo}({scope}): {descripción}
+
+feat(cocina): add recipe card component [RF-C4.2.1]
+fix(shared/ui): correct table pagination
+chore(inventario): add stock model
+```
+
+## Tests
+
+- Todo componente nuevo lleva su `.spec.ts`
+- Todo service nuevo lleva su `.spec.ts`
+
+## Archivos que NUNCA modificar sin preguntar primero
+
+- `tsconfig.base.json`
+- `.eslintrc.json`
+- `nx.json`
+- `apps/**`
+- `libs/shared/**`
+- `libs/shell/feature-shell/src/lib/shell.routes.ts`
+- `package.json`

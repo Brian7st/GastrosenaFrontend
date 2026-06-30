@@ -1,0 +1,191 @@
+<!-- ── Page Header ─────────────────────────────────────────────────── -->
+<div class="paquete-page">
+  <div class="paquete-page__header">
+    <div class="paquete-page__header-text">
+      <h1 class="paquete-page__title">{{ i18n.t('paquete.titulo') }}</h1>
+      <p class="paquete-page__subtitle">{{ i18n.t('paquete.subtitulo') }}</p>
+    </div>
+    <div class="header-actions">
+      <restaurant-button *hasPermission="'paquete:crear'" variant="primary" (click)="crearPaquete()">
+        <div class="btn-icon-text">
+          <lucide-icon name="plus" [size]="20"></lucide-icon>
+          {{ i18n.t('paquete.crear') }}
+        </div>
+      </restaurant-button>
+    </div>
+  </div>
+
+  <!-- ── KPI Cards ──────────────────────────────────────────────────── -->
+  <div class="kpi-grid">
+    <restaurant-kpi-card [label]="i18n.t('paquete.kpi_total')" [value]="kpiTotal().toString()" icon="folders"
+      iconColor="blue" trend="Total de paquetes" [trendUp]="null"></restaurant-kpi-card>
+
+    <restaurant-kpi-card [label]="i18n.t('paquete.kpi_incompletos')" [value]="kpiIncompleto().toString()" icon="file-edit"
+      iconColor="orange" trend="Incompletos" [trendUp]="null"></restaurant-kpi-card>
+
+    <restaurant-kpi-card [label]="i18n.t('paquete.kpi_completos')" [value]="kpiCompleto().toString()" icon="check-circle"
+      iconColor="green" trend="Aprobados" [trendUp]="true"></restaurant-kpi-card>
+
+    <restaurant-kpi-card [label]="i18n.t('paquete.kpi_archivados')" [value]="kpiArchivado().toString()" icon="archive"
+      iconColor="gray" trend="Histórico" [trendUp]="null"></restaurant-kpi-card>
+  </div>
+
+  <!-- ── Tabla de Paquetes ────────────────────────────────────────── -->
+  <restaurant-data-table>
+    <div dtHeader class="dt-controls">
+      <div class="dt-controls__title">
+        <lucide-icon name="folder-archive" [size]="22" class="dt-controls__icon"></lucide-icon>
+        <h3 class="dt-controls__heading">{{ i18n.t('paquete.tabla_titulo') }}</h3>
+      </div>
+      <div class="dt-controls__actions">
+        <!-- Filtros integrados -->
+        <div class="dt-filter">
+          <select class="dt-filter__select" (change)="onEstadoChange($event)">
+            <option value="">{{ i18n.t('comun.todos_estados') }}</option>
+            <option value="INCOMPLETO">{{ i18n.t('paquete.estado_incompleto') }}</option>
+            <option value="COMPLETO">{{ i18n.t('paquete.estado_completo') }}</option>
+            <option value="ARCHIVADO">{{ i18n.t('paquete.estado_archivado') }}</option>
+          </select>
+        </div>
+
+        <div class="dt-search">
+          <lucide-icon name="search" [size]="18" class="dt-search__icon"></lucide-icon>
+          <input
+            type="text"
+            class="dt-search__input"
+            [placeholder]="i18n.t('paquete.buscar')"
+            (input)="onSearch($event)"
+          />
+        </div>
+      </div>
+    </div>
+
+    <thead>
+      <tr>
+        <th>{{ i18n.t('paquete.th_id') }}</th>
+        <th>{{ i18n.t('paquete.th_detalle') }}</th>
+        <th class="text-center">{{ i18n.t('comun.estado') }}</th>
+        <th>{{ i18n.t('paquete.th_docs') }}</th>
+        <th>{{ i18n.t('paquete.th_responsable') }}</th>
+        <th>{{ i18n.t('comun.fecha') }}</th>
+        <th class="text-center">{{ i18n.t('comun.acciones') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (paquete of filteredPaquetes(); track paquete.id) {
+        <tr class="paquete-table__row" (click)="irADetalle(paquete.id)">
+          <!-- ID Expediente -->
+          <td>
+            <a
+              class="paquete-table__expediente"
+              (click)="irADetalle(paquete.id); $event.stopPropagation()"
+            >
+              {{ paquete.expediente }}
+            </a>
+          </td>
+
+          <!-- Detalle / Ficha -->
+          <td>
+            <p class="paquete-table__titulo">{{ paquete.titulo }}</p>
+            <p class="paquete-table__ficha">{{ i18n.t('acta.ficha_prefix') }} {{ paquete.fichaId }}</p>
+          </td>
+
+          <!-- Estado -->
+          <td class="text-center">
+            <restaurant-status-badge
+              [label]="getEstadoLabel(paquete.estado)"
+              [variant]="getEstadoVariant(paquete.estado)"
+            ></restaurant-status-badge>
+          </td>
+
+          <!-- Documentos Base (Checklist) -->
+          <td>
+            <div class="paquete-table__docs">
+              <div class="paquete-table__doc-item" [class.paquete-table__doc-item--missing]="!paquete.actaId">
+                @if (paquete.actaId) {
+                  <lucide-icon name="check-circle-2" [size]="14" class="paquete-table__doc-icon--ok"></lucide-icon>
+                } @else {
+                  <lucide-icon name="circle" [size]="14" class="paquete-table__doc-icon--pending"></lucide-icon>
+                }
+                <span>{{ i18n.t('paquete.doc_acta') }}</span>
+              </div>
+              <div class="paquete-table__doc-item" [class.paquete-table__doc-item--missing]="!paquete.requisicionId">
+                @if (paquete.requisicionId) {
+                  <lucide-icon name="check-circle-2" [size]="14" class="paquete-table__doc-icon--ok"></lucide-icon>
+                } @else {
+                  <lucide-icon name="circle" [size]="14" class="paquete-table__doc-icon--pending"></lucide-icon>
+                }
+                <span>{{ i18n.t('paquete.doc_req') }}</span>
+              </div>
+              <div class="paquete-table__doc-item" [class.paquete-table__doc-item--missing]="!paquete.registroAsistenciaAdjunto">
+                @if (paquete.registroAsistenciaAdjunto) {
+                  <lucide-icon name="check-circle-2" [size]="14" class="paquete-table__doc-icon--ok"></lucide-icon>
+                } @else {
+                  <lucide-icon name="circle" [size]="14" class="paquete-table__doc-icon--pending"></lucide-icon>
+                }
+                <span>{{ i18n.t('paquete.doc_asistencia') }}</span>
+              </div>
+            </div>
+          </td>
+
+          <!-- Responsable -->
+          <td>
+            <div class="paquete-table__responsable">
+              <div class="paquete-table__responsable-avatar">
+                {{ getIniciales(paquete) }}
+              </div>
+              <span class="paquete-table__responsable-name">{{ paquete.instructorId }}</span>
+            </div>
+          </td>
+
+          <!-- Fecha -->
+          <td class="paquete-table__fecha">{{ paquete.fecha }}</td>
+
+          <!-- Acciones -->
+          <td class="text-center">
+            <div class="actions-row" style="justify-content: center;">
+              @if (paquete.estado === 'INCOMPLETO') {
+                <button
+                  class="action-icon action-icon--primary"
+                  title="Completar Paquete"
+                  (click)="irADetalle(paquete.id); $event.stopPropagation()"
+                >
+                  <lucide-icon name="check-circle" [size]="18"></lucide-icon>
+                </button>
+              }
+              <button
+                class="action-icon"
+                title="Ver Paquete"
+                (click)="irADetalle(paquete.id); $event.stopPropagation()"
+              >
+                <lucide-icon name="eye" [size]="18"></lucide-icon>
+              </button>
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="7">
+            <inventario-empty-state
+              icon="folder"
+              title="Sin paquetes"
+              message="No se encontraron expedientes con los filtros aplicados."
+            />
+          </td>
+        </tr>
+      }
+    </tbody>
+    <div dtFooter class="dt-footer">
+      <span class="dt-page-info">{{ i18n.t('paquete.mostrando', { count: filteredPaquetes().length.toString(), total: allPaquetes().length.toString() }) }}</span>
+      <div class="dt-pagination">
+        <button class="dt-page-btn" disabled>
+          <lucide-icon name="chevron-left" [size]="18"></lucide-icon>
+        </button>
+        <button class="dt-page-btn dt-page-btn--active">1</button>
+        <button class="dt-page-btn">
+          <lucide-icon name="chevron-right" [size]="18"></lucide-icon>
+        </button>
+      </div>
+    </div>
+  </restaurant-data-table>
+</div>

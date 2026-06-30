@@ -1,0 +1,121 @@
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    
+    <!-- Decorative Header Line -->
+    <div class="modal-line" [class.modal-line--blocked]="isBlocked"></div>
+    
+    <div class="modal-content">
+      
+      <!-- Icon & Title Section -->
+      <div class="modal-header">
+        <div class="modal-icon-wrap" [class.modal-icon-wrap--blocked]="isBlocked">
+          <span class="material-symbols-outlined modal-icon" style="font-variation-settings: 'FILL' 1;">
+            {{ isBlocked ? 'block' : 'warning' }}
+          </span>
+        </div>
+        <h2 class="modal-title">
+          {{ isBlocked ? i18n.t('consolidado.modal_revertir_bloqueado') : i18n.t('consolidado.modal_revertir_pregunta') }}
+        </h2>
+        @if (!isBlocked) {
+<p class="modal-subtitle">
+          {{ i18n.t('consolidado.modal_revertir_body') }}
+        </p>
+}
+      </div>
+      
+      <!-- Summary Panel -->
+      <div class="summary-panel" [class.summary-panel--blocked]="isBlocked">
+        @if (!isBlocked) {
+<div class="summary-panel__header">
+          <span class="summary-panel__label">{{ i18n.t('consolidado.modal_consolidado_label') }}</span>
+          <span class="summary-panel__value">{{ consolidadoId }}</span>
+        </div>
+}
+        
+        @if (!isBlocked) {
+<div class="summary-panel__body">
+          <div class="summary-row">
+            <span class="summary-row__label">{{ i18n.t('consolidado.modal_periodo') }}</span>
+            <span class="summary-row__value">{{ periodo }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-row__label">{{ i18n.t('consolidado.modal_comprobantes') }}</span>
+            <span class="summary-row__value">{{ comprobantes }}</span>
+          </div>
+        </div>
+}
+
+        @if (!isBlocked) {
+<div class="summary-panel__footer">
+          <span class="summary-panel__total-label">{{ i18n.t('consolidado.modal_total_reversar') }}</span>
+          <span class="summary-panel__total-value">{{ total }}</span>
+        </div>
+}
+
+        <!-- Blocked layout is simplified -->
+        @if (isBlocked) {
+
+          <div class="flex-between">
+            <div>
+              <p class="font-bold text-on-surface">{{ consolidadoId }}</p>
+              <p class="text-on-surface-variant text-sm">{{ periodo }}</p>
+            </div>
+            <p class="font-extrabold text-on-surface text-lg">{{ total }}</p>
+          </div>
+        
+}
+      </div>
+
+      <!-- Blocked Error Banner -->
+      @if (isBlocked) {
+<div class="blocked-banner">
+        <span class="material-symbols-outlined text-error">error</span>
+        <p class="blocked-banner__text">
+          {{ i18n.t('consolidado.modal_bloqueado_texto') }}
+        </p>
+      </div>
+}
+
+      <!-- Security Input (Confirm only) -->
+      @if (!isBlocked) {
+<div class="security-box">
+        <label class="security-box__label" for="security-confirm">{{ i18n.t('consolidado.modal_security_label') }}</label>
+        <input 
+          id="security-confirm" 
+          type="text" 
+          class="security-box__input" 
+          placeholder="REVERSAR"
+          [ngModel]="confirmKeyword()"
+          (ngModelChange)="confirmKeyword.set($event)"
+        />
+      </div>
+}
+
+      <!-- Action Buttons -->
+      <div class="modal-actions" [class.modal-actions--blocked]="isBlocked">
+        @if (!isBlocked) {
+
+          <button 
+            class="modal-btn modal-btn--danger" 
+            [disabled]="!isValid"
+            (click)="onConfirm()">
+            <span class="material-symbols-outlined">delete_forever</span>
+            {{ i18n.t('consolidado.confirmar_reversion') }}
+          </button>
+          <button class="modal-btn modal-btn--cancel" (click)="onClose()">{{ i18n.t('comun.cancelar') }}</button>
+        
+}
+
+        @if (isBlocked) {
+
+          <button class="modal-btn modal-btn--cancel modal-btn--full" (click)="onClose()">{{ i18n.t('comun.entendido') }}</button>
+        
+}
+      </div>
+
+      <!-- Extra Caution Hint -->
+      <p class="modal-hint">{{ i18n.t('consolidado.modal_audit_hint') }}</p>
+
+    </div>
+  </div>
+</div>

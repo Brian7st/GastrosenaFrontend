@@ -1,0 +1,251 @@
+<section class="facturas-list">
+
+  <!-- ── PAGE HEADER ── -->
+  <div class="page-header">
+    <div class="page-header__title">
+      <h1>{{ i18n.t('facturas.titulo') }}</h1>
+      <p class="page-header__subtitle">{{ i18n.t('facturas.subtitulo') }}</p>
+    </div>
+    <div class="page-header__actions">
+      <restaurant-button *hasPermission="'facturas:crear'" variant="ghost" (click)="onImportar()">
+        <span class="material-symbols-outlined">upload</span>
+        Importar
+      </restaurant-button>
+      <restaurant-button *hasPermission="'facturas:exportar_contable'" variant="ghost" (click)="onExportar()">
+        <span class="material-symbols-outlined">download</span>
+        Exportar
+      </restaurant-button>
+    </div>
+  </div>
+
+  <!-- ── KPI CARDS ── -->
+  @if (kpis(); as k) {
+<div class="kpi-grid">
+
+    <restaurant-kpi-card
+      [label]="i18n.t('facturas.kpi_total')"
+      [value]="k.totalFacturas | number"
+      icon="file-text"
+      iconColor="green"
+      [trend]="'Tendencia no disponible'"
+      [trendUp]="false"
+    />
+
+    <restaurant-kpi-card
+      [label]="i18n.t('facturas.kpi_monto')"
+      [value]="'$' + (k.montoMensual | number:'1.2-2')"
+      icon="banknote"
+      iconColor="blue"
+      [trend]="'Tendencia no disponible'"
+      [trendUp]="false"
+    />
+
+    <restaurant-kpi-card variant="states">
+      <div class="kpi-states-grid">
+        <div class="kpi-state">
+          <span class="kpi-state__label">{{ i18n.t('facturas.kpi_registradas') }}</span>
+          <span class="kpi-state__value kpi-state__value--blue">{{ k.registradas }}</span>
+        </div>
+        <div class="kpi-state">
+          <span class="kpi-state__label">{{ i18n.t('facturas.kpi_verificadas') }}</span>
+          <span class="kpi-state__value kpi-state__value--orange">{{ k.verificadas }}</span>
+        </div>
+        <div class="kpi-state">
+          <span class="kpi-state__label">{{ i18n.t('facturas.kpi_pagadas') }}</span>
+          <span class="kpi-state__value kpi-state__value--green">{{ k.pagadas | number }}</span>
+        </div>
+        <div class="kpi-state">
+          <span class="kpi-state__label">{{ i18n.t('facturas.kpi_anuladas') }}</span>
+          <span class="kpi-state__value kpi-state__value--red">{{ k.anuladas }}</span>
+        </div>
+      </div>
+    </restaurant-kpi-card>
+
+  </div>
+}
+
+  <!-- ── TABLE CARD ── -->
+  <restaurant-data-table
+    tableTitle="Lista de Facturas"
+    tableIcon="receipt_long"
+    searchPlaceholder="Buscar por proveedor o número de orden..."
+    [showFilterButton]="true"
+    [filterActive]="showFilters()"
+    [filterCount]="filtrosActivos()"
+    (searchChange)="onSearch($event)"
+    (filterToggle)="onToggleFilters()"
+  >
+
+    <!-- Panel de filtros colapsable (slot [dtHeader]) -->
+    @if (showFilters()) {
+      <div dtHeader class="filter-panel">
+        <div class="filter-panel__row">
+          <div class="filter-group">
+            <label class="filter-label">{{ i18n.t('comun.estado') }}</label>
+            <select class="filter-select" [value]="filtroEstado()" (change)="onFiltroEstadoChange($any($event.target).value)">
+              <option value="">{{ i18n.t('comun.todos') }}</option>
+              <option value="REGISTRADA">{{ i18n.t('facturas.estado_registrada') }}</option>
+              <option value="VERIFICADA">{{ i18n.t('facturas.estado_verificada') }}</option>
+              <option value="PAGADA">{{ i18n.t('facturas.estado_pagada') }}</option>
+              <option value="ANULADA">{{ i18n.t('facturas.estado_anulada') }}</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">{{ i18n.t('facturas.filtro_proveedor') }}</label>
+            <input type="text" class="filter-input" placeholder="Ej. 900000001" [value]="filtroProveedor()" (input)="onFiltroProveedorChange($any($event.target).value)" />
+          </div>
+          <div class="filter-group filter-group--actions">
+            <button class="filter-clear-btn" (click)="onLimpiarFiltros()" [disabled]="filtrosActivos() === 0">
+              <span class="material-symbols-outlined">clear_all</span>
+              Limpiar
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Loading skeleton -->
+    @if (loading()) {
+<tbody>
+      @for (i of [1,2,3,4,5]; track i) {
+<tr>
+        <td colspan="6">
+          <div class="skeleton-row">
+            <div class="skeleton skeleton--avatar"></div>
+            <div class="skeleton skeleton--text-lg"></div>
+            <div class="skeleton skeleton--text-sm"></div>
+            <div class="skeleton skeleton--text-sm"></div>
+            <div class="skeleton skeleton--badge"></div>
+          </div>
+        </td>
+      </tr>
+}
+    </tbody>
+}
+
+    <!-- Table content -->
+    @if (!loading()) {
+<thead>
+      <tr>
+        <th class="col-proveedor">{{ i18n.t('facturas.th_proveedor') }}</th>
+        <th class="col-orden">{{ i18n.t('facturas.th_orden') }}</th>
+        <th class="col-total">{{ i18n.t('facturas.th_total') }}</th>
+        <th class="col-fecha">{{ i18n.t('facturas.th_fecha') }}</th>
+        <th class="col-estado">{{ i18n.t('comun.estado') }}</th>
+        <th class="col-acciones cell--actions">{{ i18n.t('comun.acciones') }}</th>
+      </tr>
+    </thead>
+}
+    @if (!loading()) {
+<tbody>
+      @for (factura of facturas(); track factura) {
+<tr
+        (click)="onVerFactura(factura)"
+        class="row-clickable"
+      >
+        <td>
+          <div class="proveedor-cell">
+            <div class="proveedor-avatar">
+              {{ getProveedorIniciales(factura.proveedorNombre) }}
+            </div>
+            <div>
+              <p class="proveedor-cell__name">
+                <span class="material-symbols-outlined doc-type-icon" title="Factura electrónica">
+                  {{ getDocumentoIcono('Factura Electrónica') }}
+                </span>
+                {{ factura.proveedorNombre }}
+              </p>
+              <p class="proveedor-cell__id">{{ factura.proveedorNit }}</p>
+            </div>
+          </div>
+        </td>
+        <td class="cell--medium">{{ factura.ordenCompra ?? '—' }}</td>
+        <td class="cell--bold">${{ factura.total | number:'1.2-2' }}</td>
+        <td class="cell--muted">{{ factura.fechaEmision | date:'MMM dd, yyyy' }}</td>
+        <td>
+          <span class="status-badge" [ngClass]="getEstadoBadgeClass(factura.estado)">
+            {{ factura.estado }}
+          </span>
+        </td>
+        <td class="cell--actions">
+          <div class="actions-row">
+            <button *hasPermission="'facturas:editar'" class="action-icon"
+              [disabled]="factura.estado === 'ANULADA' || factura.estado === 'PAGADA'"
+              (click)="$event.stopPropagation(); onEditarFactura(factura)" title="Editar">
+              <span class="material-symbols-outlined">edit</span>
+            </button>
+            <button class="action-icon" (click)="$event.stopPropagation(); onVerFactura(factura)" title="Ver detalle">
+              <span class="material-symbols-outlined">visibility</span>
+            </button>
+            <button *hasPermission="'facturas:anular'" class="action-icon action-icon--danger"
+              [disabled]="factura.estado === 'ANULADA'"
+              (click)="$event.stopPropagation(); onAnularFactura(factura)" title="Anular">
+              <span class="material-symbols-outlined">block</span>
+            </button>
+          </div>
+        </td>
+      </tr>
+} @empty {
+      <tr>
+        <td colspan="6">
+          <inventario-empty-state
+            icon="receipt_long"
+            title="Sin facturas"
+            message="Intenta ajustar los filtros de búsqueda."
+          />
+        </td>
+      </tr>
+}
+    </tbody>
+}
+
+    <!-- Pagination slot -->
+    @if (!loading() && facturas().length > 0) {
+<div dtFooter class="dt-footer">
+      <span class="dt-page-info">
+        {{ i18n.t('facturas.mostrando', { count: facturas().length.toString(), total: (paginacion().totalElements | number) ?? '' }) }}
+      </span>
+      <div class="dt-pagination">
+        <button class="dt-page-btn" [disabled]="paginacion().page === 0" (click)="onIrAPagina(paginacion().page - 1)">
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        @for (p of paginas(); track p) {
+          <button class="dt-page-btn" [class.dt-page-btn--active]="p === paginacion().page" (click)="onIrAPagina(p)">{{ p + 1 }}</button>
+        }
+        <button class="dt-page-btn" [disabled]="paginacion().page >= paginacion().totalPages - 1" (click)="onIrAPagina(paginacion().page + 1)">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+      </div>
+    </div>
+}
+
+  </restaurant-data-table>
+
+</section>
+
+<!-- ── MODAL: Exportar Facturas ── -->
+@if (showExportarModal()) {
+<inventario-exportar
+ 
+  titulo="Exportar Panel de Facturación"
+  subtitulo="Seleccione el formato de salida para el reporte de facturas electrónicas"
+  (exportar)="onConfirmarExportar($event)"
+  (cerrar)="onCerrarExportar()"
+/>
+}
+
+<!-- ── MODAL: Anular Factura ── -->
+<restaurant-keyword-confirm-modal
+  [open]="showAnularModal()"
+  title="¿Anular esta factura?"
+  description="Esta acción marcará la factura como Anulada y no podrá revertirse."
+  keyword="ANULAR"
+  keywordLabel="Escribe ANULAR para confirmar"
+  confirmLabel="Sí, anular factura"
+  cancelLabel="Cancelar"
+  [identifierLabel]="'Factura'"
+  [identifierValue]="facturaParaAnular()?.proveedorNombre ?? ''"
+  accent="danger"
+  (confirm)="onConfirmarAnular()"
+  (cancel)="onCancelarAnular()"
+/>

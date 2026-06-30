@@ -1,0 +1,374 @@
+.caja-pagar-page {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  min-height: calc(100vh - var(--topbar-height));
+  background-color: var(--color-fondo);
+
+  /* Cabecera y botón de retroceso unificado */
+  .header-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-4);
+
+    .back-btn {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--color-text-primary);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s;
+
+      &:hover {
+        background: var(--color-background-soft);
+      }
+    }
+
+    restaurant-page-header {
+      ::ng-deep .page-header {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .main-content-block {
+    width: 100%;
+  }
+
+  .data-table-wrapper {
+    display: block;
+  }
+
+  .subtitle {
+    display: block;
+    padding: 0 var(--space-6) var(--space-4) var(--space-6);
+    margin-top: calc(var(--space-2) * -1);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .amount-pending {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+  }
+
+  .cobrar-btn {
+    ::ng-deep button {
+      font-size: var(--font-size-sm);
+      padding: var(--space-1) var(--space-3);
+    }
+  }
+
+  .card {
+    background-color: var(--color-surface-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .block-header {
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: var(--space-4);
+
+    .title-group {
+      display: flex;
+      flex-direction: column;
+
+      h5 {
+        margin: 0;
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-text-heading);
+      }
+
+      .subtitle {
+        font-size: var(--font-size-sm);
+        color: var(--color-text-secondary);
+      }
+    }
+  }
+
+  /* ESTILOS INTERNOS DEL MODAL DE COBRO */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(3px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+
+  .modal-card {
+    background-color: var(--color-surface-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideUp 0.2s ease-out;
+  }
+
+  .modal-header {
+    padding: var(--space-4) var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h3 {
+      margin: 0;
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text-heading);
+    }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      color: var(--color-text-muted);
+      cursor: pointer;
+
+      &:hover {
+        color: var(--color-text-primary);
+      }
+    }
+  }
+
+  .modal-body {
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .total-badge {
+    background-color: var(--color-surface-hover);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--color-border);
+
+    .lbl {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      font-weight: 500;
+    }
+
+    .val {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--color-brand-primary);
+    }
+
+    &.primary {
+      background-color: transparent;
+      border-color: var(--color-brand-primary);
+      
+      .lbl {
+        color: var(--color-text-primary);
+      }
+      .val {
+        color: var(--color-brand-primary);
+      }
+    }
+  }
+
+  .tip-section {
+    background-color: var(--color-surface-secondary);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+  }
+
+  .section-hint {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-3);
+    font-weight: 500;
+    text-transform: uppercase;
+    display: block;
+  }
+
+  /* Cuadrícula de Métodos de Pago */
+  .method-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-3);
+  }
+
+  .method-card {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4) var(--space-2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+
+    &:hover {
+      border-color: var(--color-brand-primary);
+      color: var(--color-brand-primary);
+      background-color: var(--color-surface-hover);
+    }
+
+    &.active {
+      border-color: var(--color-brand-primary);
+      background-color: transparent;
+      color: var(--color-brand-primary);
+      box-shadow: 0 0 0 1px var(--color-brand-primary);
+    }
+
+    &.small {
+      padding: var(--space-2);
+      min-height: unset;
+      height: auto;
+      
+      span {
+        font-size: var(--font-size-xs);
+      }
+    }
+  }
+
+  /* Formularios globales */
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    width: 100%;
+
+    label {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-secondary);
+    }
+  }
+
+  .form-control {
+    padding: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-md);
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+    outline: none;
+    width: 100%;
+
+    &:focus {
+      border-color: var(--color-brand-primary);
+    }
+  }
+
+  /* Caja del Calculador de Efectivo */
+  .cash-calculator-box {
+    background-color: var(--color-surface-secondary);
+    border: 1px dashed var(--color-border);
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+
+    .change-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: var(--space-4);
+      margin-top: var(--space-4);
+      border-top: 1px dashed var(--color-border);
+
+      .change-lbl {
+        font-size: var(--font-size-sm);
+        font-weight: 500;
+        color: var(--color-text-heading);
+      }
+
+      .change-val {
+        font-size: 1.3rem;
+        font-weight: 700;
+        
+        &.negative {
+          color: var(--color-danger);
+        }
+        &.positive {
+          color: var(--color-success);
+        }
+      }
+    }
+  }
+
+  .alert {
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-xs);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+
+    &.alert-info {
+      background-color: var(--color-surface-hover);
+      color: var(--color-brand-primary);
+      border: 1px solid var(--color-border);
+    }
+  }
+
+  .modal-footer {
+    padding: var(--space-4) var(--space-6);
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+  }
+
+  .btn-content-centered {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mt-3 {
+    margin-top: var(--space-3);
+  }
+
+  .mt-4 {
+    margin-top: var(--space-4);
+  }
+  
+  .mb-4 {
+    margin-bottom: var(--space-4);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

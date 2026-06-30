@@ -1,0 +1,200 @@
+<div class="page-container">
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       HEADER
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="page-header-row">
+    <div class="title-group">
+      <inventario-back-button (clicked)="goBack()" />
+      <div>
+        <h1 class="page-title">{{ i18n.t('conciliacion.historial_titulo') }}</h1>
+        <p class="page-subtitle">{{ i18n.t('conciliacion.historial_subtitulo') }}</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <restaurant-button variant="ghost" (click)="onExportar()">
+        <div class="btn-icon-text">
+          <lucide-icon name="download" [size]="18"></lucide-icon>
+          {{ i18n.t('conciliacion.exportar_reporte') }}
+        </div>
+      </restaurant-button>
+      <restaurant-button variant="primary" routerLink="../toma-fisica">
+        <div class="btn-icon-text">
+          <lucide-icon name="plus" [size]="18"></lucide-icon>
+          {{ i18n.t('conciliacion.nueva') }}
+        </div>
+      </restaurant-button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       KPI ROW
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="kpi-row">
+    <restaurant-kpi-card
+      [label]="i18n.t('conciliacion.kpi_total')"
+      [value]="totalConciliaciones()"
+      iconName="check-square"
+      iconVariant="success">
+    </restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      [label]="i18n.t('conciliacion.kpi_diferencias')"
+      [value]="diferenciasTotal()"
+      iconName="alert-triangle"
+      iconVariant="alert">
+    </restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      [label]="i18n.t('conciliacion.kpi_precision')"
+      [value]="precisionPromedio() + '%'"
+      iconName="check-circle-2"
+      iconVariant="info">
+    </restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      [label]="i18n.t('conciliacion.kpi_ultima')"
+      [value]="ultimaFecha() ?? 'Sin datos'"
+      iconName="clock"
+      iconVariant="neutral">
+    </restaurant-kpi-card>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       MAIN GRID
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="main-layout-grid">
+    
+    <!-- MAIN CONTENT: TABLE -->
+    <div class="main-content">
+      <restaurant-data-table 
+        tableTitle="Registros Recientes" 
+        tableIcon="list"
+        searchPlaceholder="Buscar ID, Ubicación...">
+        
+        <div dtHeader class="table-filters">
+          <div class="filter-dropdown">
+            <span>{{ i18n.t('comun.todos') }}</span>
+            <lucide-icon name="chevron-down" [size]="16"></lucide-icon>
+          </div>
+          <div class="filter-dropdown">
+            <span>{{ i18n.t('conciliacion.todos_estados') }}</span>
+            <lucide-icon name="chevron-down" [size]="16"></lucide-icon>
+          </div>
+        </div>
+
+        <thead>
+          <tr>
+            <th>{{ i18n.t('comun.fecha') }}</th>
+            <th>{{ i18n.t('conciliacion.th_ubicacion') }}</th>
+            <th>{{ i18n.t('conciliacion.th_items') }}</th>
+            <th>{{ i18n.t('conciliacion.th_precision') }}</th>
+            <th>{{ i18n.t('comun.estado') }}</th>
+            <th class="text-center">{{ i18n.t('comun.accion') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (reg of registros(); track reg.id) {
+            <tr>
+              <td class="text-secondary whitespace-pre">{{ reg.fecha.replace(', ', '\n') }}</td>
+              <td class="text-secondary">{{ reg.ubicacion }}</td>
+              <td>
+                <div class="items-cell">
+                  <span class="font-medium text-primary">{{ reg.itemsTotal }}</span>
+                  <span class="dif-mini-badge">{{ reg.itemsDif }} dif</span>
+                </div>
+              </td>
+              <td>
+                <div class="precision-cell">
+                  <div class="precision-bar-bg">
+                    <div class="precision-bar-fill" [style.width.%]="reg.precision" [ngClass]="'fill--' + reg.estadoColor"></div>
+                  </div>
+                  <span class="text-secondary font-medium">{{ reg.precision }}%</span>
+                </div>
+              </td>
+              <td>
+                <span class="status-badge" [ngClass]="'status-badge--' + reg.estadoColor">
+                  {{ reg.estado }}
+                </span>
+              </td>
+              <td class="text-center">
+                <button class="action-btn" [routerLink]="['../', reg.id]">
+                  <lucide-icon name="eye" [size]="18"></lucide-icon>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </restaurant-data-table>
+    </div>
+
+  </div>
+
+  <!-- PANELS BELOW THE TABLE -->
+  <div class="bottom-panels">
+    
+    <!-- Top 3 conciliaciones con más diferencias -->
+    <div class="sidebar-card">
+      <h3 class="sidebar-title">{{ i18n.t('conciliacion.top3_titulo') }}</h3>
+      <div class="top-list">
+        @if (topDiferencias().length === 0) {
+          <p class="text-secondary">{{ i18n.t('conciliacion.sin_diferencias') }}</p>
+        }
+        @for (item of topDiferencias(); track item.label) {
+          <div class="top-item">
+            <div class="top-icon">
+              <lucide-icon name="alert-triangle" [size]="18"></lucide-icon>
+            </div>
+            <div class="top-info">
+              <span class="top-name">{{ item.label }}</span>
+              <span class="top-fecha">{{ item.fecha }}</span>
+            </div>
+            <span class="top-dif">{{ item.diferencia }} dif.</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Volumen vs Precisión (últimos 6 meses reales) -->
+    <div class="sidebar-card">
+      <div class="sidebar-header-flex">
+        <h3 class="sidebar-title">{{ i18n.t('conciliacion.precision_mensual') }}</h3>
+        <lucide-icon name="more-vertical" [size]="18" class="text-disabled"></lucide-icon>
+      </div>
+      <p class="sidebar-subtitle">Últimos {{ tendenciaMensual().length }} meses</p>
+
+      @if (tendenciaMensual().length === 0) {
+        <p class="text-secondary">{{ i18n.t('comun.sin_datos') }}</p>
+      } @else {
+        <div class="placeholder-chart">
+          <div class="vol-bars">
+            @for (m of tendenciaMensual(); track m.mes) {
+              <div class="vol-col">
+                <div class="bar-pair">
+                  <div class="bar prec" [class.chart-bar--current]="m.isCurrent" [style.height.%]="m.precision"></div>
+                </div>
+                <span [class.chart-label--current]="m.isCurrent">{{ m.label }}</span>
+              </div>
+            }
+          </div>
+          <div class="chart-legend">
+            <div class="legend-item"><div class="dot prec-dot"></div><span>{{ i18n.t('conciliacion.leyenda_precision') }}</span></div>
+          </div>
+        </div>
+      }
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ── MODAL: Exportar Historial ── -->
+@if (showExportarModal()) {
+<inventario-exportar
+ 
+  titulo="Exportar Historial de Conciliaciones"
+  subtitulo="Seleccione el formato de salida para el reporte de auditoría"
+  (exportar)="onConfirmarExportar($event)"
+  (cerrar)="onCerrarExportar()"
+/>
+}

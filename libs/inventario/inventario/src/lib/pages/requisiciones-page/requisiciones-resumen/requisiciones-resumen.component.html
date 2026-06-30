@@ -1,0 +1,109 @@
+<!-- Modal Overlay -->
+<div class="modal-overlay" (click)="close()"></div>
+
+<!-- Modal Container -->
+<div class="modal-container">
+  <div class="modal-card">
+
+    <!-- Header -->
+    <div class="modal-card__header">
+      <div>
+        <h2 class="modal-card__title">{{ i18n.t('req.resumen_titulo') }}</h2>
+        <p class="modal-card__subtitle">
+          Ficha {{ draft.contexto().fichaId }} — {{ draft.contexto().fecha }}
+          {{ draft.contexto().horaSesion }}
+        </p>
+      </div>
+      <div class="modal-card__header-icon">
+        <lucide-icon name="clipboard-check" [size]="24"></lucide-icon>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-card__body">
+
+      @if (draft.totalItems() === 0) {
+        <div class="empty-notice">
+          <lucide-icon name="inbox" [size]="16"></lucide-icon>
+          No hay productos seleccionados. Vuelva a editar.
+        </div>
+      } @else {
+        @for (grupo of itemsPorCategoria(); track grupo.cat) {
+          <section class="category-section">
+            <div class="category-section__divider">
+              <span class="category-section__label">{{ grupo.label }}</span>
+              <div class="category-section__line"></div>
+            </div>
+            <div class="item-list">
+              @for (item of grupo.items; track item.bien.codigoSena) {
+                <div class="item-card"
+                     [class.item-card--alert]="item.bien.estado === 'Bajo Stock' || item.bien.estado === 'Agotado'">
+                  <div class="item-card__left">
+                    <div class="item-card__icon-wrap"
+                         [class.item-card__icon-wrap--alert]="item.bien.estado === 'Bajo Stock' || item.bien.estado === 'Agotado'">
+                      <lucide-icon name="package" [size]="20"></lucide-icon>
+                    </div>
+                    <div class="item-card__info">
+                      <div class="item-card__name-row">
+                        <h4 class="item-card__name">{{ item.bien.descripcion }}</h4>
+                        @if (item.bien.estado === 'Bajo Stock') {
+                          <span class="item-card__stock-badge">Bajo Stock</span>
+                        }
+                        @if (item.bien.estado === 'Agotado') {
+                          <span class="item-card__stock-badge">Agotado</span>
+                        }
+                      </div>
+                      <p class="item-card__code">{{ i18n.t('comun.codigo') }}: {{ item.bien.codigoSena }}</p>
+                    </div>
+                  </div>
+                  <div class="item-card__right"
+                       [class.item-card__right--alert]="item.bien.estado === 'Bajo Stock' || item.bien.estado === 'Agotado'">
+                    <span class="item-card__qty"
+                          [class.item-card__qty--alert]="item.bien.estado === 'Bajo Stock'">
+                      {{ item.cantidad | number:'2.0-0' }}
+                    </span>
+                    <span class="item-card__unit"
+                          [class.item-card__unit--alert]="item.bien.estado === 'Bajo Stock'">
+                      {{ item.bien.unidadMedida }}
+                    </span>
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+        }
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-card__footer">
+      <div class="modal-footer__summary">
+        <div>
+          <p class="modal-footer__total-label">{{ i18n.t('req.total_solicitud') }}</p>
+          <h3 class="modal-footer__total-value">{{ draft.totalUnidades() }} {{ i18n.t('req.unidades') }}</h3>
+        </div>
+        <p class="modal-footer__note">{{ i18n.t('req.pedido_nota') }}</p>
+      </div>
+      <!-- Slot de mensaje con espacio reservado: el error no debe mover los botones -->
+      <div class="modal-footer__error-slot" [class.modal-footer__error-slot--visible]="!!error()">
+        @if (error()) {
+          <p class="modal-footer__error">{{ error() }}</p>
+        }
+      </div>
+      <div class="modal-footer__actions">
+        <button class="btn-secondary" (click)="volver()" [disabled]="enviando()">{{ i18n.t('req.volver_editar') }}</button>
+        <button class="btn-primary" (click)="confirmar()"
+                [disabled]="enviando() || draft.totalItems() === 0">
+          @if (enviando()) {
+            <lucide-icon name="loader-2" [size]="18"></lucide-icon>
+            {{ i18n.t('req.enviando') }}
+          } @else {
+            {{ i18n.t('req.confirmar_pedido') }}
+            <lucide-icon name="send" [size]="18"></lucide-icon>
+          }
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

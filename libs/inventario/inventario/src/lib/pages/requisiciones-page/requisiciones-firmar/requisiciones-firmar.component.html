@@ -1,0 +1,149 @@
+<!-- Modal Overlay -->
+<div class="modal-overlay" (click)="close()"></div>
+
+<!-- Modal Container -->
+<div class="modal-container">
+  <div class="modal-card">
+
+    <!-- Modal Header -->
+    <div class="modal-card__header">
+      <div class="modal-card__title-group">
+        <div class="modal-card__icon-wrap">
+          <lucide-icon name="pen-tool" [size]="20"></lucide-icon>
+        </div>
+        <h2 class="modal-card__title">{{ i18n.t('req.firmar_titulo') }}</h2>
+      </div>
+      <button class="modal-card__close" type="button" (click)="close()">
+        <lucide-icon name="x" [size]="20"></lucide-icon>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-card__body">
+
+      <!-- Info Alert -->
+      <div class="info-alert">
+        <lucide-icon name="info" [size]="20" class="info-alert__icon"></lucide-icon>
+        <p class="info-alert__text">
+          Al confirmar, usted declara que recibió los insumos detallados en la
+          <strong>{{ numeroReq() || 'esta requisición' }}</strong>
+          en las condiciones y cantidades estipuladas.
+        </p>
+      </div>
+
+      <!-- Items List — datos reales de la requisición -->
+      <div class="items-list">
+        <h3 class="items-list__label">{{ i18n.t('req.insumos_despachados') }}</h3>
+        <div class="items-list__rows">
+          @if (facade.loading()) {
+            <p class="items-list__empty">{{ i18n.t('comun.cargando') }}</p>
+          } @else if (items().length === 0) {
+            <p class="items-list__empty">{{ i18n.t('req.sin_insumos') }}</p>
+          } @else {
+            @for (item of items(); track item.productoId) {
+              <div class="item-row">
+                <div class="item-row__qty">
+                  <span class="item-row__qty-value">{{ item.cantidad }}</span>
+                  <span class="item-row__qty-unit">{{ item.unidadMedida }}</span>
+                </div>
+                <div class="item-row__info">
+                  <p class="item-row__name">{{ item.productoNombre }}</p>
+                  <p class="item-row__code">{{ i18n.t('comun.codigo') }}: {{ item.productoId }}</p>
+                </div>
+                <lucide-icon name="check-circle" [size]="20" class="item-row__check"></lucide-icon>
+              </div>
+            }
+          }
+        </div>
+      </div>
+
+      <!-- Signatures Grid -->
+      <div class="signatures-grid">
+
+        <!-- Instructor — solo lectura, datos del sistema -->
+        <div class="signature-block">
+          <h4 class="signature-block__title">
+            <lucide-icon name="user" [size]="16"></lucide-icon>
+            {{ i18n.t('req.firma_instructor') }}
+          </h4>
+          <div class="form-field">
+            <label class="form-field__label">{{ i18n.t('req.nombre_instructor') }}</label>
+            <input class="form-field__input" type="text" readonly [value]="instructor()" />
+          </div>
+          <div class="form-field">
+            <label class="form-field__label">{{ i18n.t('req.fecha_firma') }}</label>
+            <input class="form-field__input" type="text" readonly [value]="hoy" />
+          </div>
+        </div>
+
+        <!-- Vocero — editable -->
+        <div class="signature-block">
+          <h4 class="signature-block__title">
+            <lucide-icon name="graduation-cap" [size]="16"></lucide-icon>
+            {{ i18n.t('req.firma_vocero') }}
+          </h4>
+          <div class="form-field">
+            <label class="form-field__label">{{ i18n.t('req.nombre_completo') }} <span class="form-field__required">*</span></label>
+            <input
+              class="form-field__input form-field__input--editable"
+              type="text"
+              [placeholder]="i18n.t('req.vocero_nombre_placeholder')"
+              [value]="voceroNombre()"
+              (input)="setVoceroNombre($event)"
+            />
+          </div>
+          <div class="form-field">
+            <label class="form-field__label">{{ i18n.t('req.doc_identidad') }} <span class="form-field__required">*</span></label>
+            <input
+              class="form-field__input form-field__input--editable"
+              type="text"
+              [placeholder]="i18n.t('req.doc_placeholder')"
+              [value]="voceroDocumento()"
+              (input)="setVoceroDocumento($event)"
+            />
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Verification Checkbox -->
+      <label class="verify-check">
+        <div class="verify-check__box-wrapper">
+          <input
+            class="verify-check__input"
+            type="checkbox"
+            [checked]="verificado()"
+            (change)="setVerificado($event)"
+          />
+          <div class="verify-check__box">
+            <lucide-icon name="check" [size]="14"></lucide-icon>
+          </div>
+        </div>
+        <span class="verify-check__label">
+          {{ i18n.t('req.verificado_check') }}
+        </span>
+      </label>
+
+      <!-- Error -->
+      @if (error()) {
+        <p class="form-error">{{ error() }}</p>
+      }
+
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-card__footer">
+      <button class="btn-ghost" type="button" (click)="close()">{{ i18n.t('comun.cancelar') }}</button>
+      <button
+        class="btn-primary"
+        type="button"
+        [disabled]="!puedeConfirmar() || firmando()"
+        (click)="firmar()"
+      >
+        <lucide-icon name="shield-check" [size]="18"></lucide-icon>
+        {{ firmando() ? i18n.t('req.firmando') : i18n.t('req.confirmar_firmar') }}
+      </button>
+    </div>
+
+  </div>
+</div>

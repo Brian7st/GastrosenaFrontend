@@ -1,0 +1,166 @@
+<div class="consolidado-page">
+  <!-- Header Section -->
+  <header class="page-header">
+    <div class="page-header__left">
+      <inventario-back-button (clicked)="goBack()"></inventario-back-button>
+      <div class="page-header__title-row">
+        <h1 class="page-header__title">Detalle: <span class="text-primary">#{{ consolidado()?.numero ?? '...' }}</span></h1>
+      </div>
+    </div>
+
+    <div class="page-header__actions">
+      <restaurant-button variant="surface" (click)="openExportModal()">
+        <span class="material-symbols-outlined btn-icon">download</span> {{ i18n.t('comun.exportar') }}
+      </restaurant-button>
+      <restaurant-button variant="danger" (click)="openReversarModal()">
+        <span class="material-symbols-outlined btn-icon">cancel</span> {{ i18n.t('consolidado.revertir') }}
+      </restaurant-button>
+    </div>
+  </header>
+
+  <!-- Dashboard Stats Summary (Bento Grid) -->
+  <div class="kpi-grid">
+    <restaurant-kpi-card
+      [label]="i18n.t('consolidado.kpi_valor_neto')"
+      [value]="(consolidado()?.totales?.valorNeto ?? 0) | currency:'COP':'symbol-narrow':'1.0-0'"
+      icon="landmark"
+      iconColor="green">
+    </restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      [label]="i18n.t('consolidado.kpi_lineas')"
+      [value]="(consolidado()?.lineas?.length ?? 0)"
+      icon="file-text"
+      iconColor="blue">
+    </restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      [label]="i18n.t('consolidado.kpi_fecha_gen')"
+      [value]="consolidado()?.fechaGeneracion ?? '--'"
+      icon="calendar"
+      iconColor="slate">
+    </restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      [label]="i18n.t('consolidado.kpi_generado_por')"
+      [value]="consolidado()?.generadoPor ?? '--'"
+      icon="user"
+      iconColor="blue">
+    </restaurant-kpi-card>
+  </div>
+
+  <!-- Section 1: Totales reales del consolidado -->
+  <section class="bento-card p-0">
+    <div class="section-header">
+      <div class="section-header__title-container">
+        <div class="section-header__icon">
+          <span class="material-symbols-outlined">pie_chart</span>
+        </div>
+        <h3 class="section-header__title">{{ i18n.t('consolidado.resumen_financiero') }}</h3>
+      </div>
+      <span class="section-header__subtitle">{{ i18n.t('consolidado.totales_subtitle') }}</span>
+    </div>
+
+    <restaurant-data-table>
+      <thead>
+        <tr>
+          <th class="th-left">{{ i18n.t('consolidado.th_concepto') }}</th>
+          <th class="th-right">{{ i18n.t('comun.valor') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="td-bold">{{ i18n.t('consolidado.suma_montos') }}</span></td>
+          <td class="text-right">
+            <span class="td-value-primary">{{ (consolidado()?.totales?.sumaMontos ?? 0) | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="td-bold">{{ i18n.t('comun.retencion_zese') }}</span></td>
+          <td class="text-right">
+            <span class="td-value-primary">{{ (consolidado()?.totales?.sumaRetencionZese ?? 0) | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="td-bold">{{ i18n.t('consolidado.valor_neto') }}</span></td>
+          <td class="text-right">
+            <span class="td-value-primary">{{ (consolidado()?.totales?.valorNeto ?? 0) | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+          </td>
+        </tr>
+        @if (!consolidado()) {
+          <tr><td colspan="2" class="td-muted text-center">{{ i18n.t('comun.sin_datos') }}</td></tr>
+        }
+      </tbody>
+    </restaurant-data-table>
+  </section>
+
+  <!-- Section 2: Líneas de ejecución -->
+  <section class="bento-card p-0 table-overflow">
+    <div class="section-header">
+      <div class="section-header__title-container">
+        <div class="section-header__icon">
+          <span class="material-symbols-outlined">table_view</span>
+        </div>
+        <h3 class="section-header__title">{{ i18n.t('consolidado.lineas_titulo') }}</h3>
+      </div>
+    </div>
+
+    <restaurant-data-table>
+      <thead>
+        <tr>
+          <th class="th-left">{{ i18n.t('consolidado.th_gil_id') }}</th>
+          <th class="th-left">{{ i18n.t('consolidado.th_factura_nro') }}</th>
+          <th class="th-left">{{ i18n.t('consolidado.th_concepto') }}</th>
+          <th class="th-left">{{ i18n.t('comun.fecha') }}</th>
+          <th class="th-right">{{ i18n.t('consolidado.th_monto') }}</th>
+          <th class="th-right">{{ i18n.t('consolidado.th_ret_zese') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (linea of (consolidado()?.lineas ?? []); track linea.gilId) {
+          <tr>
+            <td class="td-mono td-muted">{{ linea.gilId }}</td>
+            <td class="td-mono">{{ linea.numeroFactura }}</td>
+            <td class="td-normal">{{ linea.concepto }}</td>
+            <td class="td-muted">{{ linea.fecha }}</td>
+            <td class="text-right td-medium">{{ linea.monto | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+            <td class="text-right td-normal">{{ linea.retencionZese | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+          </tr>
+        }
+        @if ((consolidado()?.lineas ?? []).length === 0) {
+          <tr><td colspan="6" class="td-muted text-center">{{ i18n.t('consolidado.sin_lineas') }}</td></tr>
+        }
+      </tbody>
+      <tfoot dtFooter class="tfoot-totals">
+        <tr>
+          <td class="tfoot-totals__label" colspan="4">{{ i18n.t('comun.totales') }}</td>
+          <td class="text-right">
+            <span class="tfoot-totals__value">{{ totalMonto() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+          </td>
+          <td class="text-right">
+            <span class="tfoot-totals__value">{{ totalRetencion() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+          </td>
+        </tr>
+      </tfoot>
+    </restaurant-data-table>
+  </section>
+
+  @if (showExportModal()) {
+    <restaurant-exportar-consolidado-modal
+      (close)="closeExportModal()"
+      (export)="onExport($event)">
+    </restaurant-exportar-consolidado-modal>
+  }
+
+  @if (showReversarModal() && consolidado()) {
+    <restaurant-reversar-consolidado-modal
+      [consolidadoId]="consolidado()!.id"
+      [periodo]="consolidado()!.fechaGeneracion"
+      [total]="(consolidado()!.totales.valorNeto | currency:'COP':'symbol-narrow':'1.0-0') ?? ''"
+      [comprobantes]="consolidado()!.lineas.length"
+      [isBlocked]="isReversarBlocked()"
+      (close)="closeReversarModal()"
+      (confirm)="confirmReversar()">
+    </restaurant-reversar-consolidado-modal>
+  }
+</div>

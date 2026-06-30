@@ -1,0 +1,370 @@
+<!-- Page Header Actions -->
+<div class="page-header-row">
+  <div>
+    <h1 class="page-title">{{ i18n.t('bienes.title') }}</h1>
+    <p class="page-subtitle">{{ i18n.t('bienes.subtitle') }}</p>
+  </div>
+  <div class="header-actions">
+    <restaurant-button variant="surface" (click)="onImportBienes()">
+      <span class="material-symbols-outlined">file_upload</span>
+      {{ i18n.t('bienes.import') }}
+    </restaurant-button>
+    <restaurant-button variant="surface" (click)="onExportBienes()">
+      <span class="material-symbols-outlined">file_download</span>
+      {{ i18n.t('bienes.export') }}
+    </restaurant-button>
+    <restaurant-button variant="primary" (click)="onNuevoBien()">
+      <span class="material-symbols-outlined">add</span>
+      {{ i18n.t('bienes.new') }}
+    </restaurant-button>
+  </div>
+</div>
+
+<!-- Summary Dashboard Stats -->
+@if (kpis(); as k) {
+<div class="kpi-grid">
+
+  <restaurant-kpi-card
+    [label]="i18n.t('bien-kpi.valor_total')"
+    [value]="k.valorTotal | currency:'COP':'symbol-narrow':'1.0-0'"
+    icon="landmark"
+    iconColor="green"
+    [trend]="'+' + (k.tendenciaValor ?? 0) + '% ' + i18n.t('bien-kpi.vs_mes_anterior')"
+    [trendUp]="true"
+  />
+
+  <restaurant-kpi-card
+    [label]="i18n.t('bien-kpi.bienes_alerta')"
+    [value]="k.totalAlertas + ' ' + i18n.t('bien-kpi.items')"
+    icon="warehouse"
+    iconColor="red"
+    [trend]="i18n.t('bien-kpi.critico')"
+    [trendUp]="false"
+  />
+
+  <restaurant-kpi-card
+    [label]="i18n.t('bien-kpi.movimientos_recientes')"
+    [value]="k.movimientosHoy + ' ' + i18n.t('bien-kpi.altas')"
+    icon="refresh-cw"
+    iconColor="blue"
+    [trend]="i18n.t('bien-kpi.hoy')"
+    [trendUp]="null"
+  />
+
+</div>
+}
+
+<!-- Toggle de vistas: Bienes / Contratos -->
+<div class="vista-toggle" role="group" [attr.aria-label]="i18n.t('bienes.toggle_bienes')">
+  <button
+    class="vista-toggle__btn"
+    [class.vista-toggle__btn--active]="vista() === 'bienes'"
+    (click)="cambiarVista('bienes')"
+    type="button">
+    <span class="material-symbols-outlined">inventory_2</span>
+    {{ i18n.t('bienes.toggle_bienes') }}
+  </button>
+  <button
+    class="vista-toggle__btn"
+    [class.vista-toggle__btn--active]="vista() === 'contratos'"
+    (click)="cambiarVista('contratos')"
+    type="button">
+    <span class="material-symbols-outlined">description</span>
+    {{ i18n.t('bienes.toggle_contratos') }}
+  </button>
+</div>
+
+<!-- ── Vista: Bienes ──────────────────────────────────────────────────────── -->
+@if (vista() === 'bienes') {
+<!-- Dashboard Card Container (Tabla) -->
+<restaurant-data-table
+  [tableTitle]="i18n.t('bienes.table_title')"
+  tableIcon="package"
+  [searchPlaceholder]="i18n.t('bienes.search_placeholder')"
+  [showFilterButton]="true"
+  [filterActive]="showFilters()"
+  [filterCount]="filtrosActivos()"
+  (searchChange)="onSearch($event)"
+  (filterToggle)="onToggleFilters()"
+>
+
+  <!-- Panel de filtros colapsable (slot [dtHeader]) -->
+  @if (showFilters()) {
+    <div dtHeader class="filter-panel">
+      <div class="filter-panel__row">
+        <div class="filter-group">
+          <label class="filter-label">{{ i18n.t('bienes.filter_categoria') }}</label>
+          <select class="filter-select" [value]="filtroCategoria()" (change)="onFiltroCategoria($any($event.target).value)">
+            <option value="">{{ i18n.t('bienes.filter_todas') }}</option>
+            @for (cat of CATEGORIAS; track cat) {
+              <option [value]="cat">{{ cat }}</option>
+            }
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">{{ i18n.t('bienes.filter_estado') }}</label>
+          <select class="filter-select" [value]="filtroEstado()" (change)="onFiltroEstado($any($event.target).value)">
+            <option value="">{{ i18n.t('bienes.filter_todos') }}</option>
+            <option value="Activo">{{ i18n.t('bienes.filter_activo') }}</option>
+            <option value="Inactivo">{{ i18n.t('bienes.filter_inactivo') }}</option>
+          </select>
+        </div>
+        <div class="filter-group filter-group--actions">
+          <button class="filter-clear-btn" (click)="onLimpiarFiltros()" [disabled]="filtrosActivos() === 0">
+            <span class="material-symbols-outlined">clear_all</span>
+            {{ i18n.t('bienes.filter_limpiar') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Cabecera de tabla -->
+  <thead>
+    <tr>
+      <th>{{ i18n.t('bienes.th_cod_sena') }}</th>
+      <th>{{ i18n.t('bienes.th_descripcion') }}</th>
+      <th class="text-center">{{ i18n.t('bienes.th_stock') }}</th>
+      <th class="text-center">{{ i18n.t('bienes.th_stock_min') }}</th>
+      <th class="text-center">{{ i18n.t('bienes.th_um') }}</th>
+      <th>{{ i18n.t('bienes.th_valor') }}</th>
+      <th>{{ i18n.t('bienes.th_estado') }}</th>
+      <th class="text-center">{{ i18n.t('bienes.th_acciones') }}</th>
+    </tr>
+  </thead>
+
+  <!-- Filas de datos -->
+  <tbody>
+    @if (loading()) {
+      <tr>
+        <td colspan="8">
+          <restaurant-loading-skeleton [rows]="5" [columns]="8"></restaurant-loading-skeleton>
+        </td>
+      </tr>
+    } @else {
+      @for (bien of bienes(); track bien) {
+<tr class="table-row">
+            <td>
+              <span class="code-mono">{{ bien.codigoSena }}</span>
+            </td>
+            <td>
+              <p class="bien-desc">{{ bien.descripcion }}</p>
+            </td>
+            <td class="text-center">
+              <span class="stock-value" [class.stock-value--danger]="bien.stockActual < bien.stockMinimo">{{ bien.stockActual }}</span>
+            </td>
+            <td class="text-center">
+              <span class="stock-min">{{ bien.stockMinimo }}</span>
+            </td>
+            <td class="text-center">
+              <span class="um-value">{{ bien.unidadMedida }}</span>
+            </td>
+            <td>
+              <span class="valor-text">{{ bien.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+            </td>
+            <td>
+              <span class="estado-badge" [ngClass]="getEstadoBadgeClass(bien.estado)">
+                <span class="estado-dot"></span>
+                {{ bien.estado }}
+              </span>
+            </td>
+            <td class="text-center">
+              <div class="actions-row">
+                <button class="action-icon" (click)="onEditar(bien)" [title]="i18n.t('bien-table.editar')">
+                  <span class="material-symbols-outlined">edit</span>
+                </button>
+                <button class="action-icon" (click)="onVerDetalle(bien)" [title]="i18n.t('bien-table.ver_detalle')">
+                  <span class="material-symbols-outlined">visibility</span>
+                </button>
+                @if (bien.estado === 'Activo') {
+                  <button class="action-icon action-icon--warning" (click)="onDesactivar(bien)" [title]="i18n.t('bien-table.desactivar')">
+                    <span class="material-symbols-outlined">toggle_off</span>
+                  </button>
+                }
+                @if (bien.estado === 'Inactivo') {
+                  <button class="action-icon action-icon--success" (click)="onActivar(bien)" [title]="i18n.t('bien-table.activar')">
+                    <span class="material-symbols-outlined">toggle_on</span>
+                  </button>
+                }
+              </div>
+            </td>
+          </tr>
+} @empty {
+          <tr>
+            <td colspan="8">
+              <inventario-empty-state
+                icon="inventory_2"
+                [title]="i18n.t('bienes.empty_title')"
+                [message]="i18n.t('bienes.empty_message')"
+              />
+            </td>
+          </tr>
+}
+    }
+  </tbody>
+
+  <!-- Paginación (slot [dtFooter]) -->
+  <div dtFooter class="dt-footer">
+    <p class="dt-page-info">
+      {{ i18n.t('bienes.pagina_info', { count: bienes().length, total: paginacion().totalElements }) }}
+    </p>
+    <div class="dt-pagination">
+      <button class="dt-page-btn"
+        [disabled]="paginacion().page === 0"
+        (click)="onIrAPagina(paginacion().page - 1)">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      @for (p of paginas(); track p) {
+        <button class="dt-page-btn"
+          [class.dt-page-btn--active]="p === paginacion().page"
+          (click)="onIrAPagina(p)">
+          {{ p + 1 }}
+        </button>
+      }
+      <button class="dt-page-btn"
+        [disabled]="paginacion().page >= paginacion().totalPages - 1"
+        (click)="onIrAPagina(paginacion().page + 1)">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
+    </div>
+  </div>
+
+</restaurant-data-table>
+}
+
+<!-- ── Vista: Contratos ───────────────────────────────────────────────────── -->
+@if (vista() === 'contratos') {
+<div class="contratos-toolbar">
+  <restaurant-button variant="primary" (click)="onAbrirImportarContrato()">
+    <span class="material-symbols-outlined">file_upload</span>
+    {{ i18n.t('bienes.import_contrato') }}
+  </restaurant-button>
+</div>
+
+@if (ultimaImportacion(); as imp) {
+<div class="import-result">
+  <span class="material-symbols-outlined">check_circle</span>
+  {{ i18n.t('bienes.contrato_importado', { creados: imp.productosCreados, actualizados: imp.productosActualizados }) }}
+</div>
+}
+
+@if (feedbackCierre(); as feedback) {
+<div class="import-result import-result--cierre">
+  <span class="material-symbols-outlined">lock</span>
+  {{ i18n.t('bienes.contrato_cerrado', { feedback }) }}
+</div>
+}
+
+<restaurant-data-table
+  class="tabla-contratos"
+  [tableTitle]="i18n.t('bienes.contratos_table_title')"
+  tableIcon="file-text"
+  [showFilterButton]="false"
+>
+  <thead>
+    <tr>
+      <th>{{ i18n.t('bienes.th_nro_contrato') }}</th>
+      <th>{{ i18n.t('bienes.th_descripcion') }}</th>
+      <th class="text-center">{{ i18n.t('bienes.th_vigencia') }}</th>
+      <th class="text-center">{{ i18n.t('bienes.th_items') }}</th>
+      <th>{{ i18n.t('bienes.th_estado') }}</th>
+      <th class="text-center">{{ i18n.t('bienes.th_acciones') }}</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    @if (loadingContratos()) {
+      <tr>
+        <td colspan="6">
+          <restaurant-loading-skeleton [rows]="5" [columns]="6"></restaurant-loading-skeleton>
+        </td>
+      </tr>
+    } @else {
+      @for (contrato of contratos(); track contrato.id) {
+        <tr class="table-row">
+          <td>
+            <span class="code-mono">{{ contrato.numero }}</span>
+          </td>
+          <td>
+            <p class="bien-desc">{{ contrato.descripcion }}</p>
+          </td>
+          <td class="text-center">
+            <span class="um-value">{{ contrato.vigencia }}</span>
+          </td>
+          <td class="text-center">
+            <span class="stock-value">{{ contrato.items.length }}</span>
+          </td>
+          <td>
+            <span class="estado-badge" [ngClass]="getEstadoContratoBadgeClass(contrato.estado)">
+              <span class="estado-dot"></span>
+              {{ contrato.estado }}
+            </span>
+          </td>
+          <td class="text-center">
+            <div class="actions-row">
+              <button class="action-icon" (click)="onVerDetalleContrato(contrato.id)" [title]="i18n.t('bien-table.ver_detalle')">
+                <span class="material-symbols-outlined">visibility</span>
+              </button>
+              @if (contrato.estado === 'VIGENTE') {
+                <button class="action-icon action-icon--warning" (click)="onCerrarContrato(contrato.id)" [title]="i18n.t('bienes.cerrar_contrato')">
+                  <span class="material-symbols-outlined">lock</span>
+                </button>
+              }
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="6">
+            <inventario-empty-state
+              icon="description"
+              [title]="i18n.t('bienes.contratos_empty_title')"
+              [message]="i18n.t('bienes.contratos_empty_message')"
+            />
+          </td>
+        </tr>
+      }
+    }
+  </tbody>
+</restaurant-data-table>
+}
+
+<!-- Modales -->
+@if (showFormModal()) {
+<restaurant-bien-form
+ 
+  [mode]="formMode()"
+  [bien]="selectedBien()"
+  (save)="onSaveBien($event)"
+  (cancel)="showFormModal.set(false)"
+></restaurant-bien-form>
+}
+
+@if (showImportModal()) {
+<restaurant-bien-import
+
+  (cancelar)="showImportModal.set(false)"
+  (importar)="onProcessImport($event)"
+></restaurant-bien-import>
+}
+
+@if (showImportContratoModal()) {
+<restaurant-contrato-import
+  (cancelar)="showImportContratoModal.set(false)"
+  (importar)="onImportarContrato($event)"
+></restaurant-contrato-import>
+}
+
+<restaurant-confirmar-cierre-contrato-modal
+  [isOpen]="showCierreContratoModal()"
+  (confirmed)="onConfirmarCierre()"
+  (cancelled)="onCancelarCierre()"
+/>
+
+@if (showDetalleContratoModal()) {
+<restaurant-contrato-detalle
+  [contrato]="contratosFacade.contratoSeleccionado()"
+  [loading]="contratosFacade.loading()"
+  (cerrar)="showDetalleContratoModal.set(false)"
+></restaurant-contrato-detalle>
+}

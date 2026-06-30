@@ -1,0 +1,466 @@
+/* ==========================================================================
+   Generar GIL - Selección múltiple (design tokens)
+   ========================================================================== */
+
+.generar-page-container {
+  padding: var(--space-8);
+  width: 100%;
+}
+
+/* ── Header ────────────────────────────────────────────────────────────── */
+.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.header-titles {
+  .title {
+    font-family: var(--font-family-headline);
+    font-size: var(--font-size-2xl);
+    font-weight: 800;
+    color: var(--color-text-heading);
+    margin: 0 0 var(--space-1);
+    letter-spacing: -0.025em;
+  }
+  .subtitle {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+}
+
+/* ── Form Card ─────────────────────────────────────────────────────────── */
+.form-card {
+  background: var(--color-surface-primary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-xs);
+  padding: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.form-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-6);
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  &__code {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-secondary);
+    background: var(--color-surface-tertiary);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-pill);
+  }
+}
+
+.section-title {
+  font-family: var(--font-family-headline);
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  color: var(--color-text-heading);
+  margin: 0;
+}
+
+.section-icon {
+  color: var(--color-primario);
+  font-size: 20px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.form-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.form-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-heading);
+}
+
+.required-mark {
+  color: var(--color-error);
+}
+
+.form-control {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-primary);
+  color: var(--color-text-primary);
+  transition: border-color var(--duration-fast) var(--ease-standard);
+  font-family: var(--font-family-base);
+
+  &::placeholder {
+    color: var(--color-text-disabled);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primario);
+    box-shadow: var(--focus-ring);
+  }
+}
+
+textarea.form-control {
+  resize: vertical;
+}
+
+/* ── Grid Principal ────────────────────────────────────────────────────── */
+.generar-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+
+  @media (min-width: 1024px) {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.main-col {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Tabla overrides ───────────────────────────────────────────────────── */
+.w-checkbox {
+  width: 40px;
+  padding-right: var(--space-2);
+}
+
+.td-checkbox {
+  padding-right: var(--space-2);
+}
+
+.row-disabled {
+  background: var(--color-surface-secondary);
+
+  .text-dark,
+  .text-muted {
+    color: var(--color-text-disabled);
+  }
+}
+
+/* ── Estado badges (Training states) ──────────────────────────────────── */
+.estado-badge {
+  display: inline-block;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+
+  &--creada {
+    background: var(--color-estado-inactivo-bg);
+    color: var(--color-estado-inactivo);
+  }
+
+  &--aprobada {
+    background: var(--color-estado-activo-bg);
+    color: var(--color-estado-activo);
+  }
+
+  &--rechazada {
+    background: var(--color-estado-anulada-bg);
+    color: var(--color-estado-anulada);
+  }
+
+  &--comprometida {
+    background: var(--color-info-bg);
+    color: var(--color-info-text);
+  }
+}
+
+/* ── Checkbox Personalizado ──────────────────────────────────────────── */
+.custom-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  width: 18px;
+  height: 18px;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 18px;
+    width: 18px;
+    background-color: var(--color-surface-primary);
+    border: 2px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    transition: all var(--duration-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .icon {
+      color: var(--color-en-primario);
+      font-size: 14px;
+      font-weight: 800;
+      opacity: 0;
+      transition: opacity var(--duration-fast);
+    }
+  }
+
+  &:hover input ~ .checkmark {
+    border-color: var(--color-primario);
+  }
+
+  input:checked ~ .checkmark {
+    background-color: var(--color-primario);
+    border-color: var(--color-primario);
+
+    .icon {
+      opacity: 1;
+    }
+  }
+}
+
+/* ── Sidebar Resumen ──────────────────────────────────────────────────── */
+.sidebar-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-card {
+  background: var(--color-surface-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+
+  .summary-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
+
+    .icon-doc {
+      color: var(--color-primario);
+      font-size: 20px;
+    }
+
+    h3 {
+      font-family: var(--font-family-headline);
+      font-size: var(--font-size-lg);
+      font-weight: 800;
+      color: var(--color-text-heading);
+      margin: 0;
+    }
+  }
+
+  .summary-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px dashed var(--color-pizarra-300);
+  }
+
+  .summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-secondary);
+
+    .value {
+      font-size: var(--font-size-lg);
+      font-weight: 800;
+    }
+
+    .text-primario {
+      color: var(--color-primario);
+    }
+  }
+
+  .info-box {
+    margin-top: var(--space-2);
+    background: var(--color-pizarra-100);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    display: flex;
+    gap: var(--space-2);
+    align-items: flex-start;
+
+    .info-icon {
+      color: var(--color-text-secondary);
+      font-size: 16px;
+      margin-top: 2px;
+    }
+
+    p {
+      margin: 0;
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+    }
+  }
+
+  .summary-footer {
+    padding-top: var(--space-6);
+
+    restaurant-button {
+      ::ng-deep button {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--space-3) var(--space-5);
+
+        .right-icon {
+          font-size: 18px;
+        }
+      }
+    }
+  }
+}
+
+/* ── Cuentadantes ─────────────────────────────────────────────────────── */
+.cuentadantes-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.cuentadante-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+
+  .material-symbols-outlined {
+    font-size: 16px;
+    color: var(--color-primario);
+  }
+
+  .cuentadante-nombre {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-heading);
+  }
+
+  .cuentadante-cedula {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-xs);
+  }
+}
+
+.btn-chip-remove {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  color: var(--color-text-disabled);
+  transition: color var(--duration-fast);
+
+  .material-symbols-outlined {
+    font-size: 16px;
+    color: inherit;
+  }
+
+  &:hover {
+    color: var(--color-error);
+  }
+}
+
+.btn-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primario);
+  padding: var(--space-1) 0;
+  transition: opacity var(--duration-fast);
+
+  .material-symbols-outlined {
+    font-size: 18px;
+  }
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.nueva-cuenta-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface-tertiary);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+/* ── Utilities ────────────────────────────────────────────────────────── */
+.w-full {
+  width: 100%;
+}
+
+.text-dark {
+  color: var(--color-text-heading);
+}
+
+.text-muted {
+  color: var(--color-text-secondary);
+}
+
+.font-medium {
+  font-weight: var(--font-weight-semibold);
+}

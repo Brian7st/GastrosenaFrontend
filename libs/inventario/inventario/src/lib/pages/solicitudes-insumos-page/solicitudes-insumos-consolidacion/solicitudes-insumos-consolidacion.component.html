@@ -1,0 +1,90 @@
+<!-- Back Button -->
+<div class="action-header-wrap" style="margin-bottom: -1rem;">
+  <inventario-back-button (clicked)="goBack()" />
+</div>
+
+<!-- Header -->
+<div class="page-header">
+  <h1 class="page-title">{{ i18n.t('si.consolidacion_titulo') }}</h1>
+  <p class="page-subtitle">{{ i18n.t('si.consolidacion_subtitulo') }}</p>
+</div>
+
+<!-- Origen de datos -->
+<div class="origen-datos">
+  <span class="origen-label">{{ i18n.t('si.origen_datos') }}</span>
+  <div class="origen-tags">
+    @for (orig of origenes(); track orig) {
+<span class="origen-tag">{{ orig }}</span>
+}
+  </div>
+</div>
+
+<!-- Contenedor Principal (Tarjeta) -->
+<div class="consolidacion-card">
+  <!-- Cabecera -->
+  <div class="card-header">
+    <h2 class="card-title">{{ i18n.t('si.items_consolidados') }}</h2>
+    <span class="items-badge">{{ itemsConsolidados().length }} {{ i18n.t('si.items_unicos') }}</span>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-container">
+    <table class="consolidacion-table">
+      <thead>
+        <tr>
+          <th>{{ i18n.t('si.th_item') }}</th>
+          <th>{{ i18n.t('si.th_unidad') }}</th>
+          <th>{{ i18n.t('si.th_desglose') }}</th>
+          <th class="text-right">{{ i18n.t('si.th_total_consolidado') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of itemsConsolidados(); track item) {
+<tr>
+          <!-- Columna Ítem -->
+          <td class="col-item">
+            <div class="item-icon">
+              <span class="material-symbols-outlined">{{ item.icono }}</span>
+            </div>
+            <div class="item-info">
+              <span class="item-name">{{ item.nombre }}</span>
+              <restaurant-status-badge
+                [label]="'Consolidado ×' + item.origenes.length"
+                variant="success">
+              </restaurant-status-badge>
+            </div>
+          </td>
+          
+          <!-- Columna Unidad -->
+          <td class="col-unidad">{{ item.unidad }}</td>
+
+          <!-- Columna Desglose -->
+          <td class="col-desglose">
+            <div class="desglose-list">
+              @for (orig of item.origenes; track orig) {
+<div class="desglose-row">
+                <span class="desglose-tag">{{ orig.solicitud }}</span>
+                <span class="desglose-qty">{{ orig.cantidad }} {{ item.unidad }}</span>
+              </div>
+}
+            </div>
+          </td>
+
+          <!-- Columna Total -->
+          <td class="col-total text-right">
+            <span class="total-value">{{ item.total }}</span>
+          </td>
+        </tr>
+}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="page-footer" style="justify-content: flex-end;">
+  <restaurant-button variant="primary" (click)="onConfirm()">
+    {{ i18n.t('si.confirmar_gil') }}
+    <span class="material-symbols-outlined" style="margin-left: 8px;">arrow_forward</span>
+  </restaurant-button>
+</div>

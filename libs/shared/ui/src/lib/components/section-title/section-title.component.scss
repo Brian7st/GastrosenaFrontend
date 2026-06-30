@@ -1,0 +1,10 @@
+.section-title {
+  margin-bottom: var(--space-10);
+
+  &.align-center { text-align: center; }
+  &.align-left   { text-align: left; }
+  &.align-right  { text-align: right; }
+}
+
+.section-title__heading  { font-size: var(--font-size-2xl); font-weight: var(--font-weight-semibold); margin-bottom: var(--space-2); }
+.section-title__subtitle { color: var(--color-text-secondary); line-height: 1.7; max-width: 42rem; margin: 0 auto; }

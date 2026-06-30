@@ -1,0 +1,232 @@
+import type { InfoBancariaTipo } from '../data-access/api/sourcing.api';
+
+/**
+ * Estados posibles de una Factura Electrónica.
+ */
+export type EstadoFactura = 'REGISTRADA' | 'VERIFICADA' | 'PAGADA' | 'ANULADA';
+
+/**
+ * Línea de detalle dentro de una factura.
+ */
+export interface FacturaLinea {
+  productoId?: string;
+  descripcion: string;
+  cantidad: number;
+  precioUnitario: number;
+  porcentajeIva?: number;
+  iva: number;
+  subtotal?: number;
+  valorIva?: number;
+  total: number;
+}
+
+/**
+ * Pre-factura vinculada a una solicitud GIL.
+ */
+export interface PreFactura {
+  id: string;
+  proveedor: string;
+  subtotal: number;
+  items: FacturaLinea[];
+}
+
+/**
+ * Representa una Factura Electrónica.
+ */
+export interface Factura {
+  id: string | number;
+  numeroFactura: string;
+  cufe: string;
+  proveedorNit: string;
+  proveedorNombre: string;
+  fechaEmision: string;
+  fechaRecepcion: string;
+  estado: EstadoFactura;
+  lineas: FacturaLinea[];
+  subtotal: number;
+  totalIva: number;
+  total: number;
+  ordenCompra?: string;
+  instructorId?: string;
+  valorRetencionZese?: number;
+  motivoAnulacion?: string;
+  proveedorBeneficiarioZese?: boolean;
+  valorNetoAPagar?: number;
+  infoBancariaBanco?: string;
+  infoBancariaCuenta?: string;
+  infoBancariaTipo?: InfoBancariaTipo;
+}
+
+/**
+ * KPIs del panel de facturación.
+ */
+export interface FacturaKpis {
+  totalFacturas: number;
+  tendenciaTotalFacturas: number;
+  montoMensual: number;
+  tendenciaMonto: number;
+  registradas: number;
+  verificadas: number;
+  pagadas: number;
+  anuladas: number;
+}
+
+/**
+ * Filtros para el listado de facturas.
+ */
+export interface FacturaFiltros {
+  busqueda?: string;
+  estado?: EstadoFactura;
+  proveedor?: string;
+  fechaDesde?: string;
+  fechaHasta?: string;
+  page?: number;
+  size?: number;
+}
+
+export interface FacturaPaginacion {
+  totalElements: number;
+  totalPages: number;
+  page: number;
+  size: number;
+}
+
+/**
+ * DTO para crear o editar una factura (POST/PUT /facturas).
+ */
+export interface FacturaFormDto {
+  numeroFactura: string;
+  cufe: string;
+  fechaEmision: string;
+  fechaRecepcion: string;
+  proveedorNit: string;
+  proveedorNombre: string;
+  proveedorBeneficiarioZese?: boolean;
+  ordenCompra?: string;
+  infoBancariaBanco?: string;
+  infoBancariaCuenta?: string;
+  infoBancariaTipo?: InfoBancariaTipo;
+  lineas: Array<{
+    productoId?: string;
+    descripcion: string;
+    cantidad: number;
+    precioUnitario: number;
+    porcentajeIva: number;
+  }>;
+}
+
+// ─── Nota Crédito ────────────────────────────────────────────────────────────
+
+export type MotivoNotaCredito =
+  | 'SOBREFACTURACION'
+  | 'DEVOLUCION'
+  | 'DESCUENTO'
+  | 'ANULACION_PARCIAL';
+
+export interface LineaNotaCredito {
+  productoId:    string;
+  cantidad:      number;
+  valorUnitario: number;
+  valorTotal:    number;
+}
+
+export interface NotaCredito {
+  id:            string;
+  facturaId:     string;
+  cufeOrigen:    string;
+  motivo:        MotivoNotaCredito;
+  fechaEmision:  string;
+  estado:        string;
+  valorTotal:    number;
+  lineas:        LineaNotaCredito[];
+}
+
+export interface RegistrarNotaCreditoRequest {
+  facturaId:    string;
+  cufeOrigen:   string;
+  motivo:       MotivoNotaCredito;
+  fechaEmision: string;
+  lineas: Array<{
+    productoId:    string;
+    cantidad:      number;
+    valorUnitario: number;
+  }>;
+}
+
+// ─── Conciliación Factura-GIL ───────────────────────────────────────────────
+
+export interface ConciliacionGilDiferencia {
+  gilItemId:             string;
+  descripcion:           string;
+  cantidadGil:           number;
+  cantidadFactura:       number;
+  precioUnitarioGil:     number;
+  precioUnitarioFactura: number;
+  diferencia:            number;
+  observacion?:          string;
+  resuelta:              boolean;
+  cantidadRecibida:      number | null;
+}
+
+export interface ConciliacionGil {
+  id:          string;
+  facturaId:   string;
+  gilId:       string;
+  estado:      string;
+  diferencias: ConciliacionGilDiferencia[];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Estado de la solicitud GIL F-014.
+ */
+export type EstadoGIL = 'BORRADOR' | 'EMITIDO' | 'ENVIADO_PROVEEDOR' | 'VERIFICADO' | 'CERRADO';
+
+export interface GilPickerItem {
+  id: string;
+  numeroGil: string;
+  destino: string;
+}
+
+/**
+ * Solicitud GIL F-014 completa con trazabilidad.
+ */
+export interface SolicitudGIL {
+  id: string;
+  nombreVocero: string;
+  horarios: string;
+  resultadoAprendizaje: string;
+  estadoSolicitud: EstadoGIL;
+  fechaCreacion: string;
+  totalEstimado: number;
+  responsable: string;
+  avatarResponsable?: string;
+  regional: string;
+  centroFormacion: string;
+  areaPrograma: string;
+  cuentadanteResponsable: string;
+  destinoBien: string;
+  preFacturas: PreFactura[];
+  observaciones: string;
+  comentarios?: string[];
+  hashTransaccion: string;
+  idTransaccion: string;
+  // Información real del GIL (GET /procurement/giles/{id})
+  numeroGil?: string;
+  codigoGrupo?: string;
+  solicitante?: string;
+  cuentadantes?: string[];
+  bienes?: GilBienDetalle[];
+}
+
+/** Bien (ítem) que compone un GIL, tal como lo devuelve el backend. */
+export interface GilBienDetalle {
+  codigoSena: string;
+  descripcion: string;
+  unidadMedida: string;
+  cantidad: number;
+  valorUnitario: number;
+  iva: number;
+  subtotal: number;
+}

@@ -1,0 +1,23 @@
+:host {
+  display: block;
+}
+
+.contenido-principal {
+  // Sincroniza con los anchos fijos del sidebar (16rem) y la barra superior.
+  transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              margin-right 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              max-width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// Panel del asistente abierto: barra colapsada (5rem) + espacio del panel (22rem).
+// Sobrescribe el margen global de `.contenido-principal` (libs/shared/ui) por
+// especificidad de estilos scoped del componente.
+.layout-principal--asistente .contenido-principal {
+  margin-left: 5rem;
+  margin-right: 22rem;
+  max-width: calc(100vw - 5rem - 22rem);
+}
+
+.contenido-principal__contenedor {
+  min-height: calc(100vh - 6rem);
+}

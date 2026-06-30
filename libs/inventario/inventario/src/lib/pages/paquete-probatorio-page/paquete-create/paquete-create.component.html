@@ -1,0 +1,189 @@
+<div class="paquete-create">
+
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
+  <div class="paquete-create__header">
+    <inventario-back-button (clicked)="volver()" />
+    <h1 class="paquete-create__title">{{ i18n.t('paquete.crear_titulo') }}</h1>
+    <p class="paquete-create__subtitle">{{ i18n.t('paquete.crear_subtitulo') }}</p>
+  </div>
+
+  <div class="paquete-create__content">
+
+    <!-- ── Stepper ────────────────────────────────────────────────────────── -->
+    <div class="paquete-create__stepper">
+      <div class="paquete-create__step"
+           [class.paquete-create__step--active]="currentStep() >= 1"
+           [class.paquete-create__step--completed]="currentStep() > 1">
+        <div class="paquete-create__step-icon">
+          @if (currentStep() > 1) {
+            <lucide-icon name="check-circle" [size]="16"></lucide-icon>
+          } @else {
+            <span class="paquete-create__step-num">1</span>
+          }
+        </div>
+        <span class="paquete-create__step-label">{{ i18n.t('paquete.step_info') }}</span>
+      </div>
+
+      <div class="paquete-create__step-connector"
+           [class.paquete-create__step-connector--active]="currentStep() > 1"></div>
+
+      <div class="paquete-create__step"
+           [class.paquete-create__step--active]="currentStep() === 2">
+        <div class="paquete-create__step-icon">2</div>
+        <span class="paquete-create__step-label">{{ i18n.t('paquete.step_confirmacion') }}</span>
+      </div>
+    </div>
+
+    <!-- ── Formulario ─────────────────────────────────────────────────────── -->
+    <form [formGroup]="form" class="paquete-create__form-container">
+
+      <!-- Paso 1: Información — campos pre-llenados desde el acta -->
+      @if (currentStep() === 1) {
+        <div class="paquete-create__section">
+          <h2 class="paquete-create__section-title">{{ i18n.t('paquete.datos') }}</h2>
+
+          @if (actaLoading()) {
+            <p class="paquete-create__loading">
+              <lucide-icon name="loader" [size]="16"></lucide-icon>
+              {{ i18n.t('paquete.cargando_acta') }}
+            </p>
+          }
+
+          <div class="paquete-create__form-grid">
+
+            <!-- fichaId — pre-llenado desde el acta, editable -->
+            <div class="form-group">
+              <label>{{ i18n.t('acta.ficha_caract') }} <span class="required">*</span></label>
+              <input type="text" formControlName="fichaId" placeholder="Cargando..." />
+              @if (form.controls.fichaId.touched && form.controls.fichaId.errors?.['required']) {
+                <span class="error-text">{{ i18n.t('paquete.error_ficha') }}</span>
+              }
+            </div>
+
+            <!-- instructorId — pre-llenado desde el acta, editable -->
+            <div class="form-group">
+              <label>{{ i18n.t('acta.instructor_resp') }} <span class="required">*</span></label>
+              <input type="text" formControlName="instructorId" placeholder="Cargando..." />
+              @if (form.controls.instructorId.touched && form.controls.instructorId.errors?.['required']) {
+                <span class="error-text">{{ i18n.t('paquete.error_instructor') }}</span>
+              }
+            </div>
+
+            <!-- Campos de vínculo — solo lectura -->
+            <div class="form-group">
+              <label>{{ i18n.t('paquete.acta_vinculada') }}</label>
+              <input type="text" class="form-control--readonly" readonly
+                     [value]="acta()?.numeroActa ? 'Acta #' + acta()!.numeroActa : actaId" />
+            </div>
+
+            <div class="form-group">
+              <label>{{ i18n.t('paquete.req_vinculada') }}</label>
+              <input type="text" class="form-control--readonly" readonly [value]="requisicionId" />
+            </div>
+
+          </div>
+        </div>
+      }
+
+      <!-- Paso 2: Confirmación — resumen + documentos requeridos -->
+      @if (currentStep() === 2) {
+        <div class="paquete-create__section">
+
+          <!-- Resumen del paquete -->
+          <div class="paquete-create__summary">
+            <h2 class="paquete-create__section-title">{{ i18n.t('paquete.resumen') }}</h2>
+            <div class="paquete-create__summary-grid">
+              <div class="paquete-create__summary-item">
+                <span class="paquete-create__summary-label">{{ i18n.t('acta.th_ficha') }}</span>
+                <span class="paquete-create__summary-value">{{ resumen().fichaId }}</span>
+              </div>
+              <div class="paquete-create__summary-item">
+                <span class="paquete-create__summary-label">{{ i18n.t('acta.th_instructor') }}</span>
+                <span class="paquete-create__summary-value">{{ resumen().instructorId }}</span>
+              </div>
+              <div class="paquete-create__summary-item">
+                <span class="paquete-create__summary-label">{{ i18n.t('paquete.doc_acta') }}</span>
+                <span class="paquete-create__summary-value">{{ resumen().numeroActa }}</span>
+              </div>
+              <div class="paquete-create__summary-item">
+                <span class="paquete-create__summary-label">{{ i18n.t('paquete.doc_req') }}</span>
+                <span class="paquete-create__summary-value">{{ resumen().requisicionId }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Documentos requeridos -->
+          <div class="paquete-create__section-header">
+            <h2 class="paquete-create__section-title">{{ i18n.t('paquete.docs_requeridos') }}</h2>
+            <p class="paquete-create__section-subtitle">{{ i18n.t('paquete.docs_hint') }}</p>
+          </div>
+          <div class="paquete-create__req-grid">
+            <div class="paquete-create__req-card">
+              <div class="paquete-create__req-icon">
+                <lucide-icon name="file-text" [size]="20"></lucide-icon>
+              </div>
+              <div class="paquete-create__req-content">
+                <h3>{{ i18n.t('paquete.doc_acta_titulo') }}</h3>
+                <p>{{ i18n.t('paquete.doc_auto') }}</p>
+              </div>
+              <lucide-icon name="check-circle" [size]="16" class="paquete-create__req-done"></lucide-icon>
+            </div>
+
+            <div class="paquete-create__req-card">
+              <div class="paquete-create__req-icon">
+                <lucide-icon name="scroll-text" [size]="20"></lucide-icon>
+              </div>
+              <div class="paquete-create__req-content">
+                <h3>{{ i18n.t('paquete.doc_req_titulo') }}</h3>
+                <p>{{ i18n.t('paquete.doc_auto') }}</p>
+              </div>
+              <lucide-icon name="check-circle" [size]="16" class="paquete-create__req-done"></lucide-icon>
+            </div>
+
+            <div class="paquete-create__req-card">
+              <div class="paquete-create__req-icon">
+                <lucide-icon name="users" [size]="20"></lucide-icon>
+              </div>
+              <div class="paquete-create__req-content">
+                <h3>{{ i18n.t('paquete.doc_asistencia_titulo') }}</h3>
+                <p>{{ i18n.t('paquete.doc_asistencia_hint') }}</p>
+              </div>
+              <lucide-icon name="clock" [size]="16" class="paquete-create__req-pending"></lucide-icon>
+            </div>
+          </div>
+
+          <!-- Error de creación -->
+          @if (error()) {
+            <p class="error-text paquete-create__error">{{ error() }}</p>
+          }
+
+        </div>
+      }
+
+      <!-- ── Footer Actions ──────────────────────────────────────────────── -->
+      <div class="paquete-create__actions">
+        @if (currentStep() === 1) {
+          <restaurant-button variant="surface" type="button" (click)="cancelar()">
+            {{ i18n.t('comun.cancelar') }}
+          </restaurant-button>
+          <restaurant-button variant="primary" type="button" (click)="siguientePaso()">
+            {{ i18n.t('comun.siguiente') }}
+            <lucide-icon name="arrow-right" [size]="16"></lucide-icon>
+          </restaurant-button>
+        } @else {
+          <restaurant-button variant="surface" type="button" (click)="pasoAnterior()"
+                             [disabled]="enviando()">
+            <lucide-icon name="arrow-left" [size]="16"></lucide-icon>
+            {{ i18n.t('comun.anterior') }}
+          </restaurant-button>
+          <restaurant-button variant="primary" type="button" (click)="guardarPaquete()"
+                             [disabled]="enviando()">
+            <lucide-icon name="save" [size]="16"></lucide-icon>
+            {{ enviando() ? i18n.t('paquete.creando') : i18n.t('paquete.crear_btn') }}
+          </restaurant-button>
+        }
+      </div>
+
+    </form>
+  </div>
+</div>

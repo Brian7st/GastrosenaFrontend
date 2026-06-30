@@ -1,0 +1,85 @@
+<div class="modal-backdrop" (click)="cerrarModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    
+    <!-- ── Header ────────────────────────────────────────────────────── -->
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <div class="modal-icon">
+          <lucide-icon name="upload-cloud" [size]="20"></lucide-icon>
+        </div>
+        <div>
+          <h2 class="modal-title">{{ i18n.t('paquete.upload_titulo') }}</h2>
+          <p class="modal-subtitle">{{ i18n.t('paquete.upload_subtitulo') }}</p>
+        </div>
+      </div>
+      <button class="modal-close-btn" (click)="cerrarModal()">
+        <lucide-icon name="x" [size]="20"></lucide-icon>
+      </button>
+    </div>
+
+    <!-- ── Body ──────────────────────────────────────────────────────── -->
+    <div class="modal-body">
+      
+      <!-- Upload Zone -->
+      @if (!selectedFile()) {
+        <div
+          class="upload-zone"
+          [class.upload-zone--dragging]="isDragging()"
+        >
+          <div class="upload-zone__icon">
+            <lucide-icon name="file-down" [size]="32"></lucide-icon>
+          </div>
+          <h3 class="upload-zone__title">{{ i18n.t('paquete.upload_arrastrar') }}</h3>
+          <p class="upload-zone__text">
+            {{ i18n.t('paquete.upload_o') }} <label class="upload-zone__browse">{{ i18n.t('paquete.upload_buscar') }} <input type="file" hidden accept=".pdf,.png,.jpg,.jpeg" (change)="onFileSelected($event)"></label>
+          </p>
+          <p class="upload-zone__hint">{{ i18n.t('paquete.upload_hint') }}</p>
+        </div>
+      } @else {
+        <!-- Selected File Preview -->
+        <div class="file-preview">
+          <div class="file-preview__icon">
+            @if (selectedFile()?.type === 'application/pdf') {
+              <lucide-icon name="file-text" [size]="24" class="text-error"></lucide-icon>
+            } @else {
+              <lucide-icon name="file-image" [size]="24" class="text-primary"></lucide-icon>
+            }
+          </div>
+          <div class="file-preview__info">
+            <p class="file-preview__name">{{ selectedFile()?.name }}</p>
+          </div>
+          <button class="file-preview__remove" (click)="removeFile()" [disabled]="procesando()">
+            <lucide-icon name="trash-2" [size]="16"></lucide-icon>
+          </button>
+        </div>
+      }
+
+      @if (errorArchivo()) {
+        <p class="upload-zone__error">{{ errorArchivo() }}</p>
+      }
+      @if (error()) {
+        <p class="upload-zone__error">{{ error() }}</p>
+      }
+
+    </div>
+
+    <!-- ── Footer ────────────────────────────────────────────────────── -->
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="cerrarModal()" [disabled]="procesando()">{{ i18n.t('comun.cancelar') }}</button>
+      <button
+        class="btn-primary"
+        [disabled]="!puedeAdjuntar()"
+        (click)="subirDocumento()"
+      >
+        @if (procesando()) {
+          <lucide-icon name="refresh-cw" [size]="16" class="spin-icon"></lucide-icon>
+          {{ i18n.t('paquete.adjuntando') }}
+        } @else {
+          <lucide-icon name="check" [size]="16"></lucide-icon>
+          {{ i18n.t('paquete.confirmar_adjuntar') }}
+        }
+      </button>
+    </div>
+
+  </div>
+</div>

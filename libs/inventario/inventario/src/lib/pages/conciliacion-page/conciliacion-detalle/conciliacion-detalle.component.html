@@ -1,0 +1,230 @@
+<div class="page-container">
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       HEADER
+       ═══════════════════════════════════════════════════════════════════════ -->
+  @if (detalle()) {
+  <div class="header-section">
+    <div class="header-top">
+      <div class="title-group">
+        <inventario-back-button (clicked)="goBack()" />
+        <h1 class="page-title">{{ i18n.t('conciliacion.detalle_titulo') }}</h1>
+      </div>
+
+      @if (detalle()!.estado !== 'COMPLETADA') {
+        <button
+          *hasPermission="'conciliacion:registrar_conteo'"
+          class="cerrar-btn"
+          [disabled]="!puedeCerrar() || loading()"
+          [title]="puedeCerrar() ? 'Cerrar y finalizar la conciliación' : 'Resolvé todas las diferencias antes de cerrar'"
+          (click)="cerrar()">
+          <lucide-icon name="lock" [size]="18"></lucide-icon>
+          {{ i18n.t('conciliacion.cerrar') }}
+        </button>
+      } @else {
+        <span class="cerrada-badge">
+          <lucide-icon name="check-circle" [size]="18"></lucide-icon>
+          {{ i18n.t('conciliacion.cerrada') }}
+        </span>
+      }
+    </div>
+
+    @if (detalle()!.estado !== 'COMPLETADA' && diferenciasPendientes() > 0) {
+      <p class="cerrar-hint">
+        <lucide-icon name="info" [size]="14"></lucide-icon>
+        Quedan {{ diferenciasPendientes() }} diferencia(s) por resolver para poder cerrar la conciliación.
+      </p>
+    }
+
+    <div class="info-badges-row">
+      <div class="info-badge">
+        <lucide-icon name="calendar" [size]="14"></lucide-icon>
+        <span>{{ detalle()!.fecha }}</span>
+      </div>
+      <div class="info-badge">
+        <lucide-icon name="user" [size]="14"></lucide-icon>
+        <span>{{ detalle()!.responsable }} (Resp.)</span>
+      </div>
+    </div>
+
+    <div class="status-badge">
+      <span>{{ detalle()!.estado }}</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       KPI ROW (5 CARDS)
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="kpi-grid">
+    <restaurant-kpi-card
+      [label]="i18n.t('conciliacion.kpi_items')"
+      [value]="detalle()!.totalItemsContados"
+      iconName="list"
+      iconVariant="neutral">
+    </restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      [label]="i18n.t('conciliacion.kpi_diferencias_card')"
+      [value]="detalle()!.diferencias"
+      iconName="alert-triangle"
+      iconVariant="alert">
+    </restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      [label]="i18n.t('conciliacion.kpi_precision_card')"
+      [value]="detalle()!.precision + '%'"
+      iconName="check-circle"
+      iconVariant="info">
+    </restaurant-kpi-card>
+
+    <restaurant-kpi-card
+      [label]="i18n.t('conciliacion.kpi_valoracion')"
+      [value]="valoracionMonetaria()"
+      iconName="trending-down"
+      iconVariant="alert">
+    </restaurant-kpi-card>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       TABLE SECTION
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="table-section">
+    <div class="table-header">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <lucide-icon name="file-text" [size]="20" class="text-secondary"></lucide-icon>
+        <h2 class="section-title">{{ i18n.t('conciliacion.detalle_diferencias') }}</h2>
+      </div>
+      <button class="filter-btn">
+        <lucide-icon name="filter" [size]="18"></lucide-icon>
+      </button>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="dif-table">
+        <thead>
+          <tr>
+            <th>{{ i18n.t('conciliacion.th_bien') }}</th>
+            <th>{{ i18n.t('conciliacion.th_categoria') }}</th>
+            <th class="text-right">{{ i18n.t('conciliacion.th_stock_sis') }}</th>
+            <th class="text-right">{{ i18n.t('conciliacion.th_fisico') }}</th>
+            <th class="text-center">{{ i18n.t('conciliacion.th_dif') }}</th>
+            <th class="text-right">{{ i18n.t('conciliacion.th_valor_unit') }}</th>
+            <th class="text-right">{{ i18n.t('conciliacion.th_impacto') }}</th>
+            <th class="text-center">{{ i18n.t('comun.estado') }}</th>
+            <th class="text-center">{{ i18n.t('comun.accion') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of diferenciasList(); track item.codigo) {
+            <tr>
+              <td>
+                <div class="bien-info">
+                  <div class="bien-icon">
+                    <lucide-icon name="package" [size]="20"></lucide-icon>
+                  </div>
+                  <div class="bien-text">
+                    <span class="bien-name">{{ item.producto }}</span>
+                    <span class="bien-code">{{ item.codigo }}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="text-secondary">{{ item.categoria }}</td>
+              <td class="text-right text-secondary">{{ item.stockSistema }} {{ item.unidad }}</td>
+              <td class="text-right font-bold">{{ item.stockFisico }} {{ item.unidad }}</td>
+              <td class="text-center">
+                <!-- RF-5.8.4: faltante (sistema > físico → dif positiva) = rojo; sobrante = amarillo -->
+                <span class="dif-badge"
+                      [class.dif-badge--neg]="item.diferencia > 0"
+                      [class.dif-badge--warn]="item.diferencia < 0"
+                      [class.dif-badge--zero]="item.diferencia === 0">
+                  {{ item.diferencia > 0 ? '+' : '' }}{{ item.diferencia }}
+                </span>
+              </td>
+              <td class="text-right text-secondary">${{ item.valorUnit | number }}</td>
+              <td class="text-right font-bold" [ngClass]="item.impacto < 0 ? 'text-danger' : 'text-success'">
+                {{ item.impacto > 0 ? '+' : (item.impacto < 0 ? '-' : '') }}${{ (item.impacto < 0 ? (item.impacto * -1) : item.impacto) | number }}
+              </td>
+              <td class="text-center">
+                <span class="estado-badge"
+                      [class.estado-badge--resuelta]="item.estado === 'RESUELTA'"
+                      [class.estado-badge--pendiente]="item.estado === 'PENDIENTE'"
+                      [class.estado-badge--revisada]="item.estado === 'REVISADA'">
+                  {{ item.estado }}
+                </span>
+              </td>
+              <td class="text-center">
+                @if (item.estado !== 'RESUELTA') {
+                  <button *hasPermission="'conciliacion:registrar_conteo'" class="resolver-btn" (click)="abrirResolver(item)" [disabled]="loading()">
+                    <lucide-icon name="check" [size]="16"></lucide-icon>
+                    {{ i18n.t('conciliacion.resolver') }}
+                  </button>
+                } @else {
+                  <lucide-icon name="check-circle" [size]="18" class="text-success"></lucide-icon>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <!-- TABLE FOOTER AGGREGATES -->
+      <div class="table-aggregates">
+        <div class="aggregate-neto">
+          <span class="aggregate-label">{{ i18n.t('conciliacion.valor_total_dif') }}</span>
+          <span class="aggregate-value text-danger">{{ valoracionMonetaria() }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  } @else {
+    <div class="loading-state">{{ i18n.t('conciliacion.cargando_detalle') }}</div>
+  }
+
+</div>
+
+<!-- ── MODAL: Resolver diferencia (RF-5.8.4) ── -->
+@if (showResolverModal() && diferenciaSeleccionada()) {
+  <div class="modal-overlay" (click)="cerrarResolver()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">{{ i18n.t('conciliacion.modal_resolver_titulo') }}</h3>
+        <button class="modal-close" (click)="cerrarResolver()" aria-label="Cerrar">
+          <lucide-icon name="x" [size]="20"></lucide-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-resumen">
+          <span class="modal-producto">{{ diferenciaSeleccionada()!.producto }}</span>
+          <span class="modal-codigo">{{ diferenciaSeleccionada()!.codigo }}</span>
+          <span class="modal-dif"
+                [class.text-danger]="diferenciaSeleccionada()!.diferencia > 0"
+                [class.text-warning]="diferenciaSeleccionada()!.diferencia < 0">
+            Diferencia: {{ diferenciaSeleccionada()!.diferencia > 0 ? '+' : '' }}{{ diferenciaSeleccionada()!.diferencia }}
+            {{ diferenciaSeleccionada()!.unidad }}
+          </span>
+        </div>
+
+        <label class="modal-label" for="justificacion">{{ i18n.t('conciliacion.justificacion') }}</label>
+        <textarea
+          id="justificacion"
+          class="modal-textarea"
+          rows="4"
+          [placeholder]="i18n.t('conciliacion.justificacion_placeholder')"
+          [ngModel]="justificacion()"
+          (ngModelChange)="justificacion.set($event)"></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn--ghost" (click)="cerrarResolver()">{{ i18n.t('comun.cancelar') }}</button>
+        <button
+          class="modal-btn modal-btn--primary"
+          [disabled]="justificacion().trim().length === 0 || loading()"
+          (click)="confirmarResolver()">
+          {{ i18n.t('conciliacion.confirmar_resolucion') }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

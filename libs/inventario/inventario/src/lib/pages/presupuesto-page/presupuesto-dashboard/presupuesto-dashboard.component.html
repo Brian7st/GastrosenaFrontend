@@ -1,0 +1,446 @@
+<div class="page-container">
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       HEADER
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="page-header-row">
+    <div>
+      <h1 class="page-title">{{ i18n.t('presupuesto.titulo') }}</h1>
+      @if (resumenGlobal()) {
+        <p class="page-subtitle">
+          Vigencia Fiscal {{ resumenGlobal()!.vigencia ?? 'N/A' }} — {{ resumenGlobal()!.totalPresupuestos }} presupuesto(s)
+        </p>
+      }
+    </div>
+    <div class="header-actions">
+      <restaurant-button variant="surface" (click)="openExportModal()">
+        <div class="btn-icon-text">
+          <lucide-icon name="download" [size]="20"></lucide-icon>
+          {{ i18n.t('presupuesto.exportar_pdf') }}
+        </div>
+      </restaurant-button>
+      <restaurant-button variant="primary" routerLink="registrar">
+        <div class="btn-icon-text">
+          <lucide-icon name="plus-circle" [size]="20"></lucide-icon>
+          {{ i18n.t('presupuesto.nuevo') }}
+        </div>
+      </restaurant-button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       KPI GRID — datos del endpoint /resumen (cuando disponibles)
+       ═══════════════════════════════════════════════════════════════════════ -->
+  @if (resumenGlobal()) {
+  <div class="kpi-grid">
+    <restaurant-kpi-card [label]="i18n.t('presupuesto.kpi_total_asignado')" [value]="resumenGlobal()!.totalAsignado | formatoMoneda" icon="landmark"
+      iconColor="blue" trend="Apropiación total" [trendUp]="null"></restaurant-kpi-card>
+
+    <restaurant-kpi-card [label]="i18n.t('presupuesto.kpi_comprometido')" [value]="resumenGlobal()!.totalComprometido | formatoMoneda" icon="file-check"
+      iconColor="orange" [trend]="(resumenGlobal()!.porcentajeEjecucion | number:'1.2-2') + '% ejecutado'" [trendUp]="null"></restaurant-kpi-card>
+
+    <restaurant-kpi-card [label]="i18n.t('presupuesto.kpi_pagado')" [value]="resumenGlobal()!.totalPagado | formatoMoneda" icon="banknote"
+      iconColor="green" trend="Verificado a la fecha" [trendUp]="null"></restaurant-kpi-card>
+
+    <restaurant-kpi-card [label]="i18n.t('presupuesto.kpi_saldo')" [value]="resumenGlobal()!.saldoGlobal | formatoMoneda" icon="wallet"
+      iconColor="blue" trend="Saldo sin comprometer" [trendUp]="null"></restaurant-kpi-card>
+
+    <restaurant-kpi-card [label]="i18n.t('presupuesto.kpi_presupuestos')" [value]="resumenGlobal()!.totalPresupuestos" icon="layers"
+      iconColor="red" trend="Total registrados" [trendUp]="null"></restaurant-kpi-card>
+  </div>
+  }
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       TABLA DE ESTRUCTURA PRESUPUESTAL (colapsable por programa)
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="estructura-card">
+    <div class="estructura-header">
+      <div class="estructura-title-group">
+        <lucide-icon name="layers" [size]="20" class="estructura-icon"></lucide-icon>
+        <h2 class="estructura-title">{{ i18n.t('presupuesto.estructura_titulo') }}</h2>
+      </div>
+      <restaurant-button variant="surface" routerLink="traslado">
+        <div class="btn-icon-text">
+          <lucide-icon name="arrow-left-right" [size]="18"></lucide-icon>
+          {{ i18n.t('presupuesto.traslado') }}
+        </div>
+      </restaurant-button>
+    </div>
+
+    <div class="estructura-table-wrapper">
+      <table class="estructura-table">
+        <thead>
+          <tr>
+            <th class="col-estructura">{{ i18n.t('presupuesto.th_estructura') }}</th>
+            <th class="col-money">{{ i18n.t('presupuesto.th_apropiacion') }}</th>
+            <th class="col-money">{{ i18n.t('presupuesto.th_disponible') }}</th>
+            <th class="col-money">{{ i18n.t('presupuesto.th_comprometido') }}</th>
+            <th class="col-money">{{ i18n.t('presupuesto.th_pagado') }}</th>
+            <th class="col-money">{{ i18n.t('presupuesto.th_ret_zese') }}</th>
+            <th class="col-ejecucion">{{ i18n.t('presupuesto.th_ejecucion') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (grupo of grupos(); track grupo.fichaId) {
+          <!-- Fila de grupo (agrupado por ficha) -->
+          <tr class="grupo-row" (click)="toggleGrupo(grupo.fichaId)">
+            <td class="col-estructura">
+              <div class="grupo-toggle">
+                <lucide-icon [name]="isExpanded(grupo.fichaId) ? 'chevron-down' : 'chevron-right'" [size]="16"
+                  class="toggle-chevron"></lucide-icon>
+                <span class="grupo-nombre">{{ grupo.programaFormacion }}</span>
+              </div>
+            </td>
+            <td class="col-money grupo-value">{{ grupo.totalMontoAsignado | formatoMoneda:false }}</td>
+            <td class="col-money grupo-value">{{ grupo.totalSaldoDisponible | formatoMoneda:false }}</td>
+            <td class="col-money grupo-value">{{ grupo.totalMontoComprometido | formatoMoneda:false }}</td>
+            <td class="col-money grupo-value">{{ grupo.totalMontoPagado | formatoMoneda:false }}</td>
+            <td class="col-money grupo-value">{{ grupo.totalZese | formatoMoneda:false }}</td>
+            <td class="col-ejecucion">
+              <span class="ejecucion-badge" [ngClass]="getEjecucionClass(grupo.porcentajeEjecucion)">
+                {{ grupo.porcentajeEjecucion | number:'1.2-2' }}%
+              </span>
+            </td>
+          </tr>
+          <!-- Filas de rubros (se muestran si el grupo está expandido) -->
+          @if (isExpanded(grupo.fichaId)) {
+          @for (rubro of grupo.rubros; track rubro.id) {
+          <tr class="rubro-row">
+            <td class="col-estructura">
+              <div class="rubro-info">
+                <span class="rubro-codigo">{{ rubro.codigo }}</span>
+                <span class="rubro-nombre">{{ rubro.descripcion }}</span>
+              </div>
+            </td>
+            <td class="col-money">{{ rubro.montoAsignado | formatoMoneda:false }}</td>
+            <td class="col-money">{{ rubro.saldoDisponible | formatoMoneda:false }}</td>
+            <td class="col-money">{{ rubro.montoComprometido | formatoMoneda:false }}</td>
+            <td class="col-money">{{ rubro.montoPagado | formatoMoneda:false }}</td>
+            <td class="col-money">{{ rubro.retencionZese | formatoMoneda:false }}</td>
+            <td class="col-ejecucion">
+              <div class="ejecucion-bar-container">
+                <div class="ejecucion-bar" [style.width.%]="rubro.porcentajeEjecucion"></div>
+              </div>
+              <span class="ejecucion-text">{{ rubro.porcentajeEjecucion | number:'1.2-2' }}%</span>
+            </td>
+          </tr>
+          }
+          }
+          }
+        </tbody>
+        @if (resumenGlobal()) {
+        <tfoot>
+          <tr class="total-row">
+            <td class="col-estructura total-label">{{ i18n.t('presupuesto.total_consolidado') }}</td>
+            <td class="col-money total-value">{{ resumenGlobal()!.totalAsignado | formatoMoneda:false }}</td>
+            <td class="col-money total-value">{{ resumenGlobal()!.saldoGlobal | formatoMoneda:false }}</td>
+            <td class="col-money total-value">{{ resumenGlobal()!.totalComprometido | formatoMoneda:false }}</td>
+            <td class="col-money total-value">{{ resumenGlobal()!.totalPagado | formatoMoneda:false }}</td>
+            <td class="col-money total-value">—</td>
+            <td class="col-ejecucion">
+              <span class="ejecucion-badge" [ngClass]="getEjecucionClass(resumenGlobal()!.porcentajeEjecucion)">
+                {{ resumenGlobal()!.porcentajeEjecucion | number:'1.2-2' }}%
+              </span>
+            </td>
+          </tr>
+        </tfoot>
+        }
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       TABLA SIIF (Sección B): por posición presupuestal + fuente
+       ═══════════════════════════════════════════════════════════════════════ -->
+  @if (gruposPorPosicion().length > 0) {
+  <div class="estructura-card">
+    <div class="estructura-header">
+      <div class="estructura-title-group">
+        <lucide-icon name="landmark" [size]="20" class="estructura-icon"></lucide-icon>
+        <h2 class="estructura-title">{{ i18n.t('presupuesto.siif_titulo') }}</h2>
+      </div>
+    </div>
+
+    <div class="estructura-table-wrapper">
+      <table class="estructura-table">
+        <thead>
+          <tr>
+            <th class="col-estructura">{{ i18n.t('presupuesto.th_posicion') }}</th>
+            <th>{{ i18n.t('presupuesto.th_fuente') }}</th>
+            <th class="col-money">Apropiación Inicial</th>
+            <th class="col-money">Disponible</th>
+            <th class="col-money">Comprometido</th>
+            <th class="col-money">{{ i18n.t('presupuesto.th_por_cancelar') }}</th>
+            <th class="col-ejecucion">Ejecución</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (grupo of gruposPorPosicion(); track grupo.posicionPresupuestal + grupo.fuente) {
+          <tr class="grupo-row">
+            <td class="col-estructura">
+              <span class="rubro-codigo">{{ grupo.posicionPresupuestal }}</span>
+            </td>
+            <td>
+              <span class="fuente-badge" [ngClass]="'fuente-badge--' + grupo.fuente.toLowerCase()">
+                {{ grupo.fuente }}
+              </span>
+            </td>
+            <td class="col-money grupo-value">{{ grupo.totalMontoAsignado | formatoMoneda:false }}</td>
+            <td class="col-money grupo-value">{{ grupo.totalSaldoDisponible | formatoMoneda:false }}</td>
+            <td class="col-money grupo-value">{{ grupo.totalMontoComprometido | formatoMoneda:false }}</td>
+            <td class="col-money grupo-value">{{ grupo.totalValorPorCancelar | formatoMoneda:false }}</td>
+            <td class="col-ejecucion">
+              <span class="ejecucion-badge" [ngClass]="getEjecucionClass(grupo.porcentajeEjecucion)">
+                {{ grupo.porcentajeEjecucion | number:'1.2-2' }}%
+              </span>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+  }
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       BENTO GRID: Ejecución Mensual + Próximos Vencimientos
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="bento-grid">
+    <!-- Curva de Ejecución Mensual (gráfico de barras CSS) -->
+    <div class="bento-card bento-chart">
+      <div class="bento-card-header">
+        <lucide-icon name="bar-chart-3" [size]="18" class="bento-icon"></lucide-icon>
+        <h3 class="bento-card-title">{{ i18n.t('presupuesto.curva_ejecucion') }}</h3>
+      </div>
+      <div class="chart-container">
+        @for (mes of ejecucionMensual(); track mes.mes) {
+        <div class="chart-col">
+          <div class="chart-bar-track">
+            <div class="chart-bar" [class.chart-bar--actual]="mes.esMesActual" [style.height.%]="mes.porcentaje"></div>
+          </div>
+          <span class="chart-label" [class.chart-label--actual]="mes.esMesActual">{{ mes.mes }}</span>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Próximos Vencimientos -->
+    <div class="bento-card bento-timeline">
+      <div class="bento-card-header">
+        <lucide-icon name="clock" [size]="18" class="bento-icon"></lucide-icon>
+        <h3 class="bento-card-title">{{ i18n.t('presupuesto.proximos_vencimientos') }}</h3>
+      </div>
+      <div class="timeline-list">
+        @for (v of vencimientos(); track v.id) {
+        <div class="vencimiento-card" [ngClass]="getUrgenciaClass(v.urgencia)">
+          <div class="vencimiento-icon-container">
+            <lucide-icon [name]="v.icono" [size]="20"></lucide-icon>
+          </div>
+          <div class="vencimiento-body">
+            <p class="vencimiento-titulo">{{ v.titulo }}</p>
+            <p class="vencimiento-fecha">{{ v.fechaVencimiento }}</p>
+          </div>
+          <span class="vencimiento-dias">
+            @if (v.diasRestantes <= 3) { {{ v.diasRestantes }}d } @else { {{ v.diasRestantes }} días } </span>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       HISTORIAL DE AFECTACIÓN PRESUPUESTAL (DataTableComponent)
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <restaurant-data-table tableTitle="Historial de Afectación Presupuestal" tableIcon="history"
+    searchPlaceholder="Buscar afectaciones, documentos o rubros..."
+    [showFilterButton]="true"
+    [filterActive]="showFilters()"
+    [filterCount]="filtrosActivos()"
+    (filterToggle)="onToggleFilters()"
+    (searchChange)="onSearch($event)">
+    <restaurant-button dtActions variant="surface" routerLink="cargar-gil">
+      <div class="btn-icon-text">
+        <lucide-icon name="upload" [size]="18"></lucide-icon>
+        {{ i18n.t('presupuesto.cargar_gil') }}
+      </div>
+    </restaurant-button>
+
+    <!-- Panel de filtros colapsable (slot [dtHeader]) -->
+    @if (showFilters()) {
+      <div dtHeader class="filter-panel">
+        <div class="filter-panel__row">
+          <div class="filter-group">
+            <label class="filter-label">{{ i18n.t('comun.estado') }}</label>
+            <select class="filter-select" [value]="filtroEstado()" (change)="onFilterEstado($any($event.target).value)">
+              <option value="">{{ i18n.t('comun.todos') }}</option>
+              @for (e of estadosDisponibles(); track e) {
+                <option [value]="e">{{ e }}</option>
+              }
+            </select>
+          </div>
+          <div class="filter-group filter-group--actions">
+            <button class="filter-clear-btn" (click)="onLimpiarFiltros()" [disabled]="filtrosActivos() === 0">
+              <span class="material-symbols-outlined">clear_all</span>
+              Limpiar
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <thead>
+      <tr>
+        <th class="text-center">{{ i18n.t('comun.fecha') }}</th>
+        <th class="text-center">{{ i18n.t('comun.estado') }}</th>
+        <th class="text-center">{{ i18n.t('presupuesto.th_gil') }}</th>
+        <th class="text-center">{{ i18n.t('presupuesto.th_concepto') }}</th>
+        <th class="text-center">{{ i18n.t('presupuesto.th_rubro') }}</th>
+        <th style="text-align: right;">{{ i18n.t('presupuesto.th_monto') }}</th>
+        <th style="text-align: right;">{{ i18n.t('presupuesto.th_ret_zese') }}</th>
+        <th class="text-center">{{ i18n.t('comun.accion') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (a of afectacionesPaginadas(); track a.id) {
+      <tr class="table-row">
+        <td class="text-center">
+          <span class="fecha-text">{{ a.fecha }}</span>
+        </td>
+        <td class="text-center">
+          <restaurant-status-badge [status]="getTipoConfig(a.estado).status" [class]="getTipoConfig(a.estado).cssClass" [label]="a.estado"></restaurant-status-badge>
+        </td>
+        <td class="text-center">
+          <span class="rubro-code">{{ gilLabel(a.gilId) }}</span>
+        </td>
+        <td class="text-center">
+          <span class="programa-text">{{ a.concepto }}</span>
+        </td>
+        <td class="text-center">
+          <span class="rubro-code">{{ rubroLabel(a.rubroId) }}</span>
+        </td>
+        <td style="text-align: right;">
+          <span class="money-val" [class.money-val--negativo]="a.monto < 0">
+            {{ a.monto | formatoMoneda:false }}
+          </span>
+        </td>
+        <td style="text-align: right;">
+          <span class="saldo-text">{{ a.montoRetencionZese | formatoMoneda:false }}</span>
+        </td>
+        <td class="text-center">
+          @if (esPagable(a.estado)) {
+            <restaurant-button variant="primary" (click)="abrirPago(a)">
+              <div class="btn-icon-text">
+                <lucide-icon name="dollar-sign" [size]="14"></lucide-icon>
+                {{ i18n.t('presupuesto.pagar') }}
+              </div>
+            </restaurant-button>
+          }
+          @if (esAnulable(a.estado)) {
+            <restaurant-button variant="surface" (click)="onAnular(a)">
+              <div class="btn-icon-text">
+                <lucide-icon name="x-circle" [size]="14"></lucide-icon>
+                {{ i18n.t('presupuesto.anular') }}
+              </div>
+            </restaurant-button>
+          }
+        </td>
+      </tr>
+      }
+    </tbody>
+    
+    <div dtFooter class="dt-footer">
+      <span class="dt-page-info">
+        Mostrando {{ (paginaActual() - 1) * ITEMS_POR_PAGINA + 1 }}–{{ minOf(paginaActual() * ITEMS_POR_PAGINA, afectacionesFiltradas().length) }}
+        de {{ afectacionesFiltradas().length }} resultados
+      </span>
+      <div class="dt-pagination">
+        <button
+          class="dt-page-btn"
+          [disabled]="paginaActual() === 1"
+          (click)="anterior()"
+          aria-label="Página anterior"
+        >
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+
+        @for (p of paginas(); track p) {
+          <button
+            class="dt-page-btn"
+            [class.dt-page-btn--active]="paginaActual() === p"
+            (click)="irAPagina(p)"
+          >{{ p }}</button>
+        }
+
+        <button
+          class="dt-page-btn"
+          [disabled]="paginaActual() === totalPaginas()"
+          (click)="siguiente()"
+          aria-label="Página siguiente"
+        >
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+      </div>
+    </div>
+  </restaurant-data-table>
+</div>
+
+<!-- Modal de exportación -->
+@if (showExportModal()) {
+<inventario-exportar
+ 
+  titulo="Exportar Presupuesto"
+  subtitulo="Seleccione el formato de salida para el presupuesto general"
+  (exportar)="onExport($event)"
+  (cerrar)="closeExportModal()">
+</inventario-exportar>
+}
+
+<!-- Modal: Registrar Pago de un compromiso PENDIENTE -->
+@if (showPagoModal()) {
+<div class="pago-overlay" (click)="cerrarPago()">
+  <div class="pago-card" (click)="$event.stopPropagation()">
+    <div class="pago-header">
+      <div>
+        <h3 class="pago-title">{{ i18n.t('presupuesto.registrar_pago') }}</h3>
+        <p class="pago-sub">{{ pagoConcepto() }}</p>
+      </div>
+      <button class="pago-close" (click)="cerrarPago()" aria-label="Cerrar">
+        <lucide-icon name="x" [size]="18"></lucide-icon>
+      </button>
+    </div>
+
+    <div class="pago-body">
+      <restaurant-input
+        label="CUFE de la fuente de pago"
+        placeholder="CUFE de la factura electrónica…"
+        [ngModel]="pagoCufe()" (ngModelChange)="pagoCufe.set($event)">
+      </restaurant-input>
+      @if (pagoCargandoCufe()) {
+        <p class="pago-cufe-hint">{{ i18n.t('presupuesto.cargando_cufe') }}</p>
+      } @else if (pagoCufe()) {
+        <p class="pago-cufe-hint pago-cufe-hint--ok">{{ i18n.t('presupuesto.cufe_cargado') }}</p>
+      }
+      <restaurant-input
+        label="Monto" type="number" placeholder="0"
+        [ngModel]="pagoMonto()" (ngModelChange)="pagoMonto.set($event)">
+      </restaurant-input>
+      <restaurant-input
+        label="Fecha de pago" type="text"
+        [ngModel]="pagoFecha()" (ngModelChange)="pagoFecha.set($event)">
+      </restaurant-input>
+    </div>
+
+    <div class="pago-actions">
+      <restaurant-button variant="surface" (click)="cerrarPago()">{{ i18n.t('comun.cancelar') }}</restaurant-button>
+      <restaurant-button variant="primary" [disabled]="!pagoValido()" (click)="confirmarPago()">
+        <div class="btn-icon-text">
+          <lucide-icon name="dollar-sign" [size]="16"></lucide-icon>
+          {{ i18n.t('presupuesto.confirmar_pago') }}
+        </div>
+      </restaurant-button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Router outlet para modales (registrar, traslado, cargar-gil) -->
+<router-outlet></router-outlet>

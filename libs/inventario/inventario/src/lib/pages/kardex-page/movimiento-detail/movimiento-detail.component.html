@@ -1,0 +1,165 @@
+<main class="page-container">
+
+  @if (!loading() && documento() === undefined && bienes().length === 0) {
+
+  <div class="content-area">
+    <header class="action-header">
+      <inventario-back-button (clicked)="goBack()"></inventario-back-button>
+    </header>
+    <section class="card">
+      <p class="text-secondary">{{ i18n.t('kardex.doc_no_encontrado') }}</p>
+    </section>
+  </div>
+
+  } @else if (loading() && bienes().length === 0) {
+
+  <div class="content-area">
+    <section class="card">
+      <p class="text-secondary">{{ i18n.t('kardex.cargando_doc') }}</p>
+    </section>
+  </div>
+
+  } @else {
+
+  <!-- Action Header -->
+  <header class="action-header">
+    <div class="header-left">
+      <inventario-back-button (clicked)="goBack()"></inventario-back-button>
+      <div>
+        <h1 class="page-title">
+          {{ getTipoLabel(documento()?.tipo) }} —
+          {{ documento()?.numeroDocumento ?? 'Documento' }}
+          <span class="status-badge">{{ documento()?.estado }}</span>
+        </h1>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <restaurant-button variant="surface">
+        <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: bold;">
+          <lucide-icon name="printer" [size]="18"></lucide-icon>
+          Imprimir Comprobante
+        </div>
+      </restaurant-button>
+      <restaurant-button variant="primary" (click)="openExportModal()">
+        <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: bold;">
+          <lucide-icon name="file-text" [size]="18"></lucide-icon>
+          Exportar PDF
+        </div>
+      </restaurant-button>
+    </div>
+  </header>
+
+  <!-- Content Area -->
+  <div class="content-area">
+
+    <!-- Section 1: Información del Documento -->
+    <section class="card">
+      <h2 class="section-title">{{ i18n.t('kardex.info_doc') }}</h2>
+      <div class="info-grid">
+
+        <div class="info-item">
+          <span class="info-label">{{ i18n.t('comun.tipo') }}</span>
+          <div class="info-value">
+            <div class="icon-box"
+                 [class.icon-box--entrada]="documento()?.tipo === 'ENTRADA'"
+                 [class.icon-box--salida]="documento()?.tipo !== 'ENTRADA'">
+              <lucide-icon [name]="documento()?.tipo === 'ENTRADA' ? 'arrow-down' : 'arrow-up'" [size]="16"></lucide-icon>
+            </div>
+            {{ getTipoLabel(documento()?.tipo) }}
+          </div>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">{{ i18n.t('kardex.th_nro_doc') }}</span>
+          <div class="info-value">
+            {{ documento()?.numeroDocumento ?? '—' }}
+          </div>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">{{ i18n.t('comun.fecha') }}</span>
+          <div class="info-value">
+            <lucide-icon name="calendar" [size]="18" class="text-secondary"></lucide-icon>
+            {{ documento()?.fecha | date:'dd MMM y, hh:mm a' }}
+          </div>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">{{ i18n.t('kardex.cant_bienes') }}</span>
+          <div class="info-value">{{ documento()?.cantidadBienes ?? bienes().length }}</div>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">{{ i18n.t('kardex.cant_total') }}</span>
+          <div class="info-value">{{ documento()?.cantidadTotal ?? 0 }}</div>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">{{ i18n.t('comun.estado') }}</span>
+          <div class="info-value">{{ documento()?.estado ?? '—' }}</div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Section 2: Bienes del Documento -->
+    <section class="card no-padding">
+      <div class="card-header">
+        <h2 class="section-title">{{ i18n.t('kardex.bienes_doc') }}</h2>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>{{ i18n.t('kardex.th_producto') }}</th>
+              <th>{{ i18n.t('comun.codigo_sena') }}</th>
+              <th class="text-right">{{ i18n.t('comun.cantidad') }}</th>
+              <th class="text-right">{{ i18n.t('comun.valor') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (bien of bienes(); track bien.id) {
+            <tr>
+              <td>
+                <div class="product-cell">
+                  <div class="product-icon">
+                    <lucide-icon name="box" [size]="20"></lucide-icon>
+                  </div>
+                  <span class="product-name">{{ bien.productoNombre || '—' }}</span>
+                </div>
+              </td>
+              <td class="text-secondary">{{ bien.codigoSena }}</td>
+              <td class="text-right">
+                <span class="qty-badge">{{ bien.cantidad }} {{ bien.unidadMedida }}</span>
+              </td>
+              <td class="text-right">${{ bien.valor | number:'1.0-0' }}</td>
+            </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3" class="text-right font-bold">{{ i18n.t('kardex.gran_total') }}</td>
+              <td class="text-right font-bold total-val">${{ documento()?.valorTotal | number:'1.0-0' }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  }
+
+</main>
+
+<!-- Modal de exportación -->
+@if (showExportModal()) {
+<inventario-exportar
+  titulo="Exportar Documento"
+  subtitulo="Seleccione el formato de salida para este documento"
+  (exportar)="onExport($event)"
+  (cerrar)="closeExportModal()">
+</inventario-exportar>
+}

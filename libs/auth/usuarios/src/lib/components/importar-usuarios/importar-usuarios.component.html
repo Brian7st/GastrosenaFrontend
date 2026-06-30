@@ -1,0 +1,133 @@
+<div class="modal-backdrop" (click)="cerrar.emit()" (keydown.escape)="cerrar.emit()" role="dialog" aria-modal="true" tabindex="-1">
+  <div class="modal" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="modal__header">
+      <div class="modal__header-icon modal__header-icon--import">
+        <lucide-icon name="upload" [size]="20"></lucide-icon>
+      </div>
+      <div>
+        <h2 class="modal__title">{{ i18n.t('importar.titulo') }}</h2>
+        <p class="modal__subtitle">{{ i18n.t('importar.subtitulo') }}</p>
+      </div>
+      <button class="modal__close" type="button" (click)="cerrar.emit()" [attr.aria-label]="i18n.t('importar.cerrar')">
+        <lucide-icon name="x" [size]="18"></lucide-icon>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal__body">
+
+      <!-- Tipo de usuario (Corrección 2) -->
+      <div class="modal__field">
+        <label class="modal__label" for="imp-tipo">{{ i18n.t('importar.tipo_usuario') }}</label>
+        <div class="modal__select-wrapper">
+          <select
+            id="imp-tipo"
+            class="modal__select"
+            [value]="tipo()"
+            (change)="onTipoChange($event)"
+          >
+            <option value="INSTRUCTOR">{{ i18n.t('importar.instructor') }}</option>
+            <option value="APRENDIZ">{{ i18n.t('importar.aprendiz') }}</option>
+          </select>
+          <lucide-icon name="chevron-down" [size]="16" class="modal__select-icon"></lucide-icon>
+        </div>
+      </div>
+
+      <!-- Drop zone -->
+      <label
+        class="modal__dropzone"
+        [class.modal__dropzone--active]="isDragging()"
+        [class.modal__dropzone--ready]="archivo() !== null"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave()"
+        (drop)="onDrop($event)"
+      >
+        @if (archivo()) {
+          <lucide-icon name="file-check" [size]="36" class="modal__dropzone-icon modal__dropzone-icon--ready"></lucide-icon>
+          <p class="modal__dropzone-text">{{ archivo()!.name }}</p>
+          <p class="modal__dropzone-hint">{{ i18n.t('importar.drop_ready') }}</p>
+        } @else {
+          <lucide-icon name="file-up" [size]="36" class="modal__dropzone-icon"></lucide-icon>
+          <p class="modal__dropzone-text">{{ i18n.t('importar.drop_text') }}</p>
+          <p class="modal__dropzone-hint">{{ i18n.t('importar.drop_hint') }}</p>
+        }
+        <input
+          type="file"
+          accept=".xlsx,.xls,.csv"
+          class="modal__dropzone-input"
+          (change)="onFileChange($event)"
+        />
+      </label>
+
+      <!-- Yellow note -->
+      <div class="modal__note">
+        <lucide-icon name="triangle-alert" [size]="16" class="modal__note-icon"></lucide-icon>
+        <div>
+          <p class="modal__note-title">{{ i18n.t('importar.note_title') }}</p>
+          @if (tipo() === 'INSTRUCTOR') {
+            <p class="modal__note-cols">{{ i18n.t('importar.cols_instructor') }}</p>
+          } @else {
+            <p class="modal__note-cols">{{ i18n.t('importar.cols_aprendiz') }}</p>
+          }
+        </div>
+      </div>
+
+      <!-- Loading state (Corrección 6) -->
+      @if (importando) {
+        <div class="modal__loading">
+          <lucide-icon name="loader-circle" [size]="18" class="modal__loading-icon"></lucide-icon>
+          <span>{{ i18n.t('importar.procesando') }}</span>
+        </div>
+      }
+
+      <!-- Resumen de resultado (Corrección 6) -->
+      @if (resultado && !importando) {
+        <div class="modal__result">
+          <div class="modal__result-row modal__result-row--success">
+            <lucide-icon name="check-circle" [size]="16"></lucide-icon>
+            <span>
+              {{ resultado.exitosos }}
+              {{ i18n.t('importar.resultado_exito') }}
+            </span>
+          </div>
+          @if (resultado.fallidos > 0) {
+            <div class="modal__result-row modal__result-row--error">
+              <lucide-icon name="x-circle" [size]="16"></lucide-icon>
+              <span>
+                {{ resultado.fallidos }}
+                {{ i18n.t('importar.resultado_error') }}
+              </span>
+            </div>
+            @if (resultado.errores.length > 0) {
+              <ul class="modal__result-errors">
+                @for (err of resultado.errores; track err) {
+                  <li class="modal__result-error-item">{{ err }}</li>
+                }
+              </ul>
+            }
+          }
+        </div>
+      }
+
+    </div>
+
+    <!-- Footer -->
+    <div class="modal__footer">
+      <button class="modal__btn modal__btn--ghost" type="button" (click)="cerrar.emit()">
+        {{ i18n.t('importar.cerrar') }}
+      </button>
+      <button
+        class="modal__btn modal__btn--primary"
+        type="button"
+        [disabled]="archivo() === null || importando"
+        (click)="onImportar()"
+      >
+        <lucide-icon name="upload" [size]="16"></lucide-icon>
+        {{ i18n.t('importar.iniciar') }}
+      </button>
+    </div>
+
+  </div>
+</div>

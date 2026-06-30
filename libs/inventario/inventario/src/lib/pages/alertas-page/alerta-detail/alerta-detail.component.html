@@ -1,0 +1,116 @@
+@if (alerta(); as a) {
+  <div class="detail-container">
+
+    <!-- ── Action Header (patrón Kardex) ──────────────────────────────────── -->
+    <header class="action-header">
+      <div class="header-left">
+        <inventario-back-button (clicked)="volver()"></inventario-back-button>
+        <div>
+          <h1 class="page-title">
+            Detalle de Alerta: {{ a.nombreBien ?? a.descripcion }}
+          </h1>
+          <p class="detail-meta">
+            Código: {{ a.codigoSena ?? '—' }} &bull; Tipo: {{ a.tipo }}
+          </p>
+        </div>
+      </div>
+      <div class="header-right">
+        <restaurant-button *hasPermission="'alertas:configurar_umbrales'" variant="surface" (click)="irAUmbral()">
+          <div class="btn-icon-text">
+            <lucide-icon name="settings" [size]="18"></lucide-icon>
+            {{ i18n.t('alerta.editar_umbral') }}
+          </div>
+        </restaurant-button>
+        <restaurant-button *hasPermission="'alertas:resolver'" variant="primary" (click)="abrirResolver()">
+          <div class="btn-icon-text">
+            <lucide-icon name="check-circle" [size]="18"></lucide-icon>
+            {{ i18n.t('alerta.resolver_ahora') }}
+          </div>
+        </restaurant-button>
+      </div>
+    </header>
+
+    <!-- ── Content Grid ───────────────────────────────────────────────────── -->
+    <div class="detail-grid">
+
+      <!-- ── Columna izquierda ─────────────────────────────────────────── -->
+      <div class="col-main">
+
+        <!-- Tarjeta de Estado ─────────────────────────────────────────── -->
+        <section class="estado-card" [class]="'estado-card--' + a.prioridad.toLowerCase()">
+          <div class="estado-card__top-bar" [class]="'estado-card__top-bar--' + a.prioridad.toLowerCase()"></div>
+
+          <div class="estado-card__header">
+            <div class="estado-card__icon-wrap" [class]="'estado-card__icon-wrap--' + a.prioridad.toLowerCase()">
+              <span class="material-symbols-outlined estado-card__icon">oil_barrel</span>
+            </div>
+            <div>
+              <h2 class="estado-card__titulo">
+                @if (a.estado === 'CRITICA') { {{ i18n.t('alerta.estado_critico') }} }
+                @else if (a.prioridad === 'ALTA') { {{ i18n.t('alerta.stock_bajo') }} }
+                @else { {{ i18n.t('alerta.bajo_umbral') }} }
+              </h2>
+              <p class="estado-card__subtitulo">
+                @if (a.estado === 'CRITICA') { {{ i18n.t('alerta.atencion_inmediata') }} }
+                @else { {{ i18n.t('alerta.monitorear') }}
+              }</p>
+            </div>
+            <restaurant-status-badge
+              [label]="i18n.t('alerta.bajo_stock')"
+              [variant]="prioridadVariant()"
+              class="estado-card__badge"
+            ></restaurant-status-badge>
+          </div>
+
+          <div class="stock-grid">
+            <div>
+              <p class="stock-label">{{ i18n.t('alerta.stock_actual_label') }}</p>
+              <p class="stock-value" [class]="'stock-value--' + a.prioridad.toLowerCase()">
+                {{ a.stockActual ?? 0 }}
+                <span class="stock-unit">{{ a.unidad ?? '' }}</span>
+              </p>
+            </div>
+            <div>
+              <p class="stock-label">{{ i18n.t('alerta.umbral_minimo') }}</p>
+              <p class="stock-value stock-value--neutral">
+                {{ a.stockMinimo ?? 0 }}
+                <span class="stock-unit">{{ a.unidad ?? '' }}</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Barra de progreso -->
+          <div class="progress-section">
+            <div class="progress-header">
+              <span>{{ i18n.t('alerta.capacidad') }}: {{ porcentajeStock().toFixed(0) }}%</span>
+            </div>
+            <div class="progress-track">
+              <div
+                class="progress-fill"
+                [class]="'progress-fill--' + a.prioridad.toLowerCase()"
+                [style.width.%]="porcentajeStock()"
+              ></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Descripción de la alerta -->
+        <section class="chart-card">
+          <h2 class="chart-card__title">{{ i18n.t('comun.descripcion') }}</h2>
+          <p class="descripcion-text">{{ a.descripcion }}</p>
+          @if (a.fechaResolucion) {
+            <p class="resolucion-fecha">
+              <span class="material-symbols-outlined">check_circle</span>
+              {{ i18n.t('alerta.resuelta') }}: {{ a.fechaResolucion }}
+            </p>
+          }
+        </section>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Router outlet para modal Resolver ────────────────────────────── -->
+  <router-outlet></router-outlet>
+}

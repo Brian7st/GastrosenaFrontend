@@ -1,0 +1,370 @@
+<!-- ══════════════════════════════════════════════════════════════════════════
+     Editar Solicitud GIL-F-014
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="edit-page-container">
+
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
+  <div class="page-header">
+    <inventario-back-button (clicked)="onCancel()" />
+    <div class="header-main">
+      <div class="header-titles">
+        <h2 class="title">{{ i18n.t('solicitudes-edit.titulo') }} {{ solicitudId() }}</h2>
+        <p class="subtitle">{{ i18n.t('solicitudes-edit.subtitulo') }}</p>
+      </div>
+      <div class="header-status">
+        <span class="badge badge--active">{{ solicitud()?.estado ?? 'Borrador' }}</span>
+        <span class="header-id">{{ solicitudId() }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Feedback banner ─────────────────────────────────────────────────── -->
+  @if (feedbackMsg()) {
+    <div
+      class="feedback-banner"
+      [class.feedback-banner--success]="feedbackMsg()!.tipo === 'success'"
+      [class.feedback-banner--error]="feedbackMsg()!.tipo === 'error'">
+      <span class="material-symbols-outlined">
+        {{ feedbackMsg()!.tipo === 'success' ? 'check_circle' : 'error' }}
+      </span>
+      <p>{{ feedbackMsg()!.texto }}</p>
+    </div>
+  }
+
+  <!-- ── Blocked banner ──────────────────────────────────────────────────── -->
+  @if (isBlocked()) {
+    <div class="feedback-banner feedback-banner--warning">
+      <span class="material-symbols-outlined">lock</span>
+      <p>{{ i18n.t('solicitudes-edit.bloqueado', { estado: solicitud()?.estado ?? '' }) }}</p>
+    </div>
+  }
+
+  <!-- ── Loading skeleton ────────────────────────────────────────────────── -->
+  @if (loading() && !solicitud()) {
+    <div class="loading-placeholder">
+      <span class="material-symbols-outlined spin">sync</span>
+      {{ i18n.t('solicitudes-edit.cargando') }}
+    </div>
+  }
+
+  <div class="edit-grid">
+
+    <!-- ════════════════════════════════════════════════════════════════════
+         Columna Principal
+    ════════════════════════════════════════════════════════════════════ -->
+    <!-- ── Información Institucional (col izquierda, fila 1) ─────────────── -->
+    <div
+      class="form-card info-card"
+      [class.opacity-50]="isBlocked()"
+      [class.pointer-events-none]="isBlocked()">
+      <div class="card-header">
+        <span class="material-symbols-outlined icon-primary">corporate_fare</span>
+        <h3>{{ i18n.t('solicitudes-edit.info_institucional') }}</h3>
+      </div>
+        <div class="form-row-2">
+
+          <div class="form-group">
+            <label>{{ i18n.t('solicitudes-edit.fecha_solicitud') }} <span class="required">*</span></label>
+            <input
+              type="date"
+              class="form-control"
+              [value]="fechaSolicitud()"
+              (input)="fechaSolicitud.set($any($event.target).value)"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>{{ i18n.t('solicitudes-edit.destino_bienes') }} <span class="required">*</span></label>
+            <select
+              class="form-control"
+              [value]="destinoBienes()"
+              (change)="destinoBienes.set($any($event.target).value)">
+              @for (d of DESTINOS; track d.value) {
+                <option [value]="d.value">{{ d.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>{{ i18n.t('solicitudes-edit.regional_codigo') }} <span class="required">*</span></label>
+            <input
+              type="number"
+              class="form-control"
+              [placeholder]="i18n.t('solicitudes-edit.ph_regional')"
+              min="1"
+              [value]="regionalCodigo() ?? ''"
+              (input)="regionalCodigo.set(+$any($event.target).value || null)"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>{{ i18n.t('solicitudes-edit.regional_nombre') }} <span class="required">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              [placeholder]="i18n.t('solicitudes-edit.ph_regional_nombre')"
+              [value]="regionalNombre()"
+              (input)="regionalNombre.set($any($event.target).value)"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>{{ i18n.t('solicitudes-edit.cc_codigo') }} <span class="required">*</span></label>
+            <input
+              type="number"
+              class="form-control"
+              [placeholder]="i18n.t('solicitudes-edit.ph_cc')"
+              min="1"
+              [value]="centroCostosCodigo() ?? ''"
+              (input)="centroCostosCodigo.set(+$any($event.target).value || null)"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>{{ i18n.t('solicitudes-edit.cc_nombre') }} <span class="required">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              [placeholder]="i18n.t('solicitudes-edit.ph_cc_nombre')"
+              [value]="centroCostosNombre()"
+              (input)="centroCostosNombre.set($any($event.target).value)"
+            />
+          </div>
+
+          <div class="form-group col-span-2">
+            <label>{{ i18n.t('solicitudes-edit.area') }} <span class="required">*</span></label>
+            <select
+              class="form-control"
+              (change)="area.set($any($event.target).value)">
+              <option value="" [selected]="area() === ''">{{ i18n.t('solicitudes-edit.seleccione_area') }}</option>
+              @for (a of AREAS; track a) {
+                <option [value]="a" [selected]="a === area()">{{ a }}</option>
+              }
+            </select>
+          </div>
+
+        </div>
+      </div>
+
+    <!-- ── Resto del formulario (ancho completo, debajo) ────────────────── -->
+    <div
+      class="form-col-full"
+      [class.opacity-50]="isBlocked()"
+      [class.pointer-events-none]="isBlocked()">
+
+      <!-- ── Solicitante y Coordinador ──────────────────────────────────── -->
+      <div class="form-card">
+        <div class="card-header">
+          <span class="material-symbols-outlined icon-primary">person</span>
+          <h3>{{ i18n.t('solicitudes-edit.solicitante_coord') }}</h3>
+        </div>
+        <div class="form-row-2">
+
+          <div class="form-group">
+            <label>{{ i18n.t('solicitudes-edit.solicitante') }} <span class="required">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              [placeholder]="i18n.t('solicitudes-edit.ph_solicitante')"
+              [value]="solicitante()"
+              (input)="solicitante.set($any($event.target).value)"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>{{ i18n.t('solicitudes-edit.jefe_oficina') }} <span class="required">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              [placeholder]="i18n.t('solicitudes-edit.ph_jefe')"
+              [value]="jefeOficinaCoordinador()"
+              (input)="jefeOficinaCoordinador.set($any($event.target).value)"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>{{ i18n.t('solicitudes-edit.codigo_grupo') }}</label>
+            <input
+              type="text"
+              class="form-control"
+              [placeholder]="i18n.t('solicitudes-edit.ph_grupo')"
+              [value]="codigoGrupo()"
+              (input)="codigoGrupo.set($any($event.target).value)"
+            />
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── Cuentadantes ───────────────────────────────────────────────── -->
+      <div class="form-card">
+        <div class="card-header">
+          <span class="material-symbols-outlined icon-primary">groups</span>
+          <h3>{{ i18n.t('solicitudes-edit.cuentadantes') }}</h3>
+        </div>
+
+        @if (cuentadantes().length > 0) {
+          <div class="cuentadantes-list">
+            @for (c of cuentadantes(); track c; let i = $index) {
+              <div class="cuentadante-chip">
+                <span class="material-symbols-outlined">person</span>
+                <span class="chip-nombre">{{ c.nombre }}</span>
+                <span class="chip-cedula">CC {{ c.cedula }}</span>
+                <button class="btn-icon btn-icon--danger" type="button" (click)="onRemoveCuentadante(i)">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="empty-hint">{{ i18n.t('solicitudes-edit.sin_cuentadantes') }}</p>
+        }
+      </div>
+
+      <!-- ── Bienes Solicitados ─────────────────────────────────────────── -->
+      <div class="form-card">
+        <div class="card-header">
+          <span class="material-symbols-outlined icon-primary">category</span>
+          <h3>{{ i18n.t('solicitudes-edit.bienes_solicitados') }}</h3>
+        </div>
+        <div class="table-container">
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>{{ i18n.t('comun.codigo_sena') }}</th>
+                <th class="w-full">{{ i18n.t('solicitudes-edit.th_descripcion') }}</th>
+                <th>{{ i18n.t('solicitudes-edit.th_um') }}</th>
+                <th class="text-right">{{ i18n.t('comun.cantidad') }}</th>
+                <th class="text-right">{{ i18n.t('solicitudes-edit.th_valor_unit') }}</th>
+                <th class="text-right">{{ i18n.t('solicitudes-edit.th_subtotal') }}</th>
+                <th class="text-center">{{ i18n.t('comun.accion') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (bien of bienes(); track bien; let i = $index) {
+                <tr>
+                  <td class="font-medium text-dark">{{ bien.codigoSena }}</td>
+                  <td class="text-muted">{{ bien.descripcion }}</td>
+                  <td class="text-muted">{{ bien.unidadMedida }}</td>
+                  <td class="text-right font-medium text-dark">{{ bien.cantidad }}</td>
+                  <td class="text-right text-muted">{{ bien.valorUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                  <td class="text-right font-bold text-dark">{{ bien.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                  <td class="text-center">
+                    <button type="button" class="btn-icon btn-icon--danger" (click)="onRemoveBien(i)">
+                      <span class="material-symbols-outlined">delete</span>
+                    </button>
+                  </td>
+                </tr>
+              }
+              @if (bienes().length === 0) {
+                <tr>
+                  <td colspan="7" class="empty-row">
+                    <span class="material-symbols-outlined">category</span>
+                    {{ i18n.t('solicitudes-edit.sin_bienes') }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── Observaciones ──────────────────────────────────────────────── -->
+      <div class="form-card">
+        <div class="card-header">
+          <span class="material-symbols-outlined icon-primary">notes</span>
+          <h3>{{ i18n.t('solicitudes-edit.observaciones') }}</h3>
+        </div>
+        <div class="form-group">
+          <textarea
+            class="form-control"
+            rows="4"
+            [placeholder]="i18n.t('solicitudes-edit.ph_obs')"
+            [value]="observaciones()"
+            (input)="observaciones.set($any($event.target).value)">
+          </textarea>
+        </div>
+      </div>
+
+      <!-- ── Acciones ───────────────────────────────────────────────────── -->
+      <div class="actions-footer">
+        <restaurant-button variant="ghost" (click)="onCancel()" [disabled]="isSaving()">
+          {{ i18n.t('comun.cancelar') }}
+        </restaurant-button>
+        <restaurant-button variant="primary" (click)="onSave()" [disabled]="isSaving()">
+          <span class="material-symbols-outlined">save</span>
+          {{ isSaving() ? i18n.t('comun.guardando') : i18n.t('solicitudes-edit.guardar') }}
+        </restaurant-button>
+      </div>
+
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════════════
+         Sidebar
+    ════════════════════════════════════════════════════════════════════ -->
+    <div class="sidebar-col">
+
+      <!-- Historial -->
+      <div class="side-card side-card--history">
+        <h4>
+          <span class="material-symbols-outlined icon-history">history</span>
+          {{ i18n.t('solicitudes-edit.historial') }}
+        </h4>
+        <div class="history-timeline">
+          <div class="timeline-item">
+            <div class="timeline-dot timeline-dot--completed">
+              <span class="material-symbols-outlined">check</span>
+            </div>
+            <div class="timeline-content">
+              <p class="history-title">{{ i18n.t('solicitudes-edit.hist_creado') }}</p>
+              <p class="history-date">{{ solicitud()?.fechaSolicitud ?? '—' }}</p>
+            </div>
+          </div>
+          <div class="timeline-item timeline-item--last">
+            <div class="timeline-dot timeline-dot--current">
+              <span class="material-symbols-outlined">edit</span>
+            </div>
+            <div class="timeline-content">
+              <p class="history-title">{{ i18n.t('solicitudes-edit.hist_edicion') }}</p>
+              <p class="history-date">{{ i18n.t('solicitudes-edit.hist_hoy') }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumen -->
+      <div class="side-card side-card--summary">
+        <h4>{{ i18n.t('solicitudes-edit.resumen_gil') }}</h4>
+        <div class="summary-total">
+          <span>{{ i18n.t('solicitudes-edit.num_gil') }}</span>
+          <span class="summary-value">{{ solicitudId() || '—' }}</span>
+        </div>
+        <div class="summary-total">
+          <span>{{ i18n.t('comun.estado') }}</span>
+          <span class="summary-value">{{ solicitud()?.estado ?? '—' }}</span>
+        </div>
+        <div class="summary-total">
+          <span>{{ i18n.t('solicitudes-edit.solicitante_label') }}</span>
+          <span class="summary-value">{{ solicitante() || '—' }}</span>
+        </div>
+        <div class="summary-total">
+          <span>{{ i18n.t('solicitudes-edit.coordinador') }}</span>
+          <span class="summary-value">{{ jefeOficinaCoordinador() || '—' }}</span>
+        </div>
+        <div class="summary-total">
+          <span>{{ i18n.t('solicitudes-edit.codigo_grupo_label') }}</span>
+          <span class="summary-value">{{ codigoGrupo() || '—' }}</span>
+        </div>
+        <div class="summary-total">
+          <span>{{ i18n.t('solicitudes-edit.total_bienes') }}</span>
+          <span class="summary-value">{{ bienes().length }} ítem(s)</span>
+        </div>
+        <div class="summary-total">
+          <span>{{ i18n.t('solicitudes-edit.valor_estimado') }}</span>
+          <span class="summary-value">{{ totalValor() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

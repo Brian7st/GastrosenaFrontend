@@ -1,0 +1,17 @@
+.contact {
+  padding: 3rem 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  &__card { background: var(--color-surface-primary); border: 1px solid var(--color-border); border-radius: 1.5rem; padding: 3rem; }
+  &__header { text-align: center; margin-bottom: 2.5rem; }
+  &__title  { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; }
+  &__sub    { color: var(--color-text-secondary); }
+  &__grid   { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; }
+}
+
+.contact-item {
+  display: flex; align-items: flex-start; gap: 1rem;
+  &__icon { width: 44px; height: 44px; border-radius: 10px; background: color-mix(in srgb, var(--color-success) 12%, transparent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--color-success); }
+  &__label { font-size: 0.75rem; font-weight: 600; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
+  &__value  { font-size: 0.9375rem; color: var(--color-text-primary); }
+}

@@ -1,0 +1,107 @@
+<div class="modulo-container">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-4);">
+    <restaurant-page-header [title]="i18n.t('recetas.page.title')" [subtitle]="i18n.t('recetas.page.subtitle')" style="margin-bottom: 0;"></restaurant-page-header>
+    <div style="display: flex; gap: var(--space-3);">
+      <restaurant-button *hasRole="[Rol.ADMINISTRADOR, Rol.CHEF]" variant="surface" (click)="abrirGestionCategorias()">
+        <lucide-icon name="list" size="18" style="margin-right: var(--space-2);"></lucide-icon> {{ i18n.t('recetas.btn_categorias') }}
+      </restaurant-button>
+      <restaurant-button *hasRole="[Rol.ADMINISTRADOR, Rol.CHEF]" variant="primary" (click)="abrirNuevaReceta()">
+        <lucide-icon name="plus" size="18" style="margin-right: var(--space-2);"></lucide-icon> {{ i18n.t('recetas.btn_nueva') }}
+      </restaurant-button>
+    </div>
+  </div>
+
+  <div class="recetas-filters">
+    <div class="filter-search">
+      <restaurant-search-filter
+        [label]="i18n.t('recetas.buscar_label')"
+        [placeholder]="i18n.t('recetas.buscar_placeholder')"
+        [value]="searchTerm()"
+        (valueChange)="searchTerm.set($event)"
+      ></restaurant-search-filter>
+    </div>
+    <div class="filter-category">
+      <restaurant-select-filter
+        [label]="i18n.t('recetas.categoria_label')"
+        [value]="categoriaSeleccionada()"
+        [options]="opcionesCategoria()"
+        (valueChange)="categoriaSeleccionada.set($event)"
+      ></restaurant-select-filter>
+    </div>
+  </div>
+
+  <div class="showcase__grid-3 recetas-grid">
+    @for (receta of recetasFiltradas(); track receta.idReceta) {
+      <restaurant-card
+        [title]="receta.nombreReceta"
+        [subtitle]="receta.nombreCategoria || i18n.t('recetas.sin_categoria')"
+        [imageUrl]="receta.urlImagen || ('https://placehold.co/600x400/f8f9fa/a0aec0?text=' + i18n.t('recetas.sin_imagen'))"
+        [price]="receta.precioUnitario || 0"
+      >
+        <div class="card-content" style="display: flex; flex-direction: column; flex: 1; justify-content: space-between;">
+          <div>
+            <div class="details-row" style="display: flex; gap: var(--space-2); color: var(--color-text-secondary); font-size: var(--font-size-sm); margin-bottom: var(--space-3); margin-top: var(--space-2);">
+              <span class="temp-text">{{ receta.temperatura }}</span>
+              <span class="separator">•</span>
+              <span class="time-text">{{ receta.tiempoPreparacion }} min</span>
+            </div>
+            <div class="ingredients-list" style="display: flex; gap: var(--space-2); flex-wrap: wrap; margin-bottom: var(--space-4);">
+              @for (ing of receta.ingredientes?.slice(0, 3); track ing.idIngrediente) {
+                <span class="ing-chip" style="background: var(--color-surface-secondary); padding: var(--space-1) var(--space-2); border-radius: var(--radius-sm); font-size: var(--font-size-xs); color: var(--color-text-secondary);">{{ ing.nombreIngrediente }}</span>
+              }
+              @if (receta.ingredientes && receta.ingredientes.length > 3) {
+                <span class="ing-chip more" style="background: var(--color-surface-secondary); padding: var(--space-1) var(--space-2); border-radius: var(--radius-sm); font-size: var(--font-size-xs); color: var(--color-text-secondary);">+{{ receta.ingredientes.length - 3 }}</span>
+              }
+            </div>
+          </div>
+          <div class="action-buttons" style="display: flex; gap: var(--space-2); align-items: center; justify-content: space-between; margin-top: auto; padding-top: var(--space-4); border-top: 1px solid var(--color-border);">
+            <restaurant-button variant="primary" (click)="verDetalle(receta)" style="flex: 1;">{{ i18n.t('recetas.ver_detalle') }}</restaurant-button>
+            <div *hasRole="[Rol.ADMINISTRADOR, Rol.CHEF]" style="display: flex; gap: var(--space-2);">
+              <restaurant-button variant="surface" (click)="editarReceta(receta)"><lucide-icon name="pencil" size="16"></lucide-icon></restaurant-button>
+              <restaurant-button variant="ghost" (click)="prepararEliminacion(receta.idReceta)"><lucide-icon name="trash-2" size="16"></lucide-icon></restaurant-button>
+            </div>
+          </div>
+        </div>
+      </restaurant-card>
+    } @empty {
+      <restaurant-empty-state
+        [title]="i18n.t('recetas.sin_resultados')"
+        [message]="i18n.t('recetas.sin_resultados_msg').replace('{0}', searchTerm())"
+      ></restaurant-empty-state>
+    }
+  </div>
+
+  @if (mostrarDetalle() && recetaSeleccionada()) {
+    <restaurant-detalle-receta
+      [receta]="recetaSeleccionada()!"
+      (close)="cerrarModales()"
+    ></restaurant-detalle-receta>
+  }
+
+  @if (mostrarGestion()) {
+    <restaurant-gestion-receta
+      [receta]="recetaSeleccionada()"
+      (close)="cerrarModales($event)"
+    ></restaurant-gestion-receta>
+  }
+
+  @if (mostrarCategorias()) {
+    <restaurant-gestion-categorias
+      (close)="cerrarModales($event)"
+    ></restaurant-gestion-categorias>
+  }
+
+  <restaurant-confirm-dialog
+    [open]="confirmDeleteOpen()"
+    [title]="i18n.t('recetas.confirm_titulo')"
+    [message]="i18n.t('recetas.confirm_mensaje')"
+    (confirm)="confirmarEliminacion()"
+    (cancel)="cancelarEliminacion()"
+  ></restaurant-confirm-dialog>
+
+  @if (alertMessage()) {
+    <div style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
+      <restaurant-alert [type]="alertType()" [message]="alertMessage()"></restaurant-alert>
+    </div>
+  }
+</div>

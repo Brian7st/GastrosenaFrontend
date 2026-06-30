@@ -1,0 +1,75 @@
+<div class="modal-backdrop" (click)="cerrarModal($event)">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    
+    <div class="detalle-header">
+      <div class="titulo-area">
+        <lucide-icon name="book-open" size="24"></lucide-icon>
+        <h2>{{ receta.nombreReceta }}</h2>
+      </div>
+      <button (click)="cerrar()" class="btn-close-top" [attr.aria-label]="i18n.t('detalle-receta.cerrar')">
+        <lucide-icon name="x" size="24"></lucide-icon>
+      </button>
+    </div>
+
+    @if (receta.urlImagen) {
+      <div class="detalle-imagen">
+        <img [src]="receta.urlImagen" [alt]="receta.nombreReceta">
+      </div>
+    }
+
+    <div class="detalle-body">
+      <p class="subtitulo">{{ i18n.t('detalle-receta.subtitulo') }}</p>
+
+      <div class="detalle-grid">
+        <div class="columna-izquierda">
+          <section class="info-general">
+            <h3>{{ i18n.t('detalle-receta.info_general') }}</h3>
+            <div class="meta-data">
+              <span class="meta-item" style="display:flex;align-items:center;gap: var(--space-1);"><lucide-icon name="clock" size="16"></lucide-icon> {{ receta.tiempoPreparacion }} min</span>
+              <span class="meta-item" style="display:flex;align-items:center;gap: var(--space-1);"><lucide-icon name="chef-hat" size="16"></lucide-icon> {{ receta.temperatura }}</span>
+            </div>
+          </section>
+          
+          <section class="ingredientes-seccion">
+            <h3>{{ i18n.t('detalle-receta.ingredientes') }}</h3>
+            <div class="ingredientes-lista">
+              @for (ing of receta.ingredientes; track $index) {
+                <div class="ingrediente-row">
+                  <span class="nombre">{{ ing.nombreIngrediente }}</span>
+                  <span class="cantidad">{{ ing.cantidadRequerida }} {{ ing.unidadMedida }}</span>
+                </div>
+              } @empty {
+                <p class="empty-msg">{{ i18n.t('detalle-receta.sin_ingredientes') }}</p>
+              }
+            </div>
+          </section>
+        </div>
+
+        <div class="columna-derecha">
+          <section class="instrucciones-seccion">
+            <h3>{{ i18n.t('detalle-receta.instrucciones') }}</h3>
+            <div class="pasos-container">
+              @for (paso of receta.pasos; track paso.orden) {
+                <div class="paso-card">
+                  <div class="paso-numero-container">
+                    <span class="paso-numero">{{ paso.orden }}</span>
+                  </div>
+                  <div class="paso-contenido">
+                    <p class="descripcion">{{ paso.descripcionPaso }}</p>
+                    @if (paso.notasAdicionales) {
+                      <div class="nota-container">
+                        <small><em>{{ i18n.t('detalle-receta.nota') }}</em> {{ paso.notasAdicionales }}</small>
+                      </div>
+                    }
+                  </div>
+                </div>
+              } @empty {
+                <p class="empty-msg">{{ i18n.t('detalle-receta.sin_pasos') }}</p>
+              }
+            </div>
+          </section>
+        </div>
+      </div> 
+    </div>
+  </div>
+</div>

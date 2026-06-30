@@ -1,0 +1,257 @@
+<div class="dashboard-container">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-4);">
+    <restaurant-page-header
+      [title]="i18n.t('inicio.page.title')"
+      [subtitle]="i18n.t('inicio.page.subtitle')"
+      style="margin-bottom: 0;"
+    ></restaurant-page-header>
+    
+    <div class="date-badge">{{ fechaActual }}</div>
+  </div>
+
+  <div class="showcase__grid-3 stats-grid">
+    <restaurant-kpi-card 
+      [label]="i18n.t('inicio.kpi.active-orders')" 
+      [value]="estadisticas().activos.toString()" 
+      icon="clock" 
+      iconColor="orange"
+    ></restaurant-kpi-card>
+
+    <div (click)="abrirModalListas()" style="cursor: pointer;">
+      <restaurant-kpi-card
+        [label]="i18n.t('inicio.kpi.completed-today')"
+        [value]="estadisticas().completados.toString()"
+        icon="check-circle"
+        iconColor="green"
+      ></restaurant-kpi-card>
+    </div>
+
+    <div (click)="abrirModal('CANCELACION')" style="cursor: pointer;">
+      <restaurant-kpi-card 
+        [label]="i18n.t('inicio.kpi.cancelled')" 
+        [value]="estadisticas().cancelados.toString()" 
+        icon="x-circle" 
+        iconColor="red"
+      ></restaurant-kpi-card>
+    </div>
+
+    <div (click)="abrirModal('DEVOLUCION')" style="cursor: pointer;">
+      <restaurant-kpi-card 
+        [label]="i18n.t('inicio.kpi.returned')" 
+        [value]="estadisticas().devueltos.toString()" 
+        icon="arrow-left-right" 
+        iconColor="yellow"
+      ></restaurant-kpi-card>
+    </div>
+  </div>
+
+  <section class="recent-section showcase__section">
+    <restaurant-section-title 
+      [title]="i18n.t('inicio.section.recent-orders')" 
+      [subtitle]="i18n.t('inicio.section.recent-subtitle')" 
+      align="left"
+    ></restaurant-section-title>
+
+    <div class="order-list showcase__stack">
+      @for (pedido of pedidosPendientes(); track pedido.platos) {
+        <div class="order-item showcase__row" style="justify-content: space-between; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-secondary);">
+          <div class="left showcase__row">
+            <span class="showcase__value">{{ i18n.t('inicio.table.label') }} {{ pedido.mesa }}</span>
+            <restaurant-status-badge 
+              [label]="pedido.estado" 
+              [variant]="getBadgeVariant(pedido.clase)"
+            ></restaurant-status-badge>
+            <p class="order-details" style="margin: 0; font-size: var(--font-size-sm);">{{ pedido.platos }}</p>
+          </div>
+          <span class="time" style="font-size: var(--font-size-sm); color: var(--color-text-secondary);"><lucide-icon name="clock" size="14"></lucide-icon> {{ pedido.tiempo }}</span>
+        </div>
+      }
+    </div>
+
+    <div style="margin-top: var(--space-4);">
+      <restaurant-button routerLink="/app/bar/comandas" variant="primary" style="width: 100%; display: block;">{{ i18n.t('inicio.go-to-orders') }}</restaurant-button>
+    </div>
+  </section>
+</div>
+
+<!-- ===== MODAL DE INCIDENCIAS ===== -->
+@if (modalAbierto()) {
+  <div class="modal-overlay" (click)="cerrarConOverlay($event)">
+    <div class="modal-incidencias">
+
+      <div class="modal-header">
+        <div class="modal-title-row">
+          <lucide-icon name="x-circle" size="24" class="modal-icon"></lucide-icon>
+          <div>
+            <h2>{{ modalTitulo() }}</h2>
+            <p class="modal-subtitle">{{ i18n.t('inicio.modal.subtitle-' + modalTipo().toLowerCase()) }}</p>
+          </div>
+        </div>
+        <button class="modal-close" (click)="cerrarModal()">
+          <lucide-icon name="x" size="20"></lucide-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        @if (cargando()) {
+          <div class="modal-loading">
+            <div class="spinner"></div>
+            <p>{{ i18n.t('inicio.modal.incidences-loading') }}</p>
+          </div>
+        } @else if (incidencias().length === 0) {
+          <div class="modal-empty">
+            <lucide-icon name="package" size="48"></lucide-icon>
+            <p>{{ i18n.t('inicio.modal.no-incidences') }}</p>
+          </div>
+        } @else {
+          @for (inc of incidencias(); track inc.idAuditoria) {
+            <div class="incidencia-card">
+              <div class="incidencia-left">
+                <div class="incidencia-meta">
+                  <span class="comanda-id">#{{ inc.comanda.idComanda | slice:0:6 | uppercase }}</span>
+                  <span class="mesa-badge">{{ i18n.t('inicio.table.label') }} {{ inc.comanda.mesa?.numeroMesa ?? '—' }}</span>
+                </div>
+                <div class="incidencia-info">
+                  <span class="hora"><lucide-icon name="clock" size="14"></lucide-icon> {{ formatHora(inc.fechaRegistro) }}</span>
+                  <span class="mesero">{{ i18n.t('inicio.modal.waiter') }} {{ inc.comanda.nombreMesero || i18n.t('inicio.modal.not-assigned') }}</span>
+                </div>
+              </div>
+
+              <div class="incidencia-right">
+                @if (inc.detalleModificado) {
+                  <p class="platos-label">{{ i18n.t('inicio.modal.drinks') }}</p>
+                  <p class="platos-text">{{ inc.detalleModificado }}</p>
+                }
+                <div class="motivo-box">
+                  <p class="motivo-label">{{ getEtiquetaTipo(inc.tipoIncidencia) }}</p>
+                  <p class="motivo-text">{{ inc.motivo }}</p>
+                </div>
+              </div>
+            </div>
+          }
+        }
+      </div>
+
+      <div class="modal-footer">
+        {{ i18n.t('inicio.modal.total') }} <strong>{{ incidencias().length }} {{ i18n.t('inicio.modal.orders') }}</strong>
+      </div>
+
+    </div>
+  </div>
+}
+
+<!-- ===== MODAL TODAS LAS COMANDAS LISTAS ===== -->
+@if (modalListasAbierto()) {
+  <div class="modal-overlay" (click)="cerrarListasConOverlay($event)">
+    <div class="modal-listas">
+
+      <!-- Header -->
+      <div class="modal-header">
+        <div class="modal-title-row">
+          <lucide-icon name="check-circle-2" size="24" class="modal-icon-listas"></lucide-icon>
+          <div>
+            <h2>{{ i18n.t('inicio.modal-listas.title') }}</h2>
+          </div>
+        </div>
+        <button class="modal-close" (click)="cerrarModalListas()">
+          <lucide-icon name="x" size="20"></lucide-icon>
+        </button>
+      </div>
+
+      <!-- Search -->
+      <div class="modal-search-bar">
+        <lucide-icon name="search" size="16" class="search-icon"></lucide-icon>
+        <input
+          type="text"
+          class="search-input"
+          [placeholder]="i18n.t('inicio.modal-listas.search-placeholder')"
+          [ngModel]="busquedaListas()"
+          (ngModelChange)="busquedaListas.set($event)"
+        />
+      </div>
+
+      <!-- Date range filter -->
+      <div class="modal-date-range">
+        <span class="range-label">{{ i18n.t('inicio.modal-listas.delete-range') }}</span>
+        <input
+          type="date"
+          class="date-input"
+          #desdeInput
+          [ngModel]="fechaEliminarDesde()"
+          (ngModelChange)="fechaEliminarDesde.set($event)"
+        />
+        <span class="range-separator">–</span>
+        <input
+          type="date"
+          class="date-input"
+          #hastaInput
+          [ngModel]="fechaEliminarHasta()"
+          (ngModelChange)="fechaEliminarHasta.set($event)"
+        />
+        <button
+          class="btn-eliminar"
+          (click)="eliminarPorRango()"
+        >{{ i18n.t('inicio.modal-listas.delete-btn') }}</button>
+      </div>
+
+      @if (mensajeEliminar()) {
+        <div class="mensaje-eliminar">{{ mensajeEliminar() }}</div>
+      }
+
+      <!-- Body -->
+      <div class="modal-body">
+        @if (cargandoListas()) {
+          <div class="modal-loading">
+            <div class="spinner"></div>
+            <p>{{ i18n.t('inicio.modal-listas.loading') }}</p>
+          </div>
+        } @else if (comandasListasFiltradas().length === 0) {
+          <div class="modal-empty">
+            <lucide-icon name="inbox" size="48"></lucide-icon>
+            <p>{{ i18n.t('inicio.modal-listas.empty') }}</p>
+          </div>
+        } @else {
+          @for (c of comandasListasFiltradas(); track c.idComanda) {
+            <div class="comanda-lista-card">
+              <!-- Columna izquierda -->
+              <div class="cl-left">
+                <div class="cl-meta">
+                  <span class="cl-id">#{{ getIdCorto(c.idComanda) }}</span>
+                  <span class="cl-mesa">{{ i18n.t('inicio.table.label') }} {{ c.numeroMesa }}</span>
+                </div>
+                <div class="cl-info">
+                  <span class="cl-hora">
+                    <lucide-icon name="clock" size="13"></lucide-icon>
+                    {{ formatHora(c.horaEntrada) }}
+                  </span>
+                  <span class="cl-mesero">{{ i18n.t('inicio.modal-listas.waiter') }} {{ c.mesero || i18n.t('inicio.modal-listas.not-assigned') }}</span>
+                </div>
+              </div>
+
+              <!-- Columna derecha -->
+              <div class="cl-right">
+                <p class="cl-platos-label">{{ i18n.t('inicio.modal-listas.dishes') }}</p>
+                <p class="cl-platos-text">{{ c.preparacion }}</p>
+                <div class="cl-estado-box">
+                  <p class="cl-estado-label">{{ i18n.t('inicio.modal-listas.current-status') }}</p>
+                  <p class="cl-estado-text">{{ i18n.t('inicio.modal-listas.processed-msg') }}</p>
+                </div>
+              </div>
+
+              <!-- Icono eliminar individual -->
+              <button class="btn-delete-single" (click)="eliminarComanda(c.idComanda)" [title]="i18n.t('inicio.modal-listas.delete-title')">
+                <lucide-icon name="trash-2" size="16"></lucide-icon>
+              </button>
+            </div>
+          }
+        }
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer">
+        {{ i18n.t('inicio.modal-listas.total') }} <strong>{{ comandasListasFiltradas().length }} {{ i18n.t('inicio.modal-listas.orders') }}</strong>
+      </div>
+
+    </div>
+  </div>
+}

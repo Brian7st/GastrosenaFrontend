@@ -2,21 +2,27 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  border: 1px solid #e2e8f0;
-  border-radius: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  background: #fff;
-  transition: box-shadow 0.2s;
+  background: var(--color-surface-primary);
+  transition: box-shadow var(--duration-base) var(--ease-standard);
 
-  &:hover { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); }
+  &:hover { box-shadow: var(--shadow-hover); }
 }
 
 .card__image {
-  aspect-ratio: 4/3;
+  height: 220px;
   overflow: hidden;
   flex-shrink: 0;
+  border-radius: 12px 12px 0 0;
 
-  img { width: 100%; height: 100%; object-fit: cover; }
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
 }
 
 .card__body {
@@ -39,7 +45,7 @@
 
 .card__subtitle {
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--color-text-secondary);
   margin-bottom: 0.75rem;
   line-height: 1.5;
   display: -webkit-box;
@@ -50,7 +56,7 @@
 
 .card__price {
   font-weight: 700;
-  color: #22c55e;
+  color: var(--color-success-vivid);
   margin-top: auto;
   padding-top: 0.5rem;
 }

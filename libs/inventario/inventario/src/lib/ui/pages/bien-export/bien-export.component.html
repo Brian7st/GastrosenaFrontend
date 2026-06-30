@@ -1,0 +1,96 @@
+<div class="export-page">
+
+  <!-- Breadcrumb + Back -->
+  <div class="breadcrumb">
+    <inventario-back-button (clicked)="onVolver()" />
+    <nav class="breadcrumb-nav">
+      <span class="breadcrumb-link" (click)="onVolver()">{{ i18n.t('bien-export.breadcrumb_inventario') }}</span>
+      <span class="material-symbols-outlined breadcrumb-sep">chevron_right</span>
+      <span class="breadcrumb-current">{{ i18n.t('bien-export.breadcrumb_exportar') }}</span>
+    </nav>
+  </div>
+
+  <div class="export-title-block">
+    <h1 class="page-title">{{ i18n.t('bien-export.title') }}</h1>
+    <p class="page-subtitle">{{ i18n.t('bien-export.subtitle') }}</p>
+  </div>
+
+  <div class="export-layout">
+    <!-- Main Form Area -->
+    <div class="export-main">
+
+      <!-- Formato de Exportación -->
+      <div class="form-section">
+        <div class="form-section__header">
+          <span class="material-symbols-outlined section-icon text-primary">download</span>
+          <h3>{{ i18n.t('bien-export.formato') }}</h3>
+        </div>
+
+        <div class="format-cards">
+          @for (f of FORMATOS; track f) {
+<button class="format-card"
+
+                  [class.format-card--selected]="selectedFormato() === f.id"
+                  (click)="onSelectFormato(f.id)">
+
+            <div class="radio-circle">
+              @if (selectedFormato() === f.id) {
+<div class="radio-dot"></div>
+}
+            </div>
+
+            <div class="format-icon" [style.color]="f.iconColor">
+              <span class="material-symbols-outlined">{{ f.id === 'excel' ? 'table' : (f.id === 'pdf' ? 'picture_as_pdf' : 'data_object') }}</span>
+            </div>
+
+            <span class="format-label">{{ f.label }}</span>
+            <span class="format-sub">{{ f.id === 'excel' ? i18n.t('bien-export.formato_sub_excel') : i18n.t('bien-export.formato_sub_pdf') }}</span>
+          </button>
+}
+        </div>
+      </div>
+
+      <!-- Opciones -->
+      <div class="form-section">
+        <div class="form-section__header">
+          <span class="material-symbols-outlined section-icon text-primary">tune</span>
+          <h3>{{ i18n.t('bien-export.opciones') }}</h3>
+        </div>
+
+        <div class="checkbox-row">
+          <label class="checkbox-label">
+            <input type="checkbox" [ngModel]="soloActivos()" (ngModelChange)="soloActivos.set($event)" />
+            <span class="custom-checkbox"><span class="material-symbols-outlined check-icon">check</span></span>
+            {{ i18n.t('bien-export.excluir_sin_existencias') }}
+          </label>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Sidebar Area -->
+    <div class="export-sidebar">
+
+      <div class="info-box">
+        <span class="material-symbols-outlined info-icon">info</span>
+        <p>{{ i18n.t('bien-export.info') }}</p>
+      </div>
+
+      <!-- Main Action Button -->
+      <button class="btn-generate" (click)="onGenerar()" [disabled]="isGenerating()">
+        @if (!isGenerating()) {
+<span class="material-symbols-outlined">cloud_download</span>
+}
+        @if (isGenerating()) {
+<span class="material-symbols-outlined spin">sync</span>
+}
+        <div class="btn-text">
+          <span class="btn-main-text">{{ isGenerating() ? i18n.t('bien-export.generando') : i18n.t('bien-export.generar_descargar') }}</span>
+          <span class="btn-sub-text">{{ i18n.t('bien-export.procesar_sub') }}</span>
+        </div>
+      </button>
+
+    </div>
+  </div>
+
+</div>

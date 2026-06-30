@@ -1,0 +1,80 @@
+<div class="modal-backdrop" (click)="cerrarModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    
+    <div class="detalle-header">
+      <div class="titulo-area">
+        <lucide-icon name="book-open" size="24"></lucide-icon>
+        <h2>{{ receta.nombreReceta }}</h2>
+      </div>
+      <button (click)="cerrar()" class="btn-close-top" aria-label="Cerrar">
+        <lucide-icon name="x" size="24"></lucide-icon>
+      </button>
+    </div>
+
+    @if (receta.urlImagen) {
+      <div class="detalle-imagen">
+        <img [src]="receta.urlImagen" [alt]="receta.nombreReceta">
+      </div>
+    }
+
+    <div class="detalle-body">
+      <p class="subtitulo">Receta completa con ingredientes y procedimiento paso a paso</p>
+
+      <div class="detalle-grid">
+        <div class="columna-izquierda">
+          <section class="info-general">
+            <h3>Información General</h3>
+            <div class="meta-data">
+              <span class="meta-item" style="display:flex;align-items:center;gap:4px;"><lucide-icon name="clock" size="16"></lucide-icon> {{ receta.tiempoPreparacion }} min</span>
+              <span class="meta-item" style="display:flex;align-items:center;gap:4px;"><lucide-icon name="coffee" size="16"></lucide-icon> {{ receta.temperatura }}</span>
+            </div>
+          </section>
+          
+          <section class="ingredientes-seccion">
+            <h3>Ingredientes</h3>
+            <div class="ingredientes-lista">
+              @for (ing of receta.ingredientes; track $index) {
+                <div class="ingrediente-row">
+                  <span class="nombre">{{ ing.nombreIngrediente }}</span>
+                  <span class="cantidad">{{ ing.cantidadRequerida }} {{ ing.unidadMedida }}</span>
+                </div>
+              } @empty {
+                <restaurant-empty-state title="Sin ingredientes" message="No hay ingredientes registrados."></restaurant-empty-state>
+              }
+            </div>
+          </section>
+        </div>
+
+        <div class="columna-derecha">
+          <section class="instrucciones-seccion">
+            <h3>Instrucciones</h3>
+            <div class="pasos-container">
+              @for (paso of receta.pasos; track paso.orden) {
+                <div class="paso-card">
+                  <div class="paso-numero-container">
+                    <span class="paso-numero">{{ paso.orden }}</span>
+                  </div>
+                  <div class="paso-contenido">
+                    <p class="descripcion">{{ paso.descripcionPaso }}</p>
+                    @if (paso.notasAdicionales) {
+                      <div class="nota-container">
+                        <small><em>Nota:</em> {{ paso.notasAdicionales }}</small>
+                      </div>
+                    }
+                  </div>
+                </div>
+              } @empty {
+                <restaurant-empty-state title="Sin pasos" message="No hay pasos registrados."></restaurant-empty-state>
+              }
+            </div>
+          </section>
+        </div>
+      </div> 
+    </div>
+    
+    <!-- Footer -->
+    <div class="modal-footer-custom">
+      <button class="btn-aceptar" (click)="cerrar()">Cerrar Receta</button>
+    </div>
+  </div>
+</div>

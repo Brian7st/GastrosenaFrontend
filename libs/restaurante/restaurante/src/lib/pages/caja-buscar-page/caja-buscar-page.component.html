@@ -1,0 +1,180 @@
+<div class="caja-buscar-page">
+  <div class="header-section">
+    <button class="back-btn" (click)="volver()">
+      <lucide-icon name="arrow-left" [size]="20"></lucide-icon>
+    </button>
+    <restaurant-page-header [title]="i18n.t('cajaBuscar.title')"
+      [subtitle]="i18n.t('cajaBuscar.subtitle')"></restaurant-page-header>
+  </div>
+
+  <div class="main-content-block">
+    <restaurant-card class="search-filters">
+      <div class="block-header">
+        <div class="title-group">
+          <h5>{{ i18n.t('cajaBuscar.criteriaTitle') }}</h5>
+          <span class="subtitle">{{ i18n.t('cajaBuscar.criteriaSubtitle') }}</span>
+        </div>
+      </div>
+
+      <div class="filter-controls mt-4">
+        <div class="inputs-grid">
+
+          <div class="form-group custom-select-wrapper" (click)="$event.stopPropagation()">
+            <label>{{ i18n.t('cajaBuscar.table') }}</label>
+            <input type="text" class="form-control" [placeholder]="i18n.t('cajaBuscar.tablePlaceholder')" [ngModel]="filtroMesa()"
+              (ngModelChange)="filtroMesa.set($event)" (focus)="dropdownMesaAbierto.set(true)">
+
+            @if (dropdownMesaAbierto() && mesasFiltradas().length > 0) {
+            <div class="custom-dropdown">
+              @for (mesa of mesasFiltradas(); track mesa) {
+              <div class="dropdown-item" (click)="seleccionarMesa(mesa)">{{ mesa }}</div>
+              }
+            </div>
+            }
+          </div>
+
+          <div class="form-group custom-select-wrapper" (click)="$event.stopPropagation()">
+            <label>{{ i18n.t('cajaBuscar.cashier') }}</label>
+            <input type="text" class="form-control" [placeholder]="i18n.t('cajaBuscar.cashierPlaceholder')" [ngModel]="filtroCajero()"
+              (ngModelChange)="filtroCajero.set($event)" (focus)="dropdownCajeroAbierto.set(true)">
+
+            @if (dropdownCajeroAbierto() && cajerosFiltrados().length > 0) {
+            <div class="custom-dropdown">
+              @for (cajero of cajerosFiltrados(); track cajero) {
+              <div class="dropdown-item" (click)="seleccionarCajero(cajero)">{{ cajero | slice:0:8 | uppercase }}</div>
+              }
+            </div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label>{{ i18n.t('cajaBuscar.startDate') }}</label>
+            <input type="date" class="form-control" [ngModel]="fechaInicio()" (ngModelChange)="fechaInicio.set($event)">
+          </div>
+
+          <div class="form-group">
+            <label>{{ i18n.t('cajaBuscar.endDate') }}</label>
+            <input type="date" class="form-control" [ngModel]="fechaFin()" (ngModelChange)="fechaFin.set($event)">
+          </div>
+        </div>
+
+        <div class="action-buttons mt-4">
+          <restaurant-button variant="ghost" (click)="limpiarFiltros()">
+            <lucide-icon name="x" [size]="18"></lucide-icon>
+            <span>{{ i18n.t('cajaBuscar.clearFilters') }}</span>
+          </restaurant-button>
+          <restaurant-button variant="surface" (click)="exportarResultados()"
+            [disabled]="facturasFiltradas().length === 0">
+            <lucide-icon name="file-text" [size]="18"></lucide-icon>
+            <span>{{ i18n.t('cajaBuscar.exportResults') }}</span>
+          </restaurant-button>
+        </div>
+      </div>
+    </restaurant-card>
+
+    <restaurant-data-table [tableTitle]="i18n.t('cajaBuscar.invoiceTableTitle')" tableIcon="receipt" class="mt-6" style="display: block;">
+      <div dtActions>
+        <span class="results-badge"
+          style="background: var(--color-surface-hover); padding: 0.25rem 0.75rem; border-radius: var(--radius-pill); font-size: var(--font-size-xs); font-weight: var(--font-weight-medium); color: var(--color-text-secondary); border: 1px solid var(--color-border);">{{ getInvoiceCountText() }}</span>
+      </div>
+      <ng-container dtHeader>
+        <span class="subtitle"
+          style="display: block; padding: 0 var(--space-6) var(--space-4) var(--space-6); margin-top: calc(var(--space-2) * -1); font-size: var(--font-size-sm); color: var(--color-text-secondary);">{{ i18n.t('cajaBuscar.showingResults') }}</span>
+      </ng-container>
+
+      <thead>
+        <tr>
+          <th>{{ i18n.t('cajaBuscar.invoiceNumber') }}</th>
+          <th>{{ i18n.t('cajaBuscar.tableHeader') }}</th>
+          <th>{{ i18n.t('cajaBuscar.dateHeader') }}</th>
+          <th>{{ i18n.t('cajaBuscar.method') }}</th>
+          <th>{{ i18n.t('cajaBuscar.total') }}</th>
+          <th>{{ i18n.t('cajaBuscar.status') }}</th>
+          <th class="text-center">{{ i18n.t('cajaBuscar.action') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (factura of facturasFiltradas(); track factura.id) {
+        <tr>
+          <td><strong>{{ factura.numeroFactura }}</strong></td>
+          <td>{{ factura.nombreMesa || i18n.t('cajaBuscar.takeAway') }}</td>
+          <td>{{ factura.fechaEmision | date:'shortDate' }}</td>
+          <td>
+            <span class="badge" [ngClass]="factura.metodoPago?.includes('EFECTIVO') ? 'badge-cash' : 'badge-card'">
+              {{ factura.metodoPago?.includes('TARJETA') ? 'TARJETA' : factura.metodoPago }}
+            </span>
+          </td>
+          <td class="amount-positive"
+            style="font-weight: var(--font-weight-semibold); color: var(--color-text-primary);">{{ factura.total |
+            currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+          <td>
+            <restaurant-status-badge [label]="factura.estado" variant="success"></restaurant-status-badge>
+          </td>
+          <td class="text-center">
+            <restaurant-button variant="surface" (click)="verDetalle(factura)"
+              style="font-size: 0.85rem; padding: 0.25rem 0.75rem;">
+              <lucide-icon name="eye" [size]="16"></lucide-icon>
+              <span>{{ i18n.t('cajaBuscar.viewDetail') }}</span>
+            </restaurant-button>
+          </td>
+        </tr>
+        } @empty {
+        <tr>
+          <td colspan="7" class="p-0 border-0">
+            <restaurant-empty-state [title]="i18n.t('cajaBuscar.noResultsTitle')"
+              [message]="i18n.t('cajaBuscar.noResultsMessage')">
+            </restaurant-empty-state>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </restaurant-data-table>
+  </div>
+
+  @if (mostrarModalDetalle() && facturaSeleccionada()) {
+  <div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header-custom">
+        <h3>{{ i18n.t('cajaBuscar.invoiceDetail') }}</h3>
+        <button class="close-btn" (click)="cerrarModal()">
+          <lucide-icon name="x" [size]="20"></lucide-icon>
+        </button>
+      </div>
+
+      <div class="modal-body-custom">
+        <div class="invoice-main-info text-center">
+          <span class="label">{{ i18n.t('cajaBuscar.invoiceNumberLabel') }}</span>
+          <h2>{{ facturaSeleccionada()?.numeroFactura }}</h2>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-item"><span>{{ i18n.t('cajaBuscar.tableHeader') }}:</span> <strong>{{ facturaSeleccionada()?.nombreMesa }}</strong></div>
+          <div class="info-item"><span>{{ i18n.t('cajaBuscar.cashierId') }}:</span> <strong>{{ facturaSeleccionada()?.cajeroId | slice:0:8 |
+              uppercase }}</strong></div>
+          <div class="info-item"><span>{{ i18n.t('cajaBuscar.paymentMethod') }}:</span> <strong>{{ facturaSeleccionada()?.metodoPago }}</strong>
+          </div>
+          <div class="info-item"><span>{{ i18n.t('cajaBuscar.date') }}:</span> <strong>{{ facturaSeleccionada()?.fechaEmision | date:'shortDate'
+              }}</strong></div>
+        </div>
+
+        <div class="billing-summary">
+          <div class="summary-row total">
+            <span>{{ i18n.t('cajaBuscar.totalLabel') }}</span>
+            <strong>{{ facturaSeleccionada()?.total | currency:'COP':'symbol-narrow':'1.0-0' }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions-between">
+        <restaurant-button variant="ghost" (click)="cerrarModal()">
+          <span>{{ i18n.t('cajaBuscar.close') }}</span>
+        </restaurant-button>
+        <restaurant-button variant="primary" (click)="imprimirFactura()">
+          <lucide-icon name="file-text" [size]="18"></lucide-icon>
+          <span>{{ i18n.t('cajaBuscar.printReceipt') }}</span>
+        </restaurant-button>
+      </div>
+    </div>
+  </div>
+  }
+</div>

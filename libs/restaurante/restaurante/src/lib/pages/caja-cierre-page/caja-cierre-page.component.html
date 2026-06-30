@@ -1,0 +1,87 @@
+<div class="caja-cierre-page">
+  <div class="header-section">
+    <button class="back-btn" (click)="volver()">
+      <lucide-icon name="arrow-left" [size]="20"></lucide-icon>
+    </button>
+    <restaurant-page-header
+            [title]="i18n.t('cajaCierre.title')"
+            [subtitle]="i18n.t('cajaCierre.subtitle')"
+    ></restaurant-page-header>
+  </div>
+
+  <div class="main-content-block">
+    <div class="card summary-card">
+      <div class="block-header">
+        <div class="title-group">
+          <h5>{{ i18n.t('cajaCierre.summaryTitle') }}</h5>
+          <span class="subtitle">{{ i18n.t('cajaCierre.summarySubtitle') }}</span>
+        </div>
+      </div>
+
+      <div class="summary-body">
+        <div class="summary-row">
+          <span class="label">{{ i18n.t('cajaCierre.initialAmount') }}</span>
+          <span class="value">{{ montoInicial() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+
+        <div class="divider"></div>
+        <h6 class="section-title">{{ i18n.t('cajaCierre.incomeByMethod') }}</h6>
+
+        <div class="summary-row">
+          <span class="label">
+            <lucide-icon name="banknote" [size]="16" class="icon-align"></lucide-icon> {{ i18n.t('cajaCierre.cash') }}
+          </span>
+          <span class="value text-success">+ {{ totalEfectivo() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+
+        <div class="summary-row">
+          <span class="label">
+            <lucide-icon name="credit-card" [size]="16" class="icon-align"></lucide-icon> {{ i18n.t('cajaCierre.card') }}
+          </span>
+          <span class="value text-success">+ {{ totalTarjeta() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+
+        <div class="summary-row">
+          <span class="label">
+            <lucide-icon name="arrow-right-left" [size]="16" class="icon-align"></lucide-icon> {{ i18n.t('cajaCierre.transfer') }}
+          </span>
+          <span class="value text-success">+ {{ totalTransferencia() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="summary-row total-row">
+          <span class="label">{{ i18n.t('cajaCierre.totalSales') }}</span>
+          <span class="value">{{ totalVentas() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+
+        <div class="summary-row expected-row mt-6">
+          <div class="label-group">
+            <span class="label">{{ i18n.t('cajaCierre.expectedTotal') }}</span>
+            <span class="hint">{{ i18n.t('cajaCierre.expectedHint') }}</span>
+          </div>
+          <span class="value highlight">{{ totalEsperado() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+      </div>
+
+      <div class="form-actions mt-6">
+        <restaurant-button variant="surface" (click)="volver()">
+          {{ i18n.t('cajaCierre.cancel') }}
+        </restaurant-button>
+        <restaurant-button variant="primary" (click)="generarCierre()">
+          <lucide-icon name="lock" [size]="18"></lucide-icon>
+          <span>{{ i18n.t('cajaCierre.confirmClosing') }}</span>
+        </restaurant-button>
+      </div>
+    </div>
+  </div>
+
+  <restaurant-confirm-dialog
+          [open]="alertDialog().open"
+          [title]="alertDialog().title"
+          [message]="alertDialog().message"
+          [confirmText]="i18n.t('cajaCierre.acceptAndReturn')"
+          [showCancel]="false"
+          (confirm)="confirmarCierreExitoso()"
+  ></restaurant-confirm-dialog>
+</div>

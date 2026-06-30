@@ -1,0 +1,245 @@
+<!-- ══════════════════════════════════════════════════════════════════════════
+     Header: Título + Botón Nueva Solicitud
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="page-header-row">
+  <div>
+    <h1 class="page-title">{{ i18n.t('si.titulo') }}</h1>
+    <p class="page-subtitle">{{ i18n.t('si.subtitulo') }}</p>
+  </div>
+  <restaurant-button variant="primary" routerLink="nueva">
+    <span class="material-symbols-outlined">add</span>
+    {{ i18n.t('si.nueva') }}
+  </restaurant-button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     KPI Grid — 4 tarjetas con restaurant-kpi-card
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="kpi-grid">
+
+  <restaurant-kpi-card
+    [label]="i18n.t('si.kpi_pendientes')"
+    [value]="totalCreadasPendientes()"
+    icon="send"
+    iconColor="blue"
+  />
+
+  <restaurant-kpi-card
+    [label]="i18n.t('si.kpi_aprobadas')"
+    [value]="totalAprobadasHoy()"
+    icon="check-circle"
+    iconColor="green"
+  />
+
+  <restaurant-kpi-card
+    [label]="i18n.t('si.kpi_rechazadas')"
+    [value]="totalRechazadas()"
+    icon="x-circle"
+    iconColor="red"
+  />
+
+  <restaurant-kpi-card
+    [label]="i18n.t('si.kpi_comprometidas')"
+    [value]="totalComprometidas()"
+    icon="lock"
+    iconColor="slate"
+  />
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     Tabla con filtros
+══════════════════════════════════════════════════════════════════════════ -->
+@if (facade.errorSesion()) {
+  <div class="error-inline">
+    <lucide-icon name="alert-triangle" [size]="16" />
+    {{ facade.errorSesion() }}
+  </div>
+}
+
+<restaurant-data-table
+  [tableTitle]="i18n.t('si.tabla_titulo')"
+  tableIcon="clipboard-list"
+  [searchPlaceholder]="i18n.t('si.buscar')"
+  [showFilterButton]="true"
+  [filterActive]="showFilters()"
+  [filterCount]="filtrosActivos()"
+  (searchChange)="onSearch($event)"
+  (filterToggle)="onToggleFilters()">
+
+  <!-- Panel de filtros colapsable (slot [dtHeader]) -->
+  @if (showFilters()) {
+    <div dtHeader class="filter-panel">
+      <div class="filter-panel__row">
+        <div class="filter-group">
+          <label class="filter-label">{{ i18n.t('comun.estado') }}</label>
+          <select class="filter-select" [value]="filtroEstado()" (change)="onFilterEstado($any($event.target).value)">
+            @for (opt of estadoOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="filter-group filter-group--actions">
+          <button class="filter-clear-btn" (click)="onClearFilters()" type="button" [disabled]="filtrosActivos() === 0">
+            <span class="material-symbols-outlined">clear_all</span>
+            {{ i18n.t('comun.limpiar') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Cabecera de tabla -->
+  <thead>
+    <tr>
+      <th style="width: 10%;">{{ i18n.t('si.th_id') }}</th>
+      <th style="width: 22%;">{{ i18n.t('req.instructor') }}</th>
+      <th style="width: 10%;">{{ i18n.t('req.ficha') }}</th>
+      <th style="width: 12%;">{{ i18n.t('comun.fecha') }}</th>
+      <th style="width: 8%;">{{ i18n.t('si.th_items') }}</th>
+      <th style="width: 12%;">{{ i18n.t('comun.estado') }}</th>
+      <th style="width: 26%; text-align: center;">{{ i18n.t('comun.acciones') }}</th>
+    </tr>
+  </thead>
+
+  <!-- Filas de datos -->
+  <tbody>
+    @if (facade.loadingSesion()) {
+      <tr>
+        <td colspan="7" style="text-align: center; padding: 2rem;">
+          <span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">progress_activity</span>
+          {{ i18n.t('si.cargando') }}
+        </td>
+      </tr>
+    } @else {
+      @for (s of facade.solicitudesSesion(); track s.id) {
+        <tr>
+
+          <!-- ID Solicitud -->
+          <td>
+            @if (s.numeroSolicitud) {
+              <span class="code-bold" [class.opacity-40]="s.estado === 'CERRADA'">
+                #{{ s.numeroSolicitud }}
+              </span>
+            } @else {
+              <span class="code-muted" [class.opacity-40]="s.estado === 'CERRADA'"
+                    [title]="s.id">
+                {{ s.id.slice(0, 8) }}&hellip;
+              </span>
+            }
+          </td>
+
+          <!-- Instructor con avatar -->
+          <td>
+            <div class="solicitante-cell" [class.opacity-40]="s.estado === 'CERRADA'">
+              <div class="avatar" [ngClass]="getAvatarColor(s.estado)">
+                {{ getInitials(s.instructorId) }}
+              </div>
+              <span class="solicitante-nombre">{{ s.instructorId }}</span>
+            </div>
+          </td>
+
+          <!-- Ficha -->
+          <td class="text-secondary" [class.opacity-40]="s.estado === 'CERRADA'">{{ s.fichaId }}</td>
+
+          <!-- Fecha -->
+          <td class="text-secondary" [class.opacity-40]="s.estado === 'CERRADA'">
+            {{ s.fechaSolicitud ?? '—' }}
+          </td>
+
+          <!-- Ítems -->
+          <td class="text-secondary" [class.opacity-40]="s.estado === 'CERRADA'">
+            {{ s.items.length }} ítems
+          </td>
+
+          <!-- Estado badge -->
+          <td>
+            <restaurant-status-badge
+              [label]="s.estado"
+              [variant]="getSolicitudVariant(s.estado)">
+            </restaurant-status-badge>
+          </td>
+
+          <!-- Acciones -->
+          <td>
+            <div class="actions-row">
+              <button class="action-icon" (click)="onView(s.id)" title="Ver Detalle">
+                <span class="material-symbols-outlined">visibility</span>
+              </button>
+
+              <button
+                class="action-icon"
+                (click)="onEdit(s.id)"
+                title="Solo se pueden editar solicitudes en estado CREADA"
+                [disabled]="s.estado !== 'CREADA'">
+                <span class="material-symbols-outlined">edit</span>
+              </button>
+
+              @if (s.estado === 'CREADA') {
+                <button class="action-icon action-icon--approve" (click)="onApprove(s); $event.stopPropagation()" title="Aprobar Solicitud">
+                  <lucide-icon name="check-circle" [size]="16"></lucide-icon>
+                </button>
+                <button class="action-icon action-icon--reject" (click)="onReject(s); $event.stopPropagation()" title="Rechazar Solicitud">
+                  <lucide-icon name="x" [size]="16"></lucide-icon>
+                </button>
+              }
+              @if (s.estado === 'APROBADA') {
+                <button class="action-icon action-icon--approve" (click)="onComprometer(s.id); $event.stopPropagation()" title="Comprometer Solicitud">
+                  <span class="material-symbols-outlined" style="font-size:16px">lock</span>
+                </button>
+              }
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="7">
+            <inventario-empty-state
+              icon="assignment"
+              title="Sin solicitudes de insumos"
+              message="No hay solicitudes registradas para esta sesión."
+            />
+          </td>
+        </tr>
+      }
+    }
+  </tbody>
+
+  <!-- Paginación -->
+  <div dtFooter class="dt-footer">
+    <span class="dt-page-info">{{ i18n.t('si.mostrando', { count: facade.solicitudesSesion().length.toString(), total: facade.paginacionSesion().totalElements.toString() }) }}</span>
+    <div class="dt-pagination">
+      <button class="dt-page-btn"
+        [disabled]="facade.paginacionSesion().page === 0"
+        (click)="facade.irAPaginaSesion(facade.paginacionSesion().page - 1)">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      @for (p of paginasSesion(); track p) {
+        <button class="dt-page-btn" [class.dt-page-btn--active]="p === facade.paginacionSesion().page"
+          (click)="facade.irAPaginaSesion(p)">{{ p + 1 }}</button>
+      }
+      <button class="dt-page-btn"
+        [disabled]="facade.paginacionSesion().page >= facade.paginacionSesion().totalPages - 1"
+        (click)="facade.irAPaginaSesion(facade.paginacionSesion().page + 1)">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
+    </div>
+  </div>
+
+</restaurant-data-table>
+
+<!-- Modal de aprobación -->
+<restaurant-aprobar-solicitud-modal
+  [isOpen]="solicitudSeleccionada() !== null"
+  [solicitud]="solicitudSeleccionada()"
+  (cancel)="onCloseModal()"
+  (confirm)="onConfirmApprove($event)">
+</restaurant-aprobar-solicitud-modal>
+
+<!-- Modal de rechazo -->
+<restaurant-rechazar-solicitud-modal
+  [isOpen]="solicitudRechazo() !== null"
+  [solicitud]="solicitudRechazo()"
+  (cancelar)="onCloseRechazo()"
+  (confirmar)="onConfirmReject($event)">
+</restaurant-rechazar-solicitud-modal>

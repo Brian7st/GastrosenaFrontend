@@ -3,6 +3,23 @@
   border-radius: var(--radius-md);
   padding: var(--space-3) var(--space-4);
   background: var(--color-brand-primary);
-  color: white;
+  color: var(--color-en-primario);
   font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-standard),
+              box-shadow var(--duration-fast) var(--ease-standard);
+
+  &:hover {
+    background: var(--color-brand-primary-strong);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }

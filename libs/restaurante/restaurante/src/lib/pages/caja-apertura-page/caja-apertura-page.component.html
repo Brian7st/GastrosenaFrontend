@@ -1,0 +1,53 @@
+<div class="caja-apertura-page">
+    <div class="header-section">
+        <button class="back-btn" (click)="volver()">
+            <lucide-icon name="arrow-left" [size]="20"></lucide-icon>
+        </button>
+
+        <restaurant-page-header
+                [title]="i18n.t('cajaApertura.title')"
+                [subtitle]="i18n.t('cajaApertura.subtitle')"
+        ></restaurant-page-header>
+    </div>
+
+    <div class="form-block">
+        <div class="card">
+            <div class="block-header">
+                <div class="title-group">
+                    <h5>{{ i18n.t('cajaApertura.initialBase') }}</h5>
+                    <span class="subtitle">{{ i18n.t('cajaApertura.initialBaseSubtitle') }}</span>
+                </div>
+
+                <div class="alert alert-warning mt-4" *ngIf="facade.turnoCaja()?.estado === 'ABIERTA'">
+                    <strong>{{ i18n.t('cajaApertura.alertWarning') }}</strong>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>{{ i18n.t('cajaApertura.cashBase') }}</label>
+                <input
+                        type="number"
+                        class="form-control"
+                        placeholder="$ 0"
+                        [formControl]="baseEfectivoCtrl"
+                        (keydown)="preventInvalidChars($event)"
+                />
+            </div>
+
+            <div class="input-group mt-4">
+                <label>{{ i18n.t('cajaApertura.responsible') }}</label>
+                <input type="text" class="form-control" [value]="nombreCajero" disabled />
+            </div>
+
+            <div class="form-actions mt-4">
+                <restaurant-button variant="surface" (click)="volver()">
+                    {{ i18n.t('cajaApertura.cancel') }}
+                </restaurant-button>
+                <restaurant-button variant="primary" (click)="confirmarApertura()" [disabled]="baseEfectivoCtrl.invalid || facade.turnoCaja()?.estado === 'ABIERTA'">
+                    <lucide-icon name="log-in" [size]="18"></lucide-icon>
+                    <span>{{ i18n.t('cajaApertura.openCash') }}</span>
+                </restaurant-button>
+            </div>
+        </div>
+    </div>
+</div>

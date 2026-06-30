@@ -1,0 +1,226 @@
+<!-- ══════════════════════════════════════════════════════════════════════════
+     Header: Título + Botón Nueva Solicitud
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="page-header-row">
+  <div>
+    <h1 class="page-title">{{ i18n.t('solicitudes-list.title') }}</h1>
+    <p class="page-subtitle">{{ i18n.t('solicitudes-list.subtitle') }}</p>
+  </div>
+  <div style="display: flex; gap: 1rem;">
+    <restaurant-button *hasPermission="'gil:crear'" variant="primary" routerLink="generar">
+      <span class="material-symbols-outlined">library_add_check</span>
+      {{ i18n.t('solicitudes-list.generar_gil') }}
+    </restaurant-button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     KPI Grid — 4 tarjetas con restaurant-kpi-card
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="kpi-grid">
+
+  <restaurant-kpi-card
+    [label]="i18n.t('solicitudes-list.kpi_total')"
+    [value]="totalSolicitudes() | number"
+    icon="file-text"
+    iconColor="green"
+  />
+
+  <restaurant-kpi-card
+    [label]="i18n.t('solicitudes-list.kpi_borradores')"
+    [value]="borradorPagina() | number"
+    icon="pencil"
+    iconColor="blue"
+  />
+
+  <restaurant-kpi-card
+    [label]="i18n.t('solicitudes-list.kpi_en_tramite')"
+    [value]="enTramitePagina() | number"
+    icon="clock"
+    iconColor="orange"
+  />
+
+  <restaurant-kpi-card
+    [label]="i18n.t('solicitudes-list.kpi_finalizadas')"
+    [value]="finalizadasPagina() | number"
+    icon="check-circle"
+    iconColor="green"
+  />
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     Tabla con filtros
+══════════════════════════════════════════════════════════════════════════ -->
+<restaurant-data-table
+  [tableTitle]="i18n.t('solicitudes-list.table_title')"
+  tableIcon="clipboard-list"
+  [searchPlaceholder]="i18n.t('solicitudes-list.search_placeholder')"
+  [showFilterButton]="true"
+  [filterActive]="showFilters()"
+  [filterCount]="filtrosActivos()"
+  (searchChange)="onSearch($event)"
+  (filterToggle)="onToggleFilters()"
+>
+
+  <!-- Panel de filtros colapsable (slot [dtHeader]) -->
+  @if (showFilters()) {
+    <div dtHeader class="filter-panel">
+      <div class="filter-panel__row">
+        <div class="filter-group">
+          <label class="filter-label">{{ i18n.t('solicitudes-list.filter_estado') }}</label>
+          <select class="filter-select" [value]="filtroEstado()" (change)="onFilterEstado($any($event.target).value)">
+            @for (opt of estadoOptions; track opt) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="filter-group filter-group--actions">
+          <button class="filter-clear-btn" (click)="onLimpiarFiltros()" [disabled]="filtrosActivos() === 0">
+            <span class="material-symbols-outlined">clear_all</span>
+            {{ i18n.t('solicitudes-list.filter_limpiar') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Cabecera de tabla -->
+  <thead>
+    <tr>
+      <th>{{ i18n.t('solicitudes-list.th_codigo') }}</th>
+      <th>{{ i18n.t('solicitudes-list.th_fecha') }}</th>
+      <th>{{ i18n.t('solicitudes-list.th_solicitante') }}</th>
+      <th>{{ i18n.t('solicitudes-list.th_grupo') }}</th>
+      <th>{{ i18n.t('solicitudes-list.th_estado') }}</th>
+      <th>{{ i18n.t('solicitudes-list.th_total') }}</th>
+      <th class="text-right">{{ i18n.t('solicitudes-list.th_acciones') }}</th>
+    </tr>
+  </thead>
+
+  <!-- Filas de datos -->
+  <tbody>
+    @for (s of solicitudes(); track s) {
+<tr>
+
+      <!-- Código -->
+      <td>
+        <span class="code-bold">{{ s.numeroGil }}</span>
+      </td>
+
+      <!-- Fecha -->
+      <td class="text-secondary">{{ s.fechaSolicitud }}</td>
+
+      <!-- Solicitante con avatar -->
+      <td>
+        <div class="solicitante-cell">
+          <div class="avatar" [ngClass]="'avatar--' + getAvatarColor(s.id)">
+            {{ getInitials(s.cuentadantes[0]?.nombre ?? '') }}
+          </div>
+          <span class="solicitante-nombre">{{ s.cuentadantes[0]?.nombre ?? '—' }}</span>
+        </div>
+      </td>
+
+      <!-- Ficha / Grupo -->
+      <td class="text-secondary">{{ s.codigoGrupo ?? '—' }}</td>
+
+      <!-- Estado badge -->
+      <td>
+        <span class="estado-badge"
+              [ngClass]="{
+                'estado-badge--borrador':  s.estado === 'BORRADOR',
+                'estado-badge--pendiente': s.estado === 'EMITIDO',
+                'estado-badge--validado':    s.estado === 'ENVIADO_PROVEEDOR',
+                'estado-badge--verificado': s.estado === 'VERIFICADO',
+                'estado-badge--procesado':  s.estado === 'CERRADO'
+              }">
+          {{ s.estado }}
+        </span>
+      </td>
+
+      <!-- Total COP -->
+      <td>
+        <span class="monto-text">{{ formatCOP(getMontoTotal(s)) }}</span>
+      </td>
+
+      <!-- Acciones: Ver · Editar · PDF · Eliminar -->
+      <td>
+        <div class="actions-row">
+          <button class="action-icon" (click)="onView(s.id)" [title]="i18n.t('solicitudes-list.ver_detalle')">
+            <span class="material-symbols-outlined">visibility</span>
+          </button>
+          <button *hasPermission="'gil:editar'" class="action-icon"
+                  (click)="onEdit(s.id)"
+                  [disabled]="!canEdit(s.estado)"
+                  [title]="i18n.t('solicitudes-list.editar')">
+            <span class="material-symbols-outlined"
+                  [class.opacity-40]="!canEdit(s.estado)">edit</span>
+          </button>
+          <button class="action-icon" (click)="onExportPdf(s.id)" [title]="i18n.t('solicitudes-list.exportar_pdf')">
+            <span class="material-symbols-outlined">picture_as_pdf</span>
+          </button>
+          <button *hasPermission="'gil:editar'" class="action-icon action-icon--danger"
+                  (click)="onDelete(s)"
+                  [title]="i18n.t('solicitudes-list.eliminar')">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
+        </div>
+      </td>
+    </tr>
+} @empty {
+    <tr>
+      <td colspan="7">
+        <inventario-empty-state
+          icon="assignment"
+          [title]="i18n.t('solicitudes-list.empty_title')"
+          [message]="i18n.t('solicitudes-list.empty_message')"
+        />
+      </td>
+    </tr>
+}
+  </tbody>
+
+  <!-- Paginación -->
+  <div dtFooter class="dt-footer">
+    <p class="dt-page-info">
+      {{ i18n.t('solicitudes-list.pagina_info', { count: solicitudes().length, total: paginacion().totalElements }) }}
+    </p>
+    <div class="dt-pagination">
+      <button class="dt-page-btn"
+        [disabled]="paginacion().page === 0"
+        (click)="onIrAPagina(paginacion().page - 1)">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      @for (p of paginas(); track p) {
+        <button class="dt-page-btn"
+          [class.dt-page-btn--active]="p === paginacion().page"
+          (click)="onIrAPagina(p)">
+          {{ p + 1 }}
+        </button>
+      }
+      <button class="dt-page-btn"
+        [disabled]="paginacion().page >= paginacion().totalPages - 1"
+        (click)="onIrAPagina(paginacion().page + 1)">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
+    </div>
+  </div>
+
+</restaurant-data-table>
+
+
+<!-- ── MODAL: Eliminar GIL ── -->
+<restaurant-keyword-confirm-modal
+  [open]="showDeleteModal()"
+  [title]="i18n.t('solicitudes-list.modal_title')"
+  [description]="i18n.t('solicitudes-list.modal_description')"
+  [keyword]="i18n.t('solicitudes-list.modal_keyword')"
+  [keywordLabel]="i18n.t('solicitudes-list.modal_keyword_label')"
+  [confirmLabel]="i18n.t('solicitudes-list.modal_confirm')"
+  [cancelLabel]="i18n.t('solicitudes-list.modal_cancel')"
+  [identifierLabel]="'GIL'"
+  [identifierValue]="itemToDelete()?.numeroGil ?? ''"
+  accent="danger"
+  (confirm)="confirmDelete()"
+  (cancel)="closeDeleteModal()"
+/>

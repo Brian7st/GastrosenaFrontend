@@ -1,0 +1,210 @@
+@if (solicitud(); as s) {
+<div class="gil-detail">
+
+  <!-- ── TOPBAR ── -->
+  <div class="topbar">
+    <div class="topbar__left">
+      <button class="back-link" (click)="onVolver()">
+        <lucide-icon name="arrow-left" [size]="18"></lucide-icon>
+        Volver
+      </button>
+      <span class="breadcrumb-sep">/</span>
+      <span class="breadcrumb-label">{{ i18n.t('factura.solicitudes_gil') }}</span>
+    </div>
+    <div class="topbar__actions">
+      <restaurant-button *hasPermission="'gil:editar'" variant="ghost" (click)="onEditar()">
+        <lucide-icon name="pencil" [size]="16"></lucide-icon>
+        Editar
+      </restaurant-button>
+      @if (s.estadoSolicitud === 'BORRADOR') {
+        <restaurant-button *hasPermission="'gil:emitir'" variant="primary" id="btn-enviar-aprobacion" (click)="onEnviarAprobacion()">
+          Enviar a Aprobación
+        </restaurant-button>
+      }
+    </div>
+  </div>
+
+  <!-- ── TITLE ── -->
+  <h1 class="gil-title">{{ s.numeroGil || s.id }}</h1>
+
+  <!-- ── TIMELINE ── -->
+  <div class="timeline-container">
+    @for (step of STEPS; track step; let last = $last) {
+<div
+     
+      class="timeline-step"
+      [ngClass]="'timeline-step--' + getStepState(step, s.estadoSolicitud)"
+    >
+      <div class="timeline-step__icon">
+        @if (getStepState(step, s.estadoSolicitud) === 'active') {
+<lucide-icon name="clock" [size]="18"></lucide-icon>
+}
+        @if (getStepState(step, s.estadoSolicitud) === 'done') {
+<lucide-icon name="check-circle" [size]="18"></lucide-icon>
+}
+        @if (getStepState(step, s.estadoSolicitud) === 'pending') {
+<lucide-icon name="circle" [size]="18"></lucide-icon>
+}
+      </div>
+      <span class="timeline-step__label">{{ step | uppercase }}</span>
+      @if (!last) {
+<div class="timeline-step__connector"></div>
+}
+    </div>
+}
+  </div>
+
+  <!-- ── MAIN GRID ── -->
+  <div class="detail-grid">
+
+    <!-- LEFT COLUMN -->
+    <div class="detail-left">
+
+      <!-- Info Sesión -->
+      <div class="detail-card">
+        <div class="detail-card__header">
+          <lucide-icon name="calendar" [size]="18"></lucide-icon>
+          <h2>{{ i18n.t('factura.info_sesion') }}</h2>
+        </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-item__label">{{ i18n.t('factura.nombre_vocero') }}</span>
+            <span class="info-item__value">{{ s.nombreVocero }}</span>
+          </div>
+          @if (s.resultadoAprendizaje) {
+            <div class="info-item info-item--full">
+              <span class="info-item__label">{{ i18n.t('factura.resultado_aprendizaje') }}</span>
+              <span class="info-item__value">{{ s.resultadoAprendizaje }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Estado + General -->
+      <div class="two-col-layout">
+        <!-- Estado Card -->
+        <div class="detail-card status-card">
+          <span class="info-item__label">{{ i18n.t('comun.estado') }}</span>
+          <div class="status-badge-wrap">
+            <restaurant-status-badge
+              [label]="s.estadoSolicitud"
+              [variant]="getEstadoVariant(s.estadoSolicitud)"
+            ></restaurant-status-badge>
+            <span class="status-date">Creado el {{ s.fechaCreacion | date:'dd MMM yyyy' }}</span>
+          </div>
+          <div class="total-amount">{{ formatMoney(s.totalEstimado) }}</div>
+          <span class="total-label">{{ i18n.t('factura.total_estimado') }}</span>
+          <div class="responsable-chip">
+            <div class="responsable-avatar">{{ getResponsableIniciales(s.responsable) }}</div>
+            <span class="responsable-nombre">{{ s.responsable }}</span>
+          </div>
+          <span class="responsable-rol">{{ i18n.t('factura.responsable_instructor') }}</span>
+        </div>
+
+        <!-- Información General -->
+        <div class="detail-card">
+          <span class="info-section-label">{{ i18n.t('factura.informacion_general') }}</span>
+          <div class="info-stack">
+            <div class="info-item">
+              <span class="info-item__label">{{ i18n.t('factura.regional') }}</span>
+              <span class="info-item__value">{{ s.regional }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-item__label">{{ i18n.t('factura.centro_formacion') }}</span>
+              <span class="info-item__value">{{ s.centroFormacion }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-item__label">{{ i18n.t('factura.area_programa') }}</span>
+              <span class="info-item__value">{{ s.areaPrograma }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-item__label">{{ i18n.t('factura.cuentadantes') }}</span>
+              <span class="info-item__value">{{ (s.cuentadantes?.length ? s.cuentadantes : [s.cuentadanteResponsable]).join(', ') || '—' }}</span>
+            </div>
+            @if (s.solicitante) {
+              <div class="info-item">
+                <span class="info-item__label">{{ i18n.t('factura.solicitante') }}</span>
+                <span class="info-item__value">{{ s.solicitante }}</span>
+              </div>
+            }
+            @if (s.codigoGrupo) {
+              <div class="info-item">
+                <span class="info-item__label">{{ i18n.t('factura.codigo_grupo') }}</span>
+                <span class="info-item__value">{{ s.codigoGrupo }}</span>
+              </div>
+            }
+            <div class="info-item">
+              <span class="info-item__label">{{ i18n.t('factura.destino_bien') }}</span>
+              <span class="info-item__value">{{ s.destinoBien }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="detail-right">
+
+      <!-- Bienes del GIL -->
+      <div class="detail-card">
+        <div class="detail-card__header">
+          <lucide-icon name="package" [size]="18"></lucide-icon>
+          <h2>{{ i18n.t('factura.bienes_gil') }}</h2>
+          <span class="count-badge">{{ (s.bienes?.length ?? 0) }} ÍTEMS</span>
+        </div>
+
+        @if (s.bienes?.length) {
+          <div class="bienes-table-scroll">
+            <table class="pf-items-table">
+              <thead>
+                <tr>
+                  <th>{{ i18n.t('comun.codigo_sena') }}</th>
+                  <th>{{ i18n.t('comun.descripcion') }}</th>
+                  <th>{{ i18n.t('comun.unidad') }}</th>
+                  <th class="td--center">{{ i18n.t('comun.cant') }}</th>
+                  <th class="td--right">{{ i18n.t('comun.vr_unitario') }}</th>
+                  <th class="td--center">{{ i18n.t('comun.iva_pct') }}</th>
+                  <th class="td--right">{{ i18n.t('comun.subtotal') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (bien of s.bienes; track bien.codigoSena) {
+                  <tr>
+                    <td class="td--mono">{{ bien.codigoSena }}</td>
+                    <td>{{ bien.descripcion }}</td>
+                    <td>{{ bien.unidadMedida }}</td>
+                    <td class="td--center">{{ bien.cantidad }}</td>
+                    <td class="td--right">{{ formatMoney(bien.valorUnitario) }}</td>
+                    <td class="td--center">{{ bien.iva }}%</td>
+                    <td class="td--right td--bold">{{ formatMoney(bien.subtotal) }}</td>
+                  </tr>
+                }
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="6" class="td--right td--bold">{{ i18n.t('factura.total_estimado') }}</td>
+                  <td class="td--right td--bold">{{ formatMoney(s.totalEstimado) }}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        } @else {
+          <p class="empty-hint">{{ i18n.t('factura.gil_sin_bienes') }}</p>
+        }
+      </div>
+
+    </div>
+  </div>
+
+</div>
+} @else {
+
+  <div class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>{{ i18n.t('factura.cargando_gil') }}</p>
+  </div>
+
+}
+
+

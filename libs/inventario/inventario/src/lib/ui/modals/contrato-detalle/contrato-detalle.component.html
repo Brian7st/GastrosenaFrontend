@@ -1,0 +1,134 @@
+<div class="modal-overlay" (click)="cerrar.emit()">
+  <div class="detalle-dialog" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+
+    <!-- Header -->
+    <div class="detalle-header">
+      <div class="detalle-header__info">
+        <h2 class="detalle-title">
+          @if (contrato) {
+            {{ i18n.t('contrato-detalle.title').replace('{{ numero }}', contrato.numero) }}
+          } @else {
+            {{ i18n.t('contrato-detalle.title_fallback') }}
+          }
+        </h2>
+        @if (contrato) {
+          <p class="detalle-subtitle">{{ i18n.t('contrato-detalle.vigencia', { vigencia: contrato.vigencia }) }}</p>
+        }
+      </div>
+      <div class="detalle-header__actions">
+        @if (contrato) {
+          <span class="estado-badge" [ngClass]="getEstadoBadgeClass(contrato.estado)">
+            <span class="estado-dot"></span>
+            {{ contrato.estado }}
+          </span>
+        }
+        <button class="btn-close" (click)="cerrar.emit()" [attr.aria-label]="i18n.t('contrato-detalle.cerrar')">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="detalle-body">
+
+      @if (loading && !contrato) {
+        <restaurant-loading-skeleton [rows]="6" [columns]="4"></restaurant-loading-skeleton>
+      } @else if (contrato) {
+
+        <!-- Metadata grid -->
+        <div class="meta-grid">
+          <div class="meta-field">
+            <span class="meta-label">{{ i18n.t('contrato-detalle.label_descripcion') }}</span>
+            <span class="meta-value">{{ contrato.descripcion ?? '—' }}</span>
+          </div>
+          <div class="meta-field">
+            <span class="meta-label">{{ i18n.t('contrato-detalle.label_fecha_inicio') }}</span>
+            <span class="meta-value">{{ contrato.fechaInicio ?? '—' }}</span>
+          </div>
+          <div class="meta-field">
+            <span class="meta-label">{{ i18n.t('contrato-detalle.label_fecha_fin') }}</span>
+            <span class="meta-value">{{ contrato.fechaFin ?? '—' }}</span>
+          </div>
+          <div class="meta-field">
+            <span class="meta-label">{{ i18n.t('contrato-detalle.label_total_items') }}</span>
+            <span class="meta-value">{{ contrato.items.length }}</span>
+          </div>
+        </div>
+
+        <!-- Items table -->
+        <div class="items-section">
+          <div class="items-section__header">
+            <span class="material-symbols-outlined">receipt_long</span>
+            <h3 class="items-section__title">{{ i18n.t('contrato-detalle.items_title') }}</h3>
+            <span class="items-count">{{ contrato.items.length }}</span>
+          </div>
+
+          <div class="table-wrap">
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th>{{ i18n.t('contrato-detalle.th_ref_articulo') }}</th>
+                  <th>{{ i18n.t('contrato-detalle.th_descripcion') }}</th>
+                  <th class="text-center">{{ i18n.t('contrato-detalle.th_unidad') }}</th>
+                  <th class="text-right">{{ i18n.t('contrato-detalle.th_vlr_adjudicado') }}</th>
+                  <th class="text-right">{{ i18n.t('contrato-detalle.th_vlr_antes') }}</th>
+                  <th class="text-right">{{ i18n.t('contrato-detalle.th_iva') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of itemsPagina; track item.refArticulo) {
+                  <tr>
+                    <td><span class="code-mono">{{ item.refArticulo }}</span></td>
+                    <td><span class="item-desc">{{ item.descripcion }}</span></td>
+                    <td class="text-center">{{ item.unidadMedida ?? '—' }}</td>
+                    <td class="text-right">{{ formatCurrency(item.vrlAdjudicado) }}</td>
+                    <td class="text-right">{{ formatCurrency(item.vrlAntes) }}</td>
+                    <td class="text-right">{{ formatPorcentaje(item.ivaPorcentaje) }}</td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="6" class="empty-row">{{ i18n.t('contrato-detalle.sin_items') }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          @if (totalPaginas > 1) {
+            <div class="items-paginacion">
+              <span class="items-paginacion__info">
+                {{ rangoDesde }}–{{ rangoHasta }} de {{ totalItems }}
+              </span>
+              <div class="items-paginacion__controles">
+                <restaurant-button
+                  variant="surface"
+                  [disabled]="pagina === 0"
+                  (click)="paginaAnterior()">
+                  {{ i18n.t('contrato-detalle.pag_anterior') }}
+                </restaurant-button>
+                <span class="items-paginacion__pagina">
+                  {{ pagina + 1 }} / {{ totalPaginas }}
+                </span>
+                <restaurant-button
+                  variant="surface"
+                  [disabled]="pagina >= totalPaginas - 1"
+                  (click)="paginaSiguiente()">
+                  {{ i18n.t('contrato-detalle.pag_siguiente') }}
+                </restaurant-button>
+              </div>
+            </div>
+          }
+        </div>
+
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="detalle-footer">
+      <restaurant-button variant="surface" (click)="cerrar.emit()">
+        {{ i18n.t('contrato-detalle.cerrar') }}
+      </restaurant-button>
+    </div>
+
+  </div>
+</div>

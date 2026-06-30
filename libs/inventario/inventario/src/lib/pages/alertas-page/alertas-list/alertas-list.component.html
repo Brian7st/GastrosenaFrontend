@@ -1,0 +1,203 @@
+<div class="page-container">
+
+  <!-- ── Header & Actions ─────────────────────────────────────────────────── -->
+  <div class="page-header-row">
+    <div>
+
+      <h1 class="page-title">{{ i18n.t('alerta.titulo') }}</h1>
+      <p class="page-subtitle">{{ i18n.t('alerta.subtitulo') }}</p>
+    </div>
+    <div class="header-actions">
+      <restaurant-button variant="surface" (click)="onExportarCSV()">
+        <div class="btn-icon-text">
+          <lucide-icon name="download" [size]="20"></lucide-icon>
+          {{ i18n.t('alerta.exportar_csv') }}
+        </div>
+      </restaurant-button>
+      <restaurant-button variant="surface" (click)="irAConfig()">
+        <div class="btn-icon-text">
+          <lucide-icon name="settings" [size]="20"></lucide-icon>
+          {{ i18n.t('alerta.configurar_umbrales') }}
+        </div>
+      </restaurant-button>
+    </div>
+  </div>
+
+  <!-- ── KPI Grid ─────────────────────────────────────────────────────────── -->
+  <div class="kpi-grid">
+    <restaurant-kpi-card
+      [label]="i18n.t('alerta.kpi_criticas')"
+      [value]="kpiCriticas().toString()"
+      icon="triangle-alert"
+      iconColor="red"
+    ></restaurant-kpi-card>
+    <restaurant-kpi-card
+      [label]="i18n.t('alerta.kpi_activas')"
+      [value]="kpiActivas().toString()"
+      icon="bell"
+      iconColor="green"
+    ></restaurant-kpi-card>
+  </div>
+
+  <!-- ── Main Content Split ──────────────────────────────────────────────── -->
+  <div class="content-split">
+
+    <!-- ── Columna Izquierda: Lista de Alertas ──────────────────────────── -->
+    <div class="col-alertas">
+
+      <!-- Filtros -->
+      <div class="filter-bar">
+        <div class="filter-bar__search">
+          <span class="material-symbols-outlined filter-bar__icon">search</span>
+          <input
+            type="text"
+            class="filter-bar__input"
+            [placeholder]="i18n.t('alerta.buscar_placeholder')"
+            (input)="onSearch($event)"
+          />
+        </div>
+        <select class="filter-bar__select" (change)="onPrioridadChange($event)">
+          <option value="">{{ i18n.t('alerta.filtro_prioridad') }}</option>
+          <option value="ALTA">{{ i18n.t('alerta.prioridad_alta') }}</option>
+          <option value="MEDIA">{{ i18n.t('alerta.prioridad_media') }}</option>
+          <option value="BAJA">{{ i18n.t('alerta.prioridad_baja') }}</option>
+        </select>
+        <select class="filter-bar__select" (change)="onEstadoChange($event)">
+          <option value="">{{ i18n.t('comun.estado') }}</option>
+          <option value="ACTIVA">{{ i18n.t('alerta.estado_activa') }}</option>
+          <option value="CRITICA">{{ i18n.t('alerta.estado_critica') }}</option>
+          <option value="RESUELTA">{{ i18n.t('alerta.estado_resuelta') }}</option>
+        </select>
+      </div>
+
+      <!-- Lista de Alertas -->
+      <div class="alertas-list">
+        @for (alerta of filteredAlertas(); track alerta.id) {
+          <div
+            class="alerta-card"
+            [class]="'alerta-card--' + alerta.prioridad"
+            (click)="irADetalle(alerta.id)"
+            role="button"
+          >
+            <!-- Ícono de prioridad -->
+            <div class="alerta-card__icon" [class]="'alerta-card__icon--' + alerta.prioridad">
+              <span class="material-symbols-outlined">
+                @if (alerta.estado === 'CRITICA') { warning }
+                @else if (alerta.prioridad === 'ALTA') { error_outline }
+                @else { info }
+              </span>
+            </div>
+
+            <!-- Contenido principal -->
+            <div class="alerta-card__body">
+              <div class="alerta-card__header">
+                <div class="alerta-card__meta">
+                  <h3 class="alerta-card__nombre">{{ alerta.nombreBien ?? alerta.descripcion }}</h3>
+                  <p class="alerta-card__codigo">{{ alerta.codigoSena ?? '—' }}</p>
+                </div>
+                <restaurant-status-badge
+                  [label]="getPrioridadLabel(alerta.prioridad)"
+                  [variant]="getPrioridadVariant(alerta.prioridad)"
+                ></restaurant-status-badge>
+              </div>
+
+              <div class="alerta-card__stats">
+                <div class="alerta-stat">
+                  <p class="alerta-stat__label">{{ i18n.t('alerta.stock_actual') }}</p>
+                  <p class="alerta-stat__value" [class]="'alerta-stat__value--' + alerta.prioridad">
+                    {{ alerta.stockActual ?? 0 }} / {{ alerta.stockMinimo ?? 0 }}{{ alerta.unidad ?? '' }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botón Resolver -->
+            <div class="alerta-card__action">
+              <button
+                *hasPermission="'alertas:resolver'"
+                class="btn-resolver"
+                (click)="irAResolver($event, alerta.id)"
+              >
+                {{ i18n.t('alerta.resolver') }}
+              </button>
+            </div>
+          </div>
+        }
+
+        @empty {
+          <inventario-empty-state
+            icon="notifications"
+            title="Sin alertas"
+            message="No hay alertas con los filtros seleccionados."
+          />
+        }
+      </div>
+    </div>
+
+    <!-- ── Columna Derecha: Panel lateral ───────────────────────────────── -->
+    <aside class="col-lateral">
+
+      <!-- Resumen de Alertas (datos reales: /reporting/alertas/resumen) -->
+      <div class="lateral-card">
+        <div class="lateral-card__header">
+          <h3 class="lateral-card__title">{{ i18n.t('alerta.resumen_titulo') }}</h3>
+        </div>
+        <div class="lateral-card__body">
+          @if (resumen(); as r) {
+            <div class="historial-item">
+              <div>
+                <p class="historial-item__bien">{{ i18n.t('alerta.total_alertas') }}</p>
+                <p class="historial-item__accion">{{ r.totalAlertas }}</p>
+              </div>
+            </div>
+            <div class="historial-item">
+              <div>
+                <p class="historial-item__bien">{{ i18n.t('alerta.pendientes') }}</p>
+                <p class="historial-item__accion">{{ r.alertasPendientes }}</p>
+              </div>
+            </div>
+            <div class="historial-item">
+              <div>
+                <p class="historial-item__bien">{{ i18n.t('alerta.resueltas') }}</p>
+                <p class="historial-item__accion">{{ r.alertasResueltas }}</p>
+              </div>
+            </div>
+            <div class="historial-item">
+              <div>
+                <p class="historial-item__bien">{{ i18n.t('alerta.productos_criticos') }}</p>
+                <p class="historial-item__accion">{{ r.productosCriticos }}</p>
+              </div>
+            </div>
+            @if (r.ultimaAlerta) {
+              <div class="historial-item">
+                <div>
+                  <p class="historial-item__bien">{{ i18n.t('alerta.ultima_alerta') }}</p>
+                  <p class="historial-item__tiempo">{{ r.ultimaAlerta }}</p>
+                </div>
+              </div>
+            }
+          } @else {
+            <p class="text-secondary">{{ i18n.t('comun.cargando') }}</p>
+          }
+        </div>
+      </div>
+
+      <!-- Alertas por tipo -->
+      @if (resumen()?.alertasPorTipo?.length) {
+        <div class="lateral-card">
+          <h3 class="lateral-card__title lateral-card__title--pad">{{ i18n.t('alerta.por_tipo') }}</h3>
+          <div class="movimientos-list">
+            @for (t of resumen()!.alertasPorTipo; track t.tipo) {
+              <div class="movimiento-item">
+                <span class="movimiento-item__nombre">{{ t.tipo }}</span>
+                <span class="movimiento-item__cantidad">{{ t.cantidad }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+    </aside>
+  </div>
+
+</div>

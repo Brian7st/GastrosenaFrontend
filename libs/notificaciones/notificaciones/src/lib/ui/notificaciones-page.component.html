@@ -1,0 +1,71 @@
+<div class="notificaciones-wrapper">
+
+  <restaurant-page-header
+    [title]="i18n.t('page.title')"
+    [subtitle]="i18n.t('page.subtitle')"
+  />
+
+  <div class="notificaciones-topbar">
+    <div class="notificaciones-topbar__info">
+      @if (noLeidas() > 0) {
+        <span class="notificaciones-badge">
+          <lucide-icon name="bell" [size]="16"></lucide-icon>
+          {{ noLeidas() === 1 ? i18n.t('badge.no_leidas').replace('{count}', noLeidas()) : i18n.t('badge.no_leidas_plural').replace('{count}', noLeidas()) }}
+        </span>
+      } @else {
+        <span class="notificaciones-badge notificaciones-badge--vacio">
+          <lucide-icon name="bell-off" [size]="16"></lucide-icon>
+          {{ i18n.t('badge.al_dia') }}
+        </span>
+      }
+    </div>
+    <restaurant-button variant="surface" (click)="marcarTodasLeidas()">
+      <lucide-icon name="check-circle" [size]="14"></lucide-icon>
+      {{ i18n.t('btn.marcar_todas') }}
+    </restaurant-button>
+  </div>
+
+  @if (loading()) {
+    <div class="notificaciones-loading">{{ i18n.t('loading') }}</div>
+  } @else {
+    <div class="notificaciones-lista-simple">
+      @if (notificaciones().length === 0) {
+        <div class="notificaciones-empty">
+          <lucide-icon name="bell-off" [size]="40"></lucide-icon>
+          <p>{{ i18n.t('empty') }}</p>
+        </div>
+      } @else {
+        @for (n of notificaciones(); track n.idNotificacion) {
+          <div class="notificacion-item" [class.notificacion-item--no-leida]="!n.leida">
+            <div class="notificacion-item__icono">
+              <lucide-icon name="bell" [size]="20"></lucide-icon>
+            </div>
+            <div class="notificacion-item__body">
+              <div class="notificacion-item__header">
+                <p class="notificacion-item__titulo">{{ getTipoLabel(n.tipo) }}</p>
+                @if (!n.leida) {
+                  <span class="notificacion-item__punto"></span>
+                }
+              </div>
+              <p class="notificacion-item__mensaje">{{ n.mensaje }}</p>
+              <div class="notificacion-item__meta">
+                <restaurant-status-badge
+                  [label]="n.leida ? i18n.t('estado.leida') : i18n.t('estado.no_leida')"
+                  [variant]="n.leida ? 'success' : 'warning'"
+                />
+                <span class="notificacion-item__fecha">
+                  {{ n.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}
+                </span>
+              </div>
+              @if (!n.leida) {
+                <restaurant-button variant="ghost" (click)="marcarComoLeida(n.idNotificacion)">
+                  {{ i18n.t('btn.marcar_leida') }}
+                </restaurant-button>
+              }
+            </div>
+          </div>
+        }
+      }
+    </div>
+  }
+</div>

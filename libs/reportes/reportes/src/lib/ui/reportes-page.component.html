@@ -1,0 +1,106 @@
+<div class="reportes-wrapper">
+
+  <restaurant-page-header
+    [title]="i18n.t('page.title')"
+    [subtitle]="i18n.t('page.subtitle')"
+  />
+
+  <!-- Filtros -->
+  <div class="reportes-filtros">
+    <restaurant-select-filter
+      [label]="i18n.t('filter.tipo')"
+      [value]="tipoSeleccionado()"
+      [options]="tipoOpciones()"
+      (valueChange)="tipoSeleccionado.set($event)"
+    />
+    <restaurant-select-filter
+      [label]="i18n.t('filter.periodicidad')"
+      [value]="periodicidadSeleccionada()"
+      [options]="periodicidadOpciones()"
+      (valueChange)="periodicidadSeleccionada.set($event)"
+    />
+    <restaurant-button variant="primary" (click)="onGenerarReporte()">
+      <lucide-icon name="trending-up" [size]="16"></lucide-icon>
+      {{ i18n.t('btn.generar_reporte') }}
+    </restaurant-button>
+  </div>
+
+  <!-- Secciones por rol -->
+  @for (seccion of seccionesFiltradas(); track seccion.rol) {
+    <div class="reportes-seccion">
+      <div class="reportes-seccion__header">
+        <div class="reportes-seccion__titulo">
+          <lucide-icon [name]="seccion.icono" [size]="20" class="reportes-seccion__icono"></lucide-icon>
+          <h2 class="reportes-seccion__nombre" [class]="'reportes-seccion__nombre--' + seccion.color">
+            {{ seccion.rol }}
+          </h2>
+        </div>
+        <restaurant-status-badge
+          [label]="i18n.t('badge.reportes').replace('{count}', seccion.reportes.length)"
+          variant="warning"
+        />
+      </div>
+
+      <div class="reportes-grid">
+        @for (reporte of seccion.reportes; track reporte.id) {
+          <div class="reporte-card">
+            <div class="reporte-card__body">
+              <h3 class="reporte-card__titulo">{{ reporte.titulo }}</h3>
+              <p class="reporte-card__desc">{{ reporte.descripcion }}</p>
+            </div>
+           <div class="reporte-card__actions">
+  <restaurant-button variant="surface" (click)="descargarPdf(reporte.id)">
+    <lucide-icon name="file-text" [size]="14"></lucide-icon>
+    {{ i18n.t('btn.pdf') }}
+  </restaurant-button>
+  <restaurant-button variant="primary" (click)="generarReporte(reporte.id)">
+    <lucide-icon name="refresh-cw" [size]="14"></lucide-icon>
+    {{ i18n.t('btn.generar') }}
+  </restaurant-button>
+  <restaurant-button variant="surface" (click)="descargarReporte(reporte.id)">
+    <lucide-icon name="file-spreadsheet" [size]="14"></lucide-icon>
+    {{ i18n.t('btn.excel') }}
+  </restaurant-button>
+</div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Reportes recientes -->
+  @if (reportesRecientes().length > 0) {
+    <restaurant-data-table
+      [tableTitle]="i18n.t('table.title')"
+      tableIcon="file-text"
+    >
+      <thead>
+        <tr>
+          <th>{{ i18n.t('th.nombre') }}</th>
+          <th>{{ i18n.t('th.fecha') }}</th>
+          <th>{{ i18n.t('th.estado') }}</th>
+          <th>{{ i18n.t('th.accion') }}</th>
+        </tr>
+      </thead>
+      @for (reporte of reportesRecientes(); track reporte.id) {
+        <tr>
+          <td>{{ reporte.nombre }}</td>
+          <td>{{ reporte.fecha }}</td>
+          <td>
+            <restaurant-status-badge
+              [label]="reporte.estado"
+              variant="success"
+            />
+          </td>
+          <td>
+            <restaurant-button variant="surface" (click)="descargarReporte(reporte.id)">
+              <lucide-icon name="download" [size]="14"></lucide-icon>
+              {{ i18n.t('btn.descargar') }}
+            </restaurant-button>
+          </td>
+        </tr>
+      }
+    </restaurant-data-table>
+  }
+
+</div>

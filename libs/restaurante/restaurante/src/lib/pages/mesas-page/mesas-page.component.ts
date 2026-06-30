@@ -1,0 +1,537 @@
+import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import {
+  PageHeaderComponent,
+  KpiCardComponent,
+  CardComponent,
+  StatusBadgeComponent,
+  ButtonComponent,
+  LucideIconComponent,
+  EmptyStateComponent,
+  ConfirmDialogComponent
+} from '@restaurant/shared/ui';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
+import { RestauranteFacade } from '../../data-access/restaurante.facade';
+import { Mesa } from '../../models/restaurante.model';
+import { CurrencyCopPipe } from '@restaurant/shared/util';
+import { I18nService } from '../../i18n/i18n.service';
+
+@Component({
+  selector: 'restaurant-mesas-page',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    PageHeaderComponent,
+    KpiCardComponent,
+    CardComponent,
+    StatusBadgeComponent,
+    ButtonComponent,
+    LucideIconComponent,
+    EmptyStateComponent,
+    ConfirmDialogComponent,
+    CurrencyCopPipe
+  ],
+  templateUrl: './mesas-page.component.html',
+  styleUrl: './mesas-page.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class MesasPageComponent {
+  protected readonly i18n = inject(I18nService);
+  private facade = inject(RestauranteFacade);
+  private router  = inject(Router);
+  private route   = inject(ActivatedRoute);
+
+  mostrarModalAccesoDenegado = this.facade.mostrarModalAccesoDenegado;
+  cerrarModalAccesoDenegado = () => this.facade.cerrarModalAccesoDenegado();
+
+  // ── Signals del Facade ──────────────────────────────────────────────────────
+  mesas = this.facade.mesas;
+  mesasCargando = this.facade.mesasCargando;
+  mesasError = this.facade.mesasError;
+  puedeAdministrarMesas = this.facade.puedeAdministrarMesas;
+  mesasActivas = computed(() => this.mesas().filter(m => m.activo));
+  mesasInactivas = computed(() => this.mesas().filter(m => !m.activo));
+  stats = this.facade.stats;
+
+  // ── Estado local del modal ───────────────────────────────────────────────────
+  modalActivo = signal<string | null>(null);
+  mesaSeleccionada = signal<Mesa | null>(null);
+  tabActivo        = signal<'desactivar' | 'activar'>('desactivar');
+  searchQueryGestionMesas = signal<string>('');
+  filtroEstado = signal<'TODAS' | 'LIBRE' | 'OCUPADA' | 'POR_PAGAR'>('TODAS');
+  
+  // ── Estado local de la vista principal ───────────────────────────────────────
+  searchQueryMain = signal<string>('');
+
+  filteredMesasActivasMain = computed(() => {
+    return this.mesasActivas().filter(m => this._matchMesa(m.nombre, this.searchQueryMain()));
+  });
+
+  private _sortMesas(mesas: Mesa[]): Mesa[] {
+    return [...mesas].sort((a, b) => {
+      const numA = parseInt(a.nombre.replace(/\D/g, ''), 10) || 0;
+      const numB = parseInt(b.nombre.replace(/\D/g, ''), 10) || 0;
+      return numA - numB;
+    });
+  }
+
+  filteredMesasLibres = computed(() => {
+    return this._sortMesas(this.filteredMesasActivasMain().filter(m => m.estado === 'LIBRE'));
+  });
+
+  filteredMesasOcupadas = computed(() => {
+    return this._sortMesas(this.filteredMesasActivasMain().filter(m => m.estado === 'OCUPADA'));
+  });
+
+  filteredMesasPorPagar = computed(() => {
+    return this._sortMesas(this.filteredMesasActivasMain().filter(m => m.estado === 'POR_PAGAR'));
+  });
+
+  filteredMesasActivasModal = computed(() => {
+    return this.mesasActivas().filter(m => this._matchMesa(m.nombre, this.searchQueryGestionMesas()));
+  });
+
+  filteredMesasInactivasModal = computed(() => {
+    return this.mesasInactivas().filter(m => this._matchMesa(m.nombre, this.searchQueryGestionMesas()));
+  });
+
+  private _matchMesa(nombreMesa: string, query: string): boolean {
+    const q = query.toLowerCase().trim();
+    if (!q) return true;
+
+    const nombre = nombreMesa.toLowerCase();
+    const cleanNombre = nombre.replace(/^mesa\s*/, '');
+    const cleanQuery = q.replace(/^mesa\s*/, '');
+
+    const esNumeroNombre = /^\d+$/.test(cleanNombre);
+    const esNumeroQuery = /^\d+$/.test(cleanQuery);
+
+    if (esNumeroNombre && esNumeroQuery) {
+      const numNombre = parseInt(cleanNombre, 10).toString();
+      const numQuery = parseInt(cleanQuery, 10).toString();
+      return numNombre.includes(numQuery);
+    }
+
+    return cleanNombre.includes(cleanQuery) || nombre.includes(q);
+  }
+
+  // ── Mesas en servicio (Ocupadas / Por pagar) ──────────────────────────────────
+  mesasEnServicio = computed(() => {
+    const meseros = [
+      'W01 - John Smith', 
+      'W02 - Anna Gomez', 
+      'W03 - Charles Ruiz', 
+      'W04 - Mary Lopez', 
+      'W05 - Luisa Fernanda'
+    ];
+    return this.mesasActivas()
+      .filter(m => m.estado === 'OCUPADA' || m.estado === 'POR_PAGAR')
+      .map(m => {
+        const index = m.id.charCodeAt(0) % meseros.length;
+        return { ...m, meseroAsignado: meseros[index] };
+      });
+  });
+
+  // ── Signals para CREAR mesa (MesaCreateRequest) ──────────────────────────────
+  nuevoNombre = signal<string>('');
+  nuevaCapacidad = signal<number | null>(1);
+  nuevaZona = signal<string>('');
+
+  // ── Signals para EDITAR mesa (MesaUpdateRequest) — se pre-llenan al abrir ──
+  editNombre = signal('');
+  editCapacidad = signal(1);
+  editZona = signal('');
+  editObservaciones = signal('');
+
+  // ── Opciones de Zona (Autocomplete) ──────────────────────────────────────────
+  opcionesZonas = ['Main Hall', 'Terrace', 'VIP Room', 'Bar'];
+
+  showNuevaZonaDropdown = signal(false);
+  filteredNuevaZonas = computed(() => {
+    const q = this.nuevaZona().toLowerCase().trim();
+    if (!q || this.opcionesZonas.some(z => z.toLowerCase() === q)) {
+      return this.opcionesZonas;
+    }
+    return this.opcionesZonas.filter(z => z.toLowerCase().includes(q));
+  });
+
+  showEditZonaDropdown = signal(false);
+  filteredEditZonas = computed(() => {
+    const q = this.editZona().toLowerCase().trim();
+    if (!q || this.opcionesZonas.some(z => z.toLowerCase() === q)) {
+      return this.opcionesZonas;
+    }
+    return this.opcionesZonas.filter(z => z.toLowerCase().includes(q));
+  });
+
+  selectZona(zona: string, tipo: 'nueva' | 'editar') {
+    if (tipo === 'nueva') {
+      this.nuevaZona.set(zona);
+      this.showNuevaZonaDropdown.set(false);
+    } else {
+      this.editZona.set(zona);
+      this.showEditZonaDropdown.set(false);
+    }
+  }
+
+  onBlurZona(tipo: 'nueva' | 'editar') {
+    setTimeout(() => {
+      if (tipo === 'nueva') this.showNuevaZonaDropdown.set(false);
+      else this.showEditZonaDropdown.set(false);
+    }, 200);
+  }
+
+  // ── Signals para ABRIR mesa ──────────────────────────────────────────────────
+  comensales = signal<number>(1);
+
+  // ── Apertura / cierre de modales ─────────────────────────────────────────────
+  abrirModal(nombre: string, mesa: Mesa | null = null) {
+    this.modalActivo.set(nombre);
+    this.mesaSeleccionada.set(mesa);
+
+    if (nombre === 'agregar') {
+      this.nuevoNombre.set('');
+      this.nuevaCapacidad.set(1);
+      this.nuevaZona.set('');
+    } else if (nombre === 'editar' && mesa) {
+      this.mesaSeleccionada.set(mesa);
+      const nombreLimpio = mesa.nombre.toUpperCase().startsWith('MESA ') 
+        ? mesa.nombre.substring(5) 
+        : mesa.nombre;
+      this.editNombre.set(nombreLimpio);
+      this.editCapacidad.set(mesa.capacidad);
+      this.editZona.set(mesa.zona || '');
+      this.editObservaciones.set(mesa.observaciones || '');
+    } else if (nombre === 'abrir' && mesa) {
+      this.comensales.set(1);
+    } else if (nombre === 'gestion-mesas') {
+      this.tabActivo.set('desactivar');
+      this.searchQueryGestionMesas.set('');
+    }
+  }
+
+  cerrarModales() {
+    this.modalActivo.set(null);
+    this.mesaSeleccionada.set(null);
+    
+    this.showNuevaZonaDropdown.set(false);
+    this.showEditZonaDropdown.set(false);
+    this.searchQueryGestionMesas.set('');
+  }
+
+  // ── Modal de alertas y notificaciones ────────────────────────────────────────
+  alertDialog = signal<{
+    open: boolean,
+    title: string,
+    message: string,
+    type: 'success' | 'error' | 'confirm',
+    confirmText?: string,
+    cancelText?: string,
+    onConfirm?: () => void,
+    onCancel?: () => void
+  }>({
+    open: false,
+    title: '',
+    message: '',
+    type: 'error'
+  });
+  
+  cerrarAlertDialog() {
+    const state = this.alertDialog();
+    if (state.onCancel) {
+      state.onCancel();
+    }
+    this.alertDialog.update(s => ({...s, open: false}));
+  }
+
+  confirmAlertDialog() {
+    const state = this.alertDialog();
+    if (state.onConfirm) {
+      state.onConfirm();
+    }
+    this.alertDialog.update(s => ({...s, open: false}));
+  }
+
+  mostrarExito(mensaje: string) {
+    this.alertDialog.set({ open: true, title: this.i18n.t('mesasPage.successTitle'), message: mensaje, type: 'success' });
+  }
+
+  mostrarError(mensaje: string) {
+    this.alertDialog.set({ open: true, title: this.i18n.t('mesasPage.errorTitle'), message: mensaje, type: 'error' });
+  }
+
+  pedirConfirmacion(title: string, message: string, onConfirm: () => void) {
+    this.alertDialog.set({
+      open: true,
+      title,
+      message,
+      type: 'confirm',
+      confirmText: this.i18n.t('mesasPage.accept'),
+      cancelText: this.i18n.t('mesasPage.cancelAction'),
+      onConfirm
+    });
+  }
+
+  // ── CREAR ────────────────────────────────────────────────────────────────────
+  crearMesa() {
+    const rawNombre = this.nuevoNombre().trim();
+    const nombre    = rawNombre ? `MESA ${rawNombre}` : '';
+    let capacidad   = this.nuevaCapacidad();
+    const zona      = this.nuevaZona().trim();
+
+    if (capacidad === null || capacidad === undefined || capacidad.toString().trim() === '') {
+      capacidad = 1;
+    }
+    
+    capacidad = Number(capacidad);
+
+    if (!rawNombre) {
+      this.mostrarError(this.i18n.t('mesasPage.requiredName'));
+      return;
+    }
+    if (capacidad < 1 || capacidad > 20 || isNaN(capacidad)) {
+      this.mostrarError(this.i18n.t('mesasPage.invalidCapacity'));
+      return;
+    }
+
+    this.facade.agregarMesa(nombre, capacidad, zona).subscribe({
+      next: (resultado) => {
+        if (resultado === true) {
+          this.cerrarModales();
+          this.mostrarExito(this.i18n.t('mesasPage.createdSuccess').replace('{{ name }}', nombre));
+        } else {
+          this.mostrarError(resultado as string);
+        }
+      }
+    });
+  }
+
+  // ── EDITAR ───────────────────────────────────────────────────────────────────
+  guardarEdicion() {
+    const mesa = this.mesaSeleccionada();
+    if (!mesa) return;
+
+    const rawNombre = this.editNombre().trim();
+    
+    // Calcular el nombre original limpio igual que al abrir el modal
+    const nombreLimpioOriginal = mesa.nombre.toUpperCase().startsWith('MESA ') 
+      ? mesa.nombre.substring(5).trim() 
+      : mesa.nombre.trim();
+      
+    // Si el nombre ingresado es idéntico al original, enviar el nombre exacto de la base de datos
+    // para evitar que el backend lo vea diferente por espacios o mayúsculas y lance error de duplicado
+    const nombre = (rawNombre === nombreLimpioOriginal) 
+      ? mesa.nombre 
+      : (rawNombre ? `MESA ${rawNombre}` : '');
+
+    const capacidad = this.editCapacidad();
+    const zona = this.editZona().trim();
+    const obs = this.editObservaciones().trim();
+    const obsCambiada = obs !== (mesa.observaciones || '');
+
+    if (!rawNombre) {
+      this.mostrarError(this.i18n.t('mesasPage.requiredName'));
+      return;
+    }
+    if (capacidad < 1 || capacidad > 20) {
+      this.mostrarError(this.i18n.t('mesasPage.invalidCapacity'));
+      return;
+    }
+
+    this.facade.editarMesa(mesa.id, {
+      nombre,
+      capacidad,
+      zona: zona || null,
+      observaciones: obs || null,
+    }).subscribe({
+      next: (resultado) => {
+        if (resultado === true) {
+          this.cerrarModales();
+          if (obs && obsCambiada) {
+            if (mesa.estado !== 'LIBRE') {
+              this.mostrarExito(this.i18n.t('mesasPage.updatedWithObs'));
+            } else {
+              this.facade.cambiarEstadoActivoMesa(mesa.id, false);
+              this.mostrarExito(this.i18n.t('mesasPage.updatedAndDeactivated'));
+            }
+          } else {
+            this.mostrarExito(this.i18n.t('mesasPage.updatedSuccess'));
+          }
+        } else {
+          this.mostrarError(resultado as string);
+        }
+      }
+    });
+  }
+
+  // ── CONTROLES DE CAPACIDAD ───────────────────────────────────────────────────
+  incrementarCapacidad(tipo: 'nueva' | 'editar') {
+    if (tipo === 'nueva') {
+      const actual = this.nuevaCapacidad() || 1;
+      if (actual < 20) this.nuevaCapacidad.set(actual + 1);
+    } else {
+      const actual = this.editCapacidad() || 1;
+      if (actual < 20) this.editCapacidad.set(actual + 1);
+    }
+  }
+
+  decrementarCapacidad(tipo: 'nueva' | 'editar') {
+    if (tipo === 'nueva') {
+      const actual = this.nuevaCapacidad() || 1;
+      if (actual > 1) this.nuevaCapacidad.set(actual - 1);
+    } else {
+      const actual = this.editCapacidad() || 1;
+      if (actual > 1) this.editCapacidad.set(actual - 1);
+    }
+  }
+
+  incrementarComensales() {
+    const actual = Number(this.comensales()) || 1;
+    const max = Number(this.mesaSeleccionada()?.capacidad) || 20;
+    if (actual < max) this.comensales.set(actual + 1);
+  }
+
+  decrementarComensales() {
+    const actual = Number(this.comensales()) || 1;
+    if (actual > 1) this.comensales.set(actual - 1);
+  }
+
+  // ── ACCIONES DE ESTADO ───────────────────────────────────────────────────────
+  abrirMesa(id: string) {
+    const comensales = this.comensales();
+    this.facade.abrirMesa(id, '', comensales);
+    this.cerrarModales();
+    this.router.navigate(['../pedidos'], { 
+      relativeTo: this.route,
+      state: { comensales: comensales, mesaId: id }
+    });
+  }
+
+  verPedido(id: string) {
+    const mesa = this.facade.mesas().find(m => m.id === id);
+    if (mesa && (mesa.estado === 'OCUPADA' || mesa.estado === 'POR_PAGAR')) {
+      this.facade.cargarPedidoDeMesaOcupada(id).subscribe({
+        next: (exito) => {
+          if (exito) {
+            if (mesa.estado === 'POR_PAGAR') {
+              this.abrirModal('ver-cuenta', mesa);
+            } else {
+              this.router.navigate(['../pedidos'], { relativeTo: this.route });
+            }
+          } else {
+            this.pedirConfirmacion(
+              this.i18n.t('mesasPage.noActiveOrderTitle'),
+              this.i18n.t('mesasPage.noActiveOrderMessage').replace('{{ status }}', mesa.estado),
+              () => {
+                this.facade.liberarMesa(id).subscribe(res => {
+                  if (res === true) {
+                    this.mostrarExito(this.i18n.t('mesasPage.releasedSuccess'));
+                  } else {
+                    this.mostrarError(res as string);
+                  }
+                });
+              }
+            );
+          }
+        }
+      });
+    } else {
+      this.facade.seleccionarMesaParaPedido(id);
+      this.router.navigate(['../pedidos'], { relativeTo: this.route });
+    }
+  }
+
+  liberarMesa(id: string) {
+    this.cerrarModales();
+    this.facade.liberarMesa(id).subscribe(res => {
+      if (res === true) {
+        this.mostrarExito(this.i18n.t('mesasPage.releasedSuccess'));
+      } else {
+        this.mostrarError(res as string);
+      }
+    });
+  }
+
+  // ── COMPUTEDS PARA MODAL DE CUENTA ───────────────────────────────────────────
+  pedidoCuenta = computed(() => this.facade.pedidoActivo());
+  comidasPedidoCuenta = computed(() => {
+    const pedido = this.pedidoCuenta();
+    return pedido ? pedido.detalles.filter(d => {
+      const cat = (d.categoria || '').toLowerCase();
+      return cat !== 'bebidas' && cat !== 'bebida';
+    }) : [];
+  });
+  bebidasPedidoCuenta = computed(() => {
+    const pedido = this.pedidoCuenta();
+    return pedido ? pedido.detalles.filter(d => {
+      const cat = (d.categoria || '').toLowerCase();
+      return cat === 'bebidas' || cat === 'bebida';
+    }) : [];
+  });
+  totalCuenta = computed(() => {
+    const detalles = this.pedidoCuenta()?.detalles || [];
+    return detalles.reduce((sum, item) => sum + (item.cantidad * item.precioUnitario), 0);
+  });
+
+  // ── ACTIVAR / DESACTIVAR ─────────────────────────────────────────────────────
+  cambiarEstadoMesa(id: string, activo: boolean) {
+    if (!activo) {
+      const mesa = this.facade.mesas().find(m => m.id === id);
+      if (mesa && mesa.estado !== 'LIBRE') {
+        this.mostrarError(this.i18n.t('mesasPage.cannotDeactivateOccupied'));
+        return;
+      }
+
+      this.pedirConfirmacion(
+        this.i18n.t('mesasPage.deactivateConfirmTitle'),
+        this.i18n.t('mesasPage.deactivateConfirmMessage'),
+        () => {
+          this.facade.cambiarEstadoActivoMesa(id, activo).subscribe(res => {
+            if (res === true) {
+              this.mostrarExito(this.i18n.t('mesasPage.deactivatedSuccess'));
+            } else {
+              this.mostrarError(res as string);
+            }
+          });
+        }
+      );
+    } else {
+      this.facade.cambiarEstadoActivoMesa(id, activo).subscribe(res => {
+        if (res === true) {
+          this.mostrarExito(this.i18n.t('mesasPage.activatedSuccess'));
+        } else {
+          this.mostrarError(res as string);
+        }
+      });
+    }
+  }
+
+  eliminarMesa(id: string) {
+    this.cambiarEstadoMesa(id, false);
+    this.cerrarModales();
+  }
+
+  recargarMesas() {
+    this.facade.cargarMesas();
+  }
+
+  // ── Helpers de UI ────────────────────────────────────────────────────────────
+  soloNumeros(event: KeyboardEvent) {
+    const charCode = event.which ? event.which : event.keyCode;
+    if (charCode < 48 || charCode > 57) {
+      event.preventDefault();
+    }
+  }
+
+  getBadgeType(estado: string): 'info' | 'success' | 'warning' | 'danger' {
+    switch (estado) {
+      case 'LIBRE':     return 'success';
+      case 'OCUPADA':   return 'danger';
+      case 'POR_PAGAR': return 'warning';
+      case 'INACTIVA':  return 'info';
+      default:          return 'info';
+    }
+  }
+}

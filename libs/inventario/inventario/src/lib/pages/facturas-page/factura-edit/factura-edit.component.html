@@ -1,0 +1,288 @@
+@if (factura(); as f) {
+  <div class="factura-edit">
+    @if (isBlocked()) {
+      <div class="blocked-banner">
+        <span class="material-symbols-outlined">lock</span>
+        <span>{{ i18n.t('factura-edit.bloqueada') }}: <strong>{{ f.estado }}</strong></span>
+      </div>
+    }
+
+    <div class="page-header">
+      <div class="page-header__left">
+        <inventario-back-button (clicked)="onVolver()" />
+        <div>
+          <div class="page-header__breadcrumb">
+            <span>SENA FEL</span>
+            <span class="page-header__breadcrumb-sep">|</span>
+            <span class="page-header__cufe">CUFE: {{ (f.cufe | slice:0:12) }}...{{ (f.cufe | slice:-8) }}</span>
+          </div>
+          <div class="page-header__title-row">
+            <span class="material-symbols-outlined page-header__icon">edit_document</span>
+            <h1>{{ i18n.t('factura-edit.titulo') }}</h1>
+          </div>
+          <p class="page-header__sub">{{ i18n.t('factura-edit.modificando') }}: <strong class="page-header__doc-id">{{ f.numeroFactura }}</strong></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="edit-card">
+      <div class="form-grid form-grid--2">
+        <div class="form-field">
+          <label>{{ i18n.t('factura-edit.nit_proveedor') }}</label>
+          <div class="input-with-badge">
+            <input
+              type="text"
+              id="field-nit-cliente"
+              [ngModel]="nitCliente()"
+              (ngModelChange)="nitCliente.set($event)"
+              [disabled]="isBlocked()"
+            />
+            <span class="material-symbols-outlined input-badge" [class.input-badge--ok]="nitCliente().length > 3">
+              {{ nitCliente().length > 3 ? 'check_circle' : 'radio_button_unchecked' }}
+            </span>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>{{ i18n.t('factura-edit.proveedor') }}</label>
+          <input
+            type="text"
+            id="field-proveedor-nombre"
+            [ngModel]="proveedorNombre()"
+            (ngModelChange)="proveedorNombre.set($event)"
+            [disabled]="isBlocked()"
+          />
+        </div>
+      </div>
+
+      <div class="form-grid form-grid--2">
+        <div class="form-field">
+          <label>{{ i18n.t('factura-edit.cufe') }}</label>
+          <input
+            type="text"
+            id="field-cufe"
+            [ngModel]="cufe()"
+            (ngModelChange)="cufe.set($event)"
+            [disabled]="isBlocked()"
+          />
+        </div>
+        <div class="form-field">
+          <label>{{ i18n.t('factura-edit.fecha_emision') }}</label>
+          <input
+            type="date"
+            id="field-fecha"
+            [ngModel]="fechaEmision()"
+            (ngModelChange)="fechaEmision.set($event)"
+            [disabled]="isBlocked()"
+          />
+        </div>
+      </div>
+
+      <div class="form-grid form-grid--2">
+        <div class="form-field">
+          <label>{{ i18n.t('factura-edit.fecha_recepcion') }}</label>
+          <input
+            type="date"
+            id="field-fecha-recepcion"
+            [ngModel]="fechaRecepcion()"
+            (ngModelChange)="fechaRecepcion.set($event)"
+            [disabled]="isBlocked()"
+          />
+        </div>
+        <div class="form-field">
+          <label>{{ i18n.t('factura-edit.orden_compra') }}</label>
+          <input
+            type="text"
+            id="field-orden-compra"
+            [ngModel]="ordenCompra()"
+            (ngModelChange)="ordenCompra.set($event)"
+            [disabled]="isBlocked()"
+          />
+        </div>
+      </div>
+
+      <div class="form-grid form-grid--2">
+        <div class="form-field">
+          <label>{{ i18n.t('factura-edit.banco') }}</label>
+          <input
+            type="text"
+            id="field-banco"
+            [ngModel]="banco()"
+            (ngModelChange)="banco.set($event)"
+            [disabled]="isBlocked()"
+          />
+        </div>
+        <div class="form-field">
+          <label>{{ i18n.t('factura-edit.numero_cuenta') }}</label>
+          <input
+            type="text"
+            id="field-numero-cuenta"
+            [ngModel]="numeroCuenta()"
+            (ngModelChange)="numeroCuenta.set($event)"
+            [disabled]="isBlocked()"
+          />
+        </div>
+      </div>
+
+      <div class="form-grid form-grid--2">
+        <div class="form-field">
+          <label>{{ i18n.t('factura-edit.tipo_cuenta') }}</label>
+          <div class="select-wrapper">
+            <select id="field-tipo-cuenta" [ngModel]="tipoCuenta()" (ngModelChange)="tipoCuenta.set($event)" [disabled]="isBlocked()">
+              <option value="">{{ i18n.t('comun.seleccione') }}</option>
+              <option value="AHORROS">AHORROS</option>
+              <option value="CORRIENTE">CORRIENTE</option>
+            </select>
+            <span class="material-symbols-outlined">expand_more</span>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>{{ i18n.t('factura-edit.beneficiario_zese') }}</label>
+          <input
+            type="checkbox"
+            id="field-zese"
+            [ngModel]="proveedorBeneficiarioZese()"
+            (ngModelChange)="proveedorBeneficiarioZese.set($event)"
+            [disabled]="isBlocked()"
+          />
+        </div>
+      </div>
+
+      <div class="section-header">
+        <div class="section-header__left">
+          <span class="material-symbols-outlined">table_rows</span>
+          <h3>{{ i18n.t('factura-edit.detalle_productos') }}</h3>
+        </div>
+        @if (!isBlocked()) {
+          <button class="btn btn--add-item" (click)="onAgregarItem()">
+            <span class="material-symbols-outlined">add_circle</span>
+            Agregar Ítem
+          </button>
+        }
+      </div>
+
+      <div class="items-table-wrapper">
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th>{{ i18n.t('factura-edit.th_cant') }}</th>
+              <th>{{ i18n.t('factura-edit.th_descripcion') }}</th>
+              <th>{{ i18n.t('factura-edit.th_precio_u') }}</th>
+              <th>{{ i18n.t('factura-edit.th_iva') }}</th>
+              <th>{{ i18n.t('factura-edit.th_total') }}</th>
+              @if (!isBlocked()) {
+                <th></th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of localItems(); track item; let i = $index) {
+              <tr>
+                <td class="td--num">
+                  @if (!isBlocked()) {
+                    <input class="td-input td-input--num" type="number" min="1" [ngModel]="item.cantidad" (ngModelChange)="onItemChange(i, 'cantidad', +$event)" />
+                  } @else {
+                    {{ item.cantidad }}
+                  }
+                </td>
+                <td>
+                  @if (!isBlocked()) {
+                    <input class="td-input td-input--desc" type="text" [ngModel]="item.descripcion" (ngModelChange)="onItemChange(i, 'descripcion', $event)" [placeholder]="i18n.t('factura-edit.desc_placeholder')" />
+                  } @else {
+                    {{ item.descripcion }}
+                  }
+                </td>
+                <td class="td--currency">
+                  @if (!isBlocked()) {
+                    <input class="td-input td-input--num" type="number" min="0" [ngModel]="item.precioUnitario" (ngModelChange)="onItemChange(i, 'precioUnitario', +$event)" />
+                  } @else {
+                    {{ formatMoney(item.precioUnitario) }}
+                  }
+                </td>
+                <td class="td--iva">
+                  @if (!isBlocked()) {
+                    <div class="iva-select">
+                      <select [ngModel]="item.porcentajeIva ?? item.iva" (ngModelChange)="onItemChange(i, 'porcentajeIva', +$event)">
+                        <option [value]="0">0%</option>
+                        <option [value]="5">5%</option>
+                        <option [value]="19">19%</option>
+                      </select>
+                      <span class="material-symbols-outlined">expand_more</span>
+                    </div>
+                  } @else {
+                    {{ item.porcentajeIva ?? item.iva }}%
+                  }
+                </td>
+                <td class="td--currency td--bold">{{ formatMoney(item.total) }}</td>
+                @if (!isBlocked()) {
+                  <td>
+                    <button class="icon-btn icon-btn--danger" (click)="onEliminarItem(i)">
+                      <span class="material-symbols-outlined">delete</span>
+                    </button>
+                  </td>
+                }
+              </tr>
+            }
+            @if (localItems().length === 0) {
+              <tr>
+                <td [attr.colspan]="isBlocked() ? 5 : 6" class="empty-row">{{ i18n.t('factura-edit.sin_items') }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="bottom-section">
+        <div class="totals-card">
+          <div class="totals-row">
+            <span>{{ i18n.t('factura.subtotal') }}:</span>
+            <span>{{ formatMoney(f.subtotal) }}</span>
+          </div>
+          <div class="totals-row">
+            <span>{{ i18n.t('factura.total_iva') }}:</span>
+            <span>{{ formatMoney(f.totalIva) }}</span>
+          </div>
+          <div class="totals-row totals-row--total">
+            <span>{{ i18n.t('factura-edit.total_fel') }}:</span>
+            <span class="totals-total-value">{{ formatMoney(f.total) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      @if (!isBlocked()) {
+        <button class="btn btn--anular" (click)="onAnular()">
+          <span class="material-symbols-outlined">cancel</span>
+          Anular Documento
+        </button>
+      }
+      <div class="footer-right">
+        <button class="btn btn--ghost" (click)="onVolver()">{{ i18n.t('comun.cancelar') }}</button>
+        <button class="btn btn--primary" id="btn-guardar-factura" [disabled]="isBlocked()" (click)="onGuardar()">
+          <span class="material-symbols-outlined">save</span>
+          Guardar Cambios
+        </button>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>{{ i18n.t('factura.cargando') }}</p>
+  </div>
+}
+
+<restaurant-keyword-confirm-modal
+  [open]="showAnularModal()"
+  title="Anular edición de FEL"
+  description="Esta acción marcará el documento como Anulado. No podrá ser revertida."
+  keyword="ANULAR"
+  keywordLabel="Escribe ANULAR para confirmar"
+  confirmLabel="Sí, anular documento"
+  cancelLabel="Cancelar"
+  [identifierLabel]="'Documento'"
+  [identifierValue]="factura()?.numeroFactura ?? ''"
+  accent="warning"
+  (confirm)="onConfirmarAnular()"
+  (cancel)="onCancelarAnular()"
+/>

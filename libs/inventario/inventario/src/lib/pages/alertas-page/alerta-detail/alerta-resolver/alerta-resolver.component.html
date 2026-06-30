@@ -1,0 +1,117 @@
+<div class="modal-overlay" (click)="cerrar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+
+    <!-- ── Header ──────────────────────────────────────────────────── -->
+    <div class="modal-header">
+      <div class="modal-header__info">
+        <h2 class="modal-title">{{ i18n.t('alerta.modal_resolver_titulo') }}</h2>
+        <p class="modal-subtitle">{{ i18n.t('alerta.modal_resolver_subtitulo') }}</p>
+      </div>
+      <button class="modal-close" (click)="cerrar()" aria-label="Cerrar modal">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <!-- Bien afectado card -->
+    @if (alerta(); as a) {
+      <div class="bien-card">
+        <div class="bien-card__icon-wrap">
+          <span class="material-symbols-outlined">inventory_2</span>
+        </div>
+        <div>
+          <p class="bien-card__label">{{ i18n.t('alerta.activo_afectado') }}</p>
+          <p class="bien-card__nombre">{{ a.nombreBien }}</p>
+        </div>
+        <div class="bien-card__badge">
+          <span class="material-symbols-outlined">warning</span>
+          <span>{{ i18n.t('alerta.prioridad_label') }}: {{ prioridadLabel() }}</span>
+        </div>
+      </div>
+    }
+
+    <!-- ── Body ────────────────────────────────────────────────────── -->
+    <div class="modal-body" [formGroup]="resolverForm">
+
+      <!-- Acción Tomada -->
+      <div class="form-group">
+        <label class="form-label">{{ i18n.t('alerta.accion_tomada') }} <span class="form-required">*</span></label>
+        <div class="action-dropdown">
+          <div class="action-dropdown__trigger">
+            <span>
+              @if (accionSeleccionada() === '') { {{ i18n.t('alerta.seleccione_accion') }} }
+              @else if (accionSeleccionada() === 'gil') { {{ i18n.t('alerta.accion_gil') }} }
+              @else if (accionSeleccionada() === 'entrada_manual') { {{ i18n.t('alerta.accion_entrada') }} }
+              @else { {{ i18n.t('alerta.accion_revisada') }} }
+            </span>
+            <span class="material-symbols-outlined">expand_more</span>
+          </div>
+          <ul class="action-dropdown__list">
+            <li class="action-dropdown__item" (click)="selectAccion('gil')">
+              <span class="material-symbols-outlined action-dropdown__icon">description</span>
+              {{ i18n.t('alerta.accion_gil') }}
+            </li>
+            <li class="action-dropdown__item" (click)="selectAccion('entrada_manual')">
+              <span class="material-symbols-outlined action-dropdown__icon">edit_document</span>
+              {{ i18n.t('alerta.accion_entrada') }}
+            </li>
+            <li class="action-dropdown__item" (click)="selectAccion('revisada')">
+              <span class="material-symbols-outlined action-dropdown__icon">task_alt</span>
+              {{ i18n.t('alerta.accion_revisada') }}
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Documento de Referencia -->
+      <div class="form-group">
+        <label class="form-label" for="referencia">{{ i18n.t('alerta.doc_referencia') }}</label>
+        <input
+          id="referencia"
+          type="text"
+          class="form-input"
+          [placeholder]="i18n.t('alerta.ref_placeholder')"
+          formControlName="referencia"
+        />
+        <span class="form-hint">{{ i18n.t('alerta.ref_hint') }}</span>
+      </div>
+
+      <!-- Descripción -->
+      <div class="form-group">
+        <label class="form-label" for="descripcion">{{ i18n.t('alerta.desc_gestion') }} <span class="form-required">*</span></label>
+        <textarea
+          id="descripcion"
+          class="form-textarea"
+          rows="4"
+          [placeholder]="i18n.t('alerta.desc_placeholder')"
+          formControlName="descripcion"
+        ></textarea>
+      </div>
+
+      <!-- Responsable (readonly) -->
+      <div class="form-group">
+        <label class="form-label" for="responsable">{{ i18n.t('alerta.responsable') }}</label>
+        <div class="input-readonly-wrap">
+          <span class="material-symbols-outlined input-readonly-wrap__icon">person</span>
+          <input
+            id="responsable"
+            type="text"
+            class="form-input form-input--readonly"
+            formControlName="responsable"
+            readonly
+          />
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Footer ──────────────────────────────────────────────────── -->
+    <div class="modal-footer">
+      <restaurant-button variant="surface" (click)="cerrar()">{{ i18n.t('comun.cancelar') }}</restaurant-button>
+      <restaurant-button variant="primary" (click)="onConfirmar()">
+        <span class="material-symbols-outlined">check_circle</span>
+        {{ i18n.t('alerta.confirmar_resolucion') }}
+      </restaurant-button>
+    </div>
+
+  </div>
+</div>

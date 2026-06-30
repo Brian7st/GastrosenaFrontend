@@ -1,0 +1,216 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(25, 28, 29, 0.2);
+  backdrop-filter: blur(8px);
+  padding: 1rem;
+}
+
+.modal-content {
+  background-color: var(--color-surface-primary);
+  width: 100%;
+  max-width: 45rem; /* 720px */
+  border-radius: 0.75rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(189, 202, 185, 0.1);
+  overflow: hidden;
+  animation: modal-in 0.2s ease-out forwards;
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-header {
+  padding: 2rem 2rem 1.5rem;
+}
+
+.modal-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-en-fondo);
+  margin: 0;
+  letter-spacing: -0.025em;
+}
+
+.modal-subtitle {
+  font-size: 0.875rem;
+  color: var(--color-secundario);
+  font-weight: 500;
+  margin: 0.25rem 0 0;
+}
+
+.modal-body {
+  padding: 0 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.section-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-contorno);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+}
+
+/* ── Date Range ── */
+.date-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .input-icon {
+    position: absolute;
+    left: 1rem;
+    color: var(--color-contorno);
+    pointer-events: none;
+  }
+}
+
+.form-input {
+  width: 100%;
+  background-color: var(--color-superficie-contenedor-bajo);
+  border: 1px solid transparent;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-en-fondo);
+  transition: all 0.2s;
+  
+  &:focus {
+    outline: none;
+    background-color: var(--color-surface-primary);
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 2px rgba(0, 110, 37, 0.2);
+  }
+}
+
+
+/* ── Chip Group ── */
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chip-btn {
+  padding: 0.625rem 1.25rem;
+  border-radius: 9999px;
+  background-color: var(--color-superficie-contenedor-bajo);
+  color: var(--color-contorno);
+  border: 1px solid rgba(189, 202, 185, 0.3);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: var(--color-superficie-contenedor-alto);
+  }
+
+  &.active {
+    background-color: var(--color-primario-gradient-end);
+    color: var(--color-en-primario-contenedor);
+    border-color: transparent;
+    box-shadow: 0 0 0 2px rgba(0, 110, 37, 0.2);
+  }
+}
+
+/* ── Format Selection ── */
+.format-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.format-card {
+  position: relative;
+  background-color: var(--color-surface-primary);
+  border: 1px solid rgba(189, 202, 185, 0.3);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: var(--color-superficie-contenedor-bajo);
+  }
+
+  &.selected {
+    border: 2px solid var(--color-primario);
+    background-color: rgba(0, 110, 37, 0.05);
+  }
+}
+
+.format-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.excel-icon {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: var(--color-primario);
+  }
+
+  &.pdf-icon {
+    background-color: rgba(255, 85, 95, 0.1);
+    color: var(--color-terciario);
+  }
+
+  &.csv-icon {
+    background-color: rgba(91, 100, 107, 0.1);
+    color: var(--color-en-secundario-contenedor);
+  }
+}
+
+.format-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-en-fondo);
+  letter-spacing: -0.025em;
+}
+
+.check-indicator {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  color: var(--color-primario);
+}
+
+/* ── Footer ── */
+.modal-footer {
+  margin-top: 1rem;
+  margin-bottom: -2rem;
+  margin-left: -2rem;
+  margin-right: -2rem;
+  padding: 1.5rem 2rem;
+  background-color: var(--color-superficie-contenedor-bajo);
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  align-items: center;
+}

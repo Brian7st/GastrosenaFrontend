@@ -1,0 +1,91 @@
+<div class="comanda-container">
+  <restaurant-page-header [title]="i18n.t('comandas.page.title')" [subtitle]="i18n.t('comandas.page.subtitle')"></restaurant-page-header>
+
+  @if (errorToast()) {
+  <div class="toast-error shadow">
+    <i class="bi bi-exclamation-triangle-fill"></i> {{ errorToast() }}
+  </div>
+  }
+
+  <!-- Filtros -->
+  <div class="filters-container showcase__row" style="margin-bottom: var(--space-6);">
+    <div style="flex: 1; min-width: 250px;">
+      <restaurant-search-filter 
+        [label]="i18n.t('comandas.filter.search-label')" 
+        [placeholder]="i18n.t('comandas.filter.search-placeholder')" 
+        [value]="searchTerm()" 
+        (valueChange)="searchTerm.set($event)"
+      ></restaurant-search-filter>
+    </div>
+
+    <div style="min-width: 180px;">
+      <restaurant-select-filter 
+        [label]="i18n.t('comandas.filter.status-label')" 
+        [value]="filtroEstado()" 
+        [options]="opcionesEstado()" 
+        (valueChange)="filtroEstado.set($event)"
+      ></restaurant-select-filter>
+    </div>
+
+    <div style="min-width: 180px;">
+      <restaurant-select-filter 
+        [label]="i18n.t('comandas.filter.priority-label')" 
+        [value]="filtroPrioridad()" 
+        [options]="opcionesPrioridad()" 
+        (valueChange)="filtroPrioridad.set($event)"
+      ></restaurant-select-filter>
+    </div>
+
+    <div style="min-width: 180px;">
+      <restaurant-select-filter 
+        [label]="i18n.t('comandas.filter.sort-label')" 
+        [value]="filtroOrden()" 
+        [options]="opcionesOrden()" 
+        (valueChange)="filtroOrden.set($event)"
+      ></restaurant-select-filter>
+    </div>
+  </div>
+
+  <div class="comandas-grid">
+
+    <div class="column col-espera">
+      <div class="col-header showcase__row" style="justify-content: space-between; margin-bottom: var(--space-4);">
+        <h5 class="m-0 fw-bold">{{ i18n.t('comandas.column.waiting') }}</h5>
+        <span class="showcase__value">{{ enEspera().length }}</span>
+      </div>
+      @for (c of enEspera(); track c.idComanda) {
+        <restaurant-comanda-card class="comanda-card-wrapper shadow-sm" [comanda]="c"
+          (iniciarPlato)="onIniciarPlato($event)"
+          (finalizarPlato)="onFinalizarPlato($event)">
+        </restaurant-comanda-card>
+      }
+    </div>
+
+    <div class="column col-preparando">
+      <div class="col-header showcase__row" style="justify-content: space-between; margin-bottom: var(--space-4);">
+        <h5 class="m-0 fw-bold">{{ i18n.t('comandas.column.preparing') }}</h5>
+        <span class="showcase__value">{{ preparando().length }}</span>
+      </div>
+      @for (c of preparando(); track c.idComanda) {
+        <restaurant-comanda-card class="comanda-card-wrapper shadow-sm" [comanda]="c"
+          (iniciarPlato)="onIniciarPlato($event)"
+          (finalizarPlato)="onFinalizarPlato($event)">
+        </restaurant-comanda-card>
+      }
+    </div>
+
+    <div class="column col-listo">
+      <div class="col-header showcase__row" style="justify-content: space-between; margin-bottom: var(--space-4);">
+        <h5 class="m-0 fw-bold">{{ i18n.t('comandas.column.ready') }}</h5>
+        <span class="showcase__value">{{ listos().length }}</span>
+      </div>
+      @for (c of listos(); track c.idComanda) {
+        <restaurant-comanda-card class="comanda-card-wrapper shadow-sm card-completed" [comanda]="c"
+          (iniciarPlato)="onIniciarPlato($event)"
+          (finalizarPlato)="onFinalizarPlato($event)">
+        </restaurant-comanda-card>
+      }
+    </div>
+
+  </div>
+</div>

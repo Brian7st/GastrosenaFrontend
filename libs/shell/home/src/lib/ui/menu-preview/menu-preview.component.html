@@ -1,0 +1,59 @@
+<section class="menu-section" id="menu">
+  <div class="container">
+    <div class="menu-section__header">
+      <span class="tag tag-green">Nuestro Menú</span>
+      <h2 class="menu-section__title">Platos elaborados con<br><em>pasión y técnica</em></h2>
+      <p class="menu-section__desc">Descubre los exquisitos platos creados por nuestros estudiantes de gastronomía, supervisados por chefs profesionales.</p>
+    </div>
+
+    <div class="menu-section__tabs">
+      @for (cat of categories; track cat.key) {
+        <button class="tab-btn" [class.active]="activeTab() === cat.key" (click)="setTab(cat.key)">
+          {{ cat.label }}
+        </button>
+      }
+    </div>
+
+    @if (activeTab() === 'platos') {
+      <div class="menu-grid">
+        @for (p of platos(); track p.name) {
+          <div class="menu-card">
+            @if (p.img) {
+              <div class="menu-card__img" [style.background-image]="'url(' + p.img + ')'">
+              </div>
+            }
+            <div class="menu-card__body">
+              <span class="menu-card__tag">{{ p.category }}</span>
+              <h3 class="menu-card__name">{{ p.name }}</h3>
+              <p  class="menu-card__desc">{{ p.desc }}</p>
+              <span class="menu-card__price">{{ p.price | currency:'COP':'symbol':'1.0-0' }}</span>
+            </div>
+          </div>
+        } @empty {
+          <p class="menu-empty">No hay platos disponibles en este momento.</p>
+        }
+      </div>
+    }
+
+    @if (activeTab() === 'bar') {
+      <div class="menu-grid">
+        @for (b of bebidas(); track b.name) {
+          <div class="menu-card">
+            @if (b.img) {
+              <div class="menu-card__img" [style.background-image]="'url(' + b.img + ')'">
+              </div>
+            }
+            <div class="menu-card__body">
+              <span class="menu-card__tag">{{ b.category }}</span>
+              <h3 class="menu-card__name">{{ b.name }}</h3>
+              <p  class="menu-card__desc">{{ b.desc }}</p>
+              <span class="menu-card__price">{{ b.price | currency:'COP':'symbol':'1.0-0' }}</span>
+            </div>
+          </div>
+        } @empty {
+          <p class="menu-empty">No hay bebidas disponibles en este momento.</p>
+        }
+      </div>
+    }
+  </div>
+</section>

@@ -1,0 +1,92 @@
+<div class="modal-overlay">
+  <!-- Export Modal Container -->
+  <div class="modal-content">
+    
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <h3 class="modal-title">{{ i18n.t('kardex.export_titulo') }}</h3>
+      <p class="modal-subtitle">{{ i18n.t('kardex.export_subtitulo') }}</p>
+    </div>
+
+    <!-- Modal Body -->
+    <form [formGroup]="exportForm" (ngSubmit)="onSubmit()" class="modal-body">
+      
+      <!-- Date Range Section -->
+      <div class="form-section">
+        <label class="section-label">{{ i18n.t('kardex.rango_fechas') }}</label>
+        <div class="date-grid">
+          <div class="input-wrapper">
+            <lucide-icon name="calendar" class="input-icon" [size]="18"></lucide-icon>
+            <input type="date" formControlName="fechaInicio" class="form-input">
+          </div>
+          <div class="input-wrapper">
+            <lucide-icon name="calendar-days" class="input-icon" [size]="18"></lucide-icon>
+            <input type="date" formControlName="fechaFin" class="form-input">
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter by Type -->
+      <div class="form-section">
+        <label class="section-label">{{ i18n.t('kardex.tipo_movimiento') }}</label>
+        <div class="chip-group">
+          <button type="button" class="chip-btn" [class.active]="tipoSeleccionado() === 'entradas'" (click)="setTipo('entradas')">
+            Entradas
+          </button>
+          <button type="button" class="chip-btn" [class.active]="tipoSeleccionado() === 'salidas'" (click)="setTipo('salidas')">
+            Salidas
+          </button>
+          <button type="button" class="chip-btn" [class.active]="tipoSeleccionado() === 'ambos'" (click)="setTipo('ambos')">
+            Ambos
+          </button>
+        </div>
+      </div>
+
+      <!-- Format Selection -->
+      <div class="form-section">
+        <label class="section-label">{{ i18n.t('kardex.formato_archivo') }}</label>
+        <div class="format-grid">
+          
+          <!-- Excel Card -->
+          <div class="format-card" [class.selected]="formatoSeleccionado() === 'excel'" (click)="setFormato('excel')">
+            <div class="format-icon excel-icon">
+              <lucide-icon name="file-spreadsheet" [size]="24"></lucide-icon>
+            </div>
+            <span class="format-title">{{ i18n.t('comun.excel_xlsx') }}</span>
+            @if (formatoSeleccionado() === 'excel') {
+<div class="check-indicator">
+              <lucide-icon name="check-circle" [size]="18"></lucide-icon>
+            </div>
+}
+          </div>
+
+          <!-- PDF Card -->
+          <div class="format-card" [class.selected]="formatoSeleccionado() === 'pdf'" (click)="setFormato('pdf')">
+            <div class="format-icon pdf-icon">
+              <lucide-icon name="file-text" [size]="24"></lucide-icon>
+            </div>
+            <span class="format-title">{{ i18n.t('comun.pdf_pdf') }}</span>
+            @if (formatoSeleccionado() === 'pdf') {
+<div class="check-indicator">
+              <lucide-icon name="check-circle" [size]="18"></lucide-icon>
+            </div>
+}
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Modal Footer Buttons -->
+      <div class="modal-footer">
+        <restaurant-button variant="surface" (click)="closeModal()" type="button">{{ i18n.t('comun.cancelar') }}</restaurant-button>
+        <restaurant-button variant="primary" type="submit" [disabled]="exportForm.invalid">
+          <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: bold;">
+            <lucide-icon name="download" [size]="18"></lucide-icon>
+            Exportar Reporte
+          </div>
+        </restaurant-button>
+      </div>
+
+    </form>
+  </div>
+</div>

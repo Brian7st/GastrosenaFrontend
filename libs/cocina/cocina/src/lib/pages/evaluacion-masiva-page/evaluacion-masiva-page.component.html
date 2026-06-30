@@ -1,0 +1,304 @@
+<div class="evaluacion-container" (click)="cerrarTodosMenus()">
+
+  <!-- ===== CABECERA ===== -->
+  <div class="page-header">
+    <button
+      id="btn-volver-masiva"
+      class="back-btn"
+      type="button"
+      (click)="volver(); $event.stopPropagation()"
+      [attr.aria-label]="i18n.t('general.volver')"
+    >
+      <lucide-icon name="arrow-left" [size]="20"></lucide-icon>
+    </button>
+
+    <div class="header-info" style="flex: 1;">
+      <h1 class="page-title">{{ i18n.t('evaluacion-masiva.page.title') }}</h1>
+      <p class="page-subtitle">
+        {{ i18n.t('evaluacion-masiva.subtitle') }}
+        <strong>{{ i18n.t('evaluacion-masiva.seleccionados').replace('{0}', cantidadSeleccionados().toString()) }}</strong>
+      </p>
+    </div>
+
+    <!-- Botones header -->
+    <div class="header-actions">
+      <button
+        id="btn-ver-actividades"
+        class="btn-outline"
+        type="button"
+        (click)="goToActividades(); $event.stopPropagation()"
+      >
+        {{ i18n.t('evaluacion-masiva.ver_actividades') }}
+      </button>
+
+      <button
+        id="btn-toggle-evaluacion"
+        class="btn-primary"
+        type="button"
+        (click)="toggleModoSeleccion(); $event.stopPropagation()"
+      >
+        {{ modoSeleccionAbierto() ? i18n.t('evaluacion-masiva.btn_cancelar') : i18n.t('evaluacion-masiva.btn_evaluar') }}
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== INFO ACTIVIDAD + CAMBIAR ESTADO ===== -->
+  @if (actividad()) {
+    <div class="actividad-info-bar">
+
+      <div class="actividad-info-left">
+        <lucide-icon
+          name="file-text"
+          size="18"
+          class="actividad-info-icon"
+        ></lucide-icon>
+
+        <span class="actividad-info-nombre">
+          {{ actividad()!.nombre }}
+        </span>
+      </div>
+
+      <div
+        class="actividad-estado-wrapper"
+        (click)="$event.stopPropagation()"
+      >
+        <button
+          class="btn-estado"
+          [ngClass]="getEstadoActividadClass(actividad()!.estado)"
+          type="button"
+          (click)="toggleMenuEstado()"
+        >
+          {{ actividad()!.estado }}
+
+          <lucide-icon
+            name="chevron-down"
+            size="14"
+            class="estado-chevron"
+          ></lucide-icon>
+        </button>
+
+        @if (menuEstadoAbierto()) {
+          <div class="estado-menu">
+
+            @for (estado of estadosActividad; track estado) {
+              <button
+                class="estado-option"
+                [class.estado-option--active]="actividad()!.estado === estado"
+                type="button"
+                (click)="cambiarEstadoActividad(estado)"
+              >
+                {{ estado }}
+
+                @if (actividad()!.estado === estado) {
+                  <lucide-icon
+                    name="check-circle"
+                    size="14"
+                    class="check-icon"
+                  ></lucide-icon>
+                }
+              </button>
+            }
+
+          </div>
+        }
+      </div>
+
+    </div>
+  }
+
+  <!-- ===== APRENDICES ===== -->
+  <div class="aprendices-wrapper">
+
+    <!-- Sección Activos -->
+    <div class="seccion-aprendices">
+
+      <div class="seccion-header">
+        <span class="seccion-icon seccion-icon--activo"></span>
+        <span class="seccion-titulo">{{ i18n.t('evaluacion-masiva.activos_titulo') }}</span>
+        <span class="seccion-count">
+          ({{ aprendicesActivos().length }})
+        </span>
+        @if (modoSeleccionAbierto()) {
+          <div style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
+            <input 
+              type="checkbox" 
+              class="custom-check" 
+              [checked]="todosSeleccionados()" 
+              (change)="toggleSelectAll()"
+            >
+            <span style="font-size: 0.8rem; font-weight: bold; color: var(--color-primario);">{{ i18n.t('evaluacion-masiva.seleccionar_todos') }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="aprendices-list">
+
+        @for (aprendiz of aprendicesActivos(); track aprendiz.id) {
+          <div
+            class="aprendiz-row"
+            [class.fila-seleccionada]="isSelected(aprendiz.id)"
+            (click)="modoSeleccionAbierto()
+              ? toggleSelection(aprendiz.id)
+              : goToIndividual(aprendiz.id);
+              $event.stopPropagation()"
+          >
+
+            @if (modoSeleccionAbierto()) {
+              <input
+                [id]="'check-' + aprendiz.id"
+                type="checkbox"
+                class="custom-check"
+                [checked]="isSelected(aprendiz.id)"
+                (change)="toggleSelection(aprendiz.id)"
+                (click)="$event.stopPropagation()"
+                [attr.aria-label]="aprendiz.nombreCompleto"
+              />
+            }
+
+            <span
+              class="avatar"
+              [attr.data-inicial]="aprendiz.inicial"
+            >
+              {{ aprendiz.inicial }}
+            </span>
+
+            <div class="aprendiz-info">
+              <span class="nombre">
+                {{ aprendiz.nombreCompleto }}
+              </span>
+
+              <span class="sub-info">
+                  {{ i18n.t('evaluacion-masiva.ficha') }}{{ aprendiz.ficha }}{{ i18n.t('evaluacion-masiva.separador') }}{{ aprendiz.jornada }}
+                </span>
+              </div>
+
+              <span
+                class="estado-badge"
+                [class.estado-pendiente]="aprendiz.estado === 'Pendiente'"
+                [class.estado-aprobo]="aprendiz.estado === 'Aprobó'"
+                [class.estado-no-aprobo]="aprendiz.estado === 'No Aprobó'"
+              >
+                {{ aprendiz.estado }}
+            </span>
+
+            @if (!modoSeleccionAbierto()) {
+              <span class="row-chevron">›</span>
+            }
+
+          </div>
+        }
+
+      </div>
+    </div>
+
+    <!-- Sección Inactivos -->
+    @if (aprendicesInactivos().length > 0) {
+
+      <div class="seccion-aprendices seccion-inactivos">
+
+        <div class="seccion-header">
+          <span class="seccion-icon seccion-icon--inactivo"></span>
+          <span class="seccion-titulo">{{ i18n.t('evaluacion-masiva.inactivos_titulo') }}</span>
+          <span class="seccion-count">
+            ({{ aprendicesInactivos().length }})
+          </span>
+        </div>
+
+        <div class="aprendices-list">
+
+          @for (aprendiz of aprendicesInactivos(); track aprendiz.id) {
+            <div class="aprendiz-row aprendiz-inactivo">
+
+              <span class="avatar avatar--inactivo">
+                {{ aprendiz.inicial }}
+              </span>
+
+              <div class="aprendiz-info">
+                <span class="nombre">
+                  {{ aprendiz.nombreCompleto }}
+                </span>
+
+                <span class="sub-info">
+                {{ i18n.t('evaluacion-masiva.ficha') }}{{ aprendiz.ficha }}{{ i18n.t('evaluacion-masiva.separador') }}{{ aprendiz.jornada }}
+                </span>
+              </div>
+
+              <span class="estado-badge estado-inactivo">
+                {{ i18n.t('evaluacion-masiva.inactivo') }}
+              </span>
+
+            </div>
+          }
+
+        </div>
+      </div>
+
+    }
+
+  </div>
+
+  <!-- ===== BOTÓN EVALUAR (desplegable) ===== -->
+  @if (modoSeleccionAbierto()) {
+
+    <div class="evaluar-bar" (click)="$event.stopPropagation()">
+
+      <div class="evaluar-dropdown-wrapper">
+
+        @if (menuEvaluarAbierto()) {
+          <div
+            class="evaluar-menu"
+            role="menu"
+            [attr.aria-label]="i18n.t('evaluacion-masiva.menu_label')"
+          >
+
+            <button
+              id="btn-aprobo-masiva"
+              class="evaluar-option evaluar-option--aprobo"
+              type="button"
+              role="menuitem"
+              (click)="submitEvaluacionMasiva('aprobo')"
+            >
+              <span class="option-icon">✓</span>
+              {{ i18n.t('evaluacion-masiva.resultado_aprobo') }}
+            </button>
+
+            <button
+              id="btn-no-aprobo-masiva"
+              class="evaluar-option evaluar-option--no-aprobo"
+              type="button"
+              role="menuitem"
+              (click)="submitEvaluacionMasiva('no_aprobo')"
+            >
+              <span class="option-icon">✗</span>
+              {{ i18n.t('evaluacion-masiva.resultado_no_aprobo') }}
+            </button>
+
+          </div>
+        }
+
+        <button
+          id="btn-evaluar-masiva"
+          class="btn-evaluar"
+          type="button"
+          [disabled]="cantidadSeleccionados() === 0"
+          (click)="toggleMenuEvaluar()"
+          [attr.aria-expanded]="menuEvaluarAbierto()"
+          aria-haspopup="menu"
+        >
+          {{ i18n.t('evaluacion-masiva.evaluar') }}
+
+          <span
+            class="evaluar-caret"
+            [class.caret-up]="menuEvaluarAbierto()"
+          >
+            ▲
+          </span>
+        </button>
+
+      </div>
+
+    </div>
+
+  }
+
+</div>

@@ -1,0 +1,97 @@
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
+import { DecimalPipe, TitleCasePipe } from '@angular/common';
+import { LucideIconComponent, HasPermissionDirective } from '@restaurant/shared/ui';
+import { RequisicionesFacade } from '../../../data-access/requisiciones.facade';
+import { RequisicionItem } from '../../../models/requisicion.model';
+import { I18nService } from '../../../i18n/i18n.service';
+
+const CATEGORIA_LABELS: Record<string, string> = {
+  'ABARROTES':              'Abarrotes y Secos',
+  'FRUTAS_Y_VEGETALES':     'Fruver',
+  'LACTEOS':                'Lácteos',
+  'CARNES_PESCADOS_MARISCOS': 'Carnes y Proteínas',
+  'BEBIDAS':                'Bebidas',
+};
+
+const ESTADO_LABELS: Record<string, string> = {
+  'BORRADOR':   'Borrador',
+  'ENVIADA':    'Enviada',
+  'DESPACHADA': 'Despachada',
+  'FIRMADA':    'Firmada',
+  'LEGALIZADA': 'Legalizada',
+};
+
+const ESTADO_CLASS: Record<string, string> = {
+  'BORRADOR':   'draft',
+  'ENVIADA':    'sent',
+  'DESPACHADA': 'info',
+  'FIRMADA':    'success',
+  'LEGALIZADA': 'success',
+};
+
+@Component({
+  selector: 'restaurant-requisiciones-detalle',
+  standalone: true,
+  imports: [RouterModule, LucideIconComponent, HasPermissionDirective, DecimalPipe, TitleCasePipe],
+  templateUrl: './requisiciones-detalle.component.html',
+  styleUrl: './requisiciones-detalle.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class RequisicionesDetalleComponent implements OnInit {
+  private router  = inject(Router);
+  protected readonly i18n = inject(I18nService);
+  private route   = inject(ActivatedRoute);
+  private facade  = inject(RequisicionesFacade);
+
+  requisicion  = this.facade.requisicionSeleccionada;
+  loading      = this.facade.loading;
+  error        = this.facade.error;
+
+  reqId        = computed(() => this.requisicion()?.id ?? '');
+  estado       = computed(() => this.requisicion()?.estado ?? '');
+  estadoLabel  = computed(() => ESTADO_LABELS[this.estado()] ?? this.estado());
+  estadoClass  = computed(() => ESTADO_CLASS[this.estado()] ?? 'draft');
+
+  itemsPorCategoria = computed(() => {
+    const items = this.requisicion()?.items ?? [];
+    const grupos = new Map<string, RequisicionItem[]>();
+    for (const item of items) {
+      const cat = item.categoria ?? 'ABARROTES';
+      if (!grupos.has(cat)) grupos.set(cat, []);
+      grupos.get(cat)!.push(item);
+    }
+    return Array.from(grupos.entries()).map(([cat, catItems]) => ({
+      cat,
+      label: CATEGORIA_LABELS[cat] ?? cat,
+      items: catItems,
+    }));
+  });
+
+  totalItems = computed(() => this.requisicion()?.items?.length ?? 0);
+
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.facade.cargarRequisicion(id);
+    } else {
+      this.router.navigate(['/app/inventario/requisiciones']);
+    }
+  }
+
+  enviar(): void {
+    const id = this.reqId();
+    if (!id) return;
+    this.facade.enviarRequisicion(id);
+  }
+
+  close(): void {
+    this.router.navigate(['/app/inventario/requisiciones']);
+  }
+
+  /** Descarga el PDF de la requisición (lo genera ga-ms-reportes vía /api/reportes/requisicion). */
+  exportarPdf(): void {
+    const id = this.reqId();
+    if (id) this.facade.exportarRequisicion(id);
+  }
+}

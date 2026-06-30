@@ -1,0 +1,45 @@
+<div class="stats-container">
+  
+  <!-- KPIs Header -->
+  <div class="kpis-grid">
+    <div class="kpi-card shadow-sm kpi-orange">
+      <div class="kpi-icon-wrapper">
+        <lucide-icon name="clock" [size]="24"></lucide-icon>
+      </div>
+      <div class="kpi-info">
+        <h3>{{ i18n.t('estadisticas.promedio_general') }}</h3>
+        <p class="kpi-value">{{ promedioFormateado() || '00:00' }}</p>
+      </div>
+    </div>
+
+    <div class="kpi-card shadow-sm kpi-green">
+      <div class="kpi-icon-wrapper">
+        <lucide-icon name="check-circle" [size]="24"></lucide-icon>
+      </div>
+      <div class="kpi-info">
+        <h3>{{ i18n.t('estadisticas.plato_mas_rapido') }}</h3>
+        <p class="kpi-value">{{ kpis()?.platoMasRapido || '—' }}</p>
+      </div>
+    </div>
+
+    <div class="kpi-card shadow-sm kpi-blue">
+      <div class="kpi-icon-wrapper">
+        <lucide-icon name="clipboard-list" [size]="24"></lucide-icon>
+      </div>
+      <div class="kpi-info">
+        <h3>{{ i18n.t('estadisticas.platos_preparados') }}</h3>
+        <p class="kpi-value">{{ kpis()?.totalPlatosDespachadosHoy || 0 }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráficos -->
+  <div class="charts-grid">
+    <div class="chart-card shadow-sm full-width">
+      <div class="chart-wrapper">
+        <canvas #graficoPromedios></canvas>
+      </div>
+    </div>
+  </div>
+
+</div>

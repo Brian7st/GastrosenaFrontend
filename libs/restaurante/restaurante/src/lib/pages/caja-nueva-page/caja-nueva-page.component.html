@@ -1,0 +1,93 @@
+<div class="caja-nueva-page">
+  <div class="header-section">
+    <restaurant-button variant="ghost" (click)="volver()">
+      <lucide-icon name="arrow-left" [size]="18"></lucide-icon>
+      <span>{{ i18n.t('cajaNueva.back') }}</span>
+    </restaurant-button>
+    <restaurant-page-header
+      [title]="i18n.t('cajaNueva.title')"
+      [subtitle]="i18n.t('cajaNueva.subtitle')"
+    ></restaurant-page-header>
+  </div>
+
+  <div class="forms-grid">
+    <restaurant-card class="form-block">
+      <div class="block-header">
+        <lucide-icon name="user" [size]="20" class="icon-primary"></lucide-icon>
+        <div class="title-group">
+          <h5>{{ i18n.t('cajaNueva.clientData') }}</h5>
+          <span class="subtitle">{{ i18n.t('cajaNueva.clientDataSubtitle') }}</span>
+        </div>
+      </div>
+      
+      <div class="input-group">
+        <input type="text" class="form-control" [placeholder]="i18n.t('cajaNueva.clientNamePlaceholder')" [ngModel]="nombreCliente()" (ngModelChange)="nombreCliente.set($event)">
+        <input type="text" class="form-control" [placeholder]="i18n.t('cajaNueva.documentPlaceholder')" [ngModel]="documento()" (ngModelChange)="documento.set($event)">
+      </div>
+    </restaurant-card>
+    
+    <restaurant-card class="form-block">
+      <div class="block-header">
+        <lucide-icon name="shopping-cart" [size]="20" class="icon-success"></lucide-icon>
+        <div class="title-group">
+          <h5 class="text-success">{{ i18n.t('cajaNueva.addProducts') }}</h5>
+          <span class="subtitle">{{ i18n.t('cajaNueva.addProductsSubtitle') }}</span>
+        </div>
+      </div>
+      
+      <div class="input-grid">
+        <input type="text" class="form-control product-name" [placeholder]="i18n.t('cajaNueva.productNamePlaceholder')" [ngModel]="productoActualNombre()" (ngModelChange)="productoActualNombre.set($event)">
+        <input type="number" class="form-control product-cant" [placeholder]="i18n.t('cajaNueva.qtyPlaceholder')" [ngModel]="productoActualCantidad()" (ngModelChange)="productoActualCantidad.set($event)">
+        <input type="number" class="form-control product-price" [placeholder]="i18n.t('cajaNueva.pricePlaceholder')" [ngModel]="productoActualPrecio()" (ngModelChange)="productoActualPrecio.set($event)">
+      </div>
+
+      <restaurant-button variant="outline" class="mt-4 full-width" (click)="agregarProducto()" [disabled]="!productoActualNombre() || !productoActualPrecio()">
+        <lucide-icon name="plus" [size]="18"></lucide-icon>
+        <span>{{ i18n.t('cajaNueva.addProductBtn') }}</span>
+      </restaurant-button>
+
+      <div class="items-table-container mt-4">
+        <table class="items-table" style="width: 100%; text-align: left;">
+          <thead>
+            <tr>
+              <th>{{ i18n.t('cajaNueva.description') }}</th>
+              <th>{{ i18n.t('cajaNueva.qty') }}</th>
+              <th>{{ i18n.t('cajaNueva.unitPrice') }}</th>
+              <th>{{ i18n.t('cajaNueva.subtotal') }}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of listaProductos(); track $index) {
+              <tr>
+                <td>{{ item.nombreProducto }}</td>
+                <td>{{ item.cantidad }}</td>
+                <td>${{ item.precioUnitario | number }}</td>
+                <td>${{ (item.cantidad * item.precioUnitario) | number }}</td>
+                <td>
+                  <button class="delete-btn" style="background: none; border: none; color: var(--color-danger); cursor: pointer;" (click)="eliminarProducto($index)">
+                    <lucide-icon name="trash-2" [size]="16"></lucide-icon>
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" style="text-align: center; color: var(--color-text-secondary); padding: 1rem 0;">{{ i18n.t('cajaNueva.noProducts') }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="totals-section mt-4" style="border-top: 1px solid var(--color-border); padding-top: 1rem; display: flex; justify-content: space-between; font-weight: bold; font-size: 1.2rem;">
+        <span>{{ i18n.t('cajaNueva.totalToPay') }}</span>
+        <span>${{ totalFactura() | number }}</span>
+      </div>
+
+      <restaurant-button variant="primary" class="submit-btn mt-4 full-width" (click)="generarFactura()" [disabled]="listaProductos().length === 0">
+        <lucide-icon name="file-check-2" [size]="18"></lucide-icon>
+        <span>{{ i18n.t('cajaNueva.generateInvoice') }}</span>
+      </restaurant-button>
+    </restaurant-card>
+  </div>
+</div>

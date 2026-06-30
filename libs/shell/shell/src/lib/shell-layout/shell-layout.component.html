@@ -1,0 +1,20 @@
+<div
+  class="layout-principal"
+  [class.layout-principal--asistente]="asistente.panelAbierto()"
+>
+  <restaurant-barra-lateral [config]="sidebarConfig"></restaurant-barra-lateral>
+
+  <main class="contenido-principal">
+    <restaurant-barra-superior
+      [perfil]="{ nombre: currentUser()?.nombre ?? 'Usuario autenticado', avatarUrl: '' }"
+      [buscarPlaceholder]="'Buscar módulos, reportes o bienes...'"
+      [enlaces]="topMenu"
+    ></restaurant-barra-superior>
+
+    <div class="contenido-principal__contenedor">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+
+  <restaurant-panel-asistente></restaurant-panel-asistente>
+</div>

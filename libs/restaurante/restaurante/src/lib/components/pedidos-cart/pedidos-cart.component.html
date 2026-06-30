@@ -1,0 +1,331 @@
+<div class="cart-header">
+  <h2>{{ i18n.t('pedidosCart.title') }}</h2>
+</div>
+
+<div class="cart-items">
+  @if (pedidoActivo(); as pedido) {
+    @for (item of pedido.detalles; track item.productoId; let i = $index) {
+      <div class="item-row">
+        <div class="item-details">
+          <h4 class="name">{{ item.nombreProducto }}</h4>
+            <div class="obs-display">
+              <span class="category" [title]="item.observaciones || i18n.t('pedidosCart.sinObservaciones')">{{ item.observaciones || i18n.t('pedidosCart.sinObservaciones') }}</span>
+              @if (!esPedidoSoloLectura()) {
+                <button class="btn-edit-obs" (click)="iniciarEdicionObservacion(i, item.observaciones || '')" [title]="i18n.t('pedidosCart.editObservations')">
+                  <lucide-icon name="pencil" [size]="14"></lucide-icon>
+                </button>
+              }
+            </div>
+          
+          <div class="quantity-controls">
+            @if (!esPedidoSoloLectura()) {
+              <button class="btn-minus" (click)="decrementar(i)">
+                <lucide-icon name="minus" [size]="14"></lucide-icon>
+              </button>
+            }
+            <span class="qty">{{ item.cantidad }}</span>
+            @if (!esPedidoSoloLectura()) {
+              <button class="btn-plus" (click)="incrementar(i)">
+                <lucide-icon name="plus" [size]="14"></lucide-icon>
+              </button>
+            }
+          </div>
+        </div>
+        
+        <div class="item-pricing">
+          <div class="prices">
+            <span class="current">{{ item.precioUnitario | currencyCop }}</span>
+          </div>
+          @if (estadoPedido() === 'BORRADOR') {
+            <button class="btn-delete" (click)="eliminarItem(i)" [title]="i18n.t('pedidosCart.deleteProduct')">
+              <lucide-icon name="trash-2" [size]="16"></lucide-icon>
+            </button>
+          } @else if (estadoPedido() !== 'FACTURADO' && estadoPedido() !== 'CANCELADO') {
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-delete" style="color: var(--color-error);" (click)="iniciarAccionItem(item.id, item.nombreProducto, 'CANCELAR')" [title]="i18n.t('pedidosCart.cancelProduct')">
+                <lucide-icon name="x-circle" [size]="16"></lucide-icon>
+              </button>
+              @if (estadoPedido() === 'ENTREGADO' || estadoPedido() === 'LISTO_PARA_SERVIR') {
+                <button class="btn-delete" style="color: var(--color-warning);" (click)="iniciarAccionItem(item.id, item.nombreProducto, 'DEVOLVER')" [title]="i18n.t('pedidosCart.returnProduct')">
+                  <lucide-icon name="arrow-left" [size]="16"></lucide-icon>
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    } @empty {
+      <div class="empty-cart">
+        <p>{{ i18n.t('pedidosCart.emptyCart') }}</p>
+      </div>
+    }
+  }
+</div>
+
+<div class="cart-notes">
+  <label for="order-notes">{{ i18n.t('pedidosCart.orderNotes') }}</label>
+  <textarea 
+    id="order-notes" 
+    class="notes-textarea" 
+    [placeholder]="i18n.t('pedidosCart.orderNotesPlaceholder')"
+    [ngModel]="observacionesGenerales()"
+    (ngModelChange)="observacionesGenerales.set($event)"
+    [readonly]="esPedidoSoloLectura()"
+  ></textarea>
+</div>
+
+<div class="cart-summary">
+  @if (pedidoActivo(); as pedido) {
+    <div class="summary-total">
+      <span class="label">{{ i18n.t('pedidosCart.total') }}</span>
+      <span class="value">{{ pedido.subtotal | currencyCop }}</span>
+    </div>
+  }
+</div>
+
+<div class="cart-actions">
+  @if (estadoPedido() === 'BORRADOR') {
+    <restaurant-button 
+      class="action-btn" 
+      variant="ghost" 
+      [disabled]="!pedidoActivo()" 
+      (click)="iniciarCancelacion()">
+      <lucide-icon name="trash-2" [size]="18" class="text-error"></lucide-icon>
+      <span>{{ i18n.t('pedidosCart.cancel') }}</span>
+    </restaurant-button>
+    
+    <restaurant-button 
+      class="action-btn flex-1" 
+      variant="primary" 
+      [disabled]="!pedidoActivo()?.detalles?.length" 
+      (click)="iniciarConfirmacion()">
+      <span>{{ i18n.t('pedidosCart.confirmOrder') }}</span>
+    </restaurant-button>
+  } @else if (estadoPedido() !== 'FACTURADO' && estadoPedido() !== 'CANCELADO') {
+    <div style="display: flex; gap: 8px; width: 100%;">
+      <restaurant-button 
+        class="action-btn flex-1 btn-anular" 
+        variant="primary" 
+        (click)="iniciarAnulacionBackend()">
+        <lucide-icon name="alert-triangle" [size]="18" class="text-white"></lucide-icon>
+        <span>{{ i18n.t('pedidosCart.cancel') }}</span>
+      </restaurant-button>
+      
+      @if (estadoPedido() === 'ENTREGADO' || estadoPedido() === 'LISTO_PARA_SERVIR') {
+        <restaurant-button 
+          class="action-btn flex-1 btn-devolver" 
+          variant="primary" 
+          (click)="iniciarDevolucionBackend()">
+          <lucide-icon name="arrow-left" [size]="18" class="text-white"></lucide-icon>
+          <span>{{ i18n.t('pedidosCart.return') }}</span>
+        </restaurant-button>
+      }
+    </div>
+  } @else {
+    <div class="status-badge" style="width: 100%; text-align: center; padding: 12px; background: var(--bg-neutral); border-radius: var(--radius-md); color: var(--text-secondary); font-weight: 500;">
+      {{ i18n.t('pedidosCart.cannotCancel') }} ({{ i18n.t('pedidosCart.orderLabel') }} {{ estadoPedido().replace('_', ' ') | titlecase }})
+    </div>
+  }
+</div>
+
+<restaurant-confirm-dialog
+  [open]="showCancelModal()"
+  [title]="i18n.t('pedidosCart.cancelOrderTitle')"
+  [message]="i18n.t('pedidosCart.cancelOrderMessage')"
+  [confirmText]="i18n.t('pedidosCart.cancelOrderConfirm')"
+  [cancelText]="i18n.t('pedidosCart.cancelOrderDeny')"
+  [showCancel]="true"
+  (confirm)="ejecutarCancelacion()"
+  (cancel)="showCancelModal.set(false)"
+></restaurant-confirm-dialog>
+
+<restaurant-confirm-dialog
+  [open]="showEmptyCartModal()"
+  [title]="i18n.t('pedidosCart.emptyCartTitle')"
+  [message]="i18n.t('pedidosCart.emptyCartMessage')"
+  [confirmText]="i18n.t('pedidosCart.emptyCartConfirm')"
+  [showCancel]="false"
+  (confirm)="showEmptyCartModal.set(false)"
+></restaurant-confirm-dialog>
+
+@if (showAnularBackendModal()) {
+  <div class="custom-modal-backdrop" (click)="showAnularBackendModal.set(false)">
+    <section class="custom-modal-dialog" (click)="$event.stopPropagation()">
+      <strong class="modal-title text-error">{{ i18n.t('pedidosCart.cancelBackendTitle') }}</strong>
+      <p class="modal-message">{{ i18n.t('pedidosCart.cancelBackendMessage') }}</p>
+      
+      <div class="cancel-reason-container">
+        <label for="motivoAnulacion">{{ i18n.t('pedidosCart.cancelReasonLabel') }}</label>
+        <textarea 
+          id="motivoAnulacion"
+          [(ngModel)]="motivoAnulacion"
+          [placeholder]="i18n.t('pedidosCart.cancelReasonPlaceholder')"
+          rows="3"
+          required
+          class="cancel-reason-input"
+        ></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <restaurant-button variant="ghost" (click)="showAnularBackendModal.set(false)">{{ i18n.t('pedidosCart.cancelBackendDeny') }}</restaurant-button>
+        <restaurant-button class="btn-anular" variant="primary" [disabled]="!motivoAnulacion().trim()" (click)="ejecutarAnulacionBackend()">{{ i18n.t('pedidosCart.cancelBackendConfirm') }}</restaurant-button>
+      </div>
+    </section>
+  </div>
+}
+
+@if (showDevolverBackendModal()) {
+  <div class="custom-modal-backdrop" (click)="showDevolverBackendModal.set(false)">
+    <section class="custom-modal-dialog" (click)="$event.stopPropagation()">
+      <strong class="modal-title" style="color: var(--color-warning);">{{ i18n.t('pedidosCart.returnTitle') }}</strong>
+      <p class="modal-message">{{ i18n.t('pedidosCart.returnMessage') }}</p>
+      
+      <div class="cancel-reason-container">
+        <label for="motivoDevolucion">{{ i18n.t('pedidosCart.returnReasonLabel') }}</label>
+        <textarea 
+          id="motivoDevolucion"
+          [(ngModel)]="motivoDevolucion"
+          [placeholder]="i18n.t('pedidosCart.returnReasonPlaceholder')"
+          rows="3"
+          required
+          class="cancel-reason-input"
+        ></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <restaurant-button variant="ghost" (click)="showDevolverBackendModal.set(false)">{{ i18n.t('pedidosCart.returnDeny') }}</restaurant-button>
+        <restaurant-button class="btn-devolver" variant="primary" [disabled]="!motivoDevolucion().trim()" (click)="ejecutarDevolucionBackend()">{{ i18n.t('pedidosCart.returnConfirm') }}</restaurant-button>
+      </div>
+    </section>
+  </div>
+}
+
+@if (showItemActionModal() && itemAccionActual(); as accionItem) {
+  <div class="custom-modal-backdrop" (click)="limpiarAccionItem()">
+    <section class="custom-modal-dialog" (click)="$event.stopPropagation()">
+      <strong class="modal-title" [ngStyle]="{'color': accionItem.tipo === 'CANCELAR' ? 'var(--color-error)' : 'var(--color-warning)'}">
+        {{ accionItem.tipo === 'CANCELAR' ? i18n.t('pedidosCart.cancelItemTitle') : i18n.t('pedidosCart.returnItemTitle') }}
+      </strong>
+      <p class="modal-message">
+        {{ i18n.t('pedidosCart.itemActionConfirm').replace('{{ action }}', accionItem.tipo === 'CANCELAR' ? i18n.t('pedidosCart.cancelItem') : i18n.t('pedidosCart.returnItem')).replace('{{ name }}', accionItem.nombre) }}
+      </p>
+      
+      <div class="cancel-reason-container">
+        <label for="motivoItem">{{ i18n.t('pedidosCart.itemReasonLabel').replace('{{ action }}', accionItem.tipo === 'CANCELAR' ? i18n.t('pedidosCart.cancellation') : i18n.t('pedidosCart.returnNoun')) }}</label>
+        <textarea 
+          id="motivoItem"
+          [(ngModel)]="motivoItem"
+          [placeholder]="i18n.t('pedidosCart.itemReasonPlaceholder')"
+          rows="3"
+          required
+          class="cancel-reason-input"
+        ></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <restaurant-button variant="ghost" (click)="limpiarAccionItem()">{{ i18n.t('pedidosCart.itemActionDeny') }}</restaurant-button>
+        <restaurant-button 
+          [class]="accionItem.tipo === 'DEVOLVER' ? 'btn-devolver' : 'btn-anular'"
+          variant="primary" 
+          [disabled]="!motivoItem().trim()" 
+          (click)="ejecutarAccionItem()">
+          {{ i18n.t('pedidosCart.itemActionConfirmBtn').replace('{{ action }}', accionItem.tipo === 'CANCELAR' ? i18n.t('pedidosCart.cancelItem') : i18n.t('pedidosCart.returnItem')) }}
+        </restaurant-button>
+      </div>
+    </section>
+  </div>
+}
+
+@if (showConfirmModal()) {
+  <div class="custom-modal-backdrop" (click)="showConfirmModal.set(false)">
+    <section class="custom-modal-dialog" (click)="$event.stopPropagation()">
+      <strong class="modal-title">{{ i18n.t('pedidosCart.sendToKitchenTitle') }}</strong>
+      <p class="modal-message">{{ i18n.t('pedidosCart.sendToKitchenMessage') }}</p>
+      
+      <div class="modal-order-summary">
+        @if (pedidoActivo(); as pedido) {
+          
+          @if (comidasPedido().length > 0) {
+            <h5 class="category-title">{{ i18n.t('pedidosCart.meals') }}</h5>
+            <ul class="summary-list">
+              @for (item of comidasPedido(); track item.productoId) {
+                <li class="summary-item-container">
+                  <div class="summary-item-main">
+                    <span class="qty">{{ item.cantidad }}x</span>
+                    <span class="name">{{ item.nombreProducto }}</span>
+                    <span class="price">{{ (item.cantidad * item.precioUnitario) | currencyCop }}</span>
+                  </div>
+                  @if (item.observaciones) {
+                    <div class="summary-item-obs">
+                      {{ item.observaciones }}
+                    </div>
+                  }
+                </li>
+              }
+            </ul>
+          }
+
+          @if (bebidasPedido().length > 0) {
+            <h5 class="category-title mt-3">{{ i18n.t('pedidosCart.drinks') }}</h5>
+            <ul class="summary-list">
+              @for (item of bebidasPedido(); track item.productoId) {
+                <li class="summary-item-container">
+                  <div class="summary-item-main">
+                    <span class="qty">{{ item.cantidad }}x</span>
+                    <span class="name">{{ item.nombreProducto }}</span>
+                    <span class="price">{{ (item.cantidad * item.precioUnitario) | currencyCop }}</span>
+                  </div>
+                  @if (item.observaciones) {
+                    <div class="summary-item-obs">
+                      {{ item.observaciones }}
+                    </div>
+                  }
+                </li>
+              }
+            </ul>
+          }
+
+          @if (observacionesGenerales()) {
+            <div class="summary-notes">
+              <strong>{{ i18n.t('pedidosCart.notes') }}:</strong> {{ observacionesGenerales() }}
+            </div>
+          }
+          <div class="summary-total-row">
+            <span>{{ i18n.t('pedidosCart.total') }}:</span>
+            <strong>{{ pedido.subtotal | currencyCop }}</strong>
+          </div>
+        }
+      </div>
+
+      <div class="modal-actions">
+        <restaurant-button variant="ghost" (click)="showConfirmModal.set(false)">{{ i18n.t('pedidosCart.reviewAgain') }}</restaurant-button>
+        <restaurant-button variant="primary" (click)="ejecutarConfirmacion()">{{ i18n.t('pedidosCart.sendOrder') }}</restaurant-button>
+      </div>
+    </section>
+  </div>
+}
+
+@if (editIndex() !== null) {
+  <div class="custom-modal-backdrop" (click)="cancelarEdicionObservacion()">
+    <section class="custom-modal-dialog" (click)="$event.stopPropagation()">
+      <strong class="modal-title">{{ i18n.t('pedidosCart.productObservationsTitle') }}</strong>
+      <p class="modal-message">{{ i18n.t('pedidosCart.productObservationsMessage') }}</p>
+      
+      <div class="obs-textarea-container">
+        <textarea 
+          [ngModel]="tempObservacion()" 
+          (ngModelChange)="tempObservacion.set($event)"
+          [placeholder]="i18n.t('pedidosCart.productObservationsPlaceholder')"
+          rows="4"
+          class="obs-textarea-input"
+          autofocus
+        ></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <restaurant-button variant="ghost" (click)="cancelarEdicionObservacion()">{{ i18n.t('pedidosCart.cancelAction') }}</restaurant-button>
+        <restaurant-button variant="primary" (click)="guardarObservacion()">{{ i18n.t('pedidosCart.save') }}</restaurant-button>
+      </div>
+    </section>
+  </div>
+}

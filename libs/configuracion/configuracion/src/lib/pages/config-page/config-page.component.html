@@ -1,0 +1,173 @@
+<div class="config-page">
+
+  @if (success(); as msg) {
+    <div class="config-page__toast" role="status" aria-live="polite">
+      <lucide-icon name="check-circle" [size]="16"></lucide-icon>
+      {{ msg }}
+    </div>
+  }
+
+  <div class="config-page__header">
+    <div class="config-page__header-text">
+      <h1 class="config-page__title">{{ t('config.title') }}</h1>
+      <p class="config-page__subtitle">{{ t('config.subtitle') }}</p>
+    </div>
+  </div>
+
+  @if (error()) {
+    <restaurant-alert type="error" [message]="error()!" />
+  }
+
+  @if (loading()) {
+    <div class="config-page__loading">
+      <lucide-icon name="loader-circle" [size]="20"></lucide-icon>
+      {{ t('load.title') }}
+    </div>
+  } @else {
+    <div class="config-page__sections">
+
+      <!-- GENERAL -->
+      <restaurant-config-section
+        [titulo]="t('general.title')"
+        [subtitulo]="t('general.subtitle')"
+        icono="building-2"
+        [expanded]="expandedSection() === 'general'"
+        [guardando]="false"
+        (toggleSection)="onToggleSection('general')"
+      >
+        <div class="config-page__form">
+          <div class="config-page__info-row">
+            <span class="config-page__info-label">{{ t('general.nombre') }}</span>
+            <span class="config-page__info-value">{{ t('gastrosena') }}</span>
+          </div>
+          <div class="config-page__info-row">
+            <span class="config-page__info-label">{{ t('general.ciudad') }}</span>
+            <span class="config-page__info-value">{{ t('ciudad.ar') }}</span>
+          </div>
+          <div class="config-page__info-row">
+            <span class="config-page__info-label">{{ t('general.centro') }}</span>
+            <span class="config-page__info-value">{{ t('centro') }}</span>
+          </div>
+        </div>
+      </restaurant-config-section>
+
+      <!-- APARIENCIA -->
+      <restaurant-config-section
+        [titulo]="t('apariencia.title')"
+        [subtitulo]="t('apariencia.subtitle')"
+        icono="palette"
+        [expanded]="expandedSection() === 'apariencia'"
+        [guardando]="false"
+        (toggleSection)="onToggleSection('apariencia')"
+      >
+        <div class="config-page__form">
+          <div class="config-page__field">
+            <label class="config-page__label">{{ t('apariencia.modo') }}</label>
+            <div class="config-page__toggles">
+              <label class="config-page__toggle">
+                <input
+                  type="checkbox"
+                  [checked]="aparienciaForm().tema === 'dark'"
+                  (change)="onAparienciaTema($any($event.target).checked ? 'dark' : 'light')"
+                >
+                <span class="config-page__toggle-slider"></span>
+                <span class="config-page__toggle-label">{{ t('apariencia.oscuro') }}</span>
+              </label>
+            </div>
+          </div>
+          <div class="config-page__field">
+            <label class="config-page__label">{{ t('apariencia.fuente') }}</label>
+            <div class="config-page__radio-group">
+              @for (opt of fuenteOptions(); track opt.value) {
+                <label class="config-page__radio">
+                  <input
+                    type="radio"
+                    name="tamanoFuente"
+                    [value]="opt.value"
+                    [checked]="aparienciaForm().tamanoFuente === opt.value"
+                    (change)="onAparienciaTamanoFuente(opt.value)"
+                  >
+                  <span class="config-page__radio-label">{{ opt.label }}</span>
+                </label>
+              }
+            </div>
+          </div>
+          <div class="config-page__actions">
+            <button class="config-page__btn config-page__btn--primary" type="button" (click)="onSaveApariencia()">
+              <lucide-icon name="save" [size]="16"></lucide-icon>
+              {{ t('btn.guardar') }}
+            </button>
+          </div>
+        </div>
+      </restaurant-config-section>
+
+      <!-- AVANZADO -->
+      <restaurant-config-section
+        [titulo]="t('avanzado.title')"
+        [subtitulo]="t('avanzado.subtitle')"
+        icono="settings-2"
+        [expanded]="expandedSection() === 'avanzado'"
+        [guardando]="false"
+        (toggleSection)="onToggleSection('avanzado')"
+      >
+        <div class="config-page__form">
+          <div class="config-page__field">
+            <label class="config-page__label">{{ t('avanzado.idioma') }}</label>
+            <div class="config-page__select-wrapper">
+              <select
+                class="config-page__select"
+                [value]="avanzadoForm().idioma"
+                (change)="onAvanzadoIdioma($any($event.target).value)"
+              >
+                <option value="es">{{ t('idioma.es') }}</option>
+                <option value="en">{{ t('idioma.en') }}</option>
+              </select>
+              <lucide-icon class="config-page__select-icon" name="chevron-down" [size]="14"></lucide-icon>
+            </div>
+          </div>
+          <div class="config-page__actions">
+            <button class="config-page__btn config-page__btn--primary" type="button" (click)="onSaveAvanzado()">
+              <lucide-icon name="save" [size]="16"></lucide-icon>
+              {{ t('btn.guardar') }}
+            </button>
+          </div>
+        </div>
+      </restaurant-config-section>
+
+      <!-- SISTEMA -->
+      <restaurant-config-section
+        [titulo]="t('sistema.title')"
+        [subtitulo]="t('sistema.subtitle')"
+        icono="terminal"
+        [expanded]="expandedSection() === 'sistema'"
+        [guardando]="false"
+        (toggleSection)="onToggleSection('sistema')"
+      >
+        <div class="config-page__form">
+          <div class="config-page__info-row">
+            <span class="config-page__info-label">{{ t('sistema.version') }}</span>
+            <span class="config-page__info-value">{{ config()?.sistema?.version ?? '—' }}</span>
+          </div>
+          <div class="config-page__info-row">
+            <span class="config-page__info-label">{{ t('sistema.backup') }}</span>
+            <span class="config-page__info-value">{{ config()?.sistema?.ultimoBackup ?? t('sistema.backup.empty') }}</span>
+          </div>
+          <div class="config-page__info-row">
+            <span class="config-page__info-label">{{ t('sistema.mantenimiento') }}</span>
+            <span class="config-page__info-value">
+              <span
+                class="config-page__badge"
+                [class.config-page__badge--activo]="config()?.sistema?.modoMantenimiento"
+                [class.config-page__badge--inactivo]="!config()?.sistema?.modoMantenimiento"
+              >
+                {{ config()?.sistema?.modoMantenimiento ? t('sistema.activo') : t('sistema.inactivo') }}
+              </span>
+            </span>
+          </div>
+        </div>
+      </restaurant-config-section>
+
+    </div>
+  }
+
+</div>

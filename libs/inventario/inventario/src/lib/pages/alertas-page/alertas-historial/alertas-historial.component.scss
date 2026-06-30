@@ -1,0 +1,277 @@
+/* ==========================================================================
+   Historial de Gestión de Alertas
+   ========================================================================== */
+
+.page-container {
+  padding: 0;
+  min-height: 100%;
+  background: var(--color-superficie-contenedor-bajo);
+}
+
+// ── Action Header (patrón Kardex) ──────────────────────────────────────────
+.action-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 2rem 2rem 1.5rem;
+  flex-wrap: wrap;
+
+  .header-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background: var(--color-superficie-contenedor-alto);
+  border: none;
+  color: var(--color-en-superficie);
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  margin-top: 0.375rem;
+
+  &:hover { background: var(--color-superficie-contenedor-mas-alto); }
+}
+
+.breadcrumb-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-contorno);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.375rem;
+
+  .active { color: var(--color-en-superficie); }
+}
+
+.page-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--color-en-superficie);
+  letter-spacing: -0.02em;
+  margin: 0 0 0.25rem;
+}
+
+.page-subtitle {
+  font-size: 0.875rem;
+  color: var(--color-contorno);
+  margin: 0;
+}
+
+// ── Table section ──────────────────────────────────────────────────────────
+.table-section {
+  padding: 0 2rem 2rem;
+}
+
+// ── Filtros ─────────────────────────────────────────────────────────────────
+.filter-select-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.filter-icon {
+  position: absolute;
+  left: 0.625rem;
+  font-size: 1rem;
+  color: var(--color-contorno);
+  pointer-events: none;
+}
+
+.filter-select {
+  background: var(--color-superficie-contenedor-bajo);
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.5rem 1rem 0.5rem 2rem;
+  font-size: 0.875rem;
+  color: var(--color-en-superficie);
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  padding-right: 1.5rem;
+
+  &:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primario-gradient-end) 40%, transparent); }
+}
+
+.control-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-primario-gradient-end) 100%);
+  color: var(--color-en-primario);
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primario) 25%, transparent);
+  transition: opacity 0.2s;
+
+  .material-symbols-outlined { font-size: 1rem; }
+  &:hover { opacity: 0.9; }
+}
+
+// ── Table rows (hover) ─────────────────────────────────────────────────────
+.table-row {
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover { background: var(--color-superficie-contenedor-bajo) !important; }
+}
+
+.td-empty {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-contorno);
+  font-size: 0.875rem;
+}
+
+// ── Bien cell ──────────────────────────────────────────────────────────────
+.bien-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  &__icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.5rem;
+    background: var(--color-surface-primary);
+    border: 1px solid color-mix(in srgb, var(--color-superficie-contenedor-mas-alto) 70%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-contorno);
+    flex-shrink: 0;
+
+    .material-symbols-outlined { font-size: 1.25rem; }
+  }
+
+  &__nombre {
+    font-weight: 600;
+    color: var(--color-en-superficie);
+    margin: 0 0 0.125rem;
+    font-size: 0.9375rem;
+  }
+
+  &__lote {
+    font-size: 0.75rem;
+    color: var(--color-contorno);
+    margin: 0;
+  }
+}
+
+// ── Priority badge ─────────────────────────────────────────────────────────
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+
+  &--critico { background: color-mix(in srgb, var(--color-terciario, #ba1830) 12%, transparent); color: var(--color-terciario, #ba1830); }
+  &--alto    { background: color-mix(in srgb, var(--color-warning-interactive-dark, #f97316) 12%, transparent);   color: var(--color-warning-interactive-dark, #f97316); }
+  &--medio   { background: color-mix(in srgb, var(--color-warning) 15%, transparent);   color: var(--color-warning-text, #886600); }
+  &--bajo    { background: color-mix(in srgb, var(--color-primario) 10%, transparent);   color: var(--color-primario); }
+}
+
+// ── Accion badge ───────────────────────────────────────────────────────────
+.accion-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+
+  &--entrada  { background: color-mix(in srgb, var(--color-primario) 8%, transparent); color: var(--color-en-primario-contenedor, #00531a); border-color: color-mix(in srgb, var(--color-primario) 20%, transparent); }
+  &--gil      { background: color-mix(in srgb, var(--color-superficie-contenedor-mas-alto) 50%, transparent); color: var(--color-contorno); border-color: color-mix(in srgb, var(--color-superficie-contenedor-mas-alto) 80%, transparent); }
+  &--revisada { background: var(--color-superficie-contenedor-alto); color: var(--color-en-superficie); border-color: color-mix(in srgb, var(--color-superficie-contenedor-mas-alto) 60%, transparent); }
+
+  &__icon { font-size: 0.875rem; }
+}
+
+// ── Responsable cell ───────────────────────────────────────────────────────
+.responsable-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+
+  &__avatar {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-primario-gradient-end) 100%);
+    color: var(--color-en-primario);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  &__nombre {
+    font-weight: 500;
+    color: var(--color-en-superficie);
+    font-size: 0.875rem;
+  }
+}
+
+// ── Referencia link ────────────────────────────────────────────────────────
+.ref-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--color-primario);
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--color-primario) 30%, transparent);
+  text-underline-offset: 2px;
+  transition: color 0.15s;
+
+  &:hover { color: var(--color-en-primario-contenedor, #004d1a); }
+  &__icon { font-size: 1rem; }
+}
+
+// ── Fecha cell ─────────────────────────────────────────────────────────────
+.fecha-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  &__date {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-en-superficie);
+  }
+
+  &__hora {
+    font-size: 0.75rem;
+    color: var(--color-contorno);
+    margin-top: 0.125rem;
+  }
+}
+
+

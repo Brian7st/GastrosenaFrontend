@@ -1,0 +1,21 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/api/agente",
+      "destination": "https://agente.gastrosena.uk/api/agente"
+    },
+    {
+      "source": "/api/agente/(.*)",
+      "destination": "https://agente.gastrosena.uk/api/agente/$1"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "https://api.gastrosena.uk/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

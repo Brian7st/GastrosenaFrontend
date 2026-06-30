@@ -1,0 +1,210 @@
+<div class="lista-page">
+
+  @if (mensajeExito()) {
+    <div class="lista-page__toast" role="status" aria-live="polite">
+      <lucide-icon name="check-circle" [size]="16"></lucide-icon>
+      {{ mensajeExito() }}
+    </div>
+  }
+
+  <!-- Page Header -->
+  <div class="lista-page__header">
+    <div class="lista-page__header-text">
+      <h1 class="lista-page__title">{{ i18n.t('lista.titulo') }}</h1>
+      <p class="lista-page__subtitle">{{ i18n.t('lista.subtitulo') }}</p>
+    </div>
+    <div class="lista-page__header-actions">
+      <button class="lista-page__btn lista-page__btn--ghost" type="button" (click)="mostrarImportar.set(true)">
+        <lucide-icon name="upload" [size]="16"></lucide-icon>
+        {{ i18n.t('lista.importar') }}
+      </button>
+      <button class="lista-page__btn lista-page__btn--ghost" type="button" (click)="mostrarExportar.set(true)">
+        <lucide-icon name="download" [size]="16"></lucide-icon>
+        {{ i18n.t('lista.exportar') }}
+      </button>
+      <button class="lista-page__btn lista-page__btn--primary" type="button" (click)="onCrearUsuario()">
+        <lucide-icon name="user-plus" [size]="16"></lucide-icon>
+        {{ i18n.t('lista.nuevo_usuario') }}
+      </button>
+    </div>
+  </div>
+
+  @if (mensajeExport()) {
+    <restaurant-alert
+      [type]="mensajeExport()!.tipo"
+      [message]="mensajeExport()!.texto"
+    ></restaurant-alert>
+  }
+
+  @if (error()) {
+    <restaurant-alert
+      type="error"
+      [message]="error()!"
+    ></restaurant-alert>
+  }
+
+  <!-- KPI Cards -->
+  <div class="lista-page__kpis">
+    <restaurant-kpi-card
+      [label]="i18n.t('lista.kpi_total')"
+      [value]="totalMostrar().toString()"
+      icon="users"
+      iconColor="blue"
+    ></restaurant-kpi-card>
+    <restaurant-kpi-card
+      [label]="i18n.t('lista.kpi_activos')"
+      [value]="activosMostrar().toString()"
+      icon="user-check"
+      iconColor="green"
+    ></restaurant-kpi-card>
+    <restaurant-kpi-card
+      [label]="i18n.t('lista.kpi_inactivos')"
+      [value]="inactivosMostrar().toString()"
+      icon="user-x"
+      iconColor="red"
+    ></restaurant-kpi-card>
+  </div>
+
+  <!-- Filtros -->
+  <div class="lista-page__filters">
+    <div class="lista-page__search-wrapper">
+      <lucide-icon name="search" [size]="16" class="lista-page__search-icon"></lucide-icon>
+      <input
+        class="lista-page__search-input"
+        type="text"
+        [placeholder]="i18n.t('lista.buscar')"
+        [value]="busqueda()"
+        (input)="busqueda.set($any($event.target).value)"
+      >
+    </div>
+    <div class="lista-page__filter-selects">
+      <div class="lista-page__select-wrapper">
+        <select class="lista-page__select" (change)="rolFiltro.set($any($event.target).value)">
+          <option value="">{{ i18n.t('lista.todos_roles') }}</option>
+          @for (rol of rolesDisponibles; track rol) {
+            <option [value]="rol">{{ rol }}</option>
+          }
+        </select>
+        <lucide-icon name="filter" [size]="14" class="lista-page__select-icon"></lucide-icon>
+      </div>
+      <div class="lista-page__select-wrapper">
+        <select class="lista-page__select" (change)="estadoFiltro.set($any($event.target).value)">
+          <option value="todos">{{ i18n.t('lista.filtro_todos') }}</option>
+          <option value="activos">{{ i18n.t('lista.filtro_activos') }}</option>
+          <option value="inactivos">{{ i18n.t('lista.filtro_inactivos') }}</option>
+        </select>
+        <lucide-icon name="filter" [size]="14" class="lista-page__select-icon"></lucide-icon>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <restaurant-data-table>
+    <thead>
+      <tr>
+        <th>{{ i18n.t('lista.col_usuario') }}</th>
+        <th>{{ i18n.t('lista.col_rol') }}</th>
+        <th>{{ i18n.t('lista.col_estado') }}</th>
+        <th>{{ i18n.t('lista.col_ultimo_acceso') }}</th>
+        <th>{{ i18n.t('lista.col_acciones') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (loading()) {
+        <tr>
+          <td colspan="5" class="lista-page__loading">
+            <lucide-icon name="loader-circle" [size]="20"></lucide-icon>
+            {{ i18n.t('lista.cargando') }}
+          </td>
+        </tr>
+      } @else if (usuariosMostrar().length === 0) {
+        <tr>
+          <td colspan="5" class="lista-page__empty">{{ i18n.t('lista.sin_resultados') }}</td>
+        </tr>
+      } @else {
+        @for (u of usuariosMostrar(); track u.id) {
+          <tr>
+            <td>
+              <div class="lista-page__user">
+                <restaurant-usuario-avatar
+                  [nombre]="u.nombre"
+                  [apellidos]="u.apellidos"
+                ></restaurant-usuario-avatar>
+                <div>
+                  <p class="lista-page__user-name">{{ u.nombre }} {{ u.apellidos }}</p>
+                  <p class="lista-page__user-email">{{ u.email }}</p>
+                </div>
+              </div>
+            </td>
+            <td>
+              <restaurant-usuario-rol-badge [rol]="u.rol"></restaurant-usuario-rol-badge>
+            </td>
+            <td>
+              <button
+                class="lista-page__badge lista-page__badge--toggle"
+                  [class.lista-page__badge--bloqueado]="u.cuentaBloqueada"
+                  [class.lista-page__badge--activo]="!u.cuentaBloqueada && u.activo"
+                  [class.lista-page__badge--inactivo]="!u.cuentaBloqueada && !u.activo"
+                type="button"
+                (click)="onCambiarEstado(u)"
+                [attr.aria-label]="(u.activo ? i18n.t('lista.desactivar') : i18n.t('lista.activar'))"
+              >
+                {{ u.cuentaBloqueada ? 'Bloqueada' : u.activo ? i18n.t('lista.activo') : i18n.t('lista.inactivo') }}
+              </button>
+            </td>
+            <td class="lista-page__last-access">
+              {{ (u.ultimoAcceso | date:'dd/MM/yyyy') || '—' }}
+            </td>
+           <td>
+  <div class="lista-page__actions">
+    <!-- Botón Editar (siempre visible) -->
+    <button class="lista-page__action-btn" type="button" (click)="onEditarUsuario(u)" [attr.aria-label]="i18n.t('lista.editar')">
+      <lucide-icon name="pencil" [size]="16"></lucide-icon>
+    </button>
+    
+    <!-- 👇 Botón Eliminar SOLO para NO administradores -->
+    @if (!esAdmin()) {
+      <button
+        class="lista-page__action-btn lista-page__action-btn--danger"
+        type="button"
+        (click)="onEliminar(u.id)"
+        [attr.aria-label]="i18n.t('lista.eliminar')"
+      >
+        <lucide-icon name="trash-2" [size]="16"></lucide-icon>
+      </button>
+    }
+  </div>
+</td>
+          </tr>
+        }
+      }
+    </tbody>
+  </restaurant-data-table>
+
+</div>
+
+<!-- Modals -->
+@if (mostrarExportar()) {
+  <restaurant-exportar-usuarios
+    [totalUsuarios]="totalElements()"
+    (cerrar)="mostrarExportar.set(false)"
+    (exportar)="onExportar($event)"
+  ></restaurant-exportar-usuarios>
+}
+
+@if (mostrarImportar()) {
+  <restaurant-importar-usuarios
+    [resultado]="resultadoImport()"
+    [importando]="importando()"
+    (cerrar)="mostrarImportar.set(false)"
+    (importar)="onImportar($event)"
+  ></restaurant-importar-usuarios>
+}
+
+@if (mostrarFormulario()) {
+  <restaurant-usuario-form
+    [usuario]="usuarioEditando()"
+    (cerrar)="onCerrarFormulario()"
+    (guardar)="onGuardarUsuario($event)"
+  ></restaurant-usuario-form>
+}

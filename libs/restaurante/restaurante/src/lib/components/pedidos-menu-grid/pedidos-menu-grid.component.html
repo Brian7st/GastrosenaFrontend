@@ -1,0 +1,36 @@
+<div class="menu-header">
+  <h2>{{ i18n.t('pedidosMenuGrid.title') }}</h2>
+</div>
+
+<div class="menu-grid">
+  @for (product of products; track product.id) {
+    <restaurant-card class="product-card" (click)="agregarProducto(product)">
+      <div class="image-container">
+        <img [src]="product.image" [alt]="product.name" loading="lazy" />
+      </div>
+      <div class="info-container">
+        <h3 class="product-name">{{ product.name }}</h3>
+        <p class="stats">
+          @if (product.tiempoPreparacion) { {{ product.tiempoPreparacion }} min }
+          @if (product.tiempoPreparacion && product.temperatura) { • }
+          @if (product.temperatura) { {{ product.temperatura }} }
+        </p>
+        <div class="price-row">
+          <div class="prices">
+            <span class="current-price">{{ product.price | currencyCop }}</span>
+          </div>
+        </div>
+      </div>
+    </restaurant-card>
+  }
+</div>
+
+<restaurant-confirm-dialog
+  [open]="showNoTableModal()"
+  [title]="i18n.t('pedidosMenuGrid.noTableTitle')"
+  [message]="i18n.t('pedidosMenuGrid.noTableMessage')"
+  [confirmText]="i18n.t('pedidosMenuGrid.goToTables')"
+  [showCancel]="false"
+  (confirm)="irAMesas()"
+  (cancel)="showNoTableModal.set(false)"
+></restaurant-confirm-dialog>

@@ -1,0 +1,108 @@
+import { SolicitudGil, BienSolicitud } from './solicitudes-gil.model';
+export { BienSolicitud };
+
+// ── Bienes por solicitud (ítems de formulario) ───────────────────────────────
+
+export const BIENES_SOLICITUD_MOCK: BienSolicitud[] = [
+  {
+    codigoSena: 'ALM-001',
+    descripcion: 'Harina de Trigo x 50kg',
+    unidadMedida: 'Bto',
+    cantidad: 2,
+    valorUnitario: 150000,
+    subtotal: 300000,
+  },
+];
+
+// ── Alias requerido por los componentes ──────────────────────────────────────
+export const SOLICITUDES_MOCK: SolicitudGil[] = [
+  {
+    id: 1,
+    numeroGil: 'GIL-F-014-2024-001',
+    fechaSolicitud: '2024-10-24',
+    regionalCodigo: 63,
+    regionalNombre: 'Quindío',
+    centroCostosCodigo: 953810,
+    centroCostosNombre: 'Comercio y Turismo',
+    area: 'Gastronomía',
+    destinoBienes: 'FORMACION',
+    jefeOficinaCoordinador: 'María García Rincón',
+    cuentadantes: [{ id: 1, nombre: 'Carlos Alberto Ruiz', cedula: '1234567890' }],
+    solicitante: 'Ing. Ricardo Sarmiento',
+    codigoGrupo: 'ADSO-2670687',
+    estado: 'BORRADOR',
+    bienes: [...BIENES_SOLICITUD_MOCK],
+  },
+  {
+    id: 2,
+    numeroGil: 'GIL-F-014-2024-002',
+    fechaSolicitud: '2024-10-22',
+    regionalCodigo: 63,
+    regionalNombre: 'Quindío',
+    centroCostosCodigo: 953810,
+    centroCostosNombre: 'Comercio y Turismo',
+    area: 'Mantenimiento',
+    destinoBienes: 'LABORATORIO',
+    jefeOficinaCoordinador: 'María García Rincón',
+    cuentadantes: [{ id: 2, nombre: 'Martha Lucía Gomez', cedula: '9876543210' }],
+    solicitante: 'Lic. Martha Lucía Peña',
+    codigoGrupo: 'MANT-2550122',
+    estado: 'EMITIDO',
+    bienes: [...BIENES_SOLICITUD_MOCK],
+  },
+  {
+    id: 3,
+    numeroGil: 'GIL-F-014-2024-003',
+    fechaSolicitud: '2024-10-20',
+    regionalCodigo: 63,
+    regionalNombre: 'Quindío',
+    centroCostosCodigo: 953810,
+    centroCostosNombre: 'Comercio y Turismo',
+    area: 'Gestión Empresarial',
+    destinoBienes: 'AULA',
+    jefeOficinaCoordinador: 'María García Rincón',
+    cuentadantes: [{ id: 3, nombre: 'Fernando Vallejo', cedula: '5551234567' }],
+    solicitante: 'Ing. Ricardo Sarmiento',
+    codigoGrupo: 'GEST-2899341',
+    estado: 'ENVIADO_PROVEEDOR',
+    bienes: [...BIENES_SOLICITUD_MOCK],
+  },
+  {
+    id: 4,
+    numeroGil: 'GIL-F-014-2024-004',
+    fechaSolicitud: '2024-10-18',
+    regionalCodigo: 63,
+    regionalNombre: 'Quindío',
+    centroCostosCodigo: 953810,
+    centroCostosNombre: 'Comercio y Turismo',
+    area: 'Gastronomía',
+    destinoBienes: 'FORMACION',
+    jefeOficinaCoordinador: 'María García Rincón',
+    cuentadantes: [{ id: 4, nombre: 'Lucía Mercedes Prada', cedula: '3334445556' }],
+    solicitante: 'Lic. Martha Lucía Peña',
+    codigoGrupo: 'ADSO-2670687',
+
+    estado: 'CERRADO',
+    bienes: [...BIENES_SOLICITUD_MOCK],
+  },
+  {
+    id: 5,
+    numeroGil: 'GIL-F-014-2024-005',
+    fechaSolicitud: '2024-10-15',
+    regionalCodigo: 63,
+    regionalNombre: 'Quindío',
+    centroCostosCodigo: 953810,
+    centroCostosNombre: 'Comercio y Turismo',
+    area: 'Mantenimiento',
+    destinoBienes: 'LABORATORIO',
+    jefeOficinaCoordinador: 'María García Rincón',
+    cuentadantes: [{ id: 5, nombre: 'Roberto Jaramillo', cedula: '7778889990' }],
+    solicitante: 'Ing. Ricardo Sarmiento',
+    codigoGrupo: 'MANT-2550122',
+    estado: 'CERRADO',
+    bienes: [...BIENES_SOLICITUD_MOCK],
+  },
+];
+
+/** @deprecated Use SOLICITUDES_MOCK — kept for backward-compat with SolicitudesService */
+export const SOLICITUDES_GIL_MOCK = SOLICITUDES_MOCK;

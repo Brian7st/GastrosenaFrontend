@@ -1,0 +1,71 @@
+<div class="historial-page">
+
+  <restaurant-page-header
+    [title]="i18n.t('historial.titulo')"
+    [subtitle]="i18n.t('historial.subtitulo')"
+  ></restaurant-page-header>
+
+  <!-- Filtros -->
+  <div class="historial-page__filters">
+    <restaurant-search-filter
+      [label]="i18n.t('historial.buscar_usuario')"
+      [placeholder]="i18n.t('historial.buscar_placeholder')"
+      [value]="busqueda()"
+      (valueChange)="busqueda.set($event)"
+    ></restaurant-search-filter>
+    <restaurant-select-filter
+      [label]="i18n.t('historial.tipo_accion')"
+      [value]="filtroAccion()"
+      [options]="accionOpcionesTranslated()"
+      (valueChange)="filtroAccion.set($event)"
+    ></restaurant-select-filter>
+  </div>
+
+  @if (loading()) {
+    <restaurant-loading-skeleton [lines]="8"></restaurant-loading-skeleton>
+  } @else {
+    <restaurant-data-table>
+      <thead>
+        <tr>
+          <th>{{ i18n.t('historial.col_usuario') }}</th>
+          <th>{{ i18n.t('historial.col_accion') }}</th>
+          <th>{{ i18n.t('historial.col_fecha') }}</th>
+          <th>{{ i18n.t('historial.col_ip') }}</th>
+          <th>{{ i18n.t('historial.col_detalles') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of historialFiltrado(); track item.id) {
+          <tr>
+            <td>
+              <div class="historial-page__user">
+                <p class="historial-page__user-name">{{ item.usuarioNombre }}</p>
+                <p class="historial-page__user-email">{{ item.usuarioEmail }}</p>
+              </div>
+            </td>
+            <td>
+              <span class="accion-badge accion-badge--{{ getAccionClass(item.accion) }}">
+                {{ item.accion }}
+              </span>
+            </td>
+            <td class="historial-page__fecha">
+              {{ item.fecha | date:'dd/MM/yyyy HH:mm' }}
+            </td>
+            <td class="historial-page__ip">{{ item.ip }}</td>
+            <td class="historial-page__detalles">{{ item.detalles }}</td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="historial-page__empty-cell">
+              <restaurant-empty-state
+                [title]="i18n.t('historial.sin_registros')"
+                [message]="i18n.t('historial.sin_registros_msg')"
+              ></restaurant-empty-state>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </restaurant-data-table>
+  }
+
+</div>

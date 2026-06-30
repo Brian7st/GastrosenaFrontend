@@ -1,0 +1,40 @@
+import { Movimiento } from './movimiento.model';
+
+export const MOVIMIENTOS_MOCK: Movimiento[] = [
+  {
+    id: '1',
+    tipo: 'ENTRADA',
+    productoNombre: 'Cable UTP Cat 6a',
+    codigoSena: 'AOL001',
+    cantidad: 150,
+    unidadMedida: 'Metros',
+    fechaMovimiento: '2023-10-15T09:45:00Z',
+    responsableNombre: 'Carlos R.',
+    valor: 450000,
+    estado: 'Completado',
+  },
+  {
+    id: '2',
+    tipo: 'SALIDA',
+    productoNombre: 'Multímetro Digital Pro',
+    codigoSena: 'HTP002',
+    cantidad: 12,
+    unidadMedida: 'Unidades',
+    fechaMovimiento: '2023-10-15T11:20:00Z',
+    responsableNombre: 'Ana M.',
+    valor: 1240000,
+    estado: 'Pendiente',
+  },
+  {
+    id: '3',
+    tipo: 'ENTRADA',
+    productoNombre: 'Conector RJ45 blindado',
+    codigoSena: 'TCP003',
+    cantidad: 1000,
+    unidadMedida: 'Piezas',
+    fechaMovimiento: '2023-10-14T16:15:00Z',
+    responsableNombre: 'SISTEMA',
+    valor: 85000,
+    estado: 'Completado',
+  },
+];

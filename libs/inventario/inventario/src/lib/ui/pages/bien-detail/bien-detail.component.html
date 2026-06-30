@@ -1,0 +1,176 @@
+<!-- Breadcrumb + Back -->
+<div class="breadcrumb">
+  <inventario-back-button (clicked)="onVolver()" />
+  <nav class="breadcrumb-nav">
+    <span class="breadcrumb-link" (click)="onVolver()">{{ i18n.t('bien-export.breadcrumb_inventario') }}</span>
+    <span class="material-symbols-outlined breadcrumb-sep">chevron_right</span>
+    <span class="breadcrumb-link" (click)="onVolver()">{{ bien()?.categoria ?? i18n.t('bienes.toggle_bienes') }}</span>
+    <span class="material-symbols-outlined breadcrumb-sep">chevron_right</span>
+    <span class="breadcrumb-current">{{ bien()?.codigoSena }}</span>
+  </nav>
+</div>
+
+@if (bien(); as b) {
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <p class="page-codigo">{{ b.codigoSena }}</p>
+      <h1 class="page-title">{{ b.descripcion }}</h1>
+    </div>
+    <div class="header-actions">
+      <restaurant-button *hasPermission="'bienes:editar'" variant="primary" (click)="onEditarActivo()">
+        <span class="material-symbols-outlined">edit</span>
+        {{ i18n.t('bien-detail.editar') }}
+      </restaurant-button>
+    </div>
+  </div>
+
+  <!-- Info Grid -->
+  <div class="info-grid">
+
+    <!-- Identificación -->
+    <div class="info-card">
+      <div class="info-card__header">
+        <span class="material-symbols-outlined">badge</span>
+        <h4>{{ i18n.t('bien-detail.identificacion') }}</h4>
+      </div>
+      <div class="info-rows">
+        <div class="info-row">
+          <span class="info-label">{{ i18n.t('bien-detail.codigo_sena') }}</span>
+          <span class="info-val code-mono">{{ b.codigoSena }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">{{ i18n.t('bien-detail.codigo_proveedor') }}</span>
+          <span class="info-val code-mono">{{ b.codigoProveedor || '—' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">{{ i18n.t('bien-detail.categoria') }}</span>
+          <span class="info-val">{{ b.categoria }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">{{ i18n.t('bien-detail.unidad_medida') }}</span>
+          <span class="info-val">{{ b.unidadMedida }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">{{ i18n.t('bien-detail.estado') }}</span>
+          <restaurant-status-badge [label]="b.estado" [variant]="getEstadoVariant(b.estado)" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Stock -->
+    <div class="info-card">
+      <div class="info-card__header">
+        <span class="material-symbols-outlined">inventory</span>
+        <h4>{{ i18n.t('bien-detail.stock') }}</h4>
+      </div>
+      <div class="stock-display">
+        <div class="stock-main" [class.stock-main--danger]="b.stockActual < b.stockMinimo">
+          <span class="stock-num">{{ b.stockActual }}</span>
+          <span class="stock-um">{{ b.unidadMedida }}</span>
+        </div>
+        <div class="stock-min-row">
+          <span class="material-symbols-outlined" [class.icon--danger]="b.stockActual < b.stockMinimo">
+            {{ b.stockActual < b.stockMinimo ? 'warning' : 'check_circle' }}
+          </span>
+          <span>{{ i18n.t('bien-detail.minimo_requerido') }} <strong>{{ b.stockMinimo }}</strong></span>
+        </div>
+        <div class="info-row mt-2">
+          <span class="info-label">{{ i18n.t('bien-detail.estado_stock') }}</span>
+          <span class="info-val">{{ b.estadoStock ?? '—' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Valores -->
+    <div class="info-card">
+      <div class="info-card__header">
+        <span class="material-symbols-outlined">payments</span>
+        <h4>{{ i18n.t('bien-detail.valores') }}</h4>
+      </div>
+      <div class="info-rows">
+        <div class="info-row">
+          <span class="info-label">{{ i18n.t('bien-detail.valor_adjudicado') }}</span>
+          <span class="info-val valor-text">{{ b.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">{{ i18n.t('bien-detail.valor_antes_iva') }}</span>
+          <span class="info-val">{{ (b.valorNeto | currency:'COP':'symbol-narrow':'1.0-0') ?? '—' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">{{ i18n.t('bien-detail.iva') }}</span>
+          <span class="info-val">{{ b.iva !== null && b.iva !== undefined ? (b.iva + '%') : '—' }}</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Historial de Movimientos -->
+  <section class="section-card mt-6">
+    <div class="section-header">
+      <div class="section-title">
+        <span class="material-symbols-outlined filled text-primary">sync</span>
+        <h3>{{ i18n.t('bien-detail.historial_movimientos') }}</h3>
+      </div>
+    </div>
+
+    @if (movimientos().length > 0) {
+      <div class="movements-table-wrap">
+        <table class="movements-table">
+          <thead>
+            <tr>
+              <th>{{ i18n.t('bien-detail.th_fecha') }}</th>
+              <th>{{ i18n.t('bien-detail.th_tipo') }}</th>
+              <th class="text-right">{{ i18n.t('bien-detail.th_cantidad') }}</th>
+              <th class="text-right">{{ i18n.t('bien-detail.th_valor') }}</th>
+              <th>{{ i18n.t('bien-detail.th_estado') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (m of movimientos(); track m.id) {
+              <tr>
+                <td class="mov-fecha">{{ m.fechaMovimiento | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td>
+                  <restaurant-status-badge [label]="getTipoLabel(m.tipo)" [variant]="getTipoVariant(m.tipo)" />
+                </td>
+                <td class="text-right">
+                  <span class="cantidad-text" [ngClass]="getCantidadClass(m)">
+                    {{ getCantidadPrefix(m) }} {{ m.unidadMedida }}
+                  </span>
+                </td>
+                <td class="text-right mov-valor" [ngClass]="getCantidadClass(m)">{{ getSigno(m) }}{{ m.valor | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+                <td class="mov-estado">{{ m.estado }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="empty-state">
+        <span class="material-symbols-outlined">sync</span>
+        <p>{{ i18n.t('bien-detail.sin_movimientos') }}</p>
+        <small>{{ i18n.t('bien-detail.sin_movimientos_sub') }}</small>
+      </div>
+    }
+  </section>
+
+} @else {
+
+  <div class="loading-state">
+    <span class="material-symbols-outlined loading-icon">inventory_2</span>
+    <p>{{ i18n.t('bien-detail.cargando') }}</p>
+  </div>
+
+}
+
+<!-- Modal de edición -->
+@if (showEditModal()) {
+<restaurant-bien-form
+  mode="edit"
+  [bien]="bien()"
+  (save)="onSaveEdit($event)"
+  (cancel)="showEditModal.set(false)"
+></restaurant-bien-form>
+}
