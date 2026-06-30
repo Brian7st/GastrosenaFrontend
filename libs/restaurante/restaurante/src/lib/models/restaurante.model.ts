@@ -3,6 +3,41 @@ export { EstadoPedido };
 
 export type EstadoMesa = 'LIBRE' | 'OCUPADA' | 'POR_PAGAR' | 'INACTIVA';
 
+// --- Enums de Detalles e Incidencias (Reglas de Cancelación/Devolución) ---
+export type EstadoDetallePedido =
+  | 'PENDIENTE'
+  | 'PREPARANDO'
+  | 'TERMINADO'
+  | 'EN_DEVOLUCION'
+  | 'ENTREGADO'
+  | 'CANCELADO'
+  | 'DEVUELTO';
+
+export type TipoIncidencia = 'CANCELACION' | 'DEVOLUCION';
+export type EstadoIncidencia = 'EN_PROCESO' | 'RESUELTA';
+
+export interface IncidenciaPedidoResponse {
+  id: string;
+  tipo: TipoIncidencia;
+  detalleId: string | null;
+  producto: string | null;
+  cantidadAfectada: number | null;
+  motivo: string;
+  estado: EstadoIncidencia;
+  registradaPor: string;
+  fechaRegistro: string;
+  fechaResolucion: string | null;
+}
+
+
+
+export interface CategoriaMenu {
+  id: string;
+  name: string;
+  icon: string;
+  type?: 'COMIDA' | 'BEBIDA' | 'ALL';
+}
+
 export interface Mesa {
   id: string;        // UUID proveniente del backend
   nombre: string;
@@ -124,7 +159,7 @@ export interface DetallePedidoResponse {
   precioUnitario: number;     // BigDecimal → number
   subtotalLinea: number;      // cantidad * precioUnitario (calculado por backend)
   observaciones?: string | null;
-  estadoDetalle?: string;     // PENDIENTE, PREPARANDO, TERMINADO, CANCELADO
+  estadoDetalle?: EstadoDetallePedido;
 }
 
 /**
@@ -156,6 +191,7 @@ export interface PedidoResponse {
   fechaCreacion: string;              // LocalDateTime → ISO-8601
   fechaCierre: string | null;         // null mientras esté abierto
   detalles: DetallePedidoResponse[];
+  incidencias?: IncidenciaPedidoResponse[];
 }
 
 // --- DTOs provenientes de Cocina (Recetas) ---

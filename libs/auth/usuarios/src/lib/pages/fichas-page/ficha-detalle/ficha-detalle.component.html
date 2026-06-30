@@ -7,7 +7,7 @@
       Volver
     </button>
     <div class="detalle__title-block">
-      <h1 class="detalle__title">Ficha #{{ ficha()?.numero }}</h1>
+      <h1 class="detalle__title">Ficha {{ ficha()?.numero }}</h1>
       <span class="detalle__programa">{{ ficha()?.programa }}</span>
     </div>
     <span
@@ -97,9 +97,9 @@
             @for (aprendiz of aprendices(); track aprendiz.id) {
               <tr [class.detalle__row--vocero]="esVocero(aprendiz.id)"
                   [class.detalle__row--subvocero]="esSubvocero(aprendiz.id)">
-                <td class="detalle__td-mono">{{ aprendiz.documento }}</td>
-                <td class="detalle__td-nombre">{{ aprendiz.nombre }} {{ aprendiz.apellidos }}</td>
-                <td class="detalle__td-email">{{ aprendiz.email }}</td>
+                <td>{{ aprendiz.documento }}</td>
+                <td>{{ aprendiz.nombre }} {{ aprendiz.apellidos }}</td>
+                <td>{{ aprendiz.email }}</td>
                 <td>
                   @if (esVocero(aprendiz.id)) {
                     <span class="detalle__badge detalle__badge--vocero"><lucide-icon name="star" [size]="12"></lucide-icon> Vocero</span>

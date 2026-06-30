@@ -47,12 +47,12 @@
         </restaurant-button>
 
         @if (puedeRevisar()) {
-          <restaurant-button variant="primary" [disabled]="loading()" (click)="revisarPaquete()">
+          <restaurant-button *hasPermission="'paquete:revisar'" variant="primary" [disabled]="loading()" (click)="revisarPaquete()">
             <lucide-icon name="clipboard-check" [size]="16"></lucide-icon>
             {{ loading() ? 'Revisando...' : 'Revisar Paquete' }}
           </restaurant-button>
         } @else if (puedeArchivar()) {
-          <restaurant-button variant="primary" [disabled]="loading()" (click)="archivarExpediente()">
+          <restaurant-button *hasPermission="'paquete:cerrar'" variant="primary" [disabled]="loading()" (click)="archivarExpediente()">
             <lucide-icon name="archive" [size]="16"></lucide-icon>
             Archivar Expediente
           </restaurant-button>
@@ -155,7 +155,7 @@
               </div>
             } @else {
               <p class="paquete-detail__doc-missing-text">Falta tomar asistencia</p>
-              <button class="paquete-detail__doc-upload-btn" (click)="irAdjuntar()">
+              <button *hasPermission="'asistencia:registrar'" class="paquete-detail__doc-upload-btn" (click)="irAdjuntar()">
                 <lucide-icon name="users" [size]="14"></lucide-icon> Tomar asistencia
               </button>
             }

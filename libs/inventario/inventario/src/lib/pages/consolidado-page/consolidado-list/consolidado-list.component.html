@@ -9,7 +9,7 @@
       <restaurant-button variant="ghost" (click)="openExportModal()">
         <span class="material-symbols-outlined btn-icon">download</span> Exportar
       </restaurant-button>
-      <restaurant-button variant="primary" routerLink="/app/inventario/consolidado/nuevo">
+      <restaurant-button *hasPermission="'consolidado:crear'" variant="primary" routerLink="/app/inventario/consolidado/nuevo">
         <span class="material-symbols-outlined btn-icon">add</span> Generar Nuevo Consolidado
       </restaurant-button>
     </div>
@@ -104,7 +104,7 @@
               <button class="icon-btn-action" title="Ver Detalles" (click)="goToDetail(item.numero)">
                 <span class="material-symbols-outlined">visibility</span>
               </button>
-              <button class="icon-btn-action icon-btn-action--danger" title="Reversar / Eliminar" (click)="reversar(item.id)">
+              <button *hasPermission="'consolidado:crear'" class="icon-btn-action icon-btn-action--danger" title="Reversar / Eliminar" (click)="reversar(item.id)">
                 <span class="material-symbols-outlined">undo</span>
               </button>
             </div>

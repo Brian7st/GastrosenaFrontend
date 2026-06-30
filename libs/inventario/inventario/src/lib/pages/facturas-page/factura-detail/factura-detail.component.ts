@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, s
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-import { ButtonComponent, DataTableComponent } from '@restaurant/shared/ui';
+import { ButtonComponent, DataTableComponent, HasPermissionDirective } from '@restaurant/shared/ui';
 import { BackButtonComponent } from '../../../components/back-button/back-button.component';
 import { RegistrarNotaCreditoModalComponent } from '../../../components/registrar-nota-credito-modal/registrar-nota-credito-modal.component';
 import { FacturasFacade } from '../../../data-access/facturas.facade';
@@ -16,7 +16,7 @@ const PRODUCTO_PENDIENTE = 'PENDIENTE-CATALOGO';
 @Component({
   selector: 'restaurant-factura-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, ButtonComponent, DataTableComponent, BackButtonComponent, RegistrarNotaCreditoModalComponent],
+  imports: [CommonModule, FormsModule, RouterModule, ButtonComponent, DataTableComponent, HasPermissionDirective, BackButtonComponent, RegistrarNotaCreditoModalComponent],
   templateUrl: './factura-detail.component.html',
   styleUrl: './factura-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

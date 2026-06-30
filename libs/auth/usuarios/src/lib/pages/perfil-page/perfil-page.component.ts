@@ -48,15 +48,15 @@ export class PerfilPageComponent implements OnInit {
   readonly usuario   = this.authService.currentUser();
   readonly guardando = signal(false);
   readonly exito     = signal(false);
+  readonly errorMsg  = signal('')
   readonly subiendo  = signal(false);
- readonly fotoUrl = signal<string | null>(
+  readonly fotoUrl = signal<string | null>(
   localStorage.getItem(`fotoUrl_${this.usuario?.id}`) ?? null
 );
 
 readonly mostrarContrasenaActual = signal(false);
 readonly mostrarNuevaContrasena = signal(false);
 readonly mostrarConfirmarContrasena = signal(false);
-readonly errorMsg = signal('');
 
   readonly iniciales = computed(() => {
     const nombre = this.usuario?.nombre ?? '';

@@ -19,7 +19,7 @@
       <h1 class="page-title">{{ b.descripcion }}</h1>
     </div>
     <div class="header-actions">
-      <restaurant-button variant="primary" (click)="onEditarActivo()">
+      <restaurant-button *hasPermission="'bienes:editar'" variant="primary" (click)="onEditarActivo()">
         <span class="material-symbols-outlined">edit</span>
         Editar Bien
       </restaurant-button>

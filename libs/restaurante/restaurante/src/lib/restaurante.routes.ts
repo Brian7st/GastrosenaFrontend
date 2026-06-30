@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';
+import { Routes, Router } from '@angular/router';
 import { MesasPageComponent } from './pages/mesas-page/mesas-page.component';
 import { PedidosPageComponent } from './pages/pedidos-page/pedidos-page.component';
 import { CajaPageComponent } from './pages/caja-page/caja-page.component';
@@ -25,6 +25,7 @@ import {
 import { inject } from '@angular/core';
 import { AuthService } from './data-access/auth.service';
 import { RestauranteFacade } from './data-access/restaurante.facade';
+
 
 const cajaGuard = () => {
   const auth = inject(AuthService);
@@ -54,11 +55,19 @@ export const RESTAURANTE_ROUTES: Routes = [
       )
     ],
     children: [
-      {
-        path: '',
-        pathMatch: 'full',
-        redirectTo: 'mesas'
-      },
+{
+  path: '',
+  pathMatch: 'full',
+  redirectTo: '',
+  canActivate: [() => {
+    const auth = inject(AuthService);
+    const router = inject(Router);
+    if (auth.hasAnyRole(['CAJERO', 'ROLE_CAJERO', 'PAGOS_REGISTRAR'])) {
+      return router.createUrlTree(['caja']);
+    }
+    return router.createUrlTree(['mesas']);
+  }]
+},
       {
         path: 'mesas',
         component: MesasPageComponent,

@@ -12,7 +12,7 @@
       <restaurant-button variant="surface" (click)="openExportModal()">
         <span class="material-symbols-outlined btn-icon">download</span> Exportar
       </restaurant-button>
-      <restaurant-button variant="danger" (click)="openReversarModal()">
+      <restaurant-button *hasPermission="'consolidado:crear'" variant="danger" (click)="openReversarModal()">
         <span class="material-symbols-outlined btn-icon">cancel</span> Reversar Consolidado
       </restaurant-button>
     </div>

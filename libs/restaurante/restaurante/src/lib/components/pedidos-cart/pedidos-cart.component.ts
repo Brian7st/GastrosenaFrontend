@@ -44,6 +44,8 @@ export class PedidosCartComponent {
   showDevolverBackendModal = signal(false);
   showItemActionModal = signal(false);
   
+  errorModalVisible = signal(false);
+  errorMessage = signal('');
   motivoAnulacion = signal('');
   motivoDevolucion = signal('');
   motivoItem = signal('');
@@ -130,10 +132,12 @@ export class PedidosCartComponent {
     if (!this.motivoAnulacion().trim()) return;
     this.showAnularBackendModal.set(false);
     this.facade.cancelarPedidoActivoEnBackend(this.motivoAnulacion()).subscribe({
-      next: (exito) => {
-        if (exito) {
+      next: (res) => {
+        if (res.exito) {
           this.motivoAnulacion.set('');
           this.router.navigate(['/app/restaurante/mesas']);
+        } else {
+          this.mostrarError(res.mensaje || 'Error al cancelar el pedido');
         }
       }
     });
@@ -147,10 +151,12 @@ export class PedidosCartComponent {
     if (!this.motivoDevolucion().trim()) return;
     this.showDevolverBackendModal.set(false);
     this.facade.devolverPedidoActivoEnBackend(this.motivoDevolucion()).subscribe({
-      next: (exito) => {
-        if (exito) {
+      next: (res) => {
+        if (res.exito) {
           this.motivoDevolucion.set('');
           this.router.navigate(['/app/restaurante/mesas']);
+        } else {
+          this.mostrarError(res.mensaje || 'Error al devolver el pedido');
         }
       }
     });
@@ -190,14 +196,22 @@ export class PedidosCartComponent {
 
     if (accion.tipo === 'CANCELAR') {
       this.facade.cancelarItemPedido(accion.id, motivo, cantidad).subscribe({
-        next: (exito) => {
-          if (exito) this.limpiarAccionItem();
+        next: (res) => {
+          if (res.exito) {
+            this.limpiarAccionItem();
+          } else {
+            this.mostrarError(res.mensaje || 'Error al cancelar el ítem');
+          }
         }
       });
     } else {
       this.facade.devolverItemPedido(accion.id, motivo, cantidad).subscribe({
-        next: (exito) => {
-          if (exito) this.limpiarAccionItem();
+        next: (res) => {
+          if (res.exito) {
+            this.limpiarAccionItem();
+          } else {
+            this.mostrarError(res.mensaje || 'Error al devolver el ítem');
+          }
         }
       });
     }
@@ -216,6 +230,7 @@ export class PedidosCartComponent {
       case 'PREPARANDO': return 'estado-preparando';
       case 'TERMINADO': return 'estado-terminado';
       case 'CANCELADO': return 'estado-cancelado';
+      case 'EN_DEVOLUCION': return 'estado-cancelado';
       case 'DEVUELTO': return 'estado-cancelado';
       default: return 'estado-pendiente';
     }
@@ -223,7 +238,18 @@ export class PedidosCartComponent {
 
   getEstadoDetalleText(estado?: string): string {
     if (!estado) return 'Pendiente';
-    return estado.charAt(0).toUpperCase() + estado.slice(1).toLowerCase();
+    const cleanEstado = estado.replace('_', ' ');
+    return cleanEstado.charAt(0).toUpperCase() + cleanEstado.slice(1).toLowerCase();
+  }
+
+  mostrarError(mensaje: string) {
+    this.errorMessage.set(mensaje);
+    this.errorModalVisible.set(true);
+  }
+
+  cerrarErrorModal() {
+    this.errorModalVisible.set(false);
+    this.errorMessage.set('');
   }
 }
 

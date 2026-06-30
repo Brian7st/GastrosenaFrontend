@@ -49,6 +49,8 @@ export class UsuarioFormComponent implements OnChanges {
 
   ngOnChanges(): void {
     if (this.usuario) {
+          console.log('ROL DEL USUARIO:', this.usuario.rol);      // ← aquí
+    console.log('OPCIONES DEL ENUM:', this.rolOptions); 
       this.form.patchValue({
         nombre:    this.usuario.nombre,
         apellidos: this.usuario.apellidos,

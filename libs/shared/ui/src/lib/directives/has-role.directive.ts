@@ -1,4 +1,4 @@
-import { Directive, Input, TemplateRef, ViewContainerRef, effect, inject } from '@angular/core';
+import { Directive, TemplateRef, ViewContainerRef, effect, inject, input } from '@angular/core';
 import { AuthService } from '@restaurant/shared/auth';
 import { Rol } from '@restaurant/shared/models';
 
@@ -10,12 +10,14 @@ export class HasRoleDirective {
   private readonly templateRef = inject(TemplateRef<unknown>);
   private readonly viewContainer = inject(ViewContainerRef);
   private readonly authService = inject(AuthService);
-  private roles: Rol[] = [];
+  
+  hasRole = input.required<Rol[]>();
 
   constructor() {
     effect(() => {
       const user = this.authService.currentUser();
-      const shouldRender = !!user && this.roles.includes(user.rol);
+      const roles = this.hasRole();
+      const shouldRender = !!user && roles.includes(user.rol);
 
       this.viewContainer.clear();
 
@@ -23,10 +25,5 @@ export class HasRoleDirective {
         this.viewContainer.createEmbeddedView(this.templateRef);
       }
     });
-  }
-
-  @Input({ alias: 'hasRole' })
-  set hasRole(value: Rol[]) {
-    this.roles = value;
   }
 }

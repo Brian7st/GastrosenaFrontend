@@ -1,5 +1,5 @@
 import { Injectable, signal, inject } from '@angular/core';
-import { ActividadService, ActividadDTO } from './actividad.service';
+import { ActividadService, ActividadDTO, FichaService, FichaDTO, AprendizService, AprendizDTO } from './actividad.service';
 import { EvaluacionService } from './evaluacion.service';
 
 export interface AprendizMock {
@@ -13,6 +13,7 @@ export interface AprendizMock {
 }
 
 export type ActividadMock = ActividadDTO;
+export type { FichaDTO };
 
 const APRENDICES_MOCK: AprendizMock[] = [
   { id: 1, nombreCompleto: 'Camila Rodriguez Torres',  inicial: 'C', ficha: '2561234', jornada: 'Diurna',   estado: 'Pendiente' },
@@ -27,13 +28,40 @@ const APRENDICES_MOCK: AprendizMock[] = [
 @Injectable({ providedIn: 'root' })
 export class CocinaFacade {
   private actividadService = inject(ActividadService);
+  private fichaService     = inject(FichaService);
+  private aprendizService  = inject(AprendizService);
   private evaluacionService = inject(EvaluacionService);
 
-  readonly aprendices = signal<AprendizMock[]>(APRENDICES_MOCK);
+  readonly aprendices = signal<AprendizMock[]>([]);
   readonly actividades = signal<ActividadMock[]>([]);
+  readonly fichas      = signal<FichaDTO[]>([]);
+  readonly fichasCargando = signal<boolean>(false);
 
   constructor() {
     this.cargarActividades();
+    this.cargarFichas();
+    this.cargarAprendices();
+  }
+
+  cargarAprendices(): void {
+    this.aprendizService.getAll().subscribe({
+      next: (data) => {
+        const mapeados: AprendizMock[] = (data || []).map(a => ({
+          id: a.id,
+          nombreCompleto: a.nombreCompleto,
+          inicial: a.inicial || a.nombreCompleto.charAt(0).toUpperCase(),
+          ficha: a.ficha,
+          jornada: a.jornada as 'Diurna' | 'Nocturna' | 'Mixta',
+          estado: 'Pendiente', // por defecto
+          inactivo: a.inactivo
+        }));
+        this.aprendices.set(mapeados);
+      },
+      error: (err) => {
+        console.warn('No se pudieron cargar aprendices reales, usando mock:', err);
+        this.aprendices.set(APRENDICES_MOCK);
+      }
+    });
   }
 
   cargarActividades(): void {
@@ -43,8 +71,22 @@ export class CocinaFacade {
     });
   }
 
+  cargarFichas(): void {
+    this.fichasCargando.set(true);
+    this.fichaService.getAll().subscribe({
+      next: (data) => {
+        this.fichas.set(data || []);
+        this.fichasCargando.set(false);
+      },
+      error: (err) => {
+        console.warn('No se pudieron cargar fichas desde el microservicio de usuarios:', err);
+        this.fichasCargando.set(false);
+      }
+    });
+  }
+
   actualizarEstado(id: number, estado: 'Aprobó' | 'No Aprobó'): void {
-    this.aprendices.update(aprendices => 
+    this.aprendices.update(aprendices =>
       aprendices.map(a => a.id === id ? { ...a, estado } : a)
     );
   }
