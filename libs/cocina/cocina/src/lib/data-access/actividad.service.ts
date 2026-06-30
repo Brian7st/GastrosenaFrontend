@@ -46,6 +46,8 @@ export interface AprendizDTO {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────────────────────────────────
+
 @Injectable({ providedIn: 'root' })
 export class ActividadService {
   private http = inject(HttpClient);
@@ -99,7 +101,7 @@ export interface UsuarioFichaDTO {
 @Injectable({ providedIn: 'root' })
 export class AprendizService {
   private http = inject(HttpClient);
-  private readonly BASE = `${GATEWAY}/api/fichas`;
+  private readonly BASE = '/api/fichas';
 
   /**
    * Obtiene los aprendices (rol AUXILIAR_COCINA) de una ficha dado su UUID.
