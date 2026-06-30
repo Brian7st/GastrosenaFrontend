@@ -19,8 +19,7 @@
         @for (p of platos(); track p.name) {
           <div class="menu-card">
             @if (p.img) {
-              <div class="menu-card__img">
-                <img [src]="p.img" [alt]="p.name" loading="lazy">
+              <div class="menu-card__img" [style.background-image]="'url(' + p.img + ')'">
                 <span class="menu-card__tag">{{ p.category }}</span>
               </div>
             }
@@ -41,8 +40,7 @@
         @for (b of bebidas(); track b.name) {
           <div class="menu-card">
             @if (b.img) {
-              <div class="menu-card__img">
-                <img [src]="b.img" [alt]="b.name" loading="lazy">
+              <div class="menu-card__img" [style.background-image]="'url(' + b.img + ')'">
                 <span class="menu-card__tag">{{ b.category }}</span>
               </div>
             }

@@ -69,36 +69,38 @@
   }
 
   <!-- Reportes recientes -->
-  <restaurant-data-table
-    [tableTitle]="i18n.t('table.title')"
-    tableIcon="file-text"
-  >
-    <thead>
-      <tr>
-        <th>{{ i18n.t('th.nombre') }}</th>
-        <th>{{ i18n.t('th.fecha') }}</th>
-        <th>{{ i18n.t('th.estado') }}</th>
-        <th>{{ i18n.t('th.accion') }}</th>
-      </tr>
-    </thead>
-    @for (reporte of reportesRecientes(); track reporte.id) {
-      <tr>
-        <td>{{ reporte.nombre }}</td>
-        <td>{{ reporte.fecha }}</td>
-        <td>
-          <restaurant-status-badge
-            [label]="reporte.estado"
-            variant="success"
-          />
-        </td>
-        <td>
-          <restaurant-button variant="surface" (click)="descargarReporte(reporte.id)">
-            <lucide-icon name="download" [size]="14"></lucide-icon>
-            {{ i18n.t('btn.descargar') }}
-          </restaurant-button>
-        </td>
-      </tr>
-    }
-  </restaurant-data-table>
+  @if (reportesRecientes().length > 0) {
+    <restaurant-data-table
+      [tableTitle]="i18n.t('table.title')"
+      tableIcon="file-text"
+    >
+      <thead>
+        <tr>
+          <th>{{ i18n.t('th.nombre') }}</th>
+          <th>{{ i18n.t('th.fecha') }}</th>
+          <th>{{ i18n.t('th.estado') }}</th>
+          <th>{{ i18n.t('th.accion') }}</th>
+        </tr>
+      </thead>
+      @for (reporte of reportesRecientes(); track reporte.id) {
+        <tr>
+          <td>{{ reporte.nombre }}</td>
+          <td>{{ reporte.fecha }}</td>
+          <td>
+            <restaurant-status-badge
+              [label]="reporte.estado"
+              variant="success"
+            />
+          </td>
+          <td>
+            <restaurant-button variant="surface" (click)="descargarReporte(reporte.id)">
+              <lucide-icon name="download" [size]="14"></lucide-icon>
+              {{ i18n.t('btn.descargar') }}
+            </restaurant-button>
+          </td>
+        </tr>
+      }
+    </restaurant-data-table>
+  }
 
 </div>

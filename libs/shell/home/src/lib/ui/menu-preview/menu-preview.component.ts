@@ -25,6 +25,13 @@ interface BarMenuDTO {
   tiempoPreparacion?: number;
 }
 
+const PALABRAS_BAR = ['coctel', 'cocktail', 'bebida', 'licor', 'trago', 'café', 'cafe', 'caliente', 'tinto', 'cerveza', 'vino', 'whisky', 'ron', 'vodka', 'ginebra'];
+
+function esDeBar(categoria: string): boolean {
+  const c = categoria.toLowerCase();
+  return PALABRAS_BAR.some(p => c.includes(p));
+}
+
 @Component({
   selector: 'restaurant-menu-preview',
   standalone: true,
@@ -50,7 +57,9 @@ export class MenuPreviewComponent implements OnInit {
     this.http.get<RecetaMenuDTO[]>('/api/recetas/menu')
       .subscribe({
         next: recetas => {
-          const disponibles = recetas.filter(r => r.disponible !== false);
+          const disponibles = recetas
+            .filter(r => r.disponible !== false)
+            .filter(r => !esDeBar(r.nombreCategoria ?? ''));
           if (disponibles.length > 0) {
             this.platos.set(
               disponibles.slice(0, 12).map(r => ({
@@ -70,9 +79,10 @@ export class MenuPreviewComponent implements OnInit {
     this.http.get<BarMenuDTO[]>('/api/barybarismo/recetas/menu')
       .subscribe({
         next: items => {
-          if (items.length > 0) {
+          const filtrados = items.filter(r => esDeBar(r.nombreCategoria ?? ''));
+          if (filtrados.length > 0) {
             this.bebidas.set(
-              items.slice(0, 12).map(r => ({
+              filtrados.slice(0, 12).map(r => ({
                 name: r.nombreReceta,
                 category: r.nombreCategoria ?? 'Bar',
                 price: r.precioUnitario ?? 0,
