@@ -27,7 +27,8 @@ export class ReportesFacade {
 
     this.service.getReportesRecientes(filtros).subscribe({
       next: (data) => {
-        this.reportesRecientes.set(data);
+        const validos = (data ?? []).filter(r => r?.id && r?.nombre && r?.fecha && r?.estado);
+        this.reportesRecientes.set(validos);
         this.cargando.set(false);
       },
       error: (err) => {
@@ -44,17 +45,19 @@ export class ReportesFacade {
 
     this.service.generarReporte(request).subscribe({
       next: (response: GenerarReporteResponse) => {
-        this.reportesRecientes.update(list => [
-          {
-            id: response.id,
-            nombre: response.nombre,
-            fecha: response.fechaGeneracion,
-            estado: response.estado,
-            tipo: request.tipo as any,
-            url: response.url,
-          },
-          ...list,
-        ]);
+        if (response?.id && response?.nombre && response?.fechaGeneracion && response?.estado) {
+          this.reportesRecientes.update(list => [
+            {
+              id: response.id,
+              nombre: response.nombre,
+              fecha: response.fechaGeneracion,
+              estado: response.estado,
+              tipo: request.tipo as any,
+              url: response.url,
+            },
+            ...list,
+          ]);
+        }
         this.generando.set(false);
       },
       error: (err) => {

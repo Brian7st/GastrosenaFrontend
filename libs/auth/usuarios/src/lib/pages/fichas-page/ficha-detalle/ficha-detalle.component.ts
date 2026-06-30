@@ -1,5 +1,6 @@
 import { Component, computed, signal, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { DataTableComponent, KpiCardComponent, LucideIconComponent } from '@restaurant/shared/ui';
 import { FichasService } from '../../../data-access/fichas.service';
 import { UsuariosService } from '../../../data-access/usuarios.service';
@@ -134,6 +135,13 @@ cargarRoles() {
       error: (err) => console.error('Error removiendo rol:', err)
     });
   }
+
+  eliminarAprendiz(usuarioId: string) {
+    this.usuarioFichaService.eliminarAprendiz(this.fichaId(), usuarioId).subscribe({
+      next: () => this.cargarAprendices(),
+      error: (err) => console.error('Error eliminando aprendiz:', err)
+    });
+  }
  
   abrirModalAsignar() {
     this.mostrarModalAsignar.set(true);
@@ -147,14 +155,29 @@ cargarRoles() {
   }
  
   cargarUsuariosDisponibles() {
-    this.usuariosService.obtenerAprendices().subscribe({
-      next: (usuarios) => {
+    forkJoin({
+      todosAprendices: this.usuariosService.obtenerAprendices(),
+      fichas: this.fichasService.obtenerFichas(),
+    }).subscribe({
+      next: ({ todosAprendices, fichas }) => {
         const asignadosIds = new Set(this.aprendices().map(a => a.id));
-        this.usuariosDisponibles.set(
-          usuarios.filter(u => !asignadosIds.has(u.id))
-        );
+        const otrasFichas = fichas.filter(f => f.id !== this.fichaId());
+        if (otrasFichas.length === 0) {
+          this.usuariosDisponibles.set(todosAprendices.filter(u => !asignadosIds.has(u.id)));
+          return;
+        }
+        forkJoin(otrasFichas.map(f => this.usuarioFichaService.getAprendicesByFicha(f.id)))
+          .subscribe({
+            next: (resultados) => {
+              resultados.forEach(lista =>
+                lista.forEach((a: any) => asignadosIds.add(a.idUsuario ?? a.id))
+              );
+              this.usuariosDisponibles.set(todosAprendices.filter(u => !asignadosIds.has(u.id)));
+            },
+            error: (err) => console.error('Error cargando aprendices de fichas:', err)
+          });
       },
-      error: (err) => console.error('Error cargando usuarios disponibles:', err)
+      error: (err) => console.error('Error cargando datos:', err)
     });
   }
  

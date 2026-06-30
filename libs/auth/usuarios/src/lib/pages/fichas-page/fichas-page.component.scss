@@ -240,6 +240,39 @@
       color: var(--color-error-text);
     }
   }
+
+  // ── Error al eliminar ─────────────────────────────────────────────────
+  &__error-eliminar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-error-bg);
+    color: var(--color-error-text);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+
+    lucide-icon { flex-shrink: 0; }
+
+    span { flex: 1; }
+  }
+
+  &__error-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    opacity: 0.7;
+
+    &:hover { opacity: 1; }
+  }
 }
 
 .fichas-modal-backdrop {

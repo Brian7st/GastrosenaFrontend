@@ -17,6 +17,7 @@ import {
 import { AuthService } from '@restaurant/shared/auth';
 import { Rol } from '@restaurant/shared/models';
 import { FichasService } from '../../data-access/fichas.service';
+import { UsuarioFichaService } from '../../data-access/usuario-ficha.service';
 import { I18nService } from '../../i18n/i18n.service';
 import { Ficha } from '../../models/ficha.model';
 
@@ -38,6 +39,7 @@ type EstadoFiltro = 'todos' | 'activas' | 'inactivas';
 })
 export class FichasPageComponent implements OnInit {
   private readonly fichasService = inject(FichasService);
+  private readonly usuarioFichaService = inject(UsuarioFichaService);
   private readonly router = inject(Router);
   private readonly auth = inject(AuthService);
   protected readonly i18n = inject(I18nService);
@@ -151,15 +153,30 @@ export class FichasPageComponent implements OnInit {
 
 readonly mostrarModalEliminar = signal(false);
 readonly fichaAEliminar = signal<Ficha | null>(null);
+readonly errorEliminar = signal('');
 
 abrirModalEliminar(ficha: Ficha): void {
-  this.fichaAEliminar.set(ficha);
-  this.mostrarModalEliminar.set(true);
+  this.errorEliminar.set('');
+  this.usuarioFichaService.getAprendicesByFicha(ficha.id).subscribe({
+    next: (aprendices) => {
+      if (aprendices.length > 0) {
+        this.errorEliminar.set(`No se puede eliminar la ficha ${ficha.numero}: tiene ${aprendices.length} aprendiz(es) asignado(s).`);
+        return;
+      }
+      this.fichaAEliminar.set(ficha);
+      this.mostrarModalEliminar.set(true);
+    },
+    error: () => {
+      this.fichaAEliminar.set(ficha);
+      this.mostrarModalEliminar.set(true);
+    }
+  });
 }
 
 cerrarModalEliminar(): void {
   this.mostrarModalEliminar.set(false);
   this.fichaAEliminar.set(null);
+  this.errorEliminar.set('');
 }
 
 confirmarEliminar(): void {

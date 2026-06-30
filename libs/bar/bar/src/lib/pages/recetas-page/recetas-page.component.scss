@@ -59,9 +59,14 @@
 
 .recetas-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: var(--space-4, 1.2rem);
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: var(--space-6, 1.5rem);
     padding: var(--space-2, 0.5rem) 0;
+}
+
+:host ::ng-deep restaurant-card .card__image {
+  height: auto !important;
+  aspect-ratio: 5 / 3 !important;
 }
 
 .receta-card {

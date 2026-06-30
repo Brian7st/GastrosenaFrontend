@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { HeroBannerComponent }          from '../../ui/hero-banner/hero-banner.component';
 import { GeneralInfoSectionComponent }  from '../../ui/general-info-section/general-info-section.component';
 import { MenuPreviewComponent }         from '../../ui/menu-preview/menu-preview.component';
@@ -32,4 +32,10 @@ import { CommentsFormComponent }        from '../../ui/comments-form/comments-fo
   styleUrl: './home-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HomePageComponent {}
+export class HomePageComponent {
+  menuActiveTab = signal<'platos' | 'bar' | null>(null);
+
+  onMenuTabChange(tab: 'platos' | 'bar'): void {
+    this.menuActiveTab.set(tab);
+  }
+}

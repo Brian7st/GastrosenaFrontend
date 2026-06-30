@@ -48,13 +48,7 @@ export class ReportesService {
     { id: 'r13', nombre: 'Ventas por Mesero', descripcion: 'Consulta de platos más vendidos según mesero asignado.',         tipo: 'ventas',      rol: 'CHEF'          },
   ];
 
-  private mockRecientes: ReporteReciente[] = [
-    { id: 'rc1', nombre: 'Facturación Marzo 2025',        fecha: '2025-04-01', estado: 'Completado', tipo: 'ventas'      },
-    { id: 'rc2', nombre: 'Inventario Trimestre Q1 2025',  fecha: '2025-03-31', estado: 'Completado', tipo: 'inventario'  },
-    { id: 'rc3', nombre: 'Presupuesto Febrero 2025',      fecha: '2025-03-02', estado: 'Completado', tipo: 'financiero'  },
-    { id: 'rc4', nombre: 'Ventas por Mesero Marzo 2025',  fecha: '2025-04-02', estado: 'Completado', tipo: 'ventas'      },
-    { id: 'rc5', nombre: 'Desempeño Aprendices Q1 2025',  fecha: '2025-03-30', estado: 'Completado', tipo: 'usuarios'    },
-  ];
+  private mockRecientes: ReporteReciente[] = [];
 
   constructor(private http: HttpClient) {}
 
