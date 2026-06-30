@@ -206,7 +206,7 @@
   <!-- Paginación (slot [dtFooter]) -->
   <div dtFooter class="dt-footer">
     <p class="dt-page-info">
-      {{ i18n.t('bienes.pagina_info').replace('{{ count }}', String(bienes().length)).replace('{{ total }}', String(paginacion().totalElements)) }}
+      {{ i18n.t('bienes.pagina_info', { count: bienes().length, total: paginacion().totalElements }) }}
     </p>
     <div class="dt-pagination">
       <button class="dt-page-btn"
@@ -244,14 +244,14 @@
 @if (ultimaImportacion(); as imp) {
 <div class="import-result">
   <span class="material-symbols-outlined">check_circle</span>
-  {{ i18n.t('bienes.contrato_importado').replace('{{ creados }}', String(imp.productosCreados)).replace('{{ actualizados }}', String(imp.productosActualizados)) }}
+  {{ i18n.t('bienes.contrato_importado', { creados: imp.productosCreados, actualizados: imp.productosActualizados }) }}
 </div>
 }
 
 @if (feedbackCierre(); as feedback) {
 <div class="import-result import-result--cierre">
   <span class="material-symbols-outlined">lock</span>
-  {{ i18n.t('bienes.contrato_cerrado').replace('{{ feedback }}', feedback) }}
+  {{ i18n.t('bienes.contrato_cerrado', { feedback }) }}
 </div>
 }
 
