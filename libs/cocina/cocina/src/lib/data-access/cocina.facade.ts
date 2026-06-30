@@ -85,24 +85,32 @@ export class CocinaFacade {
         this.fichas.set(data || []);
         this.fichasCargando.set(false);
         // Una vez que tenemos las fichas, cargamos los aprendices (desde el mock temporalmente)
-        this.cargarAprendices();
+        this.cargarAprendices(data || []);
       },
       error: (err) => {
         console.error('Error al cargar fichas desde el microservicio de usuarios:', err);
         this.fichasCargando.set(false);
         // Aún si falla, cargamos el mock para que la vista funcione
-        this.cargarAprendices();
+        this.cargarAprendices([]);
       }
     });
   }
 
   // ── Aprendices (Mock temporal) ─────────────────────────────────────────────
 
-  cargarAprendices(): void {
+  cargarAprendices(fichas: FichaDTO[] = []): void {
     this.aprendicesCargando.set(true);
-    // Asignar directamente el mock, simulando respuesta exitosa
+    // Generar el mock para las fichas reales cargadas, para que el filtro por ficha coincida
     setTimeout(() => {
-      this.aprendices.set(APRENDICES_MOCK);
+      const todos = fichas.length > 0 
+        ? fichas.flatMap((f, fIdx) => APRENDICES_MOCK.map((a, aIdx) => ({
+            ...a,
+            id: a.id + (fIdx * 100), // IDs únicos
+            ficha: f.numero // Asignamos la ficha real para que coincida en la vista
+          })))
+        : APRENDICES_MOCK;
+        
+      this.aprendices.set(todos);
       this.aprendicesCargando.set(false);
     }, 300);
   }
