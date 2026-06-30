@@ -9,8 +9,8 @@
     "changeOrigin": true
   },
   "/api": {
-    "target": "http://localhost:8088",
-    "secure": false,
+    "target": "https://app.gastrosena.uk",
+    "secure": true,
     "changeOrigin": true
   }
 }
