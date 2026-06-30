@@ -288,6 +288,17 @@ restaurant-data-table {
     border-color: var(--color-error-bg);
     &:hover { opacity: 0.85; }
   }
+
+  &--eliminar {
+    background: transparent;
+    color: var(--color-text-muted);
+    border-color: transparent;
+    &:hover {
+      background: var(--color-error-bg);
+      color: var(--color-error-text);
+      border-color: var(--color-error-bg);
+    }
+  }
 }
  
 // ── MODAL ─────────────────────────────────────

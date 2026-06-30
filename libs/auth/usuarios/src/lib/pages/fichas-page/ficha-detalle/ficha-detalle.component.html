@@ -139,6 +139,14 @@
                     Quitar rol
                   </button>
                 }
+                <button
+                  class="detalle__btn-accion detalle__btn-accion--eliminar"
+                  (click)="eliminarAprendiz(aprendiz.id)"
+                  title="Eliminar aprendiz de la ficha"
+                >
+                  <lucide-icon name="user-x" [size]="14"></lucide-icon>
+                  Eliminar
+                </button>
               </div>
             </td>
           </tr>

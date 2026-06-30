@@ -62,6 +62,17 @@
     </div>
   </div>
 
+  <!-- Error al eliminar -->
+  @if (errorEliminar()) {
+    <div class="fichas-page__error-eliminar">
+      <lucide-icon name="alert-triangle" [size]="16"></lucide-icon>
+      <span>{{ errorEliminar() }}</span>
+      <button class="fichas-page__error-close" (click)="errorEliminar.set('')">
+        <lucide-icon name="x" [size]="14"></lucide-icon>
+      </button>
+    </div>
+  }
+
   <!-- Tabla -->
   <restaurant-data-table>
     <thead>
