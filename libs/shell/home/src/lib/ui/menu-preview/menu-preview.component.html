@@ -18,46 +18,43 @@
       <div class="menu-grid">
         @for (p of platos(); track p.name) {
           <div class="menu-card">
-            <div class="menu-card__img">
-              <img [src]="p.img" [alt]="p.name" loading="lazy">
-              <span class="menu-card__tag">{{ p.category }}</span>
-            </div>
+            @if (p.img) {
+              <div class="menu-card__img">
+                <img [src]="p.img" [alt]="p.name" loading="lazy">
+                <span class="menu-card__tag">{{ p.category }}</span>
+              </div>
+            }
             <div class="menu-card__body">
               <h3 class="menu-card__name">{{ p.name }}</h3>
               <p  class="menu-card__desc">{{ p.desc }}</p>
               <span class="menu-card__price">{{ p.price | currency:'COP':'symbol':'1.0-0' }}</span>
             </div>
           </div>
+        } @empty {
+          <p class="menu-empty">No hay platos disponibles en este momento.</p>
         }
       </div>
     }
 
     @if (activeTab() === 'bar') {
-      <div class="bar-grid">
-        <div class="bar-col">
-          <h4 class="bar-col__title">Cafés Especiales</h4>
-          @for (b of cafes; track b.name) {
-            <div class="bar-item">
-              <div>
-                <p class="bar-item__name">{{ b.name }}</p>
-                <p class="bar-item__desc">{{ b.desc }}</p>
+      <div class="menu-grid">
+        @for (b of bebidas(); track b.name) {
+          <div class="menu-card">
+            @if (b.img) {
+              <div class="menu-card__img">
+                <img [src]="b.img" [alt]="b.name" loading="lazy">
+                <span class="menu-card__tag">{{ b.category }}</span>
               </div>
-              <span class="bar-item__price">{{ b.price | currency:'COP':'symbol':'1.0-0' }}</span>
+            }
+            <div class="menu-card__body">
+              <h3 class="menu-card__name">{{ b.name }}</h3>
+              <p  class="menu-card__desc">{{ b.desc }}</p>
+              <span class="menu-card__price">{{ b.price | currency:'COP':'symbol':'1.0-0' }}</span>
             </div>
-          }
-        </div>
-        <div class="bar-col">
-          <h4 class="bar-col__title">Bebidas Signature</h4>
-          @for (b of bebidas; track b.name) {
-            <div class="bar-item">
-              <div>
-                <p class="bar-item__name">{{ b.name }}</p>
-                <p class="bar-item__desc">{{ b.desc }}</p>
-              </div>
-              <span class="bar-item__price">{{ b.price | currency:'COP':'symbol':'1.0-0' }}</span>
-            </div>
-          }
-        </div>
+          </div>
+        } @empty {
+          <p class="menu-empty">No hay bebidas disponibles en este momento.</p>
+        }
       </div>
     }
   </div>

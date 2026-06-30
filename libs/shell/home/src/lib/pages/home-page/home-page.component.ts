@@ -7,6 +7,7 @@ import { MainDishesSectionComponent }   from '../../ui/main-dishes-section/main-
 import { DessertsSectionComponent }     from '../../ui/desserts-section/desserts-section.component';
 import { GastronomySectionComponent }   from '../../ui/gastronomy-section/gastronomy-section.component';
 import { BarSectionComponent }          from '../../ui/bar-section/bar-section.component';
+import { BarismoSectionComponent }      from '../../ui/barismo-section/barismo-section.component';
 
 import { ContactSectionComponent }      from '../../ui/contact-section/contact-section.component';
 import { CommentsFormComponent }        from '../../ui/comments-form/comments-form.component';
@@ -23,6 +24,7 @@ import { CommentsFormComponent }        from '../../ui/comments-form/comments-fo
     DessertsSectionComponent,
     GastronomySectionComponent,
     BarSectionComponent,
+    BarismoSectionComponent,
     ContactSectionComponent,
     CommentsFormComponent,
   ],
