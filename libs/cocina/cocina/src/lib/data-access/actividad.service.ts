@@ -46,13 +46,12 @@ export interface AprendizDTO {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Gateway único de entrada — apunta al API Gateway en lugar de cada microservicio directamente */
-const GATEWAY = 'http://localhost:8088';
+// ─────────────────────────────────────────────────────────────────────────────
 
 @Injectable({ providedIn: 'root' })
 export class ActividadService {
   private http = inject(HttpClient);
-  private readonly BASE = `${GATEWAY}/api/actividades`;
+  private readonly BASE = '/api/actividades';
 
   /** Obtiene todas las actividades ordenadas por fecha desc */
   getAll(): Observable<ActividadDTO[]> {
@@ -78,7 +77,7 @@ export class ActividadService {
 @Injectable({ providedIn: 'root' })
 export class FichaService {
   private http = inject(HttpClient);
-  private readonly BASE = `${GATEWAY}/api/fichas`;
+  private readonly BASE = '/api/fichas';
 
   /** Obtiene todas las fichas desde el microservicio de usuarios vía el gateway */
   getAll(): Observable<FichaDTO[]> {
@@ -102,7 +101,7 @@ export interface UsuarioFichaDTO {
 @Injectable({ providedIn: 'root' })
 export class AprendizService {
   private http = inject(HttpClient);
-  private readonly BASE = `${GATEWAY}/api/fichas`;
+  private readonly BASE = '/api/fichas';
 
   /**
    * Obtiene los aprendices (rol AUXILIAR_COCINA) de una ficha dado su UUID.
