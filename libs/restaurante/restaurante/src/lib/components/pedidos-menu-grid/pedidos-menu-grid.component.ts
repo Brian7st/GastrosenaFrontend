@@ -34,15 +34,11 @@ export class PedidosMenuGridComponent {
   get products() {
     let filtered = this.facade.productosMenu();
 
+    // Filtra por la categoría real del plato (idCategoria de la receta).
+    // 'all' = sin filtro. Esto mantiene el grid consistente con los chips
+    // dinámicos que emite pedidos-categories.
     if (this.mainCategory !== 'all') {
-      filtered = filtered.filter(p => {
-        const isBeb = !!(p.categoryName || '').toLowerCase().match(/bebida|jugo|licor|café|cafe|alcohol|alcholica|coctel|cóctel/);
-        return this.mainCategory === 'BEBIDA' ? isBeb : !isBeb;
-      });
-    }
-
-    if (this.subCategory !== 'all') {
-      filtered = filtered.filter(p => p.category === this.subCategory);
+      filtered = filtered.filter(p => p.category === this.mainCategory);
     }
 
     if (this._searchTerm) {

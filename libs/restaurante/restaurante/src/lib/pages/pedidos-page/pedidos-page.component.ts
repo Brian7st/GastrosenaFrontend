@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, computed, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -28,11 +28,18 @@ import { I18nService } from '../../i18n/i18n.service';
   styleUrls: ['./pedidos-page.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PedidosPageComponent {
+export class PedidosPageComponent implements OnInit {
   protected readonly i18n = inject(I18nService);
   public facade = inject(RestauranteFacade);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+
+  ngOnInit(): void {
+    // El facade es singleton (providedIn: 'root') y solo carga el menú en su
+    // constructor, así que las recetas/categorías creadas en Cocina durante la
+    // sesión no se reflejaban sin un reload completo. Refrescamos al entrar.
+    this.facade.cargarMenu();
+  }
 
   searchTerm = signal('');
   selectedMainCategory = signal('all');
