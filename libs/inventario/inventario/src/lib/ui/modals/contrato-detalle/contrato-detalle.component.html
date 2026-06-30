@@ -12,7 +12,7 @@
           }
         </h2>
         @if (contrato) {
-          <p class="detalle-subtitle">{{ i18n.t('contrato-detalle.vigencia').replace('{{ vigencia }}', String(contrato.vigencia)) }}</p>
+          <p class="detalle-subtitle">{{ i18n.t('contrato-detalle.vigencia', { vigencia: contrato.vigencia }) }}</p>
         }
       </div>
       <div class="detalle-header__actions">
