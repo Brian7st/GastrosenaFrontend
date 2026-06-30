@@ -1,12 +1,18 @@
 <restaurant-hero-banner />
 <restaurant-general-info-section />
-<restaurant-menu-preview />
-<restaurant-recipes-section />
-<restaurant-main-dishes-section />
-<restaurant-desserts-section />
-<restaurant-gastronomy-section />
-<restaurant-bar-section />
-<restaurant-barismo-section />
+<restaurant-menu-preview (tabChange)="onMenuTabChange($event)" />
+
+@if (menuActiveTab() === 'platos' || menuActiveTab() === null) {
+  <restaurant-recipes-section />
+  <restaurant-main-dishes-section />
+  <restaurant-desserts-section />
+  <restaurant-gastronomy-section />
+}
+
+@if (menuActiveTab() === 'bar' || menuActiveTab() === null) {
+  <restaurant-bar-section />
+  <restaurant-barismo-section />
+}
 
 <restaurant-contact-section />
 <restaurant-comments-form />

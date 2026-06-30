@@ -20,10 +20,10 @@
           <div class="menu-card">
             @if (p.img) {
               <div class="menu-card__img" [style.background-image]="'url(' + p.img + ')'">
-                <span class="menu-card__tag">{{ p.category }}</span>
               </div>
             }
             <div class="menu-card__body">
+              <span class="menu-card__tag">{{ p.category }}</span>
               <h3 class="menu-card__name">{{ p.name }}</h3>
               <p  class="menu-card__desc">{{ p.desc }}</p>
               <span class="menu-card__price">{{ p.price | currency:'COP':'symbol':'1.0-0' }}</span>
@@ -41,10 +41,10 @@
           <div class="menu-card">
             @if (b.img) {
               <div class="menu-card__img" [style.background-image]="'url(' + b.img + ')'">
-                <span class="menu-card__tag">{{ b.category }}</span>
               </div>
             }
             <div class="menu-card__body">
+              <span class="menu-card__tag">{{ b.category }}</span>
               <h3 class="menu-card__name">{{ b.name }}</h3>
               <p  class="menu-card__desc">{{ b.desc }}</p>
               <span class="menu-card__price">{{ b.price | currency:'COP':'symbol':'1.0-0' }}</span>
