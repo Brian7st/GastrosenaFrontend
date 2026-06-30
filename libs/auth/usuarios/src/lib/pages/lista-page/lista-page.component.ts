@@ -4,10 +4,11 @@ import {
   DestroyRef,
   OnInit,
   computed,
+  effect,
   inject,
   signal,
 } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop'; 
 import { DatePipe } from '@angular/common';
 import { map } from 'rxjs';
 import { Rol } from '@restaurant/shared/models';
@@ -57,6 +58,7 @@ export class ListaPageComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   protected readonly i18n = inject(I18nService);
   private toastTimer: ReturnType<typeof setTimeout> | null = null;
+  private exportTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly authService = inject(AuthService);
 
   // ── Signals del Facade ──────────────────────────────────────────────────
@@ -121,6 +123,23 @@ export class ListaPageComponent implements OnInit {
   readonly activosMostrar = computed(() => this.totalActivos());
   readonly inactivosMostrar = computed(() => this.totalInactivos());
 
+  // ── Constructor ──────────────────────────────────────────────────────────
+  // Bug 2: el store nunca limpia mensajeExport por sí solo, así que lo
+  // auto-limpiamos aquí 4s después de que aparezca.
+  constructor() {
+    effect(() => {
+      if (this.mensajeExport()) {
+        if (this.exportTimer !== null) {
+          clearTimeout(this.exportTimer);
+        }
+        this.exportTimer = setTimeout(() => {
+          this.facade.limpiarMensajeExport();
+          this.exportTimer = null;
+        }, 4000);
+      }
+    });
+  }
+
   // ── Lifecycle ────────────────────────────────────────────────────────────
 
   ngOnInit(): void {
@@ -130,6 +149,9 @@ export class ListaPageComponent implements OnInit {
     this.destroyRef.onDestroy(() => {
       if (this.toastTimer !== null) {
         clearTimeout(this.toastTimer);
+      }
+      if (this.exportTimer !== null) {
+        clearTimeout(this.exportTimer);
       }
     });
   }

@@ -350,3 +350,13 @@ export const recargarTrasDesbloquear$ = createEffect(
     ),
   { functional: true },
 );
+
+export const recargarTrasAsignarRol$ = createEffect(
+  (actions$ = inject(Actions)) =>
+    actions$.pipe(
+      ofType(UsuariosActions.asignarRolMasivoExitoso),
+      map(() => UsuariosActions.cargarUsuarios({})),
+    ),
+  { functional: true },
+);
+

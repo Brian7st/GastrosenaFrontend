@@ -121,4 +121,8 @@ bloquearCuenta(id: string): void {
   asignarRolMasivo(request: AsignacionMasivaRequest): void {
     this.store.dispatch(UsuariosActions.asignarRolMasivo({ request }));
   }
+
+  limpiarMensajeExport(): void {
+  this.store.dispatch(UsuariosActions.limpiarMensajeExport());
+}
 }

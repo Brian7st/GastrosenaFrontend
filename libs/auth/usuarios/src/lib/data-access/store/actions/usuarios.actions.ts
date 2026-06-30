@@ -76,6 +76,7 @@ export const UsuariosActions = createActionGroup({
     'Exportar Usuarios':            props<{ config: ExportarConfig }>(),
     'Exportar Usuarios Exitoso':    emptyProps(),
     'Exportar Usuarios Fallido':    props<{ error: string }>(),
+    'Limpiar Mensaje Export':       emptyProps(),
 
     // ── Roles detalle ─────────────────────────────────────────────────────────
     'Cargar Roles Detalle':         emptyProps(),
